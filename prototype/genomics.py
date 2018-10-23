@@ -20,6 +20,7 @@ class GCF(object):
     def __init__(self,gcf_id):
         self.gcf_id = gcf_id
         self.bgc_list = []
+        self.random_gcf = None
 
     def add_bgc(self,bgc):
         self.bgc_list.append(bgc)
@@ -29,6 +30,9 @@ class GCF(object):
             if bgc.strain == strain:
                 return True
         return False
+
+    def add_random(self,strain_list):
+        self.random_gcf = RandomGCF(self,strain_list)
 
 class RandomGCF(object):
     def __init__(self,real_gcf,strain_list):

@@ -14,6 +14,7 @@ class Spectrum(object):
         self.metadata = {}
         self.edges = []
         self.family = None
+        self.random_spectrum = None
 
 
     def get_metadata_value(self,key):
@@ -35,6 +36,10 @@ class Spectrum(object):
     def plot(self,xlim = None,**kwargs):
         plot_spectrum(self.peaks,xlim=xlim,title = "{} {} (m/z= {})".format(self.file_name,self.scan_number,self.parent_mz),**kwargs)
 
+
+    def add_random(self,strain_list):
+    	self.random_spectrum = RandomSpectrum(self,strain_list)
+
     def __str__(self):
         return "Spectrum {} with {} peaks, max_ms2_intensity {}".format(self.spectrum_id,self.n_peaks,self.max_ms2_intensity)
 
@@ -54,11 +59,11 @@ class RandomSpectrum(object):
 
 		self.strain_set = set(np.random.choice(strain_list,n_strains,replace = True))
 
-		def has_strain(self,strain):
-			if strain in self.strain_set:
-				return True
-			else:
-				return False
+	def has_strain(self,strain):
+		if strain in self.strain_set:
+			return True
+		else:
+			return False
 
 def load_spectra(mgf_file):
 	from ms2lda_feature_extraction import LoadMGF
