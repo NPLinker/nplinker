@@ -126,7 +126,7 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list,antismash_dir = N
 
 
 def find_antismash_file(antismash_dir,bgc_name):
-    import glob
+    import glob,os
     subdirs = [s.split(os.sep)[-1] for s in glob.glob(antismash_dir + os.sep+'*')]
     if bgc_name.startswith('BGC'):
         print "No file for MiBIG BGC"
