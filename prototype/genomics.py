@@ -69,7 +69,7 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list):
             for line in reader:
                 metadata[line[0]] = line
 
-    for filename in file_list:
+    for filename in network_file_list:
         with open(filename,'rU') as f:
             reader = csv.reader(f,delimiter = '\t')
             heads = reader.next()
