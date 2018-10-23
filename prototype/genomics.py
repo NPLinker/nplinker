@@ -66,6 +66,7 @@ def loadBGC_from_cluster_files(file_list):
             reader = csv.reader(f)
             heads = reader.next()
             print heads
+    return 1,2,3
 
 def loadBGC_from_node_files(file_list):
     strain_id_dict = {}
