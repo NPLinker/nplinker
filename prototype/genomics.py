@@ -160,6 +160,7 @@ def find_antismash_file(antismash_dir,bgc_name):
         print cluster_names
         print
         print
+        return None
     return antismash_name
 
 def loadBGC_from_node_files(file_list):
