@@ -58,6 +58,8 @@ class MiBIGBGC(BGC):
 def loadBGC_from_cluster_files(network_file_list,ann_file_list):
     strain_id_dict = {}
     strain_dict = {}
+    gcf_dict = {}
+    gcf_list = []
     strain_list = []
     bgc_list = []
     with open('strain_ids.csv','r') as f:
@@ -112,12 +114,18 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list):
                     new_bgc = MiBIGBGC(name,product_prediction)
                 bgc_list.append(new_bgc)
 
+                if not family in gcf_dict:
+                    new_gcf = GCF(family)
+                    gcf_dict[family] = new_gcf
+                    gcf_list.append(new_gcf)
+                gcf_dict[family].add_bgc(new_bgc)
+
 
 
                 
 
 
-    return 1,2,3
+    return gcf_list,bgc_list,strain_list
 
 def loadBGC_from_node_files(file_list):
     strain_id_dict = {}
