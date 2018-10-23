@@ -111,9 +111,7 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list,antismash_dir = N
                 if not strain_name == 'MiBIG':
                     new_bgc = BGC(strain,name,bigscape_class,product_prediction)
                     if antismash_dir:
-                        # antismash_file = name.split()
-                        # add antismash file here -- harder than it ought to be
-                        pass
+                        new_bgc.antismash_file = find_antismash_file(antismash_dir,new_bgc.name)
                 else:
                     new_bgc = MiBIGBGC(name,product_prediction)
                 bgc_list.append(new_bgc)
@@ -124,12 +122,39 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list,antismash_dir = N
                     gcf_list.append(new_gcf)
                 gcf_dict[family].add_bgc(new_bgc)
 
-
-
-                
-
-
     return gcf_list,bgc_list,strain_list
+
+
+def find_antismash_file(antismash_dir,bgc_name):
+    import glob
+    subdirs = [s.split(os.sep)[-1] for s in glob.glob(antismash_dir + os.sep+'*')]
+    if bgc_name.startswith('BGC'):
+        print "No file for MiBIG BGC"
+        return None # MiBIG BGC
+    # this code is nasty... :-)
+    name_tokens = bgc_name.split('_')
+    found = False
+    for i in range(len(name_tokens)):
+        sub_name = '_'.join(name_tokens[:i])
+        if sub_name in subdirs:
+            found = True
+            found_name = sub_name
+    if not found:
+        name_tokens = bgc_name.split('.')[0]
+        for i in range(len(name_tokens)):
+            sub_name = '.'.join(name_tokens[:i])
+            if sub_name in subdirs:
+                found = True
+                found_name = sub_name
+    if not found:
+        print "Can't find antiSMASH info for ",bgc_name
+        return None
+#     print found_name
+    dir_contents = glob.glob(antismash_dir + os.sep + found_name + os.sep + '*.gbk')
+    cluster_names = [d.split('.')[-2] for d in dir_contents]
+    this_name = bgc_name.split('.')[-1]
+    antismash_name = dir_contents[cluster_names.index(bgc_name.split('.')[-1])]
+    return antismash_name
 
 def loadBGC_from_node_files(file_list):
     strain_id_dict = {}
