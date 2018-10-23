@@ -57,6 +57,9 @@ class MiBIGBGC(BGC):
 
 def loadBGC_from_cluster_files(network_file_list,ann_file_list):
     strain_id_dict = {}
+    strain_dict = {}
+    strain_list = []
+    bgc_list = []
     with open('strain_ids.csv','r') as f:
         reader = csv.reader(f)
         for line in reader:
@@ -85,7 +88,32 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list):
                         except:
                             strain_name = strain_id_dict[name.split('.')[0]]
                     except:
-                        print name
+                        print "NO STRAIN"
+                if not strain_name in strain_dict:
+                    new_strain = Strain(strain_name)
+                    strain_dict[strain_name] = new_strain
+                    strain_list.append(new_strain)
+                strain = strain_dict[strain_name]
+                tokens = name.split('.')
+                clusterid = tokens[-1]
+                rest = '.'.join(tokens[:-1])
+
+                metadata_line = metadata[name]
+                description = metadata_line[2]
+                bigscape_class = metadata_line[4]
+                product_prediction = metadata_line[3]
+
+                # make a BGC object
+                # the same BGC objects might be made more than once
+                # because they appear in multiple clusterings
+                if not strain_name == 'MiBIG':
+                    new_bgc = BGC(strain,name,bigscape_class,product_prediction)
+                else:
+                    new_bgc = MiBIGBGC(name,product_prediction)
+                bgc_list.append(new_bgc)
+
+
+
                 
 
 
