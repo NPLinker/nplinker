@@ -83,8 +83,8 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list):
                         strain_name = strain_id_dict[name.split('.')[0]]
                 except:
                     # it's a MiBIG one
-                    print strain_name
                     strain_name = 'MiBIG'
+                print name,strain_name
 
 
     return 1,2,3
