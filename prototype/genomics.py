@@ -55,7 +55,7 @@ class MiBIGBGC(BGC):
         super(MiBIGBGC,self).__init__(None,name,None,product_prediction)
 
 
-def loadBGC_from_cluster_files(network_file_list,ann_file_list):
+def loadBGC_from_cluster_files(network_file_list,ann_file_list,antismash_dir = None):
     strain_id_dict = {}
     strain_dict = {}
     gcf_dict = {}
@@ -110,6 +110,10 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list):
                 # because they appear in multiple clusterings
                 if not strain_name == 'MiBIG':
                     new_bgc = BGC(strain,name,bigscape_class,product_prediction)
+                    if antismash_dir:
+                        # antismash_file = name.split()
+                        # add antismash file here -- harder than it ought to be
+                        pass
                 else:
                     new_bgc = MiBIGBGC(name,product_prediction)
                 bgc_list.append(new_bgc)
