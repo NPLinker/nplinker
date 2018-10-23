@@ -76,15 +76,17 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list):
             for line in reader:
                 name = line[0]
                 family = filename + ":" + line[1]
-                try:
+                if name.startswith("BGC"):
+                    strain_name = MiBIG
+                else:
                     try:
-                        strain_name = strain_id_dict[name.split('_')[0]]
+                        try:
+                            strain_name = strain_id_dict[name.split('_')[0]]
+                        except:
+                            strain_name = strain_id_dict[name.split('.')[0]]
                     except:
-                        strain_name = strain_id_dict[name.split('.')[0]]
-                except:
-                    # it's a MiBIG one
-                    strain_name = 'MiBIG'
-                print name,strain_name
+                        print name
+                
 
 
     return 1,2,3
