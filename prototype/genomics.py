@@ -55,6 +55,18 @@ class MiBIGBGC(BGC):
         super(MiBIGBGC,self).__init__(None,name,None,product_prediction)
 
 
+def loadBGC_from_cluster_files(file_list):
+    strain_id_dict = {}
+    with open('strain_ids.csv','r') as f:
+        reader = csv.reader(f)
+        for line in reader:
+            strain_id_dict[line[0]] = line[1]
+    for filename in file_list:
+        with open(filename,'rU') as f:
+            reader = csv.reader(f)
+            heads = reader.next()
+            print heads
+
 def loadBGC_from_node_files(file_list):
     strain_id_dict = {}
     with open('strain_ids.csv','r') as f:
