@@ -153,7 +153,13 @@ def find_antismash_file(antismash_dir,bgc_name):
     dir_contents = glob.glob(antismash_dir + os.sep + found_name + os.sep + '*.gbk')
     cluster_names = [d.split('.')[-2] for d in dir_contents]
     this_name = bgc_name.split('.')[-1]
-    antismash_name = dir_contents[cluster_names.index(bgc_name.split('.')[-1])]
+    try:
+        antismash_name = dir_contents[cluster_names.index(bgc_name.split('.')[-1])]
+    except:
+        print bgc_name
+        print cluster_names
+        print
+        print
     return antismash_name
 
 def loadBGC_from_node_files(file_list):
