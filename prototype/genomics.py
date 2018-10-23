@@ -77,7 +77,7 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list):
                 name = line[0]
                 family = filename + ":" + line[1]
                 if name.startswith("BGC"):
-                    strain_name = MiBIG
+                    strain_name = 'MiBIG'
                 else:
                     try:
                         try:
