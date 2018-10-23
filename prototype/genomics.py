@@ -67,6 +67,7 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list):
             reader =  csv.reader(f,delimiter = '\t')
             heads = reader.next()
             for line in reader:
+                line.append(a)
                 if line[0] in metadata:
                     print "WHAT?"
                     print '\t',line
