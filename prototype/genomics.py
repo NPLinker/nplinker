@@ -67,19 +67,26 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list):
             reader =  csv.reader(f,delimiter = '\t')
             heads = reader.next()
             for line in reader:
-                line.append(a)
-                if line[0] in metadata:
-                    print "WHAT?"
-                    print '\t',line
-                    print '\t',metadata[line[0]]
-                    print
                 metadata[line[0]] = line
 
-    # for filename in file_list:
-    #     with open(filename,'rU') as f:
-    #         reader = csv.reader(f,delimiter = '\t')
-    #         heads = reader.next()
-    #         print heads
+    for filename in file_list:
+        with open(filename,'rU') as f:
+            reader = csv.reader(f,delimiter = '\t')
+            heads = reader.next()
+            for line in reader:
+                name = line[0]
+                family = filename + ":" + line[1]
+                try:
+                    try:
+                        strain_name = strain_id_dict[name.split('_')[0]]
+                    except:
+                        strain_name = strain_id_dict[name.split('.')[0]]
+                except:
+                    # it's a MiBIG one
+                    print strain_name
+                    strain_name = 'MiBIG'
+
+
     return 1,2,3
 
 def loadBGC_from_node_files(file_list):
