@@ -55,7 +55,7 @@ class MiBIGBGC(BGC):
         super(MiBIGBGC,self).__init__(None,name,None,product_prediction)
 
 
-def loadBGC_from_cluster_files(network_file_list,ann_file_list,antismash_dir = None):
+def loadBGC_from_cluster_files(network_file_list,ann_file_list,antismash_dir = None,antismash_format = 'flat'):
     strain_id_dict = {}
     strain_dict = {}
     gcf_dict = {}
@@ -111,7 +111,10 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list,antismash_dir = N
                 if not strain_name == 'MiBIG':
                     new_bgc = BGC(strain,name,bigscape_class,product_prediction)
                     if antismash_dir:
-                        new_bgc.antismash_file = find_antismash_file(antismash_dir,new_bgc.name)
+                        if antismash_format == 'flat':
+                            new_bgc.antismash_file = find_antismash_file_flat(antismash_dir,new_bgc.name)
+                        else:
+                            new_bgc.antismash_file = find_antismash_file(antismash_dir,new_bgc.name)
                 else:
                     new_bgc = MiBIGBGC(name,product_prediction)
                 bgc_list.append(new_bgc)
@@ -123,6 +126,19 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list,antismash_dir = N
                 gcf_dict[family].add_bgc(new_bgc)
 
     return gcf_list,bgc_list,strain_list
+
+# this is really slow. But hey, it works. Finally.
+def find_antismash_file_flat(antismash_dir,bgc_name):
+    import glob,os
+    all_gbk_files = glob.glob(antismash_dir + os.sep + '*.gbk')
+    last_bit = [o.split(os.sep)[-1] for o in all_gbk_files]
+    bgc_file_name = bgc_name + '.gbk'
+    if bgc_file_name in last_bit:
+        idx = last_bit.index(bgc_file_name)
+        return all_gbk_files[idx]
+    else:
+        print "NOOO",bgc_name
+        return None
 
 
 def find_antismash_file(antismash_dir,bgc_name):
