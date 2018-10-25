@@ -13,7 +13,7 @@ def compute_all_scores(spectra_list,gcf_list,strain_list,scoring_function,do_ran
                 s_random = scoring_function(spectrum.random_spectrum,gcf.random_gcf,strain_list)
             else:
                 s_random = None
-            m_scores[spectrum][gcf] = (s,s_random)
+            m_scores[spectrum][gcf] = (s,s_random,None)
             if s > best:
                 best = s
                 print "Best: ",best
@@ -38,4 +38,11 @@ def metcalf_scoring(spectral_like,gcf_like,strains,both = 10,met_not_gcf = -10,g
     return cum_score
 
 def name_scoring(spectral_like,gcf_like):
-	pass
+	if len(spectral_like.annotations) == 0:
+		return None
+	spectral_annotations = set()
+	for annotation in spectral_like.annotations:
+		spectral_annotations.add(annotation)
+	mibig_bgcs = []
+	for bgc in gcf_like.bgc_list:
+		print type(bgc)
