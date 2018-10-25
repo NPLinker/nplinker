@@ -64,9 +64,9 @@ def match(spectral_annotation,mibig_name):
 	metadata = None
 	for name,source in spectral_annotation:
 		for m_name in mibig_name:
-			name.lower() == m_name.split()[0].lower():
-			metadata = (name,m_name)
-			return metadata
+			if name.lower() == m_name.split()[0].lower():
+				metadata = (name,m_name)
+				return metadata
 	return False
 
 
