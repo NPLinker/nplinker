@@ -15,6 +15,12 @@ class Spectrum(object):
         self.edges = []
         self.family = None
         self.random_spectrum = None
+        self.annotations = []
+
+    def annotation_from_metadata(self):
+    	annotation = self.get_metadata_value('LibraryID')
+    	if annotation:
+    		self.annotations.append((annotation,'gnps'))
 
 
     def get_metadata_value(self,key):
@@ -105,6 +111,7 @@ def load_metadata(spectra,metadata_file):
 					if value == 'N/A':
 						value = None
 				spectrum.metadata[key] = value
+	spectra.annotation_from_metadata()
 
 def load_edges(spectra,edge_file):
 	spec_dict = {}
