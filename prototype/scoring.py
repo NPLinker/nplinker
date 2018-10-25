@@ -39,6 +39,7 @@ def metcalf_scoring(spectral_like,gcf_like,strains,both = 10,met_not_gcf = -10,g
 
 def name_scoring(spectral_like,gcf_like,mibig_map):
 	score = 0
+	metadata = None
 	if len(spectral_like.annotations) == 0:
 		print "No annotations"
 		return None
