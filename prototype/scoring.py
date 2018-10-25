@@ -76,7 +76,7 @@ def knownclusterblast_scoring(spectral_like,gcf_like,mibig_map):
         print "No annotations"
         return None
     kcb = []
-    for bgc in gcf.bgc_list:
+    for bgc in gcf_like.bgc_list:
         if hasattr(bgc,'metadata'):
             these = bgc.metadata.get('knownclusterblast',None)
             if these:
