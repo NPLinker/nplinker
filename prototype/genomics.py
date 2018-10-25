@@ -311,3 +311,17 @@ def load_mibig_map(filename = 'mibig_gnps_links_q3_loose.csv'):
             else:
                 mibig_map[bgc] = [line[3]]
     return mibig_map
+
+
+def load_mibig_library_json(mibig_json_directory):
+    import glob,os,json
+    mibig = {}
+    files = glob.glob(mibig_json_directory + os.sep + '*.json')
+    print "Found {} files".format(len(files))
+    for file in files:
+        with open(file,'r') as f:
+            bgc_id = file.split(os.sep)[-1].split('.')[0]
+            mibig[bgc_id] = json.load(f)
+    return mibig
+
+

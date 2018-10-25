@@ -2,6 +2,7 @@ appnope==0.1.0
 backports-abc==0.5
 backports.functools-lru-cache==1.5
 backports.shutil-get-terminal-size==1.0.0
+biopython==1.72
 bleach==3.0.2
 configparser==3.5.0
 cycler==0.10.0
@@ -32,6 +33,7 @@ notebook==5.7.0
 numpy==1.15.2
 pandocfilters==1.4.2
 pathlib2==2.3.2
+pbr==4.2.0
 pexpect==4.6.0
 pickleshare==0.7.5
 prometheus-client==0.4.2
@@ -48,11 +50,15 @@ Send2Trash==1.5.0
 simplegeneric==0.8.1
 singledispatch==3.4.0.3
 six==1.11.0
+stevedore==1.29.0
 subprocess32==3.5.3
 terminado==0.8.1
 testpath==0.4.2
 tornado==5.1.1
 traitlets==4.3.2
+virtualenv==16.0.0
+virtualenv-clone==0.3.0
+virtualenvwrapper==4.8.2
 wcwidth==0.1.7
 webencodings==0.5.1
 widgetsnbextension==3.4.2
