@@ -111,7 +111,7 @@ def load_metadata(spectra,metadata_file):
 					if value == 'N/A':
 						value = None
 				spectrum.metadata[key] = value
-	spectra.annotation_from_metadata()
+			spectrum.annotation_from_metadata()
 
 def load_edges(spectra,edge_file):
 	spec_dict = {}
