@@ -51,6 +51,7 @@ def name_scoring(spectral_like,gcf_like,mibig_map):
 	for annotation in spectral_annotations:
 		for mibig in mibig_bgcs:
 			short_mibig = mibig.split('.')[0]
+			print short_mibig
 			if short_mibig in mibig_map:
 				print annotation,mibig_map[short_mibig]
 
