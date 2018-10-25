@@ -1,6 +1,8 @@
 import csv,glob
 import numpy as np
 
+import aa_pred
+
 
 class Strain(object):
     def __init__(self,name):
@@ -14,8 +16,23 @@ class BGC(object):
         self.name = name
         self.bigscape_class = bigscape_class
         self.product_prediction = product_prediction
+
+        self.antismash_file = None
+        self._aa_predictions = None
+
     def __str__(self):
         return self.name + "(" + str(self.strain) + ")"
+
+    @property
+    def aa_predictions(self):
+        # Load aa predictions and cache them
+        if self._aa_predictions is None:
+            self._aa_predictions = []
+            if self.antismash_file is not None:
+                for p in aa_pred.predict_aa(self.antismash_file):
+                    self._aa_predictions.append(p)
+        return self._aa_predictions
+
 
 class GCF(object):
     def __init__(self,gcf_id):
@@ -23,7 +40,9 @@ class GCF(object):
         self.bgc_list = []
         self.random_gcf = None
 
-    def add_bgc(self,bgc):
+        self._aa_predictions = None
+
+    def add_bgc(self, bgc):
         self.bgc_list.append(bgc)
 
     def has_strain(self,strain):
@@ -41,6 +60,33 @@ class GCF(object):
             if type(bgc) == MiBIGBGC:
                 mibig.append(bgc)
         return mibig
+
+    @property
+    def aa_predictions(self):
+        """
+        Return the predicted AAs for the GCF
+        """
+        if self._aa_predictions is None:
+            # Make sure that we record a 0 probability if an AA is predicted
+            # for _some_ but not _all_ BGCs in a GCF
+            bgc_aa_prob = {}
+
+            for bgc_count, bgc in enumerate(self.bgc_list):
+                for aa, p_aa in bgc.aa_predictions:
+                    # If we come across a new AA, set it to zero for all previous BGCs
+                    if aa not in bgc_aa_prob:
+                        aa_prob = [0.0]
+                        bgc_aa_prob[aa] = aa_prob
+                    bgc_aa_prob[aa].append(p_aa)
+
+            for aa in bgc_aa_prob.keys():
+                # Replace the prob list with the mean
+                bgc_aa_prob[aa] = np.mean(bgc_aa_prob[aa])
+
+            self._aa_predictions = bgc_aa_prob.items()
+
+        return self._aa_predictions
+
 
 class RandomGCF(object):
     def __init__(self,real_gcf,strain_list):
