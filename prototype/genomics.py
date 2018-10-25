@@ -35,8 +35,8 @@ class GCF(object):
         self.random_gcf = RandomGCF(self,strain_list)
     def get_mibig_bgcs(self):
         mibig = []
-        for bgc in bgc_list:
-            if type(bgc) == MiBIGBGC:
+        for bgc in self.bgc_list:
+            if type(bgc) == genomics.MiBIGBGC:
                 mibig.append(bgc)
         return mibig
 
