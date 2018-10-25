@@ -88,7 +88,7 @@ def knownclusterblast_scoring(spectral_like,gcf_like,mibig_map):
     total_score = 0
     for annotation in spectral_like.annotations:
         for mibig,score in kcb:
-            short_mibig = mibig.name.split('_')[0]
+            short_mibig = mibig.split('_')[0]
             if short_mibig in mibig_map:
                 m = match(annotation,mibig_map[short_mibig])
                 if m:
