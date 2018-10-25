@@ -38,6 +38,7 @@ def metcalf_scoring(spectral_like,gcf_like,strains,both = 10,met_not_gcf = -10,g
     return cum_score
 
 def name_scoring(spectral_like,gcf_like,mibig_map):
+	score = 0
 	if len(spectral_like.annotations) == 0:
 		print "No annotations"
 		return None
@@ -53,5 +54,19 @@ def name_scoring(spectral_like,gcf_like,mibig_map):
 			short_mibig = mibig.name.split('.')[0]
 			print short_mibig
 			if short_mibig in mibig_map:
-				print annotation,mibig_map[short_mibig]
+				m = match(annotation,mibig_map[short_mibig])
+				if m:
+					metadata = m
+					score += 100
+	return (score,None,metadata)
+
+def match(spectral_annotation,mibig_name):
+	metadata = None
+	for name,source in spectral_annotation:
+		for m_name in mibig_name:
+			name.lower() == m_name.split()[0].lower():
+			metadata = (name,m_name)
+			return metadata
+	return False
+
 
