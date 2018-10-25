@@ -39,12 +39,14 @@ def metcalf_scoring(spectral_like,gcf_like,strains,both = 10,met_not_gcf = -10,g
 
 def name_scoring(spectral_like,gcf_like,strains):
 	if len(spectral_like.annotations) == 0:
+		print "No annotations"
 		return None
 	spectral_annotations = set()
 	for annotation in spectral_like.annotations:
 		spectral_annotations.add(annotation)
 	mibig_bgcs = gcf_like.get_mibig_bgcs()
 	if len(mibig_bgcs) == 0:
+		print "no mibig"
 		return None
 	for annotation in spectral_annotations:
 		for mibig in mibig_bgcs:
