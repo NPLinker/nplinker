@@ -93,4 +93,5 @@ def knownclusterblast_scoring(spectral_like,gcf_like,mibig_map):
                 if m:
                     metadata = m
                     total_score += int(score)
+                    print m
     return total_score,metadata
