@@ -50,6 +50,7 @@ def name_scoring(spectral_like,gcf_like,mibig_map):
 	if len(mibig_bgcs) == 0:
 		print "no mibig"
 		return None
+	print spectral_annotations
 	for annotation in spectral_annotations:
 		for mibig in mibig_bgcs:
 			short_mibig = mibig.name.split('.')[0]
