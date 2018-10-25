@@ -257,7 +257,7 @@ def load_mibig_map(filename = 'mibig_gnps_links_q3_loose.csv'):
     with open(filename,'rU') as f:
         reader = csv.reader(f)
         heads = reader.next()
-        print heads
+        
         for line in reader:
             bgc = line[0]
             if bgc in mibig_map:
