@@ -46,4 +46,7 @@ def name_scoring(spectral_like,gcf_like,strains):
 	mibig_bgcs = gcf_like.get_mibig_bgcs()
 	if len(mibig_bgcs) == 0:
 		return None
+	for annotation in spectral_annotations:
+		for mibig in mibig_bgcs:
+			print annotation,mibig
 
