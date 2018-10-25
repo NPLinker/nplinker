@@ -16,4 +16,7 @@ def get_known_cluster_blast(bgc):
 						bgc_name = tokens[0].split('.')[1].strip()
 						similarity = tokens[1].split('(')[1].split('%')[0]
 						hits.append((bgc_name,similarity))
-	bgc.metadata['knownclusterblast'] = hits
+	if hasattr(bgc,'metadata'):
+		bgc.metadata['knownclusterblast'] = hits
+	else:
+		bgc.metadata = {'knownclusterblast': hits}
