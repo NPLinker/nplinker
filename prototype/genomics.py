@@ -253,8 +253,15 @@ def loadBGC_from_node_files(file_list):
     
 
 def load_mibig_map(filename = 'mibig_gnps_links_q3_loose.csv'):
+    mibig_map = {}
     with open(filename,'rU') as f:
         reader = csv.reader(f)
         heads = reader.next()
+        print heads
         for line in reader:
-            print line
+            bgc = line[0]
+            if bgc in mibig_map:
+                mibig_map[bgc].append(line[3])
+            else:
+                mibig_map[bgc] = [line[3]]
+    return mibig_map
