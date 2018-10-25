@@ -8,12 +8,12 @@ def compute_all_scores(spectra_list,gcf_list,strain_list,scoring_function,do_ran
         if i % 100 == 0:
             print "Done {} of {}".format(i,len(spectra_list))
         for gcf in gcf_list:
-            s = scoring_function(spectrum,gcf,strain_list)
+            s,metadata = scoring_function(spectrum,gcf,strain_list)
             if do_random:
-                s_random = scoring_function(spectrum.random_spectrum,gcf.random_gcf,strain_list)
+                s_random,_ = scoring_function(spectrum.random_spectrum,gcf.random_gcf,strain_list)
             else:
                 s_random = None
-            m_scores[spectrum][gcf] = (s,s_random,None)
+            m_scores[spectrum][gcf] = (s,s_random,metadata)
             if s > best:
                 best = s
                 print "Best: ",best
@@ -24,18 +24,20 @@ def compute_all_scores(spectra_list,gcf_list,strain_list,scoring_function,do_ran
 
 def metcalf_scoring(spectral_like,gcf_like,strains,both = 10,met_not_gcf = -10,gcf_not_met = 0,neither = 1):
     cum_score = 0
+    shared_strains = set()
     for strain in strains:
         in_spec = spectral_like.has_strain(strain)
         in_gcf = gcf_like.has_strain(strain)
         if in_spec and in_gcf:
             cum_score += both
+            shared_strains.add(strain)
         if in_spec and not in_gcf:
             cum_score += met_not_gcf
         if in_gcf and not in_spec:
             cum_score += gcf_not_met
         if not in_gcf and not in_spec:
             cum_score += 1
-    return cum_score
+    return cum_score,shared_strains
 
 def name_scoring(spectral_like,gcf_like,mibig_map):
 	score = 0
@@ -55,7 +57,7 @@ def name_scoring(spectral_like,gcf_like,mibig_map):
 				if m:
 					metadata = m
 					score += 100
-	return (score,None,metadata)
+	return (score,metadata)
 
 def match(spectral_annotation,mibig_name):
 	metadata = None
