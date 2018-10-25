@@ -33,6 +33,12 @@ class GCF(object):
 
     def add_random(self,strain_list):
         self.random_gcf = RandomGCF(self,strain_list)
+    def get_mibig_bgcs(self):
+        mibig = []
+        for bgc in bgc_list:
+            if type(bgc) == MiBIGBGC:
+                mibig.append(bgc)
+        return mibig
 
 class RandomGCF(object):
     def __init__(self,real_gcf,strain_list):
