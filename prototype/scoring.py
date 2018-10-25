@@ -44,11 +44,11 @@ def name_scoring(spectral_like,gcf_like,mibig_map):
 	metadata = None
 	if len(spectral_like.annotations) == 0:
 		print "No annotations"
-		return None
+		return None,None
 	mibig_bgcs = gcf_like.get_mibig_bgcs()
 	if len(mibig_bgcs) == 0:
 		print "no mibig"
-		return None
+		return None,None
 	for annotation in spectral_like.annotations:
 		for mibig in mibig_bgcs:
 			short_mibig = mibig.name.split('.')[0]
@@ -74,7 +74,7 @@ def knownclusterblast_scoring(spectral_like,gcf_like,mibig_map):
     metadata = None
     if len(spectral_like.annotations) == 0:
         print "No annotations"
-        return None
+        return None,None
     kcb = []
     for bgc in gcf_like.bgc_list:
         if hasattr(bgc,'metadata'):
@@ -84,7 +84,7 @@ def knownclusterblast_scoring(spectral_like,gcf_like,mibig_map):
                     kcb.append((mibig,score))
     if len(kcb) == 0:
         print "No KCB"
-        return None
+        return None,None
     total_score = 0
     for annotation in spectral_like.annotations:
         for mibig,score in kcb:
