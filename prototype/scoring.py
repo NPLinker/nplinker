@@ -20,6 +20,7 @@ def compute_all_scores(spectra_list,gcf_list,strain_list,scoring_function,do_ran
             if s_random > best_random:
                 best_random = s_random
                 print "Best random: ",best_random
+    return m_scores
 
 def metcalf_scoring(spectral_like,gcf_like,strains,both = 10,met_not_gcf = -10,gcf_not_met = 0,neither = 1):
     cum_score = 0
