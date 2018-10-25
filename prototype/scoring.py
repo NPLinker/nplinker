@@ -83,7 +83,6 @@ def knownclusterblast_scoring(spectral_like,gcf_like,mibig_map):
                 for mibig,score in these:
                     kcb.append((mibig,score))
     if len(kcb) == 0:
-        print "No KCB"
         return None,None
     total_score = 0
     for annotation in spectral_like.annotations:
@@ -93,5 +92,5 @@ def knownclusterblast_scoring(spectral_like,gcf_like,mibig_map):
                 m = match(annotation,mibig_map[short_mibig])
                 if m:
                     metadata = m
-                    total_score += score
+                    total_score += int(score)
     return total_score,metadata
