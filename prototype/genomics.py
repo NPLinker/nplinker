@@ -36,7 +36,7 @@ class GCF(object):
     def get_mibig_bgcs(self):
         mibig = []
         for bgc in self.bgc_list:
-            if type(bgc) == genomics.MiBIGBGC:
+            if type(bgc) == MiBIGBGC:
                 mibig.append(bgc)
         return mibig
 
