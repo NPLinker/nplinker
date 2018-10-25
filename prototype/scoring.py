@@ -37,7 +37,7 @@ def metcalf_scoring(spectral_like,gcf_like,strains,both = 10,met_not_gcf = -10,g
             cum_score += 1
     return cum_score
 
-def name_scoring(spectral_like,gcf_like):
+def name_scoring(spectral_like,gcf_like,strains):
 	if len(spectral_like.annotations) == 0:
 		return None
 	spectral_annotations = set()
