@@ -50,7 +50,6 @@ def name_scoring(spectral_like,gcf_like,mibig_map):
 	for annotation in spectral_like.annotations:
 		for mibig in mibig_bgcs:
 			short_mibig = mibig.name.split('.')[0]
-			print short_mibig
 			if short_mibig in mibig_map:
 				m = match(annotation,mibig_map[short_mibig])
 				if m:
@@ -63,6 +62,7 @@ def match(spectral_annotation,mibig_name):
 	name,source = spectral_annotation
 	for m_name in mibig_name:
 		if name.lower() == m_name.split()[0].lower():
+			print name,m_name
 			metadata = (name,m_name)
 			return metadata
 	return False
