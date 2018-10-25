@@ -1,6 +1,7 @@
 import csv,glob
 import numpy as np
 
+
 class Strain(object):
     def __init__(self,name):
         self.name = name
@@ -33,7 +34,7 @@ class GCF(object):
 
     def add_random(self,strain_list):
         self.random_gcf = RandomGCF(self,strain_list)
-        
+
     def get_mibig_bgcs(self):
         mibig = []
         for bgc in self.bgc_list:
@@ -251,3 +252,9 @@ def loadBGC_from_node_files(file_list):
     return gcf_list,bgc_list,strain_list
     
 
+def load_mibig_map(filename = 'mibig_gnps_links_q3_loose.csv'):
+    with open(filename,'rU') as f:
+        reader = csv.reader(f)
+        heads = reader.next()
+        for line in reader:
+            print line
