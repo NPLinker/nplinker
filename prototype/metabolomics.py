@@ -1,5 +1,7 @@
-from nplinker_constants import LDA_PATH
+import csv
 import numpy as np
+
+from nplinker_constants import LDA_PATH
 
 class Spectrum(object):
     def __init__(self,peaks,spectrum_id,precursor_mz,parent_mz = None,rt = None):
@@ -16,6 +18,8 @@ class Spectrum(object):
         self.family = None
         self.random_spectrum = None
         self.annotations = []
+
+        self._losses = None
 
     def annotation_from_metadata(self):
     	annotation = self.get_metadata_value('LibraryID')
@@ -54,6 +58,44 @@ class Spectrum(object):
             return 1
         else:
             return -1
+
+    @property
+    def losses(self):
+        """
+        All mass shifts in the spectrum, and the indices of the peaks
+        """
+        if self._losses is None:
+            # populate loss table
+            losses = []
+            for i in xrange(len(self.peaks)):
+                for j in xrange(i):
+                    loss = self.peaks[i][0] - self.peaks[j][0]
+                    losses.append((loss, i, j))
+            # Sort by loss
+            losses.sort(key=lambda x: x[0])
+            self._losses = losses
+        return self._losses
+
+    def has_loss(self, mass, tol):
+        """
+        Check if the scan has the specified loss (within tolerance)
+        """
+        matched_losses = []
+
+        idx = 0
+        # Check losses in range [0, mass]
+        while idx < len(self.losses) and self.losses[idx][0] <= mass:
+            if mass - self.losses[idx][0] < tol:
+                matched_losses.append(self.losses[idx])
+            idx += 1
+
+        # Add all losses in range [mass, mass+tol(
+        while idx < len(self.losses) and self.losses[idx][0] < mass + tol:
+            matched_losses.append(self.losses[idx])
+            idx += 1
+
+        return matched_losses
+
 
 class RandomSpectrum(object):
 	def __init__(self,real_spectrum,strain_list):
@@ -118,7 +160,6 @@ def load_edges(spectra,edge_file):
 	for spec in spectra:
 		spec_dict[spec.spectrum_id] = spec
 
-	import csv
 
 	with open(edge_file,'rU') as f:
 		reader = csv.reader(f,delimiter='\t')
@@ -185,3 +226,20 @@ def make_families(spectra):
 			else:
 				family_dict[family_id].add_spectrum(spectrum)
 	return families
+
+
+def read_aa_losses(filename):
+    """
+    Read AA losses from data file. (assume fixed structure...)
+    """
+    aa_list = []
+    with open(filename, 'rU') as f:
+        reader = csv.reader(f, delimiter=',')
+        header = reader.next()
+        for line in reader:
+            aa_id = line[1]
+            aa_mono = float(line[4])
+            aa_avg = float(line[5])
+            aa_list.append((aa_id, aa_mono, aa_avg))
+
+    return aa_list
