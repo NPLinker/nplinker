@@ -1,12 +1,46 @@
+import multiprocessing, time
+import numpy as np
 
-def compute_all_scores(spectra_list,gcf_list,strain_list,scoring_function,do_random = True):
+def compute_all_scores_multi(spectra_list, gcf_list, strain_list, scoring_function, do_random=True):
+    cpus = 10 # TODO get num available from psutil
+    spectra_part_list = np.array_split(spectra_list, cpus)
+
+    q = multiprocessing.Queue()
+    procs = []
+    for i in range(cpus):
+        if len(spectra_part_list[i]) == 0:
+            continue
+
+        p = multiprocessing.Process(target=compute_all_scores, args=(spectra_part_list[i], gcf_list, strain_list, scoring_function, do_random, q))
+        procs.append(p)
+
+    for p in procs:
+        p.start()
+
+    m_scores = {}
+
+    t = time.time()
+    num_finished = 0
+    while num_finished < len(procs):
+        data = q.get()
+        m_scores.update(data)
+        num_finished += 1
+
+    print('Total time: {:.1f}, {:.1f}/s'.format(time.time() - t, len(spectra_list) / (time.time() - t)))
+    for p in procs:
+        p.join()
+
+    return m_scores
+
+def compute_all_scores(spectra_list,gcf_list,strain_list,scoring_function,do_random = True, q=None):
     m_scores = {}
     best = 0
     best_random = 0
+
     for i,spectrum in enumerate(spectra_list):
         m_scores[spectrum] = {}
         if i % 100 == 0:
-            print "Done {} of {}".format(i,len(spectra_list))
+            print("Done {} of {}".format(i,len(spectra_list)))
         for gcf in gcf_list:
             s,metadata = scoring_function(spectrum,gcf,strain_list)
             if do_random:
@@ -16,10 +50,14 @@ def compute_all_scores(spectra_list,gcf_list,strain_list,scoring_function,do_ran
             m_scores[spectrum][gcf] = (s,s_random,metadata)
             if s > best:
                 best = s
-                print "Best: ",best
+                print("Best: ",best)
             if s_random > best_random:
                 best_random = s_random
-                print "Best random: ",best_random
+                print("Best random: ",best_random)
+
+    if q is not None:
+        q.put(m_scores)
+
     return m_scores
 
 def metcalf_scoring(spectral_like,gcf_like,strains,both = 10,met_not_gcf = -10,gcf_not_met = 0,neither = 1):
