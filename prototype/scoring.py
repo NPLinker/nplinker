@@ -1,4 +1,6 @@
 import multiprocessing, time
+
+import psutil
 import numpy as np
 
 def compute_all_scores_multi(spectra_list, gcf_list, strain_list, scoring_function, do_random=True, cpus=8):
@@ -11,7 +13,7 @@ def compute_all_scores_multi(spectra_list, gcf_list, strain_list, scoring_functi
         if len(spectra_part_list[i]) == 0:
             continue
 
-        p = multiprocessing.Process(target=compute_all_scores, args=(spectra_part_list[i], gcf_list, strain_list, scoring_function, do_random, q))
+        p = multiprocessing.Process(target=compute_all_scores, args=(spectra_part_list[i], gcf_list, strain_list, scoring_function, do_random, q, i))
         procs.append(p)
 
     for p in procs:
@@ -32,10 +34,13 @@ def compute_all_scores_multi(spectra_list, gcf_list, strain_list, scoring_functi
 
     return m_scores
 
-def compute_all_scores(spectra_list,gcf_list,strain_list,scoring_function,do_random = True, q=None):
+def compute_all_scores(spectra_list,gcf_list,strain_list,scoring_function,do_random = True, q=None, cpu_aff=None):
     m_scores = {}
     best = 0
     best_random = 0
+
+    if cpu_aff is not None:
+        psutil.Process().cpu_affinity([cpu_aff])
 
     for i,spectrum in enumerate(spectra_list):
         m_scores[spectrum] = {}
