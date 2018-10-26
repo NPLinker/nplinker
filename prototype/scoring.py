@@ -1,8 +1,8 @@
 import multiprocessing, time
 import numpy as np
 
-def compute_all_scores_multi(spectra_list, gcf_list, strain_list, scoring_function, do_random=True):
-    cpus = 10 # TODO get num available from psutil
+def compute_all_scores_multi(spectra_list, gcf_list, strain_list, scoring_function, do_random=True, cpus=8):
+    # TODO get num CPUs available from psutil
     spectra_part_list = np.array_split(spectra_list, cpus)
 
     q = multiprocessing.Queue()
