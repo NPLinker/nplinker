@@ -79,11 +79,11 @@ class GCF(object):
                         bgc_aa_prob[aa] = aa_prob
                     bgc_aa_prob[aa].append(p_aa)
 
-            for aa in bgc_aa_prob.keys():
+            for aa in list(bgc_aa_prob.keys()):
                 # Replace the prob list with the mean
                 bgc_aa_prob[aa] = np.mean(bgc_aa_prob[aa])
 
-            self._aa_predictions = bgc_aa_prob.items()
+            self._aa_predictions = list(bgc_aa_prob.items())
 
         return self._aa_predictions
 
@@ -124,14 +124,14 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list,antismash_dir = N
     for a in ann_file_list:
         with open(a,'rU') as f:
             reader =  csv.reader(f,delimiter = '\t')
-            heads = reader.next()
+            heads = next(reader)
             for line in reader:
                 metadata[line[0]] = line
 
     for filename in network_file_list:
         with open(filename,'rU') as f:
             reader = csv.reader(f,delimiter = '\t')
-            heads = reader.next()
+            heads = next(reader)
             for line in reader:
                 name = line[0]
                 family = filename + ":" + line[1]
@@ -144,7 +144,7 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list,antismash_dir = N
                         except:
                             strain_name = strain_id_dict[name.split('.')[0]]
                     except:
-                        print "NO STRAIN"
+                        print("NO STRAIN")
                 if not strain_name in strain_dict:
                     new_strain = Strain(strain_name)
                     strain_dict[strain_name] = new_strain
@@ -191,7 +191,7 @@ def find_antismash_file_flat(antismash_dir,bgc_name):
         idx = last_bit.index(bgc_file_name)
         return all_gbk_files[idx]
     else:
-        print "NOOO",bgc_name
+        print("NOOO",bgc_name)
         return None
 
 
@@ -199,7 +199,7 @@ def find_antismash_file(antismash_dir,bgc_name):
     import glob,os
     subdirs = [s.split(os.sep)[-1] for s in glob.glob(antismash_dir + os.sep+'*')]
     if bgc_name.startswith('BGC'):
-        print "No file for MiBIG BGC"
+        print("No file for MiBIG BGC")
         return None # MiBIG BGC
     # this code is nasty... :-)
     name_tokens = bgc_name.split('_')
@@ -217,7 +217,7 @@ def find_antismash_file(antismash_dir,bgc_name):
                 found = True
                 found_name = sub_name
     if not found:
-        print "Can't find antiSMASH info for ",bgc_name
+        print("Can't find antiSMASH info for ",bgc_name)
         return None
 #     print found_name
     dir_contents = glob.glob(antismash_dir + os.sep + found_name + os.sep + '*.gbk')
@@ -226,10 +226,10 @@ def find_antismash_file(antismash_dir,bgc_name):
     try:
         antismash_name = dir_contents[cluster_names.index(bgc_name.split('.')[-1])]
     except:
-        print bgc_name
-        print cluster_names
-        print
-        print
+        print(bgc_name)
+        print(cluster_names)
+        print()
+        print()
         return None
     return antismash_name
 
@@ -248,7 +248,7 @@ def loadBGC_from_node_files(file_list):
     for filename in file_list:
         with open(filename,'rU') as f:
             reader = csv.reader(f)
-            heads = reader.next()
+            heads = next(reader)
             name_pos = heads.index("shared name")
             description_pos = heads.index("Description")
             bigscape_class_pos = heads.index("BiG-SCAPE class")
@@ -302,7 +302,7 @@ def load_mibig_map(filename = 'mibig_gnps_links_q3_loose.csv'):
     mibig_map = {}
     with open(filename,'rU') as f:
         reader = csv.reader(f)
-        heads = reader.next()
+        heads = next(reader)
         
         for line in reader:
             bgc = line[0]
@@ -317,7 +317,7 @@ def load_mibig_library_json(mibig_json_directory):
     import glob,os,json
     mibig = {}
     files = glob.glob(mibig_json_directory + os.sep + '*.json')
-    print "Found {} files".format(len(files))
+    print("Found {} files".format(len(files)))
     for file in files:
         with open(file,'r') as f:
             bgc_id = file.split(os.sep)[-1].split('.')[0]

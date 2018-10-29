@@ -38,10 +38,10 @@ class Spectrum(object):
     	return False
 
     def print_spectrum(self):
-        print
-        print self.file_name,self.spectrum_id
+        print()
+        print(self.file_name,self.spectrum_id)
         for i,(mz,intensity) in enumerate(self.peaks):
-            print i,mz,intensity,self.normalised_peaks[i][1]
+            print(i,mz,intensity,self.normalised_peaks[i][1])
 
     def plot(self,xlim = None,**kwargs):
         plot_spectrum(self.peaks,xlim=xlim,title = "{} {} (m/z= {})".format(self.file_name,self.scan_number,self.parent_mz),**kwargs)
@@ -67,8 +67,8 @@ class Spectrum(object):
         if self._losses is None:
             # populate loss table
             losses = []
-            for i in xrange(len(self.peaks)):
-                for j in xrange(i):
+            for i in range(len(self.peaks)):
+                for j in range(i):
                     loss = self.peaks[i][0] - self.peaks[j][0]
                     losses.append((loss, i, j))
             # Sort by loss
@@ -116,7 +116,7 @@ class RandomSpectrum(object):
 def load_spectra(mgf_file):
 	from ms2lda_feature_extraction import LoadMGF
 	ms1,ms2,metadata = LoadMGF(name_field = 'scans').load_spectra([mgf_file])
-	print "Loaded {} molecules".format(len(ms1))
+	print("Loaded {} molecules".format(len(ms1)))
 	return mols_to_spectra(ms2,metadata)
 
 def mols_to_spectra(ms2,metadata):
@@ -142,7 +142,7 @@ def load_metadata(spectra,metadata_file):
 	import csv
 	with open(metadata_file,'rU') as f:
 		reader = csv.reader(f,delimiter='\t')
-		heads = reader.next()
+		heads = next(reader)
 		for line in reader:
 			spectrum = spec_dict[line[0]]
 			for i,value in enumerate(line):
@@ -163,7 +163,7 @@ def load_edges(spectra,edge_file):
 
 	with open(edge_file,'rU') as f:
 		reader = csv.reader(f,delimiter='\t')
-		heads = reader.next()
+		heads = next(reader)
 		for line in reader:
 			spec1_id = line[0]
 			spec2_id = line[1]
@@ -235,7 +235,7 @@ def read_aa_losses(filename):
     aa_list = []
     with open(filename, 'rU') as f:
         reader = csv.reader(f, delimiter=',')
-        header = reader.next()
+        header = next(reader)
         for line in reader:
             aa_id = line[1]
             aa_mono = float(line[4])
