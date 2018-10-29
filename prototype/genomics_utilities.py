@@ -3,7 +3,7 @@ def get_known_cluster_blast(bgc):
 	if hasattr(bgc,'antismash_file'):		
 		bgc_file = bgc.antismash_file
 		if not bgc_file:
-			print "No antismash file in {}".format(bgc)
+			print("No antismash file in {}".format(bgc))
 			return None
 		records = list(SeqIO.parse(bgc.antismash_file,'genbank'))
 		hits = []
