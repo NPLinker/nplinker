@@ -1,4 +1,4 @@
-import csv,glob
+import csv, glob, os
 import numpy as np
 
 import aa_pred
@@ -166,7 +166,11 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list,antismash_dir = N
                     new_bgc = BGC(strain,name,bigscape_class,product_prediction)
                     if antismash_dir:
                         if antismash_format == 'flat':
-                            new_bgc.antismash_file = find_antismash_file_flat(antismash_dir,new_bgc.name)
+                            antismash_filename = os.path.join(antismash_dir, new_bgc.name + '.gbk')
+                            if not os.path.exists(antismash_filename):
+                                print('Error: missing antismash file: {}'.format(antismash_filename))
+                                return None, None, None
+                            new_bgc.antismash_file = antismash_filename
                         else:
                             new_bgc.antismash_file = find_antismash_file(antismash_dir,new_bgc.name)
                 else:
