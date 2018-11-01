@@ -232,7 +232,7 @@ def read_aa_losses(filename):
     """
     Read AA losses from data file. (assume fixed structure...)
     """
-    aa_list = []
+    aa_losses = {}
     with open(filename, 'rU') as f:
         reader = csv.reader(f, delimiter=',')
         header = next(reader)
@@ -240,6 +240,6 @@ def read_aa_losses(filename):
             aa_id = line[1]
             aa_mono = float(line[4])
             aa_avg = float(line[5])
-            aa_list.append((aa_id, aa_mono, aa_avg))
+            aa_losses[aa_id.lower()] = (aa_mono, aa_avg)
 
-    return aa_list
+    return aa_losses
