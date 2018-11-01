@@ -19,6 +19,7 @@ class BGC(object):
 
         self.antismash_file = None
         self._aa_predictions = None
+        self._known_cluster_blast = None
 
     def __str__(self):
         return self.name + "(" + str(self.strain) + ")"
@@ -32,6 +33,13 @@ class BGC(object):
                 for p in aa_pred.predict_aa(self.antismash_file):
                     self._aa_predictions.append(p)
         return self._aa_predictions
+
+    @property
+    def known_cluster_blast(self):
+        if self._known_cluster_blast is None:
+            from genomics_utilities import get_known_cluster_blast
+            self._known_cluster_blast = get_known_cluster_blast(self)
+        return self._known_cluster_blast
 
 
 class GCF(object):
@@ -109,7 +117,7 @@ class MiBIGBGC(BGC):
         super(MiBIGBGC,self).__init__(None,name,None,product_prediction)
 
 
-def loadBGC_from_cluster_files(network_file_list,ann_file_list,antismash_dir = None,antismash_format = 'flat'):
+def loadBGC_from_cluster_files(network_file_list,ann_file_list,antismash_dir = None,antismash_format = 'flat',mibig_bgc_dict = None):
     strain_id_dict = {}
     strain_dict = {}
     gcf_dict = {}
@@ -173,9 +181,15 @@ def loadBGC_from_cluster_files(network_file_list,ann_file_list,antismash_dir = N
                             new_bgc.antismash_file = antismash_filename
                         else:
                             new_bgc.antismash_file = find_antismash_file(antismash_dir,new_bgc.name)
+                    bgc_list.append(new_bgc)
                 else:
-                    new_bgc = MiBIGBGC(name,product_prediction)
-                bgc_list.append(new_bgc)
+                    if mibig_bgc_dict:
+                        try:
+                            new_bgc = mibig_bgc_dict[name.split('.')[0]]
+                        except:
+                            print(name)
+                            new_bgc = MiBIGBGC(name,product_prediction)
+                
 
                 if not family in gcf_dict:
                     new_gcf = GCF(family)
@@ -321,11 +335,21 @@ def load_mibig_library_json(mibig_json_directory):
     import glob,os,json
     mibig = {}
     files = glob.glob(mibig_json_directory + os.sep + '*.json')
-    print("Found {} files".format(len(files)))
+    print("Found {} MiBIG json files".format(len(files)))
     for file in files:
         with open(file,'r') as f:
             bgc_id = file.split(os.sep)[-1].split('.')[0]
             mibig[bgc_id] = json.load(f)
     return mibig
+
+def make_mibig_bgc_dict(mibig_json_directory):
+    mibig_dict = load_mibig_library_json(mibig_json_directory)
+    mibig_bgc_dict = {}
+    for name,data in list(mibig_dict.items()):
+        new_bgc = MiBIGBGC(data['general_params']['mibig_accession'],data['general_params']['biosyn_class'])
+        mibig_bgc_dict[data['general_params']['mibig_accession']] = new_bgc
+    return mibig_bgc_dict
+    
+    
 
 

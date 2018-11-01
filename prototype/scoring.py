@@ -53,12 +53,6 @@ def compute_all_scores(spectra_list,gcf_list,strain_list,scoring_function,do_ran
             else:
                 s_random = None
             m_scores[spectrum][gcf] = (s,s_random,metadata)
-            if s > best:
-                best = s
-                print(("Best: ",best))
-            if s_random > best_random:
-                best_random = s_random
-                print(("Best random: ",best_random))
 
     if q is not None:
         q.put(m_scores)
@@ -120,11 +114,12 @@ def knownclusterblast_scoring(spectral_like,gcf_like,mibig_map):
         return None,None
     kcb = []
     for bgc in gcf_like.bgc_list:
-        if hasattr(bgc,'metadata'):
-            these = bgc.metadata.get('knownclusterblast',None)
-            if these:
-                for mibig,score in these:
-                    kcb.append((mibig,score))
+        these = bgc.known_cluster_blast
+        # if hasattr(bgc,'metadata'):
+        #     these = bgc.metadata.get('knownclusterblast',None)
+        if these:
+            for mibig,score in these:
+                kcb.append((mibig,score))
     if len(kcb) == 0:
         return None,None
     total_score = 0
