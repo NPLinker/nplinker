@@ -57,11 +57,11 @@ class AntiSmashRecord(object):
         self.build_prob()
 
     def display(self):
-        print self.products
-        print self.smiles
-        print self.asdomains_with_predictions_known
+        print(self.products)
+        print(self.smiles)
+        print(self.asdomains_with_predictions_known)
 
-        print self.asdomains_with_predictions_known[0].qualifiers['specificity']
+        print(self.asdomains_with_predictions_known[0].qualifiers['specificity'])
 
     def get_probable_aa(self):
         aalist = []
@@ -196,4 +196,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     for aa, res in predict_aa(args.file):
-        print '%s,%s' % (aa, res)
+        print('%s,%s' % (aa, res))
