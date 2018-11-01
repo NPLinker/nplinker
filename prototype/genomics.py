@@ -50,6 +50,9 @@ class GCF(object):
 
         self._aa_predictions = None
 
+    def __str__(self):
+        return str(self.gcf_id)
+        
     def add_bgc(self, bgc):
         self.bgc_list.append(bgc)
 

@@ -184,3 +184,10 @@ def aa_scoring(spectrum, gcf_like):
 
     return p
 
+def expand_spectrum_score(spectrum,gcf,scoring_function,strain_list):
+    initial_score,initial_metadata = scoring_function(spectrum,gcf,strain_list)
+    expanded_score,expanded_metadata = scoring_function(spectrum.family,gcf,strain_list)
+    print("{} <-> {}\tInitial: {}, expanded: {} ({} spectra in family (id = {}))".format(
+        spectrum,gcf,
+        initial_score,expanded_score,len(spectrum.family.spectra),
+        spectrum.family.family_id))

@@ -51,7 +51,8 @@ class Spectrum(object):
     	self.random_spectrum = RandomSpectrum(self,strain_list)
 
     def __str__(self):
-        return "Spectrum {} with {} peaks, max_ms2_intensity {}".format(self.spectrum_id,self.n_peaks,self.max_ms2_intensity)
+        # return "Spectrum {} with {} peaks, max_ms2_intensity {}".format(self.spectrum_id,self.n_peaks,self.max_ms2_intensity)
+        return "Spectrum {}".format(self.spectrum_id)
 
     def __cmp__(self,other):
         if self.parent_mz >= other.parent_mz:
