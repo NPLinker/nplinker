@@ -51,8 +51,8 @@ class GCF(object):
         self._aa_predictions = None
 
     def __str__(self):
-        return str(self.gcf_id)
-        
+        return str(self.gcf_id.split(os.sep)[-1])
+
     def add_bgc(self, bgc):
         self.bgc_list.append(bgc)
 
