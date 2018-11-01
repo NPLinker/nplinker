@@ -43,8 +43,8 @@ class Spectrum(object):
         for i,(mz,intensity) in enumerate(self.peaks):
             print(i,mz,intensity,self.normalised_peaks[i][1])
 
-    def plot(self,xlim = None,**kwargs):
-        plot_spectrum(self.peaks,xlim=xlim,title = "{} {} (m/z= {})".format(self.file_name,self.scan_number,self.parent_mz),**kwargs)
+    # def plot(self,xlim = None,**kwargs):
+    #     plot_spectrum(self.peaks,xlim=xlim,title = "{} {} (m/z= {})".format(self.file_name,self.scan_number,self.parent_mz),**kwargs)
 
 
     def add_random(self,strain_list):
@@ -188,10 +188,11 @@ class MolecularFamily(object):
 	def __init__(self,family_id):
 		self.family_id = family_id
 		self.spectra = []
+		self.random_molecular_family = RandomMolecularFamily(self)
 
-	def has_strain(self,strain_name):
+	def has_strain(self,strain):
 		for spectrum in self.spectra:
-			if spectrum.has_strain(strain_name):
+			if spectrum.has_strain(strain):
 				return True
 		return False
 
@@ -200,6 +201,18 @@ class MolecularFamily(object):
 
 	def __str__(self):
 		return "Molecular family with {} spectra".format(len(self.spectra))
+
+class RandomMolecularFamily(object):
+	def __init__(self,molecular_family):
+		self.molecular_family = molecular_family
+	def has_strain(self,strain):
+		for spectrum in self.molecular_family.spectra:
+			try:
+				if spectrum.random_spectrum.has_strain(strain):
+					return True
+			except:
+				print("Spectrum objects need random spectra attached for this functionality")
+		return False
 
 class SingletonFamily(MolecularFamily):
 	def __init__(self):
