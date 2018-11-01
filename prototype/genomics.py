@@ -69,6 +69,13 @@ class GCF(object):
                 mibig.append(bgc)
         return mibig
 
+    def n_non_mibig_bgc(self):
+        n = 0
+        for bgc in self.bgc_list:
+            if not type(bgc) == 'genomics.MiBIGBGC':
+                n += 1
+        return n
+
     @property
     def aa_predictions(self):
         """
@@ -99,7 +106,7 @@ class GCF(object):
 class RandomGCF(object):
     def __init__(self,real_gcf,bgc_list):
         self.real_gcf = real_gcf
-        n_bgc = len(self.real_gcf.bgc_list)
+        n_bgc = self.real_gcf.n_non_mibig_bgc()
         # select n_bgc bgcs from the bgc_list
         self.bgc_list = set(np.random.choice(bgc_list,n_bgc,replace = False))
     def has_strain(self,strain):

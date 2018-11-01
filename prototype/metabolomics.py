@@ -229,15 +229,18 @@ def make_families(spectra):
 		if family_id == '-1': # singleton
 			new_family = SingletonFamily()
 			new_family.add_spectrum(spectrum)
+			spectrum.family = new_family
 			families.append(new_family)
 		else:
 			if not family_id in family_dict:
 				new_family = MolecularFamily(family_id)
 				new_family.add_spectrum(spectrum)
+				spectrum.family = new_family
 				families.append(new_family)
 				family_dict[family_id] = new_family
 			else:
 				family_dict[family_id].add_spectrum(spectrum)
+				spectrum.family = family_dict[family_id]
 	return families
 
 
