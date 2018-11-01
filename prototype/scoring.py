@@ -5,15 +5,6 @@ import psutil
 import numpy as np
 
 
-def compute_all_scores(spectra_list,gcf_list,strain_list,scoring_function,do_random = True, inv=False):
-    m_scores = {}
-    if inv:
-        best = 1.0
-        best_random = 1.0
-    else:
-        best = 0
-        best_random = 0
-
 def compute_all_scores_multi(spectra_list, gcf_list, strain_list, scoring_function, do_random=True, cpus=8):
     # TODO get num CPUs available from psutil
     spectra_part_list = np.array_split(spectra_list, cpus)
