@@ -70,6 +70,7 @@ prompt_toolkit = "==1.0.15"
 Pygments = "==2.2.0"
 "Send2Trash" = "==1.5.0"
 psutil = "*"
+scipy = "*"
 
 [requires]
 python_version = "3.7"
