@@ -1,8 +1,14 @@
+import scipy.stats
 
-def compute_all_scores(spectra_list,gcf_list,strain_list,scoring_function,do_random = True):
+
+def compute_all_scores(spectra_list,gcf_list,strain_list,scoring_function,do_random = True, inv=False):
     m_scores = {}
-    best = 0
-    best_random = 0
+    if inv:
+        best = 1.0
+        best_random = 1.0
+    else:
+        best = 0
+        best_random = 0
     for i,spectrum in enumerate(spectra_list):
         m_scores[spectrum] = {}
         if i % 100 == 0:
@@ -14,12 +20,20 @@ def compute_all_scores(spectra_list,gcf_list,strain_list,scoring_function,do_ran
             else:
                 s_random = None
             m_scores[spectrum][gcf] = (s,s_random,metadata)
-            if s > best:
-                best = s
-                print "Best: ",best
-            if s_random > best_random:
-                best_random = s_random
-                print "Best random: ",best_random
+            if not inv:
+                if s > best:
+                    best = s
+                    print "Best: ",best
+                if s_random > best_random:
+                    best_random = s_random
+                    print "Best random: ",best_random
+            else:
+                if s < best:
+                    best = s
+                    print "Best: ",best
+                if s_random < best_random:
+                    best_random = s_random
+                    print "Best random: ",best_random
     return m_scores
 
 def metcalf_scoring(spectral_like,gcf_like,strains,both = 10,met_not_gcf = -10,gcf_not_met = 0,neither = 1):
@@ -38,6 +52,30 @@ def metcalf_scoring(spectral_like,gcf_like,strains,both = 10,met_not_gcf = -10,g
         if not in_gcf and not in_spec:
             cum_score += 1
     return cum_score,shared_strains
+
+
+def hg_scoring(spectral_like, gcf_like, strains):
+    spectral_count = 0
+    gcf_count = 0
+    overlap_count = 0
+
+    for strain in strains:
+        if spectral_like.has_strain(strain):
+            spectral_count += 1
+        if gcf_like.has_strain(strain):
+            gcf_count += 1
+        if spectral_like.has_strain(strain) and gcf_like.has_strain(strain):
+            overlap_count += 1
+
+    pos_in_sample = overlap_count
+    N = spectral_count
+    n = gcf_count
+    M = len(strains)
+
+    r = scipy.stats.hypergeom.sf(pos_in_sample, M, n, N, 1)
+    return r, None
+
+
 
 def name_scoring(spectral_like,gcf_like,mibig_map):
 	score = 0
@@ -95,3 +133,27 @@ def knownclusterblast_scoring(spectral_like,gcf_like,mibig_map):
                     total_score += int(score)
                     print m
     return total_score,metadata
+
+
+def aa_scoring(spectrum, gcf_like):
+    """
+    Check for the prescence of AA mass shifts in the spectrum
+    """
+    tol = 0.01
+    from metabolomics import read_aa_losses
+    aa_loss_file = 'aa_residues.csv'
+    aa_losses = read_aa_losses(aa_loss_file)
+
+    p = 1.0
+    for aa, aa_prob in gcf_like.aa_predictions:
+        if aa_prob < 0.2 or aa_prob > 0.8:
+            if aa in aa_losses:
+                mass_iso, mass_avg = aa_losses[aa]
+                found_losses = spectrum.has_loss(mass_iso, tol)
+                if len(found_losses) > 0:
+                    p *= aa_prob
+                else:
+                    p *= (1 - aa_prob)
+
+    return p
+
