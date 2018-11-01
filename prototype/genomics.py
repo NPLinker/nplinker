@@ -59,8 +59,8 @@ class GCF(object):
                 return True
         return False
 
-    def add_random(self,strain_list):
-        self.random_gcf = RandomGCF(self,strain_list)
+    def add_random(self,bgc_list):
+        self.random_gcf = RandomGCF(self,bgc_list)
 
     def get_mibig_bgcs(self):
         mibig = []
@@ -97,20 +97,16 @@ class GCF(object):
 
 
 class RandomGCF(object):
-    def __init__(self,real_gcf,strain_list):
-        n_strains = 0
+    def __init__(self,real_gcf,bgc_list):
         self.real_gcf = real_gcf
-        for s in strain_list:
-            if self.real_gcf.has_strain(s):
-                n_strains += 1
-        # select n_strains from strain_list
-        self.strain_set = set(np.random.choice(strain_list,n_strains,replace = False))
+        n_bgc = len(self.real_gcf.bgc_list)
+        # select n_bgc bgcs from the bgc_list
+        self.bgc_list = set(np.random.choice(bgc_list,n_bgc,replace = False))
     def has_strain(self,strain):
-        if strain in self.strain_set:
-            return True
-        else:
-            return False
-
+        for bgc in self.bgc_list:
+            if bgc.strain == strain:
+                return True
+        return False
 
 class MiBIGBGC(BGC):
     def __init__(self,name,product_prediction):

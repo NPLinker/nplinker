@@ -37,11 +37,11 @@ class Spectrum(object):
     		return True
     	return False
 
-    def print_spectrum(self):
-        print()
-        print(self.file_name,self.spectrum_id)
-        for i,(mz,intensity) in enumerate(self.peaks):
-            print(i,mz,intensity,self.normalised_peaks[i][1])
+    # def print_spectrum(self):
+    #     print()
+    #     print(self.file_name,self.spectrum_id)
+    #     for i,(mz,intensity) in enumerate(self.peaks):
+    #         print(i,mz,intensity,self.normalised_peaks[i][1])
 
     # def plot(self,xlim = None,**kwargs):
     #     plot_spectrum(self.peaks,xlim=xlim,title = "{} {} (m/z= {})".format(self.file_name,self.scan_number,self.parent_mz),**kwargs)
@@ -98,14 +98,14 @@ class Spectrum(object):
 
 
 class RandomSpectrum(object):
-	def __init__(self,real_spectrum,strain_list):
+	def __init__(self,real_spectrum,strain_prob_dict):
 		self.real_spectrum = real_spectrum
 		n_strains = 0
-		for strain in strain_list:
+		for strain in strain_prob_dict:
 			if self.real_spectrum.has_strain(strain):
 				n_strains += 1
 
-		self.strain_set = set(np.random.choice(strain_list,n_strains,replace = True))
+		self.strain_set = set(np.random.choice(list(strain_prob_dict.keys()),n_strains,replace = True,p = list(strain_prob_dict.values())))
 
 	def has_strain(self,strain):
 		if strain in self.strain_set:
