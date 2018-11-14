@@ -128,7 +128,6 @@ def compute_all_scores_multi_np(spectra_list, gcf_list, strain_list, scoring_fun
         p.join()
 
     print(('Total time: {:.1f} secs, {:.1f} scores/sec'.format(time.time() - t, len(spectra_list) / (time.time() - t))))
-
     return m_scores
 
 def compute_all_scores_np(spectra_list, gcf_list, strain_list, scoring_function, do_random=True, q=None, cpu_aff=None):
@@ -143,9 +142,16 @@ def compute_all_scores_np(spectra_list, gcf_list, strain_list, scoring_function,
     started = time.time()
     m_scores = {s: {} for s in spectra_list}
 
+    # TODO: this could possibly be made faster by adjusting the datatypes slightly and using 
+    # multiprocessing.Arrays instead, or a shared data structure via multiprocessing.Manager
     for spectrum, gcf in itertools.product(spectra_list, gcf_list):
         s, s_random, metadata = scoring_function(spectrum, gcf, strain_list, do_random)
-        m_scores[spectrum][gcf] = (s, s_random, metadata)
+
+        # don't care about results where there are no common strains, so exclude them here
+        # (this saves a *lot* of entries in m_scores and makes the scoring significantly
+        # faster overall)
+        if metadata is not None:
+            m_scores[spectrum][gcf] = (s, s_random, metadata)
 
     if q is not None:
         q.put(m_scores)
@@ -177,7 +183,12 @@ def metcalf_scoring_np(spectral_like, gcf_like, strains, do_random, weights=METC
         rand_result = (2 * spectral_like.random_spectrum.strains_lookup) + gcf_like.random_gcf.strains_lookup
         cum_score_rand = np.sum(np.bincount(rand_result, minlength=4) * weights)
 
-    return cum_score, cum_score_rand, strains[np.where(result == 3)]
+    # get common strains, if any
+    common = np.where(result == 3)[0]
+    if len(common) > 0:
+        return cum_score, cum_score_rand, strains[common]
+
+    return cum_score, cum_score_rand, None
 
 def hg_scoring(spectral_like, gcf_like, strains):
     spectral_count = 0
