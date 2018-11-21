@@ -130,7 +130,9 @@ class DataLinks(object):
             M_strain_spec[i, 0:len(strain_meta_num)] = [metadata_value[x] for x in strain_meta_num]
 
         strain_spec_labels = [metadata_category[x] for x in strain_meta_num]  # strain names
-
+        
+        # normalize M_strain_spec (only 0 or 1 - co-occurence or not)
+        M_strain_spec[M_strain_spec > 1] = 1
         self.M_strain_spec = M_strain_spec
         self.map_strain_name = strain_spec_labels
 
@@ -177,7 +179,6 @@ class DataLinks(object):
             M_strain_type1 = self.M_strain_spec
         elif type == 'fam-gcf':
             M_strain_type1 = self.M_strain_fam
-        elif type == 'spec-bgc' or type == 'fam-bgc':
             print("Given types are not yet supported... ")
         else:
             print("Wrong correlation 'type' given.")
