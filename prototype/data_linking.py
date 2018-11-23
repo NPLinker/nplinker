@@ -18,13 +18,21 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import seaborn as sns
 
+import data_linking_functions
+
 
 class DataLinks(object):
+    """ DataLinks collects and structures co-occurence data
+    1) Co-occurences of spectra, families, and GCFs with respect to strains
+    2) Mappings: Lookup-tables that link different ids and categories
+    3) Correlation matrices that show how often spectra/families and GCFs co-occur
+    """
+
     def __init__(self):
         # matrices that store co-occurences with respect to strains
-        self.M_strain_gcf = []
-        self.M_strain_spec = []
-        self.M_strain_fam = []
+        self.M_gcf_strain = []
+        self.M_spec_strain = []
+        self.M_fam_strain = []
 
         # mappings (lookup lists to map between different ids and categories
         self.map_spec_id = []
@@ -52,7 +60,7 @@ class DataLinks(object):
         self.matrix_strain_gcf(gcf_list, strain_list)
         self.matrix_strain_spec(spectra, strain_list)
 
-      
+
     def find_correlations(self, include_singletons=False):
         # collect correlations/ co-occurences
         print("Create correlation matrices: spectra<->gcfs.")
@@ -89,7 +97,7 @@ class DataLinks(object):
             for m in range(0, len(gcf_list[i].bgc_list)):
                 bigscape_class.append(gcf_list[i].bgc_list[m].bigscape_class)
                 class_counter = Counter(bigscape_class)
-            
+
             # try not to select "Others"
             if class_counter.most_common(1)[0][0] == "Others" and class_counter.most_common(1)[0][1] < len(bigscape_class): 
                 bigscape_bestguess.append([class_counter.most_common(2)[1][0], class_counter.most_common(2)[1][1]/len(bigscape_class)])
@@ -100,21 +108,21 @@ class DataLinks(object):
 
 
     def matrix_strain_gcf(self, gcf_list, strain_list):
-        # Collect co-ocurences in M_strain_spec matrix
-        M_strain_gcf = np.zeros((len(gcf_list), len(strain_list)))
+        # Collect co-ocurences in M_spec_strain matrix
+        M_gcf_strain = np.zeros((len(gcf_list), len(strain_list)))
 
         for i, strain  in enumerate(strain_list):
             for m, gcf in enumerate(gcf_list):
                 in_gcf = gcf.has_strain(strain)
                 if in_gcf:
-                    M_strain_gcf[m,i] += 1
+                    M_gcf_strain[m,i] += 1
 
-        self.M_strain_gcf = M_strain_gcf
+        self.M_gcf_strain = M_gcf_strain
 
 
     def matrix_strain_spec(self, spectra, strain_list):
         # Collect co-ocurences in M_strains_specs matrix
-        M_strain_spec = np.zeros((len(spectra), len(strain_list)))
+        M_spec_strain = np.zeros((len(spectra), len(strain_list)))
 
         # find strain data in spectra metadata
         metadata_category, metadata_value = zip(*list(spectra[0].metadata.items()))
@@ -127,18 +135,18 @@ class DataLinks(object):
 
         for i,spectrum in enumerate(spectra):
             metadata_category, metadata_value = zip(*list(spectra[i].metadata.items()))
-            M_strain_spec[i, 0:len(strain_meta_num)] = [metadata_value[x] for x in strain_meta_num]
+            M_spec_strain[i, 0:len(strain_meta_num)] = [metadata_value[x] for x in strain_meta_num]
 
         strain_spec_labels = [metadata_category[x] for x in strain_meta_num]  # strain names
-        
-        # normalize M_strain_spec (only 0 or 1 - co-occurence or not)
-        M_strain_spec[M_strain_spec > 1] = 1
-        self.M_strain_spec = M_strain_spec
+
+        # normalize M_spec_strain (only 0 or 1 - co-occurence or not)
+        M_spec_strain[M_spec_strain > 1] = 1
+        self.M_spec_strain = M_spec_strain
         self.map_strain_name = strain_spec_labels
 
 
     def data_family_mapping(self, include_singletons=False):
-        # Create M_strain_fam matrix that gives co-occurences between mol. families and strains
+        # Create M_fam_strain matrix that gives co-occurences between mol. families and strains
         # matrix dimensions are: number of families  x  number of strains
 
         family_ids = np.unique(self.map_spec_fam) # get unique family ids
@@ -149,24 +157,24 @@ class DataLinks(object):
         else:
             num_of_singletons = 0
             num_unique_fams = len(family_ids)
-   
-        M_strain_fam = np.zeros((num_unique_fams, self.M_strain_spec.shape[1]))
+
+        M_fam_strain = np.zeros((num_unique_fams, self.M_spec_strain.shape[1]))
         strain_fam_labels = []
 
         if num_of_singletons > 0:  # if singletons exist + included
-            M_strain_fam[(num_unique_fams-num_of_singletons):,
-                         :] = self.M_strain_spec[np.where(self.map_spec_fam[:,0] == -1)[0],:]     
-            
+            M_fam_strain[(num_unique_fams-num_of_singletons):,
+                         :] = self.M_spec_strain[np.where(self.map_spec_fam[:,0] == -1)[0],:]
+
         # go through families (except singletons) and collect member strain occurences    
         for i, fam_id in enumerate(family_ids[np.where(family_ids != -1)].astype(int)):
-            M_strain_fam[i,:] = np.sum(self.M_strain_spec[np.where(self.map_spec_fam[:,0] == fam_id),:], axis=1)
+            M_fam_strain[i,:] = np.sum(self.M_spec_strain[np.where(self.map_spec_fam[:,0] == fam_id),:], axis=1)
             strain_fam_labels.append(fam_id)
-            
+
         # only looking for co-occurence, hence only 1 or 0
-        M_strain_fam[M_strain_fam>1] = 1
+        M_fam_strain[M_fam_strain>1] = 1
         strain_fam_labels.append([-1] * num_of_singletons)
         
-        self.M_strain_fam = M_strain_fam
+        self.M_fam_strain = M_fam_strain
         self.strain_fam_labels = strain_fam_labels
 
 
@@ -175,44 +183,20 @@ class DataLinks(object):
         # IF type='spec-gcf':  spectra and GCFS in M_spec_gcf matrix
         # IF type='fam-gcf':  mol.families and GCFS in M_fam_gcf matrix
 
+        # Make selection for scenario spec<->gcf or fam<->gcf
         if type == 'spec-gcf':
-            M_strain_type1 = self.M_strain_spec
+            M_type1_strain = self.M_spec_strain
         elif type == 'fam-gcf':
-            M_strain_type1 = self.M_strain_fam
+            M_type1_strain = self.M_fam_strain
             print("Given types are not yet supported... ")
         else:
             print("Wrong correlation 'type' given.")
             print("Must be one of 'spec-gcf', 'fam-gcf', ...")
 
         print("Calculating correlation matrices of type: ", type)
-        dim1 = M_strain_type1.shape[0]
-        dim2 = self.M_strain_gcf.shape[0]
 
-        M_type1_gcf = np.zeros((dim1, dim2))
-        M_type1_notgcf = np.zeros((dim1, dim2))
-        M_nottype1_gcf = np.zeros((dim1, dim2))
-
-        for i in range(0, dim2):
-            if (i+1) % 100 == 0 or i == dim2-1:  # show progress
-                print('\r', ' Done ', i+1, ' of ', dim2, ' GCFs.', end="")
-                
-            updates = M_strain_type1[:, np.where(self.M_strain_gcf[i,:] > 0)[0]]
-            updates = np.sum(updates, axis=1)
-
-            M_type1_gcf[:,i] = updates
-            # look where GCF i is NOT present:
-            updates = M_strain_type1[:, np.where(self.M_strain_gcf[i,:] == 0)[0]]
-            updates = np.sum(updates, axis=1)
-            M_type1_notgcf[:,i] = updates
-        print("")
-
-        for i in range(0, dim1):
-            if (i+1) % 100 == 0 or i == dim1-1:  # show progress
-                print('\r', ' Done ', i+1, ' of ', dim1, ' spectra/families.', end="")
-            # look where spectrum or family i is NOT present:
-            updates = self.M_strain_gcf[:, np.where(M_strain_type1[i,:] == 0)[0]]
-            updates = np.sum(updates, axis=1)
-            M_nottype1_gcf[i,:] = updates
+        # Calculate correlation matrix from co-occurence matrices
+        M_type1_gcf, M_type1_notgcf, M_nottype1_gcf = data_linking_functions.calc_correlation_matrix(M_type1_strain, self.M_gcf_strain)
 
         # return results:
         if type == 'spec-gcf':
@@ -233,6 +217,12 @@ class DataLinks(object):
 
 
 class LinkProbability(object):
+    """ Class to: 
+    1) create ansd store likelihood matrices,
+    2) select potential calculates for links
+    3) output selected candidates (plots and tables)
+    """
+
     def __init__(self):
         # matrices that store probabilities of co-occurence
         # P_spec_givengcf contains probabilities P(spec_x|gcf_y),
@@ -251,10 +241,6 @@ class LinkProbability(object):
         # selection of candidates
         self.link_candidates_gcf_spec = []
         self.link_candidates_gcf_fam = []
-#        self.candidates_fam_gcf = []
-#        self.gcf_fam_competition = []
-#        self.fam_gcf_winners = []
-#        self.fam_gcf_winnersscores = []
 
 
     def correlation_probabilities(self, data_links, type='spec-gcf'):
@@ -266,63 +252,43 @@ class LinkProbability(object):
         # P(GCF_x | fam_y), P(fam_y | GCF_x), 
         # P(GCF_x | not fam_y), P(fam_y | not GCF_x) 
 
+        # Make selection for scenario spec<->gcf or fam<->gcf
         if type == 'spec-gcf':
-            M_type1_gcf = data_links.M_spec_gcf 
-            M_type1_notgcf = data_links.M_spec_notgcf
-            M_nottype1_gcf = data_links.M_notspec_gcf
-            M_strain_type1 = data_links.M_strain_spec
+            M_type1_type2 = data_links.M_spec_gcf 
+            M_type1_nottype2 = data_links.M_spec_notgcf
+            M_nottype1_type2 = data_links.M_notspec_gcf
+            M_type1_cond = data_links.M_spec_strain
         elif type == 'fam-gcf':
-            M_type1_gcf = data_links.M_fam_gcf
-            M_type1_notgcf = data_links.M_fam_notgcf
-            M_nottype1_gcf = data_links.M_notfam_gcf
-            M_strain_type1 = data_links.M_strain_fam
+            M_type1_type2 = data_links.M_fam_gcf
+            M_type1_nottype2 = data_links.M_fam_notgcf
+            M_nottype1_type2 = data_links.M_notfam_gcf
+            M_type1_cond = data_links.M_fam_strain
         elif type == 'spec-bgc' or type == 'fam-bgc':
             print("Given types are not yet supported... ")
         else:
             print("Wrong correlation 'type' given.")
             print("Must be one of 'spec-gcf', 'fam-gcf'...")
 
-        print("Calculating probability matrices of type: ", type)
-        dim1, dim2 = M_type1_gcf.shape
-        num_strains = data_links.M_strain_gcf.shape[1]
-
-        P_gcf_given_type1 = np.zeros((dim1, dim2))
-        P_gcf_not_type1 = np.zeros((dim1, dim2))
-        P_type1_given_gcf = np.zeros((dim1, dim2))
-        P_type1_not_gcf = np.zeros((dim1, dim2))
-
-        # Calculate P_gcf_given_type1 matrix
-        P_sum_spec = np.sum(M_strain_type1, axis=1)
-        P_sum_spec[P_sum_spec < 1] = 1 #avoid later division by 0
-        P_gcf_given_type1 = M_type1_gcf/np.tile(P_sum_spec, 
-                                                (dim2, 1)).transpose(1, 0)
-
-        # Calculate P_type1_given_gcf matrix
-        P_sum_gcf = np.sum(data_links.M_strain_gcf, axis=1)
-        P_sum_gcf[P_sum_gcf < 1] = 1 #avoid later division by 0
-        P_type1_given_gcf = M_type1_gcf/np.tile(P_sum_gcf, (dim1, 1))
-
-        # Calculate P_gcf_not_type1 matrix
-        P_sum_not_spec = num_strains - P_sum_spec
-        P_gcf_not_type1 = M_nottype1_gcf/np.tile(P_sum_not_spec,
-                                                 (dim2, 1)).transpose(1, 0)
-
-        # Calculate P_type1_not_gcf matrix
-        P_sum_not_gcf = num_strains - P_sum_gcf  
-        P_type1_not_gcf = M_type1_notgcf/np.tile(P_sum_not_gcf, (dim1, 1))
-
+        print("Calculating likelihood matrices of type: ", type)
+        # Calculate likelihood matrices using calc_likelihood_matrix()
+        P_type2_given_type1, P_type2_not_type1, P_type1_given_type2, \
+            P_type1_not_type2 = data_linking_functions.calc_likelihood_matrix(M_type1_cond, 
+                                                                              data_links.M_gcf_strain, 
+                                                                              M_type1_type2, 
+                                                                              M_type1_nottype2, 
+                                                                              M_nottype1_type2) 
         if type == 'spec-gcf':
-            self.P_gcf_given_spec = P_gcf_given_type1
-            self.P_gcf_not_spec = P_gcf_not_type1
-            self.P_spec_given_gcf = P_type1_given_gcf
-            self.P_spec_not_gcf = P_type1_not_gcf
+            self.P_gcf_given_spec = P_type2_given_type1
+            self.P_gcf_not_spec = P_type2_not_type1
+            self.P_spec_given_gcf = P_type1_given_type2
+            self.P_spec_not_gcf = P_type1_not_type2
         elif type == 'fam-gcf':
-            self.P_gcf_given_fam = P_gcf_given_type1
-            self.P_gcf_not_fam = P_gcf_not_type1
-            self.P_fam_given_gcf = P_type1_given_gcf
-            self.P_fam_not_gcf = P_type1_not_gcf
+            self.P_gcf_given_fam = P_type2_given_type1
+            self.P_gcf_not_fam = P_type2_not_type1
+            self.P_fam_given_gcf = P_type1_given_type2
+            self.P_fam_not_gcf = P_type1_not_type2
         else:
-            print("No correct probability matrices were created.")
+            print("No correct likelihood matrices were created.")
 
 
     def select_link_candidates(self, data_links, P_cutoff=0.8, score_cutoff=0, type='fam-gcf'):
@@ -332,6 +298,7 @@ class LinkProbability(object):
         #
         # Only consider candidates if P_gcf_given_type1 >= P_cutoff
 
+        # Make selection for scenario spec<->gcf or fam<->gcf
         if type == 'spec-gcf':
             P_gcf_given_type1 = self.P_gcf_given_spec
             P_gcf_not_type1 = self.P_gcf_not_spec
@@ -370,8 +337,8 @@ class LinkProbability(object):
         link_candidates[6,:] = M_type1_gcf[candidate_ids].astype(int)
 
         # The next is the actual SCORING. Just a starting point...
-        # now it is:
-        # P_gcf_given_type1 * (1-P_type1_not_gcf) weighted by no. of strains they co-occure
+        # for now it is:
+        # P_gcf_given_type1 * (1-P_type1_not_gcf) weighted by no. of strains they co-occur
         link_candidates[7,:] = link_candidates[2,:] * (1 - link_candidates[5,:]) \
                             *(1-np.exp(-0.5 * link_candidates[6,:]))
         print(link_candidates.shape[1], " candidates selected with ", 
@@ -386,7 +353,7 @@ class LinkProbability(object):
         link_candidates_pd = pd.DataFrame(link_candidates.transpose(1,0), columns = index_names)
         
         # add other potentially relevant knowdledge
-        # If this will grow to more collected information -> create separate function
+        # If this will grow to more collected information -> create separate function/class
         bgc_class = [] 
         for i in link_candidates_pd["GCF id"].astype(int):
             bgc_class.append(data_links.map_gcf_class[i][0])
@@ -466,15 +433,15 @@ class LinkProbability(object):
                                col_colors=col_colors, 
                                robust=True)
         graph.fig.suptitle('Correlation map') 
-    
+
         # Rotate labels
         plt.setp(graph.ax_heatmap.xaxis.get_majorticklabels(), rotation=90)
         plt.setp(graph.ax_heatmap.yaxis.get_majorticklabels(), rotation=0)
-    
+
         # Make labels smaller
         plt.setp(graph.ax_heatmap.xaxis.get_majorticklabels(), fontsize=7)
         plt.setp(graph.ax_heatmap.yaxis.get_majorticklabels(), fontsize=7)
-        
+
         plt.ylabel("scoring index")
     
         return M_links
