@@ -3,7 +3,8 @@
 import numpy as np
 
 def calc_correlation_matrix(M_type1_cond, M_type2_cond):
-    """ Calculate correlation matrices from co-occurence matrices
+    """ 
+    Calculate correlation matrices from co-occurence matrices
     Input:
     M_type1_cond(x,y) is 1 if type1_x IS observed under condition_y
     M_type1_cond(x,y) is 0 if type1_x IS NOT observed under condition_y
@@ -53,7 +54,8 @@ def calc_correlation_matrix(M_type1_cond, M_type2_cond):
 
 def calc_likelihood_matrix(M_type1_cond, M_type2_cond, 
                            M_type1_type2, M_type1_nottype2, M_nottype1_type2):
-    """ Calculate correlation matrices from co-occurence matrices
+    """ 
+    Calculate correlation matrices from co-occurence matrices
     Input:
     M_type1_cond(x,y) is 1 if type1_x IS observed under condition_y
     M_type1_cond(x,y) is 0 if type1_x IS NOT observed under condition_y
