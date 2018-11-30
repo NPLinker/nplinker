@@ -80,7 +80,7 @@ class DataLinks(object):
 
         if isinstance(spectra[0].family, str):  
             for i, spectrum in enumerate(spectra):
-                mapping_spec[i,1] = F
+                mapping_spec[i,1] = spectrum.spectrum_id
                 mapping_spec[i,2] = spectrum.family
 
         elif isinstance(spectra[0].family.family_id, str): # assume make_families was run
