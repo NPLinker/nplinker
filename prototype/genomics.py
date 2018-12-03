@@ -164,7 +164,7 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
                         except:
                             strain_name = strain_id_dict[name.split('.')[0]]
                     except:
-                        print("NO STRAIN")
+                        print("NO STRAIN %s" % name)
 
                 if strain_name not in strain_dict:
                     new_strain = strain_name
