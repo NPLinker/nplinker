@@ -5,7 +5,7 @@ from ms2lda_feature_extraction import LoadMGF
 
 class Spectrum(object):
     
-    METADATA_BLACKLIST = set(['AllOrganisms', 'AllFiles', 'LibraryID', 'RTStdErr', 'RTMean', 'AllGroups', 'DefaultGroups',
+    METADATA_BLACKLIST = set(['AllOrganisms', 'LibraryID', 'RTStdErr', 'RTMean', 'AllGroups', 'DefaultGroups',
                             'precursor mass', 'parent mass', 'ProteoSAFeClusterLink', 'precursor intensity', 'sum(precursor intensity)'])
 
     def __init__(self, peaks, spectrum_id, precursor_mz, parent_mz=None, rt=None):
