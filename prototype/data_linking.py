@@ -53,7 +53,6 @@ class DataLinks(object):
         self.M_notfam_gcf = []
         self.strain_fam_labels = []  # labels for strain-family matrix
 
-
     def load_data(self, spectra, gcf_list, strain_list):
         # load data from spectra, GCFs, and strains
         print("Create mappings between spectra, gcfs, and strains.")
@@ -62,7 +61,6 @@ class DataLinks(object):
         print("Create co-occurence matrices: spectra<->strains + and gcfs<->strains.")
         self.matrix_strain_gcf(gcf_list, strain_list)
         self.matrix_strain_spec(spectra, strain_list)
-
 
     def find_correlations(self, include_singletons=False):
         # collect correlations/ co-occurences
@@ -167,7 +165,6 @@ class DataLinks(object):
         self.M_spec_strain = M_spec_strain
         self.map_strain_name = strain_spec_labels
 
-
     def data_family_mapping(self, include_singletons=False):
         # Create M_fam_strain matrix that gives co-occurences between mol. families and strains
         # matrix dimensions are: number of families  x  number of strains
@@ -248,6 +245,41 @@ class DataLinks(object):
     # class data_links OUTPUT functions
     # TODO add output functions (e.g. to search for mappings of individual specs, gcfs etc.)
 
+class RandomisedDataLinks(DataLinks):
+    """Simple subclass of DataLinks that randomly shuffles the strains within
+        the strains to spectra matrices (to be used for generating random 
+        scoring output as point of comparison with real scores) """
+
+    @classmethod
+    def from_datalinks(cls, datalinks):
+        self = cls()
+        # check if load_data has been called
+        if len(datalinks.M_spec_strain) == 0 or len(datalinks.M_gcf_strain) == 0:
+            raise Exception('DataLinks object not initialised (call load_data first)')
+
+        # create copies of the data structures required
+        # TODO all of these needed?
+        self.mapping_spec = datalinks.mapping_spec.copy()
+        self.mapping_gcf = datalinks.mapping_gcf.copy()
+        self.M_gcf_strain = datalinks.M_gcf_strain.copy()
+        self.M_spec_strain = datalinks.M_spec_strain.copy()
+        self.map_strain_name = datalinks.map_strain_name.copy()
+
+        # shuffle matrices
+        self._shuffle_cols(self.M_spec_strain)
+        # TODO needed?
+        # self._shuffle_cols(self.M_gcf_strain)
+
+        # can now run find_correlations with the shuffled matrices
+        return self
+
+    def _shuffle_cols(self, m):
+        # shuffle the columns a gcf/spec-strain matrix so that each strain remains 
+        # present in the same number of now-random objects.
+        # np.random.shuffle only operates on first axis of multi-axis arrays, so
+        # take transpose to get columns here instead.
+        for col in m.T:
+            np.random.shuffle(col)
 
 
 class LinkLikelihood(object):
@@ -388,7 +420,7 @@ class LinkFinder(object):
                               + data_links.M_notfam_gcf * gcf_not_type1)
             
             self.metcalf_fam_gcf = metcalf_scores
-
+        return metcalf_scores
 
     def likelihood_scoring(self, data_links, likelihoods, 
                         alpha_weighing=0.5,
@@ -430,7 +462,7 @@ class LinkFinder(object):
                                  )
             
             self.likescores_fam_gcf = likelihood_scores
-
+        return likelihood_scores
 
     def select_link_candidates(self, data_links, likelihoods,
                                P_cutoff=0.8, 
