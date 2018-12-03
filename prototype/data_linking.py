@@ -53,6 +53,15 @@ class DataLinks(object):
         self.M_notfam_gcf = []
         self.strain_fam_labels = []  # labels for strain-family matrix
 
+    def get_spec_pos(self,spec_id):
+        # get the position in the arrays of a spectrum
+        row = self.mapping_spec.loc[self.mapping_spec['original spec-id'] == float(spec_id)]
+        return int(row.iloc[0]['spec-id'])
+
+    def get_gcf_pos(self,gcf_id):
+        # TODO: fix this so the original ID is present in case of re-ordering
+        pass
+
     def load_data(self, spectra, gcf_list, strain_list):
         # load data from spectra, GCFs, and strains
         print("Create mappings between spectra, gcfs, and strains.")
@@ -141,29 +150,45 @@ class DataLinks(object):
         self.M_gcf_strain = M_gcf_strain
 
 
-    def matrix_strain_spec(self, spectra, strain_list):
-        # Collect co-ocurences in M_strains_specs matrix
-        M_spec_strain = np.zeros((len(spectra), len(strain_list)))
+    # def matrix_strain_spec(self, spectra, strain_list):
+    #     # Collect co-ocurences in M_strains_specs matrix
+    #     M_spec_strain = np.zeros((len(spectra), len(strain_list)))
 
-        # find strain data in spectra metadata
-        metadata_category, metadata_value = zip(*list(spectra[0].metadata.items()))
+    #     # find strain data in spectra metadata
+    #     metadata_category, metadata_value = zip(*list(spectra[0].metadata.items()))
+    #     strain_list = [str(x) for x in strain_list]
+    #     strain_meta_num = []
+    #     for num, category in enumerate(metadata_category):
+    #         if category in strain_list:
+    #             strain_meta_num.append(num)
+    #     # TODO add test to see if all strain names are found in metadata
+
+    #     for i,spectrum in enumerate(spectra):
+    #         metadata_category, metadata_value = zip(*list(spectra[i].metadata.items()))
+    #         M_spec_strain[i, 0:len(strain_meta_num)] = [metadata_value[x] for x in strain_meta_num]
+
+    #     strain_spec_labels = [metadata_category[x] for x in strain_meta_num]  # strain names
+
+    #     # normalize M_spec_strain (only 0 or 1 - co-occurence or not)
+    #     M_spec_strain[M_spec_strain > 1] = 1
+    #     self.M_spec_strain = M_spec_strain
+    #     self.map_strain_name = strain_spec_labels
+    
+    
+    #   NOTE: Re-written by Simon because it was not conserving straing order
+    #   and other methods down the line assumed they'd be in the same
+    #   order as the gcf matrix
+    #   FLORIAN: can you check I'm not missing something here please! 
+    def matrix_strain_spec(self,spectra,strain_list):
         strain_list = [str(x) for x in strain_list]
-        strain_meta_num = []
-        for num, category in enumerate(metadata_category):
-            if category in strain_list:
-                strain_meta_num.append(num)
-        # TODO add test to see if all strain names are found in metadata
-
+        M_spec_strain = np.zeros((len(spectra), len(strain_list)))
         for i,spectrum in enumerate(spectra):
-            metadata_category, metadata_value = zip(*list(spectra[i].metadata.items()))
-            M_spec_strain[i, 0:len(strain_meta_num)] = [metadata_value[x] for x in strain_meta_num]
-
-        strain_spec_labels = [metadata_category[x] for x in strain_meta_num]  # strain names
-
-        # normalize M_spec_strain (only 0 or 1 - co-occurence or not)
-        M_spec_strain[M_spec_strain > 1] = 1
+            for j,s in enumerate(strain_list):
+                if spectrum.has_strain(s):
+                    M_spec_strain[i,j] = 1
         self.M_spec_strain = M_spec_strain
-        self.map_strain_name = strain_spec_labels
+        self.map_strain_name = strain_list
+    
 
     def data_family_mapping(self, include_singletons=False):
         # Create M_fam_strain matrix that gives co-occurences between mol. families and strains
@@ -420,7 +445,7 @@ class LinkFinder(object):
                               + data_links.M_notfam_gcf * gcf_not_type1)
             
             self.metcalf_fam_gcf = metcalf_scores
-        return metcalf_scores
+        return metcalf_scores        
 
     def likelihood_scoring(self, data_links, likelihoods, 
                         alpha_weighing=0.5,
