@@ -86,7 +86,7 @@ def metcalf_scoring(spectral_like, gcf_like, strains, both=10, met_not_gcf=-10, 
         if in_gcf and not in_spec:
             cum_score += gcf_not_met
         if not in_gcf and not in_spec:
-            cum_score += 1
+            cum_score += neither
     return cum_score, shared_strains
 
 def compute_all_scores_multi_np(spectra_list, gcf_list, strain_list, scoring_function, do_random=True, cpus=8):
