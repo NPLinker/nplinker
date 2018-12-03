@@ -252,17 +252,19 @@ class DataLinks(object):
         print("Calculating correlation matrices of type: ", type)
 
         # Calculate correlation matrix from co-occurence matrices
-        M_type1_gcf, M_type1_notgcf, M_nottype1_gcf = data_linking_functions.calc_correlation_matrix(M_type1_strain, self.M_gcf_strain)
+        M_type1_gcf, M_type1_notgcf, M_nottype1_gcf,M_nottype1_notgcf = data_linking_functions.calc_correlation_matrix(M_type1_strain, self.M_gcf_strain)
 
         # return results:
         if type == 'spec-gcf':
             self.M_spec_gcf = M_type1_gcf
             self.M_spec_notgcf = M_type1_notgcf
             self.M_notspec_gcf = M_nottype1_gcf
+            self.M_notspec_notgcf = M_nottype1_notgcf
         elif type == 'fam-gcf':
             self.M_fam_gcf = M_type1_gcf
             self.M_fam_notgcf = M_type1_notgcf
             self.M_notfam_gcf = M_nottype1_gcf
+            self.M_notfam_notgcf = M_nottype1_notgcf
         else:
             print("No correct correlation matrix was created.")
         print("")
@@ -422,6 +424,7 @@ class LinkFinder(object):
                         both=10, 
                         type1_not_gcf=-10, 
                         gcf_not_type1=0,
+                        not_type1_not_gcf = 1,
                         type='spec-gcf'):  
         """
         Calculate metcalf scores from DataLinks() co-occurence matrices 
@@ -429,12 +432,14 @@ class LinkFinder(object):
         
         # TODO: neither=1 was removed!!. 
         # Should that be needed, one  would have to include a M_notspec_notgcf matrix.
+        # DONE!
         
         if type == 'spec-gcf':
             metcalf_scores = np.zeros(data_links.M_spec_gcf.shape)
             metcalf_scores = (data_links.M_spec_gcf * both 
                               + data_links.M_spec_notgcf * type1_not_gcf 
-                              + data_links.M_notspec_gcf * gcf_not_type1)
+                              + data_links.M_notspec_gcf * gcf_not_type1
+                              + data_links.M_notspec_notgcf * not_type1_not_gcf)
             
             self.metcalf_spec_gcf = metcalf_scores
             
@@ -442,7 +447,8 @@ class LinkFinder(object):
             metcalf_scores = np.zeros(data_links.M_fam_gcf.shape)
             metcalf_scores = (data_links.M_fam_gcf * both 
                               + data_links.M_fam_notgcf * type1_not_gcf 
-                              + data_links.M_notfam_gcf * gcf_not_type1)
+                              + data_links.M_notfam_gcf * gcf_not_type1
+                              + data_links.M_notfam_notgcf * not_type1_not_gcf)
             
             self.metcalf_fam_gcf = metcalf_scores
         return metcalf_scores        

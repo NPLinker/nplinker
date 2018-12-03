@@ -15,40 +15,59 @@ def calc_correlation_matrix(M_type1_cond, M_type2_cond):
     M_nottype1_type2(x,y) --- number of conditions where NOT-type1_x and type2_y co-occur 
     """
        
-    dim1 = M_type1_cond.shape[0]
-    dim2 = M_type2_cond.shape[0]
-    M_type1_type2 = np.zeros((dim1, dim2))
-    M_type1_nottype2 = np.zeros((dim1, dim2))
-    M_nottype1_type2 = np.zeros((dim1, dim2))
+    # Modified by Simon to speed up
+    # If the matrices are all binary, we can make these
+    # quantities from matrix multiplication
+
+    # dim1 = M_type1_cond.shape[0]
+    # dim2 = M_type2_cond.shape[0]
+    # M_type1_type2 = np.zeros((dim1, dim2))
+    # M_type1_nottype2 = np.zeros((dim1, dim2))
+    # M_nottype1_type2 = np.zeros((dim1, dim2))
     
-    for i in range(0, dim2):
-        # show progress:
-        if (i+1) % 100 == 0 or i == dim2-1:  
-            print('\r', ' Done ', i+1, ' of ', dim2, ' type2s', end="")
+    # for i in range(0, dim2):
+    #     # show progress:
+    #     if (i+1) % 100 == 0 or i == dim2-1:  
+    #         print('\r', ' Done ', i+1, ' of ', dim2, ' type2s', end="")
             
-        # look where type1 AND type2 are present:
-        updates = M_type1_cond[:, np.where(M_type2_cond[i,:] > 0)[0]]
-        updates = np.sum(updates, axis=1)
-        M_type1_type2[:,i] = updates
+    #     # look where type1 AND type2 are present:
+    #     updates = M_type1_cond[:, np.where(M_type2_cond[i,:] > 0)[0]]
+    #     updates = np.sum(updates, axis=1)
+    #     M_type1_type2[:,i] = updates
 
-        # look where type2 i is NOT present:
-        updates = M_type1_cond[:, np.where(M_type2_cond[i,:] == 0)[0]]
-        updates = np.sum(updates, axis=1)
-        M_type1_nottype2[:,i] = updates
-    print("")
+    #     # look where type2 i is NOT present:
+    #     updates = M_type1_cond[:, np.where(M_type2_cond[i,:] == 0)[0]]
+    #     updates = np.sum(updates, axis=1)
+    #     M_type1_nottype2[:,i] = updates
+    # print("")
     
-    for i in range(0, dim1):
-        # show progress:
-        if (i+1) % 100 == 0 or i == dim1-1:
-            print('\r', ' Done ', i+1, ' of ', dim1, ' type1s.', end="")
+    # for i in range(0, dim1):
+    #     # show progress:
+    #     if (i+1) % 100 == 0 or i == dim1-1:
+    #         print('\r', ' Done ', i+1, ' of ', dim1, ' type1s.', end="")
 
-        # look where type1 i is NOT present:
-        updates = M_type2_cond[:, np.where(M_type1_cond[i,:] == 0)[0]]
-        updates = np.sum(updates, axis=1)
-        M_nottype1_type2[i,:] = updates
-    print("")
+    #     # look where type1 i is NOT present:
+    #     updates = M_type2_cond[:, np.where(M_type1_cond[i,:] == 0)[0]]
+    #     updates = np.sum(updates, axis=1)
+    #     M_nottype1_type2[i,:] = updates
+    # print("")
     
-    return M_type1_type2, M_type1_nottype2, M_nottype1_type2 
+    # Quick computation of sum both present
+    testA = np.dot(M_type1_cond,M_type2_cond.T)
+    # Present in type1 and not in type 2
+    testB = np.dot(M_type1_cond,1-M_type2_cond.T)
+    # Not in type 1 and in type 2
+    testC = np.dot(1-M_type1_cond,M_type2_cond.T)
+    # Not in either
+    testD = np.dot(1-M_type1_cond,1-M_type2_cond.T)
+    # print(np.abs((testA - M_type1_type2)).sum())
+    # print(np.abs((testB - M_type1_nottype2)).sum())
+    # print(np.abs((testC - M_nottype1_type2)).sum())
+    M_type1_type2 = testA
+    M_type1_nottype2 = testB
+    M_nottype1_type2 = testC
+    M_nottype1_nottype2 = testD
+    return M_type1_type2, M_type1_nottype2, M_nottype1_type2 , M_nottype1_nottype2
 
 
 
