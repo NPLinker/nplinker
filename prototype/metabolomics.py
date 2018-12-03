@@ -170,6 +170,8 @@ def load_metadata(spectra, metadata_file):
         reader = csv.reader(f, delimiter='\t')
         heads = next(reader)
         for line in reader:
+            if len(line) == 0:
+                continue
             spectrum = spec_dict[line[0]]
             for i, value in enumerate(line):
                 key = heads[i]
