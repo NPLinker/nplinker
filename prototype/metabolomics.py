@@ -157,6 +157,24 @@ def mols_to_spectra(ms2, metadata):
 
     return spectra
 
+def load_additional_annotations(spectra,annotation_file,id_field,annotation_field):
+    with open(annotation_file,'r') as f:
+        reader = csv.reader(f,delimiter = '\t')
+        heads = next(reader)
+        source_id_idx = heads.index(id_field)
+        annotation_idx = heads.index(annotation_field)
+        new_annotations = {}
+        for line in reader:
+            new_annotations[line[source_id_idx]] = (line[annotation_idx],annotation_file)
+    for s in spectra:
+        found_comp = set()
+        if s.spectrum_id in new_annotations:
+            compound = new_annotations[s.spectrum_id][0]
+            if not compound in found_comp:
+                s.annotations.append(new_annotations[s.spectrum_id])
+                found_comp.add(new_annotations[s.spectrum_id][0])
+            
+
 def load_metadata(spectra, metadata_file):
     # make a dictionary mapping spectum ids to spectrum
     spec_dict = {}
