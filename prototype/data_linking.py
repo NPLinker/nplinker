@@ -53,6 +53,14 @@ class DataLinks(object):
         self.M_notfam_gcf = []
         self.strain_fam_labels = []  # labels for strain-family matrix
 
+    def get_spec_pos(self,spec_id):
+        # get the position in the arrays of a spectrum
+        row = self.mapping_spec.loc[self.mapping_spec['original spec-id'] == float(spec_id)]
+        return int(row.iloc[0]['spec-id'])
+
+    def get_gcf_pos(self,gcf_id):
+        # TODO: fix this so the original ID is present in case of re-ordering
+        pass
 
     def load_data(self, spectra, gcf_list, strain_list):
         # load data from spectra, GCFs, and strains
@@ -62,7 +70,6 @@ class DataLinks(object):
         print("Create co-occurence matrices: spectra<->strains + and gcfs<->strains.")
         self.matrix_strain_gcf(gcf_list, strain_list)
         self.matrix_strain_spec(spectra, strain_list)
-
 
     def find_correlations(self, include_singletons=False):
         # collect correlations/ co-occurences
@@ -143,30 +150,45 @@ class DataLinks(object):
         self.M_gcf_strain = M_gcf_strain
 
 
-    def matrix_strain_spec(self, spectra, strain_list):
-        # Collect co-ocurences in M_strains_specs matrix
-        M_spec_strain = np.zeros((len(spectra), len(strain_list)))
+    # def matrix_strain_spec(self, spectra, strain_list):
+    #     # Collect co-ocurences in M_strains_specs matrix
+    #     M_spec_strain = np.zeros((len(spectra), len(strain_list)))
 
-        # find strain data in spectra metadata
-        metadata_category, metadata_value = zip(*list(spectra[0].metadata.items()))
+    #     # find strain data in spectra metadata
+    #     metadata_category, metadata_value = zip(*list(spectra[0].metadata.items()))
+    #     strain_list = [str(x) for x in strain_list]
+    #     strain_meta_num = []
+    #     for num, category in enumerate(metadata_category):
+    #         if category in strain_list:
+    #             strain_meta_num.append(num)
+    #     # TODO add test to see if all strain names are found in metadata
+
+    #     for i,spectrum in enumerate(spectra):
+    #         metadata_category, metadata_value = zip(*list(spectra[i].metadata.items()))
+    #         M_spec_strain[i, 0:len(strain_meta_num)] = [metadata_value[x] for x in strain_meta_num]
+
+    #     strain_spec_labels = [metadata_category[x] for x in strain_meta_num]  # strain names
+
+    #     # normalize M_spec_strain (only 0 or 1 - co-occurence or not)
+    #     M_spec_strain[M_spec_strain > 1] = 1
+    #     self.M_spec_strain = M_spec_strain
+    #     self.map_strain_name = strain_spec_labels
+    
+    
+    #   NOTE: Re-written by Simon because it was not conserving straing order
+    #   and other methods down the line assumed they'd be in the same
+    #   order as the gcf matrix
+    #   FLORIAN: can you check I'm not missing something here please! 
+    def matrix_strain_spec(self,spectra,strain_list):
         strain_list = [str(x) for x in strain_list]
-        strain_meta_num = []
-        for num, category in enumerate(metadata_category):
-            if category in strain_list:
-                strain_meta_num.append(num)
-        # TODO add test to see if all strain names are found in metadata
-
+        M_spec_strain = np.zeros((len(spectra), len(strain_list)))
         for i,spectrum in enumerate(spectra):
-            metadata_category, metadata_value = zip(*list(spectra[i].metadata.items()))
-            M_spec_strain[i, 0:len(strain_meta_num)] = [metadata_value[x] for x in strain_meta_num]
-
-        strain_spec_labels = [metadata_category[x] for x in strain_meta_num]  # strain names
-
-        # normalize M_spec_strain (only 0 or 1 - co-occurence or not)
-        M_spec_strain[M_spec_strain > 1] = 1
+            for j,s in enumerate(strain_list):
+                if spectrum.has_strain(s):
+                    M_spec_strain[i,j] = 1
         self.M_spec_strain = M_spec_strain
-        self.map_strain_name = strain_spec_labels
-
+        self.map_strain_name = strain_list
+    
 
     def data_family_mapping(self, include_singletons=False):
         # Create M_fam_strain matrix that gives co-occurences between mol. families and strains
@@ -230,17 +252,19 @@ class DataLinks(object):
         print("Calculating correlation matrices of type: ", type)
 
         # Calculate correlation matrix from co-occurence matrices
-        M_type1_gcf, M_type1_notgcf, M_nottype1_gcf = data_linking_functions.calc_correlation_matrix(M_type1_strain, self.M_gcf_strain)
+        M_type1_gcf, M_type1_notgcf, M_nottype1_gcf,M_nottype1_notgcf = data_linking_functions.calc_correlation_matrix(M_type1_strain, self.M_gcf_strain)
 
         # return results:
         if type == 'spec-gcf':
             self.M_spec_gcf = M_type1_gcf
             self.M_spec_notgcf = M_type1_notgcf
             self.M_notspec_gcf = M_nottype1_gcf
+            self.M_notspec_notgcf = M_nottype1_notgcf
         elif type == 'fam-gcf':
             self.M_fam_gcf = M_type1_gcf
             self.M_fam_notgcf = M_type1_notgcf
             self.M_notfam_gcf = M_nottype1_gcf
+            self.M_notfam_notgcf = M_nottype1_notgcf
         else:
             print("No correct correlation matrix was created.")
         print("")
@@ -248,6 +272,41 @@ class DataLinks(object):
     # class data_links OUTPUT functions
     # TODO add output functions (e.g. to search for mappings of individual specs, gcfs etc.)
 
+class RandomisedDataLinks(DataLinks):
+    """Simple subclass of DataLinks that randomly shuffles the strains within
+        the strains to spectra matrices (to be used for generating random 
+        scoring output as point of comparison with real scores) """
+
+    @classmethod
+    def from_datalinks(cls, datalinks):
+        self = cls()
+        # check if load_data has been called
+        if len(datalinks.M_spec_strain) == 0 or len(datalinks.M_gcf_strain) == 0:
+            raise Exception('DataLinks object not initialised (call load_data first)')
+
+        # create copies of the data structures required
+        # TODO all of these needed?
+        self.mapping_spec = datalinks.mapping_spec.copy()
+        self.mapping_gcf = datalinks.mapping_gcf.copy()
+        self.M_gcf_strain = datalinks.M_gcf_strain.copy()
+        self.M_spec_strain = datalinks.M_spec_strain.copy()
+        self.map_strain_name = datalinks.map_strain_name.copy()
+
+        # shuffle matrices
+        self._shuffle_cols(self.M_spec_strain)
+        # TODO needed?
+        # self._shuffle_cols(self.M_gcf_strain)
+
+        # can now run find_correlations with the shuffled matrices
+        return self
+
+    def _shuffle_cols(self, m):
+        # shuffle the columns a gcf/spec-strain matrix so that each strain remains 
+        # present in the same number of now-random objects.
+        # np.random.shuffle only operates on first axis of multi-axis arrays, so
+        # take transpose to get columns here instead.
+        for col in m.T:
+            np.random.shuffle(col)
 
 
 class LinkLikelihood(object):
@@ -365,6 +424,7 @@ class LinkFinder(object):
                         both=10, 
                         type1_not_gcf=-10, 
                         gcf_not_type1=0,
+                        not_type1_not_gcf = 1,
                         type='spec-gcf'):  
         """
         Calculate metcalf scores from DataLinks() co-occurence matrices 
@@ -372,12 +432,14 @@ class LinkFinder(object):
         
         # TODO: neither=1 was removed!!. 
         # Should that be needed, one  would have to include a M_notspec_notgcf matrix.
+        # DONE!
         
         if type == 'spec-gcf':
             metcalf_scores = np.zeros(data_links.M_spec_gcf.shape)
             metcalf_scores = (data_links.M_spec_gcf * both 
                               + data_links.M_spec_notgcf * type1_not_gcf 
-                              + data_links.M_notspec_gcf * gcf_not_type1)
+                              + data_links.M_notspec_gcf * gcf_not_type1
+                              + data_links.M_notspec_notgcf * not_type1_not_gcf)
             
             self.metcalf_spec_gcf = metcalf_scores
             
@@ -385,10 +447,11 @@ class LinkFinder(object):
             metcalf_scores = np.zeros(data_links.M_fam_gcf.shape)
             metcalf_scores = (data_links.M_fam_gcf * both 
                               + data_links.M_fam_notgcf * type1_not_gcf 
-                              + data_links.M_notfam_gcf * gcf_not_type1)
+                              + data_links.M_notfam_gcf * gcf_not_type1
+                              + data_links.M_notfam_notgcf * not_type1_not_gcf)
             
             self.metcalf_fam_gcf = metcalf_scores
-
+        return metcalf_scores        
 
     def likelihood_scoring(self, data_links, likelihoods, 
                         alpha_weighing=0.5,
@@ -430,7 +493,7 @@ class LinkFinder(object):
                                  )
             
             self.likescores_fam_gcf = likelihood_scores
-
+        return likelihood_scores
 
     def select_link_candidates(self, data_links, likelihoods,
                                P_cutoff=0.8, 

@@ -38,6 +38,7 @@ class BGC(object):
 class GCF(object):
     def __init__(self, gcf_id):
         self.gcf_id = gcf_id
+        self.short_gcf_id = gcf_id.split(os.sep)[-1]
         self.bgc_list = []
         self.random_gcf = None
 
@@ -45,7 +46,7 @@ class GCF(object):
         self.strains_lookup = None
 
     def __str__(self):
-        return str(self.gcf_id.split(os.sep)[-1])
+        return self.short_gcf_id
 
     def add_bgc(self, bgc):
         self.bgc_list.append(bgc)
@@ -164,7 +165,7 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
                         except:
                             strain_name = strain_id_dict[name.split('.')[0]]
                     except:
-                        print("NO STRAIN")
+                        print("NO STRAIN %s" % name)
 
                 if strain_name not in strain_dict:
                     new_strain = strain_name
