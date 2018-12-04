@@ -30,6 +30,7 @@ def get_sig_links(scores,random_scores,p_threshold=0.95,direction = 'greater'):
 def get_sig_spec(data_link,sig_links,scores,gcf_pos,min_n_strains = 2):
     # Check if there are *any* strains in the GCF
     # No strains = MiBIG
+    # Can also filter if only (e.g. 2 strains)
     strain_sum = data_link.M_gcf_strain[gcf_pos,:].sum()
     if strain_sum < min_n_strains:
         return []
