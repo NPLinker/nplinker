@@ -40,6 +40,7 @@ class DataLinks(object):
         # mappings (lookup lists to map between different ids and categories
         self.mapping_spec = []
         self.mapping_gcf = []
+        self.mapping_fam = []  # labels for strain-family matrix
         self.map_strain_name = []
         self.family_members = []
 
@@ -51,7 +52,7 @@ class DataLinks(object):
         self.M_fam_gcf = []
         self.M_fam_notgcf = []
         self.M_notfam_gcf = []
-        self.strain_fam_labels = []  # labels for strain-family matrix
+
 
     def get_spec_pos(self,spec_id):
         # get the position in the arrays of a spectrum
@@ -145,48 +146,26 @@ class DataLinks(object):
             for m, gcf in enumerate(gcf_list):
                 in_gcf = gcf.has_strain(strain)
                 if in_gcf:
-                    M_gcf_strain[m,i] += 1
+                    M_gcf_strain[m,i] = 1
 
         self.M_gcf_strain = M_gcf_strain
-
-
-    # def matrix_strain_spec(self, spectra, strain_list):
-    #     # Collect co-ocurences in M_strains_specs matrix
-    #     M_spec_strain = np.zeros((len(spectra), len(strain_list)))
-
-    #     # find strain data in spectra metadata
-    #     metadata_category, metadata_value = zip(*list(spectra[0].metadata.items()))
-    #     strain_list = [str(x) for x in strain_list]
-    #     strain_meta_num = []
-    #     for num, category in enumerate(metadata_category):
-    #         if category in strain_list:
-    #             strain_meta_num.append(num)
-    #     # TODO add test to see if all strain names are found in metadata
-
-    #     for i,spectrum in enumerate(spectra):
-    #         metadata_category, metadata_value = zip(*list(spectra[i].metadata.items()))
-    #         M_spec_strain[i, 0:len(strain_meta_num)] = [metadata_value[x] for x in strain_meta_num]
-
-    #     strain_spec_labels = [metadata_category[x] for x in strain_meta_num]  # strain names
-
-    #     # normalize M_spec_strain (only 0 or 1 - co-occurence or not)
-    #     M_spec_strain[M_spec_strain > 1] = 1
-    #     self.M_spec_strain = M_spec_strain
-    #     self.map_strain_name = strain_spec_labels
+        # extend mapping table:
+        self.mapping_gcf["no of strains"] =  np.sum(self.M_gcf_strain, axis=1)
+        
     
-    
-    #   NOTE: Re-written by Simon because it was not conserving straing order
-    #   and other methods down the line assumed they'd be in the same
-    #   order as the gcf matrix
-    #   FLORIAN: can you check I'm not missing something here please! 
-    def matrix_strain_spec(self,spectra,strain_list):
+    def matrix_strain_spec(self, spectra, strain_list):
+        # Collect co-ocurences in M_strains_specs matrix
+
         strain_list = [str(x) for x in strain_list]
         M_spec_strain = np.zeros((len(spectra), len(strain_list)))
-        for i,spectrum in enumerate(spectra):
-            for j,s in enumerate(strain_list):
+        for i, spectrum in enumerate(spectra):
+            for j, s in enumerate(strain_list):
                 if spectrum.has_strain(s):
                     M_spec_strain[i,j] = 1
         self.M_spec_strain = M_spec_strain
+        
+        # extend mapping table:
+        self.mapping_spec["no of strains"] =  np.sum(self.M_spec_strain, axis=1)
         self.map_strain_name = strain_list
     
 
@@ -205,7 +184,8 @@ class DataLinks(object):
 
         M_fam_strain = np.zeros((num_unique_fams, self.M_spec_strain.shape[1]))
         strain_fam_labels = []
-
+        
+        
         if num_of_singletons > 0:  # if singletons exist + included
             M_fam_strain[(num_unique_fams-num_of_singletons):,
                          :] = self.M_spec_strain[np.where(self.mapping_spec["fam-id"][:,0] == -1)[0],:]
@@ -223,7 +203,12 @@ class DataLinks(object):
         strain_fam_labels.append([-1] * num_of_singletons)
 
         self.M_fam_strain = M_fam_strain
-        self.strain_fam_labels = strain_fam_labels
+        # extend mapping table:
+        self.mapping_fam = pd.DataFrame(strain_fam_labels, columns = ["family id"])
+        self.mapping_fam["no of strains"] =  np.sum(self.M_fam_strain, axis=1)
+        num_members = [x[0].shape[0] for x in self.family_members]
+        num_members.append(num_of_singletons)
+        self.mapping_fam["no of members"] = num_members
         return self.family_members
 
 
@@ -336,7 +321,6 @@ class LinkLikelihood(object):
         self.P_gcf_not_fam = []
 
 
-
     def calculate_likelihoods(self, data_links, type='spec-gcf'):
         """
         Calulate likelihoods from empirically found co-occurences in data
@@ -418,7 +402,6 @@ class LinkFinder(object):
         self.link_candidates_gcf_spec = []
         self.link_candidates_gcf_fam = []
 
-
     
     def metcalf_scoring(self, data_links,
                         both=10, 
@@ -429,10 +412,6 @@ class LinkFinder(object):
         """
         Calculate metcalf scores from DataLinks() co-occurence matrices 
         """
-        
-        # TODO: neither=1 was removed!!. 
-        # Should that be needed, one  would have to include a M_notspec_notgcf matrix.
-        # DONE!
         
         if type == 'spec-gcf':
             metcalf_scores = np.zeros(data_links.M_spec_gcf.shape)
@@ -452,6 +431,7 @@ class LinkFinder(object):
             
             self.metcalf_fam_gcf = metcalf_scores
         return metcalf_scores        
+
 
     def likelihood_scoring(self, data_links, likelihoods, 
                         alpha_weighing=0.5,
@@ -473,8 +453,6 @@ class LinkFinder(object):
             weighing function is here a function of the number of strains they co-occur.
             weighing function = (1 - exp(-alpha_weighing * num_of_co-occurrences)
         """
-
-
         
         if type == 'spec-gcf':
             likelihood_scores = np.zeros(data_links.M_spec_gcf.shape)
@@ -494,6 +472,7 @@ class LinkFinder(object):
             
             self.likescores_fam_gcf = likelihood_scores
         return likelihood_scores
+
 
     def select_link_candidates(self, data_links, likelihoods,
                                P_cutoff=0.8, 
@@ -521,7 +500,7 @@ class LinkFinder(object):
             score >= score_cutoff
         """
 
-        # Make selection for scenario spec<->gcf or fam<->gcf
+        # Select scenario: spec<->gcf or fam<->gcf
         if type == 'spec-gcf':
             P_gcf_given_type1 = likelihoods.P_gcf_given_spec
             P_gcf_not_type1 = likelihoods.P_gcf_not_spec
@@ -532,7 +511,8 @@ class LinkFinder(object):
             likescores = self.likescores_spec_gcf
             index_names = ["spectrum_id", "GCF id", "P(gcf|spec)", "P(spec|gcf)", 
                              "P(gcf|not spec)", "P(spec|not gcf)", 
-                             "co-occur in # strains", "metcalf score", "likelihood score"]
+                             "co-occur in # strains", 
+                             "metcalf score", "likelihood score", "probability"]
 
         elif type == 'fam-gcf':
             P_gcf_given_type1 = likelihoods.P_gcf_given_fam
@@ -544,7 +524,8 @@ class LinkFinder(object):
             likescores = self.likescores_fam_gcf
             index_names = ["family_id", "GCF id", "P(gcf|fam)", "P(fam|gcf)", 
                              "P(gcf|not fam)", "P(fam|not gcf)", 
-                             "co-occur in # strains", "metcalf score", "likelihood score"]
+                             "co-occur in # strains", 
+                             "metcalf score", "likelihood score", "probability"]
 
         elif type == 'spec-bgc' or type == 'fam-bgc':
             print("Given types are not yet supported... ")
@@ -555,9 +536,7 @@ class LinkFinder(object):
         dim1, dim2 = P_gcf_given_type1.shape
 
         # PRE-SELECTION: 
-        # Select candidates with P_gcf_given_spec >= P_cutoff AND score >= score_cutoff
-        candidate_ids = np.where(P_gcf_given_type1[:,:] >= P_cutoff)
-        
+        # Select candidates with P_gcf_given_spec >= P_cutoff AND score >= score_cutoff        
         if main_score == 'likescore':
             candidate_ids = np.where((P_gcf_given_type1[:,:] >= P_cutoff) & (likescores >= score_cutoff))
         elif main_score == 'metcalf':
@@ -569,7 +548,7 @@ class LinkFinder(object):
         print(candidate_ids[0].shape[0], " candidates selected with ", 
               index_names[2], " >= ", P_cutoff, " and a link score >= ", score_cutoff, ".")
         
-        link_candidates = np.zeros((9, candidate_ids[0].shape[0]))
+        link_candidates = np.zeros((10, candidate_ids[0].shape[0]))
         link_candidates[0,:] = candidate_ids[0].astype(int)  # spectrum/fam number
         link_candidates[1,:] = candidate_ids[1].astype(int)  # gcf id
         link_candidates[2,:] = P_gcf_given_type1[candidate_ids]
@@ -579,6 +558,21 @@ class LinkFinder(object):
         link_candidates[6,:] = M_type1_gcf[candidate_ids].astype(int)
         link_candidates[7,:] = metcalf_scores[candidate_ids]
         link_candidates[8,:] = likescores[candidate_ids]
+        
+        # Calculate probability to find similar link by chance
+        Nx_list = data_links.mapping_gcf["no of strains"]
+        if type == 'spec-gcf':
+            Ny_list = data_links.mapping_spec["no of strains"]
+        elif type == 'fam-gcf':
+            Ny_list = data_links.mapping_fam["no of strains"]   
+            
+        num_strains = data_links.M_gcf_strain.shape[1]
+        for i in range(link_candidates.shape[1]):    
+             link_candidates[9,i] = data_linking_functions.pair_prob(link_candidates[6,i],
+                            num_strains, 
+                            Nx_list[link_candidates[1,i]],
+                            Ny_list[link_candidates[0,i]])
+                                                                 
         
         # Transform into pandas Dataframe (to avoid index confusions):
         link_candidates_pd = pd.DataFrame(link_candidates.transpose(1,0), columns = index_names)
@@ -597,8 +591,94 @@ class LinkFinder(object):
             self.link_candidates_gcf_fam = link_candidates_pd
         else:
             print("No candidate selection was created.")
-
         return link_candidates_pd
+    
+    
+    def get_links(self, input_object, 
+                  input_type, 
+                  main_score='likescore',
+                  score_cutoff=0.5):
+        """
+        Output likely links for 'input_object'
+        
+        Parameters
+        ----------
+        input_objects: int, list
+            id or list of ids of either spectra, mol.families, or GCFs
+        input_type: str 
+            type of input object ('spec', 'fam', 'gcf')
+        main_score: str
+            Which main score to use ('metcalf', 'likescore')
+        score_cutoff:  
+            Thresholds to conly consider candidates for which:
+            score >= score_cutoff
+        """
+        
+        # Check input_object:
+        if isinstance(input_object, list):
+            object_is = 'list'
+            query_size = len(input_object)
+        elif isinstance(input_object, int):
+            object_is = 'int'
+            query_size = 1
+        else: 
+            print("Input_object must be either of type 'int' or list (of 'int's).")
+        input_object = np.array(input_object)
+
+        # Check input_type:
+        # level 0 = spectra <-> gcf
+        # level 1 = mol.family <-> gcf
+        if (input_type == "spec") or (input_type =="spectrum"):
+            link_levels = [0]  
+            likescores = [self.likescores_spec_gcf[input_object, :],
+                          []]
+            metcalf_scores = [self.metcalf_spec_gcf[input_object, :],
+                              []]
+        elif input_type == "fam":
+            link_levels = [1]
+            likescores = [[], 
+                          self.likescores_fam_gcf[input_object, :]]
+            metcalf_scores = [[],
+                              self.metcalf_fam_gcf[input_object, :]]
+        elif input_type == "gcf":
+            link_levels = [0, 1]
+            likescores = [self.likescores_spec_gcf[:, input_object],
+                          self.likescores_fam_gcf[:, input_object]]
+            metcalf_scores = [self.metcalf_spec_gcf[:, input_object],
+                              self.metcalf_fam_gcf[:, input_object]]
+        else:
+            print("Unknown input type given.")
+
+        links = []
+        for linklevel in link_levels:
+            if main_score == 'likescore':
+                candidate_ids = np.where(likescores[linklevel] >= score_cutoff)
+            elif main_score == 'metcalf':
+                candidate_ids = np.where(metcalf_scores[linklevel] >= score_cutoff)
+            else:
+                print("Wrong scoring 'type' given.")
+                print("Must be one of: 'metcalf', 'likescore' ...")
+
+            link_candidates = np.zeros((3, candidate_ids[0].shape[0]))
+            
+            if query_size == 1:
+                link_candidates[0,:] = input_object  # input id
+                link_candidates[1,:] = candidate_ids[0].astype(int)  # output id
+            else:
+                if input_type == "gcf":
+                    link_candidates[0,:] = input_object[candidate_ids[1]]  # input id
+                    link_candidates[1,:] = candidate_ids[0].astype(int)  # output id
+                else:
+                    link_candidates[0,:] = input_object[candidate_ids[0]]  # input id
+                    link_candidates[1,:] = candidate_ids[1].astype(int)  # output id
+                
+            link_candidates[2,:] = likescores[linklevel][candidate_ids]
+            
+            links.append(link_candidates)
+
+        return links
+
+
 
 
     def create_cytoscape_files(self, data_links, 
@@ -682,7 +762,6 @@ class LinkFinder(object):
                 
         # export graph for drawing (e.g. using Cytoscape)
         nx.write_graphml(NPlinker_net, network_filename)
-
 
 
     def plot_candidates(self, P_cutoff=0.8, 

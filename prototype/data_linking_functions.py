@@ -14,44 +14,7 @@ def calc_correlation_matrix(M_type1_cond, M_type2_cond):
     M_type1_nottype2(x,y) --- number of conditions where type1_x and NOT-type2_y co-occur
     M_nottype1_type2(x,y) --- number of conditions where NOT-type1_x and type2_y co-occur 
     """
-       
-    # Modified by Simon to speed up
-    # If the matrices are all binary, we can make these
-    # quantities from matrix multiplication
-
-    # dim1 = M_type1_cond.shape[0]
-    # dim2 = M_type2_cond.shape[0]
-    # M_type1_type2 = np.zeros((dim1, dim2))
-    # M_type1_nottype2 = np.zeros((dim1, dim2))
-    # M_nottype1_type2 = np.zeros((dim1, dim2))
-    
-    # for i in range(0, dim2):
-    #     # show progress:
-    #     if (i+1) % 100 == 0 or i == dim2-1:  
-    #         print('\r', ' Done ', i+1, ' of ', dim2, ' type2s', end="")
-            
-    #     # look where type1 AND type2 are present:
-    #     updates = M_type1_cond[:, np.where(M_type2_cond[i,:] > 0)[0]]
-    #     updates = np.sum(updates, axis=1)
-    #     M_type1_type2[:,i] = updates
-
-    #     # look where type2 i is NOT present:
-    #     updates = M_type1_cond[:, np.where(M_type2_cond[i,:] == 0)[0]]
-    #     updates = np.sum(updates, axis=1)
-    #     M_type1_nottype2[:,i] = updates
-    # print("")
-    
-    # for i in range(0, dim1):
-    #     # show progress:
-    #     if (i+1) % 100 == 0 or i == dim1-1:
-    #         print('\r', ' Done ', i+1, ' of ', dim1, ' type1s.', end="")
-
-    #     # look where type1 i is NOT present:
-    #     updates = M_type2_cond[:, np.where(M_type1_cond[i,:] == 0)[0]]
-    #     updates = np.sum(updates, axis=1)
-    #     M_nottype1_type2[i,:] = updates
-    # print("")
-    
+          
     # Quick computation of sum both present
     testA = np.dot(M_type1_cond,M_type2_cond.T)
     # Present in type1 and not in type 2
@@ -114,3 +77,39 @@ def calc_likelihood_matrix(M_type1_cond, M_type2_cond,
     P_type1_not_type2 = M_type1_nottype2/np.tile(P_sum_not_type2, (dim1, 1))
     
     return P_type2_given_type1, P_type2_not_type1, P_type1_given_type2, P_type1_not_type2
+
+
+def pair_prob(k, N, Nx, Ny):
+    """
+    Calculate the probability to draw k times type(Ny) out of N elements (whereof Ny type(Ny)s),
+    when drawing Nx times in total.
+    """
+    if (k > Nx) or (k > Ny):
+        print("Given 'k' must be <= Nx and <= Ny.")
+    
+    import math
+    
+    term1 = math.factorial(Ny)/(math.factorial(k) * math.factorial(Ny - k))
+    term2 = math.factorial(N - Ny)/(math.factorial(Nx - k) * math.factorial(N - Nx - Ny + k))
+    term3 = math.factorial(N)/(math.factorial(Nx) * math.factorial(N - Nx))
+    
+    return term1 * term2 / term3 
+    
+
+def hit_prob_dist(N, Nx, Ny, nys):
+    
+    import math
+    
+    p_dist_ks = []
+    for k in range(1,min(Nx, Ny)+1):
+        p = pair_prob(k, N, Nx, Ny)
+        
+        p_dist = []
+        for k in range(0, nys+1):
+            term1 = math.factorial(nys) / (math.factorial(k) * math.factorial(nys - k)) 
+            term2 = p**k * (1 - p)**(nys-k)
+            p_dist.append(term1 * term2)
+        p_dist_ks.append(p_dist)
+        
+    return p_dist_ks
+        
