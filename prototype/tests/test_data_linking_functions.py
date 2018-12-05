@@ -38,3 +38,26 @@ def test_calc_likelihood_matrix():
     assert LAnotB[1][0] == 1
     assert LAnotB[4][4] == 1/3
     assert LBA.shape == (len(A), len(B))  # must have shape len(A), len(B)
+
+
+from data_linking_functions import pair_prob
+    
+def test_pair_prob():
+    # Test pair_prob with known cases
+    assert pair_prob(1, 100, 1, 1) == 1/100  
+    assert pair_prob(1, 100, 50, 1) == 0.5
+    assert pair_prob(1, 100, 1, 50) == 0.5
+    assert pair_prob(1, 100, 2, 2) == 98/100 * 2/99 + 2/100 * 98/99
+    
+    
+from data_linking_functions import hit_prob_dist
+
+def test_hit_prob_dist():
+    # Testhit_prob_dist with known cases
+    
+    pks = hit_prob_dist(100, 1, 1, 100)
+    assert np.sum(pks) > 0.99999999
+    assert np.sum(pks) < 1.00000001
+    assert pks[0][0] == 0.99**100
+    
+    
