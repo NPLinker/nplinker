@@ -1,7 +1,7 @@
 import csv
 import numpy as np
 
-from ms2lda_feature_extraction import LoadMGF
+from parsers import LoadMGF
 
 class Spectrum(object):
     
