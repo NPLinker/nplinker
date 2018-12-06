@@ -263,26 +263,26 @@ class RandomisedDataLinks(DataLinks):
         scoring output as point of comparison with real scores) """
 
     @classmethod
-    def from_datalinks(cls, datalinks):
+    def from_datalinks(cls, datalinks, find_correlations=True):
         self = cls()
         # check if load_data has been called
         if len(datalinks.M_spec_strain) == 0 or len(datalinks.M_gcf_strain) == 0:
             raise Exception('DataLinks object not initialised (call load_data first)')
 
+        # TODO is this all that's needed here?
         # create copies of the data structures required
-        # TODO all of these needed?
-        self.mapping_spec = datalinks.mapping_spec.copy()
-        self.mapping_gcf = datalinks.mapping_gcf.copy()
         self.M_gcf_strain = datalinks.M_gcf_strain.copy()
         self.M_spec_strain = datalinks.M_spec_strain.copy()
-        self.map_strain_name = datalinks.map_strain_name.copy()
+        self.mapping_spec = datalinks.mapping_spec.copy()
 
-        # shuffle matrices
+        # shuffle matrix/matrices
         self._shuffle_cols(self.M_spec_strain)
-        # TODO needed?
         # self._shuffle_cols(self.M_gcf_strain)
 
         # can now run find_correlations with the shuffled matrices
+        if find_correlations:
+            self.find_correlations()
+
         return self
 
     def _shuffle_cols(self, m):
