@@ -594,8 +594,7 @@ class LinkFinder(object):
         return link_candidates_pd
     
     
-    def get_links(self, input_object, 
-                  input_type, 
+    def get_links(self, data_links, input_object, 
                   main_score='likescore',
                   score_cutoff=0.5):
         """
@@ -603,10 +602,8 @@ class LinkFinder(object):
         
         Parameters
         ----------
-        input_objects: int, list
-            id or list of ids of either spectra, mol.families, or GCFs
-        input_type: str 
-            type of input object ('spec', 'fam', 'gcf')
+        input_objects: object()
+            Object or list of objects of either class: spectra, families, or GCFs
         main_score: str
             Which main score to use ('metcalf', 'likescore')
         score_cutoff:  
@@ -614,40 +611,68 @@ class LinkFinder(object):
             score >= score_cutoff
         """
         
-        # Check input_object:
+        from genomics import GCF
+        from metabolomics import Spectrum, MolecularFamily
+        
+        # Check if input is list:
         if isinstance(input_object, list):
-            object_is = 'list'
             query_size = len(input_object)
-        elif isinstance(input_object, int):
-            object_is = 'int'
+        else:
+            input_object = [input_object]
             query_size = 1
-        else: 
-            print("Input_object must be either of type 'int' or list (of 'int's).")
-        input_object = np.array(input_object)
-
-        # Check input_type:
-        # level 0 = spectra <-> gcf
-        # level 1 = mol.family <-> gcf
-        if (input_type == "spec") or (input_type =="spectrum"):
+        
+        # Check type of input_object:
+        # If GCF:
+        if isinstance(input_object[0], GCF):
+            input_type = "gcf"
+            link_levels = [0, 1]
+            
+            # Get necessary ids
+            input_ids = np.zeros(query_size)
+            for i, gcf in enumerate(input_object):
+                input_ids[i] = gcf.id
+            input_ids =  input_ids.astype(int)  
+            
+            likescores = [self.likescores_spec_gcf[:, input_ids],
+                          self.likescores_fam_gcf[:, input_ids]]
+            metcalf_scores = [self.metcalf_spec_gcf[:, input_ids],
+                              self.metcalf_fam_gcf[:, input_ids]]
+        # If Spectrum:
+        elif isinstance(input_object[0], Spectrum):
+            
+            # Get necessary ids
+            # TODO: maybe better also add the unique id to the Spectrum object?
+            input_ids = np.zeros(query_size)
+            mapping_spec_id = data_links.mapping_spec["original spec-id"]
+            for i, spectrum in enumerate(input_object):
+                input_ids[i] = np.where(mapping_spec_id == int(spectrum.spectrum_id))[0] 
+            input_ids =  input_ids.astype(int)  
+            
+            input_type = "spec"
             link_levels = [0]  
-            likescores = [self.likescores_spec_gcf[input_object, :],
+            likescores = [self.likescores_spec_gcf[input_ids, :],
                           []]
-            metcalf_scores = [self.metcalf_spec_gcf[input_object, :],
+            metcalf_scores = [self.metcalf_spec_gcf[input_ids, :],
                               []]
-        elif input_type == "fam":
+        # If MolecularFamily:                     
+        elif isinstance(input_object[0], MolecularFamily):
+            
+            # Get necessary ids
+            # TODO: include Singletons, maybe optinal
+            input_ids = np.zeros(query_size)
+            mapping_fam_id = data_links.mapping_fam["family id"]
+            for i, family in enumerate(input_object):
+                input_ids[i] = np.where(mapping_fam_id == int(family.family_id))[0] 
+            input_ids =  input_ids.astype(int)  
+            
+            input_type = "fam"
             link_levels = [1]
             likescores = [[], 
-                          self.likescores_fam_gcf[input_object, :]]
+                          self.likescores_fam_gcf[input_ids, :]]
             metcalf_scores = [[],
-                              self.metcalf_fam_gcf[input_object, :]]
-        elif input_type == "gcf":
-            link_levels = [0, 1]
-            likescores = [self.likescores_spec_gcf[:, input_object],
-                          self.likescores_fam_gcf[:, input_object]]
-            metcalf_scores = [self.metcalf_spec_gcf[:, input_object],
-                              self.metcalf_fam_gcf[:, input_object]]
-        else:
-            print("Unknown input type given.")
+                              self.metcalf_fam_gcf[input_ids, :]]
+        else: 
+            print("Input_object must be Spectrum, MolecularFamily, or GCF object (single or list).")
 
         links = []
         for linklevel in link_levels:
@@ -662,14 +687,14 @@ class LinkFinder(object):
             link_candidates = np.zeros((3, candidate_ids[0].shape[0]))
             
             if query_size == 1:
-                link_candidates[0,:] = input_object  # input id
+                link_candidates[0,:] = input_ids  # input id
                 link_candidates[1,:] = candidate_ids[0].astype(int)  # output id
             else:
                 if input_type == "gcf":
-                    link_candidates[0,:] = input_object[candidate_ids[1]]  # input id
+                    link_candidates[0,:] = input_ids[candidate_ids[1]]  # input id
                     link_candidates[1,:] = candidate_ids[0].astype(int)  # output id
                 else:
-                    link_candidates[0,:] = input_object[candidate_ids[0]]  # input id
+                    link_candidates[0,:] = input_ids[candidate_ids[0]]  # input id
                     link_candidates[1,:] = candidate_ids[1].astype(int)  # output id
                 
             link_candidates[2,:] = likescores[linklevel][candidate_ids]
