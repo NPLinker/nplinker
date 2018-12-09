@@ -49,6 +49,9 @@ class GCF(object):
     def __str__(self):
         return 'GCF(id={}, short_gcf_id={})'.format(self.id, self.short_gcf_id)
 
+    def __repr__(self):
+        return str(self)
+
     def add_bgc(self, bgc):
         self.bgc_list.append(bgc)
 
