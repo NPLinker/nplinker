@@ -2,6 +2,9 @@ import sys
 import os
 import glob
 import logging
+import pickle
+
+import numpy as np
 
 from metabolomics import load_spectra
 from metabolomics import load_edges
@@ -26,9 +29,13 @@ logger = LogConfig.getLogger(__file__)
 class NPLinker(object):
 
     FOLDERS = ['NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs', 'Saccharides', 'Terpene']
+    SCORING_METHODS = ['metcalf', 'likescore']
+    DEFAULT_SCORING = 'metcalf'
+    OBJ_CLASSES = [Spectrum, MolecularFamily, GCF]
 
     def __init__(self, mgf_file, edges_file, nodes_file, mibig_json_dir,
-                    root_path, antismash_dir, antismash_format='flat'):
+                    root_path, antismash_dir, antismash_format='flat',
+                    repro_file=None):
 
         for f in [mgf_file, edges_file, nodes_file, mibig_json_dir, root_path, antismash_dir]:
             if f is not None and not os.path.exists(f):
@@ -50,12 +57,41 @@ class NPLinker(object):
         self._families = None
         self._mibig_bgc_dict = {}
 
-        self._indices = {}
-        self._edges = {}
+        self._spec_gcf_scores = {m: None for m in NPLinker.SCORING_METHODS}
+        self._fam_gcf_scores = {m: None for m in NPLinker.SCORING_METHODS}
 
         self._datalinks = None
         self._rdatalinks = []
         self._linkfinders = {}
+
+        self._repro_data = {}
+        if repro_file is not None:
+            self._save_repro_data(repro_file)
+
+    def _collect_repro_data(self):
+        """
+        This method creates a dict containing various bits of information about
+        the current execution of nplinker. This data can optionally be saved to
+        a file in order to aid reproducibility.
+        """
+
+        self._repro_data = {}
+        # TODO best way to embed latest git commit hash? probably with a packaging script...
+        # TODO versions of all Python dependencies used (just rely on Pipfile.lock here?)
+        
+        # insert command line arguments
+        self._repro_data['args'] = {}
+        for i, arg in enumerate(sys.argv):
+            self._repro_data['args'][i] = arg
+
+        # TODO anything else?
+
+    def _save_repro_data(self, filename):
+        self._collect_repro_data()
+        with open(filename, 'wb') as repro_file:
+            # TODO better format than pickle? 
+            pickle.dump(self._repro_data, repro_file)
+            logger.info('Saving reproducibility data to {}'.format(filename))
 
     def load_data(self):
         logger.debug('load_data')
@@ -89,17 +125,11 @@ class NPLinker(object):
                                                 antismash_dir=self.antismash_dir, antismash_format=self.antismash_format,
                                                 mibig_bgc_dict=self._mibig_bgc_dict)
 
-        self._indices = {
-            GCF : {gcf: x for x, gcf in enumerate(self._gcfs)},
-            Spectrum : {spectra: x for x, spectra in enumerate(self._spectra)},
-            str : {strain: x for x, strain in enumerate(self._strains)},
-        }
-
         logger.debug('load_data: completed')
         return True
 
     def process_dataset(self, find_correlations=True, random_count=50,
-                            scoring_methods=['metcalf', 'likescore']):
+                            scoring_methods=SCORING_METHODS):
         """
         Construct the DataLinks and LinkFinder objects from the loaded dataset.
         Then run scoring functions using the methods in scoring_methods with
@@ -138,54 +168,130 @@ class NPLinker(object):
                 ll.calculate_likelihoods(dl, type='fam-gcf')
                 lf.likelihood_scoring(dl, ll, type='spec-gcf')
                 lf.likelihood_scoring(dl, ll, type='fam-gcf')
-        
+
+        # for storing results of calls to get_links
+        self._spec_gcf_scores = {m: np.zeros((len(self._spectra), len(self._gcfs))) for m in NPLinker.SCORING_METHODS}
+        self._fam_gcf_scores = {m: np.zeros((self._datalinks.M_fam_strain.shape[0], len(self._gcfs))) for m in NPLinker.SCORING_METHODS}
+
         return True
 
-    def _get_ids_for_objects(self, objects):
-        if isinstance(objects, list) and type(objects[0]) in self._indices:
-            t = type(objects[0])
-            return [self._indices[t][x] for x in objects]
-        
-        if type(objects) in self._indices:
-            t = type(objects)
-            return self._indices[t][objects]
+    def get_links(self, objects, datalinks=None, scoring_method=DEFAULT_SCORING, scoring_cutoff=0.5):
+        """
+        This method is used to collect scores for objects of type GCF/Spectrum/MolecularFamily given
+        a scoring method and cutoff value.
 
-        logger.warn('Unknown type supplied to _get_ids_for_objects ({})'.format(type(objects)))
-        return None
+        The objects parameter can be a single instance of any of those 3 types, a list of instances
+        of any one type, or a mixed list containing instances of all 3 types. In the first two cases,
+        the return value will be a list containing instances of objects for which links/edges were
+        found with scores above the supplied cutoff value. For the latter case, the return value
+        will be a 3-element list containing the results for each of the 3 object types, always in
+        the order [GCF, Spectrum, MolecularFamily]. 
 
-    def get_links(self, objects, datalinks=None, scoring_method='metcalf', score_cutoff=0.5):
+        To look up the actual scores for the returned objects, use NPLinker.<method>_scores
+        """
+        # single object, pass it straight through
+        if not isinstance(objects, list):
+            logger.debug('get_links: single object')
+            return self._get_links([objects], datalinks, scoring_method, scoring_cutoff)
+
+        # check if the list contains one or multiple types of object
+        type_counts = {NPLinker.OBJ_CLASSES[t]: 0 for t in range(len(NPLinker.OBJ_CLASSES))}
+        for o in objects:
+            try:
+                type_counts[type(o)] += 1
+            except KeyError:
+                raise Exception('Unsupported type passed to get_links ({})'.format(type(o)))
+
+        if max(type_counts.values()) == len(objects):
+            # if the list seems to have a uniform type, again pass straight through
+            logger.debug('get_links: uniformly typed list ({})'.format(type(objects[0])))
+            return self._get_links(objects, datalinks, scoring_method, scoring_cutoff)
+
+        # finally, if it's a mix of objects, extract them into separate lists and call 
+        # the internal method multiple times instead
+        obj_lists = {t: [] for t in NPLinker.OBJ_CLASSES}
+        for o in objects:
+            obj_lists[type(o)].append(o)
+
+        # keep consistent ordering here: GCF, Spectrum, MolecularFamily
+        obj_lists = [obj_lists[GCF], obj_lists[Spectrum], obj_lists[MolecularFamily]]
+
+        results = [[] for t in NPLinker.OBJ_CLASSES]
+        logger.debug('get_links: multiple lists')
+        for i in range(len(NPLinker.OBJ_CLASSES)):
+            if len(obj_lists[i]) > 0:
+                results[i].append(self._get_links(obj_lists[i], datalinks, scoring_method, scoring_cutoff))
+
+        return results
+
+    def _get_links(self, objects, datalinks, scoring_method, scoring_cutoff):
+        if len(objects) == 0:
+            return []
+
         if len(self._linkfinders) == 0:
             raise Exception('Need to call process_dataset first')
 
-        obj_classes = [Spectrum, MolecularFamily, GCF]
-        obj_types = ['spec', 'fam', 'gcf']
-        obj_type = None
-
-        object = objects[0] if isinstance(objects, list) else objects
-
-        for t in range(len(obj_types)):
-            if isinstance(object, obj_classes[t]):
-                obj_type = obj_types[t]
-                break
-
-        if obj_type is None:
-            given_type = type(objects[0]) if isinstance(objects, list) else type(objects)
-            raise Exception('Unsupported type passed to get_scores ({})'.format(given_type))
+        if scoring_method not in NPLinker.SCORING_METHODS:
+            raise Exception('unknown scoring method "{}"'.format(scoring_method))
 
         datalinks = datalinks or self._datalinks
 
-        # TODO this will need updated when current implementation is changed to 
-        # avoid using IDs
-        objects = self._get_ids_for_objects(objects)
-        if objects is None:
-            raise Exception('Error mapping objects to IDs!')
+        results = self._linkfinders[datalinks].get_links(datalinks, objects, scoring_method, scoring_cutoff)
+        
+        # first dimension of results contains input object ID, other object ID,
+        # and the score for the link between them both
+        R_SRC_ID, R_DST_ID, R_SCORE = range(3)
+        scores_found = set()
+        input_type = type(objects[0])
 
-        result = self._linkfinders[datalinks].get_links(objects, obj_type, scoring_method, score_cutoff)
-        print(result, type(result))
-        if isinstance(result, list):
-            print(len(result))
-            print(result[0], result[0].shape)
-        return result
+        if input_type == GCF:
+            logger.debug('get_links: result type is GCF, inputs={}, results={}'.format(len(objects), len(results)))
+            # for GCF input, results contains two arrays, giving spec-gcf and fam-gcf links respectively
+            result_gcf_spec, result_gcf_fam = results[0], results[1]
+
+            spec_scores = self._spec_gcf_scores[scoring_method]
+            fam_scores = self._fam_gcf_scores[scoring_method]
+
+            for res, sco, type_ in [(result_gcf_spec, spec_scores, 'spec'), (result_gcf_fam, fam_scores, 'fam')]:
+                if res.shape[1] == 0:
+                    logger.debug('Found no links for {}, [{}]'.format(objects, type_))
+                    continue # no results
+
+                logger.debug('Found {} links for {}, [{}]'.format(res.shape[1], objects, type_))
+
+                # for each GCF in the result array
+                for j, gcf_id in enumerate(res[R_SRC_ID]):
+                    obj_id = int(res[R_DST_ID, j])
+                    gcf_id = int(gcf_id)
+                    # record the link between the Spectrum/MolecularFamily and this GCF
+                    sco[obj_id, gcf_id] = res[R_SCORE, j]
+                    logger.debug('Setting score ({}, {}) = {} [{}]'.format(obj_id, gcf_id, res[R_SCORE, j], type_))
+                    scores_found.add(self._gcfs[gcf_id])
+        else:
+            logger.debug('get_links: result type is Spectrum/MolFam, inputs={}, results={}'.format(len(objects), len(results)))
+            # for non-GCF input, result is a list containing a single array, shape (3, x)
+            # where x is the number of links 
+            results = results[0]
+            if results.shape[1] == 0:
+                logger.debug('Found no links for {}'.format(objects))
+                return []
+
+            obj_results = self._spec_gcf_scores[scoring_method] if input_type == Spectrum else self._fam_gcf_scores[scoring_method]
+            logger.debug('Found {} links for {}'.format(results.shape[1], objects))
+
+            # for each Spectrum/MolecularFamily in this result
+            for i, obj_id in enumerate(results[R_SRC_ID]):
+                gcf_id = int(results[R_DST_ID, i])
+                obj_id = int(obj_id)
+                # record the link between the GCF and this Spectrum/MolecularFamily
+                obj_results[obj_id, gcf_id] = results[R_SCORE, i]
+                logger.debug('Setting score ({}, {}) = {}'.format(obj_id, gcf_id, results[R_SCORE, i]))
+                scores_found.add(self._spectra[obj_id] if input_type == Spectrum else self._families[obj_id])
+
+        return list(scores_found)
+
+    def get_common_strains(self, objects_a, objects_b):
+        return self._datalinks.common_strains(objects_a, objects_b)
 
     @property
     def strains(self):
@@ -209,14 +315,41 @@ class NPLinker(object):
 
     @property
     def datalinks(self):
+        """
+        Returns the main DataLinks object used for scoring etc
+        """
         return self._datalinks
 
     @property
     def rdatalinks(self):
+        """
+        Returns the list of RandomisedDataLinks objects
+        """
         return self._rdatalinks
 
+    @property
+    def repro_data(self):
+        """
+        Returns the dict of reproducibility data
+        """
+        return self._repro_data
+
+    # TODO better way of accessing the scores? or is this OK?
+    @property
+    def spec_scores(self, scoring_method=DEFAULT_SCORING):
+        return self._spec_gcf_scores[scoring_method]
+        
+    @property
+    def fam_scores(self, scoring_method=DEFAULT_SCORING):
+        return self._fam_gcf_scores[scoring_method]
+
+    @property
+    def gcf_scores(self, scoring_method=DEFAULT_SCORING):
+        return self._spec_gcf_scores[scoring_method], self._fam_gcf_scores[scoring_method]
+
+
 if __name__ == "__main__":
-    # TODO will need to handle arguments here
+    # TODO will need to handle arguments here (via argparse)
     # TODO possible to auto-discover some/all of these filenames for a given dataset?
 
     # crusemann dataset
@@ -248,14 +381,31 @@ if __name__ == "__main__":
         print('Failed to process dataset')
         sys.exit(-1)
 
-    # can now call get_links to get edge info
-    gcfs = npl.gcfs[:15]
-    gcf_links = npl.get_links(gcfs)
+    # get_links with a single Spectrum/MolecularFamily
+    obj = npl.spectra[2763]
+    result = npl.get_links(obj, scoring_method='metcalf', scoring_cutoff=150)
+    # if the input Spectrum had any links above the cutoff, it will appear in result:
+    if len(result) == 1:
+        print('Found links to object {}'.format(obj))
+        # lookup the GCFs it has links to
+        spec_scores = npl.spec_scores
+        linked_gcfs = [npl.gcfs[gcf] for gcf in np.where(spec_scores[obj.id, :] > 150)[0]]
 
-    # or do the same with a custom datalinks object
-    r_gcf_links = npl.get_links(gcfs, datalinks=npl.rdatalinks[0])
+    # get_links with a list of GCFs
+    objects = npl.gcfs[763:766]
+    result = npl.get_links(objects, scoring_method='metcalf', scoring_cutoff=150)
+    if len(result) > 0:
+        print('{}/{} objects with links found!'.format(len(result), len(objects)))
+        spec_scores = npl.spec_scores
+        linked_spectra = {}
+        for gcf in result:
+            linked_spectra[gcf] = [npl.spectra[spec] for spec in np.where(spec_scores[:, gcf.id])[0]]
+            print(gcf, linked_spectra[gcf], len(linked_spectra[gcf]))
 
-    # or use a specific scoring method (defaults to metcalf)
-    spectra = npl.spectra[100:115]
-    spectra_links = npl.get_links(spectra, scoring_method='likescore')
-    
+    # finding common_strains
+    common_strains = npl.get_common_strains(npl.gcfs[763:766], npl.spectra[3403])
+    for spec, gcfs in common_strains.items():
+        for gcf, strains in gcfs.items():
+            for strain in strains:
+                print('{} and {} share strain #{}'.format(spec, gcf, strain))
+
