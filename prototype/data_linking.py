@@ -18,6 +18,10 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import seaborn as sns
 
+from genomics import GCF
+from metabolomics import Spectrum
+from metabolomics import MolecularFamily
+
 import data_linking_functions
 
 
@@ -88,12 +92,12 @@ class DataLinks(object):
 
         if isinstance(spectra[0].family, str):  
             for i, spectrum in enumerate(spectra):
-                mapping_spec[i,1] = spectrum.spectrum_id
+                mapping_spec[i,1] = spectrum.id
                 mapping_spec[i,2] = spectrum.family
 
         elif isinstance(spectra[0].family.family_id, str): # assume make_families was run
             for i, spectrum in enumerate(spectra):
-                mapping_spec[i,1] = spectrum.spectrum_id
+                mapping_spec[i,1] = spectrum.id
                 mapping_spec[i,2] = spectrum.family.family_id
         else:
             print("No proper family-id found in spectra.")
@@ -211,6 +215,61 @@ class DataLinks(object):
         self.mapping_fam["no of members"] = num_members
         return self.family_members
 
+    def common_strains(self, objects_a, objects_b):
+        """
+        Obtain the set of common strains between all pairs from the lists objects_a
+        and objects_b.
+
+        The two parameters can be either lists or single instances of the 3 supported
+        object types (GCF, Spectrum, MolecularFamily). It's possible to use a single
+        object together with a list as well.
+
+        Returns a dict indexed by either Spectrum or MolecularFamily instances, where
+        the values are further dicts indexed by GCF instances, and the values in those
+        dicts in turn are lists of strain indices which appear in both objects, which
+        can then be looked up in NPLinker.strains. 
+        """
+        is_list_a = isinstance(objects_a, list)
+        is_list_b = isinstance(objects_b, list)
+
+        type_a = type(objects_a[0]) if is_list_a else type(objects_a)
+        type_b = type(objects_b[0]) if is_list_b else type(objects_b)
+
+        if type_a == type_b:
+            raise Exception('Must supply objects with different types!')
+        
+        # to keep things slightly simpler, ensure the GCFs are always "b"
+        if type_a == GCF:
+            type_a, type_b = type_b, type_a
+            is_list_a, is_list_b = is_list_b, is_list_a
+            objects_a, objects_b = objects_b, objects_a
+
+        if not is_list_a:
+            objects_a = [objects_a]
+        if not is_list_b:
+            objects_b = [objects_b]
+
+        # retrieve object IDs
+        ids_b = [gcf.id for gcf in objects_b]
+        ids_a = []
+        if type_a == Spectrum:
+            ids_a = [spec.id for spec in objects_a]
+        else:
+            # TODO similar treatment to Spectrum/GCF?
+            mapping_fam_id = self.mapping_fam["family id"]
+            for fam in objects_a:
+                ids_a.append(np.where(mapping_fam_id == int(fam.family_id))[0][0])
+
+        data_a = self.M_spec_strain if type_a == Spectrum else self.M_fam_strain
+        data_b = self.M_gcf_strain
+
+        results = {x: {} for x in objects_a}
+        for a, obj_a in enumerate(objects_a):
+            for b, obj_b in enumerate(objects_b):
+                # just AND both arrays and extract the indices with positive results
+                results[obj_a].update({obj_b: np.where(np.logical_and(data_a[ids_a[a]], data_b[ids_b[b]]))[0]})
+
+        return results
 
     def correlation_matrices(self, type='spec-gcf'):
         """ 
@@ -613,14 +672,14 @@ class LinkFinder(object):
         
         from genomics import GCF
         from metabolomics import Spectrum, MolecularFamily
-        
+
         # Check if input is list:
         if isinstance(input_object, list):
             query_size = len(input_object)
         else:
             input_object = [input_object]
             query_size = 1
-        
+
         # Check type of input_object:
         # If GCF:
         if isinstance(input_object[0], GCF):
@@ -637,6 +696,7 @@ class LinkFinder(object):
                           self.likescores_fam_gcf[:, input_ids]]
             metcalf_scores = [self.metcalf_spec_gcf[:, input_ids],
                               self.metcalf_fam_gcf[:, input_ids]]
+
         # If Spectrum:
         elif isinstance(input_object[0], Spectrum):
             
@@ -645,9 +705,9 @@ class LinkFinder(object):
             input_ids = np.zeros(query_size)
             mapping_spec_id = data_links.mapping_spec["original spec-id"]
             for i, spectrum in enumerate(input_object):
-                input_ids[i] = np.where(mapping_spec_id == int(spectrum.spectrum_id))[0] 
+                input_ids[i] = np.where(mapping_spec_id == int(spectrum.id))[0] 
             input_ids =  input_ids.astype(int)  
-            
+
             input_type = "spec"
             link_levels = [0]  
             likescores = [self.likescores_spec_gcf[input_ids, :],
@@ -673,6 +733,7 @@ class LinkFinder(object):
                               self.metcalf_fam_gcf[input_ids, :]]
         else: 
             print("Input_object must be Spectrum, MolecularFamily, or GCF object (single or list).")
+            return None
 
         links = []
         for linklevel in link_levels:
@@ -683,22 +744,29 @@ class LinkFinder(object):
             else:
                 print("Wrong scoring 'type' given.")
                 print("Must be one of: 'metcalf', 'likescore' ...")
+                return None
 
             link_candidates = np.zeros((3, candidate_ids[0].shape[0]))
             
             if query_size == 1:
-                link_candidates[0,:] = input_ids  # input id
-                link_candidates[1,:] = candidate_ids[0].astype(int)  # output id
-            else:
-                if input_type == "gcf":
-                    link_candidates[0,:] = input_ids[candidate_ids[1]]  # input id
-                    link_candidates[1,:] = candidate_ids[0].astype(int)  # output id
+                link_candidates[0, :] = input_ids  # input id
+                if input_type == 'gcf':
+                    link_candidates[1, :] = candidate_ids[0].astype(int)  # output id
                 else:
-                    link_candidates[0,:] = input_ids[candidate_ids[0]]  # input id
-                    link_candidates[1,:] = candidate_ids[1].astype(int)  # output id
-                
-            link_candidates[2,:] = likescores[linklevel][candidate_ids]
+                    link_candidates[1, :] = candidate_ids[1].astype(int)  # output id
+            else:
+                if input_type == 'gcf':
+                    link_candidates[0, :] = input_ids[candidate_ids[1]]  # input id
+                    link_candidates[1, :] = candidate_ids[0].astype(int)  # output id
+                else:
+                    link_candidates[0, :] = input_ids[candidate_ids[0]]  # input id
+                    link_candidates[1, :] = candidate_ids[1].astype(int)  # output id
             
+            if main_score == 'likescore':
+                link_candidates[2, :] = likescores[linklevel][candidate_ids]
+            elif main_score == 'metcalf':
+                link_candidates[2, :] = metcalf_scores[linklevel][candidate_ids]
+
             links.append(link_candidates)
 
         return links
