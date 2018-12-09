@@ -37,7 +37,7 @@ class BGC(object):
 
 class GCF(object):
     def __init__(self, gcf_id):
-        self.id = []
+        self.id = -1
         self.gcf_id = gcf_id
         self.short_gcf_id = gcf_id.split(os.sep)[-1]
         self.bgc_list = []
@@ -47,7 +47,7 @@ class GCF(object):
         self.strains_lookup = None
 
     def __str__(self):
-        return self.short_gcf_id
+        return 'GCF(id={}, short_gcf_id={})'.format(self.id, self.short_gcf_id)
 
     def add_bgc(self, bgc):
         self.bgc_list.append(bgc)
