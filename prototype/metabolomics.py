@@ -8,7 +8,8 @@ class Spectrum(object):
     METADATA_BLACKLIST = set(['AllOrganisms', 'LibraryID', 'RTStdErr', 'RTMean', 'AllGroups', 'DefaultGroups',
                             'precursor mass', 'parent mass', 'ProteoSAFeClusterLink', 'precursor intensity', 'sum(precursor intensity)'])
 
-    def __init__(self, peaks, spectrum_id, precursor_mz, parent_mz=None, rt=None):
+    def __init__(self, id, peaks, spectrum_id, precursor_mz, parent_mz=None, rt=None):
+        self.id = id
         self.peaks = sorted(peaks, key=lambda x: x[0]) # ensure sorted by mz
         self.n_peaks = len(self.peaks)
         self.max_ms2_intensity = max([intensity for mz, intensity in self.peaks])
@@ -151,8 +152,8 @@ def mols_to_spectra(ms2, metadata):
         ms2_dict[m[3]].append((m[0], m[2]))
     
     spectra = []
-    for m in ms2_dict:
-        new_spectrum = Spectrum(ms2_dict[m], m.name, metadata[m.name]['precursormass'])
+    for i, m in enumerate(ms2_dict.keys()):
+        new_spectrum = Spectrum(i, ms2_dict[m], m.name, metadata[m.name]['precursormass'])
         spectra.append(new_spectrum)
 
     return spectra
