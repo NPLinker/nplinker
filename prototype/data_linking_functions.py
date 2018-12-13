@@ -205,7 +205,7 @@ def hit_prob_dist(N, Nx, Ny, nys):
     
     p_dist_ks = []
     for k in range(1,min(Nx, Ny)+1):
-        p = pair_prob(k, N, Nx, Ny)
+        p = pair_prob_hg(k, N, Nx, Ny)
         
         p_dist = []
         for k in range(0, nys+1):

@@ -40,14 +40,14 @@ def test_calc_likelihood_matrix():
     assert LBA.shape == (len(A), len(B))  # must have shape len(A), len(B)
 
 
-from data_linking_functions import pair_prob
+from data_linking_functions import pair_prob_hg
     
-def test_pair_prob():
+def test_pair_prob_hg():
     # Test pair_prob with known cases
-    assert pair_prob(1, 100, 1, 1) == 1/100  
-    assert pair_prob(1, 100, 50, 1) == 0.5
-    assert pair_prob(1, 100, 1, 50) == 0.5
-    assert pair_prob(1, 100, 2, 2) == 98/100 * 2/99 + 2/100 * 98/99
+    assert pair_prob_hg(1, 100, 1, 1) == 1/100  
+    assert pair_prob_hg(1, 100, 50, 1) == 0.5
+    assert pair_prob_hg(1, 100, 1, 50) == 0.5
+    assert pair_prob_hg(1, 100, 2, 2) == 98/100 * 2/99 + 2/100 * 98/99
     
     
 from data_linking_functions import hit_prob_dist
