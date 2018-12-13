@@ -18,7 +18,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import seaborn as sns
 
-import data_linking_functions
+import data_linking_functions as DL_functions
 
 
 class DataLinks(object):
@@ -237,7 +237,7 @@ class DataLinks(object):
         print("Calculating correlation matrices of type: ", type)
 
         # Calculate correlation matrix from co-occurence matrices
-        M_type1_gcf, M_type1_notgcf, M_nottype1_gcf,M_nottype1_notgcf = data_linking_functions.calc_correlation_matrix(M_type1_strain, self.M_gcf_strain)
+        M_type1_gcf, M_type1_notgcf, M_nottype1_gcf,M_nottype1_notgcf = DL_functions.calc_correlation_matrix(M_type1_strain, self.M_gcf_strain)
 
         # return results:
         if type == 'spec-gcf':
@@ -353,7 +353,7 @@ class LinkLikelihood(object):
         print("Calculating likelihood matrices of type: ", type)
         # Calculate likelihood matrices using calc_likelihood_matrix()
         P_type2_given_type1, P_type2_not_type1, P_type1_given_type2, \
-            P_type1_not_type2 = data_linking_functions.calc_likelihood_matrix(M_type1_cond, 
+            P_type1_not_type2 = DL_functions.calc_likelihood_matrix(M_type1_cond, 
                                                                               data_links.M_gcf_strain, 
                                                                               M_type1_type2, 
                                                                               M_type1_nottype2, 
@@ -568,7 +568,7 @@ class LinkFinder(object):
             
         num_strains = data_links.M_gcf_strain.shape[1]
         for i in range(link_candidates.shape[1]):    
-             link_candidates[9,i] = data_linking_functions.pair_prob(link_candidates[6,i],
+             link_candidates[9,i] = DL_functions.pair_prob(link_candidates[6,i],
                             num_strains, 
                             Nx_list[link_candidates[1,i]],
                             Ny_list[link_candidates[0,i]])
