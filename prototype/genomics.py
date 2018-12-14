@@ -38,7 +38,10 @@ class BGC(object):
 class GCF(object):
     def __init__(self, gcf_id):
         self.gcf_id = gcf_id
-        self.short_gcf_id = gcf_id.split(os.sep)[-1]
+        try:
+            self.short_gcf_id = gcf_id.split(os.sep)[-1]
+        except:
+            self.short_gcf_id = self.gcf_id
         self.bgc_list = []
         self.random_gcf = None
 

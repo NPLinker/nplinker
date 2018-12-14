@@ -1,13 +1,3 @@
-import sys
-
-
-LDA_PATH = '/Users/simon/git/lda/code'
-
-
-def nplinker_setup(LDA_PATH = LDA_PATH):
-	sys.path.append(LDA_PATH)
-
-
 def setup_paths_simon():
 
     MIBIG_JSON_DIR = "/Users/simon/Desktop/carnegie_bigscape/mibig/mibig_json-1.4/"
