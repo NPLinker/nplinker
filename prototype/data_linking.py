@@ -461,7 +461,20 @@ class LinkFinder(object):
         self.link_candidates_gcf_spec = []
         self.link_candidates_gcf_fam = []
 
-    
+    def get_scores(self, method, type_):
+        if method == 'metcalf':
+            if type_ == 'spec-gcf':
+                return self.metcalf_spec_gcf
+            elif type_ == 'fam-gcf':
+                return self.metcalf_fam_gcf
+        elif method == 'likescore':
+            if type_ == 'spec-gcf':
+                return self.likescores_spec_gcf
+            elif type_ == 'fam-gcf':
+                return self.likescores_fam_gcf 
+
+        raise Exception('Unknown method or type (method="{}", type="{}")'.format(method, type_))
+
     def metcalf_scoring(self, data_links,
                         both=10, 
                         type1_not_gcf=-10, 
@@ -701,7 +714,6 @@ class LinkFinder(object):
         elif isinstance(input_object[0], Spectrum):
             
             # Get necessary ids
-            # TODO: maybe better also add the unique id to the Spectrum object?
             input_ids = np.zeros(query_size)
             mapping_spec_id = data_links.mapping_spec["original spec-id"]
             for i, spectrum in enumerate(input_object):
@@ -737,14 +749,21 @@ class LinkFinder(object):
 
         links = []
         for linklevel in link_levels:
-            if main_score == 'likescore':
-                candidate_ids = np.where(likescores[linklevel] >= score_cutoff)
-            elif main_score == 'metcalf':
-                candidate_ids = np.where(metcalf_scores[linklevel] >= score_cutoff)
+            if score_cutoff is not None:
+                if main_score == 'likescore':
+                    candidate_ids = np.where(likescores[linklevel] >= score_cutoff)
+                elif main_score == 'metcalf':
+                    candidate_ids = np.where(metcalf_scores[linklevel] >= score_cutoff)
+                else:
+                    print("Wrong scoring 'type' given.")
+                    print("Must be one of: 'metcalf', 'likescore' ...")
+                    return None
             else:
-                print("Wrong scoring 'type' given.")
-                print("Must be one of: 'metcalf', 'likescore' ...")
-                return None
+                # TODO is this best way to get same output as above code?
+                # to keep the remainder of the method identical in the case of no cutoff
+                # being supplied, while still returning all the candidate links, I'm
+                # currently abusing np.where like this
+                candidate_ids = np.where(metcalf_scores[linklevel] != np.nan)
 
             link_candidates = np.zeros((3, candidate_ids[0].shape[0]))
             
