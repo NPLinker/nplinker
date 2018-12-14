@@ -14,7 +14,7 @@ def setup_paths(root_dir):
     EDGES_FILE = glob.glob(os.path.join(spec_dir,"*.pairsinfo"))[0]
     print("EDGES_FILE:",EDGES_FILE)
 
-    NODES_FILE = os.path.join(spec_dir,'reformated.tsv')
+    NODES_FILE = glob.glob(os.path.join(spec_dir,'*.out'))[0]
     print("NODES_FILE:",NODES_FILE)
 
     ROOT_PATH = os.path.join(root_dir,'bigscape')
