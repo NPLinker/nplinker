@@ -75,6 +75,7 @@ pandas = "*"
 seaborn = "*"
 sklearn = "*"
 scikit-learn = "*"
+networkx = "*"
 
 [requires]
 python_version = "3.7"
