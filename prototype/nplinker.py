@@ -512,12 +512,12 @@ class NPLinker(object):
         """
         return self._links
 
-    def links_for_obj(self, obj, type_=None, scoring_method=DEFAULT_SCORING):
-        if type_ is None:
-            return [(obj, score) for obj, score in self._links[obj][scoring_method].items()]
-
-        # this is only really useful for GCFs, to pick between MolFam/Spectrum results
-        return [(obj, score) for obj, score in self._links[obj][scoring_method].items() if isinstance(obj, type_)]
+    def links_for_obj(self, obj, scoring_method=DEFAULT_SCORING, sort=True, type_=None):
+        # the type_ part is only really useful for GCFs, to pick between MolFam/Spectrum results
+        links = [(obj, score) for obj, score in self._links[obj][scoring_method].items() if (type_ is None or isinstance(obj, type_))]
+        if sort:
+            links.sort(key=lambda x: x[1], reverse=True)
+        return links
 
 if __name__ == "__main__":
     # TODO will need to handle arguments here (via argparse)
