@@ -37,6 +37,7 @@ class BGC(object):
 
 class GCF(object):
     def __init__(self, gcf_id):
+        self.id = []
         self.gcf_id = gcf_id
         try:
             self.short_gcf_id = gcf_id.split(os.sep)[-1]
@@ -214,6 +215,9 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
                     gcf_list.append(new_gcf)
                 gcf_dict[family].add_bgc(new_bgc)
 
+    # Assign unique ids (int)
+    for i, gcf in enumerate(gcf_list):
+        gcf.id = i
     return gcf_list, bgc_list, strain_list
 
 # this is really slow. But hey, it works. Finally.
