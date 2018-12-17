@@ -193,7 +193,7 @@ class DataLinks(object):
 
         M_fam_strain = np.zeros((num_unique_fams, self.M_spec_strain.shape[1]))
         strain_fam_labels = []
-        
+        strain_fam_index = []
         
         if num_of_singletons > 0:  # if singletons exist + included
             M_fam_strain[(num_unique_fams-num_of_singletons):,
@@ -206,14 +206,18 @@ class DataLinks(object):
             self.family_members.append(family_members)
             M_fam_strain[i,:] = np.sum(self.M_spec_strain[family_members,:], axis=1)
             strain_fam_labels.append(fam_id)
+            strain_fam_index.append(i)
 
+        strain_fam_labels.append([-1] * num_of_singletons)
+        strain_fam_index.append(i+1)
+        
         # only looking for co-occurence, hence only 1 or 0
         M_fam_strain[M_fam_strain>1] = 1
-        strain_fam_labels.append([-1] * num_of_singletons)
 
         self.M_fam_strain = M_fam_strain
         # extend mapping table:
-        self.mapping_fam["family id"] = strain_fam_labels
+        self.mapping_fam["family id"] = strain_fam_index
+        self.mapping_fam["original family id"] = strain_fam_labels
         self.mapping_fam["no of strains"] =  np.sum(self.M_fam_strain, axis=1)
         num_members = [x[0].shape[0] for x in self.family_members]
         num_members.append(num_of_singletons)
@@ -261,7 +265,7 @@ class DataLinks(object):
             ids_a = [spec.id for spec in objects_a]
         else:
             # TODO similar treatment to Spectrum/GCF?
-            mapping_fam_id = self.mapping_fam["family id"]
+            mapping_fam_id = self.mapping_fam["original family id"]
             for fam in objects_a:
                 ids_a.append(np.where(mapping_fam_id == int(fam.family_id))[0][0])
 
@@ -766,7 +770,7 @@ class LinkFinder(object):
             # Get necessary ids
             # TODO: include Singletons, maybe optinal
             input_ids = np.zeros(query_size)
-            mapping_fam_id = data_links.mapping_fam["family id"]
+            mapping_fam_id = data_links.mapping_fam["original family id"]
             for i, family in enumerate(input_object):
                 input_ids[i] = np.where(mapping_fam_id == int(family.family_id))[0] 
             input_ids =  input_ids.astype(int)  
