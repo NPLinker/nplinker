@@ -78,93 +78,9 @@ def calc_likelihood_matrix(M_type1_cond, M_type2_cond,
     P_type1_not_type2 = M_type1_nottype2/np.tile(P_sum_not_type2, (dim1, 1))
     
     return P_type2_given_type1, P_type2_not_type1, P_type1_given_type2, P_type1_not_type2
-
-
-# method to calculate unique permutations:
-class unique_element:
-    def __init__(self,value,occurrences):
-        self.value = value
-        self.occurrences = occurrences
-
-def permutation_unique(elements):
-    """
-    Derive unique permutations of elements (list)
-    """
-    eset = set(elements)
-    listunique = [unique_element(i, elements.count(i)) for i in eset]
-    num_elements = len(elements)
-    return permutation_unique_helper(listunique, [0]*num_elements, num_elements-1)
-
-def permutation_unique_helper(listunique, result_list, d):
-    """
-    Helper function to derive unique permutations of elements (list)
-    """
-    if d < 0:
-        yield tuple(result_list)
-    else:
-        for i in listunique:
-            if i.occurrences > 0:
-                result_list[d]=i.value
-                i.occurrences-=1
-                for g in  permutation_unique_helper(listunique, result_list, d-1):
-                    yield g
-                i.occurrences+=1
-
-
-
-
-def pair_prob(P_str, XG, Ny, hits):
-    """
-    Calculate probability of finding 'k' hits between Gx and Sy.
-         
-    CAREFULL: for larger Nx this quickly becomes VERY slow (many, many permutations)
-    
-    Parameters
-    ----------
-    P_str: numpy array
-        Probabilities for finding a spectrum in the a certain strain.
-        Usually this can be set to num-of-spectra-in-strain / num-of-spectra-in-all-strains
-    XG: list
-        List of ids of strains where the GCF of interest occurs.
-    Ny: int
-        Number of strains that contain the spectrum of interest.
-    hits: int
-        number of hits
-    """ 
-    
-    Nx = len(XG)
-    Nstr = len(P_str)
-    
-    # Check Nx, Ny, hits
-    if (hits > Nx) or (hits > Ny):
-        print("Given number of 'hits' must be <= Nx and <= Ny.")
-
-    # Calculate all unique permutations:        
-    state0 = [1]*hits + [0]*(Nx-hits)
-    states = np.array(list(permutation_unique(state0)))
-    
-    # Calculate the product of all probabilties accross all permutations
-    P_states = states*P_str[XG]
-    prods = np.prod(P_states + np.abs(states-1), axis=1)
-    del P_states
-    del states
-    p_mean = 1/Nstr
-    
-    # Calculate product of all non-hits
-    prod1 = 1
-    for i in range(Ny - hits):
-        prod1 = prod1 * ((Nstr- Nx - i)/Nstr)
-
-    # Calculate product of probability updates 
-    # (fewer accessible elements lead to increasing probabilities)
-    prod2 = 1
-    for j in range(Ny):
-        prod2 = prod2 * (1/(1 - j*p_mean))  
-    
-    return np.sum(math.factorial(Ny)/math.factorial(Ny-hits) * prods * prod1 * prod2)
         
 
-def pair_prob_fastapprox(P_str, XG, Ny, hits):
+def pair_prob_approx(P_str, XG, Ny, hits):
     """
     Calculate probability of finding 'k' hits between Gx and Sy.
     
@@ -284,3 +200,85 @@ def hit_prob_dist(N, Nx, Ny, nys):
         
     return p_dist_ks
         
+
+def pair_prob(P_str, XG, Ny, hits):
+    """
+    Calculate probability of finding 'k' hits between Gx and Sy.
+         
+    CAREFUL: for larger Nx, Ny, Nstr this quickly becomes *VERY* slow (many, many permutations...)
+    --> better use pair_prob_approx instead
+    
+    Parameters
+    ----------
+    P_str: numpy array
+        Probabilities for finding a spectrum in the a certain strain.
+        Usually this can be set to num-of-spectra-in-strain / num-of-spectra-in-all-strains
+    XG: list
+        List of ids of strains where the GCF of interest occurs.
+    Ny: int
+        Number of strains that contain the spectrum of interest.
+    hits: int
+        number of hits
+    """ 
+    
+    Nx = len(XG)
+    Nstr = len(P_str)
+    
+    # Check Nx, Ny, hits
+    if (hits > Nx) or (hits > Ny):
+        print("Given number of 'hits' must be <= Nx and <= Ny.")
+
+    # Calculate all unique permutations:        
+    state0 = [1]*hits + [0]*(Nx-hits)
+    states = np.array(list(permutation_unique(state0)))
+    
+    # Calculate the product of all probabilties accross all permutations
+    P_states = states*P_str[XG]
+    prods = np.prod(P_states + np.abs(states-1), axis=1)
+    del P_states
+    del states
+    p_mean = 1/Nstr
+    
+    # Calculate product of all non-hits
+    prod1 = 1
+    for i in range(Ny - hits):
+        prod1 = prod1 * ((Nstr- Nx - i)/Nstr)
+
+    # Calculate product of probability updates 
+    # (fewer accessible elements lead to increasing probabilities)
+    prod2 = 1
+    for j in range(Ny):
+        prod2 = prod2 * (1/(1 - j*p_mean))  
+    
+    return np.sum(math.factorial(Ny)/math.factorial(Ny-hits) * prods * prod1 * prod2)
+
+
+# method to calculate unique permutations:
+class unique_element:
+    def __init__(self,value,occurrences):
+        self.value = value
+        self.occurrences = occurrences
+
+def permutation_unique(elements):
+    """
+    Derive unique permutations of elements (list)
+    """
+    eset = set(elements)
+    listunique = [unique_element(i, elements.count(i)) for i in eset]
+    num_elements = len(elements)
+    return permutation_unique_helper(listunique, [0]*num_elements, num_elements-1)
+
+def permutation_unique_helper(listunique, result_list, d):
+    """
+    Helper function to derive unique permutations of elements (list)
+    """
+    if d < 0:
+        yield tuple(result_list)
+    else:
+        for i in listunique:
+            if i.occurrences > 0:
+                result_list[d]=i.value
+                i.occurrences-=1
+                for g in  permutation_unique_helper(listunique, result_list, d-1):
+                    yield g
+                i.occurrences+=1

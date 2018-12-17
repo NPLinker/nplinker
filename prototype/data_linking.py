@@ -667,7 +667,7 @@ class LinkFinder(object):
             # find set of strains which contain GCF with id link_candidates[1,i] 
             XG = np.where(data_links.M_gcf_strain[id_gcf , :] == 1)[0]
                                                            
-            link_candidates[10,i] = DL_functions.pair_prob_fastapprox(P_str, XG,
+            link_candidates[10,i] = DL_functions.pair_prob_approx(P_str, XG,
                                                             int(Ny_list[id_spec]),
                                                             int(link_candidates[6,i]))  
             # Calculate the link specific probability
