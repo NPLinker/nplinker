@@ -61,3 +61,55 @@ def test_hit_prob_dist():
     assert pks[0][0] == 0.99**100
     
     
+from data_linking_functions import permutation_unique
+
+def test_permutation_unique():
+    # Test function to find unique permutations with known cases
+    
+    testlist = [1, 2, 3, 4, 5]
+    assert len(list(permutation_unique(testlist))) == 120  # math.factorial(5)  
+    testlist = [1, 2, 3, 4, 1]
+    assert len(list(permutation_unique(testlist))) == 60   # math.factorial(5)/math.factorial(2) 
+    testlist = [1, 2, 3, 1, 2, 3]
+    assert len(list(permutation_unique(testlist))) == 90   # math.factorial(6)/math.factorial(2)**3 
+    testlist = ['A', 'B','C', 'C','C']
+    assert len(list(permutation_unique(testlist))) == 20   # math.factorial(5)/math.factorial(3)
+  
+
+from data_linking_functions import pair_prob
+
+def test_pair_prob():
+    # Test pair_prob function with known cases
+    P_str = np.ones(10)
+    P_str = P_str/np.sum(P_str)
+    XG = [0,1,2]
+    Ny = 3
+    hits= 2
+    assert pair_prob(P_str, XG, Ny, hits) == 0.175
+    
+    P_str = np.ones(10)
+    P_str = P_str/np.sum(P_str)
+    XG = [0,1]
+    Ny = 2
+    hits= 2
+    assert pair_prob(P_str, XG, Ny, hits) > 2/90  # correct result here actually should be = 2/90, but there are rounding errors
+    assert pair_prob(P_str, XG, Ny, hits) < (2/90+0.00000001)
+
+    
+from data_linking_functions import link_prob
+
+def test_link_prob():  
+    # Test link_prob function with known cases
+    Nstr = 10
+    P_str = np.ones(Nstr)
+    P_str[0:2] = P_str[0:2]*0.1
+    P_str = P_str/np.sum(P_str)
+    XGS = [0,1]
+    Ny = 2
+    Nx = 2
+    assert link_prob(P_str, XGS, Nx, Ny, Nstr) == 2*P_str[1]**2/0.9
+
+    Ny = 3
+    Nx = 5
+    assert link_prob(P_str, XGS, Nx, Ny, Nstr) == 6*0.5*P_str[0]**2/(0.9*0.8)
+  

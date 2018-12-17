@@ -87,12 +87,18 @@ class unique_element:
         self.occurrences = occurrences
 
 def permutation_unique(elements):
+    """
+    Derive unique permutations of elements (list)
+    """
     eset = set(elements)
     listunique = [unique_element(i, elements.count(i)) for i in eset]
     num_elements = len(elements)
     return permutation_unique_helper(listunique, [0]*num_elements, num_elements-1)
 
 def permutation_unique_helper(listunique, result_list, d):
+    """
+    Helper function to derive unique permutations of elements (list)
+    """
     if d < 0:
         yield tuple(result_list)
     else:
@@ -133,15 +139,75 @@ def pair_prob(P_str, XG, Ny, hits):
 
     # Calculate all unique permutations:        
     state0 = [1]*hits + [0]*(Nx-hits)
-    states = list(permutation_unique(state0))
+    states = np.array(list(permutation_unique(state0)))
     
-    P_pair = 0
-    for state in states:
-        # select strains from XG:
-        XGS = [XG[i] for i, x in enumerate(state) if x == 1]
-        P_pair += link_prob(P_str, XGS, Nx, Ny, Nstr)
+    # Calculate the product of all probabilties accross all permutations
+    P_states = states*P_str[XG]
+    prods = np.prod(P_states + np.abs(states-1), axis=1)
+    del P_states
+    del states
+    p_mean = 1/Nstr
+    
+    # Calculate product of all non-hits
+    prod1 = 1
+    for i in range(Ny - hits):
+        prod1 = prod1 * ((Nstr- Nx - i)/Nstr)
 
-    return P_pair
+    # Calculate product of probability updates 
+    # (fewer accessible elements lead to increasing probabilities)
+    prod2 = 1
+    for j in range(Ny):
+        prod2 = prod2 * (1/(1 - j*p_mean))  
+    
+    return np.sum(math.factorial(Ny)/math.factorial(Ny-hits) * prods * prod1 * prod2)
+        
+
+def pair_prob_fastapprox(P_str, XG, Ny, hits):
+    """
+    Calculate probability of finding 'k' hits between Gx and Sy.
+    
+    Parameters
+    ----------
+    P_str: numpy array
+        Probabilities for finding a spectrum in the a certain strain.
+        Usually this can be set to num-of-spectra-in-strain / num-of-spectra-in-all-strains
+    XG: list
+        List of ids of strains where the GCF of interest occurs.
+    Ny: int
+        Number of strains that contain the spectrum of interest.
+    hits: int
+        number of hits
+    """ 
+    
+    Nx = len(XG)
+    Nstr = len(P_str)
+    
+    # Check Nx, Ny, hits
+    if (hits > Nx) or (hits > Ny):
+        print("Given number of 'hits' must be <= Nx and <= Ny.")
+
+    p_hit_mean = np.sum(P_str[XG])/Nx
+    p_nohit_mean = (1 - np.sum(P_str[XG]))/(Nstr - Nx)
+    p_mean = (hits * p_hit_mean + (Ny-hits) * p_nohit_mean)/Ny
+    
+    # Calculate product of all hits
+    prod0 = 1
+    for i in range(hits):
+        prod0 = prod0 * p_hit_mean * (Nx -i)
+
+    # Calculate product of all non-hits
+    prod1 = 1
+    for i in range(Ny - hits):
+        prod1 = prod1 * ((Nstr- Nx - i)/Nstr)
+
+    # Calculate product of probability updates 
+    # (fewer accessible elements lead to increasing probabilities)
+    prod2 = 1
+    for j in range(Ny):
+        prod2 = prod2 * (1/(1 - j*p_mean))  
+    
+    return np.sum(math.factorial(Ny)/(math.factorial(hits) * math.factorial(Ny - hits)) * prod0 * prod1 * prod2)
+
 
 
 def link_prob(P_str, XGS, Nx, Ny, Nstr):

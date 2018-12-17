@@ -38,10 +38,10 @@ class DataLinks(object):
         self.M_fam_strain = []
 
         # mappings (lookup lists to map between different ids and categories
-        self.mapping_spec = []
-        self.mapping_gcf = []
-        self.mapping_fam = []  # labels for strain-family matrix
-        self.map_strain_name = []
+        self.mapping_spec = pd.DataFrame()
+        self.mapping_gcf = pd.DataFrame()
+        self.mapping_fam = pd.DataFrame()  # labels for strain-family matrix
+        self.mapping_strain = pd.DataFrame()
         self.family_members = []
 
         # correlation matrices for spectra <-> GCFs
@@ -98,9 +98,10 @@ class DataLinks(object):
         else:
             print("No proper family-id found in spectra.")
             
-        self.mapping_spec = pd.DataFrame(mapping_spec, 
-                               columns = ["spec-id", "original spec-id", "fam-id"])
-
+        # extend mapping tables:
+        self.mapping_spec["spec-id"] = mapping_spec[:,0]
+        self.mapping_spec["original spec-id"] = mapping_spec[:,1]
+        self.mapping_spec["fam-id"] = mapping_spec[:,2]
 
     def collect_mappings_gcf(self, gcf_list):
         """ 
@@ -132,10 +133,11 @@ class DataLinks(object):
 #            if bigscape_bestguess[-1] == None :
 #                bigscape_bestguess[-1] = ["Others", 0]
 
-            self.mapping_gcf = pd.DataFrame(np.arange(0, len(bigscape_bestguess)), columns = ["gcf-id"])
-            bigscape_guess, bigscape_guessscore = zip(*bigscape_bestguess)
-            self.mapping_gcf["bgc class"] = bigscape_guess
-            self.mapping_gcf["bgc class score"] = bigscape_guessscore
+        # extend mapping tables:
+        self.mapping_gcf["gcf-id"] = np.arange(0, len(bigscape_bestguess))
+        bigscape_guess, bigscape_guessscore = zip(*bigscape_bestguess)
+        self.mapping_gcf["bgc class"] = bigscape_guess
+        self.mapping_gcf["bgc class score"] = bigscape_guessscore
 
 
     def matrix_strain_gcf(self, gcf_list, strain_list):
@@ -149,8 +151,9 @@ class DataLinks(object):
                     M_gcf_strain[m,i] = 1
 
         self.M_gcf_strain = M_gcf_strain
-        # extend mapping table:
+        # extend mapping tables:
         self.mapping_gcf["no of strains"] =  np.sum(self.M_gcf_strain, axis=1)
+        self.mapping_strain["no of gcfs"] =  np.sum(self.M_gcf_strain, axis=0)
         
     
     def matrix_strain_spec(self, spectra, strain_list):
@@ -164,9 +167,10 @@ class DataLinks(object):
                     M_spec_strain[i,j] = 1
         self.M_spec_strain = M_spec_strain
         
-        # extend mapping table:
+        # extend mapping tables:
         self.mapping_spec["no of strains"] =  np.sum(self.M_spec_strain, axis=1)
-        self.map_strain_name = strain_list
+        self.mapping_strain["no of spectra"] =  np.sum(self.M_spec_strain, axis=0)
+        self.mapping_strain["strain name"] = strain_list
     
 
     def data_family_mapping(self, include_singletons=False):
@@ -204,7 +208,7 @@ class DataLinks(object):
 
         self.M_fam_strain = M_fam_strain
         # extend mapping table:
-        self.mapping_fam = pd.DataFrame(strain_fam_labels, columns = ["family id"])
+        self.mapping_fam["family id"] = strain_fam_labels
         self.mapping_fam["no of strains"] =  np.sum(self.M_fam_strain, axis=1)
         num_members = [x[0].shape[0] for x in self.family_members]
         num_members.append(num_of_singletons)
@@ -275,7 +279,7 @@ class RandomisedDataLinks(DataLinks):
         self.mapping_gcf = datalinks.mapping_gcf.copy()
         self.M_gcf_strain = datalinks.M_gcf_strain.copy()
         self.M_spec_strain = datalinks.M_spec_strain.copy()
-        self.map_strain_name = datalinks.map_strain_name.copy()
+        self.mapping_strain = datalinks.mapping_strain.copy()
 
         # shuffle matrices
         self._shuffle_cols(self.M_spec_strain)
@@ -512,7 +516,7 @@ class LinkFinder(object):
             index_names = ["spectrum_id", "GCF id", "P(gcf|spec)", "P(spec|gcf)", 
                              "P(gcf|not spec)", "P(spec|not gcf)", 
                              "co-occur in # strains", 
-                             "metcalf score", "likelihood score", "probability"]
+                             "metcalf score", "likelihood score", "HG prob", "link prob"]
 
         elif type == 'fam-gcf':
             P_gcf_given_type1 = likelihoods.P_gcf_given_fam
@@ -525,7 +529,7 @@ class LinkFinder(object):
             index_names = ["family_id", "GCF id", "P(gcf|fam)", "P(fam|gcf)", 
                              "P(gcf|not fam)", "P(fam|not gcf)", 
                              "co-occur in # strains", 
-                             "metcalf score", "likelihood score", "probability"]
+                             "metcalf score", "likelihood score", "HG prob", "link prob"]
 
         elif type == 'spec-bgc' or type == 'fam-bgc':
             print("Given types are not yet supported... ")
@@ -548,7 +552,7 @@ class LinkFinder(object):
         print(candidate_ids[0].shape[0], " candidates selected with ", 
               index_names[2], " >= ", P_cutoff, " and a link score >= ", score_cutoff, ".")
         
-        link_candidates = np.zeros((10, candidate_ids[0].shape[0]))
+        link_candidates = np.zeros((11, candidate_ids[0].shape[0]))
         link_candidates[0,:] = candidate_ids[0].astype(int)  # spectrum/fam number
         link_candidates[1,:] = candidate_ids[1].astype(int)  # gcf id
         link_candidates[2,:] = P_gcf_given_type1[candidate_ids]
@@ -559,20 +563,46 @@ class LinkFinder(object):
         link_candidates[7,:] = metcalf_scores[candidate_ids]
         link_candidates[8,:] = likescores[candidate_ids]
         
+        link_candidates[0,:] = link_candidates[0,:].astype(int)
+        link_candidates[1,:] = link_candidates[1,:].astype(int)
+        link_candidates[6,:] = link_candidates[6,:].astype(int)
+        
         # Calculate probability to find similar link by chance
         Nx_list = data_links.mapping_gcf["no of strains"]
         if type == 'spec-gcf':
             Ny_list = data_links.mapping_spec["no of strains"]
         elif type == 'fam-gcf':
             Ny_list = data_links.mapping_fam["no of strains"]   
+        
+        # Calculate probabilities of finding a spectrum in a certain strain
+        P_str = np.array(data_links.mapping_strain["no of spectra"])
+        P_str = P_str/np.sum(P_str)
             
         num_strains = data_links.M_gcf_strain.shape[1]
+        
+        # First, calculate the hypergeometric probability (as before)
         for i in range(link_candidates.shape[1]):    
-             link_candidates[9,i] = DL_functions.pair_prob(link_candidates[6,i],
-                            num_strains, 
-                            Nx_list[link_candidates[1,i]],
-                            Ny_list[link_candidates[0,i]])
-                                                                 
+             link_candidates[9,i] = DL_functions.pair_prob_hg(link_candidates[6,i],
+                                                            num_strains, 
+                                                            Nx_list[link_candidates[1,i]],
+                                                            Ny_list[int(link_candidates[0,i])])
+
+        # Then, calculate the strain specific probability
+        for i in range(link_candidates.shape[1]):  
+            
+            # find set of strains which contain GCF with id link_candidates[1,i] 
+            XG = np.where(data_links.M_gcf_strain[int(link_candidates[1,i]), :] == 1)[0]
+            
+            # show progress:
+#            if (i+1) % 10 == 0 or i == link_candidates.shape[1]-1:
+            print('\r', ' ', i+1, ' of ', link_candidates.shape[1], 
+                  ' candidates (with ',link_candidates[6,i], ' hits, Nx=', len(XG) ,', Ny=', 
+                  Ny_list[int(link_candidates[0,i])], ' )', end="")
+                                                           
+            link_candidates[10,i] = DL_functions.pair_prob_fastapprox(P_str, XG,
+                                                            int(Ny_list[int(link_candidates[0,i])]),
+                                                            int(link_candidates[6,i]))  
+        
         
         # Transform into pandas Dataframe (to avoid index confusions):
         link_candidates_pd = pd.DataFrame(link_candidates.transpose(1,0), columns = index_names)
