@@ -116,6 +116,8 @@ def permutation_unique_helper(listunique, result_list, d):
 def pair_prob(P_str, XG, Ny, hits):
     """
     Calculate probability of finding 'k' hits between Gx and Sy.
+         
+    CAREFULL: for larger Nx this quickly becomes VERY slow (many, many permutations)
     
     Parameters
     ----------

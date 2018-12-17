@@ -590,7 +590,8 @@ class LinkFinder(object):
             index_names = ["spectrum_id", "GCF id", "P(gcf|spec)", "P(spec|gcf)", 
                              "P(gcf|not spec)", "P(spec|not gcf)", 
                              "co-occur in # strains", 
-                             "metcalf score", "likelihood score", "HG prob", "link prob"]
+                             "metcalf score", "likelihood score", 
+                             "HG prob", "link prob", "link prob specific"]
 
         elif type == 'fam-gcf':
             P_gcf_given_type1 = likelihoods.P_gcf_given_fam
@@ -603,7 +604,8 @@ class LinkFinder(object):
             index_names = ["family_id", "GCF id", "P(gcf|fam)", "P(fam|gcf)", 
                              "P(gcf|not fam)", "P(fam|not gcf)", 
                              "co-occur in # strains", 
-                             "metcalf score", "likelihood score", "HG prob", "link prob"]
+                             "metcalf score", "likelihood score", 
+                             "HG prob", "link prob", "link prob specific"]
 
         elif type == 'spec-bgc' or type == 'fam-bgc':
             print("Given types are not yet supported... ")
@@ -626,20 +628,16 @@ class LinkFinder(object):
         print(candidate_ids[0].shape[0], " candidates selected with ", 
               index_names[2], " >= ", P_cutoff, " and a link score >= ", score_cutoff, ".")
         
-        link_candidates = np.zeros((11, candidate_ids[0].shape[0]))
-        link_candidates[0,:] = candidate_ids[0].astype(int)  # spectrum/fam number
-        link_candidates[1,:] = candidate_ids[1].astype(int)  # gcf id
+        link_candidates = np.zeros((12, candidate_ids[0].shape[0]))
+        link_candidates[0,:] = candidate_ids[0]  # spectrum/fam number
+        link_candidates[1,:] = candidate_ids[1]  # gcf id
         link_candidates[2,:] = P_gcf_given_type1[candidate_ids]
         link_candidates[3,:] = P_type1_given_gcf[candidate_ids]
         link_candidates[4,:] = P_gcf_not_type1[candidate_ids]
         link_candidates[5,:] = P_type1_not_gcf[candidate_ids]
-        link_candidates[6,:] = M_type1_gcf[candidate_ids].astype(int)
+        link_candidates[6,:] = M_type1_gcf[candidate_ids]
         link_candidates[7,:] = metcalf_scores[candidate_ids]
         link_candidates[8,:] = likescores[candidate_ids]
-        
-        link_candidates[0,:] = link_candidates[0,:].astype(int)
-        link_candidates[1,:] = link_candidates[1,:].astype(int)
-        link_candidates[6,:] = link_candidates[6,:].astype(int)
         
         # Calculate probability to find similar link by chance
         Nx_list = data_links.mapping_gcf["no of strains"]
@@ -654,30 +652,34 @@ class LinkFinder(object):
             
         num_strains = data_links.M_gcf_strain.shape[1]
         
-        # First, calculate the hypergeometric probability (as before)
+        # Calculate the hypergeometric probability (as before)
         for i in range(link_candidates.shape[1]):    
              link_candidates[9,i] = DL_functions.pair_prob_hg(link_candidates[6,i],
                                                             num_strains, 
                                                             Nx_list[link_candidates[1,i]],
                                                             Ny_list[int(link_candidates[0,i])])
 
-        # Then, calculate the strain specific probability
+        # Calculate the GCF specific probability
         for i in range(link_candidates.shape[1]):  
+            id_spec = int(link_candidates[0,i])
+            id_gcf = int(link_candidates[1,i])
             
             # find set of strains which contain GCF with id link_candidates[1,i] 
-            XG = np.where(data_links.M_gcf_strain[int(link_candidates[1,i]), :] == 1)[0]
-            
-            # show progress:
-#            if (i+1) % 10 == 0 or i == link_candidates.shape[1]-1:
-            print('\r', ' ', i+1, ' of ', link_candidates.shape[1], 
-                  ' candidates (with ',link_candidates[6,i], ' hits, Nx=', len(XG) ,', Ny=', 
-                  Ny_list[int(link_candidates[0,i])], ' )', end="")
+            XG = np.where(data_links.M_gcf_strain[id_gcf , :] == 1)[0]
                                                            
             link_candidates[10,i] = DL_functions.pair_prob_fastapprox(P_str, XG,
-                                                            int(Ny_list[int(link_candidates[0,i])]),
+                                                            int(Ny_list[id_spec]),
                                                             int(link_candidates[6,i]))  
-        
-        
+            # Calculate the link specific probability
+            # Find strains where GCF and spectra/family co-occur
+            if type == 'spec-gcf':
+                XGS = np.where((data_links.M_gcf_strain[id_gcf, :] == 1) & (data_links.M_spec_strain[id_spec, :] == 1))[0]
+            elif type == 'fam-gcf':
+                XGS = np.where((data_links.M_gcf_strain[id_gcf, :] == 1) & (data_links.M_fam_strain[id_spec, :] == 1))[0]
+            link_candidates[11,i] = DL_functions.link_prob(P_str, XGS, 
+                                                           int(Nx_list[id_gcf]),
+                                                           int(Ny_list[id_spec]), num_strains)
+            
         # Transform into pandas Dataframe (to avoid index confusions):
         link_candidates_pd = pd.DataFrame(link_candidates.transpose(1,0), columns = index_names)
         
@@ -688,6 +690,9 @@ class LinkFinder(object):
             bgc_class.append(data_links.mapping_gcf["bgc class"][i])
         link_candidates_pd["BGC class"] = bgc_class
 
+        # Change some columns to int
+        link_candidates_pd.iloc[:,[0,1,6,7]] = link_candidates_pd.iloc[:,[0,1,6,7]].astype(int)
+        
         # return results
         if type == 'spec-gcf':
             self.link_candidates_gcf_spec = link_candidates_pd
