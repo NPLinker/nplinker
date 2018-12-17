@@ -37,9 +37,12 @@ class BGC(object):
 
 class GCF(object):
     def __init__(self, gcf_id):
-        self.id = []
+        self.id = -1
         self.gcf_id = gcf_id
-        self.short_gcf_id = gcf_id.split(os.sep)[-1]
+        try:
+            self.short_gcf_id = gcf_id.split(os.sep)[-1]
+        except:
+            self.short_gcf_id = self.gcf_id
         self.bgc_list = []
         self.random_gcf = None
 
@@ -47,7 +50,10 @@ class GCF(object):
         self.strains_lookup = None
 
     def __str__(self):
-        return self.short_gcf_id
+        return 'GCF(id={}, short_gcf_id={})'.format(self.id, self.short_gcf_id)
+
+    def __repr__(self):
+        return str(self)
 
     def add_bgc(self, bgc):
         self.bgc_list.append(bgc)
@@ -138,7 +144,8 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
     strain_list = []
     bgc_list = []
 
-    with open('strain_ids.csv', 'r') as f:
+    # TODO might need to change this later depending on packaging etc
+    with open(os.path.join(os.path.dirname(__file__), 'strain_ids.csv'), 'r') as f:
         reader = csv.reader(f)
         for line in reader:
             strain_id_dict[line[0]] = line[1]

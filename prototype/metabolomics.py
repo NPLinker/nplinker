@@ -1,14 +1,15 @@
 import csv
 import numpy as np
 
-from ms2lda_feature_extraction import LoadMGF
+from parsers import LoadMGF
 
 class Spectrum(object):
     
     METADATA_BLACKLIST = set(['AllOrganisms', 'LibraryID', 'RTStdErr', 'RTMean', 'AllGroups', 'DefaultGroups',
                             'precursor mass', 'parent mass', 'ProteoSAFeClusterLink', 'precursor intensity', 'sum(precursor intensity)'])
 
-    def __init__(self, peaks, spectrum_id, precursor_mz, parent_mz=None, rt=None):
+    def __init__(self, id, peaks, spectrum_id, precursor_mz, parent_mz=None, rt=None):
+        self.id = id
         self.peaks = sorted(peaks, key=lambda x: x[0]) # ensure sorted by mz
         self.n_peaks = len(self.peaks)
         self.max_ms2_intensity = max([intensity for mz, intensity in self.peaks])
@@ -70,7 +71,10 @@ class Spectrum(object):
 
     def __str__(self):
         # return "Spectrum {} with {} peaks, max_ms2_intensity {}".format(self.spectrum_id,self.n_peaks,self.max_ms2_intensity)
-        return "Spectrum {}".format(self.spectrum_id)
+        return "Spectrum(id={}, spectrum_id={})".format(self.id, self.spectrum_id)
+
+    def __repr__(self):
+        return str(self)
 
     def __cmp__(self, other):
         if self.parent_mz >= other.parent_mz:
@@ -151,8 +155,8 @@ def mols_to_spectra(ms2, metadata):
         ms2_dict[m[3]].append((m[0], m[2]))
     
     spectra = []
-    for m in ms2_dict:
-        new_spectrum = Spectrum(ms2_dict[m], m.name, metadata[m.name]['precursormass'])
+    for i, m in enumerate(ms2_dict.keys()):
+        new_spectrum = Spectrum(i, ms2_dict[m], m.name, metadata[m.name]['precursormass'])
         spectra.append(new_spectrum)
 
     return spectra
@@ -233,6 +237,7 @@ def load_edges(spectra, edge_file):
 
 class MolecularFamily(object):
     def __init__(self, family_id):
+        self.id = -1 # TODO this needs set to a unique ID on creation for consistency with GCF/Spectrum
         self.family_id = family_id
         self.spectra = []
         self.random_molecular_family = RandomMolecularFamily(self)

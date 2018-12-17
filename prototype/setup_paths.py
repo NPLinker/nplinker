@@ -1,14 +1,32 @@
-import sys
+import os,glob
 
+def setup_paths(root_dir):
+    MIBIG_JSON_DIR = os.path.join(root_dir,'mibig_json')
+    print("MIBIG_JSON_DIR:",MIBIG_JSON_DIR)
 
-LDA_PATH = '/Users/simon/git/lda/code'
+    spec_dir = os.path.join(root_dir,'spectra')
+    MGF_FILE = glob.glob(os.path.join(spec_dir,'*.mgf'))[0]
 
+    print("MGF_FILE:",MGF_FILE)
+    ANNOTATION_FILES = glob.glob(os.path.join(spec_dir,'*.annotations.*'))
+    print("ANNOTATION_FILES:"," ".join(ANNOTATION_FILES))
 
-def nplinker_setup(LDA_PATH = LDA_PATH):
-	sys.path.append(LDA_PATH)
+    EDGES_FILE = glob.glob(os.path.join(spec_dir,"*.pairsinfo"))[0]
+    print("EDGES_FILE:",EDGES_FILE)
+
+    NODES_FILE = glob.glob(os.path.join(spec_dir,'*.out'))[0]
+    print("NODES_FILE:",NODES_FILE)
+
+    ROOT_PATH = os.path.join(root_dir,'bigscape')
+    ANTISMASH_DIR = os.path.join(root_dir,'antismash')
+
+    return MIBIG_JSON_DIR,NODES_FILE,ANNOTATION_FILES,MGF_FILE,EDGES_FILE,ROOT_PATH,ANTISMASH_DIR
 
 
 def setup_paths_simon():
+
+
+
 
     MIBIG_JSON_DIR = "/Users/simon/Desktop/carnegie_bigscape/mibig/mibig_json-1.4/"
     # PATH_MS2LDA = DATASET
