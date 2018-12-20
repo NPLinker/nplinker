@@ -6,9 +6,12 @@ from Bio import SeqIO
 from aalist import AA_LIST as AA_CODES
 
 
+# AA_CODES_ISO contains codes that should map to 
+# an entry in the AA_CODES list - i.e. isomers, etc.
 AA_CODES_ISO = {}
 for c in AA_CODES:
     AA_CODES_ISO['d-%s' % c] = c
+AA_CODES_ISO['b-ala'] = 'ala'
 
 
 class AntiSmashFile(object):
@@ -93,19 +96,24 @@ class AntiSmashRecord(object):
         self.specificities = [process_specificity(x.qualifiers['specificity']) for x in self.asdomains_with_predictions_known]
 
     def get_prob(self, aa):
+        # 'none' votes do not affect predictions, because then
+        # all AAs are equally likely, so we can't use them to exclude.
         prob = 1.0
         for domain in self.specificities:
             domain_vote_sum = 0
-            for vote in domain:
-                if 'none' in vote:
-                    p_vote = 1.0 / len(AA_CODES)
-                elif aa in vote:
-                    p_vote = 1.0 / len(vote)
-                else:
-                    p_vote = 0
-                domain_vote_sum += p_vote
+            for votes in domain:
+                for vote in set(votes):
+                    if vote == 'none':
+                        p_vote = 0
+                    #     p_vote = 1.0 / len(AA_CODES)
+                    elif vote == aa:
+                        p_vote = 1.0 / len(set(votes))
+                    else:
+                        p_vote = 0
+                    domain_vote_sum += p_vote
             domain_prob = domain_vote_sum / len(domain)
             prob *= (1 - domain_prob)
+
         return 1 - prob
 
 
@@ -156,18 +164,23 @@ def process_specificity(prediction_list):
     for prediction_string in prediction_list:
         if prediction_string.startswith('PID to NN:') or prediction_string.startswith('SNN score:'):
             continue
-        if prediction_string.startswith('Stachelhaus code:'):
-            prediction = stachelhaus(prediction_string)
-        elif prediction_string.startswith('NRPSpredictor3 SVM'):
-            prediction = nrpspredictor3(prediction_string)
-        elif prediction_string.startswith('pHMM'):
-            prediction = phmm(prediction_string)
-        elif prediction_string.startswith('PrediCAT'):
-            prediction = predicat(prediction_string)
-        elif prediction_string.startswith('SANDPUMA'):
+        if prediction_string.startswith('SANDPUMA'):
             prediction = sandpuma(prediction_string)
         else:
-            prediction = []
+            continue
+        # Only process SANDPUMA votes for now (to not have to collate the votes)
+        # if prediction_string.startswith('Stachelhaus code:'):
+        #     prediction = stachelhaus(prediction_string)
+        # elif prediction_string.startswith('NRPSpredictor3 SVM'):
+        #     prediction = nrpspredictor3(prediction_string)
+        # elif prediction_string.startswith('pHMM'):
+        #     prediction = phmm(prediction_string)
+        # elif prediction_string.startswith('PrediCAT'):
+        #     prediction = predicat(prediction_string)
+        # elif prediction_string.startswith('SANDPUMA'):
+        #     prediction = sandpuma(prediction_string)
+        # else:
+        #     prediction = []
         votes.append(prediction)
     return votes
 

@@ -531,9 +531,9 @@ if __name__ == "__main__":
     DATASET = sys.argv[1]
     logger.info('Loading dataset from path: {}'.format(DATASET))
         
-    MGF_FILE = os.path.join(DATASET, 'gnps/METABOLOMICS-SNETS-c36f90ba-download_clustered_spectra-main.mgf')
-    NODES_FILE = os.path.join(DATASET, 'gnps/0d51c5b6c73b489185a5503d319977ab..out')
-    EDGES_FILE = os.path.join(DATASET, 'gnps/9a93d720f69143bb9f971db39b5d2ba2.pairsinfo')
+    MGF_FILE = os.path.join(DATASET, 'spectra/METABOLOMICS-SNETS-c36f90ba-download_clustered_spectra-main.mgf')
+    NODES_FILE = os.path.join(DATASET, 'spectra/0d51c5b6c73b489185a5503d319977ab..out')
+    EDGES_FILE = os.path.join(DATASET, 'spectra/9a93d720f69143bb9f971db39b5d2ba2.pairsinfo')
     ROOT_PATH = os.path.join(DATASET, 'bigscape/bigscape_corason_crusemann_complete_annotated_mibigs_mix_automode_20180713/network_files/2018-07-13_16-34-11_hybrids_auto_crusemann_bgcs_automode_mix_mibig')
     ANTISMASH_DIR = os.path.join(DATASET, 'antismash/justin-20181022/')
 

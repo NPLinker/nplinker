@@ -21,12 +21,13 @@ class BGC(object):
     @property
     def aa_predictions(self):
         # Load aa predictions and cache them
+        self._aa_predictions = None
         if self._aa_predictions is None:
-            self._aa_predictions = []
+            self._aa_predictions = {}
             if self.antismash_file is not None:
                 for p in aa_pred.predict_aa(self.antismash_file):
-                    self._aa_predictions.append(p)
-        return self._aa_predictions
+                    self._aa_predictions[p[0]] = p[1]
+        return [self._aa_predictions]
 
     @property
     def known_cluster_blast(self):
@@ -91,23 +92,10 @@ class GCF(object):
         Return the predicted AAs for the GCF
         """
         if self._aa_predictions is None:
-            # Make sure that we record a 0 probability if an AA is predicted
-            # for _some_ but not _all_ BGCs in a GCF
-            bgc_aa_prob = {}
-
+            bgc_aa_prob = []
             for bgc_count, bgc in enumerate(self.bgc_list):
-                for aa, p_aa in bgc.aa_predictions:
-                    # If we come across a new AA, set it to zero for all previous BGCs
-                    if aa not in bgc_aa_prob:
-                        aa_prob = [0.0]
-                        bgc_aa_prob[aa] = aa_prob
-                    bgc_aa_prob[aa].append(p_aa)
-
-            for aa in list(bgc_aa_prob.keys()):
-                # Replace the prob list with the mean
-                bgc_aa_prob[aa] = np.mean(bgc_aa_prob[aa])
-
-            self._aa_predictions = list(bgc_aa_prob.items())
+                bgc_aa_prob.extend(bgc.aa_predictions)
+            self._aa_predictions = bgc_aa_prob
 
         return self._aa_predictions
 

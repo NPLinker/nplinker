@@ -271,27 +271,27 @@ def knownclusterblast_scoring(spectral_like, gcf_like, mibig_map):
                     print(m)
     return total_score, metadata
 
-def aa_scoring(spectrum, gcf_like):
+def aa_scoring(spectrum, gcf_like, tol=0.01):
     """
     Check for the prescence of AA mass shifts in the spectrum
     """
-    tol = 0.01
     from metabolomics import read_aa_losses
     aa_loss_file = 'aa_residues.csv'
     aa_losses = read_aa_losses(aa_loss_file)
 
-    p = 1.0
-    for aa, aa_prob in gcf_like.aa_predictions:
-        if aa_prob < 0.2 or aa_prob > 0.8:
-            if aa in aa_losses:
-                mass_iso, mass_avg = aa_losses[aa]
-                found_losses = spectrum.has_loss(mass_iso, tol)
-                if len(found_losses) > 0:
-                    p *= aa_prob
-                else:
-                    p *= (1 - aa_prob)
+    probs = []
+    for bgc_aa_predictions in gcf_like.aa_predictions:
+        p = 0
+        for aa, aa_prob in bgc_aa_predictions.items():
+            if aa_prob > 0:
+                if aa in aa_losses:
+                    mass_iso, mass_avg = aa_losses[aa]
+                    found_losses = spectrum.has_loss(mass_iso, tol)
+                    if len(found_losses) > 0:
+                        p += aa_prob
+        probs.append(p)
 
-    return p
+    return np.mean(probs)
 
 def expand_spectrum_score(spectrum, gcf, scoring_function, strain_list):
     initial_score, initial_metadata = scoring_function(spectrum, gcf, strain_list)

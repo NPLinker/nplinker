@@ -308,6 +308,8 @@ def read_aa_losses(filename):
         reader = csv.reader(f, delimiter=',')
         header = next(reader)
         for line in reader:
+            if len(line) == 0:
+                continue
             aa_id = line[1]
             aa_mono = float(line[4])
             aa_avg = float(line[5])
