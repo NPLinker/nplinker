@@ -91,9 +91,14 @@ class Spectrum(object):
             # populate loss table
             losses = []
             for i in range(len(self.peaks)):
-                for j in range(i):
-                    loss = self.peaks[i][0] - self.peaks[j][0]
-                    losses.append((loss, i, j))
+                loss = self.precursor_mz - self.peaks[i][0]
+                losses.append((loss, self.id, i))
+# THIS SEEMED TO ME LIKE IT WOULD TAKE THE WRONG DIFFERENCES AS LOSSES:
+# TODO: please check!
+#                for j in range(i):
+#                    loss = self.peaks[i][0] - self.peaks[j][0]
+#                    losses.append((loss, i, j))
+                
             # Sort by loss
             losses.sort(key=lambda x: x[0])
             self._losses = losses
