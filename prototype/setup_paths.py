@@ -5,8 +5,9 @@ def _find_via_glob(path, file_type):
     try:
         filename = glob.glob(path)[0]
         return filename
-    except OSError as ose:
-        raise Exception('{}: unable to find {} in path "{}"'.format(ose, file_type, path))
+    except (OSError, IndexError) as e:
+        # "from None" suppresses the traceback for the original exception, which isn't really needed
+        raise Exception('ERROR: unable to find {} in path "{}"'.format(file_type, path)) from None
 
 def setup_paths(root_dir):
     """Given a root directory for a dataset, attempts to construct the filenames
