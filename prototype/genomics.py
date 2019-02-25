@@ -10,10 +10,14 @@ class BGC(object):
         self.name = name
         self.bigscape_class = bigscape_class
         self.product_prediction = product_prediction
+        self.parent = None
 
         self.antismash_file = None
         self._aa_predictions = None
         self._known_cluster_blast = None
+
+    def __repr__(self):
+        return str(self)
 
     def __str__(self):
         return self.name + "(" + str(self.strain) + ")"
@@ -58,6 +62,7 @@ class GCF(object):
 
     def add_bgc(self, bgc):
         self.bgc_list.append(bgc)
+        bgc.parent = self
 
     @property
     def strains(self):
@@ -137,6 +142,7 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
         reader = csv.reader(f)
         for line in reader:
             strain_id_dict[line[0]] = line[1]
+
     metadata = {}
     for a in ann_file_list:
         with open(a, 'rU') as f:
@@ -145,8 +151,11 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
             for line in reader:
                 metadata[line[0]] = line
 
+    num_mibig = 0
+
     for filename in network_file_list:
         with open(filename, 'rU') as f:
+            print('filename', filename)
             reader = csv.reader(f, delimiter='\t')
             heads = next(reader)
             for line in reader:
@@ -193,12 +202,13 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
                             new_bgc.antismash_file = find_antismash_file(antismash_dir, new_bgc.name)
                     bgc_list.append(new_bgc)
                 else:
+                    num_mibig += 1
                     if mibig_bgc_dict:
                         try:
                             new_bgc = mibig_bgc_dict[name.split('.')[0]]
                         except:
-                            print(name)
                             new_bgc = MiBIGBGC(name, product_prediction)
+                    # TODO add to bgc_list too???
                 
 
                 if not family in gcf_dict:
@@ -207,6 +217,7 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
                     gcf_list.append(new_gcf)
                 gcf_dict[family].add_bgc(new_bgc)
 
+    print('# mibig BGCs = {}, # bgcs = {}'.format(num_mibig, len(bgc_list)))
     # Assign unique ids (int)
     for i, gcf in enumerate(gcf_list):
         gcf.id = i
