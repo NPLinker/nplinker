@@ -31,4 +31,5 @@ class LogConfig(object):
         LogConfig.default_logdest = dest
         dest.setFormatter(logging.Formatter(LogConfig.logfmt))
         for logger in LogConfig.active_loggers.values():
-            logger.setLogDestination(dest)
+            logger.handlers = []
+            logger.addHandler(dest)
