@@ -21,18 +21,20 @@ from data_linking import DataLinks
 from data_linking import RandomisedDataLinks
 from data_linking import LinkLikelihood
 from data_linking import LinkFinder
+from data_linking import SCORING_METHODS
+
+from config import Config, ScoringConfig, DatasetLoader, Args
 
 from logconfig import LogConfig
-
 logger = LogConfig.getLogger(__file__)
 
 # TODO Google-style docstrings
 
+
+
 class NPLinker(object):
 
     FOLDERS = ['NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs', 'Saccharides', 'Terpene']
-    SCORING_METHODS = ['metcalf', 'likescore']
-    DEFAULT_SCORING = 'metcalf'
     OBJ_CLASSES = [Spectrum, MolecularFamily, GCF]
     # enumeration for accessing results of LinkFinder.get_links, which are (3, num_links) arrays:
     # - R_SRC_ID: the ID of an object that was supplied as input to get_links
@@ -40,21 +42,31 @@ class NPLinker(object):
     # - R_SCORE: the score for the link between a pair of objects
     R_SRC_ID, R_DST_ID, R_SCORE = range(3)
 
-    def __init__(self, mgf_file, edges_file, nodes_file, mibig_json_dir,
-                    root_path, antismash_dir, antismash_format='flat',
-                    repro_file=None):
+    def __init__(self, config_dict={}):
+        """Initialise an NPLinker instance.
 
-        for f in [mgf_file, edges_file, nodes_file, mibig_json_dir, root_path, antismash_dir]:
-            if f is not None and not os.path.exists(f):
+        TODO update once finished
+        """
+
+        self._config = Config(config_dict)
+
+        # configure logging based on the supplied config params
+        LogConfig.setLogLevelStr(self._config.config['loglevel'])
+        logfile = self._config.config['logfile']
+        if len(logfile) > 0:
+            logfile_dest = logging.FileHandler(logfile)
+            LogConfig.setLogDestination(logfile_dest)
+
+        self._loader = DatasetLoader(self._config.config['dataset']['root'])
+    
+        logger.debug('Dataset info: {}'.format(self._loader))
+        for f in self._loader.key_paths():
+            if not os.path.exists(f):
                 raise FileNotFoundError('File/directory "{}" does not exist or is not readable!'.format(f))
 
-        self.mgf_file = mgf_file
-        self.edges_file = edges_file
-        self.nodes_file = nodes_file
-        self.mibig_json_dir = mibig_json_dir
-        self.root_path = root_path
-        self.antismash_dir = antismash_dir
-        self.antismash_format = antismash_format
+        # this is optional(?) so just warn 
+        if not os.path.exists(self._loader.mibig_json_dir):
+            logger.warning('mibig_json_dir "{}" does not exist or is not readable!'.format(self._loader.mibig_json_dir))
 
         self._spectra = []
         self._bgcs = []
@@ -64,6 +76,8 @@ class NPLinker(object):
         self._families = []
         self._mibig_bgc_dict = {}
 
+        self._bgc_lookup = {}
+
         self._datalinks = None
         self._linkfinder = None
 
@@ -71,7 +85,8 @@ class NPLinker(object):
         self._links = {}
 
         self._repro_data = {}
-        if repro_file is not None:
+        repro_file = self._config.config['repro_file']
+        if len(repro_file) > 0:
             self._save_repro_data(repro_file)
 
     def _collect_repro_data(self):
@@ -120,57 +135,81 @@ class NPLinker(object):
         """
 
         # TODO error handling (FileNotFoundError etc)
-        logger.debug('load_spectra({})'.format(self.mgf_file))
-        self._spectra = load_spectra(self.mgf_file)
+        logger.debug('load_spectra({})'.format(self._loader.mgf_file))
+        self._spectra = load_spectra(self._loader.mgf_file)
 
-        logger.debug('load_edges({})'.format(self.edges_file))
-        load_edges(self._spectra, self.edges_file)
+        logger.debug('load_edges({})'.format(self._loader.edges_file))
+        load_edges(self._spectra, self._loader.edges_file)
 
         # families = make_families(self.spectra) # TODO?
-        logger.debug('load_metadata({})'.format(self.nodes_file))
-        self._metadata = load_metadata(self._spectra, self.nodes_file)
+        logger.debug('load_metadata({})'.format(self._loader.nodes_file))
+        self._metadata = load_metadata(self._spectra, self._loader.nodes_file)
 
         input_files, ann_files = [], []
-        if self.mibig_json_dir is not None:
-            logger.debug('make_mibig_bgc_dict({})'.format(self.mibig_json_dir))
-            self._mibig_bgc_dict = make_mibig_bgc_dict(self.mibig_json_dir)
+        logger.debug('make_mibig_bgc_dict({})'.format(self._loader.mibig_json_dir))
+        self._mibig_bgc_dict = make_mibig_bgc_dict(self._loader.mibig_json_dir)
 
+        # TODO can this just be modified to search all folders in the root path instead of hardcoding them?
         for folder in NPLinker.FOLDERS:
-            fam_file = os.path.join(self.root_path, folder)
+            fam_file = os.path.join(self._loader.bigscape_path, folder)
             cluster_file = glob.glob(fam_file + os.sep + folder + "_clustering*")
+            print('cluster files: {}'.format(fam_file + os.sep + folder + '_clustering*'))
             annotation_files = glob.glob(fam_file + os.sep + "Network_*")
-            input_files.append(cluster_file[0])
-            ann_files.append(annotation_files[0])
+            # TODO which folders are supposed to exist? is it a critical error if some of them
+            # don't appear in a dataset???
+            if len(annotation_files) > 0:
+                input_files.append(cluster_file[0])
+                ann_files.append(annotation_files[0])
+            else:
+                logger.warning('Missing tsv file for folder: {}'.format(folder))
 
-        logger.debug('loadBGC_from_cluster_files(antismash_dir={})'.format(self.antismash_dir))
+        logger.debug('loadBGC_from_cluster_files(antismash_dir={})'.format(self._loader.antismash_dir))
         self._gcfs, self._bgcs, self._strains = loadBGC_from_cluster_files(
                                                 input_files,
                                                 ann_files,
-                                                antismash_dir=self.antismash_dir, antismash_format=self.antismash_format,
+                                                antismash_dir=self._loader.antismash_dir, 
+                                                antismash_format=self._config.config['dataset']['antismash_format'],
                                                 mibig_bgc_dict=self._mibig_bgc_dict)
+
+
+        self._bgc_lookup = {}
+        for i, bgc in enumerate(self._bgcs):
+            self._bgc_lookup[bgc.name] = i
+        
+        self._gcf_lookup = {}
+        for i, gcf in enumerate(self._gcfs):
+            self._gcf_lookup[gcf.id] = i
 
         logger.debug('load_data: completed')
         return True
 
-    def _generate_scores(self, dl, lf, scoring_methods):
-        if 'metcalf' in scoring_methods:
+    def _generate_scores(self, dl, lf):
+        # if metcalf scoring enabled
+        if self.scoring.metcalf.enabled:
             lf.metcalf_scoring(dl, type='spec-gcf')
             lf.metcalf_scoring(dl, type='fam-gcf')
 
-        if 'likescore' in scoring_methods:
+        # if hg scoring enabled
+        if self.scoring.hg.enabled:
+            lf.hg_scoring(dl, type='spec-gcf')
+            lf.hg_scoring(dl, type='fam-gcf')
+
+        # if likescore scoring enabled
+        if self.scoring.likescore.enabled:
             ll = LinkLikelihood()
             ll.calculate_likelihoods(dl, type='spec-gcf')
             ll.calculate_likelihoods(dl, type='fam-gcf')
             lf.likelihood_scoring(dl, ll, type='spec-gcf')
             lf.likelihood_scoring(dl, ll, type='fam-gcf')
 
-    def process_dataset(self, random_count=50, scoring_methods=SCORING_METHODS):
+    def process_dataset(self, random_count=50):
         """Construct the DataLinks and LinkFinder objects from the loaded dataset.
 
         Deals with initialising all the objects used for scoring/linking, and also
         currently manages the creation of randomised scoring matrices for the different
         object types. 
         """
+
         if len(self._spectra) == 0 or len(self._gcfs) == 0 or len(self._strains) == 0:
             logger.info('process_dataset: calling load_data')
             self.load_data()
@@ -181,20 +220,20 @@ class NPLinker(object):
         self._linkfinder = LinkFinder()
 
         # generate the actual scores from the standard DataLinks object
-        logger.info('Generating scores, enabled methods={}'.format(scoring_methods))
-        self._generate_scores(self._datalinks, self._linkfinder, scoring_methods)
+        logger.debug('Generating scores, enabled methods={}'.format(self.scoring.enabled()))
+        self._generate_scores(self._datalinks, self._linkfinder)
 
         # create the randomised scoring matrices, and stack them together for later use
         rdatalinks = [RandomisedDataLinks.from_datalinks(self._datalinks, True) for x in range(random_count)]
         rlinkfinders = [LinkFinder() for x in range(random_count)]
-        logger.info('Generating randomised scores, enabled methods={}'.format(scoring_methods))
+        logger.debug('Generating randomised scores, enabled methods={}'.format(self.scoring.enabled()))
         
         for i in range(random_count):
-            self._generate_scores(rdatalinks[i], rlinkfinders[i], scoring_methods)
+            self._generate_scores(rdatalinks[i], rlinkfinders[i])
         
         # create a set of dicts indexed by class to store the matrices
         self._random_scores = {}
-        for m in scoring_methods:
+        for m in self.scoring.enabled():
             rand_scores = \
             {
                 Spectrum:           np.zeros((len(self._spectra), 0)),
@@ -206,13 +245,13 @@ class NPLinker(object):
             }
 
             for i in range(random_count):
-                rand_scores[GCF][Spectrum] = np.r_[rand_scores[GCF][Spectrum], rlinkfinders[i].get_scores(m, 'spec-gcf')]
-                rand_scores[GCF][MolecularFamily] = np.r_[rand_scores[GCF][MolecularFamily], rlinkfinders[i].get_scores(m, 'fam-gcf')]
-                rand_scores[Spectrum] = np.c_[rand_scores[Spectrum], rlinkfinders[i].get_scores(m, 'spec-gcf')]
+                rand_scores[GCF][Spectrum] = np.r_[rand_scores[GCF][Spectrum], rlinkfinders[i].get_scores(m.name, 'spec-gcf')]
+                rand_scores[GCF][MolecularFamily] = np.r_[rand_scores[GCF][MolecularFamily], rlinkfinders[i].get_scores(m.name, 'fam-gcf')]
+                rand_scores[Spectrum] = np.c_[rand_scores[Spectrum], rlinkfinders[i].get_scores(m.name, 'spec-gcf')]
                 if len(self._families) > 0:
-                    rand_scores[MolecularFamily] = np.c_[rand_scores[MolecularFamily], rlinkfinders[i].get_scores(m, 'fam-gcf')]
+                    rand_scores[MolecularFamily] = np.c_[rand_scores[MolecularFamily], rlinkfinders[i].get_scores(m.name, 'fam-gcf')]
 
-            self._random_scores[m] = rand_scores
+            self._random_scores[m.name] = rand_scores
 
         self.clear_links()
         return True
@@ -221,25 +260,23 @@ class NPLinker(object):
         """Clear any previously retrieved links"""
         self._links = {}
 
-    def get_links(self, objects, datalinks=None, scoring_method=DEFAULT_SCORING, sig_percentile=95, scoring_cutoff=None):
+    def get_links(self, objects, scoring_method, datalinks=None):
         """Collects sets of links between a given set of objects and their counterparts.
 
         This method allows an application to pass in one or more objects of type GCF, Spectrum,
         or MolecularFamily, and retrieve the set of links to their counterpart objects (e.g.
-        GCF for Spectrum input) that exceed some threshold score. Returned scores can then
-        be accessed using NPLinker.all_links or NPLinker.links_for_obj. 
+        GCF for Spectrum input) that meet the scoring criteria for the selected scoring
+        method (see ScoringConfig class / self.scoring)
+        
+        Returned scores can then be accessed using NPLinker.all_links or NPLinker.links_for_obj.
 
         Args:
             objects: An instance of one of the above types, or a list containing any mix of them.
-            datalinks: The DataLinks instance used for scoring. Defaults to None, in which case the 
+            scoring_method: selects the scoring method to be used (e.g. metcalf, likescore). The value
+                of this parameter should be one of the ScoringConfig.<method> members, which also contain the
+                configurable parameters for each method.
+            datalinks: The DataLinks instance used for scoring. Defaults to None, in which case the
                 standard internal DataLinks instance is used. 
-            scoring_method (str): selects the scoring method to be used (e.g. 'metcalf', 'likescore')
-            sig_percentile (int): value between 0-100 indicating the percentile value calculated from the
-                randomised scoring matrix that candidate links must exceed to be returned. May be None,
-                in which case you must provide a value for scoring_cutoff.
-            scoring_cutoff (float): an absolute threshold that candidate links must exceed to be
-                returned. Must be None if sig_percentile is not None (i.e. the two are mutually 
-                exclusive). 
 
         Returns:
             If either a single instance or a list with uniform type is used as input, the return value
@@ -251,7 +288,7 @@ class NPLinker(object):
         # single object, pass it straight through
         if not isinstance(objects, list):
             logger.debug('get_links: single object')
-            return self._get_links([objects], datalinks, scoring_method, sig_percentile, scoring_cutoff)
+            return self._get_links([objects], datalinks, scoring_method)
 
         # check if the list contains one or multiple types of object
         type_counts = {NPLinker.OBJ_CLASSES[t]: 0 for t in range(len(NPLinker.OBJ_CLASSES))}
@@ -264,7 +301,7 @@ class NPLinker(object):
         if max(type_counts.values()) == len(objects):
             # if the list seems to have a uniform type, again pass straight through
             logger.debug('get_links: uniformly typed list ({})'.format(type(objects[0])))
-            return self._get_links(objects, datalinks, scoring_method, sig_percentile, scoring_cutoff)
+            return self._get_links(objects, datalinks, scoring_method)
 
         # finally, if it's a mix of objects, extract them into separate lists and call 
         # the internal method multiple times instead
@@ -279,7 +316,7 @@ class NPLinker(object):
         logger.debug('get_links: multiple lists')
         for i in range(len(NPLinker.OBJ_CLASSES)):
             if len(obj_lists[i]) > 0:
-                results[i].append(self._get_links(obj_lists[i], datalinks, scoring_method, sig_percentile, scoring_cutoff))
+                results[i].append(self._get_links(obj_lists[i], datalinks, scoring_method))
 
         return results
 
@@ -289,25 +326,22 @@ class NPLinker(object):
         #   scoring methods as keys, values are dst objects
         #       dst objects as keys, values are link scores
         if src not in self._links:
-            self._links[src] = {m: {} for m in NPLinker.SCORING_METHODS}
+            self._links[src] = {m: {} for m in SCORING_METHODS}
 
-        if scoring_method not in self._links[src]: 
+        if scoring_method.name not in self._links[src]: 
             raise Exception('Should never happen!')
 
-        self._links[src][scoring_method][dst] = score
+        self._links[src][scoring_method.name][dst] = score
 
-    def _get_links(self, objects, datalinks, scoring_method, sig_percentile, scoring_cutoff):
+    def _get_links(self, objects, datalinks, scoring_method):
         if len(objects) == 0:
             return []
-
-        if sig_percentile is not None and scoring_cutoff is not None:
-            raise Exception('Cannot use both sig_percentile and scoring_cutoff, one of the two must be None')
 
         if self._linkfinder is None:
             raise Exception('Need to call process_dataset first')
 
-        if scoring_method not in NPLinker.SCORING_METHODS:
-            raise Exception('unknown scoring method "{}"'.format(scoring_method))
+        if scoring_method.name not in SCORING_METHODS:
+            raise Exception('unknown scoring method "{}"'.format(scoring_method.name))
 
         datalinks = datalinks or self._datalinks
         input_type = type(objects[0])
@@ -316,16 +350,20 @@ class NPLinker(object):
         # then just call get_links without a cutoff value so it will return all scores
         # for the given objects, which we can then apply the perecentile threshold to (this
         # seemed easier than modifying the LinkFinder implementation)
-        if sig_percentile is not None:
-            scoring_cutoff = None
-            if sig_percentile < 0 or sig_percentile > 100:
-                raise Exception('sig_percentile invalid! Expected 0-100, got {}'.format(sig_percentile))
 
-        results = self._linkfinder.get_links(datalinks, objects, scoring_method, scoring_cutoff)
-
-        if sig_percentile is not None:
+        if scoring_method.name == 'metcalf':
+            if scoring_method.sig_percentile < 0 or scoring_method.sig_percentile > 100:
+                raise Exception('sig_percentile invalid! Expected 0-100, got {}'.format(scoring_method.sig_percentile))
+            logger.debug('_get_links for metcalf scoring')
+            results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, None)
             # if using percentile option, need to filter the links based on that before continuing...
-            results = self._get_links_percentile(input_type, objects, results, scoring_method, sig_percentile)
+            results = self._get_links_percentile(input_type, objects, results, scoring_method.name, scoring_method.sig_percentile)
+        elif scoring_method.name == 'likescore':
+            results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, scoring_method.cutoff)
+        elif scoring_method.name == 'hg':
+            results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, scoring_method.prob)
+        else:
+            raise Exception('Not handled yet')
 
         scores_found = set()
 
@@ -394,7 +432,7 @@ class NPLinker(object):
 
         return list(scores_found)
 
-    def _get_links_percentile(self, input_type, objects, results, scoring_method, sig_percentile):
+    def _get_links_percentile(self, input_type, objects, results, scoring_method_name, sig_percentile):
         # self._random_scores contains the randomised and stacked scores for each given type of 
         # object, so pull those out and apply np.percentile with the given threshold to the correct 
         # matrices here. the results object from get_links will contain *ALL* potential candiate
@@ -409,8 +447,8 @@ class NPLinker(object):
             results_spec, results_fam = results
 
             # lookup the appropriate random scores
-            rand_spec_scores = self._random_scores[scoring_method][input_type][Spectrum]
-            rand_fam_scores = self._random_scores[scoring_method][input_type][MolecularFamily]
+            rand_spec_scores = self._random_scores[scoring_method_name][input_type][Spectrum]
+            rand_fam_scores = self._random_scores[scoring_method_name][input_type][MolecularFamily]
 
             # calculate the threshold values for each input object
             spec_perc_thresholds = [np.percentile(rand_spec_scores[:, id], sig_percentile) for id in obj_ids]
@@ -439,7 +477,7 @@ class NPLinker(object):
             results = results[0]
 
             # lookup the appropriate random scores
-            rand_scores = self._random_scores[scoring_method][input_type]
+            rand_scores = self._random_scores[scoring_method_name][input_type]
 
             # calculate the threshold values for each input object
             perc_thresholds = [np.percentile(rand_scores[id, :], sig_percentile) for id in obj_ids]
@@ -464,9 +502,22 @@ class NPLinker(object):
     def get_common_strains(self, objects_a, objects_b):
         return self._datalinks.common_strains(objects_a, objects_b)
 
+    def has_bgc(self, name):
+        return name in self._bgc_lookup
+
+    def lookup_bgc(self, name):
+        if name not in self._bgc_lookup:
+            return None
+
+        return self._bgcs[self._bgc_lookup[name]]
+
     @property
     def strains(self):
         return self._strains
+
+    @property
+    def bgcs(self):
+        return self._bgcs
 
     @property
     def gcfs(self):
@@ -499,6 +550,13 @@ class NPLinker(object):
         return self._rdatalinks
 
     @property
+    def scoring(self):
+        """
+        Returns the ScoringConfig object used to manipulate the scoring process
+        """
+        return self._config.scoring
+
+    @property
     def repro_data(self):
         """
         Returns the dict of reproducibility data
@@ -512,41 +570,26 @@ class NPLinker(object):
         """
         return self._links
 
-    def links_for_obj(self, obj, scoring_method=DEFAULT_SCORING, sort=True, type_=None):
+    def links_for_obj(self, obj, scoring_method, sort=True, type_=None):
         # the type_ part is only really useful for GCFs, to pick between MolFam/Spectrum results
-        links = [(obj, score) for obj, score in self._links[obj][scoring_method].items() if (type_ is None or isinstance(obj, type_))]
+        if obj not in self._links:
+            logger.warning('No links found for supplied object. Either get_links was not called first or no results were found')
+            return None
+        links = [(obj, score) for obj, score in self._links[obj][scoring_method.name].items() if (type_ is None or isinstance(obj, type_))]
         if sort:
             links.sort(key=lambda x: x[1], reverse=True)
         return links
 
 if __name__ == "__main__":
-    # TODO will need to handle arguments here (via argparse)
-    # TODO possible to auto-discover some/all of these filenames for a given dataset?
-
-    if len(sys.argv) < 2:
-        print('Usage: nplinker.py <dataset root>')
-        sys.exit(0)
-
-    # crusemann dataset
-    DATASET = sys.argv[1]
-    logger.info('Loading dataset from path: {}'.format(DATASET))
-        
-    MGF_FILE = os.path.join(DATASET, 'spectra/METABOLOMICS-SNETS-c36f90ba-download_clustered_spectra-main.mgf')
-    NODES_FILE = os.path.join(DATASET, 'spectra/0d51c5b6c73b489185a5503d319977ab..out')
-    EDGES_FILE = os.path.join(DATASET, 'spectra/9a93d720f69143bb9f971db39b5d2ba2.pairsinfo')
-    ROOT_PATH = os.path.join(DATASET, 'bigscape/bigscape_corason_crusemann_complete_annotated_mibigs_mix_automode_20180713/network_files/2018-07-13_16-34-11_hybrids_auto_crusemann_bgcs_automode_mix_mibig')
-    ANTISMASH_DIR = os.path.join(DATASET, 'antismash/justin-20181022/')
-
-    # TODO is this optional???
-    # MIBIG_JSON_DIR = DATASET + "\\Data\\mibig\\mibig_json_1.4"
-    MIBIG_JSON_DIR = None
-
     # can set default logging configuration this way...
     LogConfig.setLogLevel(logging.DEBUG)
 
-    # create top level "app" object passing in dataset details 
-    # TODO alternative ways to specify this, e.g. in a .json file etc
-    npl = NPLinker(MGF_FILE, EDGES_FILE, NODES_FILE, MIBIG_JSON_DIR, ROOT_PATH, ANTISMASH_DIR)
+    npl = NPLinker(config_dict=vars(Args().args))
+
+    # reconfigure scoring methods
+    # npl.scoring.metcalf.enabled = False
+    # npl.scoring.likescore.enabled = False
+    # npl.scoring.hg.enabled = True
 
     # load the dataset
     if not npl.load_data():
@@ -554,14 +597,55 @@ if __name__ == "__main__":
         sys.exit(-1)
 
     # generate all datalinks objects etc
-    if not npl.process_dataset(random_count=3):
+    if not npl.process_dataset(random_count=1):
         print('Failed to process dataset')
         sys.exit(-1)
+
+    # testing hg stuff
+    good_gcf = npl.gcfs[8]
+    print(good_gcf.bgc_list)
+    npl.scoring.hg.prob = 0.96
+    result = npl.get_links(good_gcf, scoring_method=npl.scoring.hg)
+    good_gcf_links = npl.links_for_obj(good_gcf, npl.scoring.hg, type_=Spectrum)
+    for obj, score in good_gcf_links:
+        print('{} : {}'.format(obj, score))
+    print('{} total links found'.format(len(good_gcf_links)))
+
+    # end hg stuff
+    sys.exit(0)
+
+
+    good_gcf = npl.gcfs[8]
+    print(good_gcf.bgc_list)
+    npl.scoring.metcalf.sig_percentile = 99
+    result = npl.get_links(good_gcf, scoring_method=npl.scoring.metcalf)
+    if good_gcf not in result:
+        print('No links found!')
+
+    good_gcf_links = npl.links_for_obj(good_gcf, npl.scoring.metcalf, type_=Spectrum)
+    for obj, score in good_gcf_links:
+        print('{} : {}'.format(obj, score))
+    print('{} total links found'.format(len(good_gcf_links)))
+
+    sys.exit(0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # get_links with a single Spectrum/MolecularFamily
     obj = npl.spectra[2763:2765]
     result = npl.get_links(obj, scoring_method='metcalf', sig_percentile=99, scoring_cutoff=None)
-    # result = npl.get_links(obj, scoring_method='metcalf', sig_percentile=None, scoring_cutoff=135)
     # if the input Spectrum had any links above the cutoff, it will appear in result:
     if len(result) > 0:
         print('Found links to {} objects: {}'.format(len(result), result))
