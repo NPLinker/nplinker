@@ -230,7 +230,7 @@ def load_edges(spectra, edge_file):
             spec1 = spec_dict[spec1_id]
             spec2 = spec_dict[spec2_id]
 
-            if not family == '-1': # singletons
+            if family != '-1': # singletons
                 spec1.family = family
                 spec2.family = family
 
