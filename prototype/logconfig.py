@@ -27,6 +27,13 @@ class LogConfig(object):
             logger.setLevel(level)
 
     @staticmethod
+    def setLogLevelStr(level):
+        if not hasattr(logging, level):
+            raise Exception('Unknown/invalid loglevel "{}"'.format(level))
+
+        LogConfig.setLogLevel(getattr(logging, level))
+
+    @staticmethod
     def setLogDestination(dest):
         LogConfig.default_logdest = dest
         dest.setFormatter(logging.Formatter(LogConfig.logfmt))
