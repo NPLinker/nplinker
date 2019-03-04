@@ -63,29 +63,53 @@ class Args(object):
 
 class DatasetLoader(object):
 
-    def __init__(self, root_dir):
+    def __init__(self, root_dir, overrides):
         """Given a root directory for a dataset, attempts to construct the filenames
             that are necessary to load everything into nplinker.
         """
 
         self.root = root_dir
+        spec_dir = os.path.join(root_dir, 'spectra')
 
         # just <root_dir>/mibig_json
-        self.mibig_json_dir = os.path.join(root_dir, 'mibig_json')
+        if 'mibig_json_dir' in overrides:
+            self.mibig_json_dir = overrides['mibig_json_dir']
+        else:
+            self.mibig_json_dir = os.path.join(root_dir, 'mibig_json')
 
-        # should have an MGF file named <root_dir>/spectra/<something>.mgf
-        spec_dir = os.path.join(root_dir, 'spectra')
-        self.mgf_file = self._find_via_glob(os.path.join(spec_dir, '*.mgf'), 'MGF file')
+        if 'mgf_file' in overrides:
+            self.mgf_file = overrides['mgf_file']
+        else:
+            # should have an MGF file named <root_dir>/spectra/<something>.mgf
+            self.mgf_file = self._find_via_glob(os.path.join(spec_dir, '*.mgf'), 'MGF file')
 
         # annotation file(s) may not exist
-        self.annotation_files = glob.glob(os.path.join(spec_dir, '*.annotations.*'))
+        if 'annotation_files' in overrides:
+            self.annotation_files = overrides['annotation_files']
+        else:
+            self.annotation_files = glob.glob(os.path.join(spec_dir, '*.annotations.*'))
 
         # both of these should exist
-        self.edges_file = self._find_via_glob(os.path.join(spec_dir, "*.pairsinfo"), 'edges file')
-        self.nodes_file = self._find_via_glob(os.path.join(spec_dir, '*.out'), 'nodes file')
 
-        self.bigscape_path = os.path.join(root_dir, 'bigscape')
-        self.antismash_dir = os.path.join(root_dir, 'antismash')
+        if 'edges_file' in overrides:
+            self.edges_file = overrides['edges_file']
+        else:
+            self.edges_file = self._find_via_glob(os.path.join(spec_dir, "*.pairsinfo"), 'edges file')
+
+        if 'nodes_file' in overrides:
+            self.nodes_file = overrides['nodes_file']
+        else:
+            self.nodes_file = self._find_via_glob(os.path.join(spec_dir, '*.out'), 'nodes file')
+
+        if 'bigscape_dir' in overrides:
+            self.bigscape_dir = overrides['bigscape_dir']
+        else:
+            self.bigscape_dir = os.path.join(root_dir, 'bigscape')
+
+        if 'antismash_dir' in overrides:
+            self.antismash_dir = overrides['antismash_dir']
+        else:
+            self.antismash_dir = os.path.join(root_dir, 'antismash')
 
     def _find_via_glob(self, path, file_type):
         try:
@@ -96,11 +120,11 @@ class DatasetLoader(object):
             raise Exception('ERROR: unable to find {} in path "{}"'.format(file_type, path)) from None
 
     def key_paths(self):
-        return [self.mgf_file, self.edges_file, self.nodes_file, self.bigscape_path, self.antismash_dir]
+        return [self.mgf_file, self.edges_file, self.nodes_file, self.bigscape_dir, self.antismash_dir]
 
     def __repr__(self):
         return 'Root={}\n   MGF={}\n   EDGES={}\n   NODES={}\n   BIGSCAPE={}\n   MIBIG_JSON={}\n   ANTISMASH={}\n   ANNOTATIONS={}'.format(
-                self.root, self.mgf_file, self.edges_file, self.nodes_file, self.bigscape_path, self.mibig_json_dir, self.antismash_dir, self.annotation_files)
+                self.root, self.mgf_file, self.edges_file, self.nodes_file, self.bigscape_dir, self.mibig_json_dir, self.antismash_dir, self.annotation_files)
 
 
 class Config(object):
