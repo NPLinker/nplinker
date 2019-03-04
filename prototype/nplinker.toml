@@ -29,11 +29,14 @@ nodes_file = ""
 # edges filename. This path is passed to glob.glob, default is <root>/spectra/*.pairsinfo
 edges_file = ""
 
-# annotation filenames. This path is passed to glob.glob, default is <root>/spectra/*.annotations.*
-annotation_files = ""
+# annotation filenames. This should be a list of one or more filenames.
+annotation_files = []
 
 # Antismash data directory, default is <root>/antismash
 antismash_dir = ""
+
+# bigscape directory, default is <root>/bigscape
+bigscape_dir = ""
 
 # Scoring configuration
 [scoring]
