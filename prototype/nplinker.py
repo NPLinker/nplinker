@@ -42,13 +42,23 @@ class NPLinker(object):
     # - R_SCORE: the score for the link between a pair of objects
     R_SRC_ID, R_DST_ID, R_SCORE = range(3)
 
-    def __init__(self, config_dict={}):
+    def __init__(self, userconfig=None):
         """Initialise an NPLinker instance.
 
         TODO update once finished
         """
 
-        self._config = Config(config_dict)
+        # if userconfig is None => create Config() from empty dict
+        # if userconfig is a string => create a dict with 'config' key and string as filename
+        # if userconfig is a dict => pass it to Config() directly
+        if userconfig is None:
+            userconfig = {}
+        elif isinstance(userconfig, str):
+            userconfig = {'config': userconfig}
+        elif not isinstance(userconfig, dict):
+            raise Exception('Invalid type for userconfig (should be None/str/dict, found "{}")'.format(type(userconfig)))
+
+        self._config = Config(userconfig)
 
         # configure logging based on the supplied config params
         LogConfig.setLogLevelStr(self._config.config['loglevel'])
@@ -57,7 +67,7 @@ class NPLinker(object):
             logfile_dest = logging.FileHandler(logfile)
             LogConfig.setLogDestination(logfile_dest)
 
-        self._loader = DatasetLoader(self._config.config['dataset']['root'])
+        self._loader = DatasetLoader(self._config.config['dataset']['root'], self._config.config['dataset']['overrides'])
     
         logger.debug('Dataset info: {}'.format(self._loader))
         for f in self._loader.key_paths():
@@ -151,7 +161,7 @@ class NPLinker(object):
 
         # TODO can this just be modified to search all folders in the root path instead of hardcoding them?
         for folder in NPLinker.FOLDERS:
-            fam_file = os.path.join(self._loader.bigscape_path, folder)
+            fam_file = os.path.join(self._loader.bigscape_dir, folder)
             cluster_file = glob.glob(fam_file + os.sep + folder + "_clustering*")
             print('cluster files: {}'.format(fam_file + os.sep + folder + '_clustering*'))
             annotation_files = glob.glob(fam_file + os.sep + "Network_*")
@@ -584,7 +594,7 @@ if __name__ == "__main__":
     # can set default logging configuration this way...
     LogConfig.setLogLevel(logging.DEBUG)
 
-    npl = NPLinker(config_dict=vars(Args().args))
+    npl = NPLinker(vars(Args().args))
 
     # reconfigure scoring methods
     # npl.scoring.metcalf.enabled = False
