@@ -18,25 +18,25 @@ antismash_format = "flat"
 # paths are ignored)
 [dataset.overrides]
 # directory containing MiBIG .json files, default is <root>/mibig_json
-mibig_json_dir = ""
+#mibig_json_dir = ""
 
 # MGF filename. This path is passed to glob.glob, default is <root>/spectra/*.mgf
-mgf_file = ""
+#mgf_file = ""
 
 # nodes filename. This path is passed to glob.glob, default is <root>/spectra/*.out
-nodes_file = ""
+#nodes_file = ""
 
 # edges filename. This path is passed to glob.glob, default is <root>/spectra/*.pairsinfo
-edges_file = ""
+#edges_file = ""
 
 # annotation filenames. This should be a list of one or more filenames.
-annotation_files = []
+#annotation_files = []
 
 # Antismash data directory, default is <root>/antismash
-antismash_dir = ""
+#antismash_dir = ""
 
 # bigscape directory, default is <root>/bigscape
-bigscape_dir = ""
+#bigscape_dir = ""
 
 # Scoring configuration
 [scoring]
