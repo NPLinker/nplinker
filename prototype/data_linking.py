@@ -246,9 +246,8 @@ class DataLinks(object):
         object types (GCF, Spectrum, MolecularFamily). It's possible to use a single
         object together with a list as well.
 
-        Returns a dict indexed by either Spectrum or MolecularFamily instances, where
-        the values are further dicts indexed by GCF instances, and the values in those
-        dicts in turn are lists of strain indices which appear in both objects, which
+        Returns a dict indexed by tuples of (Spectrum/MolecularFamily, GCF), where
+        the values are lists of strain indices which appear in both objects, which
         can then be looked up in NPLinker.strains.
         """
         is_list_a = isinstance(objects_a, list)
@@ -285,11 +284,11 @@ class DataLinks(object):
         data_a = self.M_spec_strain if type_a == Spectrum else self.M_fam_strain
         data_b = self.M_gcf_strain
 
-        results = {x: {} for x in objects_a}
+        results = {}
         for a, obj_a in enumerate(objects_a):
             for b, obj_b in enumerate(objects_b):
                 # just AND both arrays and extract the indices with positive results
-                results[obj_a].update({obj_b: np.where(np.logical_and(data_a[ids_a[a]], data_b[ids_b[b]]))[0]})
+                results[(obj_a, obj_b)] = np.where(np.logical_and(data_a[ids_a[a]], data_b[ids_b[b]]))[0]
 
         return results
 
