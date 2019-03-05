@@ -36,6 +36,8 @@ class LogConfig(object):
     @staticmethod
     def setLogDestination(dest):
         LogConfig.default_logdest = dest
+        if isinstance(dest, str):
+            dest = logging.FileHandler(dest)
         dest.setFormatter(logging.Formatter(LogConfig.logfmt))
         for logger in LogConfig.active_loggers.values():
             logger.handlers = []
