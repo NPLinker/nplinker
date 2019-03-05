@@ -510,7 +510,15 @@ class NPLinker(object):
         return None
 
     def get_common_strains(self, objects_a, objects_b):
-        return self._datalinks.common_strains(objects_a, objects_b)
+        # this is a dict with structure:
+        #   (Spectrum/MolecularFamily, GCF) => list of strain indices
+        common_strains = self._datalinks.common_strains(objects_a, objects_b)
+
+        # replace the lists of strain indices with actual strain objects
+        for objpair in common_strains.keys():
+            common_strains[objpair] = [self._strains[x] for x in common_strains[objpair]]
+    
+        return common_strains
 
     def has_bgc(self, name):
         return name in self._bgc_lookup
@@ -594,96 +602,56 @@ if __name__ == "__main__":
     # can set default logging configuration this way...
     LogConfig.setLogLevel(logging.DEBUG)
 
+    # initialise NPLinker from the command-line arguments
     npl = NPLinker(vars(Args().args))
-
-    # reconfigure scoring methods
-    # npl.scoring.metcalf.enabled = False
-    # npl.scoring.likescore.enabled = False
-    # npl.scoring.hg.enabled = True
 
     # load the dataset
     if not npl.load_data():
         print('Failed to load the dataset!')
         sys.exit(-1)
 
+    # make sure metcalf scoring is enabled 
+    npl.scoring.metcalf.enabled = True
+
     # generate all datalinks objects etc
     if not npl.process_dataset(random_count=1):
         print('Failed to process dataset')
         sys.exit(-1)
 
-    # testing hg stuff
-    good_gcf = npl.gcfs[8]
-    print(good_gcf.bgc_list)
-    npl.scoring.hg.prob = 0.96
-    result = npl.get_links(good_gcf, scoring_method=npl.scoring.hg)
-    good_gcf_links = npl.links_for_obj(good_gcf, npl.scoring.hg, type_=Spectrum)
-    for obj, score in good_gcf_links:
-        print('{} : {}'.format(obj, score))
-    print('{} total links found'.format(len(good_gcf_links)))
+    # pick a GCF to get links for
+    test_gcf = npl.gcfs[8]
 
-    # end hg stuff
-    sys.exit(0)
-
-
-    good_gcf = npl.gcfs[8]
-    print(good_gcf.bgc_list)
+    # set metcalf scoring significance percentile to 99%
     npl.scoring.metcalf.sig_percentile = 99
-    result = npl.get_links(good_gcf, scoring_method=npl.scoring.metcalf)
-    if good_gcf not in result:
+
+    # call get_links and set the scoring method to metcalf by referencing the 
+    # scoring.metcalf object
+    result = npl.get_links(test_gcf, scoring_method=npl.scoring.metcalf)
+
+    # check if any links were found
+    if test_gcf not in result:
         print('No links found!')
+        sys.exit(0)
 
-    good_gcf_links = npl.links_for_obj(good_gcf, npl.scoring.metcalf, type_=Spectrum)
-    for obj, score in good_gcf_links:
+    # retrieve the specific links for this object (get_links() supports passing
+    # multiple objects as input and so doesn't return them directly). since multiple
+    # scoring methods may be in use, need to supply the desired scoring object as a
+    # parameter. By default this will return objects of any available type (so Spectrum
+    # or MolecularFamily for GCF input), but the type_ parameter can be used to select
+    # a single class if needed.
+    test_gcf_links = npl.links_for_obj(test_gcf, npl.scoring.metcalf, type_=Spectrum)
+
+    # print the objects (spectra in this example) and their scores
+    for obj, score in test_gcf_links:
         print('{} : {}'.format(obj, score))
-    print('{} total links found'.format(len(good_gcf_links)))
+        # also retrieve common strains. the return value here is a dict indexed
+        # by object tuples (either (Spectrum, GCF) or (MolecularFamily, GCF) depending
+        # on the inputs), with the values being lists of shared strains (strings)
+        common_strains = npl.get_common_strains(test_gcf, obj)
+        strain_names = list(common_strains.values())[0]
+        if len(strain_names) == 0:
+            print('   No shared strains!')
+        else:
+            print('   {} shared strains: {}'.format(len(strain_names), strain_names))
 
-    sys.exit(0)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # get_links with a single Spectrum/MolecularFamily
-    obj = npl.spectra[2763:2765]
-    result = npl.get_links(obj, scoring_method='metcalf', sig_percentile=99, scoring_cutoff=None)
-    # if the input Spectrum had any links above the cutoff, it will appear in result:
-    if len(result) > 0:
-        print('Found links to {} objects: {}'.format(len(result), result))
-
-        # print info about GCFs each Spectrum is linked to
-        for spec in result:
-            gcfs = npl.all_links[spec]['metcalf']
-            # or
-            gcfs = npl.links_for_obj(spec)
-            print('{} has links to {} GCFs'.format(spec, len(gcfs)))
-
-    # get_links with a list of GCFs
-    objects = [npl.gcfs[763]] 
-    objects = npl.gcfs[763:765]
-    result = npl.get_links(objects, scoring_method='metcalf', sig_percentile=99)
-    # result = npl.get_links(objects, scoring_method='metcalf', sig_percentile=None, scoring_cutoff=150)
-    if len(result) > 0:
-        print('{}/{} objects with links found!'.format(len(result), len(objects)))
-        for gcf in result:
-            spectra = npl.links_for_obj(gcf, Spectrum)
-            print('GCF {} has links to {} spectra'.format(gcf, len(spectra)))
-
-    sys.exit(0)
-
-    # finding common_strains
-    common_strains = npl.get_common_strains(npl.gcfs[763:766], npl.spectra[3403])
-    for spec, gcfs in common_strains.items():
-        for gcf, strains in gcfs.items():
-            for strain in strains:
-                print('{} and {} share strain #{}'.format(spec, gcf, strain))
-
+    print('{} total links found'.format(len(test_gcf_links)))
