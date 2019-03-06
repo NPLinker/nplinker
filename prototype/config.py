@@ -185,13 +185,28 @@ class ScoringConfig(object):
 
     def enabled(self):
         """
-        Returns a list of the enabled scoring methods
+        Returns a list of the currently enabled scoring methods
         """
         return [self._methods[x] for x in SCORING_METHODS if self._methods[x].enabled]
 
+    def enabled_names(self):
+        """
+        Returns a list of the names of all enabled scoring methods
+        """
+        return [m.name for m in self.enabled()]
+
     def all(self):
         """
-        Returns a list of all available scoring methods
+        Returns a list of all supported scoring methods
+        """
+        return list(self._methods.values())
+
+    def all_names(self):
+        """
+        Returns a list of the names of all supported scoring methods
         """
         return list(self._methods.keys())
+
+    def __repr__(self):
+        return str(self._methods)
 
