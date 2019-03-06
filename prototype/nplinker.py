@@ -212,12 +212,18 @@ class NPLinker(object):
             lf.likelihood_scoring(dl, ll, type='spec-gcf')
             lf.likelihood_scoring(dl, ll, type='fam-gcf')
 
-    def process_dataset(self, random_count=50):
+    def process_dataset(self, random_count=None):
         """Construct the DataLinks and LinkFinder objects from the loaded dataset.
 
         Deals with initialising all the objects used for scoring/linking, and also
         currently manages the creation of randomised scoring matrices for the different
         object types. 
+
+        Args:
+            random_count: number of randomised instances to create. The default "None"
+                effectively means "use the previously configured value" (e.g. from a
+                configuration file). Otherwise the value must be >0, and will override
+                and previously configured value.
         """
 
         if len(self._spectra) == 0 or len(self._gcfs) == 0 or len(self._strains) == 0:
@@ -234,6 +240,13 @@ class NPLinker(object):
         self._generate_scores(self._datalinks, self._linkfinder)
 
         # create the randomised scoring matrices, and stack them together for later use
+        if random_count is not None and random_count < 1:
+            raise Exception('random_count must be None or >0 (value={})'.format(random_count))
+
+        if random_count is None:
+            random_count = self.scoring.random_count
+
+        logger.debug('Generating {} randomised instances for scoring'.format(random_count))
         rdatalinks = [RandomisedDataLinks.from_datalinks(self._datalinks, True) for x in range(random_count)]
         rlinkfinders = [LinkFinder() for x in range(random_count)]
         logger.debug('Generating randomised scores, enabled methods={}'.format(self.scoring.enabled()))
