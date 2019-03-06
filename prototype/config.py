@@ -187,5 +187,5 @@ class ScoringConfig(object):
         """
         Returns a list of all available scoring methods
         """
-        return self._methods
+        return list(self._methods.keys())
 
