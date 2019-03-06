@@ -177,6 +177,12 @@ class ScoringConfig(object):
             setattr(self, m, self._methods[m])
         self.random_count = scoringdict['random_count']
 
+    def get(self, m):
+        if m in self._methods:
+            return self._methods[m]
+
+        raise Exception('Unknown scoring method "{}"'.format(m))
+
     def enabled(self):
         """
         Returns a list of the enabled scoring methods
