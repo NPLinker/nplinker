@@ -208,5 +208,17 @@ class ScoringConfig(object):
         return list(self._methods.keys())
 
     def __repr__(self):
-        return str(self._methods)
+        r = ''
+        for n in self._methods.keys():
+            r += '[{}]\n'.format(n)
+            vals = self._methods[n]
+            for vn, vv in vals.__dict__.items():
+                if vn == 'name':
+                    continue
+
+                r += '   {} = {}\n'.format(vn, vv)
+            r += '------------------\n'
+
+        return r
+
 
