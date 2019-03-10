@@ -19,7 +19,7 @@ class Args(object):
         self.parser = argparse.ArgumentParser(description='nplinker arguments', epilog='Note: command-line arguments will override '
                                               'arguments from configuration files')
         self.parser.add_argument('-c', '--config', help='Path to a .toml configuration file', metavar='path')
-        self.parser.add_argument('-d', '--dataset', help='Root path for the dataset to be loaded', metavar='path')
+        self.parser.add_argument('-d', '--dataset.root', help='Root path for the dataset to be loaded', metavar='path')
         self.parser.add_argument('-l', '--loglevel', help='Logging verbosity level: DEBUG, INFO, WARNING, ERROR', metavar='loglevel')
         self.parser.add_argument('-f', '--logfile', help='Redirect logging from stdout to this file', metavar='logfile')
 
@@ -145,9 +145,10 @@ class Config(object):
         config = toml.load(open(self.default_config_path, 'r'))
         if 'config' in config_dict:
             logger.debug('Loading user config {}'.format(config_dict['config']))
-            user_config = toml.load(open(config_dict['config'], 'r'))
-            config.update(user_config)
-            del config_dict['config']
+            if config_dict['config'] is not None:
+                user_config = toml.load(open(config_dict['config'], 'r'))
+                config.update(user_config)
+                del config_dict['config']
 
         # remaining values in the dict should override the existing ones from config files
         # however if running non-interactively, argparse will set values of all non-specified
@@ -165,6 +166,18 @@ class Config(object):
         # easily manipulated while the app is running, then remove from the overall config
         self.scoring = ScoringConfig(config['scoring'])
         del config['scoring']
+
+        if 'dataset' not in config:
+            raise Exception('No dataset defined in configuration!')
+
+        if 'dataset.root' in config:
+            root = config['dataset.root']
+            logger.debug('Dataset root is being set to "{}"'.format(root))
+            config['dataset']['root'] = root
+            del config['dataset.root']
+            if root is None or not os.path.exists(root):
+                raise Exception('Dataset path "{}" not found or not accessible'.format(root))
+
         self.config = config
 
 class ScoringConfig(object):
