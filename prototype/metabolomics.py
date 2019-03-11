@@ -162,6 +162,7 @@ def mols_to_spectra(ms2, metadata):
     spectra = []
     for i, m in enumerate(ms2_dict.keys()):
         new_spectrum = Spectrum(i, ms2_dict[m], m.name, metadata[m.name]['precursormass'])
+        new_spectrum.metadata = metadata[n.name]
         spectra.append(new_spectrum)
 
     return spectra
