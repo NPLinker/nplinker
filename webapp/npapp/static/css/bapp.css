@@ -1,0 +1,17 @@
+.btn {
+    max-width: 100%;
+}
+/* fixes text spilling out of the button */
+.btn {
+    word-wrap: break-word;
+    white-space: normal;
+}
+.btn-link {
+    word-wrap: break-word;
+}
+.card {
+    max-width: 100%;
+}
+.card-text {
+    word-wrap: break-word;
+}
