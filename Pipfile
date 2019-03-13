@@ -76,6 +76,9 @@ seaborn = "*"
 sklearn = "*"
 scikit-learn = "*"
 networkx = "*"
+xdg = "*"
+toml = "*"
+bokeh = "*"
 
 [requires]
 python_version = "3.7"
