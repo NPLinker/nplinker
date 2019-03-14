@@ -347,7 +347,6 @@ class RandomisedDataLinks(DataLinks):
         if len(datalinks.M_spec_strain) == 0 or len(datalinks.M_gcf_strain) == 0:
             raise Exception('DataLinks object not initialised (call load_data first)')
 
-        # TODO is this all that's needed here?
         # create copies of the data structures required
         self.M_gcf_strain = datalinks.M_gcf_strain.copy()
         self.M_spec_strain = datalinks.M_spec_strain.copy()

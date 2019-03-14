@@ -28,10 +28,6 @@ from config import Config, ScoringConfig, DatasetLoader, Args
 from logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
-# TODO Google-style docstrings
-
-
-
 class NPLinker(object):
 
     FOLDERS = ['NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs', 'Saccharides', 'Terpene']
@@ -43,9 +39,49 @@ class NPLinker(object):
     R_SRC_ID, R_DST_ID, R_SCORE = range(3)
 
     def __init__(self, userconfig=None):
-        """Initialise an NPLinker instance.
+        """Initialise an NPLinker instance, automatically loading a dataset and generating scores.
 
-        TODO update once finished
+        NPLinker instances can be configured in multiple ways, in ascending order of priority:
+            1. A global user-level default configuration file in TOML format, found in the directory:
+                    $XDG_CONFIG_HOME/nplinker/nplinker.toml
+            2. A local TOML configuration file
+            3. Command-line arguments / supplying a manually constructed dict instance
+
+        The user-level configuration file will be created when you first create an NPLinker instance. 
+        It contains sensible default values for each setting and is intended to be copied and edited to
+        produce dataset-specific configuration files, which will then override any parameters shared
+        with the user-level file. To load such a file, simply set the "userconfig" parameter to a 
+        string containing the filename. 
+
+        It's also possible to selectively override configuration file parameters by 
+        supplying command-line arguments (if running nplinker.py as a script), or by passing
+        a dict with a structure corresponding to the configuration file format to this method.
+
+        Some examples may make the various possible combinations a bit clearer:
+            # load the default/user-level configuration file and nothing else
+            npl = NPLinker()
+
+            # override the default file with a different one
+            npl = NPLinker('myconfig.toml')
+
+            # the same thing but running NPLinker as a script
+            > python nplinker.py --config "myconfig.toml"
+
+            # use the defaults from the user-level config while modifying the root path
+            # to load the dataset from (this is the minimum you would need to change in the
+            # default config file)
+            npl = NPLinker({'dataset': {'root': '/path/to/dataset'}})
+
+            # the same thing running NPLinker as a script
+            > python nplinker.py --dataset.root /path/to/dataset
+    
+        Args:
+            userconfig: supplies user-defined configuration data. May take one of 3 types:
+                - None: just load the user-level default configuration file
+                - str: treat as filename of a local configuration file to load 
+                        (overriding the defaults)
+                - dict: contents will be used to override values in the dict generated 
+                        from loading the configuration file(s)
         """
 
         # if userconfig is None => create Config() from empty dict
@@ -145,7 +181,6 @@ class NPLinker(object):
             True if successful, False otherwise
         """
 
-        # TODO error handling (FileNotFoundError etc)
         logger.debug('load_spectra({})'.format(self._loader.mgf_file))
         self._spectra = load_spectra(self._loader.mgf_file)
 
@@ -380,6 +415,7 @@ class NPLinker(object):
         # for the given objects, which we can then apply the perecentile threshold to (this
         # seemed easier than modifying the LinkFinder implementation)
 
+        # TODO this block can probably be simplified 
         if scoring_method.name == 'metcalf':
             if scoring_method.sig_percentile < 0 or scoring_method.sig_percentile > 100:
                 raise Exception('sig_percentile invalid! Expected 0-100, got {}'.format(scoring_method.sig_percentile))
@@ -468,7 +504,6 @@ class NPLinker(object):
         # links at this stage - e.g. for a Spectrum input, it will return all GCFs
 
         # retrieve the IDS for all the supplied objects
-        # TODO will need to add .id to MolecularFamily or this will break
         obj_ids = [obj.id for obj in objects]
 
         if input_type == GCF:
@@ -490,7 +525,6 @@ class NPLinker(object):
 
             for d, (full_results, thresholds, num_objs) in enumerate(data):
                 for i in range(len(objects)):
-                    # TODO is this the best way to do this??
                     # want to get the indices of full_results where a) the source ID matches the
                     # current object and b) the score exceeds the threshold for that object
                     obj_indices = np.intersect1d(np.where(full_results[NPLinker.R_SCORE, :] >= thresholds[i]),
@@ -514,7 +548,6 @@ class NPLinker(object):
             perc_results = np.zeros((3, 0))
 
             for i in range(len(objects)):
-                # TODO is this the best way to do this??
                 # want to get the indices of full_results where a) the source ID matches the
                 # current object and b) the score exceeds the threshold for that object
                 obj_indices = np.intersect1d(np.where(results[NPLinker.R_SCORE, :] >= perc_thresholds[i]),
@@ -628,7 +661,7 @@ if __name__ == "__main__":
     LogConfig.setLogLevel(logging.DEBUG)
 
     # initialise NPLinker from the command-line arguments
-    npl = NPLinker(vars(Args().args))
+    npl = NPLinker(Args().get_args())
 
     # load the dataset
     if not npl.load_data():

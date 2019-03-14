@@ -162,6 +162,7 @@ def mols_to_spectra(ms2, metadata):
     spectra = []
     for i, m in enumerate(ms2_dict.keys()):
         new_spectrum = Spectrum(i, ms2_dict[m], m.name, metadata[m.name]['precursormass'])
+        new_spectrum.metadata = metadata[m.name]
         spectra.append(new_spectrum)
 
     return spectra
@@ -242,7 +243,7 @@ def load_edges(spectra, edge_file):
 
 class MolecularFamily(object):
     def __init__(self, family_id):
-        self.id = -1 # TODO this needs set to a unique ID on creation for consistency with GCF/Spectrum
+        self.id = -1 
         self.family_id = family_id
         self.spectra = []
         self.random_molecular_family = RandomMolecularFamily(self)
@@ -284,16 +285,23 @@ class SingletonFamily(MolecularFamily):
 def make_families(spectra):
     families = []
     family_dict = {}
+    family_index = 0
     for spectrum in spectra:
         family_id = spectrum.family
         if family_id == '-1': # singleton
             new_family = SingletonFamily()
+            new_family.id = family_index
+            family_index += 1
+
             new_family.add_spectrum(spectrum)
             spectrum.family = new_family
             families.append(new_family)
         else:
             if family_id not in family_dict:
                 new_family = MolecularFamily(family_id)
+                new_family.id = family_index
+                family_index += 1
+                
                 new_family.add_spectrum(spectrum)
                 spectrum.family = new_family
                 families.append(new_family)
@@ -301,6 +309,7 @@ def make_families(spectra):
             else:
                 family_dict[family_id].add_spectrum(spectrum)
                 spectrum.family = family_dict[family_id]
+
 
     return families
 

@@ -16,6 +16,9 @@ logger = LogConfig.getLogger(__file__)
 class Args(object):
 
     def __init__(self):
+        def bool_checker(x):
+            return str(x).lower() == 'true'
+
         self.parser = argparse.ArgumentParser(description='nplinker arguments', epilog='Note: command-line arguments will override '
                                               'arguments from configuration files')
         self.parser.add_argument('-c', '--config', help='Path to a .toml configuration file', metavar='path')
@@ -28,12 +31,12 @@ class Args(object):
 
         self.parser.add_argument('-r', '--scoring.random', help='Number of randomized instances to create during scoring', metavar='num')
         # TODO better just leaving these in config file?
-        self.parser.add_argument('--scoring.metcalf.enabled', type=bool, help='Metcalf scoring enabled/disabled', metavar='true|false')
+        self.parser.add_argument('--scoring.metcalf.enabled', type=bool_checker, help='Metcalf scoring enabled/disabled', metavar='true|false')
         self.parser.add_argument('--scoring.metcalf.sig_percentile', type=int, help='Metcalf scoring percentile threshold value (0-100)', metavar='val')
-        self.parser.add_argument('--scoring.hg.enabled', type=bool, help='Hypergeometric scoring enabled/disabled', metavar='true|false')
+        self.parser.add_argument('--scoring.hg.enabled', type=bool_checker, help='Hypergeometric scoring enabled/disabled', metavar='true|false')
 
         self.parser.add_argument('--scoring.hg.prob', type=float, help='Hypergeometric scoring threshold (0-1.0)', metavar='val')
-        self.parser.add_argument('--scoring.likescore.enabled', type=bool, help='Likescore scoring enabled/disabled', metavar='true|false')
+        self.parser.add_argument('--scoring.likescore.enabled', type=bool_checker, help='Likescore scoring enabled/disabled', metavar='true|false')
         self.parser.add_argument('--scoring.likescore.cutoff', type=int, help='Likescoring cutoff threshold value', metavar='val')
         self.args = self.parser.parse_args()
 

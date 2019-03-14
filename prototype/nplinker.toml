@@ -55,6 +55,6 @@ enabled = true
 
 # likescore scoring
 [scoring.likescore]
-cutoff = 0.1
+cutoff = 0.8
 enabled = true
 
