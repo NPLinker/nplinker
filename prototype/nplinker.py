@@ -482,7 +482,6 @@ class NPLinker(object):
 
             for d, (full_results, thresholds, num_objs) in enumerate(data):
                 for i in range(len(objects)):
-                    # TODO is this the best way to do this??
                     # want to get the indices of full_results where a) the source ID matches the
                     # current object and b) the score exceeds the threshold for that object
                     obj_indices = np.intersect1d(np.where(full_results[NPLinker.R_SCORE, :] >= thresholds[i]),
@@ -506,7 +505,6 @@ class NPLinker(object):
             perc_results = np.zeros((3, 0))
 
             for i in range(len(objects)):
-                # TODO is this the best way to do this??
                 # want to get the indices of full_results where a) the source ID matches the
                 # current object and b) the score exceeds the threshold for that object
                 obj_indices = np.intersect1d(np.where(results[NPLinker.R_SCORE, :] >= perc_thresholds[i]),
