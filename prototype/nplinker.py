@@ -461,7 +461,6 @@ class NPLinker(object):
         # links at this stage - e.g. for a Spectrum input, it will return all GCFs
 
         # retrieve the IDS for all the supplied objects
-        # TODO will need to add .id to MolecularFamily or this will break
         obj_ids = [obj.id for obj in objects]
 
         if input_type == GCF:
