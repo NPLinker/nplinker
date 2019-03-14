@@ -616,7 +616,7 @@ if __name__ == "__main__":
     LogConfig.setLogLevel(logging.DEBUG)
 
     # initialise NPLinker from the command-line arguments
-    npl = NPLinker(vars(Args().args))
+    npl = NPLinker(Args().get_args())
 
     # load the dataset
     if not npl.load_data():
