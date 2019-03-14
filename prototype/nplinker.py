@@ -144,7 +144,6 @@ class NPLinker(object):
             True if successful, False otherwise
         """
 
-        # TODO error handling (FileNotFoundError etc)
         logger.debug('load_spectra({})'.format(self._loader.mgf_file))
         self._spectra = load_spectra(self._loader.mgf_file)
 
