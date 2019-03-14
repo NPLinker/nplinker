@@ -243,7 +243,7 @@ def load_edges(spectra, edge_file):
 
 class MolecularFamily(object):
     def __init__(self, family_id):
-        self.id = -1 # TODO this needs set to a unique ID on creation for consistency with GCF/Spectrum
+        self.id = -1 
         self.family_id = family_id
         self.spectra = []
         self.random_molecular_family = RandomMolecularFamily(self)
