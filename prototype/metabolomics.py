@@ -285,16 +285,23 @@ class SingletonFamily(MolecularFamily):
 def make_families(spectra):
     families = []
     family_dict = {}
+    family_index = 0
     for spectrum in spectra:
         family_id = spectrum.family
         if family_id == '-1': # singleton
             new_family = SingletonFamily()
+            new_family.id = family_index
+            family_index += 1
+
             new_family.add_spectrum(spectrum)
             spectrum.family = new_family
             families.append(new_family)
         else:
             if family_id not in family_dict:
                 new_family = MolecularFamily(family_id)
+                new_family.id = family_index
+                family_index += 1
+                
                 new_family.add_spectrum(spectrum)
                 spectrum.family = new_family
                 families.append(new_family)
@@ -302,6 +309,7 @@ def make_families(spectra):
             else:
                 family_dict[family_id].add_spectrum(spectrum)
                 spectrum.family = family_dict[family_id]
+
 
     return families
 
