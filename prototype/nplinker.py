@@ -87,6 +87,7 @@ class NPLinker(object):
         self._mibig_bgc_dict = {}
 
         self._bgc_lookup = {}
+        self._spec_lookup = {}
 
         self._datalinks = None
         self._linkfinder = None
@@ -182,6 +183,7 @@ class NPLinker(object):
                                                 mibig_bgc_dict=self._mibig_bgc_dict)
 
 
+        logger.debug('Generating lookup tables')
         self._bgc_lookup = {}
         for i, bgc in enumerate(self._bgcs):
             self._bgc_lookup[bgc.name] = i
@@ -189,6 +191,10 @@ class NPLinker(object):
         self._gcf_lookup = {}
         for i, gcf in enumerate(self._gcfs):
             self._gcf_lookup[gcf.id] = i
+
+        self._spec_lookup = {}
+        for i, spec in enumerate(self._spectra):
+            self._spec_lookup[spec.spectrum_id] = i
 
         logger.debug('load_data: completed')
         return True
@@ -541,6 +547,12 @@ class NPLinker(object):
             return None
 
         return self._bgcs[self._bgc_lookup[name]]
+
+    def lookup_spectrum(self, name):
+        if name not in self._spec_lookup:
+            return None
+
+        return self._spectra[self._spec_lookup[name]]
 
     @property
     def strains(self):
