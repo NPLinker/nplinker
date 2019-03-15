@@ -12,31 +12,39 @@
 {% block contents %}
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-lg-4">
-            {{ embed(roots.scale_spec) }}
-        </div>
-        <div class="col-lg-4">
-            {{ embed(roots.scale_bgc) }}
-        </div>
-        <div class="col-md-2"></div>
-    </div>
-    <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-lg-4">
+        <div class="col-md-1"></div>
+        <div class="col-lg-5">
             {{ embed(roots.fig_spec) }}
         </div>
-        <div class="col-lg-4">
+        <div class="col-lg-5">
             {{ embed(roots.fig_bgc) }}
         </div>
-        <div class="col-md-2"></div>
+        <div class="col-md-1"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-lg-5">
+            <div id="spec_hover_info"></div>
+        </div>
+        <div class="col-lg-5">
+            <div id="bgc_hover_info"></div>
+        </div>
+        <div class="col-md-1"></div>
     </div>
 </div>
 
 <div class="container-fluid">
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <strong>Select mode</strong>
+            {{ embed(roots.scoring_mode_group) }}
+        </div>
+        <div class="col-md-1"></div>
+    </div>
     <div class="row" style="background-color: #ffffff">
-        <div class="col-md-3"></div>
-        <div class="col-lg-6">
+        <div class="col-md-1"></div>
+        <div class="col-lg-10">
             <strong>Selected scoring method:</strong>
             <!-- embed the Bokeh RadioGroup -->
             {{ embed(roots.scoring_method_group) }}
@@ -44,7 +52,7 @@
             <!-- embed the slider widgets -->
             {{ embed(roots.sliders) }}
         </div>
-        <div class="col-md-3"></div>
+        <div class="col-md-1"></div>
     </div>
     <div class="row">
         <div class="col-md-2"></div>
