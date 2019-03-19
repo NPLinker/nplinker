@@ -3,7 +3,7 @@ from bokeh.layouts import row, column
 from bokeh.models import CustomJS
 from bokeh.plotting import figure, curdoc
 from bokeh.models import ColumnDataSource, HoverTool, TapTool
-from bokeh.events import LODEnd, LODStart
+from bokeh.events import LODEnd, LODStart, Reset
 
 from nplinker import Spectrum, GCF, MolecularFamily
 
@@ -18,45 +18,21 @@ SCORING_MODES = ['BGC to Spectra', 'Spectra to BGC']
 SCO_MODE_BGC_SPEC, SCO_MODE_SPEC_BGC = range(2)
 SCORING_MODES_ENUM = [SCO_MODE_BGC_SPEC, SCO_MODE_SPEC_BGC]
 
-class Range(object):
-
-    def __init__(self, s=None, e=None):
-        self.s = s
-        self.e = e
-
-    def update(self, s, e):
-        self.s = s
-        self.e = e
-
-    def range(self):
-        if self.s is None or self.e is None:
-            return 0
-
-        return self.e - self.s
-
-    def __repr__(self):
-        return 'Range(s={}, e={}, r={})'.format(self.s, self.e, self.range())
-
 class ZoomHandler(object):
     """
     This class deals with scaling the circle glyphs on the scatterplots so that
     they stay roughly the same size during zooming. 
     """
 
-    def __init__(self, plot, renderer, threshold=0.05):
-        self.x = Range()
-        self.ox = Range()
-        self.y = Range()
-        self.oy = Range()
-        self.threshold = threshold
+    def __init__(self, plot, renderer):
         self.lod_mode = False
         self.renderer = renderer
         self.ratio = POINT_RATIO
 
         # want to listen for changes to the start/end of the x/y ranges displayed by the plot...
-        plot.x_range.on_change('start', self.x_cb)
-        plot.x_range.on_change('end', self.x_cb)
-        plot.y_range.on_change('start', self.y_cb)
+        # can probably get away with only listening for one of these? (and y events seem to be
+        # delivered after x)
+        # plot.x_range.on_change('end', self.x_cb)
         plot.y_range.on_change('end', self.y_cb)
 
         # ... and also entering/leaving "level of detail" mode, a lower-detail mode activated
@@ -64,63 +40,31 @@ class ZoomHandler(object):
         # care about because it doesn't alter the zoom level
         plot.on_event(LODStart, self.lod_event)
         plot.on_event(LODEnd, self.lod_event)
-        
+        plot.on_event(Reset, self.reset_event)
+
         self.plot = plot
 
-    def xchanged(self):
-        """
-        Return True if the x range has changed
-        """
-        xd = abs(self.x.range() - self.ox.range())
-        if xd > (self.threshold * self.ox.range()):
-            return True
+    def reset_event(self, e):
+        self.renderer.glyph.radius = 0.1
 
-        return False
-
-    def ychanged(self):
-        """
-        Return True if the y range has changed
-        """
-        yd = abs(self.y.range() - self.oy.range())
-        if yd > (self.threshold * self.oy.range()):
-            return True
-
-        return False
+    def update_ratio(self):
+        # handle init state when x_/y_range are None
+        if self.plot.y_range.start is not None:
+            self.renderer.glyph.radius = self.ratio * min(self.plot.x_range.end - self.plot.x_range.start, self.plot.y_range.end - self.plot.y_range.start)
 
     def x_cb(self, attr, old, new):
         """ 
         Callback for changes to the x range. attr = 'start'/'end', 'old' and 'new'
         give the previous and current values.
         """
-        if attr == 'start':
-            self.ox.s = old
-            self.x.s = new
-        else:
-            self.ox.e = old
-            self.x.e = new
-
-        if old is None and attr == 'end':
-            self.renderer.glyph.radius = self.ratio * abs(self.plot.x_range.end - self.plot.x_range.start)
-            print('Radius is now: {}'.format(self.renderer.glyph.radius))
-
-        if attr == 'end' and not self.lod_mode and self.xchanged():
-            print('CHANGE x range: {} v {}, {}'.format(self.x.range(), self.ox.range(), abs(self.x.range() - self.ox.range())))
-            self.renderer.glyph.radius = self.ratio * self.x.range()
+        self.update_ratio()
 
     def y_cb(self, attr, old, new):
         """ 
         Callback for changes to the y range. attr = 'start'/'end', 'old' and 'new'
         give the previous and current values.
         """
-        if attr == 'start':
-            self.oy.s = old
-            self.y.s = new
-        else:
-            self.oy.e = old
-            self.y.e = new
-
-        if attr == 'end' and not self.lod_mode and self.ychanged():
-            print('CHANGE y range: {} v {}, {}'.format(self.y.range(), self.oy.range(), abs(self.y.range() - self.oy.range())))
+        self.update_ratio()
 
     def lod_event(self, event):
         self.lod_mode = isinstance(event, LODStart)
@@ -266,13 +210,8 @@ class NPLinkerBokeh(object):
         self.ds_bgc = self.ren_bgc.data_source
         self.ds_spec = self.ren_spec.data_source
 
-        def foo(event):
-            self.scoring_mode_group.active = 0
-        def bar(event):
-            self.scoring_mode_group.active = 1
-
-        self.fig_bgc.on_event('tap', foo)
-        self.fig_spec.on_event('tap', bar)
+        self.fig_bgc.on_event('tap', lambda e: self.scoring_mode_callback_tap(SCO_MODE_BGC_SPEC))
+        self.fig_spec.on_event('tap', lambda e: self.scoring_mode_callback_tap(SCO_MODE_SPEC_BGC))
 
         return f_bgc, r_bgc, f_spec, r_spec
 
@@ -564,6 +503,9 @@ class NPLinkerBokeh(object):
     def scoring_method_callback(self, attr, old, new):
         self.get_links()
         self.update_debug_output()
+
+    def scoring_mode_callback_tap(self, newmode):
+        self.scoring_mode_group.active = newmode
 
     def scoring_mode_callback(self, attr, old, new):
         self.results.mode = SCORING_MODES_ENUM[new]
