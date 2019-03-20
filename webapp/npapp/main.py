@@ -1,4 +1,4 @@
-from bokeh.models.widgets import RadioGroup, Slider, Div, Dropdown
+from bokeh.models.widgets import RadioGroup, Slider, Div, Dropdown, CheckboxButtonGroup
 from bokeh.layouts import row, column
 from bokeh.models import CustomJS
 from bokeh.plotting import figure, curdoc
@@ -17,6 +17,9 @@ POINT_RATIO = 1 / 200.0
 SCORING_MODES = ['BGC to Spectra', 'Spectra to BGC']
 SCO_MODE_BGC_SPEC, SCO_MODE_SPEC_BGC = range(2)
 SCORING_MODES_ENUM = [SCO_MODE_BGC_SPEC, SCO_MODE_SPEC_BGC]
+PLOT_TOGGLES = ['Toggle alpha-blending', 'Toggle colormap']
+PLOT_ALPHA, PLOT_CMAP = range(2)
+PLOT_TOGGLES_ENUM = [PLOT_ALPHA, PLOT_CMAP]
 
 class ZoomHandler(object):
     """
@@ -134,7 +137,7 @@ class NPLinkerBokeh(object):
         r_bgc = f_bgc.circle('x', 'y', source=self.bgc_datasource, 
                 radius=radius,
                 radius_dimension='max',
-                # fill_alpha=0.6, 
+                fill_alpha=1.0, 
                 fill_color='fill',
                 line_color=None,
                 # selection_color='#ff0000')
@@ -146,11 +149,6 @@ class NPLinkerBokeh(object):
                 nonselection_line_alpha=0)
 
         self.bgc_zoom = ZoomHandler(f_bgc, r_bgc)
-
-        # customize hover tooltip to show BGC name and index
-        # (there are some special builtin properties prefixed with $, and then 
-        # properties prefixed with @ come from the data source)
-        # hover_bgc = HoverTool(tooltips=[('index', '$index'), ('BGC name', '@name'), ('GCF name', '@gcf')])
 
         hover_callback_code = """
             var indices = cb_data.index['1d'].indices;
@@ -173,10 +171,9 @@ class NPLinkerBokeh(object):
         f_bgc.add_tools(hover_bgc)
 
         # create the MolFam figure in the same way
-        # f_spec = figure(tools=TOOLS, title="Spectra (n={})".format(len(self.nh.spec_data['x'])), plot_width=PW, plot_height=PH, name="fig_spec")
         f_spec = figure(tools=TOOLS, toolbar_location='above', title="Spectra (n={})".format(len(self.nh.spec_data['x'])), sizing_mode='scale_width', name="fig_spec")
         r_spec = f_spec.circle('x', 'y', source=self.spec_datasource, 
-                            # fill_alpha=0.6, 
+                            fill_alpha=1.0, 
                             radius=radius,
                             radius_dimension='max',
                             #fill_color='#449944', 
@@ -529,11 +526,18 @@ class NPLinkerBokeh(object):
         self.ds_bgc.selected.indices = []
         self.ds_spec.selected.indices = []
 
+    def plot_toggles_callback(self, attr, old, new):
+        self.ren_bgc.glyph.fill_alpha = 0.6 if PLOT_ALPHA in new else 1.0
+        self.ren_spec.glyph.fill_alpha = 0.6 if PLOT_ALPHA in new else 1.0
+
     def bokeh_layout(self):
         self.spec_div = Div(text="", sizing_mode='scale_height', name='spec_div')
         self.bgc_div = Div(text="", sizing_mode='scale_height', name='bgc_div')
 
         self.ds_bgc.selected.on_change('indices', self.bgc_selchanged)
+
+        self.plot_toggles = CheckboxButtonGroup(active=[PLOT_CMAP], labels=PLOT_TOGGLES, name='plot_toggles')
+        self.plot_toggles.on_change('active', self.plot_toggles_callback)
 
         self.scoring_mode_group = RadioGroup(labels=SCORING_MODES, active=SCO_MODE_BGC_SPEC, name='scoring_mode_group')
         self.scoring_mode_group.on_change('active', self.scoring_mode_callback)
@@ -555,6 +559,7 @@ class NPLinkerBokeh(object):
         # for debug output etc 
         self.debug_div = Div(text="", name='debug_div')
 
+        curdoc().add_root(self.plot_toggles)
         curdoc().add_root(self.fig_spec)
         curdoc().add_root(self.fig_bgc)
         curdoc().add_root(self.spec_div)

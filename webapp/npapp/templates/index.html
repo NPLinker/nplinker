@@ -13,6 +13,13 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-1"></div>
+        <div class="cold-lg-10">
+            {{ embed(roots.plot_toggles) }}
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-1"></div>
         <div class="col-lg-5">
             {{ embed(roots.fig_spec) }}
         </div>
@@ -37,7 +44,7 @@
     <div class="row">
         <div class="col-md-1"></div>
         <div class="col-md-10">
-            <strong>Select mode</strong>
+            <strong>Select mode:</strong>
             {{ embed(roots.scoring_mode_group) }}
         </div>
         <div class="col-md-1"></div>
