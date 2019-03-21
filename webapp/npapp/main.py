@@ -17,7 +17,7 @@ POINT_RATIO = 1 / 200.0
 SCORING_MODES = ['BGC to Spectra', 'Spectra to BGC']
 SCO_MODE_BGC_SPEC, SCO_MODE_SPEC_BGC = range(2)
 SCORING_MODES_ENUM = [SCO_MODE_BGC_SPEC, SCO_MODE_SPEC_BGC]
-PLOT_TOGGLES = ['Toggle alpha-blending', 'Toggle colormap']
+PLOT_TOGGLES = ['Toggle alpha-blending', 'Toggle colormaps']
 PLOT_ALPHA, PLOT_CMAP = range(2)
 PLOT_TOGGLES_ENUM = [PLOT_ALPHA, PLOT_CMAP]
 
@@ -529,6 +529,9 @@ class NPLinkerBokeh(object):
     def plot_toggles_callback(self, attr, old, new):
         self.ren_bgc.glyph.fill_alpha = 0.6 if PLOT_ALPHA in new else 1.0
         self.ren_spec.glyph.fill_alpha = 0.6 if PLOT_ALPHA in new else 1.0
+
+        self.ren_bgc.glyph.fill_color = 'fill' if PLOT_CMAP in new else '#449944'
+        self.ren_spec.glyph.fill_color = 'fill' if PLOT_CMAP in new else '#444499'
 
     def bokeh_layout(self):
         self.spec_div = Div(text="", sizing_mode='scale_height', name='spec_div')
