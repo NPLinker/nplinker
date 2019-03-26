@@ -14,7 +14,7 @@ PW, PH = 500, 500
 
 POINT_RATIO = 1 / 200.0
 
-SCORING_MODES = ['BGC to Spectra', 'Spectra to BGC']
+SCORING_MODES = ['BGCs to Spectra', 'Spectra to GCFs']
 SCO_MODE_BGC_SPEC, SCO_MODE_SPEC_BGC = range(2)
 SCORING_MODES_ENUM = [SCO_MODE_BGC_SPEC, SCO_MODE_SPEC_BGC]
 PLOT_TOGGLES = ['Toggle alpha-blending', 'Toggle colormaps', 'Toggle singletons']
@@ -152,7 +152,7 @@ class NPLinkerBokeh(object):
                 # selection_color='#ff0000')
                 selection_color='#ff7f00', 
                 selection_fill_alpha=0.9,
-                nonselection_fill_alpha=0.05, 
+                nonselection_fill_alpha=0.0, 
                 nonselection_fill_color='#333333', 
                 nonselection_line_color=None, 
                 nonselection_line_alpha=0)
@@ -192,7 +192,7 @@ class NPLinkerBokeh(object):
                             line_color=None,
                             selection_color='#ff7f00', 
                             selection_fill_alpha=0.9,
-                            nonselection_fill_alpha=0.05, 
+                            nonselection_fill_alpha=0.0, 
                             nonselection_fill_color='#333333', 
                             nonselection_line_color=None, 
                             nonselection_line_alpha=0)
