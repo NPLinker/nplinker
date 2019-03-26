@@ -6,7 +6,9 @@ from parsers import LoadMGF
 class Spectrum(object):
     
     METADATA_BLACKLIST = set(['AllOrganisms', 'LibraryID', 'RTStdErr', 'RTMean', 'AllGroups', 'DefaultGroups',
-                            'precursor mass', 'parent mass', 'ProteoSAFeClusterLink', 'precursor intensity', 'sum(precursor intensity)'])
+                            'precursor mass', 'parent mass', 'ProteoSAFeClusterLink', 'precursor intensity', 'sum(precursor intensity)',
+                              'precursormass', 'parentmass', 'singlechargeprecursormass', 'cluster index', 'number of spectra', 
+                              'UniqueFileSourcesCount', 'EvenOdd', 'charge', 'precursor charge'])
 
     def __init__(self, id, peaks, spectrum_id, precursor_mz, parent_mz=None, rt=None):
         self.id = id
