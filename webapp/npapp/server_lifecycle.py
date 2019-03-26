@@ -74,7 +74,7 @@ class NPLinkerHelper(object):
                 cmap = []
                 print('Unique GCFs: {}'.format(len(uniq_gcfs)))
                 while total > 0:
-                    c = bkp.viridis(min(total, 256))
+                    c = bkp.d3['Category20c'][20]
                     total -= len(c)
                     cmap.extend(c)
 
@@ -115,16 +115,17 @@ class NPLinkerHelper(object):
         total = len(uniq_fams)
         cmap = []
         while total > 0:
-            c = bkp.inferno(min(total, 256))
+            c = bkp.d3['Category20'][20]
             total -= len(c)
             cmap.extend(c)
 
         self.spec_data['fill'] = []
         for i in range(len(self.spec_data['name'])):
-            # if self.spec_data['family'][i] == '-1':
-            #     self.spec_data['fill'].append('#ffeeeeee')
-            # else:
-            self.spec_data['fill'].append(cmap[fam_lookup[self.spec_data['family'][i]]])
+            # fix singletons to a single obvious colour
+            if self.spec_data['family'][i] == '-1':
+                self.spec_data['fill'].append('#000000')
+            else:
+                self.spec_data['fill'].append(cmap[fam_lookup[self.spec_data['family'][i]]])
 
 
         self.bgc_indices = {}
