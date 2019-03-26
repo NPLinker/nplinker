@@ -28,29 +28,63 @@ class NPLinkerHelper(object):
         if not self.nplinker.process_dataset():
             raise Exception('Failed to process dataset')
 
-        # load the BGC TSNE csv file from the webapp's /data dir
-        self.bgc_data = {'x': [], 'y': [], 'strain': [], 'name': [], 'gcf': []}
-        uniq_gcfs = set()
-        gcf_lookup = {}
-        with open(os.path.join(os.path.dirname(__file__), 'data/crusemann-bgc-tsne.csv'), 'r') as csvfile:
-            csvr = csv.reader(csvfile)
-            for l in csvr:
-                (name, x, y) = l
-                # NOTE cast to float or nothing will appear!
-                if self.nplinker.has_bgc(name):
-                    self.bgc_data['x'].append(float(x))
-                    self.bgc_data['y'].append(float(y))
-                    self.bgc_data['name'].append(name)
-                    self.bgc_data['strain'].append(name) # TODO
-                    # self.bgc_data['radius'].append(0.45) 
-                    gcf = self.nplinker.lookup_bgc(name).parent.id
-                    if gcf not in uniq_gcfs:
-                        gcf_lookup[gcf] = len(uniq_gcfs)
-                        uniq_gcfs.add(gcf)
-                    self.bgc_data['gcf'].append(gcf)
+        data_dir = os.path.join(os.path.dirname(__file__), 'data')
+        # load each of the BGC TSNE csv files from the /data dir
+        # these are all named crusemann-bgc-tsne-<name>.csv
+        self.bgc_data = {}
 
-                # else:
-                #     print('Missing: {}'.format(name))
+        for f in os.listdir(data_dir):
+            if not f.startswith('crusemann-bgc-tsne-'):
+                continue
+
+            fname = os.path.join(data_dir, f)
+            print('Loading BGC TSNE from {}'.format(fname))
+            fid = f.replace('crusemann-bgc-tsne-', '')[:-4]
+            print('ID is {}'.format(fid))
+
+            bgc_data = {'x': [], 'y': [], 'strain': [], 'name': [], 'gcf': []}
+            uniq_gcfs = set()
+            gcf_lookup = {}
+            
+            with open(fname, 'r') as csvfile:
+                csvr = csv.reader(csvfile)
+                headers = next(csvr)
+                for l in csvr:
+                    if len(l) == 4:
+                        # ignore bgc type col in some files
+                        (name, x, y, _) = l
+                    else:
+                        (name, x, y) = l
+
+                    # NOTE cast to float or nothing will appear!
+                    if self.nplinker.has_bgc(name):
+                        bgc_data['x'].append(float(x))
+                        bgc_data['y'].append(float(y))
+                        bgc_data['name'].append(name)
+                        bgc_data['strain'].append(name) # TODO
+                        gcf = self.nplinker.lookup_bgc(name).parent.id
+                        if gcf not in uniq_gcfs:
+                            gcf_lookup[gcf] = len(uniq_gcfs)
+                            uniq_gcfs.add(gcf)
+                        bgc_data['gcf'].append(gcf)
+                    # else:
+                    #     print('Missing: {}'.format(name))
+
+                total = len(uniq_gcfs)
+                cmap = []
+                print('Unique GCFs: {}'.format(len(uniq_gcfs)))
+                while total > 0:
+                    c = bkp.viridis(min(total, 256))
+                    total -= len(c)
+                    cmap.extend(c)
+
+                bgc_data['fill'] = []
+                for i in range(len(bgc_data['name'])):
+                    bgc_data['fill'].append(cmap[gcf_lookup[bgc_data['gcf'][i]]])
+            
+                self.bgc_data[fid] = bgc_data
+
+        print('bgc data keys', list(self.bgc_data.keys()))
 
 
         # load the spectra TSNE csv file from the webapp's /data dir
@@ -59,6 +93,7 @@ class NPLinkerHelper(object):
         fam_lookup = {}
         with open(os.path.join(os.path.dirname(__file__), 'data/crusemann-spectra-tsne.csv')) as csvfile:
             csvr = csv.reader(csvfile)
+            headers = next(csvr)
             for l in csvr:
                 (name, x, y) = l
                 # self.spec_data['radius'].append(0.4)
@@ -92,23 +127,9 @@ class NPLinkerHelper(object):
             self.spec_data['fill'].append(cmap[fam_lookup[self.spec_data['family'][i]]])
 
 
-        total = len(uniq_gcfs)
-        cmap = []
-        print('Unique GCFs: {}'.format(len(uniq_gcfs)))
-        while total > 0:
-            c = bkp.viridis(min(total, 256))
-            total -= len(c)
-            cmap.extend(c)
-
-        self.bgc_data['fill'] = []
-        for i in range(len(self.bgc_data['name'])):
-            self.bgc_data['fill'].append(cmap[gcf_lookup[self.bgc_data['gcf'][i]]])
-            
-
-
         self.bgc_indices = {}
         self.spec_indices = {}
-        for i, bgc in enumerate(self.bgc_data['name']):
+        for i, bgc in enumerate(self.bgc_data['allbgcs']['name']):
             self.bgc_indices[bgc] = i
         for i, spec in enumerate(self.spec_data['name']):
             self.spec_indices[spec] = i

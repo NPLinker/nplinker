@@ -1,8 +1,8 @@
-from bokeh.models.widgets import RadioGroup, Slider, Div, Dropdown, CheckboxButtonGroup
-from bokeh.layouts import row, column
+from bokeh.models.widgets import RadioGroup, Slider, Div, Dropdown, CheckboxButtonGroup, Select
+from bokeh.layouts import row, column, widgetbox
 from bokeh.models import CustomJS
 from bokeh.plotting import figure, curdoc
-from bokeh.models import ColumnDataSource, HoverTool, TapTool
+from bokeh.models import ColumnDataSource, HoverTool, TapTool, CDSView, IndexFilter
 from bokeh.events import LODEnd, LODStart, Reset
 
 from nplinker import Spectrum, GCF, MolecularFamily
@@ -17,9 +17,15 @@ POINT_RATIO = 1 / 200.0
 SCORING_MODES = ['BGC to Spectra', 'Spectra to BGC']
 SCO_MODE_BGC_SPEC, SCO_MODE_SPEC_BGC = range(2)
 SCORING_MODES_ENUM = [SCO_MODE_BGC_SPEC, SCO_MODE_SPEC_BGC]
-PLOT_TOGGLES = ['Toggle alpha-blending', 'Toggle colormaps']
-PLOT_ALPHA, PLOT_CMAP = range(2)
-PLOT_TOGGLES_ENUM = [PLOT_ALPHA, PLOT_CMAP]
+PLOT_TOGGLES = ['Toggle alpha-blending', 'Toggle colormaps', 'Toggle singletons']
+PLOT_ALPHA, PLOT_CMAP, PLOT_SINGLETONS = range(3)
+PLOT_TOGGLES_ENUM = [PLOT_ALPHA, PLOT_CMAP, PLOT_SINGLETONS]
+
+def get_radius(datasource):
+    # this aims to set a sensible initial radius based on the dimensions of the plot
+    minx = min(datasource.data['x'])
+    maxx = max(datasource.data['x'])
+    return (maxx - minx) / 180.0
 
 class ZoomHandler(object):
     """
@@ -48,7 +54,9 @@ class ZoomHandler(object):
         self.plot = plot
 
     def reset_event(self, e):
-        self.renderer.glyph.radius = 0.1
+        radius = get_radius(self.renderer.data_source)
+        print('reset to  {}'.format(radius))
+        self.renderer.glyph.radius = radius
 
     def update_ratio(self):
         # handle init state when x_/y_range are None
@@ -81,26 +89,27 @@ class CurrentResults(object):
     def clear(self):
         self.bgcs = []
         self.spec = []
-        self.links = {} # keyed by GCF
+        self.links = {} 
         self.shared_strains = {}
 
     def update(self, bgcs, spec, links, shared_strains):
         self.bgcs = bgcs
         self.spec = spec
         self.links = links
-        self.shared_strains = {}
-        # TODO fix this 
-        # if shared_strains is not None:
-            # for x in links:
-            #     self.shared_strains[x[0]] = shared_strains[(x[0], gcf)]
+        self.shared_strains = shared_strains
 
 class NPLinkerBokeh(object):
 
     def __init__(self, helper):
         self.nh = helper
 
-        self.bgc_datasource = ColumnDataSource(data=self.nh.bgc_data)
+        # default to TSNE with all bgcs
+        self.bgc_tsne_id = 'allbgcs'
+        self.bgc_tsne_id_list = list(self.nh.bgc_data.keys())
+
+        self.bgc_datasource = ColumnDataSource(data=self.nh.bgc_data[self.bgc_tsne_id])
         self.spec_datasource = ColumnDataSource(data=self.nh.spec_data)
+        self.spec_datasource_view = CDSView(source=self.spec_datasource, filters=[IndexFilter(list(range(len(self.spec_datasource.data['x']))))])
 
         self.bgc_zoom = None
         self.spec_zoom = None
@@ -108,12 +117,12 @@ class NPLinkerBokeh(object):
         self.results = CurrentResults()
 
     @property
+    def bgc_data(self):
+        return self.nh.bgc_data[self.bgc_tsne_id]
+    
+    @property
     def nplinker(self):
         return self.nh.nplinker
-
-    @property
-    def bgc_data(self):
-        return self.nh.bgc_data
 
     @property
     def spec_data(self):
@@ -131,10 +140,10 @@ class NPLinkerBokeh(object):
         # create the BGC figure and populate it from the datasource (note the dict keys are used in the 
         # call to circle to identify attributes)
 
-        radius = 0.1 # initial placeholder size
+        radius = get_radius(self.bgc_datasource)
 
-        f_bgc = figure(tools=TOOLS, toolbar_location='above', title="BGCs (n={})".format(len(self.nh.bgc_data['x'])), sizing_mode='scale_width', name="fig_bgc")
-        r_bgc = f_bgc.circle('x', 'y', source=self.bgc_datasource, 
+        f_bgc = figure(tools=TOOLS, toolbar_location='above', title="BGCs (n={})".format(len(self.bgc_data['x'])), sizing_mode='scale_width', name="fig_bgc")
+        r_bgc = f_bgc.circle('x', 'y', source=self.bgc_datasource, name=self.bgc_tsne_id,
                 radius=radius,
                 radius_dimension='max',
                 fill_alpha=1.0, 
@@ -171,8 +180,10 @@ class NPLinkerBokeh(object):
         f_bgc.add_tools(hover_bgc)
 
         # create the MolFam figure in the same way
+        radius = 0.1
         f_spec = figure(tools=TOOLS, toolbar_location='above', title="Spectra (n={})".format(len(self.nh.spec_data['x'])), sizing_mode='scale_width', name="fig_spec")
         r_spec = f_spec.circle('x', 'y', source=self.spec_datasource, 
+                            view=self.spec_datasource_view,
                             fill_alpha=1.0, 
                             radius=radius,
                             radius_dimension='max',
@@ -330,15 +341,16 @@ class NPLinkerBokeh(object):
                 body_id = 'spec_body_{}'.format(i)
                 title = 'id={}, family={}'.format(spec.id, spec.family)
                 body = '<dl>'
-                for attr in ['id', 'spectrum_id', 'family']:
+                for attr in ['id', 'spectrum_id', 'family', 'strain_list']:
                     body += '<dt>{}:</dt><dd>{}</dd>'.format(attr, getattr(spec, attr))
-                if self.results.shared_strains is not None and spec in self.results.shared_strains: # TODO might need fixed
-                    body += '<dt>shared strains</dt><dd>{} (with {})</dd>'.format(self.results.shared_strains[spec], gcf)
+                # if self.results.shared_strains is not None: # TODO!
+                #     body += '<dt>shared strains</dt><dd>{} (with {})</dd>'.format(self.results.shared_strains[spec], gcf)
                 body += '</dl>'
                 test += self.TMPL.format(hdr_id, 'adeaad', body_id, title, body_id, 'accordionSpec', body)
                 i += 1
         elif self.results.mode == SCO_MODE_BGC_SPEC:
             test = '<h4>{} linked spectra</h4>'.format(len(self.ds_spec.selected.indices))
+            seen_gcfs = set()
             if self.results.links is not None:
                 for gcf, spec_scores in self.results.links.items():
                     for j, spec_score in enumerate(spec_scores):
@@ -347,10 +359,14 @@ class NPLinkerBokeh(object):
                         body_id = 'spec_body_{}'.format(i)
                         title = 'id={}, score={}'.format(spec.id, score)
                         body = '<dl>'
-                        for attr in ['id', 'spectrum_id', 'family']:
+                        for attr in ['id', 'spectrum_id', 'family', 'strain_list']:
                             body += '<dt>{}:</dt><dd>{}</dd>'.format(attr, getattr(spec, attr))
-                        if self.results.shared_strains is not None and spec in self.results.shared_strains: # TODO might need fixed
-                            body += '<dt>shared strains</dt><dd>{} (with {})</dd>'.format(self.results.shared_strains[spec], gcf)
+                        if self.results.shared_strains is not None:
+                            for bgc in self.results.bgcs:
+                                if (spec, bgc.parent) in self.results.shared_strains and bgc.parent not in seen_gcfs:
+                                    if len(self.results.shared_strains[(spec, bgc.parent)]) > 0:
+                                        body += '<dt>shared strains</dt><dd>{} (with GCF {}, BGC {})</dd>'.format(self.results.shared_strains[(spec, bgc.parent)], bgc.parent, bgc)
+                                    seen_gcfs.add(bgc.parent)
                         body += '</dl>'
                         test += self.TMPL.format(hdr_id, 'adeaad', body_id, title, body_id, 'accordionSpec', body)
                         i += 1
@@ -414,6 +430,8 @@ class NPLinkerBokeh(object):
             if mode == SCO_MODE_SPEC_BGC:
                 t = GCF
             # TODO other modes
+
+            otherobjs = set()
             for link_obj in objs_with_links:
                 objs_with_scores[link_obj] = nplinker.links_for_obj(link_obj, current_method, type_=t)
                 if mode == SCO_MODE_BGC_SPEC:
@@ -432,18 +450,21 @@ class NPLinkerBokeh(object):
 
                 selected.update(score_obj_indices)
 
+                for obj in objs_with_scores[link_obj]:
+                    otherobjs.add(obj[0])
+
                 # TODO shared strains
                 # shared_strains = nplinker.get_common_strains([gcf], [spec[0] for spec in spectra_and_scores])
 
-            shared_strains = None # TODO
+            all_shared_strains = self.nh.nplinker.get_common_strains(objs_with_links, list(otherobjs))
 
             # take the indexes of the corresponding spectra from the datasource and highlight on the other plot
             if mode == SCO_MODE_BGC_SPEC:
                 self.ds_spec.selected.indices = list(selected)
-                self.results.update(bgcs, None, objs_with_scores, shared_strains)
+                self.results.update(bgcs, None, objs_with_scores, all_shared_strains)
             elif mode == SCO_MODE_SPEC_BGC:
                 self.ds_bgc.selected.indices = list(selected)
-                self.results.update(None, specs, objs_with_scores, shared_strains)
+                self.results.update(None, specs, objs_with_scores, all_shared_strains)
 
         else:
             print('No links found!')
@@ -533,14 +554,42 @@ class NPLinkerBokeh(object):
         self.ren_bgc.glyph.fill_color = 'fill' if PLOT_CMAP in new else '#449944'
         self.ren_spec.glyph.fill_color = 'fill' if PLOT_CMAP in new else '#444499'
 
+        if PLOT_SINGLETONS in new:
+            self.ren_spec.view.filters = [IndexFilter(list(range(len(self.spec_datasource.data['x']))))]
+        else:
+            indices = [i for i in range(len(self.spec_datasource.data['x'])) if self.spec_datasource.data['family'][i] != '-1']
+            # for i in range(len(self.spec_datasource.data['x'])):
+            #     if self.spec_datasource.data['family'][i] != '-1':
+            #         indices.append(i)
+
+            self.ren_spec.view.filters = [IndexFilter(indices)]
+
+    def tsne_id_callback(self, attr, old, new):
+        print('switching from {} to {}'.format(old, new))
+        self.ds_bgc.selected.indices = []
+        self.ds_spec.selected.indices = []
+        self.bgc_tsne_id = new
+        # messy but it works and seems to be best way of doing this
+        newdata = self.nh.bgc_data[new]
+        self.bgc_datasource.data.update(
+                                             x=newdata['x'],
+                                             y=newdata['y'],
+                                             name=newdata['name'],
+                                             strain=newdata['strain'],
+                                             gcf=newdata['gcf'],
+                                             fill=newdata['fill'])
+
     def bokeh_layout(self):
         self.spec_div = Div(text="", sizing_mode='scale_height', name='spec_div')
         self.bgc_div = Div(text="", sizing_mode='scale_height', name='bgc_div')
 
         self.ds_bgc.selected.on_change('indices', self.bgc_selchanged)
 
-        self.plot_toggles = CheckboxButtonGroup(active=[PLOT_CMAP], labels=PLOT_TOGGLES, name='plot_toggles')
+        self.plot_toggles = CheckboxButtonGroup(active=[PLOT_CMAP, PLOT_SINGLETONS], labels=PLOT_TOGGLES, name='plot_toggles')
         self.plot_toggles.on_change('active', self.plot_toggles_callback)
+
+        self.tsne_id_select = Select(title='BGC TSNE:', value=self.bgc_tsne_id, options=self.bgc_tsne_id_list, name='tsne_id_select')
+        self.tsne_id_select.on_change('value', self.tsne_id_callback)
 
         self.scoring_mode_group = RadioGroup(labels=SCORING_MODES, active=SCO_MODE_BGC_SPEC, name='scoring_mode_group')
         self.scoring_mode_group.on_change('active', self.scoring_mode_callback)
@@ -563,6 +612,7 @@ class NPLinkerBokeh(object):
         self.debug_div = Div(text="", name='debug_div')
 
         curdoc().add_root(self.plot_toggles)
+        curdoc().add_root(self.tsne_id_select)
         curdoc().add_root(self.fig_spec)
         curdoc().add_root(self.fig_bgc)
         curdoc().add_root(self.spec_div)
