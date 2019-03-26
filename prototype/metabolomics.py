@@ -3,6 +3,9 @@ import numpy as np
 
 from parsers import LoadMGF
 
+from logconfig import LogConfig
+logger = LogConfig.getLogger(__file__)
+
 class Spectrum(object):
     
     METADATA_BLACKLIST = set(['AllOrganisms', 'LibraryID', 'RTStdErr', 'RTMean', 'AllGroups', 'DefaultGroups',
@@ -55,7 +58,7 @@ class Spectrum(object):
             if strain_val > 0:
                 return True
         except TypeError:
-            print('Warning: has_strain({}) failed because metadata.get returned "{}" (type({}))'.format(strain, strain_val, type(strain_val)))
+            logger.debug('Warning: has_strain({}) failed because metadata.get returned "{}" (type({}))'.format(strain, strain_val, type(strain_val)))
         return False
 
     # def print_spectrum(self):
