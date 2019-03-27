@@ -2,7 +2,7 @@
 
 # general options
 # log level (DEBUG/INFO/WARNING/ERROR)
-loglevel = "INFO"
+loglevel = "DEBUG"
 logfile = ""
 repro_file = ""
 
