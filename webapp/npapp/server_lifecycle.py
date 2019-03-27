@@ -44,6 +44,7 @@ class NPLinkerHelper(object):
         # load each of the BGC TSNE csv files from the /data dir
         # these are all named crusemann-bgc-tsne-<name>.csv
         self.bgc_data = {}
+        self.available_gcfs = {}
 
         for f in os.listdir(data_dir):
             if not f.startswith('crusemann-bgc-tsne-'):
@@ -56,6 +57,7 @@ class NPLinkerHelper(object):
             bgc_data = {'x': [], 'y': [], 'strain': [], 'name': [], 'gcf': []}
             uniq_gcfs = set()
             gcf_lookup = {}
+            self.available_gcfs[fid] = set()
             
             with open(fname, 'r') as csvfile:
                 csvr = csv.reader(csvfile)
@@ -74,11 +76,13 @@ class NPLinkerHelper(object):
                         bgc_data['y'].append(float(y))
                         bgc_data['name'].append(name)
                         bgc_data['strain'].append(name) # TODO
-                        gcf = self.nplinker.lookup_bgc(name).parent.id
-                        if gcf not in uniq_gcfs:
-                            gcf_lookup[gcf] = len(uniq_gcfs)
-                            uniq_gcfs.add(gcf)
-                        bgc_data['gcf'].append(gcf)
+                        gcf_obj = self.nplinker.lookup_bgc(name).parent
+                        self.available_gcfs[fid].add(gcf_obj)
+                        gcf_id = gcf_obj.id
+                        if gcf_id not in uniq_gcfs:
+                            gcf_lookup[gcf_id] = len(uniq_gcfs)
+                            uniq_gcfs.add(gcf_id)
+                        bgc_data['gcf'].append(gcf_id)
                     else:
                         missing += 1
                         # print('Missing: {}'.format(name))
@@ -139,13 +143,15 @@ class NPLinkerHelper(object):
             else:
                 self.spec_data['fill'].append(cmap[fam_lookup[self.spec_data['family'][i]]])
 
-
         self.bgc_indices = {}
         self.spec_indices = {}
-        for i, bgc in enumerate(self.bgc_data['allbgcs']['name']):
-            self.bgc_indices[bgc] = i
         for i, spec in enumerate(self.spec_data['name']):
             self.spec_indices[spec] = i
+
+        for fid in self.bgc_data.keys():
+            self.bgc_indices[fid] = {}
+            for i, bgc_name in enumerate(self.bgc_data[fid]['name']):
+                self.bgc_indices[fid][bgc_name] = i
 
 nh = NPLinkerHelper()
 
