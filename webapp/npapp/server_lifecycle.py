@@ -9,6 +9,7 @@ import bokeh.palettes as bkp
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../prototype'))
 
 from nplinker import NPLinker
+from genomics import load_mibig_map, MiBIGBGC
 from logconfig import LogConfig
 
 class NPLinkerHelper(object):
@@ -20,15 +21,26 @@ class NPLinkerHelper(object):
         LogConfig.setLogLevelStr('DEBUG')
 
     def load(self):
+        data_dir = os.path.join(os.path.dirname(__file__), 'data')
+
         # initialise nplinker and load the dataset, using a config file in the webapp dir
         self.nplinker = NPLinker(os.path.join(os.path.dirname(__file__), 'nplinker_webapp.toml'))
         if not self.nplinker.load_data():
             raise Exception('Failed to load data')
 
+        # TODO this should be handled better/elsewhere?
+        # hacky
+        mibig_file = os.path.join(data_dir, 'mibig_gnps_links_q1.csv')
+        mibig_map = load_mibig_map(mibig_file)
+        # mibig_bgcs = [MiBIGBGC(name, product) for (name, product) in mibig_map.items()]
+        # c = len(self.nplinker.bgcs)
+        # self.nplinker._bgcs.extend(mibig_bgcs)
+        # for i, mb in enumerate(mibig_bgcs):
+        #     self.nplinker._bgc_lookup[mb.name] = i + c
+
         if not self.nplinker.process_dataset():
             raise Exception('Failed to process dataset')
 
-        data_dir = os.path.join(os.path.dirname(__file__), 'data')
         # load each of the BGC TSNE csv files from the /data dir
         # these are all named crusemann-bgc-tsne-<name>.csv
         self.bgc_data = {}
@@ -40,7 +52,6 @@ class NPLinkerHelper(object):
             fname = os.path.join(data_dir, f)
             print('Loading BGC TSNE from {}'.format(fname))
             fid = f.replace('crusemann-bgc-tsne-', '')[:-4]
-            print('ID is {}'.format(fid))
 
             bgc_data = {'x': [], 'y': [], 'strain': [], 'name': [], 'gcf': []}
             uniq_gcfs = set()
@@ -49,6 +60,7 @@ class NPLinkerHelper(object):
             with open(fname, 'r') as csvfile:
                 csvr = csv.reader(csvfile)
                 headers = next(csvr)
+                missing = 0
                 for l in csvr:
                     if len(l) == 4:
                         # ignore bgc type col in some files
@@ -67,12 +79,12 @@ class NPLinkerHelper(object):
                             gcf_lookup[gcf] = len(uniq_gcfs)
                             uniq_gcfs.add(gcf)
                         bgc_data['gcf'].append(gcf)
-                    # else:
-                    #     print('Missing: {}'.format(name))
+                    else:
+                        missing += 1
+                        # print('Missing: {}'.format(name))
 
                 total = len(uniq_gcfs)
                 cmap = []
-                print('Unique GCFs: {}'.format(len(uniq_gcfs)))
                 while total > 0:
                     c = bkp.d3['Category20c'][20]
                     total -= len(c)
@@ -84,8 +96,8 @@ class NPLinkerHelper(object):
             
                 self.bgc_data[fid] = bgc_data
 
-        print('bgc data keys', list(self.bgc_data.keys()))
-
+                if missing > 0:
+                    print('{} had {} missing BGCs!'.format(fid, missing))
 
         # load the spectra TSNE csv file from the webapp's /data dir
         self.spec_data = {'x': [], 'y': [], 'name': [], 'family': []}
