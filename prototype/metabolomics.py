@@ -58,7 +58,8 @@ class Spectrum(object):
             if strain_val > 0:
                 return True
         except TypeError:
-            logger.debug('Warning: has_strain({}) failed because metadata.get returned "{}" (type({}))'.format(strain, strain_val, type(strain_val)))
+            # logger.debug('Warning: has_strain({}) failed because metadata.get returned "{}" (type({}))'.format(strain, strain_val, type(strain_val)))
+            pass
         return False
 
     # def print_spectrum(self):
