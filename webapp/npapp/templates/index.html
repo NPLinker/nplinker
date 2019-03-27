@@ -10,14 +10,35 @@
 {% endblock %}
   
 {% block contents %}
-<div class="container-fluid">
+<div class="container-fluid" style="margin-top: 10px">
     <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-lg-5">
-            {{ embed(roots.plot_toggles) }}
+        <div class="col-md-1">
         </div>
         <div class="col-lg-5">
-            {{ embed(roots.tsne_id_select) }}
+            <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#optionsModal" aria-expanded="false" aria-controls="optionsModal">
+                Plot options
+            </button>
+            <div class="modal" id="optionsModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Plot options</h5>
+                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                             </button>
+                        </div>
+                        <div class="modal-body">
+                            {{ embed(roots.plot_toggles) }}
+                            {{ embed(roots.tsne_id_select) }}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
         </div>
         <div class="col-md-1"></div>
     </div>
@@ -56,10 +77,8 @@
         <div class="col-md-1"></div>
         <div class="col-lg-10">
             <strong>Selected scoring method:</strong>
-            <!-- embed the Bokeh RadioGroup -->
             {{ embed(roots.scoring_method_group) }}
             <strong>Method parameters</strong>
-            <!-- embed the slider widgets -->
             {{ embed(roots.sliders) }}
         </div>
         <div class="col-md-1"></div>
