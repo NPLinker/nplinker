@@ -602,10 +602,7 @@ class NPLinkerBokeh(object):
 
         self.ds_bgc.selected.on_change('indices', self.bgc_selchanged)
 
-        self.plot_toggles = CheckboxButtonGroup(active=[PLOT_CMAP, PLOT_SINGLETONS], labels=PLOT_TOGGLES, name='plot_toggles')
-        self.plot_toggles.on_change('active', self.plot_toggles_callback)
-
-        self.plot_toggles = CheckboxGroup(active=[PLOT_CMAP, PLOT_SINGLETONS], labels=PLOT_TOGGLES, name='plot_toggles')
+        self.plot_toggles = CheckboxGroup(active=[PLOT_CMAP], labels=PLOT_TOGGLES, name='plot_toggles')
         self.plot_toggles.on_change('active', self.plot_toggles_callback)
 
         self.tsne_id_select = Select(title='BGC TSNE:', value=self.bgc_tsne_id, options=self.bgc_tsne_id_list, name='tsne_id_select')
