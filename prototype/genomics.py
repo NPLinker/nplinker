@@ -189,6 +189,8 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
                 # make a BGC object
                 # the same BGC objects might be made more than once
                 # because they appear in multiple clusterings
+                # TODO should this happen? Any reason to have duplicate objects
+                # representing the same strain? 
                 if not strain_name == 'MiBIG':
                     new_bgc = BGC(strain, name, bigscape_class, product_prediction)
                     if antismash_dir:
@@ -203,15 +205,16 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
                     bgc_list.append(new_bgc)
                 else:
                     num_mibig += 1
-                    if mibig_bgc_dict:
+                    if mibig_bgc_dict is not None:
                         try:
                             new_bgc = mibig_bgc_dict[name.split('.')[0]]
-                        except:
+                        except KeyError:
                             new_bgc = MiBIGBGC(name, product_prediction)
                     # TODO add to bgc_list too???
+                    bgc_list.append(new_bgc)
                 
 
-                if not family in gcf_dict:
+                if family not in gcf_dict:
                     new_gcf = GCF(family)
                     gcf_dict[family] = new_gcf
                     gcf_list.append(new_gcf)
