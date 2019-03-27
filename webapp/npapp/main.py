@@ -12,20 +12,21 @@ TOOLS = "crosshair,pan,wheel_zoom,box_zoom,tap,reset,save,box_select"
 
 PW, PH = 500, 500
 
-POINT_RATIO = 1 / 200.0
+POINT_FACTOR = 180.0
+POINT_RATIO = 1 / POINT_FACTOR
 
 SCORING_MODES = ['BGCs to Spectra', 'Spectra to GCFs']
-SCO_MODE_BGC_SPEC, SCO_MODE_SPEC_GCF = range(2)
+SCO_MODE_BGC_SPEC, SCO_MODE_SPEC_GCF = range(len(SCORING_MODES))
 SCORING_MODES_ENUM = [SCO_MODE_BGC_SPEC, SCO_MODE_SPEC_GCF]
-PLOT_TOGGLES = ['Toggle alpha-blending', 'Toggle colormaps', 'Toggle singletons']
-PLOT_ALPHA, PLOT_CMAP, PLOT_SINGLETONS = range(3)
-PLOT_TOGGLES_ENUM = [PLOT_ALPHA, PLOT_CMAP, PLOT_SINGLETONS]
+PLOT_TOGGLES = ['Enable alpha-blending', 'Enable colormaps', 'Show singleton families', 'Preserve colours when selecting']
+PLOT_ALPHA, PLOT_CMAP, PLOT_SINGLETONS, PLOT_PRESERVE_COLOUR = range(len(PLOT_TOGGLES))
+PLOT_TOGGLES_ENUM = [PLOT_ALPHA, PLOT_CMAP, PLOT_SINGLETONS, PLOT_PRESERVE_COLOUR]
 
 def get_radius(datasource):
     # this aims to set a sensible initial radius based on the dimensions of the plot
     minx = min(datasource.data['x'])
     maxx = max(datasource.data['x'])
-    return (maxx - minx) / 180.0
+    return (maxx - minx) / POINT_FACTOR
 
 class ZoomHandler(object):
     """
@@ -93,7 +94,7 @@ class CurrentResults(object):
         self.shared_strains = {}
 
     def update(self, gcfs, spec, links, shared_strains):
-        self.gcf = gcfs
+        self.gcfs = gcfs
         self.spec = spec
         self.links = links
         self.shared_strains = shared_strains
@@ -109,7 +110,9 @@ class NPLinkerBokeh(object):
 
         self.bgc_datasource = ColumnDataSource(data=self.nh.bgc_data[self.bgc_tsne_id])
         self.spec_datasource = ColumnDataSource(data=self.nh.spec_data)
-        self.spec_datasource_view = CDSView(source=self.spec_datasource, filters=[IndexFilter(list(range(len(self.spec_datasource.data['x']))))])
+        # hide singletons by default
+        self.singleton_indices = [i for i in range(len(self.spec_datasource.data['x'])) if self.spec_datasource.data['family'][i] != '-1']
+        self.spec_datasource_view = CDSView(source=self.spec_datasource, filters=[IndexFilter(self.singleton_indices)])
 
         self.bgc_zoom = None
         self.spec_zoom = None
@@ -134,7 +137,7 @@ class NPLinkerBokeh(object):
 
     @property
     def bgc_indices(self):
-        return self.nh.bgc_indices
+        return self.nh.bgc_indices[self.bgc_tsne_id]
 
     def create_plots(self):
         # create the BGC figure and populate it from the datasource (note the dict keys are used in the 
@@ -149,9 +152,9 @@ class NPLinkerBokeh(object):
                 fill_alpha=1.0, 
                 fill_color='fill',
                 line_color=None,
-                # selection_color='#ff0000')
-                selection_color='#ff7f00', 
+                selection_color='fill',
                 selection_fill_alpha=0.9,
+                selection_line_color=None,
                 nonselection_fill_alpha=0.0, 
                 nonselection_fill_color='#333333', 
                 nonselection_line_color=None, 
@@ -187,17 +190,18 @@ class NPLinkerBokeh(object):
                             fill_alpha=1.0, 
                             radius=radius,
                             radius_dimension='max',
-                            #fill_color='#449944', 
                             fill_color='fill',
                             line_color=None,
-                            selection_color='#ff7f00', 
+                            selection_color='fill',
                             selection_fill_alpha=0.9,
+                            selection_line_color=None,
                             nonselection_fill_alpha=0.0, 
                             nonselection_fill_color='#333333', 
                             nonselection_line_color=None, 
                             nonselection_line_alpha=0)
 
         self.spec_zoom = ZoomHandler(f_spec, r_spec)
+
 
         # hover_spec = HoverTool(tooltips=[('index', '$index'), ('Spectra name', '@name')])
         callback = CustomJS(args={'output_div_id': '#spec_hover_info', 
@@ -234,13 +238,11 @@ class NPLinkerBokeh(object):
             self.fig_spec.add_tools(self.taptool_spec)
     
     def disable_bgc_hover(self):
-        print(self.fig_bgc.tools)
         if self.hover_bgc in self.fig_bgc.tools:
             self.fig_bgc.tools.active_tap = None
             self.fig_bgc.tools.active_inspect = None
             self.fig_bgc.tools.remove(self.hover_bgc)
             self.fig_bgc.tools.remove(self.taptool_bgc)
-        print(self.fig_bgc.tools)
     
     def disable_spec_hover(self):
         if self.hover_spec in self.fig_spec.tools:
@@ -249,10 +251,12 @@ class NPLinkerBokeh(object):
             self.fig_spec.tools.remove(self.hover_spec)
             self.fig_spec.tools.remove(self.taptool_spec)
 
+    # basic template for a bootstrap "card" element to display info about a
+    # given GCF/Spectrum etc
     # format params:
-    # - id for header, e.g spec_heading_1
+    # - unique id for header, e.g spec_heading_1
     # - colour for header
-    # - id for body, e.g. spec_body_1
+    # - unique id for body, e.g. spec_body_1
     # - title text
     # - id for body, same as #2
     # - parent id 
@@ -277,14 +281,31 @@ class NPLinkerBokeh(object):
         """
         print('>> update_bgc_output for mode {}'.format(self.results.mode))
         content = ''
+
+        # scoring from BGCs to Spectra
         if self.results.mode == SCO_MODE_BGC_SPEC:
-            # in GCF to Spec mode, want to show the GCFs
+            # in this mode, currently just want to show a simple flat list
+            # of the selected BGCs, with the ability to view GCF info as well
+            # TODO possibly show grouped by GCF instead? 
             content += '<h4>{} selected BGCs</h4>'.format(len(self.ds_bgc.selected.indices))
-            for i, bgc in enumerate(self.results.gcfs):
+            print(len(self.ds_bgc.selected.indices))
+
+            # have to construct list of BGCs from the GCFs
+            bgcs = set()
+            for i, gcf in enumerate(self.results.gcfs):
+                bgcs.update(gcf.bgc_list)
+
+            for i, bgc in enumerate(list(bgcs)):
                 gcf = bgc.parent
+
+                # handle BGCs not in the current TSNE
+                if bgc.name not in self.bgc_indices:
+                    print('Skipping BGC {}'.format(bgc))
+                    continue
+
                 hdr_id = 'bgc_header_{}'.format(i)
                 body_id = 'bgc_body_{}'.format(i)
-                title = 'BGC #{}, name={}'.format(i, self.bgc_data['name'][i])
+                title = 'BGC #{}, name={}'.format(i, bgc.name)
                 body = '<dl>'
                 for attr in ['name', 'strain']:
                     body += '<dt>{}:</dt><dd>{}</dd>'.format(attr, getattr(bgc, attr))
@@ -292,52 +313,59 @@ class NPLinkerBokeh(object):
                 body += '</dl>'
 
                 content += self.TMPL.format(hdr_id, 'b4c4e8', body_id, title, body_id, 'accordionBGC', body)
-        elif self.results.mode == SCO_MODE_SPEC_GCF:
-            # in Spec to BGC mode, have to retrieve the BGCs from the .links attr instead
-            # and display with scores
-            print('Outputting BGC links')
-            uniq_gcfs = set()
-            if self.results.links is not None:
-                # links here will be a dict keyed by Spectrum objects, values will be
-                # lists of (GCF, score) pairs
-                i = 0
-                tmp = ''
 
-                # want to construct a layout like this:
-                # <<accordion start>>
-                # <spec 1>
-                #   <<accordion start>>
-                #   <gcf 1 from spec 1>
-                #   <gcf 2 from spec 1>
-                #   ...
-                #   <<accordion end>>
-                # <spec 2>
-                # <spec 3>
-                # ...
-                # <<accordion end>>
+        # scoring from Spectra to GCFs
+        elif self.results.mode == SCO_MODE_SPEC_GCF:
+            uniq_gcfs = set()
+            i = 0
+            unsorted = []
+
+            if self.results.links is not None:
+                # results.links will be a dict keyed by Spectrum objects, values will be
+                # lists of (GCF, score) pairs
+
+                # want to construct a 2-level nested list, with the top level entries corresponding to
+                # the selected spectra and the contents of each being a list of the GCFs linked to that spectrum
+
+                # for each spectrum selected
                 for spec, gcf_scores in self.results.links.items():
-                    # construct the header info (from the spectrum)
+                    # construct the object info card header info
                     hdr_id = 'spec_result_header_{}'.format(i)
                     body_id = 'spec_result_body_{}'.format(i)
                     title = '{} GCFs linked to {}'.format(len(gcf_scores), spec)
                     body = '<div class="accordion" id="accordion_spec_{}>'.format(i)
+                    # now generate the body content of the card by iterating over the GCFs it matched
                     for j, gcf_score in enumerate(gcf_scores):
                         gcf, score = gcf_score
                         uniq_gcfs.add(gcf)
 
+                        shared_strains = self.results.shared_strains[(spec, gcf)]
+
+                        # construct a similar object info card header for this GCF
                         gcf_hdr_id = 'gcf_result_header_{}_{}'.format(i, j)
                         gcf_body_id = 'gcf_body_{}_{}'.format(i, j)
-                        gcf_title = 'GCF {}, score=<strong>{}</strong>'.format(gcf, score)
+                        gcf_title = 'GCF(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(gcf.id, score, len(shared_strains))
                         gcf_body = '<dl>'
-                        for attr in ['id', 'short_gcf_id', 'gcf_id']:
+                        for attr in ['id', 'short_gcf_id']:
                             gcf_body += '<dt>{}:</dt> <dd>{}</dd>'.format(attr, getattr(gcf, attr))
-                        body += self.TMPL.format(gcf_hdr_id, 'c4b4e8', gcf_body_id, gcf_title, gcf_body_id, 'accordion_spec_{}'.format(i), gcf_body)
+
+                        # add strain information
+                        gcf_body += '<dt>shared ({}, {:.2f}%):</dt> <dd>{}</dd>'.format(len(shared_strains), 
+                                                                                                 100 * (len(shared_strains) / len(gcf.bgc_list)),
+                                                                                                 ', '.join(shared_strains))
+                        gcf_body += '<dt>all ({}):</dt> <dd>{}</dd>'.format(len(gcf.bgc_list), ', '.join([bgc.name for bgc in gcf.bgc_list]))
+                        gcf_body += '</dl>'
+                        body += self.TMPL.format(gcf_hdr_id, 'ffe0b5', gcf_body_id, gcf_title, gcf_body_id, 'accordion_spec_{}'.format(i), gcf_body)
                         
                     body += '</div>'
-                    tmp += self.TMPL.format(hdr_id, 'b4c4e8', body_id, title, body_id, 'accordionBGC', body)
+                    unsorted.append((len(gcf_scores), self.TMPL.format(hdr_id, 'b4c4e8', body_id, title, body_id, 'accordionBGC', body)))
                     i += 1
-            content += '<h4>{} linked GCFs (containing {} BGCs)</h4>'.format(len(uniq_gcfs), len(self.ds_bgc.selected.indices)) + tmp
 
+                content += '<h4>Found {} linked GCFs (containing {} BGCs)</h4>'.format(len(uniq_gcfs), len(self.ds_bgc.selected.indices)) 
+                # sort by number of GCFs linked to each spectra
+                sorted_gcfs = sorted(unsorted, key=lambda x: -x[0])
+                for _, text in sorted_gcfs:
+                    content += text
 
         self.bgc_div.text = content
         print('<< update_bgc_output')
@@ -347,46 +375,72 @@ class NPLinkerBokeh(object):
         Generate the HTML to display a list of Spectrum objects
         """
         print('>> update_spec_output')
-        i = 0
+        # scoring from Spectra to GCFs
         if self.results.mode == SCO_MODE_SPEC_GCF:
-            test = '<h4>{} selected spectra</h4>'.format(len(self.ds_spec.selected.indices))
+            content = '<h4>{} selected spectra</h4>'.format(len(self.ds_spec.selected.indices))
+            i = 0
+            # here just need to show a flat list of spectra
             for spec in self.results.spec:
-                # TODO
                 hdr_id = 'spec_header_{}'.format(i)
                 body_id = 'spec_body_{}'.format(i)
                 title = 'id={}, family={}'.format(spec.id, spec.family)
                 body = '<dl>'
                 for attr in ['id', 'spectrum_id', 'family', 'strain_list']:
                     body += '<dt>{}:</dt><dd>{}</dd>'.format(attr, getattr(spec, attr))
-                # if self.results.shared_strains is not None: # TODO!
-                #     body += '<dt>shared strains</dt><dd>{} (with {})</dd>'.format(self.results.shared_strains[spec], gcf)
+                # TODO spectrum plot etc here too
                 body += '</dl>'
-                test += self.TMPL.format(hdr_id, 'adeaad', body_id, title, body_id, 'accordionSpec', body)
+                content += self.TMPL.format(hdr_id, 'adeaad', body_id, title, body_id, 'accordionSpec', body)
                 i += 1
+            
+        # scoring from BGCs to Spectra
         elif self.results.mode == SCO_MODE_BGC_SPEC:
-            test = '<h4>{} linked spectra</h4>'.format(len(self.ds_spec.selected.indices))
-            seen_gcfs = set()
+            content = '<h4>{} linked spectra</h4>'.format(len(self.ds_spec.selected.indices))
+            i = 0
+            unsorted = []
+
             if self.results.links is not None:
+                # results.links will be a dict keyed by Spectrum objects, values will be
+                # lists of (GCF, score) pairs
+
+                # want to construct a 2-level nested list, with the top level entries corresponding to
+                # the selected spectra and the contents of each being a list of the GCFs linked to that spectrum
+
+                # for each GCF selected
                 for gcf, spec_scores in self.results.links.items():
+                    # construct the object info card header info
+                    hdr_id = 'gcf_result_header_{}'.format(i)
+                    body_id = 'gcf_result_body_{}'.format(i)
+                    title = '{} spectra linked to GCF(id={})'.format(len(spec_scores), gcf.id)
+                    body = '<div class="accordion" id="accordion_gcf_{}">'.format(i)
+                    # now generate the body content of the card by iterating over the spectra it matched
                     for j, spec_score in enumerate(spec_scores):
                         spec, score = spec_score
-                        hdr_id = 'spec_header_{}'.format(i)
-                        body_id = 'spec_body_{}'.format(i)
-                        title = 'id={}, score=<strong>{}</strong>'.format(spec.id, score)
-                        body = '<dl>'
-                        for attr in ['id', 'spectrum_id', 'family', 'strain_list']:
-                            body += '<dt>{}:</dt><dd>{}</dd>'.format(attr, getattr(spec, attr))
-                        if self.results.shared_strains is not None:
-                            for bgc in self.results.bgcs:
-                                if (spec, bgc.parent) in self.results.shared_strains and bgc.parent not in seen_gcfs:
-                                    if len(self.results.shared_strains[(spec, bgc.parent)]) > 0:
-                                        body += '<dt>shared strains</dt><dd>{} (with GCF {}, BGC {})</dd>'.format(self.results.shared_strains[(spec, bgc.parent)], bgc.parent, bgc)
-                                    seen_gcfs.add(bgc.parent)
-                        body += '</dl>'
-                        test += self.TMPL.format(hdr_id, 'adeaad', body_id, title, body_id, 'accordionSpec', body)
-                        i += 1
 
-        self.spec_div.text = test
+                        shared_strains = self.results.shared_strains[(spec, gcf)]
+
+                        spec_hdr_id = 'spec_result_header_{}_{}'.format(i, j)
+                        spec_body_id = 'spec_body_{}_{}'.format(i, j)
+                        spec_title = 'Spectrum(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.id, score, len(shared_strains))
+                        spec_body = '<dl>'
+                        for attr in ['id', 'spectrum_id', 'family']:
+                            spec_body += '<dt>{}:</dt><dd>{}</dd>'.format(attr, getattr(spec, attr))
+                        
+                        # add strain information
+                        spec_body += '<dt>shared ({}, {:.2f}%):</dt> <dd>{}</dd>'.format(len(shared_strains), 
+                                                                                                 100 * (len(shared_strains) / len(spec.strain_list)),
+                                                                                                 ', '.join(shared_strains))
+                        spec_body += '<dt>all ({}):</dt> <dd>{}</dd>'.format(len(spec.strain_list), ', '.join(spec.strain_list))
+                        spec_body += '</dl>'
+                        body += self.TMPL.format(spec_hdr_id, 'ffe0b5', spec_body_id, spec_title, spec_body_id, 'accordion_gcf_{}'.format(i), spec_body)
+
+                    body += '</div>'
+                    unsorted.append((len(spec_scores), self.TMPL.format(hdr_id, 'adeaad', body_id, title, body_id, 'accordionSpec', body)))
+                    i += 1
+
+            for _, text in sorted(unsorted, key=lambda x: -x[0]):
+                content += text
+
+        self.spec_div.text = content
         print('<< update_spec_output')
 
     def get_links(self):
@@ -408,7 +462,6 @@ class NPLinkerBokeh(object):
             print('No indices selected')
             return
 
-        print('Selected {} objects'.format(len(sel_indices)))
         nplinker = self.nh.nplinker
         nplinker.clear_links() # TODO hack
         self.results.clear()
@@ -452,13 +505,12 @@ class NPLinkerBokeh(object):
                 objs_with_scores[link_obj] = nplinker.links_for_obj(link_obj, current_method, type_=t)
                 if mode == SCO_MODE_BGC_SPEC:
                     score_obj_indices = [self.spec_indices[spec.spectrum_id] for (spec, score) in objs_with_scores[link_obj]]
+                    gcfs.add(link_obj)
                 elif mode == SCO_MODE_SPEC_GCF:
                     # in order to highlight the BGCs from the matched GCFs, need to iterate over
                     # the list of GCFs and extract them all
                     score_obj_indices = set()
                     for (gcf, score) in objs_with_scores[link_obj]:
-                        # build a list of GCFs along the way, needed to display results
-                        gcfs.add(gcf) 
                         bgc_names = [bgc.name for bgc in gcf.bgc_list]
                         for n in bgc_names:
                             try:
@@ -474,6 +526,38 @@ class NPLinkerBokeh(object):
 
             all_shared_strains = self.nh.nplinker.get_common_strains(objs_with_links, list(otherobjs))
 
+            # now that the typical scoring process is completed, need to filter out GCFs that contain BGCs not present
+            # in the current TSNE plot. in BGC_SPEC mode, can filter them out of the objs_with_scores
+            # list and abort if nothing is left. more tricky for the other mode.
+            if mode == SCO_MODE_BGC_SPEC:
+                print('Filtering out GCFs from objs_with_links, initial count={}'.format(len(objs_with_links)))
+                available_gcfs = []
+                for i, gcf in enumerate(objs_with_links):
+                    if gcf in self.nh.available_gcfs[self.bgc_tsne_id]:
+                        available_gcfs.append(gcf)
+                    else:
+                        print('Excluding GCF: {}'.format(gcf))
+
+                objs_with_links = available_gcfs
+            elif mode == SCO_MODE_SPEC_GCF:
+                print('Filtering out GCFs from objs_with_scores, initial_count={}'.format(len(objs_with_links)))
+                for spec in list(objs_with_scores.keys()):
+                    gcfs = []
+                    for gcf, score in objs_with_scores[spec]:
+                        if gcf not in self.nh.available_gcfs[self.bgc_tsne_id]:
+                            print('Excluding GCF: {}'.format(gcf))
+                        else:
+                            gcfs.append((gcf, score))
+                    if len(gcfs) == 0:
+                        del objs_with_scores[spec]
+                        objs_with_links.remove(spec)
+                        print('Removing result {}'.format(spec))
+                    else:
+                        objs_with_scores[spec] = gcfs
+
+        print('After filtering, remaining objs={}'.format(len(objs_with_links)))
+
+        if len(objs_with_links) > 0:
             # take the indexes of the corresponding spectra from the datasource and highlight on the other plot
             if mode == SCO_MODE_BGC_SPEC:
                 self.ds_spec.selected.indices = list(selected)
@@ -481,7 +565,8 @@ class NPLinkerBokeh(object):
             elif mode == SCO_MODE_SPEC_GCF:
                 self.ds_bgc.selected.indices = list(selected)
                 self.results.update(None, specs, objs_with_scores, all_shared_strains)
-
+            
+            self.update_alert('{} objects with links found'.format(len(objs_with_scores), 'primary'))
         else:
             print('No links found!')
             if mode == SCO_MODE_BGC_SPEC:
@@ -489,6 +574,7 @@ class NPLinkerBokeh(object):
             else:
                 self.ds_bgc.selected.indices = []
             self.results.clear()
+            self.update_alert('No links found for last selection', 'danger')
 
         self.update_bgc_output()
         self.update_spec_output()
@@ -497,7 +583,6 @@ class NPLinkerBokeh(object):
         """
         Callback for changes to the BGC datasource selected indices
         """
-        print('bgc_selchanged')
         # if the new selection contains any valid indices (it may be empty)
         if len(new) > 0:
             # get links for the selected BGCs and update the plots
@@ -544,7 +629,6 @@ class NPLinkerBokeh(object):
 
     def scoring_mode_callback(self, attr, old, new):
         self.results.mode = SCORING_MODES_ENUM[new]
-        print('Score mode: {}'.format(self.results.mode))
         if self.results.mode == SCO_MODE_BGC_SPEC:
             # self.enable_bgc_hover()
             # self.disable_spec_hover()
@@ -552,6 +636,7 @@ class NPLinkerBokeh(object):
             self.ds_bgc.selected.on_change('indices', self.bgc_selchanged)
             if len(self.ds_spec.selected._callbacks['indices']) > 0:
                 self.ds_spec.selected.remove_on_change('indices', self.spec_selchanged)
+            self.update_alert('Scoring mode changed: BGCs -> Spectra', 'primary')
         elif self.results.mode == SCO_MODE_SPEC_GCF:
             # self.disable_bgc_hover()
             # self.enable_spec_hover()
@@ -559,6 +644,7 @@ class NPLinkerBokeh(object):
             if len(self.ds_bgc.selected._callbacks['indices']) > 0:
                 self.ds_bgc.selected.remove_on_change('indices', self.bgc_selchanged)
             self.ds_spec.selected.on_change('indices', self.spec_selchanged)
+            self.update_alert('Scoring mode changed: Spectra -> GCFs', 'primary')
 
         # clear existing selections on mode changes
         self.ds_bgc.selected.indices = []
@@ -574,18 +660,20 @@ class NPLinkerBokeh(object):
         if PLOT_SINGLETONS in new:
             self.ren_spec.view.filters = [IndexFilter(list(range(len(self.spec_datasource.data['x']))))]
         else:
-            indices = [i for i in range(len(self.spec_datasource.data['x'])) if self.spec_datasource.data['family'][i] != '-1']
-            # for i in range(len(self.spec_datasource.data['x'])):
-            #     if self.spec_datasource.data['family'][i] != '-1':
-            #         indices.append(i)
+            self.ren_spec.view.filters = [IndexFilter(self.singleton_indices)]
 
-            self.ren_spec.view.filters = [IndexFilter(indices)]
+        if PLOT_PRESERVE_COLOUR in new:
+            self.ren_bgc.selection_glyph.fill_color = 'fill'
+            self.ren_spec.selection_glyph.fill_color = 'fill'
+        else:
+            self.ren_bgc.selection_glyph.fill_color = '#ff7f00'
+            self.ren_spec.selection_glyph.fill_color = '#ff7f00'
 
     def tsne_id_callback(self, attr, old, new):
-        print('switching from {} to {}'.format(old, new))
         self.ds_bgc.selected.indices = []
         self.ds_spec.selected.indices = []
         self.bgc_tsne_id = new
+        self.update_alert('TSNE set to {}'.format(new), 'primary')
         # messy but it works and seems to be best way of doing this
         newdata = self.nh.bgc_data[new]
         self.bgc_datasource.data.update(
@@ -596,13 +684,19 @@ class NPLinkerBokeh(object):
                                              gcf=newdata['gcf'],
                                              fill=newdata['fill'])
 
+    def update_alert(self, msg, alert_class='primary'):
+        self.alert_div.text = '<div class="alert alert-{}" role="alert">{}</div>'.format(alert_class, msg)
+
+    def clear_alert(self):
+        self.alert_div.text = ''
+    
     def bokeh_layout(self):
         self.spec_div = Div(text="", sizing_mode='scale_height', name='spec_div')
         self.bgc_div = Div(text="", sizing_mode='scale_height', name='bgc_div')
 
         self.ds_bgc.selected.on_change('indices', self.bgc_selchanged)
 
-        self.plot_toggles = CheckboxGroup(active=[PLOT_CMAP], labels=PLOT_TOGGLES, name='plot_toggles')
+        self.plot_toggles = CheckboxGroup(active=[PLOT_CMAP, PLOT_PRESERVE_COLOUR], labels=PLOT_TOGGLES, name='plot_toggles')
         self.plot_toggles.on_change('active', self.plot_toggles_callback)
 
         self.tsne_id_select = Select(title='BGC TSNE:', value=self.bgc_tsne_id, options=self.bgc_tsne_id_list, name='tsne_id_select')
@@ -636,8 +730,11 @@ class NPLinkerBokeh(object):
         # for debug output etc 
         self.debug_div = Div(text="", name='debug_div')
 
+        self.alert_div = Div(text="", name='alert_div')
+
         curdoc().add_root(self.plot_toggles)
         curdoc().add_root(self.tsne_id_select)
+        curdoc().add_root(self.alert_div)
         curdoc().add_root(self.fig_spec)
         curdoc().add_root(self.fig_bgc)
         curdoc().add_root(self.spec_div)
@@ -653,4 +750,5 @@ class NPLinkerBokeh(object):
 nb = NPLinkerBokeh(curdoc().nh)
 nb.create_plots()
 nb.bokeh_layout()
+nb.update_alert('Initialised OK!', 'success')
 
