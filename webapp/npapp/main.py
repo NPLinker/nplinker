@@ -1,4 +1,4 @@
-from bokeh.models.widgets import RadioGroup, Slider, Div, Dropdown, CheckboxButtonGroup, Select
+from bokeh.models.widgets import RadioGroup, Slider, Div, CheckboxButtonGroup, Select, CheckboxGroup
 from bokeh.layouts import row, column, widgetbox
 from bokeh.models import CustomJS
 from bokeh.plotting import figure, curdoc
@@ -605,6 +605,9 @@ class NPLinkerBokeh(object):
         self.plot_toggles = CheckboxButtonGroup(active=[PLOT_CMAP, PLOT_SINGLETONS], labels=PLOT_TOGGLES, name='plot_toggles')
         self.plot_toggles.on_change('active', self.plot_toggles_callback)
 
+        self.plot_toggles = CheckboxGroup(active=[PLOT_CMAP, PLOT_SINGLETONS], labels=PLOT_TOGGLES, name='plot_toggles')
+        self.plot_toggles.on_change('active', self.plot_toggles_callback)
+
         self.tsne_id_select = Select(title='BGC TSNE:', value=self.bgc_tsne_id, options=self.bgc_tsne_id_list, name='tsne_id_select')
         self.tsne_id_select.on_change('value', self.tsne_id_callback)
 
@@ -623,7 +626,15 @@ class NPLinkerBokeh(object):
         # hg
         self.hg_prob = Slider(start=0, end=100, value=int(100 * self.nh.nplinker.scoring.hg.prob), step=1, title='[hg] prob x 100 = ')
         self.hg_prob.on_change('value', self.hg_prob_callback)
-        self.sliders = row(self.metcalf_percentile, self.likescore_cutoff, self.hg_prob, name='sliders')
+
+        active_sliders = []
+        if self.nh.nplinker.scoring.metcalf.enabled:
+            active_sliders.append(self.metcalf_percentile)
+        if self.nh.nplinker.scoring.hg.enabled:
+            active_sliders.append(self.hg_prob)
+        if self.nh.nplinker.scoring.likescore.enabled:
+            active_sliders.append(self.likescore_cutoff)
+        self.sliders = row(active_sliders, name='sliders')
 
         # for debug output etc 
         self.debug_div = Div(text="", name='debug_div')
@@ -638,6 +649,7 @@ class NPLinkerBokeh(object):
         curdoc().add_root(self.scoring_method_group)
         curdoc().add_root(self.sliders)
         curdoc().add_root(self.debug_div)
+        curdoc().title = 'nplinker webapp'
 
 # server_lifecycle.py adds a .nh attr to the current Document instance, use that
 # to access the already-created NPLinker instance plus the TSNE data
