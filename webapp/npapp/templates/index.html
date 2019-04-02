@@ -68,9 +68,13 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-1"></div>
-        <div class="col-md-10">
-            <strong>Select mode:</strong>
-            {{ embed(roots.scoring_mode_group) }}
+        <div class="col-lg-5">
+            <strong>Metabolomics scoring mode:</strong>
+            {{ embed(roots.mb_mode_group) }}
+        </div>
+        <div class="col-lg-5">
+            <strong>Genomics scoring mode:</strong>
+            {{ embed(roots.ge_mode_group) }}
         </div>
         <div class="col-md-1"></div>
     </div>
