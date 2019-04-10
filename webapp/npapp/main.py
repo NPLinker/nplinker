@@ -268,7 +268,7 @@ class NPLinkerBokeh(object):
 
         radius = get_radius(self.bgc_datasource)
 
-        f_bgc = figure(tools=TOOLS, toolbar_location='above', title="BGCs (n={})".format(len(self.bgc_data['x'])), sizing_mode='scale_width', name="fig_bgc")
+        f_bgc = figure(tools=TOOLS, toolbar_location='above', title="BGCs (n={})".format(len(self.bgc_data['x'])), sizing_mode='scale_width', name="fig_bgc", output_backend='webgl')
         r_bgc = f_bgc.circle('x', 'y', source=self.bgc_datasource, name=self.bgc_tsne_id,
                 radius=radius,
                 radius_dimension='max',
@@ -307,7 +307,7 @@ class NPLinkerBokeh(object):
 
         # create the MolFam figure in the same way
         radius = 0.1
-        f_spec = figure(tools=TOOLS, toolbar_location='above', title="Spectra (n={})".format(len(self.nh.spec_data['x'])), sizing_mode='scale_width', name="fig_spec")
+        f_spec = figure(tools=TOOLS, toolbar_location='above', title="Spectra (n={})".format(len(self.nh.spec_data['x'])), sizing_mode='scale_width', name="fig_spec", output_backend='webgl')
         r_spec = f_spec.circle('x', 'y', source=self.spec_datasource, 
                             view=self.spec_datasource_view,
                             fill_alpha=1.0, 
@@ -372,8 +372,6 @@ class NPLinkerBokeh(object):
             self.set_tap_behavior(self.fig_bgc, 'inspect')
             self.set_tap_behavior(self.fig_spec, 'select')
 
-            # self.enable_spec_hover()
-            # self.disable_bgc_hover()
         else:
             if 'indices' in self.ds_spec.selected._callbacks and len(self.ds_spec.selected._callbacks['indices']) > 0:
                 self.ds_spec.selected.remove_on_change('indices', self.spec_selchanged)
@@ -388,9 +386,8 @@ class NPLinkerBokeh(object):
             self.set_tap_behavior(self.fig_bgc, 'select')
             self.set_tap_behavior(self.fig_spec, 'inspect')
 
-            # self.enable_bgc_hover()
-            # self.disable_spec_hover()
-
+    # messing with the tools for the plots seems to produce errors in browser console
+    # so these aren't currently used
     def enable_bgc_hover(self):
         if self.hover_bgc not in self.fig_bgc.tools:
             self.fig_bgc.add_tools(self.hover_bgc)
