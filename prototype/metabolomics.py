@@ -62,6 +62,24 @@ class Spectrum(object):
             pass
         return False
 
+    def to_jcamp_str(self):
+        jcamp = '##TITLE={}\\n' +\
+                '##JCAMP-DX=nplinker vTODO\\n' +\
+                '##DATA TYPE=Spectrum\\n' +\
+                '##DATA CLASS=PEAKTABLE\\n' +\
+                '##ORIGIN=TODO_DATASET_ID\\n' +\
+                '##OWNER=nobody\\n' +\
+                '##XUNITS=M/Z\\n' +\
+                '##YUNITS=RELATIVE ABUNDANCE\\n' +\
+                '##NPOINTS={}\\n' +\
+                '##PEAK TABLE=(XY..XY)\\n' +\
+                '{}\\n' +\
+                '##END=\\n'
+
+        peakdata = '\\n'.join('{}, {}'.format(*p) for p in self.peaks)
+
+        return jcamp.format(str(self), self.n_peaks, peakdata)
+
     # def print_spectrum(self):
     #     print()
     #     print(self.file_name,self.spectrum_id)
