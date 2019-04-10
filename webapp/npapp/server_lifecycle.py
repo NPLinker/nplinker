@@ -153,6 +153,15 @@ class NPLinkerHelper(object):
             for i, bgc_name in enumerate(self.bgc_data[fid]['name']):
                 self.bgc_indices[fid][bgc_name] = i
 
+        # provide a way to quickly look up the list of GCFs containing a particular BGC
+        self.bgc_gcf_lookup = {}
+        for gcf in self.nplinker.gcfs:
+            for bgc in gcf.bgc_list:
+                if bgc in self.bgc_gcf_lookup:
+                    self.bgc_gcf_lookup[bgc].add(gcf)
+                else:
+                    self.bgc_gcf_lookup[bgc] = set([gcf])
+
 nh = NPLinkerHelper()
 
 def on_server_loaded(server_context):
