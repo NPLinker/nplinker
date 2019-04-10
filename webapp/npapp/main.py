@@ -1,4 +1,4 @@
-from bokeh.models.widgets import RadioGroup, Slider, Div, CheckboxButtonGroup, Select, CheckboxGroup
+from bokeh.models.widgets import RadioGroup, Slider, Div, CheckboxButtonGroup, Select, CheckboxGroup, Toggle
 from bokeh.layouts import row, column, widgetbox
 from bokeh.models import CustomJS
 from bokeh.plotting import figure, curdoc
@@ -8,19 +8,141 @@ from bokeh.events import LODEnd, LODStart, Reset
 from nplinker import Spectrum, GCF, MolecularFamily
 
 # TOOLS="crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,undo,redo,reset,tap,save,box_select,poly_select,lasso_select,"
-TOOLS = "crosshair,pan,wheel_zoom,box_zoom,tap,reset,save,box_select"
+TOOLS = "crosshair,pan,wheel_zoom,box_zoom,reset,save,box_select,tap"
 
 PW, PH = 500, 500
 
-POINT_FACTOR = 180.0
+POINT_FACTOR = 150.0
 POINT_RATIO = 1 / POINT_FACTOR
 
-SCORING_MODES = ['BGCs to Spectra', 'Spectra to GCFs']
-SCO_MODE_BGC_SPEC, SCO_MODE_SPEC_GCF = range(len(SCORING_MODES))
-SCORING_MODES_ENUM = [SCO_MODE_BGC_SPEC, SCO_MODE_SPEC_GCF]
+ACTIVE_BG_FILL = '#ffffff'
+INACTIVE_BG_FILL = '#eeeeee'
+ACTIVE_BG_ALPHA = 1.0
+INACTIVE_BG_ALPHA = 0.555
+
+SCORING_GEN_TO_MET = 'TO <------ FROM'
+SCORING_MET_TO_GEN = 'FROM ------> TO'
+
 PLOT_TOGGLES = ['Enable alpha-blending', 'Enable colormaps', 'Show singleton families', 'Preserve colours when selecting']
 PLOT_ALPHA, PLOT_CMAP, PLOT_SINGLETONS, PLOT_PRESERVE_COLOUR = range(len(PLOT_TOGGLES))
 PLOT_TOGGLES_ENUM = [PLOT_ALPHA, PLOT_CMAP, PLOT_SINGLETONS, PLOT_PRESERVE_COLOUR]
+
+GENOMICS_SCORING_MODES = ['manual', 'GCF']
+METABOLOMICS_SCORING_MODES = ['manual', 'MolFam']
+
+GENOMICS_MODE_BGC, GENOMICS_MODE_GCF = range(2)
+METABOLOMICS_MODE_SPEC, METABOLOMICS_MODE_MOLFAM = range(2)
+
+# Scoring modes are:
+# 1. BGCs (i.e. the immediate parent GCFs) against Spectra
+# 2. GCFs (i.e. all GCFs containing selected BGCs) against Spectra
+# 3. BGCs (...) against MolFams
+# 4. GCFs (...) against MolFams
+# 5. Spectra against GCFs
+# 6. MolFams against GCFs
+# (there are 6 and not 8 because BGCs aren't "first-class" objects as far as scoring is concerned)
+
+# for display/output purposes, 1+3 and 2+4 are basically identical, because you still end
+# up having a list of GCFs as input to the scoring function
+
+SCO_MODE_BGC_SPEC, SCO_MODE_BGC_MOLFAM,\
+    SCO_MODE_GCF_SPEC, SCO_MODE_GCF_MOLFAM,\
+    SCO_MODE_SPEC_GCF, SCO_MODE_MOLFAM_GCF = range(6)
+
+SCO_MODE_NAMES = ['BGCs to Spectra', 'BGCs to MolFams', 'GCFs to Spectra', 'GCFs to MolFams',
+                'Spectra to GCFs', 'MolFams to GCFs']
+
+class ScoringHelper(object):
+
+    GENOMICS_LOOKUP  = {GENOMICS_MODE_BGC: [SCO_MODE_BGC_SPEC, SCO_MODE_BGC_MOLFAM],
+                        GENOMICS_MODE_GCF: [SCO_MODE_GCF_SPEC, SCO_MODE_GCF_MOLFAM]}
+
+    METABOLOMICS_LOOKUP = [SCO_MODE_SPEC_GCF, SCO_MODE_MOLFAM_GCF]
+
+    def __init__(self, nh):
+        self.genomics_mode = GENOMICS_MODE_BGC
+        self.metabolomics_mode = METABOLOMICS_MODE_SPEC
+        self.mode = SCO_MODE_BGC_SPEC
+        self.from_genomics = True
+        self.nh = nh
+        self.clear()
+
+    def clear(self):
+        self.bgcs = []
+        self.gcfs = []
+        self.spectra = []
+        self.molfams = []
+        self.inputs = set()
+
+    def set_genomics(self):
+        self.from_genomics = True
+        self._update()
+
+    def set_metabolomics(self):
+        self.from_genomics = False
+        self._update()
+
+    def update_genomics(self, m):
+        self.from_genomics = True
+        self.genomics_mode = m
+        self._update()
+
+    def update_metabolomics(self, m):
+        self.from_genomics = False
+        self.metabolomics_mode = m
+        self._update()
+
+    def _update(self):
+        if self.from_genomics:
+            self.mode = ScoringHelper.GENOMICS_LOOKUP[self.genomics_mode][self.metabolomics_mode]
+        else:
+            self.mode = ScoringHelper.METABOLOMICS_LOOKUP[self.metabolomics_mode]
+
+    @property
+    def mode_name(self):
+        return SCO_MODE_NAMES[self.mode]
+
+    def generate_scoring_objects(self, bgcs, spectra, tsne_id):
+        # now need to determine which "direction" the scoring process should work,
+        # e.g. if we're scoring from GCFs to Spectra or Spectra to GCFs.
+        scoring_objs = set()
+
+        if self.mode == SCO_MODE_BGC_SPEC:
+            # in this mode, we simply want to select the set of "parent" GCFs for
+            # all selected BGCs
+            for bgc in bgcs:
+                scoring_objs.add(bgc.parent)
+        elif self.mode == SCO_MODE_GCF_SPEC:
+            # in this mode, have to build a set of *all* GCFs that contain *any* 
+            # of the selected BGCs
+
+            # this is the set of GCFs available in the current TSNE projection
+            available_gcfs = self.nh.available_gcfs[tsne_id]
+
+            for bgc in bgcs:
+                if bgc not in self.nh.bgc_gcf_lookup:
+                    print('WARNING: missing BGC in lookup: {}'.format(bgc))
+                    continue
+
+                # get the set of GCFs containing this BGC
+                gcfs_for_bgc = self.nh.bgc_gcf_lookup[bgc]
+                
+                # filter out any not in the current TSNE projection
+                gcfs_for_bgc = [gcf for gcf in gcfs_for_bgc if gcf in available_gcfs]
+
+                # add them to the set of objects to be used for scoring
+                scoring_objs.update(gcfs_for_bgc)
+            print('Selection of {} BGCs => {} GCFs'.format(len(bgcs), len(scoring_objs)))
+        elif self.mode == SCO_MODE_SPEC_GCF:
+            # in this mode can simply add the spectra
+            for spec in spectra:
+                scoring_objs.add(spec)
+        else:
+            # TODO other modes
+            print('NOT SUPPORTED YET')
+            return None
+
+        return list(scoring_objs)
 
 def get_radius(datasource):
     # this aims to set a sensible initial radius based on the dimensions of the plot
@@ -82,10 +204,9 @@ class ZoomHandler(object):
         self.lod_mode = isinstance(event, LODStart)
 
 class CurrentResults(object):
-    
+
     def __init__(self):
         self.clear()
-        self.mode = SCO_MODE_BGC_SPEC
 
     def clear(self):
         self.gcfs = []
@@ -117,12 +238,14 @@ class NPLinkerBokeh(object):
         self.bgc_zoom = None
         self.spec_zoom = None
 
+        self.score_helper = ScoringHelper(self.nh)
+
         self.results = CurrentResults()
 
     @property
     def bgc_data(self):
         return self.nh.bgc_data[self.bgc_tsne_id]
-    
+
     @property
     def nplinker(self):
         return self.nh.nplinker
@@ -166,18 +289,18 @@ class NPLinkerBokeh(object):
             var indices = cb_data.index['1d'].indices;
             if (indices.length > 0)
             {
-                $(output_div_id).text(multi_prefix + indices.length + multi_suffix);
+                $(output_div_id).html('<small>' + multi_prefix + indices.length + multi_suffix + '</small>');
             } 
             else
             {
-                $(output_div_id).text(empty_text);
+                $(output_div_id).html('<small>' + empty_text + '</small>');
             }
         """
 
         callback = CustomJS(args={'output_div_id': '#bgc_hover_info', 
-                                  'multi_prefix': 'Click to select ', 
-                                  'multi_suffix' : ' BGCs', 
-                                  'empty_text' : '(nothing under cursor)'}, 
+                                    'multi_prefix': 'Click to select ', 
+                                    'multi_suffix' : ' BGCs', 
+                                    'empty_text' : '(nothing under cursor)'}, 
                                     code=hover_callback_code)
         hover_bgc = HoverTool(tooltips=None, callback=callback)
         f_bgc.add_tools(hover_bgc)
@@ -205,9 +328,9 @@ class NPLinkerBokeh(object):
 
         # hover_spec = HoverTool(tooltips=[('index', '$index'), ('Spectra name', '@name')])
         callback = CustomJS(args={'output_div_id': '#spec_hover_info', 
-                                  'multi_prefix': 'Click to select ', 
-                                  'multi_suffix' : ' spectra', 
-                                  'empty_text' : '(nothing under cursor)'}, 
+                                    'multi_prefix': 'Click to select ', 
+                                    'multi_suffix' : ' spectra', 
+                                    'empty_text' : '(nothing under cursor)'}, 
                                     code=hover_callback_code)
         hover_spec = HoverTool(tooltips=None, callback=callback)
         f_spec.add_tools(hover_spec)
@@ -222,34 +345,75 @@ class NPLinkerBokeh(object):
         self.ds_bgc = self.ren_bgc.data_source
         self.ds_spec = self.ren_spec.data_source
 
-        self.fig_bgc.on_event('tap', lambda e: self.scoring_mode_callback_tap(SCO_MODE_BGC_SPEC))
-        self.fig_spec.on_event('tap', lambda e: self.scoring_mode_callback_tap(SCO_MODE_SPEC_GCF))
+        # self.fig_bgc.on_event('tap', lambda e: self.plot_tapped(self.fig_bgc))
+        # self.fig_spec.on_event('tap', lambda e: self.plot_tapped(self.fig_spec))
+
+        self.set_inactive_plot(self.fig_spec)
 
         return f_bgc, r_bgc, f_spec, r_spec
+
+    def set_tap_behavior(self, plot, btype):
+        # this basically prevents clicks from selecting anything on the plot
+        taptool = plot.select(type=TapTool)[0]
+        taptool.behavior = btype
+
+    def set_inactive_plot(self, inactive):
+        if self.fig_bgc == inactive:
+            if 'indices' in self.ds_bgc.selected._callbacks and len(self.ds_bgc.selected._callbacks['indices']) > 0:
+                self.ds_bgc.selected.remove_on_change('indices', self.bgc_selchanged)
+            self.clear_selections()
+            self.fig_spec.background_fill_color = ACTIVE_BG_FILL
+            self.fig_spec.background_fill_alpha = ACTIVE_BG_ALPHA
+            self.fig_bgc.background_fill_color = INACTIVE_BG_FILL
+            self.fig_bgc.background_fill_alpha = INACTIVE_BG_ALPHA
+            self.ds_spec.selected.on_change('indices', self.spec_selchanged)
+
+            
+            self.set_tap_behavior(self.fig_bgc, 'inspect')
+            self.set_tap_behavior(self.fig_spec, 'select')
+
+            # self.enable_spec_hover()
+            # self.disable_bgc_hover()
+        else:
+            if 'indices' in self.ds_spec.selected._callbacks and len(self.ds_spec.selected._callbacks['indices']) > 0:
+                self.ds_spec.selected.remove_on_change('indices', self.spec_selchanged)
+
+            self.clear_selections()
+            self.fig_bgc.background_fill_color = ACTIVE_BG_FILL
+            self.fig_bgc.background_fill_alpha = ACTIVE_BG_ALPHA
+            self.fig_spec.background_fill_color = INACTIVE_BG_FILL
+            self.fig_spec.background_fill_alpha = INACTIVE_BG_ALPHA
+            self.ds_bgc.selected.on_change('indices', self.bgc_selchanged)
+
+            self.set_tap_behavior(self.fig_bgc, 'select')
+            self.set_tap_behavior(self.fig_spec, 'inspect')
+
+            # self.enable_bgc_hover()
+            # self.disable_spec_hover()
 
     def enable_bgc_hover(self):
         if self.hover_bgc not in self.fig_bgc.tools:
             self.fig_bgc.add_tools(self.hover_bgc)
-            self.fig_bgc.add_tools(self.taptool_bgc)
-    
+            # self.fig_bgc.add_tools(self.taptool_bgc)
+
     def enable_spec_hover(self):
         if self.hover_spec not in self.fig_spec.tools:
             self.fig_spec.add_tools(self.hover_spec)
-            self.fig_spec.add_tools(self.taptool_spec)
-    
+            # self.fig_spec.add_tools(self.taptool_spec)
+
     def disable_bgc_hover(self):
         if self.hover_bgc in self.fig_bgc.tools:
-            self.fig_bgc.tools.active_tap = None
-            self.fig_bgc.tools.active_inspect = None
+            # self.fig_bgc.tools.active_tap = None
+            # self.fig_bgc.tools.active_inspect = None
             self.fig_bgc.tools.remove(self.hover_bgc)
-            self.fig_bgc.tools.remove(self.taptool_bgc)
-    
+            # self.fig_bgc.tools.remove(self.taptool_bgc)
+
     def disable_spec_hover(self):
         if self.hover_spec in self.fig_spec.tools:
-            self.fig_spec.tools.active_tap = None
-            self.fig_spec.tools.active_inspect = None
+            # self.fig_spec.tools.active_tap = None
+            # self.fig_spec.tools.active_inspect = None
             self.fig_spec.tools.remove(self.hover_spec)
-            self.fig_spec.tools.remove(self.taptool_spec)
+            # self.fig_spec.tools.remove(self.taptool_spec)
 
     # basic template for a bootstrap "card" element to display info about a
     # given GCF/Spectrum etc
@@ -275,20 +439,24 @@ class NPLinkerBokeh(object):
                 </div>
             </div>'''
 
+    def gen_gcf_card(self, gcf, index):
+        pass
+
     def update_bgc_output(self):
         """
         Generate the HTML to display a list of BGC objects
         """
-        print('>> update_bgc_output for mode {}'.format(self.results.mode))
+        print('>> update_bgc_output for mode {}'.format(self.score_helper.mode_name))
         content = ''
 
         # scoring from BGCs to Spectra
-        if self.results.mode == SCO_MODE_BGC_SPEC:
+        # TODO should split this up to show GCFs
+        if self.score_helper.mode == SCO_MODE_BGC_SPEC or self.score_helper.mode == SCO_MODE_GCF_SPEC:
             # in this mode, currently just want to show a simple flat list
             # of the selected BGCs, with the ability to view GCF info as well
             # TODO possibly show grouped by GCF instead? 
-            content += '<h4>{} selected BGCs</h4>'.format(len(self.ds_bgc.selected.indices))
-            print(len(self.ds_bgc.selected.indices))
+
+            content += '<h4>{} GCFs ({} BGCs)</h4>'.format(len(self.results.gcfs), len(self.ds_bgc.selected.indices))
 
             # have to construct list of BGCs from the GCFs
             bgcs = set()
@@ -315,7 +483,7 @@ class NPLinkerBokeh(object):
                 content += self.TMPL.format(hdr_id, 'b4c4e8', body_id, title, body_id, 'accordionBGC', body)
 
         # scoring from Spectra to GCFs
-        elif self.results.mode == SCO_MODE_SPEC_GCF:
+        elif self.score_helper.mode == SCO_MODE_SPEC_GCF:
             uniq_gcfs = set()
             i = 0
             unsorted = []
@@ -351,8 +519,8 @@ class NPLinkerBokeh(object):
 
                         # add strain information
                         gcf_body += '<dt>shared ({}, {:.2f}%):</dt> <dd>{}</dd>'.format(len(shared_strains), 
-                                                                                                 100 * (len(shared_strains) / len(gcf.bgc_list)),
-                                                                                                 ', '.join(shared_strains))
+                                                                                                    100 * (len(shared_strains) / len(gcf.bgc_list)),
+                                                                                                    ', '.join(shared_strains))
                         gcf_body += '<dt>all ({}):</dt> <dd>{}</dd>'.format(len(gcf.bgc_list), ', '.join([bgc.name for bgc in gcf.bgc_list]))
                         gcf_body += '</dl>'
                         body += self.TMPL.format(gcf_hdr_id, 'ffe0b5', gcf_body_id, gcf_title, gcf_body_id, 'accordion_spec_{}'.format(i), gcf_body)
@@ -361,7 +529,7 @@ class NPLinkerBokeh(object):
                     unsorted.append((len(gcf_scores), self.TMPL.format(hdr_id, 'b4c4e8', body_id, title, body_id, 'accordionBGC', body)))
                     i += 1
 
-                content += '<h4>Found {} linked GCFs (containing {} BGCs)</h4>'.format(len(uniq_gcfs), len(self.ds_bgc.selected.indices)) 
+                content += '<h4>Found {} linked GCFs</h4>'.format(len(uniq_gcfs))
                 # sort by number of GCFs linked to each spectra
                 sorted_gcfs = sorted(unsorted, key=lambda x: -x[0])
                 for _, text in sorted_gcfs:
@@ -375,9 +543,10 @@ class NPLinkerBokeh(object):
         Generate the HTML to display a list of Spectrum objects
         """
         print('>> update_spec_output')
+        content = ''
         # scoring from Spectra to GCFs
-        if self.results.mode == SCO_MODE_SPEC_GCF:
-            content = '<h4>{} selected spectra</h4>'.format(len(self.ds_spec.selected.indices))
+        if self.score_helper.mode == SCO_MODE_SPEC_GCF:
+            content += '<h4>{} selected spectra</h4>'.format(len(self.ds_spec.selected.indices))
             i = 0
             # here just need to show a flat list of spectra
             for spec in self.results.spec:
@@ -393,8 +562,8 @@ class NPLinkerBokeh(object):
                 i += 1
             
         # scoring from BGCs to Spectra
-        elif self.results.mode == SCO_MODE_BGC_SPEC:
-            content = '<h4>{} linked spectra</h4>'.format(len(self.ds_spec.selected.indices))
+        elif self.score_helper.mode == SCO_MODE_BGC_SPEC or self.score_helper.mode == SCO_MODE_GCF_SPEC:
+            content += '<h4>{} linked spectra</h4>'.format(len(self.ds_spec.selected.indices))
             i = 0
             unsorted = []
 
@@ -427,8 +596,8 @@ class NPLinkerBokeh(object):
                         
                         # add strain information
                         spec_body += '<dt>shared ({}, {:.2f}%):</dt> <dd>{}</dd>'.format(len(shared_strains), 
-                                                                                                 100 * (len(shared_strains) / len(spec.strain_list)),
-                                                                                                 ', '.join(shared_strains))
+                                                                                                    100 * (len(shared_strains) / len(spec.strain_list)),
+                                                                                                    ', '.join(shared_strains))
                         spec_body += '<dt>all ({}):</dt> <dd>{}</dd>'.format(len(spec.strain_list), ', '.join(spec.strain_list))
                         spec_body += '</dl>'
                         body += self.TMPL.format(spec_hdr_id, 'ffe0b5', spec_body_id, spec_title, spec_body_id, 'accordion_gcf_{}'.format(i), spec_body)
@@ -448,45 +617,40 @@ class NPLinkerBokeh(object):
         Retrieves links for current selected objects, if any.
         """
 
-        # first check the scoring mode
+        print('get_links')
+        nplinker = self.nh.nplinker
         sel_indices = []
-        mode = self.results.mode
-        if mode == SCO_MODE_BGC_SPEC:
+        # first check the scoring mode, which is determined by the state 
+        # of the two sets of UI controls. based on the current mode, 
+        # extract the appropriate set of selected indices from the plot
+        bgcs = []
+        spectra = []
+        if self.score_helper.from_genomics:
             sel_indices = self.ds_bgc.selected.indices
-        elif mode == SCO_MODE_SPEC_GCF:
-            sel_indices = self.ds_spec.selected.indices
+            for i in range(len(sel_indices)):
+                bgcs.append(nplinker.lookup_bgc(self.bgc_data['name'][sel_indices[i]]))
         else:
-            return
+            sel_indices = self.ds_spec.selected.indices
+            for i in range(len(sel_indices)):
+                spectra.append(nplinker.lookup_spectrum(self.spec_data['name'][sel_indices[i]]))
+
+        mode = self.score_helper.mode
 
         if len(sel_indices) == 0:
-            print('No indices selected')
+            self.update_alert('No objects selected', 'danger')
             return
 
-        nplinker = self.nh.nplinker
-        nplinker.clear_links() # TODO hack
+        # TODO why did i do this
+        nplinker.clear_links() # TODO hack 
         self.results.clear()
         current_method = nplinker.scoring.enabled()[self.scoring_method_group.active]
         print('Scoring method is: {}'.format(current_method))
 
-        scoring_objs = set()
-        if mode == SCO_MODE_BGC_SPEC: # indices are into BGC plot
-            bgcs = []
-            # for each BGC, get its parent GCF
-            for i in range(len(sel_indices)):
-                bgc = nplinker.lookup_bgc(self.bgc_data['name'][sel_indices[i]])
-                scoring_objs.add(bgc.parent)
-                bgcs.append(bgc)
-        elif mode == SCO_MODE_SPEC_GCF:
-            specs = []
-            for i in range(len(sel_indices)):
-                spec = nplinker.lookup_spectrum(self.spec_data['name'][sel_indices[i]])
-                scoring_objs.add(spec)
-                specs.append(spec)
-        else:
-            # TODO other modes
-            pass
-
-        scoring_objs = list(scoring_objs)
+        scoring_objs = self.score_helper.generate_scoring_objects(bgcs, spectra, self.bgc_tsne_id)
+        if scoring_objs is None:
+            self.update_alert('ERROR: something went wrong in scoring!', 'danger')
+            self.clear_selections()
+            return
 
         print('Initial setup done')
         # this method returns the input objects that have links based on the selected scoring parameters
@@ -494,6 +658,8 @@ class NPLinkerBokeh(object):
         if len(objs_with_links) > 0:
             objs_with_scores = {}
             selected = set()
+
+            # TODO other modes
             t = Spectrum # default for BGC to Spec
             if mode == SCO_MODE_SPEC_GCF:
                 t = GCF
@@ -503,7 +669,7 @@ class NPLinkerBokeh(object):
             otherobjs = set()
             for link_obj in objs_with_links:
                 objs_with_scores[link_obj] = nplinker.links_for_obj(link_obj, current_method, type_=t)
-                if mode == SCO_MODE_BGC_SPEC:
+                if mode == SCO_MODE_BGC_SPEC or mode == SCO_MODE_GCF_SPEC:
                     score_obj_indices = [self.spec_indices[spec.spectrum_id] for (spec, score) in objs_with_scores[link_obj]]
                     gcfs.add(link_obj)
                 elif mode == SCO_MODE_SPEC_GCF:
@@ -526,19 +692,22 @@ class NPLinkerBokeh(object):
 
             all_shared_strains = self.nh.nplinker.get_common_strains(objs_with_links, list(otherobjs))
 
-            # now that the typical scoring process is completed, need to filter out GCFs that contain BGCs not present
-            # in the current TSNE plot. in BGC_SPEC mode, can filter them out of the objs_with_scores
+            # at this point, the actual nplinker scoring process is completed, but still need to 
+            # filter out GCFs that contain BGCs not present in the current TSNE projection. 
+            # in BGC_SPEC mode, can filter them out of the objs_with_scores
             # list and abort if nothing is left. more tricky for the other mode.
-            if mode == SCO_MODE_BGC_SPEC:
+            if mode == SCO_MODE_BGC_SPEC or mode == SCO_MODE_GCF_SPEC:
                 print('Filtering out GCFs from objs_with_links, initial count={}'.format(len(objs_with_links)))
-                available_gcfs = []
-                for i, gcf in enumerate(objs_with_links):
-                    if gcf in self.nh.available_gcfs[self.bgc_tsne_id]:
-                        available_gcfs.append(gcf)
-                    else:
-                        print('Excluding GCF: {}'.format(gcf))
+                # available_gcfs = []
+                # for i, gcf in enumerate(objs_with_links):
+                #     if gcf in self.nh.available_gcfs[self.bgc_tsne_id]:
+                #         available_gcfs.append(gcf)
+                #     else:
+                #         print('Excluding GCF: {}'.format(gcf))
 
-                objs_with_links = available_gcfs
+                # objs_with_links = available_gcfs
+                objs_with_links = [gcf for gcf in objs_with_links if gcf in self.nh.available_gcfs[self.bgc_tsne_id]]
+
             elif mode == SCO_MODE_SPEC_GCF:
                 print('Filtering out GCFs from objs_with_scores, initial_count={}'.format(len(objs_with_links)))
                 for spec in list(objs_with_scores.keys()):
@@ -559,17 +728,17 @@ class NPLinkerBokeh(object):
 
         if len(objs_with_links) > 0:
             # take the indexes of the corresponding spectra from the datasource and highlight on the other plot
-            if mode == SCO_MODE_BGC_SPEC:
+            if mode == SCO_MODE_BGC_SPEC or mode == SCO_MODE_GCF_SPEC:
                 self.ds_spec.selected.indices = list(selected)
                 self.results.update(gcfs, None, objs_with_scores, all_shared_strains)
             elif mode == SCO_MODE_SPEC_GCF:
                 self.ds_bgc.selected.indices = list(selected)
-                self.results.update(None, specs, objs_with_scores, all_shared_strains)
+                self.results.update(None, spectra, objs_with_scores, all_shared_strains)
             
             self.update_alert('{} objects with links found'.format(len(objs_with_scores), 'primary'))
         else:
             print('No links found!')
-            if mode == SCO_MODE_BGC_SPEC:
+            if mode == SCO_MODE_BGC_SPEC or mode == SCO_MODE_GCF_SPEC:
                 self.ds_spec.selected.indices = []
             else:
                 self.ds_bgc.selected.indices = []
@@ -578,7 +747,7 @@ class NPLinkerBokeh(object):
 
         self.update_bgc_output()
         self.update_spec_output()
-        
+            
     def bgc_selchanged(self, attr, old, new):
         """
         Callback for changes to the BGC datasource selected indices
@@ -624,31 +793,38 @@ class NPLinkerBokeh(object):
     def scoring_method_callback(self, attr, old, new):
         self.get_links()
 
-    def scoring_mode_callback_tap(self, newmode):
-        self.scoring_mode_group.active = newmode
-
-    def scoring_mode_callback(self, attr, old, new):
-        self.results.mode = SCORING_MODES_ENUM[new]
-        if self.results.mode == SCO_MODE_BGC_SPEC:
-            # self.enable_bgc_hover()
-            # self.disable_spec_hover()
-            # only want to listen for selection changes on bgc plot
-            self.ds_bgc.selected.on_change('indices', self.bgc_selchanged)
-            if len(self.ds_spec.selected._callbacks['indices']) > 0:
-                self.ds_spec.selected.remove_on_change('indices', self.spec_selchanged)
-            self.update_alert('Scoring mode changed: BGCs -> Spectra', 'primary')
-        elif self.results.mode == SCO_MODE_SPEC_GCF:
-            # self.disable_bgc_hover()
-            # self.enable_spec_hover()
-            # only want to listen for selection changes on spec plot
-            if len(self.ds_bgc.selected._callbacks['indices']) > 0:
-                self.ds_bgc.selected.remove_on_change('indices', self.bgc_selchanged)
-            self.ds_spec.selected.on_change('indices', self.spec_selchanged)
-            self.update_alert('Scoring mode changed: Spectra -> GCFs', 'primary')
-
-        # clear existing selections on mode changes
+    def clear_selections(self):
         self.ds_bgc.selected.indices = []
         self.ds_spec.selected.indices = []
+
+    def get_scoring_mode_text(self):
+        return SCO_MODE_NAMES[self.score_helper.mode]
+
+    def sco_mode_changed(self):
+        self.update_alert('Scoring mode is now <strong>{}</strong>'.format(self.get_scoring_mode_text()))
+
+    def plot_tapped(self, plot):
+        # NOT CURRENTLY USED
+        if plot == self.fig_bgc:
+            print('TAPPED BGC')
+            self.score_helper.set_genomics()
+            self.set_inactive_plot(self.fig_spec)
+        else:
+            print('TAPPED SPEC')
+            self.score_helper.set_metabolomics()
+            self.set_inactive_plot(self.fig_bgc)
+
+        self.sco_mode_changed()
+
+    def mb_mode_callback(self, attr, old, new):
+        self.score_helper.update_metabolomics(new)
+        self.set_inactive_plot(self.fig_bgc)
+        self.sco_mode_changed()
+
+    def ge_mode_callback(self, attr, old, new):
+        self.score_helper.update_genomics(new)
+        self.set_inactive_plot(self.fig_spec)
+        self.sco_mode_changed()
 
     def plot_toggles_callback(self, attr, old, new):
         self.ren_bgc.glyph.fill_alpha = 0.6 if PLOT_ALPHA in new else 1.0
@@ -670,25 +846,36 @@ class NPLinkerBokeh(object):
             self.ren_spec.selection_glyph.fill_color = '#ff7f00'
 
     def tsne_id_callback(self, attr, old, new):
-        self.ds_bgc.selected.indices = []
-        self.ds_spec.selected.indices = []
+        self.clear_selections()
         self.bgc_tsne_id = new
         self.update_alert('TSNE set to {}'.format(new), 'primary')
         # messy but it works and seems to be best way of doing this
         newdata = self.nh.bgc_data[new]
         self.bgc_datasource.data.update(
-                                             x=newdata['x'],
-                                             y=newdata['y'],
-                                             name=newdata['name'],
-                                             strain=newdata['strain'],
-                                             gcf=newdata['gcf'],
-                                             fill=newdata['fill'])
+                                            x=newdata['x'],
+                                            y=newdata['y'],
+                                            name=newdata['name'],
+                                            strain=newdata['strain'],
+                                            gcf=newdata['gcf'],
+                                            fill=newdata['fill'])
 
     def update_alert(self, msg, alert_class='primary'):
         self.alert_div.text = '<div class="alert alert-{}" role="alert">{}</div>'.format(alert_class, msg)
 
     def clear_alert(self):
         self.alert_div.text = ''
+
+    def plot_select_callback(self, val):
+        if val:
+            self.plot_select.label = SCORING_GEN_TO_MET
+            self.score_helper.set_genomics()
+            self.set_inactive_plot(self.fig_spec)
+            self.plot_select.css_classes = ['button-genomics']
+        else:
+            self.plot_select.label = SCORING_MET_TO_GEN
+            self.score_helper.set_metabolomics()
+            self.set_inactive_plot(self.fig_bgc)
+            self.plot_select.css_classes = ['button-metabolomics']
     
     def bokeh_layout(self):
         self.spec_div = Div(text="", sizing_mode='scale_height', name='spec_div')
@@ -702,8 +889,14 @@ class NPLinkerBokeh(object):
         self.tsne_id_select = Select(title='BGC TSNE:', value=self.bgc_tsne_id, options=self.bgc_tsne_id_list, name='tsne_id_select')
         self.tsne_id_select.on_change('value', self.tsne_id_callback)
 
-        self.scoring_mode_group = RadioGroup(labels=SCORING_MODES, active=SCO_MODE_BGC_SPEC, name='scoring_mode_group')
-        self.scoring_mode_group.on_change('active', self.scoring_mode_callback)
+        self.mb_mode_group = RadioGroup(labels=METABOLOMICS_SCORING_MODES, active=0, name='mb_mode_group', css_classes=['modes-metabolomics'])
+        self.mb_mode_group.on_change('active', self.mb_mode_callback)
+
+        self.plot_select = Toggle(label=SCORING_GEN_TO_MET, name='plot_select', active=True, css_classes=['button-genomics'])
+        self.plot_select.on_click(self.plot_select_callback)
+
+        self.ge_mode_group = RadioGroup(labels=GENOMICS_SCORING_MODES, active=0, name='ge_mode_group')
+        self.ge_mode_group.on_change('active', self.ge_mode_callback)
 
         self.scoring_method_group = RadioGroup(labels=[m for m in self.nh.nplinker.scoring.enabled_names()], active=0, name='scoring_method_group')
         self.scoring_method_group.on_change('active', self.scoring_method_callback)
@@ -739,7 +932,9 @@ class NPLinkerBokeh(object):
         curdoc().add_root(self.fig_bgc)
         curdoc().add_root(self.spec_div)
         curdoc().add_root(self.bgc_div)
-        curdoc().add_root(self.scoring_mode_group)
+        curdoc().add_root(self.plot_select)
+        curdoc().add_root(self.mb_mode_group)
+        curdoc().add_root(self.ge_mode_group)
         curdoc().add_root(self.scoring_method_group)
         curdoc().add_root(self.sliders)
         curdoc().add_root(self.debug_div)
