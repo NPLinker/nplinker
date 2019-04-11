@@ -98,55 +98,87 @@
     </div>
 </div>
 
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-1"></div>
-        <div class="col-lg-4" style="text-align: right">
-            <h6 style="">Metabolomics scoring mode:</h6>
-        </div>
-        <div class="col-lg-2">
-        </div>
-        <div class="col-lg-4">
-            <h6>Genomics scoring mode:</h6>
-        </div>
-        <div class="col-md-1"></div>
-    </div>
-    <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-lg-4" id="mb_mode">
-            {{ embed(roots.mb_mode_group) }}
-        </div>
-        <div class="col-lg-2">
-            {{ embed(roots.plot_select) }}
-        </div>
-        <div class="col-lg-4">
-            {{ embed(roots.ge_mode_group) }}
+        <div class="col-md-10">
+            <ul class="nav nav-tabs" id="mainTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="scoringTab" data-toggle="tab" href="#scoring_div" role="tab" aria-controls="scoring_div" aria-selected="true">Scoring</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="searchTab" data-toggle="tab" href="#search_div" role="tab" aria-controls="search_div" aria-selected="true">Search</a>
+                </li>
+            </ul>
         </div>
         <div class="col-md-1"></div>
     </div>
-    <div class="row" style="background-color: #ffffff">
-        <div class="col-md-1"></div>
-        <div class="col-lg-10">
-            <strong>Selected scoring method:</strong>
-            {{ embed(roots.scoring_method_group) }}
-            <strong>Method parameters</strong>
-            {{ embed(roots.sliders) }}
-        </div>
-        <div class="col-md-1"></div>
-    </div>
-    <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-md-5">
-            <div class="accordion" id="accordionSpec">
-                {{ embed(roots.spec_div) }}
+
+
+
+
+        <div class="tab-content" id="mainTabContent">
+            <div class="tab-pane  show active" id="scoring_div" role="tabpanel" aria-labelledby="scoringTab">
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-lg-4" style="text-align: right">
+                        <h6 style="">Metabolomics scoring mode:</h6>
+                    </div>
+                    <div class="col-lg-2">
+                    </div>
+                    <div class="col-lg-4">
+                        <h6>Genomics scoring mode:</h6>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-lg-4" id="mb_mode">
+                        {{ embed(roots.mb_mode_group) }}
+                    </div>
+                    <div class="col-lg-2">
+                        {{ embed(roots.plot_select) }}
+                    </div>
+                    <div class="col-lg-4">
+                        {{ embed(roots.ge_mode_group) }}
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                <div class="row" style="background-color: #ffffff">
+                    <div class="col-md-1"></div>
+                    <div class="col-lg-10">
+                        <strong>Selected scoring method:</strong>
+                        {{ embed(roots.scoring_method_group) }}
+                        <strong>Method parameters</strong>
+                        {{ embed(roots.sliders) }}
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-5">
+                        <div class="accordion" id="accordionSpec">
+                            {{ embed(roots.spec_div) }}
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="accordion" id="accordionBGC">
+                            {{ embed(roots.bgc_div) }}
+                        </div>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+            </div>
+
+            <div class="tab-pane " id="search_div" role="tabpanel" aria-labelledby="searchTab">
+                <div class="row">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4"></div>
+                </div>
             </div>
         </div>
-        <div class="col-md-5">
-            <div class="accordion" id="accordionBGC">
-                {{ embed(roots.bgc_div) }}
-            </div>
-        </div>
-        <div class="col-md-1"></div>
     </div>
     <div class="row">
         <div class="col-lg">
