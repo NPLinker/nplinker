@@ -436,8 +436,27 @@ class NPLinkerBokeh(object):
                 </div>
             </div>'''
 
+
+    # same as above but with an extra pair of parameters for the "onclick" handler and button id
+    TMPL_ON_CLICK = '''
+        <div class="card">
+            <div class="card-header" id="{}" style="background-color: #{}">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#{}" onclick="{}" id="{}">
+                    {}
+                </button>
+            </div>
+            <div id="{}" class="collapse" data-parent="{}">
+                <div class="card-body">
+                    {}
+                </div>
+            </div>
+        </div>'''
+
     def gen_gcf_card(self, gcf, index):
         pass
+
+    # TODO
+    # this pair of functions could really use some refactoring!
 
     def update_bgc_output(self):
         """
@@ -445,6 +464,10 @@ class NPLinkerBokeh(object):
         """
         print('>> update_bgc_output for mode {}'.format(self.score_helper.mode_name))
         content = ''
+
+        if len(self.ds_bgc.selected.indices) == 0 and len(self.ds_spec.selected.indices) == 0:
+            self.bgc_div.text = content
+            return
 
         # scoring from BGCs to Spectra
         # TODO should split this up to show GCFs
@@ -541,6 +564,11 @@ class NPLinkerBokeh(object):
         """
         print('>> update_spec_output')
         content = ''
+
+        if len(self.ds_bgc.selected.indices) == 0 and len(self.ds_spec.selected.indices) == 0:
+            self.spec_div.text = content
+            return
+
         # scoring from Spectra to GCFs
         if self.score_helper.mode == SCO_MODE_SPEC_GCF:
             content += '<h4>{} selected spectra</h4>'.format(len(self.ds_spec.selected.indices))
@@ -584,6 +612,8 @@ class NPLinkerBokeh(object):
 
                         shared_strains = self.results.shared_strains[(spec, gcf)]
 
+                        # TODO this could all be neater/templated or something
+
                         spec_hdr_id = 'spec_result_header_{}_{}'.format(i, j)
                         spec_body_id = 'spec_body_{}_{}'.format(i, j)
                         spec_title = 'Spectrum(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.id, score, len(shared_strains))
@@ -597,7 +627,15 @@ class NPLinkerBokeh(object):
                                                                                                     ', '.join(shared_strains))
                         spec_body += '<dt>all ({}):</dt> <dd>{}</dd>'.format(len(spec.strain_list), ', '.join(spec.strain_list))
                         spec_body += '</dl>'
-                        body += self.TMPL.format(spec_hdr_id, 'ffe0b5', spec_body_id, spec_title, spec_body_id, 'accordion_gcf_{}'.format(i), spec_body)
+                        
+                        # set up the chemdoodle plot so it appears when the entry is expanded 
+                        spec_btn_id = 'spec_btn_{}_{}'.format(i, j)
+                        spec_plot_id = 'spec_plot_{}_{}'.format(i, j)
+                        spec_body += '<canvas id="{}"></canvas>'.format(spec_plot_id)
+                        # note annoying escaping required here, TODO better way of doing this?
+                        spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, spec.to_jcamp_str())
+
+                        body += self.TMPL_ON_CLICK.format(spec_hdr_id, 'ffe0b5', spec_body_id, spec_onclick, spec_btn_id, spec_title, spec_body_id, 'accordion_gcf_{}'.format(i), spec_body)
 
                     body += '</div>'
                     unsorted.append((len(spec_scores), self.TMPL.format(hdr_id, 'adeaad', body_id, title, body_id, 'accordionSpec', body)))
