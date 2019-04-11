@@ -123,6 +123,8 @@ class NPLinkerHelper(object):
                     self.spec_data['x'].append(float(x))
                     self.spec_data['y'].append(float(y))
                     self.spec_data['family'].append(family)
+                    # precache JCAMP data
+                    spec.to_jcamp_str()
                     if family not in uniq_fams:
                         fam_lookup[family] = len(uniq_fams)
                         uniq_fams.add(family)
