@@ -10,6 +10,34 @@
     <script src="npapp/static/js/popper.min.js" type="text/javascript"></script>
     <script src="npapp/static/js/bootstrap.min.js" type="text/javascript"></script>
     <script src="npapp/static/js/ChemDoodleWeb.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        // this function is used to load and display ChemDoodle spectrum plots in 
+        // the result accordion elements. It is triggered by onclick handlers on each
+        // of the Spectrum elements, and is passed in:
+        //  - the ID of the button element that triggered the event
+        //  - the ID of the DOM canvas element that should contain the plot
+        //  - the plot data in JCAMP format
+        // if the plot has already been loaded it does nothing, otherwise it creates
+        // and displays it, then removes the onclick handler so it shouldn't
+        // get triggered again
+        function setupPlot(btn_id, plot_id, plot_data) {
+            console.log('setupPlot: %o', plot_id);
+            // check if width nonzero as a way to find out if the plot is already created or not
+            if($('#' + plot_id).width() > 0) {
+                console.log('Returning')
+                return;
+            }
+            var thePlot = new ChemDoodle.PerspectiveCanvas(plot_id, 400, 200);
+            thePlot.specs.plots_color = '#FF0000';
+            var theSpec = ChemDoodle.readJCAMP(plot_data);
+            theSpec.xUnits = 'm/z';
+            theSpec.yUnits = 'Relative Abundance';
+            thePlot.loadSpectrum(theSpec);
+
+            // remove the onclick handler
+            $('#' + btn_id).prop("onclick", null).off("click");
+        }
+    </script>
 {% endblock %}
   
 {% block contents %}
