@@ -6,6 +6,19 @@ from parsers import LoadMGF
 from logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
+JCAMP = '##TITLE={}\\n' +\
+        '##JCAMP-DX=nplinker vTODO\\n' +\
+        '##DATA TYPE=Spectrum\\n' +\
+        '##DATA CLASS=PEAKTABLE\\n' +\
+        '##ORIGIN=TODO_DATASET_ID\\n' +\
+        '##OWNER=nobody\\n' +\
+        '##XUNITS=M/Z\\n' +\
+        '##YUNITS=RELATIVE ABUNDANCE\\n' +\
+        '##NPOINTS={}\\n' +\
+        '##PEAK TABLE=(XY..XY)\\n' +\
+        '{}\\n' +\
+        '##END=\\n'
+
 class Spectrum(object):
     
     METADATA_BLACKLIST = set(['AllOrganisms', 'LibraryID', 'RTStdErr', 'RTMean', 'AllGroups', 'DefaultGroups',
@@ -30,6 +43,8 @@ class Spectrum(object):
         self.annotations = []
 
         self._losses = None
+
+        self._jcamp = None
 
     def annotation_from_metadata(self):
         annotation = self.get_metadata_value('LibraryID')
@@ -62,23 +77,13 @@ class Spectrum(object):
             pass
         return False
 
-    def to_jcamp_str(self):
-        jcamp = '##TITLE={}\\n' +\
-                '##JCAMP-DX=nplinker vTODO\\n' +\
-                '##DATA TYPE=Spectrum\\n' +\
-                '##DATA CLASS=PEAKTABLE\\n' +\
-                '##ORIGIN=TODO_DATASET_ID\\n' +\
-                '##OWNER=nobody\\n' +\
-                '##XUNITS=M/Z\\n' +\
-                '##YUNITS=RELATIVE ABUNDANCE\\n' +\
-                '##NPOINTS={}\\n' +\
-                '##PEAK TABLE=(XY..XY)\\n' +\
-                '{}\\n' +\
-                '##END=\\n'
+    def to_jcamp_str(self, force_refresh=False):
+        if self._jcamp is not None and not force_refresh:
+            return self._jcamp
 
         peakdata = '\\n'.join('{}, {}'.format(*p) for p in self.peaks)
-
-        return jcamp.format(str(self), self.n_peaks, peakdata)
+        self._jcamp = JCAMP.format(str(self), self.n_peaks, peakdata)
+        return self._jcamp
 
     # def print_spectrum(self):
     #     print()
