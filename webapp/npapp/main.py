@@ -1,4 +1,4 @@
-from bokeh.models.widgets import RadioGroup, Slider, Div, CheckboxButtonGroup, Select, CheckboxGroup, Toggle
+from bokeh.models.widgets import RadioGroup, Slider, Div, CheckboxButtonGroup, Select, CheckboxGroup, Toggle, Button
 from bokeh.layouts import row, column, widgetbox
 from bokeh.models import CustomJS
 from bokeh.plotting import figure, curdoc
@@ -911,7 +911,7 @@ class NPLinkerBokeh(object):
             self.score_helper.set_metabolomics()
             self.set_inactive_plot(self.fig_bgc)
             self.plot_select.css_classes = ['button-metabolomics']
-    
+
     def bokeh_layout(self):
         self.spec_div = Div(text="", sizing_mode='scale_height', name='spec_div')
         self.bgc_div = Div(text="", sizing_mode='scale_height', name='bgc_div')
@@ -958,10 +958,21 @@ class NPLinkerBokeh(object):
         # for debug output etc 
         self.debug_div = Div(text="", name='debug_div')
 
+        # status updates/errors
         self.alert_div = Div(text="", name='alert_div')
+
+        # "reset everything" button
+        self.reset_button = Button(name='reset_button', label='Reset state')
+        # no python method to reset plots, for some reason...
+        self.reset_button.js_on_click(CustomJS(args=dict(fig_bgc=self.fig_bgc, fig_spec=self.fig_spec), 
+                                               code=""" 
+                                                    fig_bgc.reset.emit();
+                                                    fig_spec.reset.emit();
+                                                """))
 
         curdoc().add_root(self.plot_toggles)
         curdoc().add_root(self.tsne_id_select)
+        curdoc().add_root(self.reset_button)
         curdoc().add_root(self.alert_div)
         curdoc().add_root(self.fig_spec)
         curdoc().add_root(self.fig_bgc)

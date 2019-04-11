@@ -42,11 +42,11 @@
   
 {% block contents %}
 <div class="container-fluid" style="margin-top: 10px">
-    <div class="row">
-        <div class="col-md-1">
+    <div class="row" style="background-color: #fffdd2">
+        <div class="col-md-3">
         </div>
-        <div class="col-lg-5">
-            <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#optionsModal" aria-expanded="false" aria-controls="optionsModal">
+        <div class="col-md-3">
+            <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#optionsModal" aria-expanded="false" aria-controls="optionsModal" style="margin-top: 10px">
                 Plot options
             </button>
             <div class="modal" id="optionsModal" tabindex="-1" role="dialog">
@@ -69,10 +69,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-5">
+        <div class="col-md-4">
             {{ embed(roots.alert_div) }}
         </div>
-        <div class="col-md-1"></div>
+        <div class="col-md-2">
+            {{ embed(roots.reset_button) }}
+        </div>
     </div>
     <div class="row">
         <div class="col-md-1"></div>
