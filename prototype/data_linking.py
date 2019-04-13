@@ -237,7 +237,7 @@ class DataLinks(object):
         self.mapping_fam["no of members"] = num_members
         return self.family_members
 
-    def common_strains(self, objects_a, objects_b):
+    def common_strains(self, objects_a, objects_b, filter_no_shared=False):
         """
         Obtain the set of common strains between all pairs from the lists objects_a
         and objects_b.
@@ -288,7 +288,10 @@ class DataLinks(object):
         for a, obj_a in enumerate(objects_a):
             for b, obj_b in enumerate(objects_b):
                 # just AND both arrays and extract the indices with positive results
-                results[(obj_a, obj_b)] = np.where(np.logical_and(data_a[ids_a[a]], data_b[ids_b[b]]))[0]
+                result = np.where(np.logical_and(data_a[ids_a[a]], data_b[ids_b[b]]))[0]
+                # if we want to exclude results with no shared strains
+                if (filter_no_shared and len(result) > 0) or not filter_no_shared:
+                    results[(obj_a, obj_b)] = result
 
         return results
 
