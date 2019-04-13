@@ -187,13 +187,15 @@ class NPLinker(object):
         logger.debug('load_edges({})'.format(self._loader.edges_file))
         load_edges(self._spectra, self._loader.edges_file)
 
-        # families = make_families(self.spectra) # TODO?
         logger.debug('load_metadata({})'.format(self._loader.nodes_file))
         self._metadata = load_metadata(self._spectra, self._loader.nodes_file)
+
+        # families = make_families(self.spectra) # TODO?
 
         input_files, ann_files = [], []
         logger.debug('make_mibig_bgc_dict({})'.format(self._loader.mibig_json_dir))
         self._mibig_bgc_dict = make_mibig_bgc_dict(self._loader.mibig_json_dir)
+        logger.debug('mibig_bgc_dict has {} entries'.format(len(self._mibig_bgc_dict)))
 
         # TODO can this just be modified to search all folders in the root path instead of hardcoding them?
         for folder in NPLinker.FOLDERS:
@@ -561,10 +563,10 @@ class NPLinker(object):
         logger.error('Bad input type in _get_links_percentile??')
         return None
 
-    def get_common_strains(self, objects_a, objects_b):
+    def get_common_strains(self, objects_a, objects_b, filter_no_shared=True):
         # this is a dict with structure:
         #   (Spectrum/MolecularFamily, GCF) => list of strain indices
-        common_strains = self._datalinks.common_strains(objects_a, objects_b)
+        common_strains = self._datalinks.common_strains(objects_a, objects_b, filter_no_shared)
 
         # replace the lists of strain indices with actual strain objects
         for objpair in common_strains.keys():
