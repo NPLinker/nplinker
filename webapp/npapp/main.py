@@ -358,9 +358,6 @@ class NPLinkerBokeh(object):
         self.ds_bgc = self.ren_bgc.data_source
         self.ds_spec = self.ren_spec.data_source
 
-        # self.fig_bgc.on_event('tap', lambda e: self.plot_tapped(self.fig_bgc))
-        # self.fig_spec.on_event('tap', lambda e: self.plot_tapped(self.fig_spec))
-
         self.set_inactive_plot(self.fig_spec)
 
         return f_bgc, r_bgc, f_spec, r_spec
@@ -896,18 +893,6 @@ class NPLinkerBokeh(object):
 
     def sco_mode_changed(self):
         self.update_alert('Scoring mode is now <strong>{}</strong>'.format(self.get_scoring_mode_text()))
-
-    # NOT CURRENTLY USED
-    # def plot_tapped(self, plot):
-    #     if plot == self.fig_bgc:
-    #         print('TAPPED BGC')
-    #         self.score_helper.set_genomics()
-    #         self.set_inactive_plot(self.fig_spec)
-    #     else:
-    #         print('TAPPED SPEC')
-    #         self.score_helper.set_metabolomics()
-    #         self.set_inactive_plot(self.fig_bgc)
-    #     self.sco_mode_changed()
 
     def mb_mode_callback(self, attr, old, new):
         self.score_helper.update_metabolomics(new)
