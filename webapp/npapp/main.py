@@ -1,3 +1,5 @@
+import os
+
 from bokeh.models.widgets import RadioGroup, Slider, Div, CheckboxButtonGroup, Select, CheckboxGroup, Toggle, Button
 from bokeh.layouts import row, column, widgetbox
 from bokeh.models import CustomJS
@@ -52,6 +54,29 @@ SCO_MODE_BGC_SPEC, SCO_MODE_BGC_MOLFAM,\
 SCO_MODE_NAMES = ['BGCs to Spectra', 'BGCs to MolFams', 'GCFs to Spectra', 'GCFs to MolFams',
                 'Spectra to GCFs', 'MolFams to GCFs']
 
+SCO_GEN_TO_MET = [True, True, True, True, False, False]
+
+# basic template for a bootstrap "card" element to display info about a
+# given GCF/Spectrum etc
+# format params:
+# - unique id for header, e.g spec_heading_1
+# - colour for header
+# - unique id for body, e.g. spec_body_1
+# - title text
+# - id for body, same as #2
+# - parent id 
+# - main text
+TMPL = open(os.path.join(os.path.dirname(__file__), 'templates/tmpl.basic.py.html')).read()
+
+# same as above but with an extra pair of parameters for the "onclick" handler and button id
+TMPL_ON_CLICK = open(os.path.join(os.path.dirname(__file__), 'templates/tmpl.onclick.py.html')).read()
+
+def get_radius(datasource):
+    # this aims to set a sensible initial radius based on the dimensions of the plot
+    minx = min(datasource.data['x'])
+    maxx = max(datasource.data['x'])
+    return (maxx - minx) / POINT_FACTOR
+
 class ScoringHelper(object):
 
     GENOMICS_LOOKUP  = {GENOMICS_MODE_BGC: [SCO_MODE_BGC_SPEC, SCO_MODE_BGC_MOLFAM],
@@ -73,6 +98,9 @@ class ScoringHelper(object):
         self.spectra = []
         self.molfams = []
         self.inputs = set()
+        self.objs_with_links = []
+        self.objs_with_scores = {}
+        self.shared_strains = {}
 
     def set_genomics(self):
         self.from_genomics = True
@@ -92,11 +120,19 @@ class ScoringHelper(object):
         self.metabolomics_mode = m
         self._update()
 
+    def gen_to_met(self):
+        return SCO_GEN_TO_MET[self.mode]
+
     def _update(self):
         if self.from_genomics:
             self.mode = ScoringHelper.GENOMICS_LOOKUP[self.genomics_mode][self.metabolomics_mode]
         else:
             self.mode = ScoringHelper.METABOLOMICS_LOOKUP[self.metabolomics_mode]
+
+    def set_results(self, objs_with_links, objs_with_scores, shared_strains):
+        self.objs_with_links = objs_with_links
+        self.objs_with_scores = objs_with_scores
+        self.shared_strains = shared_strains
 
     @property
     def mode_name(self):
@@ -156,12 +192,6 @@ class ScoringHelper(object):
 
         return list(scoring_objs)
 
-def get_radius(datasource):
-    # this aims to set a sensible initial radius based on the dimensions of the plot
-    minx = min(datasource.data['x'])
-    maxx = max(datasource.data['x'])
-    return (maxx - minx) / POINT_FACTOR
-
 class ZoomHandler(object):
     """
     This class deals with scaling the circle glyphs on the scatterplots so that
@@ -215,22 +245,6 @@ class ZoomHandler(object):
     def lod_event(self, event):
         self.lod_mode = isinstance(event, LODStart)
 
-class CurrentResults(object):
-
-    def __init__(self):
-        self.clear()
-
-    def clear(self):
-        self.gcfs = []
-        self.spec = []
-        self.links = {} 
-        self.shared_strains = {}
-
-    def update(self, gcfs, spec, links, shared_strains):
-        self.gcfs = gcfs
-        self.spec = spec
-        self.links = links
-        self.shared_strains = shared_strains
 
 class NPLinkerBokeh(object):
 
@@ -251,8 +265,6 @@ class NPLinkerBokeh(object):
         self.spec_zoom = None
 
         self.score_helper = ScoringHelper(self.nh)
-
-        self.results = CurrentResults()
         self.filter_no_shared_strains = True
 
     @property
@@ -423,57 +435,12 @@ class NPLinkerBokeh(object):
             self.fig_spec.tools.remove(self.hover_spec)
             # self.fig_spec.tools.remove(self.taptool_spec)
 
-    # basic template for a bootstrap "card" element to display info about a
-    # given GCF/Spectrum etc
-    # format params:
-    # - unique id for header, e.g spec_heading_1
-    # - colour for header
-    # - unique id for body, e.g. spec_body_1
-    # - title text
-    # - id for body, same as #2
-    # - parent id 
-    # - main text
-    TMPL = '''
-            <div class="card">
-                <div class="card-header" id="{}" style="background-color: #{}">
-                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#{}">
-                        {}
-                    </button>
-                </div>
-                <div id="{}" class="collapse" data-parent="{}">
-                    <div class="card-body">
-                        {}
-                    </div>
-                </div>
-            </div>'''
 
-
-    # same as above but with an extra pair of parameters for the "onclick" handler and button id
-    TMPL_ON_CLICK = '''
-        <div class="card">
-            <div class="card-header" id="{}" style="background-color: #{}">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#{}" onclick="{}" id="{}">
-                    {}
-                </button>
-            </div>
-            <div id="{}" class="collapse" data-parent="{}">
-                <div class="card-body">
-                    {}
-                </div>
-            </div>
-        </div>'''
-
-    def gen_gcf_card(self, gcf, index):
-        pass
-
-    # TODO
-    # this pair of functions could really use some refactoring!
-
-    def update_bgc_output(self):
+    def update_genomics_output(self):
         """
-        Generate the HTML to display a list of BGC objects
+        Generates the genomics side of the scoring results 
         """
-        print('>> update_bgc_output for mode {}'.format(self.score_helper.mode_name))
+        print('>> update_genomics_output for mode {}'.format(self.score_helper.mode_name))
         content = ''
 
         if len(self.ds_bgc.selected.indices) == 0 and len(self.ds_spec.selected.indices) == 0:
@@ -572,13 +539,13 @@ class NPLinkerBokeh(object):
                     content += text
 
         self.bgc_div.text = content
-        print('<< update_bgc_output')
+        print('<< update_genomics_output')
 
-    def update_spec_output(self):
+    def update_metabolomics_output(self):
         """
         Generate the HTML to display a list of Spectrum objects
         """
-        print('>> update_spec_output')
+        print('>> update_metabolomics_output')
         content = ''
 
         if len(self.ds_bgc.selected.indices) == 0 and len(self.ds_spec.selected.indices) == 0:
@@ -668,7 +635,7 @@ class NPLinkerBokeh(object):
                 content += text
 
         self.spec_div.text = content
-        print('<< update_spec_output')
+        print('<< update_metabolomics_output')
 
     def get_links(self):
         """
@@ -699,7 +666,6 @@ class NPLinkerBokeh(object):
 
         # TODO why did i do this
         nplinker.clear_links() # TODO hack 
-        self.results.clear()
         current_method = nplinker.scoring.enabled()[self.scoring_method_group.active]
 
         # obtain a list of objects to be passed to the scoring function
@@ -756,17 +722,17 @@ class NPLinkerBokeh(object):
             otherobjs = set()
             for link_obj, sco_data in objs_with_scores.items():
                 otherobjs.update(sco_obj for sco_obj, sco in sco_data)
-            all_shared_strains = self.nh.nplinker.get_common_strains(objs_with_links, list(otherobjs), self.filter_no_shared_strains)
+            shared_strains = self.nh.nplinker.get_common_strains(objs_with_links, list(otherobjs), self.filter_no_shared_strains)
 
-            # the all_shared_strains dict is indexed by object pairs, ALWAYS with Spectra/MolFam
+            # the shared_strains dict is indexed by object pairs, ALWAYS with Spectra/MolFam
             # as the first entry in the tuple. the next step in filtering the results 
             # (if self.filter_no_shared_strains is True) is to go through the results and remove links where
-            # that pair does not appear in all_shared_strains
+            # that pair does not appear in shared_strains
             if self.filter_no_shared_strains:
                 print('Filtering out results with no shared strains, initial count={}'.format(len(objs_with_scores[objs_with_links[0]])))
                 print(objs_with_links)
 
-                # as keys in all_shared_strains are always (Spectra, GCF) or (MolFam, GCF)
+                # as keys in shared_strains are always (Spectra, GCF) or (MolFam, GCF)
                 # pairs, need to swap link_obj/sco_obj if using a mode where GCFs are link_objs
                 key_swap = False
                 if mode == SCO_MODE_BGC_SPEC or mode == SCO_MODE_GCF_SPEC or mode == SCO_MODE_BGC_MOLFAM or mode == SCO_MODE_GCF_MOLFAM:
@@ -778,7 +744,7 @@ class NPLinkerBokeh(object):
                     for sco_obj, score in sco_objs_and_scores:
                         # check if each pairing has any shared strains and if so add to set
                         key = (sco_obj, link_obj) if key_swap else (link_obj, sco_obj)
-                        if key in all_shared_strains:
+                        if key in shared_strains:
                             to_keep.add(sco_obj)
 
                     # rebuild list including only those in the set
@@ -816,28 +782,39 @@ class NPLinkerBokeh(object):
                 selected.update(score_obj_indices)
 
         print('After filtering, remaining objs={}'.format(len(objs_with_links)))
-
+        # at the end of the scoring process, we end up with 3 important data structures:
+        # - a subset of the input objects which have been determined to have links (objs_with_links)
+        # - the (filtered) set of objects that have links to those objects, with their scores (objs_with_scores)
+        # - the dict containing shared strain information between those two sets of objects (shared_strains)
+        # all of these should then be passed to the ScoringHelper object where they can be retrieved by the 
+        # functions that are responsible for generating the output HTML etc
         if len(objs_with_links) > 0:
-            # take the indexes of the corresponding spectra from the datasource and highlight on the other plot
-            if mode == SCO_MODE_BGC_SPEC or mode == SCO_MODE_GCF_SPEC:
-                self.ds_spec.selected.indices = list(selected)
-                self.results.update(gcfs, None, objs_with_scores, all_shared_strains)
-            elif mode == SCO_MODE_SPEC_GCF:
-                self.ds_bgc.selected.indices = list(selected)
-                self.results.update(None, spectra, objs_with_scores, all_shared_strains)
+            self.score_helper.set_results(objs_with_links, objs_with_scores, shared_strains)
+        else:
+            self.score_helper.clear()
 
-            self.update_alert('{} objects with links found'.format(len(objs_with_scores), 'primary'))
+        self.update_ui_post_scoring(selected)
+
+    def update_ui_post_scoring(self, selected_indices):
+        if len(self.score_helper.objs_with_links) > 0:
+            # take the indexes of the corresponding spectra from the datasource and highlight on the other plot
+            if self.score_helper.gen_to_met():
+                self.ds_spec.selected.indices = list(selected_indices)
+            else:
+                self.ds_bgc.selected.indices = list(selected_indices)
+
+            self.update_alert('{} objects with links found'.format(len(self.score_helper.objs_with_scores), 'primary'))
         else:
             print('No links found!')
-            if mode == SCO_MODE_BGC_SPEC or mode == SCO_MODE_GCF_SPEC:
+            # clear any selection on the "output" plot
+            if self.score_helper.gen_to_met():
                 self.ds_spec.selected.indices = []
             else:
                 self.ds_bgc.selected.indices = []
-            self.results.clear()
             self.update_alert('No links found for last selection', 'danger')
 
-        self.update_bgc_output()
-        self.update_spec_output()
+        self.update_genomics_output()
+        self.update_metabolomics_output()
 
     def bgc_selchanged(self, attr, old, new):
         """
@@ -851,8 +828,8 @@ class NPLinkerBokeh(object):
             # if selection is now empty, clear the selection on the spectra plot too
             self.ds_spec.selected.indices = []
 
-            self.update_bgc_output()
-            self.update_spec_output()
+            self.update_genomics_output()
+            self.update_metabolomics_output()
 
     def spec_selchanged(self, attr, old, new):
         """
@@ -866,8 +843,8 @@ class NPLinkerBokeh(object):
             # if selection is now empty, clear the selection on the BGC plot too
             self.ds_bgc.selected.indices = []
 
-            self.update_bgc_output()
-            self.update_spec_output()
+            self.update_genomics_output()
+            self.update_metabolomics_output()
 
     def metcalf_percentile_callback(self, attr, old, new):
         self.nh.nplinker.scoring.metcalf.sig_percentile = new
