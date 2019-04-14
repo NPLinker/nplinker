@@ -409,33 +409,6 @@ class NPLinkerBokeh(object):
             self.set_tap_behavior(self.fig_bgc, 'select')
             self.set_tap_behavior(self.fig_spec, 'inspect')
 
-    # messing with the tools for the plots seems to produce errors in browser console
-    # so these aren't currently used
-    def enable_bgc_hover(self):
-        if self.hover_bgc not in self.fig_bgc.tools:
-            self.fig_bgc.add_tools(self.hover_bgc)
-            # self.fig_bgc.add_tools(self.taptool_bgc)
-
-    def enable_spec_hover(self):
-        if self.hover_spec not in self.fig_spec.tools:
-            self.fig_spec.add_tools(self.hover_spec)
-            # self.fig_spec.add_tools(self.taptool_spec)
-
-    def disable_bgc_hover(self):
-        if self.hover_bgc in self.fig_bgc.tools:
-            # self.fig_bgc.tools.active_tap = None
-            # self.fig_bgc.tools.active_inspect = None
-            self.fig_bgc.tools.remove(self.hover_bgc)
-            # self.fig_bgc.tools.remove(self.taptool_bgc)
-
-    def disable_spec_hover(self):
-        if self.hover_spec in self.fig_spec.tools:
-            # self.fig_spec.tools.active_tap = None
-            # self.fig_spec.tools.active_inspect = None
-            self.fig_spec.tools.remove(self.hover_spec)
-            # self.fig_spec.tools.remove(self.taptool_spec)
-
-
     def update_genomics_output(self):
         """
         Generates the genomics side of the scoring results 
