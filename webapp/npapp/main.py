@@ -769,28 +769,23 @@ class NPLinkerBokeh(object):
                 print('Filtering out results with no shared strains, initial count={}'.format(len(objs_with_scores[objs_with_links[0]])))
                 print(objs_with_links)
 
-                # for each object which has links
-                # TODO can these be combined in a better way?
+                # as keys in all_shared_strains are always (Spectra, GCF) or (MolFam, GCF)
+                # pairs, need to swap link_obj/sco_obj if using a mode where GCFs are link_objs
+                key_swap = False
                 if mode == SCO_MODE_BGC_SPEC or mode == SCO_MODE_GCF_SPEC or mode == SCO_MODE_BGC_MOLFAM or mode == SCO_MODE_GCF_MOLFAM:
-                    for link_obj, sco_objs_and_scores in objs_with_scores.items():
-                        to_keep = set()
-                        for sco_obj, score in sco_objs_and_scores:
-                            # check if each pairing has any shared strains and if so add to set
-                            if (sco_obj, link_obj) in all_shared_strains:
-                                to_keep.add(sco_obj)
+                    key_swap = True
 
-                        # rebuild list including only those in the set
-                        objs_with_scores[link_obj] = [(sco_obj, score) for sco_obj, score in sco_objs_and_scores if sco_obj in to_keep]
-                else:
-                    for link_obj, sco_objs_and_scores in objs_with_scores.items():
-                        to_keep = set()
-                        for sco_obj, score in sco_objs_and_scores:
-                            # check if each pairing has any shared strains and if so add to set
-                            if (link_obj, sco_obj) in all_shared_strains:
-                                to_keep.add(sco_obj)
+                # for each object which has links
+                for link_obj, sco_objs_and_scores in objs_with_scores.items():
+                    to_keep = set()
+                    for sco_obj, score in sco_objs_and_scores:
+                        # check if each pairing has any shared strains and if so add to set
+                        key = (sco_obj, link_obj) if key_swap else (link_obj, sco_obj)
+                        if key in all_shared_strains:
+                            to_keep.add(sco_obj)
 
-                        # rebuild list including only those in the set
-                        objs_with_scores[link_obj] = [(sco_obj, score) for sco_obj, score in sco_objs_and_scores if sco_obj in to_keep]
+                    # rebuild list including only those in the set
+                    objs_with_scores[link_obj] = [(sco_obj, score) for sco_obj, score in sco_objs_and_scores if sco_obj in to_keep]
 
                 print('After filtering out results with no shared strains, initial count={}'.format(len(objs_with_scores[objs_with_links[0]])))
 
@@ -798,6 +793,8 @@ class NPLinkerBokeh(object):
             # back to indices on the plot so they can be highlighted
             selected = set()
             # TODO is this really needed???
+            # work out what gets passed to Results object and how that should go in more detail,
+            # maybe even combine with the ScoringHelper object?
             gcfs = set()
             for link_obj in objs_with_links:
                 score_obj_indices = []
