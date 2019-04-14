@@ -978,6 +978,7 @@ class NPLinkerBokeh(object):
             self.score_helper.set_metabolomics()
             self.set_inactive_plot(self.fig_bgc)
         self.update_plot_select_state(val)
+        self.sco_mode_changed()
 
     def bokeh_layout(self):
         self.spec_div = Div(text="", sizing_mode='scale_height', name='spec_div')
