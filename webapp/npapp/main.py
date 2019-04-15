@@ -1,6 +1,7 @@
 import os
 
-from bokeh.models.widgets import RadioGroup, Slider, Div, CheckboxButtonGroup, Select, CheckboxGroup, Toggle, Button
+from bokeh.models.widgets import RadioGroup, Slider, Div, CheckboxButtonGroup, Select, CheckboxGroup
+from bokeh.models.widgets import Toggle, Button, DataTable, TableColumn, TextInput
 from bokeh.layouts import row, column, widgetbox
 from bokeh.models import CustomJS
 from bokeh.plotting import figure, curdoc
@@ -153,10 +154,15 @@ class ScoringHelper(object):
         """
         scoring_objs = set()
 
+        # store these for later use
+        self.bgcs = bgcs
+        self.spectra = spectra
+
         if self.mode == SCO_MODE_BGC_SPEC or self.mode == SCO_MODE_BGC_MOLFAM:
             # in either of these two modes, we simply want to select the set 
             # of "parent" GCFs for each of the selected BGCs, which is simple:
             scoring_objs = [bgc.parent for bgc in bgcs]
+            self.gcfs = scoring_objs
         elif self.mode == SCO_MODE_GCF_SPEC or self.mode == SCO_MODE_GCF_MOLFAM:
             # this pair of modes are more complex. first build a set of *all* 
             # GCFs that contain *any* of the selected BGCs
@@ -178,6 +184,7 @@ class ScoringHelper(object):
 
                 scoring_objs.update(gcfs_for_bgc)
             print('Selection of {} BGCs => {} GCFs'.format(len(bgcs), len(scoring_objs)))
+            self.gcfs = list(scoring_objs)
         elif self.mode == SCO_MODE_SPEC_GCF:
             # in this mode can simply use the list of spectra
             scoring_objs = spectra
@@ -380,7 +387,6 @@ class NPLinkerBokeh(object):
         taptool.behavior = btype
 
     def set_inactive_plot(self, inactive):
-        print('set inactive')
         if self.fig_bgc == inactive:
             if 'indices' in self.ds_bgc.selected._callbacks and len(self.ds_bgc.selected._callbacks['indices']) > 0:
                 self.ds_bgc.selected.remove_on_change('indices', self.bgc_selchanged)
@@ -409,206 +415,207 @@ class NPLinkerBokeh(object):
             self.set_tap_behavior(self.fig_bgc, 'select')
             self.set_tap_behavior(self.fig_spec, 'inspect')
 
-    def update_genomics_output(self):
-        """
-        Generates the genomics side of the scoring results 
-        """
-        print('>> update_genomics_output for mode {}'.format(self.score_helper.mode_name))
-        content = ''
+    def generate_gcf_spec_result(self, pgindex, gcf, links):
+        # generate a GCF >> Spectra nested list
 
-        if len(self.ds_bgc.selected.indices) == 0 and len(self.ds_spec.selected.indices) == 0:
-            self.bgc_div.text = content
-            return
+        body = '<div class="accordion" id="accordion_gcf_{}">'.format(pgindex)
+        # generate the body content of the card by iterating over the spectra it matched
+        for j, spec_score in enumerate(links):
+            spec, score = spec_score
 
-        # scoring from BGCs to Spectra
-        # TODO should split this up to show GCFs
-        if self.score_helper.mode == SCO_MODE_BGC_SPEC or self.score_helper.mode == SCO_MODE_GCF_SPEC:
-            # in this mode, currently just want to show a simple flat list
-            # of the selected BGCs, with the ability to view GCF info as well
-            # TODO possibly show grouped by GCF instead? 
+            # if filtering out results with no shared strains is enabled, there should
+            # be no (spec, gcf) pairs not appearing in shared_strains. however might have
+            # the filtering disabled in which case will be pairs that don't appear
+            shared_strains = self.score_helper.shared_strains.get((spec, gcf), [])
 
-            content += '<h4>{} GCFs ({} BGCs)</h4>'.format(len(self.results.gcfs), len(self.ds_bgc.selected.indices))
+            spec_hdr_id = 'spec_result_header_{}_{}'.format(pgindex, j)
+            spec_body_id = 'spec_body_{}_{}'.format(pgindex, j)
+            spec_title = 'Spectrum(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.id, score, len(shared_strains))
 
-            # have to construct list of BGCs from the GCFs
-            bgcs = set()
-            for i, gcf in enumerate(self.results.gcfs):
-                bgcs.update(gcf.bgc_list)
+            spec_body = '<dl>'
+            for attr in ['id', 'spectrum_id', 'family']:
+                spec_body += '<dt>{}:</dt><dd>{}</dd>'.format(attr, getattr(spec, attr))
 
-            for i, bgc in enumerate(list(bgcs)):
-                gcf = bgc.parent
+            # add strain information (possibly empty)
+            if len(shared_strains) == 0:
+                spec_body += '<dt>shared strains: no shared strains'
+            else:
+                spec_body += '<dt>shared strains({}, {:.2f}%):</dt> <dd>{}</dd>'.format(len(shared_strains), 
+                                                                                        100 * (len(shared_strains) / len(spec.strain_list)),
+                                                                                        ', '.join(shared_strains))
+            spec_body += '<dt>all strains ({}):</dt> <dd>{}</dd>'.format(len(spec.strain_list), ', '.join(spec.strain_list))
+            spec_body += '</dl>'
 
-                # handle BGCs not in the current TSNE
-                if bgc.name not in self.bgc_indices:
-                    print('Skipping BGC {}'.format(bgc))
-                    continue
+            # set up the chemdoodle plot so it appears when the entry is expanded 
+            spec_btn_id = 'spec_btn_{}_{}'.format(pgindex, j)
+            spec_plot_id = 'spec_plot_{}_{}'.format(pgindex, j)
+            spec_body += '<canvas id="{}"></canvas>'.format(spec_plot_id)
 
-                hdr_id = 'bgc_header_{}'.format(i)
-                body_id = 'bgc_body_{}'.format(i)
-                title = 'BGC #{}, name={}'.format(i, bgc.name)
-                body = '<dl>'
-                for attr in ['name', 'strain']:
-                    body += '<dt>{}:</dt><dd>{}</dd>'.format(attr, getattr(bgc, attr))
-                body += '<dt>Parent GCF:</dt><dd>{}</dd>'.format(gcf)
-                body += '</dl>'
+            # note annoying escaping required here, TODO better way of doing this?
+            spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, spec.to_jcamp_str())
 
-                content += self.TMPL.format(hdr_id, 'b4c4e8', body_id, title, body_id, 'accordionBGC', body)
+            body += TMPL_ON_CLICK.format(hdr_id=spec_hdr_id, hdr_color='ffe0b5', btn_target=spec_body_id, btn_onclick=spec_onclick, btn_id=spec_btn_id, 
+                                         btn_text=spec_title, body_id=spec_body_id, body_parent='accordion_gcf_{}'.format(pgindex), body_body=spec_body)
 
-        # scoring from Spectra to GCFs
-        elif self.score_helper.mode == SCO_MODE_SPEC_GCF:
-            uniq_gcfs = set()
-            i = 0
-            unsorted = []
+        body += '</div>'
+        return body
 
-            if self.results.links is not None:
-                # results.links will be a dict keyed by Spectrum objects, values will be
-                # lists of (GCF, score) pairs
+    def generate_spec_gcf_result(self, pgindex, spec, links):
+        # generate a Spectrum >> GCF nested list
 
-                # want to construct a 2-level nested list, with the top level entries corresponding to
-                # the selected spectra and the contents of each being a list of the GCFs linked to that spectrum
+        body = '<div class="accordion" id="accordion_spec_{}>'.format(pgindex)
+        # now generate the body content of the card by iterating over the GCFs it matched
+        for j, gcf_score in enumerate(links):
+            gcf, score = gcf_score
 
-                # for each spectrum selected
-                for spec, gcf_scores in self.results.links.items():
-                    # construct the object info card header info
-                    hdr_id = 'spec_result_header_{}'.format(i)
-                    body_id = 'spec_result_body_{}'.format(i)
-                    title = '{} GCFs linked to {}'.format(len(gcf_scores), spec)
-                    body = '<div class="accordion" id="accordion_spec_{}>'.format(i)
-                    # now generate the body content of the card by iterating over the GCFs it matched
-                    for j, gcf_score in enumerate(gcf_scores):
-                        gcf, score = gcf_score
+            # if filtering out results with no shared strains is enabled, there should
+            # be no (spec, gcf) pairs not appearing in shared_strains. however might have
+            # the filtering disabled in which case will be pairs that don't appear
+            shared_strains = self.score_helper.shared_strains.get((spec, gcf), [])
 
-                        # if this test fails, it means this Spectrum:GCF pair had no shared strains
-                        # and will be excluded 
-                        if (spec, gcf) not in self.results.shared_strains:
-                            continue
+            # construct a similar object info card header for this GCF
+            gcf_hdr_id = 'gcf_result_header_{}_{}'.format(pgindex, j)
+            gcf_body_id = 'gcf_body_{}_{}'.format(pgindex, j)
+            gcf_title = 'GCF(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(gcf.id, score, len(shared_strains))
+            gcf_body = '<dl>'
+            for attr in ['id', 'short_gcf_id']:
+                gcf_body += '<dt>{}:</dt> <dd>{}</dd>'.format(attr, getattr(gcf, attr))
 
-                        shared_strains = self.results.shared_strains[(spec, gcf)]
-                        uniq_gcfs.add(gcf)
+            # add strain information
+            gcf_body += '<dt>shared ({}, {:.2f}%):</dt> <dd>{}</dd>'.format(len(shared_strains), 
+                                                                                        100 * (len(shared_strains) / len(gcf.bgc_list)),
+                                                                                        ', '.join(shared_strains))
+            gcf_body += '<dt>all ({}):</dt> <dd>{}</dd>'.format(len(gcf.bgc_list), ', '.join([bgc.name for bgc in gcf.bgc_list]))
+            gcf_body += '</dl>'
+            body += TMPL.format(hdr_id=gcf_hdr_id, hdr_color='ffe0b5', btn_target=gcf_body_id, btn_text=gcf_title, 
+                                body_id=gcf_body_id, body_parent='accordion_spec_{}'.format(pgindex), body_body=gcf_body)
 
-                        # construct a similar object info card header for this GCF
-                        gcf_hdr_id = 'gcf_result_header_{}_{}'.format(i, j)
-                        gcf_body_id = 'gcf_body_{}_{}'.format(i, j)
-                        gcf_title = 'GCF(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(gcf.id, score, len(shared_strains))
-                        gcf_body = '<dl>'
-                        for attr in ['id', 'short_gcf_id']:
-                            gcf_body += '<dt>{}:</dt> <dd>{}</dd>'.format(attr, getattr(gcf, attr))
+        body += '</div>'
+        return body
 
-                        # add strain information
-                        gcf_body += '<dt>shared ({}, {:.2f}%):</dt> <dd>{}</dd>'.format(len(shared_strains), 
-                                                                                                    100 * (len(shared_strains) / len(gcf.bgc_list)),
-                                                                                                    ', '.join(shared_strains))
-                        gcf_body += '<dt>all ({}):</dt> <dd>{}</dd>'.format(len(gcf.bgc_list), ', '.join([bgc.name for bgc in gcf.bgc_list]))
-                        gcf_body += '</dl>'
-                        body += self.TMPL.format(gcf_hdr_id, 'ffe0b5', gcf_body_id, gcf_title, gcf_body_id, 'accordion_spec_{}'.format(i), gcf_body)
-                        
-                    body += '</div>'
-                    unsorted.append((len(gcf_scores), self.TMPL.format(hdr_id, 'b4c4e8', body_id, title, body_id, 'accordionBGC', body)))
-                    i += 1
+    def update_results_gcf_spec(self):
+        content = '<h4>GCFs={}, linked spectra={}</h4>'.format(len(self.score_helper.gcfs), len(self.ds_spec.selected.indices))
+        pgindex = 0
+        unsorted = []
 
-                content += '<h4>Found {} linked GCFs</h4>'.format(len(uniq_gcfs))
-                # sort by number of GCFs linked to each spectra
-                sorted_gcfs = sorted(unsorted, key=lambda x: -x[0])
-                for _, text in sorted_gcfs:
-                    content += text
-
-        self.bgc_div.text = content
-        print('<< update_genomics_output')
-
-    def update_metabolomics_output(self):
-        """
-        Generate the HTML to display a list of Spectrum objects
-        """
-        print('>> update_metabolomics_output')
-        content = ''
-
-        if len(self.ds_bgc.selected.indices) == 0 and len(self.ds_spec.selected.indices) == 0:
-            self.spec_div.text = content
-            return
-
-        # scoring from Spectra to GCFs
-        if self.score_helper.mode == SCO_MODE_SPEC_GCF:
-            content += '<h4>{} selected spectra</h4>'.format(len(self.ds_spec.selected.indices))
-            i = 0
-            # here just need to show a flat list of spectra
-            for spec in self.results.spec:
-                hdr_id = 'spec_header_{}'.format(i)
-                body_id = 'spec_body_{}'.format(i)
-                title = 'id={}, family={}'.format(spec.id, spec.family)
-                body = '<dl>'
-                for attr in ['id', 'spectrum_id', 'family', 'strain_list']:
-                    body += '<dt>{}:</dt><dd>{}</dd>'.format(attr, getattr(spec, attr))
-                # TODO spectrum plot etc here too
-                body += '</dl>'
-                content += self.TMPL.format(hdr_id, 'adeaad', body_id, title, body_id, 'accordionSpec', body)
-                i += 1
+        for gcf, spec_scores in self.score_helper.objs_with_scores.items():
+            title = '{} spectra linked to GCF(id={})'.format(len(spec_scores), gcf.id)
+            hdr_id = 'gcf_result_header_{}'.format(pgindex)
+            body_id = 'gcf_result_body_{}'.format(pgindex)
+            body = self.generate_gcf_spec_result(pgindex, gcf, spec_scores)
             
-        # scoring from BGCs to Spectra
-        elif self.score_helper.mode == SCO_MODE_BGC_SPEC or self.score_helper.mode == SCO_MODE_GCF_SPEC:
-            content += '<h4>{} linked spectra</h4>'.format(len(self.ds_spec.selected.indices))
-            i = 0
-            unsorted = []
+            # TODO need to show info about the actual GCF (and BGCs?) here, e.g.
+            # gcf_hdr_id = 'gcf_result_header_{}_{}'.format(i, j)
+            # gcf_body_id = 'gcf_body_{}_{}'.format(i, j)
+            # gcf_title = 'GCF(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(gcf.id, score, len(shared_strains))
+            # gcf_body = '<dl>'
+            # for attr in ['id', 'short_gcf_id']:
+            #     gcf_body += '<dt>{}:</dt> <dd>{}</dd>'.format(attr, getattr(gcf, attr))
 
-            if self.results.links is not None:
-                # results.links will be a dict keyed by Spectrum objects, values will be
-                # lists of (GCF, score) pairs
+            # # add strain information
+            # gcf_body += '<dt>shared ({}, {:.2f}%):</dt> <dd>{}</dd>'.format(len(shared_strains), 
+            #                                                                             100 * (len(shared_strains) / len(gcf.bgc_list)),
+            #                                                                             ', '.join(shared_strains))
+            # gcf_body += '<dt>all ({}):</dt> <dd>{}</dd>'.format(len(gcf.bgc_list), ', '.join([bgc.name for bgc in gcf.bgc_list]))
+            # gcf_body += '</dl>'
+        
+            unsorted.append((len(spec_scores), TMPL.format(hdr_id=hdr_id, hdr_color='adeaad', 
+                                                           btn_target=body_id, btn_text=title, 
+                                                           body_id=body_id, body_parent='accordionResults', 
+                                                           body_body=body)))
+            pgindex += 1
 
-                # want to construct a 2-level nested list, with the top level entries corresponding to
-                # the selected spectra and the contents of each being a list of the GCFs linked to that spectrum
+        for _, text in sorted(unsorted, key=lambda x: -x[0]):
+            content += text
 
-                # for each GCF selected
-                for gcf, spec_scores in self.results.links.items():
-                    # construct the object info card header info
-                    hdr_id = 'gcf_result_header_{}'.format(i)
-                    body_id = 'gcf_result_body_{}'.format(i)
-                    body = '<div class="accordion" id="accordion_gcf_{}">'.format(i)
-                    spec_count = 0
-                    # now generate the body content of the card by iterating over the spectra it matched
-                    for j, spec_score in enumerate(spec_scores):
-                        spec, score = spec_score
+        return content
 
-                        # if this test fails, it means this Spectrum:GCF pair had no shared strains
-                        # and will be excluded 
-                        if (spec, gcf) not in self.results.shared_strains:
-                            continue
+    def update_results_gcf_molfam(self):
+        return '' # TODO
 
-                        spec_count += 1
-                        shared_strains = self.results.shared_strains[(spec, gcf)]
+    def update_results_spec_gcf(self):
+        pgindex = 0
+        unsorted = []
+        gcf_count = 0
 
-                        # TODO this could all be neater/templated or something
+        for spec, gcf_scores in self.score_helper.objs_with_scores.items():
+            title = '{} GCFs linked to {}'.format(len(gcf_scores), spec)
+            hdr_id = 'spec_result_header_{}'.format(pgindex)
+            body_id = 'spec_result_body_{}'.format(pgindex)
+            body = self.generate_spec_gcf_result(pgindex, spec, gcf_scores)
+            gcf_count += len(gcf_scores)
 
-                        spec_hdr_id = 'spec_result_header_{}_{}'.format(i, j)
-                        spec_body_id = 'spec_body_{}_{}'.format(i, j)
-                        spec_title = 'Spectrum(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.id, score, len(shared_strains))
-                        spec_body = '<dl>'
-                        for attr in ['id', 'spectrum_id', 'family']:
-                            spec_body += '<dt>{}:</dt><dd>{}</dd>'.format(attr, getattr(spec, attr))
-                        
-                        # add strain information
-                        spec_body += '<dt>shared ({}, {:.2f}%):</dt> <dd>{}</dd>'.format(len(shared_strains), 
-                                                                                                    100 * (len(shared_strains) / len(spec.strain_list)),
-                                                                                                    ', '.join(shared_strains))
-                        spec_body += '<dt>all ({}):</dt> <dd>{}</dd>'.format(len(spec.strain_list), ', '.join(spec.strain_list))
-                        spec_body += '</dl>'
-                        
-                        # set up the chemdoodle plot so it appears when the entry is expanded 
-                        spec_btn_id = 'spec_btn_{}_{}'.format(i, j)
-                        spec_plot_id = 'spec_plot_{}_{}'.format(i, j)
-                        spec_body += '<canvas id="{}"></canvas>'.format(spec_plot_id)
-                        # note annoying escaping required here, TODO better way of doing this?
-                        spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, spec.to_jcamp_str())
+            # TODO need to show info about the Spectrum (inc ChemDoodle plot) here somehow, e.g.
+            # spec_hdr_id = 'spec_result_header_{}_{}'.format(i, j)
+            # spec_body_id = 'spec_body_{}_{}'.format(i, j)
+            # spec_title = 'Spectrum(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.id, score, len(shared_strains))
+            # spec_body = '<dl>'
+            # for attr in ['id', 'spectrum_id', 'family']:
+            #     spec_body += '<dt>{}:</dt><dd>{}</dd>'.format(attr, getattr(spec, attr))
+            
+            # # add strain information
+            # spec_body += '<dt>shared ({}, {:.2f}%):</dt> <dd>{}</dd>'.format(len(shared_strains), 
+            #                                                                             100 * (len(shared_strains) / len(spec.strain_list)),
+            #                                                                             ', '.join(shared_strains))
+            # spec_body += '<dt>all ({}):</dt> <dd>{}</dd>'.format(len(spec.strain_list), ', '.join(spec.strain_list))
+            # spec_body += '</dl>'
+            
+            # # set up the chemdoodle plot so it appears when the entry is expanded 
+            # spec_btn_id = 'spec_btn_{}_{}'.format(i, j)
+            # spec_plot_id = 'spec_plot_{}_{}'.format(i, j)
+            # spec_body += '<canvas id="{}"></canvas>'.format(spec_plot_id)
+            # # note annoying escaping required here, TODO better way of doing this?
+            # spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, spec.to_jcamp_str())
 
-                        body += self.TMPL_ON_CLICK.format(spec_hdr_id, 'ffe0b5', spec_body_id, spec_onclick, spec_btn_id, spec_title, spec_body_id, 'accordion_gcf_{}'.format(i), spec_body)
+            unsorted.append((len(gcf_scores), TMPL.format(hdr_id=hdr_id, hdr_color='b4c4e8', 
+                                                         btn_target=body_id, btn_text=title,
+                                                         body_id=body_id, body_parent='accordionResults',
+                                                         body_body=body)))
 
-                    body += '</div>'
-                    title = '{} spectra linked to GCF(id={})'.format(spec_count, gcf.id)
-                    unsorted.append((len(spec_scores), self.TMPL.format(hdr_id, 'adeaad', body_id, title, body_id, 'accordionSpec', body)))
-                    i += 1
+            pgindex += 1
+        
+        content = '<h4>Spectra={}, linked GCFs={}</h4>'.format(len(self.score_helper.spectra), gcf_count)
 
-            for _, text in sorted(unsorted, key=lambda x: -x[0]):
-                content += text
+        for _, text in sorted(unsorted, key=lambda x: -x[0]):
+            content += text
 
-        self.spec_div.text = content
-        print('<< update_metabolomics_output')
+        return content
+
+    def update_results_molfam_gcf(self):
+        return '' # TODO
+
+    def update_results(self):
+        """
+        Called after scoring is completed. Generates HTML to display results and 
+        assigns it to the content of a bokeh div to insert into the DOM
+        """
+
+        # output generated will depend on the scoring mode selected:
+        # BGC/GCF to Spec: a list of GCFs, each containing a list of Spectra
+        # BGC/GCF to MolFam: a list of GCFs, each containing a list of MolFams
+        # Spec to GCF: a list of Spectra, each containing a list of GCFs
+        # MolFam to GCF: a list of MolFams, each containing a list of GCFs
+
+        if len(self.ds_bgc.selected.indices) == 0 and len(self.ds_spec.selected.indices) == 0:
+            self.results_div.text = ''
+            return
+
+        content = ''
+        # first thing to do is check the mode and then go from there
+        if self.score_helper.mode == SCO_MODE_BGC_SPEC or self.score_helper.mode == SCO_MODE_GCF_SPEC:
+            # both of these have the same format
+            content = self.update_results_gcf_spec()
+        elif self.score_helper.mode == SCO_MODE_BGC_MOLFAM or self.score_helper.mode == SCO_MODE_GCF_MOLFAM:
+            # as do these
+            content = self.update_results_gcf_molfam()
+        elif self.score_helper.mode == SCO_MODE_SPEC_GCF:
+            content = self.update_results_spec_gcf()
+        elif self.score_helper.mode == SCO_MODE_MOLFAM_GCF:
+            content = self.update_results_molfam_gcf()
+        else:
+            print('Unknown scoring mode selected! {}'.format(self.score_helper.mode))
+
+        self.results_div.text = content
 
     def get_links(self):
         """
@@ -714,7 +721,7 @@ class NPLinkerBokeh(object):
                 # for each object which has links
                 for link_obj, sco_objs_and_scores in objs_with_scores.items():
                     to_keep = set()
-                    for sco_obj, score in sco_objs_and_scores:
+                    for sco_obj, _ in sco_objs_and_scores:
                         # check if each pairing has any shared strains and if so add to set
                         key = (sco_obj, link_obj) if key_swap else (link_obj, sco_obj)
                         if key in shared_strains:
@@ -728,21 +735,16 @@ class NPLinkerBokeh(object):
             # final step here is to take the remaining list of scoring objects and map them
             # back to indices on the plot so they can be highlighted
             selected = set()
-            # TODO is this really needed???
-            # work out what gets passed to Results object and how that should go in more detail,
-            # maybe even combine with the ScoringHelper object?
-            gcfs = set()
             for link_obj in objs_with_links:
                 score_obj_indices = []
                 if mode == SCO_MODE_BGC_SPEC or mode == SCO_MODE_GCF_SPEC:
                     # for these modes, we can just lookup spectrum indices directly
                     score_obj_indices = [self.spec_indices[spec.spectrum_id] for (spec, score) in objs_with_scores[link_obj]]
-                    gcfs.add(link_obj)
                 elif mode == SCO_MODE_SPEC_GCF or mode == SCO_MODE_MOLFAM_GCF:
                     # here we have a list of GCFs, but the plot shows BGCs. so in order
                     # to highlight the BGCs, need to iterate over the list of GCFs 
                     score_obj_indices = set()
-                    for (gcf, score) in objs_with_scores[link_obj]:
+                    for gcf, _ in objs_with_scores[link_obj]:
                         bgc_names = [bgc.name for bgc in gcf.bgc_list]
                         for n in bgc_names:
                             try:
@@ -776,7 +778,7 @@ class NPLinkerBokeh(object):
             else:
                 self.ds_bgc.selected.indices = list(selected_indices)
 
-            self.update_alert('{} objects with links found'.format(len(self.score_helper.objs_with_scores), 'primary'))
+            self.update_alert('{} objects with links found'.format(len(self.score_helper.objs_with_scores)), 'primary')
         else:
             print('No links found!')
             # clear any selection on the "output" plot
@@ -786,8 +788,7 @@ class NPLinkerBokeh(object):
                 self.ds_bgc.selected.indices = []
             self.update_alert('No links found for last selection', 'danger')
 
-        self.update_genomics_output()
-        self.update_metabolomics_output()
+        self.update_results()
 
     def bgc_selchanged(self, attr, old, new):
         """
@@ -801,8 +802,7 @@ class NPLinkerBokeh(object):
             # if selection is now empty, clear the selection on the spectra plot too
             self.ds_spec.selected.indices = []
 
-            self.update_genomics_output()
-            self.update_metabolomics_output()
+            self.update_results()
 
     def spec_selchanged(self, attr, old, new):
         """
@@ -816,8 +816,7 @@ class NPLinkerBokeh(object):
             # if selection is now empty, clear the selection on the BGC plot too
             self.ds_bgc.selected.indices = []
 
-            self.update_genomics_output()
-            self.update_metabolomics_output()
+            self.update_resultupdate_results()
 
     def metcalf_percentile_callback(self, attr, old, new):
         self.nh.nplinker.scoring.metcalf.sig_percentile = new
@@ -916,9 +915,9 @@ class NPLinkerBokeh(object):
         self.sco_mode_changed()
 
     def bokeh_layout(self):
-        self.spec_div = Div(text="", sizing_mode='scale_height', name='spec_div')
-        self.bgc_div = Div(text="", sizing_mode='scale_height', name='bgc_div')
+        self.results_div = Div(text="", sizing_mode='scale_height', name='results_div')
 
+        # bgc plot selected by default so enable the selection change listener
         self.ds_bgc.selected.on_change('indices', self.bgc_selchanged)
 
         self.plot_toggles = CheckboxGroup(active=[PLOT_CMAP, PLOT_PRESERVE_COLOUR, PLOT_ONLY_SHARED_STRAINS], labels=PLOT_TOGGLES, name='plot_toggles')
@@ -973,20 +972,40 @@ class NPLinkerBokeh(object):
                                                     fig_spec.reset.emit();
                                                 """))
 
+        search_columns = [
+            TableColumn(field='id', title='ID'),
+            TableColumn(field='name', title='name')
+        ]
+        self.search_gcf_source = ColumnDataSource(data=self.nh.search_gcf_data)
+        self.search_spec_source = ColumnDataSource(data=self.nh.search_spec_data)
+        self.search_gcf_table = DataTable(source=self.search_gcf_source, columns=search_columns, name='search_gcf_table', width=800)
+        self.search_spec_table = DataTable(source=self.search_spec_source, columns=search_columns, name='search_spec_table', width=800)
+        # TODO can use this to convert selections in the table to selections on the plot
+        self.search_gcf_source.selected.on_change('indices', lambda a, o, n: print(a, o, n))
+        self.search_spec_source.selected.on_change('indices', lambda a, o, n: print(a, o, n))
+        self.search_gcf_input = TextInput(value='', title='Search:', name='search_gcf_input', width=200)
+        self.search_gcf_input.on_change('value', lambda a, o, n: print(a, o, n))
+        self.search_spec_input = TextInput(value='', title='Search:', name='search_spec_input', width=200)
+        self.search_spec_input.on_change('value', lambda a, o, n: print(a, o, n))
+
         curdoc().add_root(self.plot_toggles)
         curdoc().add_root(self.tsne_id_select)
         curdoc().add_root(self.reset_button)
         curdoc().add_root(self.alert_div)
         curdoc().add_root(self.fig_spec)
         curdoc().add_root(self.fig_bgc)
-        curdoc().add_root(self.spec_div)
-        curdoc().add_root(self.bgc_div)
+        curdoc().add_root(self.results_div)
         curdoc().add_root(self.plot_select)
         curdoc().add_root(self.mb_mode_group)
         curdoc().add_root(self.ge_mode_group)
         curdoc().add_root(self.scoring_method_group)
         curdoc().add_root(self.sliders)
         curdoc().add_root(self.debug_div)
+        curdoc().add_root(self.search_gcf_table)
+        curdoc().add_root(self.search_gcf_input)
+        curdoc().add_root(self.search_spec_table)
+        curdoc().add_root(self.search_spec_input)
+
         curdoc().title = 'nplinker webapp'
 
 # server_lifecycle.py adds a .nh attr to the current Document instance, use that
