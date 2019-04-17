@@ -755,8 +755,7 @@ class NPLinkerBokeh(object):
             # (if self.filter_no_shared_strains is True) is to go through the results and remove links where
             # that pair does not appear in shared_strains
             if self.filter_no_shared_strains:
-                print('Filtering out results with no shared strains, initial count={}'.format(len(objs_with_scores[objs_with_links[0]])))
-                print(objs_with_links)
+                print('Filtering out results with no shared strains, initial num of objects={}'.format(len(objs_with_scores)))
 
                 # as keys in shared_strains are always (Spectra, GCF) or (MolFam, GCF)
                 # pairs, need to swap link_obj/sco_obj if using a mode where GCFs are link_objs
@@ -781,12 +780,12 @@ class NPLinkerBokeh(object):
                     else:
                         objs_with_scores[link_obj] = [(sco_obj, score) for sco_obj, score in sco_objs_and_scores if sco_obj in to_keep]
 
-                print('After filtering out results with no shared strains, count={}'.format(len(objs_with_scores[objs_with_links[0]])))
                 if len(objs_to_remove) > 0:
                     print('Removing {} objects which now have no links'.format(len(objs_to_remove)))
                     for link_obj in objs_to_remove:
                         del objs_with_scores[link_obj]
                         objs_with_links.remove(link_obj)
+                print('After filtering out results with no shared strains, num of objects={}'.format(len(objs_with_scores)))
 
             # final step here is to take the remaining list of scoring objects and map them
             # back to indices on the plot so they can be highlighted
