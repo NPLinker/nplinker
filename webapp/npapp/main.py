@@ -169,6 +169,7 @@ class ScoringHelper(object):
 
             # this is the set of GCFs available in the current TSNE projection
             available_gcfs = self.nh.available_gcfs[tsne_id]
+            all_bgcs = set()
 
             # for each selected BGC...
             for bgc in bgcs:
@@ -183,8 +184,15 @@ class ScoringHelper(object):
                 gcfs_for_bgc = [gcf for gcf in gcfs_for_bgc if gcf in available_gcfs]
 
                 scoring_objs.update(gcfs_for_bgc)
+
+                for gcf in gcfs_for_bgc:
+                    all_bgcs.update(gcf.bgc_list)
+
             print('Selection of {} BGCs => {} GCFs'.format(len(bgcs), len(scoring_objs)))
             self.gcfs = list(scoring_objs)
+            # now need to update the set of BGCs selected to include all of those
+            print('Final total of BGCs: {}'.format(len(all_bgcs)))
+            self.bgcs = list(all_bgcs)
         elif self.mode == SCO_MODE_SPEC_GCF:
             # in this mode can simply use the list of spectra
             scoring_objs = spectra
@@ -386,31 +394,42 @@ class NPLinkerBokeh(object):
         taptool = plot.select(type=TapTool)[0]
         taptool.behavior = btype
 
+    def configure_bgc_selchanged_listener(self, enabled):
+        if enabled:
+            self.ds_bgc.selected.on_change('indices', self.bgc_selchanged)
+        else:
+            self.ds_bgc.selected.remove_on_change('indices', self.bgc_selchanged)
+
+    def configure_spec_selchanged_listener(self, enabled):
+        if enabled:
+            self.ds_spec.selected.on_change('indices', self.spec_selchanged)
+        else:
+            self.ds_spec.selected.remove_on_change('indices', self.spec_selchanged)
+
     def set_inactive_plot(self, inactive):
         if self.fig_bgc == inactive:
             if 'indices' in self.ds_bgc.selected._callbacks and len(self.ds_bgc.selected._callbacks['indices']) > 0:
-                self.ds_bgc.selected.remove_on_change('indices', self.bgc_selchanged)
+                self.configure_bgc_selchanged_listener(False)
             self.clear_selections()
             self.fig_spec.background_fill_color = ACTIVE_BG_FILL
             self.fig_spec.background_fill_alpha = ACTIVE_BG_ALPHA
             self.fig_bgc.background_fill_color = INACTIVE_BG_FILL
             self.fig_bgc.background_fill_alpha = INACTIVE_BG_ALPHA
-            self.ds_spec.selected.on_change('indices', self.spec_selchanged)
+            self.configure_spec_selchanged_listener(True)
 
-            
             self.set_tap_behavior(self.fig_bgc, 'inspect')
             self.set_tap_behavior(self.fig_spec, 'select')
 
         else:
             if 'indices' in self.ds_spec.selected._callbacks and len(self.ds_spec.selected._callbacks['indices']) > 0:
-                self.ds_spec.selected.remove_on_change('indices', self.spec_selchanged)
+                self.configure_spec_selchanged_listener(False)
 
             self.clear_selections()
             self.fig_bgc.background_fill_color = ACTIVE_BG_FILL
             self.fig_bgc.background_fill_alpha = ACTIVE_BG_ALPHA
             self.fig_spec.background_fill_color = INACTIVE_BG_FILL
             self.fig_spec.background_fill_alpha = INACTIVE_BG_ALPHA
-            self.ds_bgc.selected.on_change('indices', self.bgc_selchanged)
+            self.configure_bgc_selchanged_listener(True)
 
             self.set_tap_behavior(self.fig_bgc, 'select')
             self.set_tap_behavior(self.fig_spec, 'inspect')
@@ -449,7 +468,7 @@ class NPLinkerBokeh(object):
             # set up the chemdoodle plot so it appears when the entry is expanded 
             spec_btn_id = 'spec_btn_{}_{}'.format(pgindex, j)
             spec_plot_id = 'spec_plot_{}_{}'.format(pgindex, j)
-            spec_body += '<canvas id="{}"></canvas>'.format(spec_plot_id)
+            spec_body += '<center><canvas id="{}"></canvas></center>'.format(spec_plot_id)
 
             # note annoying escaping required here, TODO better way of doing this?
             spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, spec.to_jcamp_str())
@@ -659,6 +678,29 @@ class NPLinkerBokeh(object):
             self.clear_selections()
             return
 
+        # an extra step before continuing for some scoring modes is to expand the 
+        # set of selected objects. For example, in GCF->Spec mode, the initial selection
+        # of BGCs may grow as a result of selecting all GCFs containing any of those
+        # BGCs (and similarly for MolFam selection modes with Spectra)
+        # TODO this will also need done for GCF->MolFam and MolFam->GCF
+        if mode == SCO_MODE_GCF_SPEC:
+            print('Updating selection for GCF->Spec mode to include {} BGCs'.format(len(self.score_helper.bgcs)))
+            # disable the selection change listener briefly
+            self.configure_bgc_selchanged_listener(False)
+            # need to lookup the indices of each BGC in the bokeh datasource to get the indices
+            sel_indices = []
+            lookup = self.nh.bgc_indices[self.bgc_tsne_id]
+            for bgc in self.score_helper.bgcs:
+                if bgc.name not in lookup:
+                    # this might happen due to TSNE projection in use, or ???
+                    print('WARNING: missing BGC in bgc_indices = {}'.format(bgc.name))
+                    continue
+
+                sel_indices.append(lookup[bgc.name])
+            self.ds_bgc.selected.indices = sel_indices
+            print('Finished updating selection')
+            self.configure_bgc_selchanged_listener(True)
+
         # this method returns the input objects that have links based on the selected scoring parameters
         # (ie it will be a (possibly complete, possibly empty) subset of the original list
         objs_with_links = nplinker.get_links(scoring_objs, scoring_method=current_method)
@@ -722,6 +764,7 @@ class NPLinkerBokeh(object):
                 if mode == SCO_MODE_BGC_SPEC or mode == SCO_MODE_GCF_SPEC or mode == SCO_MODE_BGC_MOLFAM or mode == SCO_MODE_GCF_MOLFAM:
                     key_swap = True
 
+                objs_to_remove = []
                 # for each object which has links
                 for link_obj, sco_objs_and_scores in objs_with_scores.items():
                     to_keep = set()
@@ -731,10 +774,19 @@ class NPLinkerBokeh(object):
                         if key in shared_strains:
                             to_keep.add(sco_obj)
 
-                    # rebuild list including only those in the set
-                    objs_with_scores[link_obj] = [(sco_obj, score) for sco_obj, score in sco_objs_and_scores if sco_obj in to_keep]
+                    # rebuild list including only those in the set, removing any which now have zero links
+                    if len(to_keep) == 0:
+                        print('No remaining linked objects for {}, removing it!'.format(link_obj))
+                        objs_to_remove.append(link_obj)
+                    else:
+                        objs_with_scores[link_obj] = [(sco_obj, score) for sco_obj, score in sco_objs_and_scores if sco_obj in to_keep]
 
-                print('After filtering out results with no shared strains, initial count={}'.format(len(objs_with_scores[objs_with_links[0]])))
+                print('After filtering out results with no shared strains, count={}'.format(len(objs_with_scores[objs_with_links[0]])))
+                if len(objs_to_remove) > 0:
+                    print('Removing {} objects which now have no links'.format(len(objs_to_remove)))
+                    for link_obj in objs_to_remove:
+                        del objs_with_scores[link_obj]
+                        objs_with_links.remove(link_obj)
 
             # final step here is to take the remaining list of scoring objects and map them
             # back to indices on the plot so they can be highlighted
