@@ -899,16 +899,26 @@ class NPLinkerBokeh(object):
         self.update_alert('Scoring mode is now <strong>{}</strong>'.format(self.get_scoring_mode_text()))
 
     def mb_mode_callback(self, attr, old, new):
+        # only change active plot (and clear selections) if going from
+        # genomics mode -> metabolomics mode
+        if self.score_helper.from_genomics:
+            self.set_inactive_plot(self.fig_bgc)
         self.score_helper.update_metabolomics(new)
-        self.set_inactive_plot(self.fig_bgc)
         self.sco_mode_changed()
         self.update_plot_select_state(False)
-    
+        # update scoring based on current selection + new mode
+        self.get_links()
+
     def ge_mode_callback(self, attr, old, new):
+        # only change active plot (and clear selections) if going from
+        # metabolomics mode -> genomics mode
+        if not self.score_helper.from_genomics:
+            self.set_inactive_plot(self.fig_spec)
         self.score_helper.update_genomics(new)
-        self.set_inactive_plot(self.fig_spec)
         self.sco_mode_changed()
         self.update_plot_select_state(True)
+        # update scoring based on current selection + new mode
+        self.get_links()
 
     def plot_toggles_callback(self, attr, old, new):
         self.ren_bgc.glyph.fill_alpha = 0.6 if PLOT_ALPHA in new else 1.0
