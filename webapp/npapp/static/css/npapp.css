@@ -33,3 +33,7 @@
 #mb_mode > .bk-root {
     float: right;
 }
+
+.nolabel > label {
+    display: none !important;
+}
