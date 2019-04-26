@@ -37,3 +37,18 @@
 .nolabel > label {
     display: none !important;
 }
+
+/* adjust padding on accordion elements */
+.card-header {
+    padding: 0rem;
+}
+
+/* tweak layout for the checkboxes in search results */
+.btn-search-header {
+    min-width: 75% !important;
+}
+
+/* tweak layout for the checkboxes in search results */
+.search-input-container {
+    display: inline;
+}

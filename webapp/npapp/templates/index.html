@@ -37,6 +37,12 @@
             // remove the onclick handler
             $('#' + btn_id).prop("onclick", null).off("click");
         }
+
+        // simply toggles state of all search result checkboxes
+        function toggleSearchSelect() {
+            var checkboxes = $('input[class=search-input]');
+            checkboxes.prop("checked", !checkboxes.prop("checked"));
+        }
     </script>
 {% endblock %}
   
@@ -78,10 +84,10 @@
     </div>
     <div class="row">
         <div class="col-md-1"></div>
-        <div class="col-lg-5">
+        <div class="col-md-5">
             {{ embed(roots.fig_spec) }}
         </div>
-        <div class="col-lg-5">
+        <div class="col-md-5">
             {{ embed(roots.fig_bgc) }}
         </div>
         <div class="col-md-1"></div>
@@ -101,89 +107,135 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-md-10">
+        <div class="col-lg-1"></div>
+        <div class="col-lg-10">
             <ul class="nav nav-tabs" id="mainTab" role="tablist">
                 <li class="nav-item">
                     <a class="nav-link active" id="scoringTab" data-toggle="tab" href="#scoring_div" role="tab" aria-controls="scoring_div" aria-selected="true">Scoring</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="searchTab" data-toggle="tab" href="#search_div" role="tab" aria-controls="search_div" aria-selected="true">Search</a>
+                    <a class="nav-link" id="searchTab" data-toggle="tab" href="#search_results_div" role="tab" aria-controls="search_results_div" aria-selected="false">Search</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="debugOut" data-toggle="tab" href="#debug_out_div" role="tab" aria-controls="debug_out_div" aria-selected="false">Log</a>
                 </li>
             </ul>
-        </div>
-        <div class="col-md-1"></div>
-    </div>
 
-
-
-
-        <div class="tab-content" id="mainTabContent">
-            <div class="tab-pane  show active" id="scoring_div" role="tabpanel" aria-labelledby="scoringTab">
-                <div class="row">
-                    <div class="col-md-1"></div>
-                    <div class="col-lg-4" style="text-align: right">
-                        <h6 style="">Metabolomics scoring mode:</h6>
-                    </div>
-                    <div class="col-lg-2">
-                    </div>
-                    <div class="col-lg-4">
-                        <h6>Genomics scoring mode:</h6>
-                    </div>
-                    <div class="col-md-1"></div>
-                </div>
-                <div class="row">
-                    <div class="col-md-1"></div>
-                    <div class="col-lg-4" id="mb_mode">
-                        {{ embed(roots.mb_mode_group) }}
-                    </div>
-                    <div class="col-lg-2">
-                        {{ embed(roots.plot_select) }}
-                    </div>
-                    <div class="col-lg-4">
-                        {{ embed(roots.ge_mode_group) }}
-                    </div>
-                    <div class="col-md-1"></div>
-                </div>
-                <div class="row" style="background-color: #ffffff">
-                    <div class="col-md-1"></div>
-                    <div class="col-lg-10">
-                        <strong>Selected scoring method:</strong>
-                        {{ embed(roots.scoring_method_group) }}
-                        <strong>Method parameters</strong>
-                        {{ embed(roots.sliders) }}
-                    </div>
-                    <div class="col-md-1"></div>
-                </div>
-                <div class="row">
-                    <div class="col-md-1"></div>
-                    <div class="col-md-5">
-                        <div class="accordion" id="accordionSpec">
-                            {{ embed(roots.spec_div) }}
+            <!-- tab body content -->
+            <div class="tab-content" id="mainTabContent">
+                <!-- scoring tab content -->
+                <div class="tab-pane  show active" id="scoring_div" role="tabpanel" aria-labelledby="scoringTab">
+                    <div class="row">
+                        <div class="col-md-1"></div>
+                        <div class="col-lg-4" style="text-align: right">
+                            <h6 style="">Metabolomics scoring mode:</h6>
                         </div>
-                    </div>
-                    <div class="col-md-5">
-                        <div class="accordion" id="accordionBGC">
-                            {{ embed(roots.bgc_div) }}
+                        <div class="col-lg-2">
                         </div>
+                        <div class="col-lg-4">
+                            <h6>Genomics scoring mode:</h6>
+                        </div>
+                        <div class="col-md-1"></div>
                     </div>
-                    <div class="col-md-1"></div>
+                    <div class="row">
+                        <div class="col-md-1"></div>
+                        <div class="col-lg-4" id="mb_mode">
+                            {{ embed(roots.mb_mode_group) }}
+                        </div>
+                        <div class="col-lg-2">
+                            {{ embed(roots.plot_select) }}
+                        </div>
+                        <div class="col-lg-4">
+                            {{ embed(roots.ge_mode_group) }}
+                        </div>
+                        <div class="col-md-1"></div>
+                    </div>
+                    <div class="row" style="background-color: #ffffff">
+                        <div class="col-md-1"></div>
+                        <div class="col-lg-10">
+                            <strong>Selected scoring method:</strong>
+                            {{ embed(roots.scoring_method_group) }}
+                            <strong>Method parameters</strong>
+                            {{ embed(roots.sliders) }}
+                        </div>
+                        <div class="col-md-1"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-1"></div>
+                        <div class="col-md-10">
+                            <div class="accordion" id="accordionResults">
+                                {{ embed(roots.results_div) }}
+                            </div>
+                        </div>
+                        <div class="col-md-1"></div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="search_results_div" role="tabpanel" aria-labelledby="searchTab">
+                    <div class="row">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-6">
+                            Search on attribute:
+                            {{ embed(roots.search_type) }}
+                        </div>
+                        <div class="col-md-3"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-6">
+                            {{ embed(roots.search_input) }}
+                            <small>{{ embed(roots.search_regex) }}
+                            (<a href="https://docs.python.org/3/library/re.html#regular-expression-syntax">Python regular expressions</a> are supported. Click <a data-toggle="modal" href="#" data-target="#regexModal">here</a> to see some examples.)</small>
+                            <div class="modal" id="regexModal" tabindex="-1" role="dialog">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5>Regular expression examples</h5>
+                                        </div>
+                                        <div class="modal-body">
+                                            <ul>
+                                                <li><strong>ARHR.*cluster0\d5</strong> : match "ARHR", followed by any number of any character, then "cluster0[any digit]5" ("ARHR01000000_KB897363.1.cluster015", "ARHR01000000_KB897363.1.cluster045", etc)</li>
+                                                <li><strong>ARH[ABC].*</strong> : match anything starting with "ARHA", "ARHB", or "ARHC"</li>
+                                                <li><strong>^foo$</strong>: match "foo" exactly</li>
+                                            </ul>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn-secondary btn" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-6">
+                            {{ embed(roots.search_button) }} 
+                            {{ embed(roots.search_score_button) }}
+                        </div>
+                        <div class="col-md-3"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2"></div>
+                        <div class="col-md-8">
+                            {{ embed(roots.search_div_header) }}
+                            <div class="accordion" id="accordionSearch">
+                                {{ embed(roots.search_div_results) }}
+                            </div>
+                        </div>
+                        <div class="col-md-2"></div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="debug_out_div" role="tabpanel" aria-labelledby="debugOut">
+                    {{ embed(roots.debug_div) }}
                 </div>
             </div>
 
-            <div class="tab-pane " id="search_div" role="tabpanel" aria-labelledby="searchTab">
-                <div class="row">
-                    <div class="col-md-4"></div>
-                    <div class="col-md-4"></div>
-                    <div class="col-md-4"></div>
-                </div>
-            </div>
         </div>
+        <div class="col-lg-1"></div>
     </div>
-    <div class="row">
-        <div class="col-lg">
-            {{ embed(roots.debug_div) }}
-        </div>
-    </div>
+
 </div>
 {% endblock %}

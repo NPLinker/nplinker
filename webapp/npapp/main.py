@@ -8,7 +8,13 @@ from bokeh.plotting import figure, curdoc
 from bokeh.models import ColumnDataSource, HoverTool, TapTool, CDSView, IndexFilter
 from bokeh.events import LODEnd, LODStart, Reset
 
-from nplinker import Spectrum, GCF, MolecularFamily
+from metabolomics import Spectrum,MolecularFamily
+from genomics import GCF, BGC
+
+from searching import SEARCH_OPTIONS, Searcher
+
+# TODO all of this code doesn't have to be in the same module, could benefit from splitting up by
+# functionality (e.g. scoring, searching, UI, ...)
 
 # TOOLS="crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,undo,redo,reset,tap,save,box_select,poly_select,lasso_select,"
 TOOLS = "crosshair,pan,wheel_zoom,box_zoom,reset,save,box_select,tap"
@@ -35,6 +41,7 @@ METABOLOMICS_SCORING_MODES = ['manual', 'MolFam']
 
 GENOMICS_MODE_BGC, GENOMICS_MODE_GCF = range(2)
 METABOLOMICS_MODE_SPEC, METABOLOMICS_MODE_MOLFAM = range(2)
+
 
 # Scoring modes are:
 # 1. BGCs (i.e. the immediate parent GCFs) against Spectra
@@ -71,6 +78,10 @@ TMPL = open(os.path.join(os.path.dirname(__file__), 'templates/tmpl.basic.py.htm
 
 # same as above but with an extra pair of parameters for the "onclick" handler and button id
 TMPL_ON_CLICK = open(os.path.join(os.path.dirname(__file__), 'templates/tmpl.onclick.py.html')).read()
+
+TMPL_SEARCH = open(os.path.join(os.path.dirname(__file__), 'templates/tmpl.basic.search.py.html')).read()
+
+TMPL_SEARCH_ON_CLICK = open(os.path.join(os.path.dirname(__file__), 'templates/tmpl.onclick.search.py.html')).read()
 
 def get_radius(datasource):
     # this aims to set a sensible initial radius based on the dimensions of the plot
@@ -160,9 +171,10 @@ class ScoringHelper(object):
 
         if self.mode == SCO_MODE_BGC_SPEC or self.mode == SCO_MODE_BGC_MOLFAM:
             # in either of these two modes, we simply want to select the set 
-            # of "parent" GCFs for each of the selected BGCs, which is simple:
-            scoring_objs = [bgc.parent for bgc in bgcs]
-            self.gcfs = scoring_objs
+            # of "parent" GCFs for each of the selected BGCs, which is simple
+            # (although have to filter out dups here!)
+            scoring_objs = set([bgc.parent for bgc in bgcs])
+            self.gcfs = list(scoring_objs)
         elif self.mode == SCO_MODE_GCF_SPEC or self.mode == SCO_MODE_GCF_MOLFAM:
             # this pair of modes are more complex. first build a set of *all* 
             # GCFs that contain *any* of the selected BGCs
@@ -179,6 +191,7 @@ class ScoringHelper(object):
 
                 # ... get the set of GCFs of which it is a member...
                 gcfs_for_bgc = self.nh.bgc_gcf_lookup[bgc]
+                print('BGC {} parents = {}'.format(bgc, gcfs_for_bgc))
 
                 # ... and filter out any not in the current TSNE projection
                 gcfs_for_bgc = [gcf for gcf in gcfs_for_bgc if gcf in available_gcfs]
@@ -235,7 +248,6 @@ class ZoomHandler(object):
 
     def reset_event(self, e):
         radius = get_radius(self.renderer.data_source)
-        print('reset to  {}'.format(radius))
         self.renderer.glyph.radius = radius
 
     def update_ratio(self):
@@ -282,6 +294,8 @@ class NPLinkerBokeh(object):
         self.score_helper = ScoringHelper(self.nh)
         self.filter_no_shared_strains = True
 
+        self.searcher = Searcher(self.nh.nplinker)
+
     @property
     def bgc_data(self):
         return self.nh.bgc_data[self.bgc_tsne_id]
@@ -312,6 +326,7 @@ class NPLinkerBokeh(object):
         r_bgc = f_bgc.circle('x', 'y', source=self.bgc_datasource, name=self.bgc_tsne_id,
                 radius=radius,
                 radius_dimension='max',
+                # marker='marker',
                 fill_alpha=1.0, 
                 fill_color='fill',
                 line_color=None,
@@ -451,19 +466,7 @@ class NPLinkerBokeh(object):
             spec_body_id = 'spec_body_{}_{}'.format(pgindex, j)
             spec_title = 'Spectrum(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.id, score, len(shared_strains))
 
-            spec_body = '<dl>'
-            for attr in ['id', 'spectrum_id', 'family']:
-                spec_body += '<dt>{}:</dt><dd>{}</dd>'.format(attr, getattr(spec, attr))
-
-            # add strain information (possibly empty)
-            if len(shared_strains) == 0:
-                spec_body += '<dt>shared strains: no shared strains'
-            else:
-                spec_body += '<dt>shared strains({}, {:.2f}%):</dt> <dd>{}</dd>'.format(len(shared_strains), 
-                                                                                        100 * (len(shared_strains) / len(spec.strain_list)),
-                                                                                        ', '.join(shared_strains))
-            spec_body += '<dt>all strains ({}):</dt> <dd>{}</dd>'.format(len(spec.strain_list), ', '.join(spec.strain_list))
-            spec_body += '</dl>'
+            spec_body = self.generate_spec_info(spec, shared_strains)
 
             # set up the chemdoodle plot so it appears when the entry is expanded 
             spec_btn_id = 'spec_btn_{}_{}'.format(pgindex, j)
@@ -496,16 +499,7 @@ class NPLinkerBokeh(object):
             gcf_hdr_id = 'gcf_result_header_{}_{}'.format(pgindex, j)
             gcf_body_id = 'gcf_body_{}_{}'.format(pgindex, j)
             gcf_title = 'GCF(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(gcf.id, score, len(shared_strains))
-            gcf_body = '<dl>'
-            for attr in ['id', 'short_gcf_id']:
-                gcf_body += '<dt>{}:</dt> <dd>{}</dd>'.format(attr, getattr(gcf, attr))
-
-            # add strain information
-            gcf_body += '<dt>shared ({}, {:.2f}%):</dt> <dd>{}</dd>'.format(len(shared_strains), 
-                                                                                        100 * (len(shared_strains) / len(gcf.bgc_list)),
-                                                                                        ', '.join(shared_strains))
-            gcf_body += '<dt>all ({}):</dt> <dd>{}</dd>'.format(len(gcf.bgc_list), ', '.join([bgc.name for bgc in gcf.bgc_list]))
-            gcf_body += '</dl>'
+            gcf_body = self.generate_gcf_info(gcf, shared_strains)
             body += TMPL.format(hdr_id=gcf_hdr_id, hdr_color='ffe0b5', btn_target=gcf_body_id, btn_text=gcf_title, 
                                 body_id=gcf_body_id, body_parent='accordion_spec_{}'.format(pgindex), body_body=gcf_body)
 
@@ -534,13 +528,7 @@ class NPLinkerBokeh(object):
             body_id = 'gcf_result_body_{}'.format(pgindex)
 
             # first part of the body content is basic info about the GCF itself
-            body = 'GCF information:' 
-            body += '<dl>'
-            for attr in ['id', 'short_gcf_id']:
-                body += '<dt>{}:</dt> <dd>{}</dd>'.format(attr, getattr(gcf, attr))
-
-            body += '<dt>all strains ({}):</dt> <dd>{}</dd>'.format(len(gcf.bgc_list), ', '.join([bgc.name for bgc in gcf.bgc_list]))
-            body += '</dl>'
+            body = self.generate_gcf_info(gcf)
             body += '<hr/><h5>Linked objects:</h5>'
             # the second part is the list of linked spectra for the GCF, which is
             # generated by calling this method
@@ -575,13 +563,7 @@ class NPLinkerBokeh(object):
             gcf_count += len(gcf_scores)
 
             body = 'Spectrum information'
-            body = '<dl>'
-            for attr in ['id', 'spectrum_id', 'family']:
-                body += '<dt>{}:</dt><dd>{}</dd>'.format(attr, getattr(spec, attr))
-            
-            # add strain information
-            body += '<dt>all strains ({}):</dt> <dd>{}</dd>'.format(len(spec.strain_list), ', '.join(spec.strain_list))
-            body += '</dl>'
+            body += self.generate_spec_info(spec)
             
             # set up the chemdoodle plot so it appears when the entry is expanded 
             btn_id = 'spec_btn_{}'.format(pgindex)
@@ -592,9 +574,6 @@ class NPLinkerBokeh(object):
     
             body += '<hr/><h5>Linked objects:</h5>'
             body += self.generate_spec_gcf_result(pgindex, spec, gcf_scores)
-
-            # body += TMPL_ON_CLICK.format(hdr_id=spec_hdr_id, hdr_color='ffe0b5', btn_target=spec_body_id, btn_onclick=spec_onclick, btn_id=spec_btn_id, 
-            #                              btn_text=spec_title, body_id=spec_body_id, body_parent='accordion_gcf_{}'.format(pgindex), body_body=spec_body)
 
             unsorted.append((len(gcf_scores), TMPL_ON_CLICK.format(hdr_id=hdr_id, hdr_color='b4c4e8', 
                                                          btn_target=body_id, btn_onclick=onclick, btn_id=btn_id, 
@@ -636,7 +615,7 @@ class NPLinkerBokeh(object):
         elif self.score_helper.mode == SCO_MODE_MOLFAM_GCF:
             content = self.update_results_molfam_gcf()
         else:
-            print('Unknown scoring mode selected! {}'.format(self.score_helper.mode))
+            self.debug_log('Unknown scoring mode selected! {}'.format(self.score_helper.mode))
 
         self.results_div.text = content
 
@@ -646,6 +625,8 @@ class NPLinkerBokeh(object):
         """
         nplinker = self.nh.nplinker
         sel_indices = []
+
+        self.debug_log('Starting scoring process', False)
 
         # first check the scoring mode, which is determined by the state 
         # of the two sets of UI controls. based on the current mode, 
@@ -665,6 +646,7 @@ class NPLinkerBokeh(object):
 
         if len(sel_indices) == 0:
             self.update_alert('No objects selected', 'danger')
+            self.debug_log('No objects selected')
             return
 
         # TODO why did i do this
@@ -684,7 +666,7 @@ class NPLinkerBokeh(object):
         # BGCs (and similarly for MolFam selection modes with Spectra)
         # TODO this will also need done for GCF->MolFam and MolFam->GCF
         if mode == SCO_MODE_GCF_SPEC:
-            print('Updating selection for GCF->Spec mode to include {} BGCs'.format(len(self.score_helper.bgcs)))
+            self.debug_log('Updating selection for GCF->Spec mode to include {} BGCs'.format(len(self.score_helper.bgcs)))
             # disable the selection change listener briefly
             self.configure_bgc_selchanged_listener(False)
             # need to lookup the indices of each BGC in the bokeh datasource to get the indices
@@ -693,12 +675,12 @@ class NPLinkerBokeh(object):
             for bgc in self.score_helper.bgcs:
                 if bgc.name not in lookup:
                     # this might happen due to TSNE projection in use, or ???
-                    print('WARNING: missing BGC in bgc_indices = {}'.format(bgc.name))
+                    self.debug_log('WARNING: missing BGC in bgc_indices = {}'.format(bgc.name))
                     continue
 
                 sel_indices.append(lookup[bgc.name])
             self.ds_bgc.selected.indices = sel_indices
-            print('Finished updating selection')
+            self.debug_log('Finished updating selection')
             self.configure_bgc_selchanged_listener(True)
 
         # this method returns the input objects that have links based on the selected scoring parameters
@@ -730,7 +712,7 @@ class NPLinkerBokeh(object):
             # the first place, and in the latter case unavailable GCFs have been filtered
             # out already by calling generate_scoring_objects())
             if mode == SCO_MODE_SPEC_GCF or mode == SCO_MODE_MOLFAM_GCF:
-                print('Excluding GCFs from objs_with_scores')
+                self.debug_log('Excluding GCFs from objs_with_scores')
                 for spec_or_fam in list(objs_with_scores.keys()):
                     gcfs = [(gcf, score) for gcf, score in objs_with_scores[spec_or_fam] if gcf in self.nh.available_gcfs[self.bgc_tsne_id]]
 
@@ -738,7 +720,7 @@ class NPLinkerBokeh(object):
                     if len(gcfs) == 0:
                         del objs_with_scores[spec_or_fam]
                         objs_with_links.remove(spec_or_fam)
-                        print('Removing result {}'.format(spec_or_fam))
+                        self.debug_log('Removing result {}'.format(spec_or_fam))
                     else:
                         # otherwise just overwrite the original list
                         objs_with_scores[spec_or_fam] = gcfs
@@ -755,7 +737,7 @@ class NPLinkerBokeh(object):
             # (if self.filter_no_shared_strains is True) is to go through the results and remove links where
             # that pair does not appear in shared_strains
             if self.filter_no_shared_strains:
-                print('Filtering out results with no shared strains, initial num of objects={}'.format(len(objs_with_scores)))
+                self.debug_log('Filtering out results with no shared strains, initial num of objects={}'.format(len(objs_with_scores)))
 
                 # as keys in shared_strains are always (Spectra, GCF) or (MolFam, GCF)
                 # pairs, need to swap link_obj/sco_obj if using a mode where GCFs are link_objs
@@ -775,17 +757,17 @@ class NPLinkerBokeh(object):
 
                     # rebuild list including only those in the set, removing any which now have zero links
                     if len(to_keep) == 0:
-                        print('No remaining linked objects for {}, removing it!'.format(link_obj))
+                        self.debug_log('No remaining linked objects for {}, removing it!'.format(link_obj))
                         objs_to_remove.append(link_obj)
                     else:
                         objs_with_scores[link_obj] = [(sco_obj, score) for sco_obj, score in sco_objs_and_scores if sco_obj in to_keep]
 
                 if len(objs_to_remove) > 0:
-                    print('Removing {} objects which now have no links'.format(len(objs_to_remove)))
+                    self.debug_log('Removing {} objects which now have no links'.format(len(objs_to_remove)))
                     for link_obj in objs_to_remove:
                         del objs_with_scores[link_obj]
                         objs_with_links.remove(link_obj)
-                print('After filtering out results with no shared strains, num of objects={}'.format(len(objs_with_scores)))
+                self.debug_log('After filtering out results with no shared strains, num of objects={}'.format(len(objs_with_scores)))
 
             # final step here is to take the remaining list of scoring objects and map them
             # back to indices on the plot so they can be highlighted
@@ -805,13 +787,13 @@ class NPLinkerBokeh(object):
                             try:
                                 score_obj_indices.add(self.bgc_indices[n])
                             except KeyError:
-                                print('Warning: missing index for BGC: {} in GCF: {}'.format(n, gcf))
+                                self.debug_log('Warning: missing index for BGC: {} in GCF: {}'.format(n, gcf))
                     score_obj_indices = list(score_obj_indices)
 
                 # add these indices to the overall set
                 selected.update(score_obj_indices)
 
-        print('After filtering, remaining objs={}'.format(len(objs_with_links)))
+        self.debug_log('All filtering completed, remaining objs={}'.format(len(objs_with_links)))
         # at the end of the scoring process, we end up with 3 important data structures:
         # - a subset of the input objects which have been determined to have links (objs_with_links)
         # - the (filtered) set of objects that have links to those objects, with their scores (objs_with_scores)
@@ -835,7 +817,7 @@ class NPLinkerBokeh(object):
 
             self.update_alert('{} objects with links found'.format(len(self.score_helper.objs_with_scores)), 'primary')
         else:
-            print('No links found!')
+            self.debug_log('No links found!')
             # clear any selection on the "output" plot
             if self.score_helper.gen_to_met():
                 self.ds_spec.selected.indices = []
@@ -961,6 +943,13 @@ class NPLinkerBokeh(object):
     def clear_alert(self):
         self.alert_div.text = ''
 
+    def debug_log(self, msg, append=True):
+        if append:
+            self.debug_div.text += '{}<br/>'.format(msg)
+        else:
+            self.debug_div.text = '{}</br>'.format(msg)
+        print('debug_log: {}'.format(msg))
+
     def update_plot_select_state(self, gen_to_met):
         if gen_to_met:
             self.plot_select.label = SCORING_GEN_TO_MET
@@ -970,38 +959,238 @@ class NPLinkerBokeh(object):
             self.plot_select.css_classes = ['button-metabolomics']
 
     def plot_select_callback(self, val):
-        if val:
+        if val: # switch to genomics selection mode
             self.score_helper.set_genomics()
             self.set_inactive_plot(self.fig_spec)
-        else:
+        else: # metabolomics selection mode
             self.score_helper.set_metabolomics()
             self.set_inactive_plot(self.fig_bgc)
         self.update_plot_select_state(val)
         self.sco_mode_changed()
 
+    def search_type_callback(self, attr, old, new):
+        print('Search type is now: {}={}'.format(new, SEARCH_OPTIONS.index(new)))
+
+    def generate_bgc_info(self, bgc):
+        bgc_body = '<ul>'
+        for attr in ['strain', 'name', 'bigscape_class']:
+            bgc_body += '<li><strong>{}</strong>: {}</li>'.format(attr, getattr(bgc, attr))
+
+        bgc_body += '</ul>'
+        return bgc_body
+
+    def generate_gcf_info(self, gcf, shared_strains=None):
+        gcf_body = '<ul>'
+        for attr in ['id', 'short_gcf_id']:
+            gcf_body += '<li><strong>{}</strong>: {}</li>'.format(attr, getattr(gcf, attr))
+
+        # add strain information
+        if shared_strains is not None and len(shared_strains) > 0:
+            gcf_body += '<li><strong>shared strains ({}, {:.2f}%)</strong>: {}</li>'.format(len(shared_strains), 
+                                                                                    100 * (len(shared_strains) / len(gcf.bgc_list)),
+                                                                                    ', '.join(shared_strains))
+        # add strain information
+        gcf_body += '<li><strong>all strains ({}):</strong> {}</li>'.format(len(gcf.bgc_list), ', '.join([bgc.strain or '[{}]'.format(bgc.name) for bgc in gcf.bgc_list]))
+
+        gcf_body += '</ul>'
+
+        return gcf_body
+
+    def generate_spec_info(self, spec, shared_strains=None):
+        spec_body = '<ul>'
+        for attr in ['id', 'spectrum_id', 'family', 'rt', 'total_ms2_intensity', 'max_ms2_intensity', 'n_peaks', 'precursor_mz', 'parent_mz']:
+            spec_body += '<li><strong>{}</strong>: {}</li>'.format(attr, getattr(spec, attr))
+        spec_body += '<li><strong>all strains ({})</strong>: {}</li>'.format(len(spec.strain_list), ', '.join(spec.strain_list))
+
+        # add strain information (possibly empty)
+        if shared_strains is not None and len(shared_strains) > 0:
+            spec_body += '<li><strong>shared strains ({}, {:.2f}%):</strong> {}</li>'.format(len(shared_strains), 
+                                                                                    100 * (len(shared_strains) / len(spec.strain_list)),
+                                                                                    ', '.join(shared_strains))
+
+        if len(spec.annotations) > 0:
+            spec_body += '<strong>Annotations:</strong><ul>'
+            for a, b in spec.annotations:
+                spec_body += '<li><strong>{}</strong>: {}</li>'.format(a, b)
+        spec_body += '</ul>'
+        return spec_body
+
+    def generate_molfam_info(self, molfam, shared_strains=[]):
+        pass # TODO
+
+    def generate_search_output_bgc(self, bgcs):
+        body = ''
+        for i, bgc in enumerate(bgcs):
+            bgc_hdr_id = 'bgc_search_header_{}'.format(i)
+            bgc_body_id = 'bgc_search_body_{}'.format(i)
+            bgc_title = 'BGC(name={})'.format(bgc.name)
+            bgc_body = self.generate_bgc_info(bgc)
+            body += TMPL_SEARCH.format(hdr_id=bgc_hdr_id, hdr_color='dddddd', btn_target=bgc_body_id, btn_text=bgc_title, 
+                                result_index=str(i), body_id=bgc_body_id, body_parent='accordionSearch', body_body=bgc_body)
+
+        
+        return body
+
+    def generate_search_output_gcf(self, gcfs):
+        body = ''
+        for i, gcf in enumerate(gcfs):
+            gcf_hdr_id = 'gcf_search_header_{}'.format(i)
+            gcf_body_id = 'gcf_search_body_{}'.format(i)
+            gcf_title = 'GCF(id={}, gcf_id={}, strains={})'.format(gcf.id, gcf.short_gcf_id, len(gcf.bgc_list))
+            gcf_body = self.generate_gcf_info(gcf)
+            body += TMPL_SEARCH.format(hdr_id=gcf_hdr_id, hdr_color='dddddd', btn_target=gcf_body_id, btn_text=gcf_title, 
+                                result_index=str(i), body_id=gcf_body_id, body_parent='accordionSearch', body_body=gcf_body)
+
+        return body
+
+
+    def generate_search_output_spec(self, spectra):
+        body = ''
+        for i, spec in enumerate(spectra):
+            spec_hdr_id = 'spec_search_header_{}'.format(i)
+            spec_body_id = 'spec_search_body_{}'.format(i)
+            spec_title = 'Spectrum(id={}, strains={})'.format(spec.id, len(spec.strain_list))
+
+            spec_body = self.generate_spec_info(spec)
+
+            # set up the chemdoodle plot so it appears when the entry is expanded 
+            spec_btn_id = 'spec_search_btn_{}'.format(i)
+            spec_plot_id = 'spec_search_plot_{}'.format(i)
+            spec_body += '<center><canvas id="{}"></canvas></center>'.format(spec_plot_id)
+
+            # note annoying escaping required here, TODO better way of doing this?
+            spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, spec.to_jcamp_str())
+
+            body += TMPL_SEARCH_ON_CLICK.format(hdr_id=spec_hdr_id, hdr_color='dddddd', btn_target=spec_body_id, btn_onclick=spec_onclick, btn_id=spec_btn_id, 
+                                         result_index=str(i), btn_text=spec_title, body_id=spec_body_id, body_parent='accordionSearch', body_body=spec_body)
+
+        return body
+
+    def generate_search_output_molfam(self, molfams):
+        return ''
+
+    def generate_search_output(self, results):
+        hdr = '<h4>{} results found</h4>'.format(len(results))
+        if len(results) == 0:
+            self.search_div_header.text = hdr
+            self.search_div_results.text = ''
+            return
+
+        hdr = '<h4><button type="button" class="btn btn-info" onclick="toggleSearchSelect()">{} results found, click to select/deselect all</button></h4>'.format(len(results))
+        self.search_div_header.text = hdr
+
+        html = ''
+        if isinstance(results[0], BGC):
+            html += self.generate_search_output_bgc(results)
+        elif isinstance(results[0], GCF):
+            html += self.generate_search_output_gcf(results)
+        elif isinstance(results[0], Spectrum):
+            html += self.generate_search_output_spec(results)
+        elif isinstance(results[0], MolecularFamily):
+            html += self.generate_search_output_molfam(results)
+            
+        self.search_div_results.text = html
+
+    def search_button_callback(self):
+        self.generate_search_output(self.searcher.search(self.search_type.value, self.search_input.value, len(self.search_regex.active) == 1))
+
+    def search_score_button_callback(self):
+        # check if the user responded yes/no to query (the JS callback for this button 
+        # is triggered before the python callback)
+        if not self.confirm_response.data['resp'][0]:
+            print('Bailing out due to JS confirmation')
+            return
+
+        # retrieve the set of selected indices from the Javascript callback and create subset of results
+        selected_indices = list(map(int, self.confirm_response.data['selected'][0]))
+        results = [self.searcher.results[i] for i in selected_indices]
+        if len(results) == 0:
+            self.update_alert('No search results!')
+            return
+
+        # may need to change scoring mode here
+        # if results are BGCs, switch to genomics mode and select the BGC mode
+        # TODO other modes to be handled
+        if isinstance(results[0], BGC):
+            print('scoring based on bgc results')
+            print('current scoring mode gen? {}'.format(self.score_helper.from_genomics))
+            if not self.score_helper.from_genomics:
+                print('switching to genomics mode')
+                # set this to true to trigger callback as if button clicked
+                self.plot_select.active = True
+                self.update_plot_select_state(True)
+            # now select bgc mode
+            self.ge_mode_group.active = 0
+
+            # and finally update selection to trigger scoring
+            indices = [self.nh.bgc_indices[self.bgc_tsne_id][bgc.name] for bgc in results]
+            self.ds_bgc.selected.indices = indices
+        # if results are GCFs, switch to genomics mode and select the GCF mode
+        elif isinstance(results[0], GCF):
+            print('scoring based on gcf results')
+            print('current scoring mode gen? {}'.format(self.score_helper.from_genomics))
+            if not self.score_helper.from_genomics:
+                print('switching to genomics mode')
+                # set this to true to trigger callback as if button clicked
+                self.plot_select.active = True
+                self.update_plot_select_state(True)
+            # now select gcf mode
+            self.ge_mode_group.active = 1
+
+            # and finally update selection to trigger scoring, by building a list
+            # of all the BGC indices corresponding to these GCFs
+            bgcs = set()
+            for gcf in results:
+                bgcs.update(gcf.bgc_list)
+            indices = [self.nh.bgc_indices[self.bgc_tsne_id][bgc.name] for bgc in bgcs]
+            self.ds_bgc.selected.indices = indices
+        elif isinstance(results[0], Spectrum):
+            print('scoring based on spectra results')
+            print('current scoring mode met? {}'.format(not self.score_helper.from_genomics))
+
+            if self.score_helper.from_genomics:
+                print('switching to metabolomics mode')
+                # set this to False to trigger callback as if button clicked
+                self.plot_select.active = False
+                self.update_plot_select_state(False)
+            # now select spectrum mode
+            self.mb_mode_group.active = 0
+
+            # finally update the selection to trigger scoring
+            indices = [self.nh.spec_indices[spec.spectrum_id] for spec in results]
+            self.ds_spec.selected.indices = indices
+
     def bokeh_layout(self):
+        widgets = []
         self.results_div = Div(text="", sizing_mode='scale_height', name='results_div')
+        widgets.append(self.results_div)
 
         # bgc plot selected by default so enable the selection change listener
         self.ds_bgc.selected.on_change('indices', self.bgc_selchanged)
 
         self.plot_toggles = CheckboxGroup(active=[PLOT_CMAP, PLOT_PRESERVE_COLOUR, PLOT_ONLY_SHARED_STRAINS], labels=PLOT_TOGGLES, name='plot_toggles')
         self.plot_toggles.on_change('active', self.plot_toggles_callback)
+        widgets.append(self.plot_toggles)
 
         self.tsne_id_select = Select(title='BGC TSNE:', value=self.bgc_tsne_id, options=self.bgc_tsne_id_list, name='tsne_id_select')
         self.tsne_id_select.on_change('value', self.tsne_id_callback)
+        widgets.append(self.tsne_id_select)
 
         self.mb_mode_group = RadioGroup(labels=METABOLOMICS_SCORING_MODES, active=0, name='mb_mode_group', css_classes=['modes-metabolomics'])
         self.mb_mode_group.on_change('active', self.mb_mode_callback)
+        widgets.append(self.mb_mode_group)
 
         self.plot_select = Toggle(label=SCORING_GEN_TO_MET, name='plot_select', active=True, css_classes=['button-genomics'])
         self.plot_select.on_click(self.plot_select_callback)
+        widgets.append(self.plot_select)
 
         self.ge_mode_group = RadioGroup(labels=GENOMICS_SCORING_MODES, active=0, name='ge_mode_group')
         self.ge_mode_group.on_change('active', self.ge_mode_callback)
+        widgets.append(self.ge_mode_group)
 
         self.scoring_method_group = RadioGroup(labels=[m for m in self.nh.nplinker.scoring.enabled_names()], active=0, name='scoring_method_group')
         self.scoring_method_group.on_change('active', self.scoring_method_callback)
+        widgets.append(self.scoring_method_group)
 
         # metcalf stuff
         self.metcalf_percentile = Slider(start=70, end=100, value=self.nh.nplinker.scoring.metcalf.sig_percentile, step=1, title='[metcalf] sig_percentile')
@@ -1021,57 +1210,96 @@ class NPLinkerBokeh(object):
         if self.nh.nplinker.scoring.likescore.enabled:
             active_sliders.append(self.likescore_cutoff)
         self.sliders = row(active_sliders, name='sliders')
+        widgets.append(self.sliders)
 
         # for debug output etc 
         self.debug_div = Div(text="", name='debug_div')
+        widgets.append(self.debug_div)
 
         # status updates/errors
         self.alert_div = Div(text="", name='alert_div')
+        widgets.append(self.alert_div)
 
         # "reset everything" button
-        self.reset_button = Button(name='reset_button', label='Reset state')
+        self.reset_button = Button(name='reset_button', label='Reset state', button_type='danger')
         # no python method to reset plots, for some reason...
         self.reset_button.js_on_click(CustomJS(args=dict(fig_bgc=self.fig_bgc, fig_spec=self.fig_spec), 
                                                code=""" 
                                                     fig_bgc.reset.emit();
                                                     fig_spec.reset.emit();
                                                 """))
+        widgets.append(self.reset_button)
 
-        search_columns = [
-            TableColumn(field='id', title='ID'),
-            TableColumn(field='name', title='name')
-        ]
-        self.search_gcf_source = ColumnDataSource(data=self.nh.search_gcf_data)
-        self.search_spec_source = ColumnDataSource(data=self.nh.search_spec_data)
-        self.search_gcf_table = DataTable(source=self.search_gcf_source, columns=search_columns, name='search_gcf_table', width=800)
-        self.search_spec_table = DataTable(source=self.search_spec_source, columns=search_columns, name='search_spec_table', width=800)
+        self.search_input = TextInput(value='', title='Search for:', name='search_input')
+        # TODO this can be used to trigger a search too, but annoyingly it is triggered when
+        # a) enter is pressed (which is fine) 
+        #   OR
+        # b) the widget is unfocused (which is a bit stupid because if the user is unfocusing to
+        # go click the search button it will end up doing the search twice)
+        # self.search_input.on_change('value', lambda a, o, n : self.search_button_callback())
+        widgets.append(self.search_input)
+
         # TODO can use this to convert selections in the table to selections on the plot
-        self.search_gcf_source.selected.on_change('indices', lambda a, o, n: print(a, o, n))
-        self.search_spec_source.selected.on_change('indices', lambda a, o, n: print(a, o, n))
-        self.search_gcf_input = TextInput(value='', title='Search:', name='search_gcf_input', width=200)
-        self.search_gcf_input.on_change('value', lambda a, o, n: print(a, o, n))
-        self.search_spec_input = TextInput(value='', title='Search:', name='search_spec_input', width=200)
-        self.search_spec_input.on_change('value', lambda a, o, n: print(a, o, n))
+        self.foo = ColumnDataSource(data={'data': [1,2,3,4,5]})
+        # self.foo.on_change('data', lambda a, o, n: print('FOO', a, o, n))
+        self.search_button = Button(name='search_button', label='Search', button_type='primary')
+        # conveniently on_click seems to get called after js_on_click, so we can do stuff on the 
+        # JS side in the CustomJS callback and then pick up the changes in the on_click handler
+        # on the Python side
 
-        curdoc().add_root(self.plot_toggles)
-        curdoc().add_root(self.tsne_id_select)
-        curdoc().add_root(self.reset_button)
-        curdoc().add_root(self.alert_div)
-        curdoc().add_root(self.fig_spec)
-        curdoc().add_root(self.fig_bgc)
-        curdoc().add_root(self.results_div)
-        curdoc().add_root(self.plot_select)
-        curdoc().add_root(self.mb_mode_group)
-        curdoc().add_root(self.ge_mode_group)
-        curdoc().add_root(self.scoring_method_group)
-        curdoc().add_root(self.sliders)
-        curdoc().add_root(self.debug_div)
-        curdoc().add_root(self.search_gcf_table)
-        curdoc().add_root(self.search_gcf_input)
-        curdoc().add_root(self.search_spec_table)
-        curdoc().add_root(self.search_spec_input)
+        self.search_button.on_click(self.search_button_callback)
+        widgets.append(self.search_button)
+
+        self.search_score_button = Button(name='search_score_button', label='Run scoring on selected results', button_type='warning')
+        self.search_score_button.on_click(self.search_score_button_callback)
+        self.confirm_response = ColumnDataSource(data={'resp': [None], 'selelected': [[]]})
+        self.search_score_button.js_on_click(CustomJS(args=dict(resp=self.confirm_response), code="""
+                // purpose of this callback is to ask the user to confirm scoring
+                // is desired if the number of selected objects is > 25 (arbitrary threshold),
+                // and also to extract the indices of the selected objects to return to the
+                // python code (this code is executed before the python callback)
+
+                // get the array of selected indices
+                var sel_indices = $('input[class=search-input]:checked').map(function() { return this.id; }).get();
+                if(sel_indices.length > 25) {
+                    // use a JS confirm dialog to get a response
+                    var answer = confirm(sel_indices.length + " objects selected, do you really want to run scoring? (may be slow!)");
+                    // switch to scoring tab if confirmed to proceed
+                    if(answer == true) {
+                        $('#scoringTab').tab('show');
+                    }
+                    // return the answer in the data source
+                    resp.data = {'resp': [answer], 'selected': [sel_indices] };
+                } else if(sel_indices.length > 0) {
+                    // in this case can just proceed directly to show scoring tab and return selection
+                    resp.data = {'resp': [true], 'selected': [sel_indices] };
+                    $('#scoringTab').tab('show');
+                }
+                resp.change.emit();
+                """))
+        widgets.append(self.search_score_button)
+
+        self.search_div_results = Div(text='', sizing_mode='scale_height', name='search_div_results')
+        widgets.append(self.search_div_results)
+
+        self.search_div_header = Div(text='', sizing_mode='scale_height', name='search_div_header')
+        widgets.append(self.search_div_header)
+
+        self.search_type = Select(options=SEARCH_OPTIONS, value=SEARCH_OPTIONS[0], name='search_type', css_classes=['nolabel'])
+        self.search_type.on_change('value', self.search_type_callback)
+        widgets.append(self.search_type)
+
+        self.search_regex = CheckboxGroup(labels=['Use regexes?'], active=[0], name='search_regex')
+        widgets.append(self.search_regex)
+
+        widgets.append(self.fig_spec)
+        widgets.append(self.fig_bgc)
+
+        for w in widgets:
+            curdoc().add_root(w)
 
         curdoc().title = 'nplinker webapp'
+        # curdoc().theme = 'dark_minimal'
 
 # server_lifecycle.py adds a .nh attr to the current Document instance, use that
 # to access the already-created NPLinker instance plus the TSNE data
