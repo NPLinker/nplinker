@@ -43,6 +43,13 @@
             var checkboxes = $('input[class=search-input]');
             checkboxes.prop("checked", !checkboxes.prop("checked"));
         }
+
+        function onChangeBGCTable(table_id, search_text) {
+            var search_term = $(search_text).val();
+            var table = $(table_id);
+            var showall = $(table_id + " tr").show();
+            var hidenotmatching = $(table_id + " tr:not(:contains('" + search_term + "'))").hide(); 
+        }
     </script>
 {% endblock %}
   
