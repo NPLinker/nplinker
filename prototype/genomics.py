@@ -5,12 +5,13 @@ import aa_pred
 from genomics_utilities import get_known_cluster_blast
 
 class BGC(object):
-    def __init__(self, strain, name, bigscape_class, product_prediction):
+    def __init__(self, strain, name, bigscape_class, product_prediction, description=None):
         self.strain = strain
         self.name = name
         self.bigscape_class = bigscape_class
         self.product_prediction = product_prediction
         self.parent = None
+        self.description = description
 
         self.antismash_file = None
         self._aa_predictions = None
@@ -20,7 +21,7 @@ class BGC(object):
         return str(self)
 
     def __str__(self):
-        return self.name + "(" + str(self.strain) + ")"
+        return self.__class__.__name__ + "(name=" + self.name + ", strain=" + str(self.strain) + ")"
 
     @property
     def aa_predictions(self):
@@ -127,7 +128,7 @@ class RandomGCF(object):
 class MiBIGBGC(BGC):
 
     def __init__(self, name, product_prediction):
-        super(MiBIGBGC, self).__init__(None, name, None, product_prediction)
+        super(MiBIGBGC, self).__init__(name, name, None, product_prediction)
 
 def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=None, antismash_format='flat', mibig_bgc_dict=None):
     strain_id_dict = {}
@@ -144,6 +145,15 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
             strain_id_dict[line[0]] = line[1]
 
     metadata = {}
+    # parse the annotation files (<dataset>/bigscape/<cluster_name>/Network_Annotations_<cluster_name>.tsv
+    # these contain fields:
+    # - BGC name/ID [0]
+    # - "Accession ID" [1]
+    # - Description [2]
+    # - Product prediction [3]
+    # - Bigscape class [4]
+    # - Organism [5]
+    # - Taxonomy [6]
     for a in ann_file_list:
         with open(a, 'rU') as f:
             reader = csv.reader(f, delimiter='\t')
@@ -155,7 +165,6 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
 
     for filename in network_file_list:
         with open(filename, 'rU') as f:
-            print('filename', filename)
             reader = csv.reader(f, delimiter='\t')
             heads = next(reader)
             for line in reader:
@@ -192,7 +201,7 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
                 # TODO should this happen? Any reason to have duplicate objects
                 # representing the same strain? 
                 if not strain_name == 'MiBIG':
-                    new_bgc = BGC(strain, name, bigscape_class, product_prediction)
+                    new_bgc = BGC(strain, name, bigscape_class, product_prediction, description)
                     if antismash_dir:
                         if antismash_format == 'flat':
                             antismash_filename = os.path.join(antismash_dir, new_bgc.name + '.gbk')
@@ -205,14 +214,21 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
                     bgc_list.append(new_bgc)
                 else:
                     num_mibig += 1
+                    # TODO should this not attempt to create any MiBIGBGC's if the dict
+                    # is not supplied??
+                    # TODO any reason not to supply the metadata fields that aren't set by
+                    # make_mibig_bgc_dict since metadata_line is available here?
                     if mibig_bgc_dict is not None:
                         try:
+                            print('NEW MIBIG', metadata_line)
                             new_bgc = mibig_bgc_dict[name.split('.')[0]]
                         except KeyError:
                             new_bgc = MiBIGBGC(name, product_prediction)
-                    # TODO add to bgc_list too???
+
+                    new_bgc.bigscape_class = bigscape_class
+                    new_bgc.description = description
+                    # TODO should add to bgc_list too???
                     bgc_list.append(new_bgc)
-                
 
                 if family not in gcf_dict:
                     new_gcf = GCF(family)
