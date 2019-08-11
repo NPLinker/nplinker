@@ -220,7 +220,6 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
                     # make_mibig_bgc_dict since metadata_line is available here?
                     if mibig_bgc_dict is not None:
                         try:
-                            print('NEW MIBIG', metadata_line)
                             new_bgc = mibig_bgc_dict[name.split('.')[0]]
                         except KeyError:
                             new_bgc = MiBIGBGC(name, product_prediction)
