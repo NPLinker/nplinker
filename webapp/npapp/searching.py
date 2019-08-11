@@ -3,6 +3,8 @@ import re
 SEARCH_OPT_BGC_NAME,\
 SEARCH_OPT_BGC_STRAIN,\
 SEARCH_OPT_BGC_BIGSCAPE_CLASS,\
+SEARCH_OPT_BGC_PRODUCT_PREDICTION,\
+SEARCH_OPT_BGC_DESCRIPTION,\
 SEARCH_OPT_GCF_ID,\
 SEARCH_OPT_GCF_STRAINS,\
 SEARCH_OPT_SPEC_ID,\
@@ -10,12 +12,14 @@ SEARCH_OPT_SPEC_ANNOTATIONS,\
 SEARCH_OPT_SPEC_FAMILY,\
 SEARCH_OPT_SPEC_STRAINS,\
 SEARCH_OPT_MOLFAM_FAMILY,\
-SEARCH_OPT_MOLFAM_SPECTRA = range(11)
+SEARCH_OPT_MOLFAM_SPECTRA = range(13)
 
 SEARCH_OPTIONS = [
     'BGC-Name',
     'BGC-Strain',
     'BGC-BigscapeClass',
+    'BGC-ProductPrediction',
+    'BGC-Description',
     'GCF-ID',
     'GCF-Strains',
     'Spectrum-ID',
@@ -66,6 +70,10 @@ class Searcher(object):
             results = [bgc for bgc in self.npl.bgcs if self.textmatch(needle, bgc.name, use_re)]
         elif mode == SEARCH_OPT_BGC_BIGSCAPE_CLASS:
             results = [bgc for bgc in self.npl.bgcs if self.textmatch(needle, bgc.bigscape_class, use_re)]
+        elif mode == SEARCH_OPT_BGC_PRODUCT_PREDICTION:
+            results = [bgc for bgc in self.npl.bgcs if self.textmatch(needle, ' '.join(bgc.product_prediction), use_re)]
+        elif mode == SEARCH_OPT_BGC_DESCRIPTION:
+            results = [bgc for bgc in self.npl.bgcs if self.textmatch(needle, bgc.description, use_re)]
         elif mode == SEARCH_OPT_GCF_STRAINS:
             results = [gcf for gcf in self.npl.gcfs if self.textmatch_list(needle, [bgc.strain for bgc in gcf.bgc_list], use_re)]
         elif mode == SEARCH_OPT_GCF_ID:
