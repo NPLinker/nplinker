@@ -1,8 +1,13 @@
 import csv, glob, os, json
+
 import numpy as np
 
 import aa_pred
 from genomics_utilities import get_known_cluster_blast
+from genomics_utilities import get_smiles
+
+from logconfig import LogConfig
+logger = LogConfig.getLogger(__file__)
 
 class BGC(object):
     def __init__(self, strain, name, bigscape_class, product_prediction, description=None):
@@ -16,12 +21,27 @@ class BGC(object):
         self.antismash_file = None
         self._aa_predictions = None
         self._known_cluster_blast = None
+        self._smiles = None
+        self._smiles_parsed = False
 
     def __repr__(self):
         return str(self)
 
     def __str__(self):
         return self.__class__.__name__ + "(name=" + self.name + ", strain=" + str(self.strain) + ")"
+    
+    @property
+    def smiles(self):
+        if self._smiles is not None or self._smiles_parsed: 
+            return self._smiles
+
+        if self.antismash_file is None:
+            return None 
+    
+        self._smiles = get_smiles(self)
+        self._smiles_parsed = True
+        logger.debug('SMILES for {} = {}'.format(self, self._smiles))
+        return self._smiles
 
     @property
     def aa_predictions(self):
@@ -130,7 +150,7 @@ class MiBIGBGC(BGC):
     def __init__(self, name, product_prediction):
         super(MiBIGBGC, self).__init__(name, name, None, product_prediction)
 
-def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=None, antismash_format='flat', mibig_bgc_dict=None):
+def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir, antismash_filenames, antismash_format='default', mibig_bgc_dict=None):
     strain_id_dict = {}
     strain_dict = {}
     gcf_dict = {}
@@ -179,7 +199,8 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
                         except:
                             strain_name = strain_id_dict[name.split('.')[0]]
                     except:
-                        print("NO STRAIN %s" % name)
+                        # logger.warning("strain lookup failed for '%s'" % name)
+                        strain_name = name
 
                 if strain_name not in strain_dict:
                     new_strain = strain_name
@@ -206,11 +227,13 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
                         if antismash_format == 'flat':
                             antismash_filename = os.path.join(antismash_dir, new_bgc.name + '.gbk')
                             if not os.path.exists(antismash_filename):
-                                print('Error: missing antismash file: {}'.format(antismash_filename))
-                                return None, None, None
+                                logger.warn('!!! Missing antismash file: {}'.format(antismash_filename))
+                                # return None, None, None
                             new_bgc.antismash_file = antismash_filename
                         else:
-                            new_bgc.antismash_file = find_antismash_file(antismash_dir, new_bgc.name)
+                            new_bgc.antismash_file = antismash_filenames.get(new_bgc.name, None)
+                            if new_bgc.antismash_file is None:
+                                logger.warning('Failed to find an antiSMASH file for {}'.format(new_bgc.name))
                     bgc_list.append(new_bgc)
                 else:
                     num_mibig += 1
@@ -253,24 +276,28 @@ def find_antismash_file_flat(antismash_dir, bgc_name):
         print("NOOO",bgc_name)
         return None
 
-
-def find_antismash_file(antismash_dir, bgc_name):
+def find_antismash_file_old(antismash_dir, bgc_name):
     subdirs = [s.split(os.sep)[-1] for s in glob.glob(antismash_dir + os.sep+'*')]
     if bgc_name.startswith('BGC'):
         print("No file for MiBIG BGC")
         return None # MiBIG BGC
+
+    print(antismash_dir, bgc_name)
     # this code is nasty... :-)
     name_tokens = bgc_name.split('_')
+    print('name_tokens', name_tokens)
     found = False
     for i in range(len(name_tokens)):
         sub_name = '_'.join(name_tokens[:i])
+        print('sub_name', sub_name)
         if sub_name in subdirs:
             found = True
             found_name = sub_name
     if not found:
-        name_tokens = bgc_name.split('.')[0]
+        name_tokens = bgc_name.split('.')#[0]
         for i in range(len(name_tokens)):
             sub_name = '.'.join(name_tokens[:i])
+            print('nt sub_name', sub_name)
             if sub_name in subdirs:
                 found = True
                 found_name = sub_name
