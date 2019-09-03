@@ -8,7 +8,6 @@ logger = LogConfig.getLogger(__file__)
 def run_iokr_scoring(spec, bgc_list):
     logger.debug('IOKR datapath: {}'.format(nplinker_iokr.get_datapath()))
 
-    print(spec)
     # extract SMILES strings for each supplied BGC (caching them in the object)
     smiles = [bgc.smiles for bgc in bgc_list]
     
