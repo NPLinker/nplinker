@@ -4,7 +4,7 @@ import logging
 class LogConfig(object):
 
     active_loggers = {}
-    logfmt = '%(asctime)s, %(levelname)s, %(filename)s:%(lineno)d, %(message)s'
+    logfmt = '%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d, %(message)s'
     default_loglevel = logging.INFO
     default_logdest = logging.StreamHandler(sys.stdout)
 
@@ -15,7 +15,7 @@ class LogConfig(object):
 
         logger = logging.Logger(obj)
         logger.setLevel(level)
-        dest.setFormatter(logging.Formatter(LogConfig.logfmt))
+        dest.setFormatter(logging.Formatter(LogConfig.logfmt, datefmt='%H:%M:%S'))
         logger.addHandler(dest)
         LogConfig.active_loggers[obj] = logger
         return logger
