@@ -1,7 +1,9 @@
 import csv
+import os
+
 import numpy as np
 
-from parsers import LoadMGF
+from parsers.mgf import LoadMGF
 
 from logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
@@ -32,7 +34,8 @@ class Spectrum(object):
         self.n_peaks = len(self.peaks)
         self.max_ms2_intensity = max([intensity for mz, intensity in self.peaks])
         self.total_ms2_intensity = sum([intensity for mz, intensity in self.peaks])
-        self.spectrum_id = str(spectrum_id)
+        assert(isinstance(spectrum_id, int))
+        self.spectrum_id = spectrum_id
         self.rt = rt
         self.precursor_mz = precursor_mz
         self.parent_mz = parent_mz
@@ -47,13 +50,16 @@ class Spectrum(object):
         self._jcamp = None
 
     def annotation_from_metadata(self):
-        annotation = self.get_metadata_value('LibraryID')
-        if annotation:
-            self.annotations.append((annotation, 'gnps'))
+        key = 'LibraryID'
+        if key in self.metadata:
+            self.annotations.append((key, 'gnps'))
 
     def get_metadata_value(self, key):
         val = self.metadata.get(key, None)
         return val
+
+    def is_library(self):
+        return len(self.annotations) > 0 and self.annotations[0][1] == 'gnps'
 
     @property
     def strain_list(self):
@@ -190,7 +196,7 @@ def mols_to_spectra(ms2, metadata):
     
     spectra = []
     for i, m in enumerate(ms2_dict.keys()):
-        new_spectrum = Spectrum(i, ms2_dict[m], m.name, metadata[m.name]['precursormass'])
+        new_spectrum = Spectrum(i, ms2_dict[m], int(m.name), metadata[m.name]['precursormass'], metadata[m.name]['parentmass'])
         new_spectrum.metadata = metadata[m.name]
         spectra.append(new_spectrum)
 
@@ -214,53 +220,82 @@ def load_additional_annotations(spectra,annotation_file,id_field,annotation_fiel
                 found_comp.add(new_annotations[s.spectrum_id][0])
             
 
-def load_metadata(spectra, metadata_file):
-    # make a dictionary mapping spectum ids to spectrum
-    spec_dict = {}
-    for spec in spectra:
-        spec_dict[spec.spectrum_id] = spec
-
+def load_metadata(nodes_file, extra_nodes_file, spectra, spec_dict):
     # to collect all strains from this source for later use
     strains = set()
 
-    with open(metadata_file, 'rU') as f:
+    nodes_lines = {}
+    # get a list of the lines in each file, indexed by the "cluster index" and "row ID" fields 
+    # (TODO correct/necessary - does ordering always remain consistent in both files?
+
+    with open(nodes_file, 'rU') as f:
+        reader = csv.reader(f, delimiter='\t')
+        headers = next(reader)
+        strains.update(headers) # TODO should be whitelisting instead?
+        
+        ci_index = headers.index('cluster index')
+
+        for line in reader:
+            tmp = {}
+            for i, v in enumerate(line):
+                tmp[headers[i]] = v
+            nodes_lines[int(line[ci_index])] = tmp
+
+    if extra_nodes_file is not None:
+        with open(extra_nodes_file, 'rU') as f:
+            reader = csv.reader(f, delimiter=',')
+            headers = next(reader)
+            strains.update(headers) # TODO again
+
+            ri_index = headers.index('row ID')
+
+            for line in reader:
+                ri = int(line[ri_index])
+                assert(ri in nodes_lines)
+                tmp = {}
+                for i, v in enumerate(line):
+                    tmp[headers[i]] = v
+                nodes_lines[ri].update(tmp)
+
+        logger.debug('Merged nodes data, total lines = {}'.format(len(nodes_lines)))
+    else:
+        logger.debug('No extra_nodes_file found')
+
+    def md_convert(val):
+        try:
+            return int(val)
+        except ValueError:
+            if val.lower() == 'n/a':
+                return None
+        return val
+
+    for l in nodes_lines.keys():
+        spectrum = spec_dict[l]
+        # TODO better way of filtering/converting all this stuff down to what's relevant?
+        for k, v in enumerate(nodes_lines[l]):
+            spectrum.metadata[k] = md_convert(v)
+
+        spectrum.annotation_from_metadata()
+
+    return spectra, strains
+
+def load_edges(edges_file, spectra, spec_dict):
+
+    logger.debug('loading edges file: {} [{} spectra from MGF]'.format(edges_file, len(spectra)))
+
+    with open(edges_file, 'rU') as f:
         reader = csv.reader(f, delimiter='\t')
         heads = next(reader)
         for line in reader:
-            if len(line) == 0:
-                continue
-            spectrum = spec_dict[line[0]]
-            for i, value in enumerate(line):
-                key = heads[i]
-                try:
-                    value = int(value)
-                except ValueError:
-                    if value == 'N/A':
-                        value = None
-                spectrum.metadata[key] = value
-                strains.add(key)
-            spectrum.annotation_from_metadata()
-
-    return strains
-
-def load_edges(spectra, edge_file):
-    spec_dict = {}
-    for spec in spectra:
-        spec_dict[spec.spectrum_id] = spec
-
-    with open(edge_file, 'rU') as f:
-        reader = csv.reader(f, delimiter='\t')
-        heads = next(reader)
-        for line in reader:
-            spec1_id = line[0]
-            spec2_id = line[1]
+            spec1_id = int(line[0])
+            spec2_id = int(line[1])
             cosine = float(line[4])
-            family = line[6]
+            family = int(line[6])
 
             spec1 = spec_dict[spec1_id]
             spec2 = spec_dict[spec2_id]
 
-            if family != '-1': # singletons
+            if family != -1: # singletons
                 spec1.family = family
                 spec2.family = family
 
@@ -269,6 +304,7 @@ def load_edges(spectra, edge_file):
             else:
                 spec1.family = family
 
+    return spectra
 
 class MolecularFamily(object):
     def __init__(self, family_id):
