@@ -282,22 +282,18 @@ def find_antismash_file_old(antismash_dir, bgc_name):
         print("No file for MiBIG BGC")
         return None # MiBIG BGC
 
-    print(antismash_dir, bgc_name)
     # this code is nasty... :-)
     name_tokens = bgc_name.split('_')
-    print('name_tokens', name_tokens)
     found = False
     for i in range(len(name_tokens)):
         sub_name = '_'.join(name_tokens[:i])
-        print('sub_name', sub_name)
         if sub_name in subdirs:
             found = True
             found_name = sub_name
     if not found:
-        name_tokens = bgc_name.split('.')#[0]
+        name_tokens = bgc_name.split('.')[0]
         for i in range(len(name_tokens)):
             sub_name = '.'.join(name_tokens[:i])
-            print('nt sub_name', sub_name)
             if sub_name in subdirs:
                 found = True
                 found_name = sub_name
