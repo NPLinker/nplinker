@@ -45,4 +45,9 @@ def get_smiles(bgc):
                         return None
 
                     # always a list (TODO?)
-                    return smiles[0] if len(smiles[0]) > 0 else None
+                    if len(smiles[0]) == 0:
+                        return None
+
+                    # seem to get space chars in some of these, which are not allowed
+                    # by the SMILES spec, so strip them out here
+                    return smiles[0].replace(' ', '')
