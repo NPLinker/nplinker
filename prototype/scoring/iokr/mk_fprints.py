@@ -37,6 +37,12 @@ def default_fingerprint_from_inchi(inchi):
 
 
 def fingerprint_from_smiles(smiles, fingerprint_type=None):
+    if fingerprint_type is None:
+        fingerprint = numpy.array([])
+        for fp_type in ('cdk_default', 'substructure', 'klekota-roth'):
+            fingerprint = numpy.hstack((fingerprint, fingerprint_from_smiles(smiles, fp_type)))
+        return fingerprint
+
     c = Compound(compound_string=smiles, identifier_type='smiles')
 
     if fingerprint_type == 'cdk_default':
@@ -57,6 +63,12 @@ def fingerprint_from_smiles(smiles, fingerprint_type=None):
 
 
 def fingerprint_from_inchi(inchi, fingerprint_type=None):
+    if fingerprint_type is None:
+        fingerprint = numpy.array([])
+        for fp_type in ('cdk_default', 'substructure', 'klekota-roth'):
+            fingerprint = numpy.hstack((fingerprint, fingerprint_from_inchi(inchi, fp_type)))
+        return fingerprint
+
     c = Compound(compound_string=inchi, identifier_type='inchi')
 
     if fingerprint_type == 'cdk_default':
