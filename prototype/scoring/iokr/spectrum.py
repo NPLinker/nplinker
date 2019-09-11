@@ -110,7 +110,11 @@ class MSSpectrum(object):
                 return self.raw_spectrum
         else:
             if self.output_spectrum is None:
-                self.output_spectrum = self.filter(self)
+                filtered_spectrum = self.filter(self)
+                if len(filtered_spectrum) is not 0:
+                    self.output_spectrum = self.filter(self)
+                else:
+                    self.output_spectrum = self.shifted_spectrum
             return self.output_spectrum
 
     @property
