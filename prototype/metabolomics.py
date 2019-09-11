@@ -272,7 +272,7 @@ def load_metadata(nodes_file, extra_nodes_file, spectra, spec_dict):
     for l in nodes_lines.keys():
         spectrum = spec_dict[l]
         # TODO better way of filtering/converting all this stuff down to what's relevant?
-        for k, v in enumerate(nodes_lines[l]):
+        for k, v in nodes_lines[l].items():
             spectrum.metadata[k] = md_convert(v)
 
         spectrum.annotation_from_metadata()
