@@ -30,6 +30,49 @@ class IOKRWrapper(object):
         """
         return fingerprint.fingerprint_from_smiles(smiles, self.fingerprint_type)
 
+    def score_smiles(self, ms_list, candidate_smiles):
+        """
+        Score a set of spectra against a candidate set of SMILES strings
+        """
+        spectrum_filters.datapath = get_datapath()
+        
+        logger.debug('cache miss')
+        logger.debug('Calculate fingerprints for candidate set')
+        # TODO: Cache this
+        candidate_fps = []
+        for i, c in enumerate(candidate_smiles):
+            logger.debug('done {}/{}'.format(i, len(candidate_smiles)))
+            candidate_fps.append(self._fingerprint(c))
+        candidate_fps = numpy.array(candidate_fps)
+        logger.debug('Extract latent basis')
+        latent, latent_basis, gamma = self.iokr_server.get_data_for_novel_candidate_ranking()
+        logger.debug('writing cache')
+
+        projection_matrix = numpy.zeros((len(ms_list), len(candidate_smiles)))
+
+        # TODO: Cache this
+        logger.debug('Preprocessing candidate set FPs')
+        candidates = iokr_opt.preprocess_candidates(candidate_fps, latent, latent_basis, gamma)
+
+        for ms_index, ms in enumerate(ms_list):
+            logger.debug('Rank spectrum {} ({}/{})'.format(ms.id, ms_index, len(ms_list)))
+            ms.filter = spectrum_filters.filter_by_frozen_dag
+            logger.debug('kernel vector')
+            t0 = time.time()
+            ms_kernel_vector = numpy.array(self.iokr_server.get_kernel_vector_for_sample(ms))
+            t1 = time.time()
+            logger.debug('done ({})'.format(t1 - t0))
+            logger.debug('project')
+            # projections, _ = iokr_opt.project_candidates_opt(0, candidate_fps, latent, ms_kernel_vector, latent_basis, gamma)
+            projections, _ = iokr_opt.project_candidates_preprocessed(candidates, ms_kernel_vector)
+            t2 = time.time()
+            logger.debug('done ({})'.format(t2 - t1))
+
+            logger.debug('save distances')
+            projection_matrix[ms_index, :] = projections
+
+        return projection_matrix
+
     def rank_smiles(self, ms, candidate_smiles):
         """
         Rank a spectrum against a candidate set of SMILES strings
@@ -65,7 +108,8 @@ def get_iokr_server():
     datapath = get_datapath()
     kernel_files = [os.path.join(datapath, 'ppk_dag_all_normalised_shifted_{}.npy'.format(x)) for x in ['nloss', 'peaks']]
 
-    fingerprint_type = "klekota-roth"
+    #fingerprint_type = "klekota-roth"
+    fingerprint_type = None
     iokr_wrapper = IOKRWrapper()
 
     iokr_wrapper.fingerprint_type = fingerprint_type

@@ -24,6 +24,18 @@ def project_candidate_opt(index, fingerprint, latent, x_kernel_vector, latent_ba
     return res, fingerprint_kernel_vector
 
 
+@jit(nopython=True)
+def preprocess_candidate_fingerprint(fingerprint, latent, latent_basis, gamma):
+    fingerprint_kernel_vector = k_vec(latent, fingerprint.T, gamma)
+    res = numpy.dot(fingerprint_kernel_vector, latent_basis)
+    return res
+
+
+@jit(nopython=True)
+def project_candidate_preprocessed(preprocessed_fingerprint, x_kernel_vector):
+    return numpy.dot(preprocessed_fingerprint, x_kernel_vector)
+
+
 def project_candidate_wrapper(index, candidate_fingerprints, latent, x_kernel_vector, latent_basis, gamma):
     return [project_candidate_opt(index, fingerprint, latent, x_kernel_vector, latent_basis, gamma) for fingerprint in candidate_fingerprints]
 
@@ -39,10 +51,26 @@ def project_candidate_kernel_wrapper(index, candidate_kernels, x_kernel_vector, 
 
 # @jit(nopython=True)
 def rank_candidates_opt(index, candidate_fingerprints, latent, x_kernel_vector, latent_basis, gamma):
+    candidate_distances, fingerprint_kernel_vectors = project_candidates_opt(index, candidate_fingerprints, latent, x_kernel_vector, latent_basis, gamma)
+    return numpy.argsort(numpy.array(candidate_distances))[::-1], fingerprint_kernel_vectors
+
+
+def project_candidates_opt(index, candidate_fingerprints, latent, x_kernel_vector, latent_basis, gamma):
     candidate_projections = [project_candidate_opt(index, fingerprint, latent, x_kernel_vector, latent_basis, gamma) for fingerprint in candidate_fingerprints]
     candidate_distances = [x[0] for x in candidate_projections]
     fingerprint_kernel_vectors = [x[1] for x in candidate_projections]
-    return numpy.argsort(numpy.array(candidate_distances))[::-1], fingerprint_kernel_vectors
+    return candidate_distances, fingerprint_kernel_vectors
+
+
+def preprocess_candidates(candidate_fingerprints, latent, latent_basis, gamma):
+    fingerprint_projections = [preprocess_candidate_fingerprint(fp, latent, latent_basis, gamma) for fp in candidate_fingerprints]
+    return fingerprint_projections
+
+
+def project_candidates_preprocessed(preprocessed_candidates, x_kernel_vector):
+    candidate_distances = [project_candidate_preprocessed(x, x_kernel_vector) for x in preprocessed_candidates]
+    return candidate_distances, []
+
 
 
 def rank_candidate_kernel_opt(index, candidate_kernels, latent, x_kernel_vector, latent_basis):

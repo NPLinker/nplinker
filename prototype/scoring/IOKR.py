@@ -5,7 +5,7 @@ from . iokr.spectrum import MSSpectrum
 from logconfig import LogConfig 
 logger = LogConfig.getLogger(__file__)
 
-def run_iokr_scoring(spec, bgc_list):
+def run_iokr_ranking(spec, bgc_list):
     logger.debug('IOKR datapath: {}'.format(nplinker_iokr.get_datapath()))
 
     # extract SMILES strings for each supplied BGC (caching them in the object)
@@ -19,6 +19,22 @@ def run_iokr_scoring(spec, bgc_list):
     iokr_server = nplinker_iokr.get_iokr_server()
     rank = iokr_server.rank_smiles(MSSpectrum(spec=spec), smiles)
     return [bgc_list[i] for i in rank]
+
+
+def run_iokr_scoring(spec_list, bgc_list):
+    logger.debug('IOKR datapath: {}'.format(nplinker_iokr.get_datapath()))
+    smiles = [bgc.smiles for bgc in bgc_list]
+    if None in smiles:
+        logger.error('Failed to run IOKR scoring, one or more BGCs missing SMILES data')
+        return None
+
+    spectra = [MSSpectrum(spec=spec) for spec in spec_list]
+
+    iokr_server = nplinker_iokr.get_iokr_server()
+    rank = iokr_server.score_smiles(spectra, smiles)
+
+    return rank
+
 
 if __name__ == "__main__":
     # peaklist = [
