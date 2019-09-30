@@ -1,3 +1,13 @@
+.bk-root {
+    width: 100%;
+    max-width: 100%;
+}
+
+.bk-clearfix {
+    width: 100%;
+    max-width: 100%;
+}
+
 .btn {
     max-width: 100%;
 }
