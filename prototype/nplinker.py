@@ -9,6 +9,7 @@ import numpy as np
 from metabolomics import Spectrum
 from metabolomics import MolecularFamily
 
+import genomics
 from genomics import GCF
 
 from data_linking import DataLinks
@@ -259,6 +260,8 @@ class NPLinker(object):
         for i in range(random_count):
             self._generate_scores(rdatalinks[i], rlinkfinders[i])
         
+        logger.debug('Finished generating randomised scores')
+        # TODO this can be a bit slow?
         # create a set of dicts indexed by class to store the matrices
         self._random_scores = {}
         for m in self.scoring.enabled():
@@ -280,6 +283,7 @@ class NPLinker(object):
                     rand_scores[MolecularFamily] = np.c_[rand_scores[MolecularFamily], rlinkfinders[i].get_scores(m.name, 'fam-gcf')]
 
             self._random_scores[m.name] = rand_scores
+        logger.debug('Scoring matrices created')
 
         self.clear_links()
         return True
