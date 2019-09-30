@@ -118,9 +118,13 @@ class DatasetLoader(object):
         # TODO can this just be modified to search all folders in the root path instead of hardcoding them?
         for folder in self.BIGSCAPE_CLASSES:
             fam_file = os.path.join(self.bigscape_dir, folder)
-            # TODO what are the different suffixes on the different clustering files indicating??
+            # TODO: the "_c0.xx.tsv" part of the filename is a similarity threshold of some sort
+            # - use "_c0.30" for now 
+            # - eventually allow the value to be set in config file (e.g. can 
+            #   select "50" there and it will parse the "..._c0.50.tsv" file)
             # should only one of them be parsed or...?
-            cluster_file = glob.glob(fam_file + os.sep + folder + "_clustering*")
+            threshold = 30
+            cluster_file = glob.glob(fam_file + os.sep + folder + "_clustering_c0.{:02d}.tsv".format(threshold))
             annotation_files = glob.glob(fam_file + os.sep + "Network_*")
             # TODO which folders are supposed to exist? is it a critical error if some of them
             # don't appear in a dataset???
@@ -137,8 +141,13 @@ class DatasetLoader(object):
         for root, dirs, files in os.walk(self.antismash_dir):
             for f in files:
                 if f.endswith('.gbk'):
-                    self.antismash_cache[f[:-4]] = os.path.join(root, f)
-        logger.debug('Cache generation took {}s'.format(time.time() - t))
+                    basename = os.path.splitext(f)[0]
+                    fullpath = os.path.join(root, f)
+                    self.antismash_cache[basename] = fullpath
+                    # also insert it with the folder name as matching on filename isn't always enough apparently
+                    parent = os.path.split(root)[-1]
+                    self.antismash_cache['{}_{}'.format(parent, basename)] = fullpath
+        logger.debug('Cache generation took {:.3f}s'.format(time.time() - t))
 
         logger.debug('loadBGC_from_cluster_files(antismash_dir={})'.format(self.antismash_dir))
         self.gcfs, self.bgcs, self.strains = loadBGC_from_cluster_files(

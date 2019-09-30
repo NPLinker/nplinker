@@ -26,7 +26,8 @@ class Spectrum(object):
     METADATA_BLACKLIST = set(['AllOrganisms', 'LibraryID', 'RTStdErr', 'RTMean', 'AllGroups', 'DefaultGroups',
                             'precursor mass', 'parent mass', 'ProteoSAFeClusterLink', 'precursor intensity', 'sum(precursor intensity)',
                               'precursormass', 'parentmass', 'singlechargeprecursormass', 'cluster index', 'number of spectra', 
-                              'UniqueFileSourcesCount', 'EvenOdd', 'charge', 'precursor charge'])
+                              'UniqueFileSourcesCount', 'EvenOdd', 'charge', 'precursor charge', 'RTConsensus', 'SumPeakIntensity',
+                              'componentindex', 'row ID', 'row m/z', 'row retention time'])
 
     def __init__(self, id, peaks, spectrum_id, precursor_mz, parent_mz=None, rt=None):
         self.id = id
@@ -71,6 +72,11 @@ class Spectrum(object):
 
     def has_strain(self, strain):
         if strain in Spectrum.METADATA_BLACKLIST:
+            return False
+
+        # XXX TODO 
+        # TEMPORARY for carnegie
+        if strain.startswith('GNPSGROUP'):
             return False
 
         strain_val = self.metadata.get(strain, 0)
@@ -264,15 +270,22 @@ def load_metadata(nodes_file, extra_nodes_file, spectra, spec_dict):
     def md_convert(val):
         try:
             return int(val)
-        except ValueError:
-            if val.lower() == 'n/a':
-                return None
+        except (ValueError, TypeError):
+            try:
+                return float(val)
+            except (ValueError, TypeError):
+                if val.lower() == 'n/a':
+                    return None
         return val
 
     for l in nodes_lines.keys():
         spectrum = spec_dict[l]
         # TODO better way of filtering/converting all this stuff down to what's relevant?
         for k, v in nodes_lines[l].items():
+            if 'Peak area' in k:
+                k = k.replace('.mzXML Peak area', '')
+                if '_' in k:
+                    k = k[:k.index('_')]
             spectrum.metadata[k] = md_convert(v)
 
         spectrum.annotation_from_metadata()
@@ -299,8 +312,8 @@ def load_edges(edges_file, spectra, spec_dict):
                 spec1.family = family
                 spec2.family = family
 
-                spec1.edges.append((spec2.spectrum_id, cosine))
-                spec2.edges.append((spec1.spectrum_id, cosine))
+                spec1.edges.append((spec2.id, spec2.spectrum_id, cosine))
+                spec2.edges.append((spec1.id, spec1.spectrum_id, cosine))
             else:
                 spec1.family = family
 
@@ -342,18 +355,22 @@ class RandomMolecularFamily(object):
 
 class SingletonFamily(MolecularFamily):
     def __init__(self):
-        super(SingletonFamily, self).__init__('-1')
+        super(SingletonFamily, self).__init__(-1)
 
     def __str__(self):
         return "Singleton molecular family"
 
+# TODO this should be better integrated with rest of the loading process
+# so that spec.family is never set to a primitive then replaced by an
+# object only if this method is called
 def make_families(spectra):
     families = []
     family_dict = {}
     family_index = 0
+    fams, singles = 0, 0
     for spectrum in spectra:
         family_id = spectrum.family
-        if family_id == '-1': # singleton
+        if family_id == -1: # singleton
             new_family = SingletonFamily()
             new_family.id = family_index
             family_index += 1
@@ -361,21 +378,24 @@ def make_families(spectra):
             new_family.add_spectrum(spectrum)
             spectrum.family = new_family
             families.append(new_family)
+            singles += 1
         else:
             if family_id not in family_dict:
                 new_family = MolecularFamily(family_id)
                 new_family.id = family_index
+                new_family.family_id = family_id # preserve original ID here
                 family_index += 1
                 
                 new_family.add_spectrum(spectrum)
                 spectrum.family = new_family
                 families.append(new_family)
                 family_dict[family_id] = new_family
+                fams += 1
             else:
                 family_dict[family_id].add_spectrum(spectrum)
                 spectrum.family = family_dict[family_id]
 
-
+    logger.debug('make_families: {} molams + {} singletons'.format(fams, singles))
     return families
 
 def read_aa_losses(filename):

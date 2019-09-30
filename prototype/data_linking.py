@@ -99,11 +99,11 @@ class DataLinks(object):
         mapping_spec = np.zeros((len(spectra),3))
         mapping_spec[:,0] = np.arange(0,len(spectra))
 
-        if isinstance(spectra[0].family, str):
+        if isinstance(spectra[0].family, int):
             for i, spectrum in enumerate(spectra):
                 mapping_spec[i,1] = spectrum.id
                 mapping_spec[i,2] = spectrum.family
-        elif isinstance(spectra[0].family.family_id, str): # assume make_families was run
+        elif isinstance(spectra[0].family.family_id, int): # assume make_families was run
             for i, spectrum in enumerate(spectra):
                 mapping_spec[i,1] = spectrum.id
                 mapping_spec[i,2] = spectrum.family.family_id
