@@ -785,8 +785,10 @@ class NPLinkerBokeh(object):
             self.debug_log('No objects selected')
             return
 
-        # TODO why did i do this
-        # nplinker.clear_links() # TODO hack 
+        # (i think the reason this is marked TODO is because it currently
+        # wouldn't update cached scores if the scoring method was changed
+        # or reconfigured (e.g. with a new threshold))
+        nplinker.clear_links() # TODO hack
         current_method = nplinker.scoring.enabled()[self.scoring_method_group.active]
 
         # obtain a list of objects to be passed to the scoring function
