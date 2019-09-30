@@ -5,11 +5,14 @@ from bokeh.models.widgets import Toggle, Button, DataTable, TableColumn, TextInp
 from bokeh.layouts import row, column, widgetbox
 from bokeh.models import CustomJS
 from bokeh.plotting import figure, curdoc
-from bokeh.models import ColumnDataSource, HoverTool, TapTool, CDSView, IndexFilter
+from bokeh.models import ColumnDataSource, HoverTool, TapTool, CDSView, IndexFilter, MultiLine
+from bokeh.models.markers import Circle
+from bokeh.models.renderers import GraphRenderer, GlyphRenderer
+from bokeh.models.graphs import StaticLayoutProvider, NodesAndLinkedEdges, NodesOnly
 from bokeh.events import LODEnd, LODStart, Reset
 
 from metabolomics import Spectrum,MolecularFamily
-from genomics import GCF, BGC
+from genomics import GCF, BGC, MiBIGBGC
 
 from searching import SEARCH_OPTIONS, Searcher
 
@@ -21,7 +24,7 @@ TOOLS = "crosshair,pan,wheel_zoom,box_zoom,reset,save,box_select,tap"
 
 PW, PH = 500, 500
 
-POINT_FACTOR = 150.0
+POINT_FACTOR = 130.0
 POINT_RATIO = 1 / POINT_FACTOR
 
 ACTIVE_BG_FILL = '#ffffff'
@@ -32,16 +35,15 @@ INACTIVE_BG_ALPHA = 0.555
 SCORING_GEN_TO_MET = 'TO <------ FROM'
 SCORING_MET_TO_GEN = 'FROM ------> TO'
 
-PLOT_TOGGLES = ['Enable alpha-blending', 'Enable colormaps', 'Show singleton families', 'Preserve colours when selecting', 'Only show results with shared strains']
-PLOT_ALPHA, PLOT_CMAP, PLOT_SINGLETONS, PLOT_PRESERVE_COLOUR, PLOT_ONLY_SHARED_STRAINS = range(len(PLOT_TOGGLES))
-PLOT_TOGGLES_ENUM = [PLOT_ALPHA, PLOT_CMAP, PLOT_SINGLETONS, PLOT_PRESERVE_COLOUR, PLOT_ONLY_SHARED_STRAINS]
+PLOT_TOGGLES = ['Enable alpha-blending', 'Enable colormaps', 'Show MiBIG BGCs', 'Show singleton families', 'Preserve colours when selecting', 'Only show results with shared strains']
+PLOT_ALPHA, PLOT_CMAP, PLOT_MIBIG_BGCS, PLOT_SINGLETONS, PLOT_PRESERVE_COLOUR, PLOT_ONLY_SHARED_STRAINS = range(len(PLOT_TOGGLES))
+PLOT_TOGGLES_ENUM = [PLOT_ALPHA, PLOT_CMAP, PLOT_MIBIG_BGCS, PLOT_SINGLETONS, PLOT_PRESERVE_COLOUR, PLOT_ONLY_SHARED_STRAINS]
 
 GENOMICS_SCORING_MODES = ['manual', 'GCF']
 METABOLOMICS_SCORING_MODES = ['manual', 'MolFam']
 
 GENOMICS_MODE_BGC, GENOMICS_MODE_GCF = range(2)
 METABOLOMICS_MODE_SPEC, METABOLOMICS_MODE_MOLFAM = range(2)
-
 
 # Scoring modes are:
 # 1. BGCs (i.e. the immediate parent GCFs) against Spectra
@@ -279,14 +281,31 @@ class NPLinkerBokeh(object):
         self.nh = helper
 
         # default to TSNE with all bgcs
-        self.bgc_tsne_id = 'allbgcs'
+        self.bgc_tsne_id = '<networkx>'
         self.bgc_tsne_id_list = list(self.nh.bgc_data.keys())
 
         self.bgc_datasource = ColumnDataSource(data=self.nh.bgc_data[self.bgc_tsne_id])
+        self.bgc_edges_datasource = ColumnDataSource(data=self.nh.bgc_edge_data[self.bgc_tsne_id])
+
         self.spec_datasource = ColumnDataSource(data=self.nh.spec_data)
-        # hide singletons by default
-        self.singleton_indices = [i for i in range(len(self.spec_datasource.data['x'])) if self.spec_datasource.data['family'][i] != '-1']
-        self.spec_datasource_view = CDSView(source=self.spec_datasource, filters=[IndexFilter(self.singleton_indices)])
+        self.spec_edges_datasource = ColumnDataSource(data=self.nh.spec_edge_data)
+
+        # hide singletons by default (spec_nonsingleton_indices holds the indices of all spectra with non-singleton families)
+        # ie the IndexFilter accepts a list of indices that you want to *show*
+        self.spec_nonsingleton_indices = [i for i in range(len(self.spec_datasource.data['x'])) if not self.spec_datasource.data['singleton'][i]]
+        self.spec_index_filter = IndexFilter(self.spec_nonsingleton_indices)
+        self.spec_datasource_view = CDSView(source=self.spec_datasource, filters=[self.spec_index_filter])
+        self.spec_edges_nonsingleton_indices = [i for i in range(len(self.spec_edges_datasource.data['singleton'])) if not self.spec_edges_datasource.data['singleton'][i]]
+        self.spec_edges_index_filter = IndexFilter(self.spec_edges_nonsingleton_indices)
+        self.spec_edges_datasource_view = CDSView(source=self.spec_edges_datasource, filters=[self.spec_edges_index_filter])
+
+        # same for MiBIG BGCs
+        self.bgc_nonmibig_indices = [i for i in range(len(self.bgc_datasource.data['x'])) if not self.bgc_datasource.data['mibig'][i]]
+        self.bgc_index_filter = IndexFilter(self.bgc_nonmibig_indices)
+        self.bgc_datasource_view = CDSView(source=self.bgc_datasource, filters=[self.bgc_index_filter])
+        self.bgc_edges_nonmibig_indices = [i for i in range(len(self.bgc_edges_datasource.data['mibig'])) if not self.bgc_edges_datasource.data['mibig'][i]]
+        self.bgc_edges_index_filter = IndexFilter(self.bgc_edges_nonmibig_indices)
+        self.bgc_edges_datasource_view = CDSView(source=self.bgc_edges_datasource, filters=[self.bgc_edges_index_filter])
 
         self.bgc_zoom = None
         self.spec_zoom = None
@@ -301,12 +320,20 @@ class NPLinkerBokeh(object):
         return self.nh.bgc_data[self.bgc_tsne_id]
 
     @property
+    def bgc_edge_data(self):
+        return self.nh.bgc_edge_data[self.bgc_tsne_id]
+
+    @property
     def nplinker(self):
         return self.nh.nplinker
 
     @property
     def spec_data(self):
         return self.nh.spec_data
+
+    @property
+    def spec_edge_data(self):
+        return self.nh.spec_edge_data
 
     @property
     def spec_indices(self):
@@ -317,31 +344,75 @@ class NPLinkerBokeh(object):
         return self.nh.bgc_indices[self.bgc_tsne_id]
 
     def create_plots(self):
-        # create the BGC figure and populate it from the datasource (note the dict keys are used in the 
-        # call to circle to identify attributes)
-
         radius = get_radius(self.bgc_datasource)
 
-        f_bgc = figure(tools=TOOLS, toolbar_location='above', title="BGCs (n={})".format(len(self.bgc_data['x'])), sizing_mode='scale_width', name="fig_bgc", output_backend='webgl')
-        r_bgc = f_bgc.circle('x', 'y', source=self.bgc_datasource, name=self.bgc_tsne_id,
-                radius=radius,
-                radius_dimension='max',
-                # marker='marker',
-                fill_alpha=1.0, 
-                fill_color='fill',
-                line_color=None,
-                selection_color='fill',
-                selection_fill_alpha=0.9,
-                selection_line_color=None,
-                nonselection_fill_alpha=0.0, 
-                nonselection_fill_color='#333333', 
-                nonselection_line_color=None, 
-                nonselection_line_alpha=0)
+        f_bgc = figure(tools=TOOLS, 
+                       toolbar_location='above', 
+                       title="BGCs (n={})".format(len(self.bgc_data['x'])), 
+                       sizing_mode='scale_width', 
+                       name='fig_bgc',
+                       x_range=self.nh.plot_x_range(), 
+                       y_range=self.nh.plot_y_range())
 
-        self.bgc_zoom = ZoomHandler(f_bgc, r_bgc)
+        bgr = GraphRenderer()
+        bgr.layout_provider = StaticLayoutProvider(graph_layout=self.nh.bgc_positions)
+        # setting GraphRenderer attributes like this avoids a rendering bug
+        # (vs setting individually)
+        print('radius is {}'.format(radius))
+        bgr.node_renderer = GlyphRenderer(data_source=self.bgc_datasource,
+                                          glyph=Circle(radius=radius,
+                                                       radius_dimension='max',
+                                                       fill_color='fill',
+                                                       fill_alpha=0.9,
+                                                       line_color=None),
+                                          selection_glyph=Circle(radius=radius,
+                                                                 radius_dimension='max',
+                                                                 fill_color='red', # TODO seems to use some pale colour here if 'fill' set???
+                                                                 fill_alpha=1,
+                                                                 line_color=None),
+                                          nonselection_glyph=Circle(radius=radius,
+                                                                    radius_dimension='max',
+                                                                    fill_color='#333333',
+                                                                    fill_alpha=0.0,
+                                                                    line_alpha=0.0,
+                                                                    line_color=None),
+                                          # hover_glyph=Circle(size=radius*50,
+                                          #                    radius_dimension='max',
+                                          #                    fill_color='fill',
+                                          #                    line_color='#000000',
+                                          #                    line_width=2),
+                                          view=self.bgc_datasource_view)
+
+        bgr.edge_renderer = GlyphRenderer(data_source=self.bgc_edges_datasource, 
+                                          glyph=MultiLine(line_color='#bbbbbb', 
+                                                          xs='xs',
+                                                          ys='ys',
+                                                          line_width=1),
+                                          selection_glyph=MultiLine(line_color='#bbbbbb',
+                                                                    xs='xs',
+                                                                    ys='ys',
+                                                                    line_width=1,
+                                                                    line_alpha=0.7),
+                                          nonselection_glyph=MultiLine(line_color='#000000',
+                                                                       xs='xs',
+                                                                       ys='ys',
+                                                                       line_width=0,
+                                                                       line_alpha=0),
+                                          view=self.bgc_edges_datasource_view)
+
+        # uncomment this and add a "hover_glyph" above if wanting to highlight hovered nodes+edges
+        # bgr.inspection_policy = NodesAndLinkedEdges()
+        bgr.selection_policy = NodesAndLinkedEdges()
+        # bgr.selection_policy = NodesOnly()
+
+        f_bgc.renderers.append(bgr)
+        r_bgc = bgr
+
+        self.bgc_zoom = ZoomHandler(f_bgc, r_bgc.node_renderer)
 
         hover_callback_code = """
-            var indices = cb_data.index['1d'].indices;
+            var indices = cb_data.index.indices;
+
             if (indices.length > 0)
             {
                 $(output_div_id).html('<small>' + multi_prefix + indices.length + multi_suffix + '</small>');
@@ -357,29 +428,79 @@ class NPLinkerBokeh(object):
                                     'multi_suffix' : ' BGCs', 
                                     'empty_text' : '(nothing under cursor)'}, 
                                     code=hover_callback_code)
-        hover_bgc = HoverTool(tooltips=None, callback=callback)
+        hover_bgc = HoverTool(tooltips=None, callback=callback, renderers=[bgr.node_renderer])
         f_bgc.add_tools(hover_bgc)
+        # TODO workaround for an apparent bug
+        # see https://github.com/bokeh/bokeh/issues/9237
+        f_bgc.add_tools(HoverTool(tooltips=None))
 
-        # create the MolFam figure in the same way
-        radius = 0.1
-        f_spec = figure(tools=TOOLS, toolbar_location='above', title="Spectra (n={})".format(len(self.nh.spec_data['x'])), sizing_mode='scale_width', name="fig_spec", output_backend='webgl')
-        r_spec = f_spec.circle('x', 'y', source=self.spec_datasource, 
-                            view=self.spec_datasource_view,
-                            fill_alpha=1.0, 
-                            radius=radius,
-                            radius_dimension='max',
-                            fill_color='fill',
-                            line_color=None,
-                            selection_color='fill',
-                            selection_fill_alpha=0.9,
-                            selection_line_color=None,
-                            nonselection_fill_alpha=0.0, 
-                            nonselection_fill_color='#333333', 
-                            nonselection_line_color=None, 
-                            nonselection_line_alpha=0)
+        # create the MolFam figure in the same way as above
 
-        self.spec_zoom = ZoomHandler(f_spec, r_spec)
+        radius = get_radius(self.spec_datasource)
 
+        f_spec = figure(tools=TOOLS, 
+                        toolbar_location='above', 
+                        title="Spectra (n={})".format(len(self.nh.spec_data['x'])), 
+                        sizing_mode='scale_width', 
+                        name='fig_spec',
+                        x_range=self.nh.plot_x_range(),
+                        y_range=self.nh.plot_y_range())
+
+        sgr = GraphRenderer()
+        sgr.layout_provider = StaticLayoutProvider(graph_layout=self.nh.spec_positions)
+        # setting GraphRenderer attributes like this avoids a rendering bug
+        # (vs setting individually)
+        print('radius is {}'.format(radius))
+        sgr.node_renderer = GlyphRenderer(data_source=self.spec_datasource,
+                                          glyph=Circle(radius=radius,
+                                                       radius_dimension='max',
+                                                       fill_color='fill',
+                                                       fill_alpha=0.9,
+                                                       line_color=None),
+                                          selection_glyph=Circle(radius=radius,
+                                                                 radius_dimension='max',
+                                                                 fill_color='fill', 
+                                                                 fill_alpha=0.9,
+                                                                 line_color=None),
+                                          nonselection_glyph=Circle(radius=radius,
+                                                                    radius_dimension='max',
+                                                                    fill_color='#333333',
+                                                                    fill_alpha=0.0,
+                                                                    line_alpha=0.0,
+                                                                    line_color=None),
+                                          # hover_glyph=Circle(size=radius*50,
+                                          #                    radius_dimension='max',
+                                          #                    fill_color='fill',
+                                          #                    line_color='#000000',
+                                          #                    line_width=2),
+                                          view=self.spec_datasource_view)
+
+        sgr.edge_renderer = GlyphRenderer(data_source=self.spec_edges_datasource, 
+                                          glyph=MultiLine(line_color='#bbbbbb', 
+                                                          xs='xs',
+                                                          ys='ys',
+                                                          line_width=1),
+                                          selection_glyph=MultiLine(line_color='#bbbbbb',
+                                                                    xs='xs',
+                                                                    ys='ys',
+                                                                    line_width=1,
+                                                                    line_alpha=0.7),
+                                          nonselection_glyph=MultiLine(line_color='#333333',
+                                                                       xs='xs',
+                                                                       ys='ys',
+                                                                       line_width=0,
+                                                                       line_alpha=0),
+                                          view=self.spec_edges_datasource_view)
+
+        # uncomment this and add a "hover_glyph" above if wanting to highlight hovered nodes+edges
+        # sgr.inspection_policy = NodesAndLinkedEdges()
+        sgr.selection_policy = NodesAndLinkedEdges()
+        # sgr.selection_policy = NodesOnly()
+
+        f_spec.renderers.append(sgr)
+        r_spec = sgr
+
+        self.spec_zoom = ZoomHandler(f_spec, r_spec.node_renderer)
 
         # hover_spec = HoverTool(tooltips=[('index', '$index'), ('Spectra name', '@name')])
         callback = CustomJS(args={'output_div_id': '#spec_hover_info', 
@@ -387,8 +508,11 @@ class NPLinkerBokeh(object):
                                     'multi_suffix' : ' spectra', 
                                     'empty_text' : '(nothing under cursor)'}, 
                                     code=hover_callback_code)
-        hover_spec = HoverTool(tooltips=None, callback=callback)
+        hover_spec = HoverTool(tooltips=None, callback=callback, renderers=[sgr.node_renderer])
         f_spec.add_tools(hover_spec)
+        # TODO workaround for an apparent bug
+        # see https://github.com/bokeh/bokeh/issues/9237
+        f_spec.add_tools(HoverTool(tooltips=None))
 
         self.fig_bgc = f_bgc
         self.fig_spec = f_spec
@@ -397,9 +521,10 @@ class NPLinkerBokeh(object):
         self.hover_bgc = hover_bgc
         self.hover_spec = hover_spec
 
-        self.ds_bgc = self.ren_bgc.data_source
-        self.ds_spec = self.ren_spec.data_source
-
+        self.ds_bgc = self.ren_bgc.node_renderer.data_source
+        self.ds_spec = self.ren_spec.node_renderer.data_source
+        self.ds_edges_bgc = self.ren_bgc.edge_renderer.data_source
+        self.ds_edges_spec = self.ren_spec.edge_renderer.data_source
         self.set_inactive_plot(self.fig_spec)
 
         return f_bgc, r_bgc, f_spec, r_spec
@@ -465,6 +590,8 @@ class NPLinkerBokeh(object):
             spec_hdr_id = 'spec_result_header_{}_{}'.format(pgindex, j)
             spec_body_id = 'spec_body_{}_{}'.format(pgindex, j)
             spec_title = 'Spectrum(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.id, score, len(shared_strains))
+            if len(spec.annotations) > 0:
+                spec_title += ', annotations={}'.format(','.join(list(ann[0] for ann in spec.annotations)))
 
             spec_body = self.generate_spec_info(spec, shared_strains)
 
@@ -476,7 +603,10 @@ class NPLinkerBokeh(object):
             # note annoying escaping required here, TODO better way of doing this?
             spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, spec.to_jcamp_str())
 
-            body += TMPL_ON_CLICK.format(hdr_id=spec_hdr_id, hdr_color='ffe0b5', btn_target=spec_body_id, btn_onclick=spec_onclick, btn_id=spec_btn_id, 
+            hdr_color = 'ffe0b5'
+            if len(spec.annotations) > 0:
+                hdr_color = 'ffb5e0'
+            body += TMPL_ON_CLICK.format(hdr_id=spec_hdr_id, hdr_color=hdr_color, btn_target=spec_body_id, btn_onclick=spec_onclick, btn_id=spec_btn_id, 
                                          btn_text=spec_title, body_id=spec_body_id, body_parent='accordion_gcf_{}'.format(pgindex), body_body=spec_body)
 
         body += '</div>'
@@ -606,13 +736,17 @@ class NPLinkerBokeh(object):
         content = ''
         if self.score_helper.mode == SCO_MODE_BGC_SPEC or self.score_helper.mode == SCO_MODE_GCF_SPEC:
             # both of these have the same format
+            self.debug_log('update_results_gcf_spec')
             content = self.update_results_gcf_spec()
         elif self.score_helper.mode == SCO_MODE_BGC_MOLFAM or self.score_helper.mode == SCO_MODE_GCF_MOLFAM:
             # as do these
+            self.debug_log('update_results_gcf_molfam')
             content = self.update_results_gcf_molfam()
         elif self.score_helper.mode == SCO_MODE_SPEC_GCF:
+            self.debug_log('update_results_spec_gcf')
             content = self.update_results_spec_gcf()
         elif self.score_helper.mode == SCO_MODE_MOLFAM_GCF:
+            self.debug_log('update_results_molfam_gcf')
             content = self.update_results_molfam_gcf()
         else:
             self.debug_log('Unknown scoring mode selected! {}'.format(self.score_helper.mode))
@@ -625,6 +759,7 @@ class NPLinkerBokeh(object):
         """
         nplinker = self.nh.nplinker
         sel_indices = []
+        selected = set()
 
         self.debug_log('Starting scoring process', False)
 
@@ -637,6 +772,7 @@ class NPLinkerBokeh(object):
             sel_indices = self.ds_bgc.selected.indices
             for i in range(len(sel_indices)):
                 bgcs.append(nplinker.lookup_bgc(self.bgc_data['name'][sel_indices[i]]))
+            print("DEBUG", bgcs)
         else:
             sel_indices = self.ds_spec.selected.indices
             for i in range(len(sel_indices)):
@@ -650,7 +786,7 @@ class NPLinkerBokeh(object):
             return
 
         # TODO why did i do this
-        nplinker.clear_links() # TODO hack 
+        # nplinker.clear_links() # TODO hack 
         current_method = nplinker.scoring.enabled()[self.scoring_method_group.active]
 
         # obtain a list of objects to be passed to the scoring function
@@ -771,23 +907,30 @@ class NPLinkerBokeh(object):
 
             # final step here is to take the remaining list of scoring objects and map them
             # back to indices on the plot so they can be highlighted
-            selected = set()
+            self.debug_log('finding indices')
             for link_obj in objs_with_links:
                 score_obj_indices = []
                 if mode == SCO_MODE_BGC_SPEC or mode == SCO_MODE_GCF_SPEC:
                     # for these modes, we can just lookup spectrum indices directly
-                    score_obj_indices = [self.spec_indices[spec.spectrum_id] for (spec, score) in objs_with_scores[link_obj]]
+                    score_obj_indices = []
+                    for (spec, score) in objs_with_scores[link_obj]:
+                        if spec.spectrum_id not in self.spec_indices:
+                            self.debug_log('Warning: missing index for Spectrum: {}'.format(spec))
+                            continue
+                        score_obj_indices.append(self.spec_indices[spec.spectrum_id])
+                    # score_obj_indices = [self.spec_indices[spec.spectrum_id] for (spec, score) in objs_with_scores[link_obj]]
                 elif mode == SCO_MODE_SPEC_GCF or mode == SCO_MODE_MOLFAM_GCF:
                     # here we have a list of GCFs, but the plot shows BGCs. so in order
                     # to highlight the BGCs, need to iterate over the list of GCFs 
                     score_obj_indices = set()
                     for gcf, _ in objs_with_scores[link_obj]:
-                        bgc_names = [bgc.name for bgc in gcf.bgc_list]
-                        for n in bgc_names:
+                        bgcs = [bgc for bgc in gcf.bgc_list]
+                        for n in bgcs:
                             try:
                                 score_obj_indices.add(self.bgc_indices[n])
                             except KeyError:
                                 self.debug_log('Warning: missing index for BGC: {} in GCF: {}'.format(n, gcf))
+                                print(list(self.bgc_indices.keys()))
                     score_obj_indices = list(score_obj_indices)
 
                 # add these indices to the overall set
@@ -801,10 +944,12 @@ class NPLinkerBokeh(object):
         # all of these should then be passed to the ScoringHelper object where they can be retrieved by the 
         # functions that are responsible for generating the output HTML etc
         if len(objs_with_links) > 0:
+            self.debug_log('set_results')
             self.score_helper.set_results(objs_with_links, objs_with_scores, shared_strains)
         else:
             self.score_helper.clear()
 
+        self.debug_log('update_ui_post_scoring')
         self.update_ui_post_scoring(selected)
 
     def update_ui_post_scoring(self, selected_indices):
@@ -825,6 +970,7 @@ class NPLinkerBokeh(object):
                 self.ds_bgc.selected.indices = []
             self.update_alert('No links found for last selection', 'danger')
 
+        self.debug_log('update_results')
         self.update_results()
 
     def bgc_selchanged(self, attr, old, new):
@@ -835,6 +981,8 @@ class NPLinkerBokeh(object):
         if len(new) > 0:
             # get links for the selected BGCs and update the plots
             self.get_links()
+
+            # TODO select correct edges (might have some nodes filtered out / added)
         else:
             # if selection is now empty, clear the selection on the spectra plot too
             self.ds_spec.selected.indices = []
@@ -873,6 +1021,8 @@ class NPLinkerBokeh(object):
     def clear_selections(self):
         self.ds_bgc.selected.indices = []
         self.ds_spec.selected.indices = []
+        self.ds_edges_bgc.selected.indices = []
+        self.ds_edges_spec.selected.indices = []
 
     def get_scoring_mode_text(self):
         return SCO_MODE_NAMES[self.score_helper.mode]
@@ -903,21 +1053,38 @@ class NPLinkerBokeh(object):
         self.get_links()
 
     def plot_toggles_callback(self, attr, old, new):
-        self.ren_bgc.glyph.fill_alpha = 0.6 if PLOT_ALPHA in new else 1.0
-        self.ren_spec.glyph.fill_alpha = 0.6 if PLOT_ALPHA in new else 1.0
+        # self.ren_bgc.glyph.fill_alpha = 0.6 if PLOT_ALPHA in new else 1.0
+        # self.ren_spec.glyph.fill_alpha = 0.6 if PLOT_ALPHA in new else 1.0
 
-        self.ren_bgc.glyph.fill_color = 'fill' if PLOT_CMAP in new else '#449944'
-        self.ren_spec.glyph.fill_color = 'fill' if PLOT_CMAP in new else '#444499'
+        # self.ren_bgc.glyph.fill_color = 'fill' if PLOT_CMAP in new else '#449944'
+        # self.ren_spec.glyph.fill_color = 'fill' if PLOT_CMAP in new else '#444499'
+
+        if PLOT_MIBIG_BGCS in new and PLOT_MIBIG_BGCS not in old:
+            self.ren_bgc.node_renderer.view.filters = []
+            self.ren_bgc.edge_renderer.view.filters = []
+            self.fig_bgc.x_range.start, self.fig_bgc.x_range.end = self.nh.plot_x_range(True)
+            self.fig_bgc.y_range.start, self.fig_bgc.y_range.end = self.nh.plot_y_range(True)
+        elif PLOT_MIBIG_BGCS in old and PLOT_MIBIG_BGCS not in new:
+            self.ren_bgc.node_renderer.view.filters = [self.bgc_index_filter]
+            self.ren_bgc.edge_renderer.view.filters = [self.bgc_edges_index_filter]
+            self.fig_bgc.x_range.start, self.fig_bgc.x_range.end = self.nh.plot_x_range(False)
+            self.fig_bgc.y_range.start, self.fig_bgc.y_range.end = self.nh.plot_y_range(False)
 
         if PLOT_SINGLETONS in new:
-            self.ren_spec.view.filters = [IndexFilter(list(range(len(self.spec_datasource.data['x']))))]
-        else:
-            self.ren_spec.view.filters = [IndexFilter(self.singleton_indices)]
+            self.ren_spec.node_renderer.view.filters = []
+            self.ren_spec.edge_renderer.view.filters = []
+            self.fig_spec.x_range.start, self.fig_spec.x_range.end = self.nh.plot_x_range(True)
+            self.fig_spec.y_range.start, self.fig_spec.y_range.end = self.nh.plot_y_range(True)
+        elif PLOT_SINGLETONS in old and PLOT_SINGLETONS not in new:
+            self.ren_spec.node_renderer.view.filters = [self.spec_index_filter]
+            self.ren_spec.edge_renderer.view.filters = [self.spec_edges_index_filter]
+            self.fig_spec.x_range.start, self.fig_spec.x_range.end = self.nh.plot_x_range(False)
+            self.fig_spec.y_range.start, self.fig_spec.y_range.end = self.nh.plot_y_range(False)
 
-        if PLOT_PRESERVE_COLOUR in new:
+        if PLOT_PRESERVE_COLOUR in new and PLOT_PRESERVE_COLOUR not in old:
             self.ren_bgc.selection_glyph.fill_color = 'fill'
             self.ren_spec.selection_glyph.fill_color = 'fill'
-        else:
+        elif PLOT_PRESERVE_COLOUR in old and PLOT_PRESERVE_COLOUR not in new:
             self.ren_bgc.selection_glyph.fill_color = '#ff7f00'
             self.ren_spec.selection_glyph.fill_color = '#ff7f00'
 
@@ -973,26 +1140,57 @@ class NPLinkerBokeh(object):
 
     def generate_bgc_info(self, bgc):
         bgc_body = '<ul>'
-        for attr in ['strain', 'name', 'bigscape_class']:
+        for attr in ['strain', 'name', 'bigscape_class', 'product_prediction', 'description']:
             bgc_body += '<li><strong>{}</strong>: {}</li>'.format(attr, getattr(bgc, attr))
-
         bgc_body += '</ul>'
         return bgc_body
 
     def generate_gcf_info(self, gcf, shared_strains=None):
-        gcf_body = '<ul>'
+        gcf_body = '<ul class="nav nav-tabs" id="gcf_{}_tabs" role="tablist">'.format(gcf.id)
+        gcf_body += '<li class="nav-item"><a class="nav-link active" id="gcf_{}_main_tab" data-toggle="tab" href="#gcf_{}_main" role="tab">Main</a></li>'.format(gcf.id, gcf.id)
+        gcf_body += '<li class="nav-item"><a class="nav-link" id="gcf_{}_bgcs_tab" data-toggle="tab" href="#gcf_{}_bgcs" role="tab">BGCs</a></li>'.format(gcf.id, gcf.id)
+        gcf_body += '</ul><div class="tab-content" id="gcf_{}_tab_content">'.format(gcf.id)
+
+        # start of main tab content
+        gcf_body += '<div class="tab-pane show active" id="gcf_{}_main" role="tabpanel">'.format(gcf.id)
+        gcf_body += '<ul>'
         for attr in ['id', 'short_gcf_id']:
             gcf_body += '<li><strong>{}</strong>: {}</li>'.format(attr, getattr(gcf, attr))
 
         # add strain information
         if shared_strains is not None and len(shared_strains) > 0:
-            gcf_body += '<li><strong>shared strains ({}, {:.2f}%)</strong>: {}</li>'.format(len(shared_strains), 
-                                                                                    100 * (len(shared_strains) / len(gcf.bgc_list)),
-                                                                                    ', '.join(shared_strains))
-        # add strain information
-        gcf_body += '<li><strong>all strains ({}):</strong> {}</li>'.format(len(gcf.bgc_list), ', '.join([bgc.strain or '[{}]'.format(bgc.name) for bgc in gcf.bgc_list]))
+            gcf_body += '<li><strong>strains (total={}, shared={})</strong>: '.format(len(gcf.bgc_list), len(shared_strains))
+
+            non_shared = [s.strain for s in gcf.bgc_list if s.strain not in shared_strains]
+
+            for s in shared_strains:
+                gcf_body += '<span style="background-color: #AAFFAA">{}</span>, '.format(s)
+            for s in non_shared:
+                gcf_body += '<span style="background-color: #DDDDDD">{}</span>, '.format(s)
+
+            gcf_body += '</li>'
+        else:
+            gcf_body += '<li><strong>strains (total={}, shared=0)</strong>: '.format(len(gcf.bgc_list))
+
+            for s in gcf.bgc_list:
+                gcf_body += '<span>{}</span>, '.format(s)
+
+            gcf_body += '</li>'
 
         gcf_body += '</ul>'
+        gcf_body += '</div>'
+
+        # second tab content
+        fields = ['name', 'strain', 'description', 'bigscape_class', 'product_prediction']
+        gcf_body += '<div class="tab-pane" id="gcf_{}_bgcs" role="tabpanel">'.format(gcf.id)
+        gcf_body += 'Type to filter: <input type="text" onkeyup="onChangeBGCTable(\'#gcf_{}_bgc_table\', \'#gcf_{}_bgc_search\')" id="gcf_{}_bgc_search">'.format(gcf.id, gcf.id, gcf.id)
+        gcf_body += '<table class="table table-responsive table-striped" id="gcf_{}_bgc_table"><thead><tr>'.format(gcf.id)
+        gcf_body += ''.join('<th scope="col">{}</th>'.format(x) for x in fields)
+        gcf_body += '</thead><tbody>'
+        for bgc in gcf.bgc_list:
+            gcf_body += '<tr><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td></tr>'.format(*list(getattr(bgc, x) for x in fields))
+        gcf_body += '</tbody></table>'
+        gcf_body += '</div></div>'
 
         return gcf_body
 
@@ -1000,18 +1198,31 @@ class NPLinkerBokeh(object):
         spec_body = '<ul>'
         for attr in ['id', 'spectrum_id', 'family', 'rt', 'total_ms2_intensity', 'max_ms2_intensity', 'n_peaks', 'precursor_mz', 'parent_mz']:
             spec_body += '<li><strong>{}</strong>: {}</li>'.format(attr, getattr(spec, attr))
-        spec_body += '<li><strong>all strains ({})</strong>: {}</li>'.format(len(spec.strain_list), ', '.join(spec.strain_list))
 
         # add strain information (possibly empty)
         if shared_strains is not None and len(shared_strains) > 0:
-            spec_body += '<li><strong>shared strains ({}, {:.2f}%):</strong> {}</li>'.format(len(shared_strains), 
-                                                                                    100 * (len(shared_strains) / len(spec.strain_list)),
-                                                                                    ', '.join(shared_strains))
+            spec_body += '<li><strong>strains (total={}, shared={})</strong>: '.format(len(spec.strain_list), len(shared_strains))
+
+            non_shared = [s for s in spec.strain_list if s not in shared_strains]
+
+            for s in shared_strains:
+                spec_body += '<span style="background-color: #AAFFAA">{}</span>, '.format(s)
+            for s in non_shared:
+                spec_body += '<span style="background-color: #DDDDDD">{}</span>, '.format(s)
+
+            spec_body += '</li>'
+        else:
+            spec_body += '<li><strong>strains (total={}, shared=0)</strong>: '.format(len(spec.strain_list))
+
+            for s in spec.strain_list:
+                spec_body += '<span>{}</span>, '.format(s)
+
+            spec_body += '</li>'
 
         if len(spec.annotations) > 0:
             spec_body += '<strong>Annotations:</strong><ul>'
             for a, b in spec.annotations:
-                spec_body += '<li><strong>{}</strong>: {}</li>'.format(a, b)
+                spec_body += '<li><strong><span class="annotation">{}</span></strong> ({})</li>'.format(a, b)
         spec_body += '</ul>'
         return spec_body
 
@@ -1023,7 +1234,7 @@ class NPLinkerBokeh(object):
         for i, bgc in enumerate(bgcs):
             bgc_hdr_id = 'bgc_search_header_{}'.format(i)
             bgc_body_id = 'bgc_search_body_{}'.format(i)
-            bgc_title = 'BGC(name={})'.format(bgc.name)
+            bgc_title = '{}(name={})'.format(bgc.__class__.__name__, bgc.name)
             bgc_body = self.generate_bgc_info(bgc)
             body += TMPL_SEARCH.format(hdr_id=bgc_hdr_id, hdr_color='dddddd', btn_target=bgc_body_id, btn_text=bgc_title, 
                                 result_index=str(i), body_id=bgc_body_id, body_parent='accordionSearch', body_body=bgc_body)
@@ -1070,6 +1281,12 @@ class NPLinkerBokeh(object):
         return ''
 
     def generate_search_output(self, results):
+        # TEMP XXX TODO
+        if isinstance(results[0], BGC):
+            # removing BGCs that don't appear in current TSNE
+            results = [r for r in results if r in self.nh.bgc_indices[self.bgc_tsne_id]]
+            self.searcher.results = results
+
         hdr = '<h4>{} results found</h4>'.format(len(results))
         if len(results) == 0:
             self.search_div_header.text = hdr
@@ -1123,7 +1340,8 @@ class NPLinkerBokeh(object):
             self.ge_mode_group.active = 0
 
             # and finally update selection to trigger scoring
-            indices = [self.nh.bgc_indices[self.bgc_tsne_id][bgc.name] for bgc in results]
+            print('constructing indices from search results, BGC mode')
+            indices = [self.nh.bgc_indices[self.bgc_tsne_id][bgc] for bgc in results]
             self.ds_bgc.selected.indices = indices
         # if results are GCFs, switch to genomics mode and select the GCF mode
         elif isinstance(results[0], GCF):
@@ -1162,7 +1380,7 @@ class NPLinkerBokeh(object):
 
     def bokeh_layout(self):
         widgets = []
-        self.results_div = Div(text="", sizing_mode='scale_height', name='results_div')
+        self.results_div = Div(text='', name='results_div', width_policy='max', height_policy='fit')
         widgets.append(self.results_div)
 
         # bgc plot selected by default so enable the selection change listener
@@ -1180,11 +1398,11 @@ class NPLinkerBokeh(object):
         self.mb_mode_group.on_change('active', self.mb_mode_callback)
         widgets.append(self.mb_mode_group)
 
-        self.plot_select = Toggle(label=SCORING_GEN_TO_MET, name='plot_select', active=True, css_classes=['button-genomics'])
+        self.plot_select = Toggle(label=SCORING_GEN_TO_MET, name='plot_select', active=True, css_classes=['button-genomics'], sizing_mode='scale_width')
         self.plot_select.on_click(self.plot_select_callback)
         widgets.append(self.plot_select)
 
-        self.ge_mode_group = RadioGroup(labels=GENOMICS_SCORING_MODES, active=0, name='ge_mode_group')
+        self.ge_mode_group = RadioGroup(labels=GENOMICS_SCORING_MODES, active=0, name='ge_mode_group', sizing_mode='scale_width')
         self.ge_mode_group.on_change('active', self.ge_mode_callback)
         widgets.append(self.ge_mode_group)
 
@@ -1213,7 +1431,7 @@ class NPLinkerBokeh(object):
         widgets.append(self.sliders)
 
         # for debug output etc 
-        self.debug_div = Div(text="", name='debug_div')
+        self.debug_div = Div(text="", name='debug_div', sizing_mode='scale_width')
         widgets.append(self.debug_div)
 
         # status updates/errors
@@ -1221,7 +1439,7 @@ class NPLinkerBokeh(object):
         widgets.append(self.alert_div)
 
         # "reset everything" button
-        self.reset_button = Button(name='reset_button', label='Reset state', button_type='danger')
+        self.reset_button = Button(name='reset_button', label='Reset state', button_type='danger', sizing_mode='scale_width')
         # no python method to reset plots, for some reason...
         self.reset_button.js_on_click(CustomJS(args=dict(fig_bgc=self.fig_bgc, fig_spec=self.fig_spec), 
                                                code=""" 
@@ -1230,7 +1448,7 @@ class NPLinkerBokeh(object):
                                                 """))
         widgets.append(self.reset_button)
 
-        self.search_input = TextInput(value='', title='Search for:', name='search_input')
+        self.search_input = TextInput(value='', title='Search for:', name='search_input', sizing_mode='scale_width')
         # TODO this can be used to trigger a search too, but annoyingly it is triggered when
         # a) enter is pressed (which is fine) 
         #   OR
@@ -1242,7 +1460,7 @@ class NPLinkerBokeh(object):
         # TODO can use this to convert selections in the table to selections on the plot
         self.foo = ColumnDataSource(data={'data': [1,2,3,4,5]})
         # self.foo.on_change('data', lambda a, o, n: print('FOO', a, o, n))
-        self.search_button = Button(name='search_button', label='Search', button_type='primary')
+        self.search_button = Button(name='search_button', label='Search', button_type='primary', sizing_mode='scale_width')
         # conveniently on_click seems to get called after js_on_click, so we can do stuff on the 
         # JS side in the CustomJS callback and then pick up the changes in the on_click handler
         # on the Python side
@@ -1250,7 +1468,7 @@ class NPLinkerBokeh(object):
         self.search_button.on_click(self.search_button_callback)
         widgets.append(self.search_button)
 
-        self.search_score_button = Button(name='search_score_button', label='Run scoring on selected results', button_type='warning')
+        self.search_score_button = Button(name='search_score_button', label='Run scoring on selected results', button_type='warning', sizing_mode='scale_width')
         self.search_score_button.on_click(self.search_score_button_callback)
         self.confirm_response = ColumnDataSource(data={'resp': [None], 'selelected': [[]]})
         self.search_score_button.js_on_click(CustomJS(args=dict(resp=self.confirm_response), code="""
@@ -1279,17 +1497,17 @@ class NPLinkerBokeh(object):
                 """))
         widgets.append(self.search_score_button)
 
-        self.search_div_results = Div(text='', sizing_mode='scale_height', name='search_div_results')
+        self.search_div_results = Div(text='', sizing_mode='scale_both', name='search_div_results')
         widgets.append(self.search_div_results)
 
         self.search_div_header = Div(text='', sizing_mode='scale_height', name='search_div_header')
         widgets.append(self.search_div_header)
 
-        self.search_type = Select(options=SEARCH_OPTIONS, value=SEARCH_OPTIONS[0], name='search_type', css_classes=['nolabel'])
+        self.search_type = Select(options=SEARCH_OPTIONS, value=SEARCH_OPTIONS[0], name='search_type', css_classes=['nolabel'], sizing_mode='scale_width')
         self.search_type.on_change('value', self.search_type_callback)
         widgets.append(self.search_type)
 
-        self.search_regex = CheckboxGroup(labels=['Use regexes?'], active=[0], name='search_regex')
+        self.search_regex = CheckboxGroup(labels=['Use regexes?'], active=[0], name='search_regex', sizing_mode='scale_width')
         widgets.append(self.search_regex)
 
         widgets.append(self.fig_spec)
