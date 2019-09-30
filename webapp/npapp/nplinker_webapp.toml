@@ -1,0 +1,61 @@
+# NPLinker default configuration
+
+# general options
+# log level (DEBUG/INFO/WARNING/ERROR)
+loglevel = "DEBUG"
+logfile = ""
+repro_file = ""
+
+# Dataset configuration
+[dataset]
+# if the dataset has the expected directory structure, this is all that's required
+root = "/mnt/archive/nplinker_data/CrusemannDataForNPLinker"
+#root = "/Users/adr/CrusemannDataForNPLinker"
+
+# antismash file structure, 'flat' is currently the only supported option
+antismash_format = "flat"
+
+# can also override any combination of individual file paths as required (empty
+# paths are ignored)
+[dataset.overrides]
+# directory containing MiBIG .json files, default is <root>/mibig_json
+#mibig_json_dir = ""
+
+# MGF filename. This path is passed to glob.glob, default is <root>/spectra/*.mgf
+#mgf_file = ""
+
+# nodes filename. This path is passed to glob.glob, default is <root>/spectra/*.out
+#nodes_file = ""
+
+# edges filename. This path is passed to glob.glob, default is <root>/spectra/*.pairsinfo
+#edges_file = ""
+
+# annotation filenames. This should be a list of one or more filenames.
+#annotation_files = []
+
+# Antismash data directory, default is <root>/antismash
+#antismash_dir = ""
+
+# bigscape directory, default is <root>/bigscape
+#bigscape_dir = ""
+
+# Scoring configuration
+[scoring]
+# number of randomized instances to create during scoring
+random_count = 2
+
+# metcalf scoring
+[scoring.metcalf]
+sig_percentile = 99
+enabled = true
+
+# hypergeometric scoring
+[scoring.hg]
+prob = 0.99
+enabled = false
+
+# likescore scoring
+[scoring.likescore]
+cutoff = 0.5
+enabled = false
+

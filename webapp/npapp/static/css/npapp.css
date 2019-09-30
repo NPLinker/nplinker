@@ -1,0 +1,54 @@
+.btn {
+    max-width: 100%;
+}
+/* fixes text spilling out of the button */
+.btn {
+    word-wrap: break-word;
+    white-space: normal;
+}
+.btn-link {
+    word-wrap: break-word;
+}
+.card {
+    max-width: 100%;
+}
+.card-text {
+    word-wrap: break-word;
+}
+
+.button-genomics {
+    background-color: #449944;
+    padding: 5px;
+}
+
+.button-metabolomics {
+    background-color: #444499;
+    padding: 5px;
+}
+
+#spec_hover_info, #bgc_hover_info { 
+    text-align: center;
+}
+
+#mb_mode > .bk-root {
+    float: right;
+}
+
+.nolabel > label {
+    display: none !important;
+}
+
+/* adjust padding on accordion elements */
+.card-header {
+    padding: 0rem;
+}
+
+/* tweak layout for the checkboxes in search results */
+.btn-search-header {
+    min-width: 75% !important;
+}
+
+/* tweak layout for the checkboxes in search results */
+.search-input-container {
+    display: inline;
+}

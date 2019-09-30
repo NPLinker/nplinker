@@ -6,16 +6,11 @@ import pickle
 
 import numpy as np
 
-from metabolomics import load_spectra
-from metabolomics import load_edges
-from metabolomics import load_metadata
-from metabolomics import make_families
 from metabolomics import Spectrum
 from metabolomics import MolecularFamily
 
+import genomics
 from genomics import GCF
-from genomics import loadBGC_from_cluster_files
-from genomics import make_mibig_bgc_dict
 
 from data_linking import DataLinks
 from data_linking import RandomisedDataLinks
@@ -23,14 +18,14 @@ from data_linking import LinkLikelihood
 from data_linking import LinkFinder
 from data_linking import SCORING_METHODS
 
-from config import Config, ScoringConfig, DatasetLoader, Args
+from config import Config, ScoringConfig, Args
+from loader import DatasetLoader
 
 from logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
 class NPLinker(object):
 
-    FOLDERS = ['NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs', 'Saccharides', 'Terpene']
     OBJ_CLASSES = [Spectrum, MolecularFamily, GCF]
     # enumeration for accessing results of LinkFinder.get_links, which are (3, num_links) arrays:
     # - R_SRC_ID: the ID of an object that was supplied as input to get_links
@@ -103,17 +98,10 @@ class NPLinker(object):
             logfile_dest = logging.FileHandler(logfile)
             LogConfig.setLogDestination(logfile_dest)
 
+        # this object takes care of figuring out the locations of all the relevant files/folders
+        # and will show error/warning if any missing (depends if optional or not)
         self._loader = DatasetLoader(self._config.config['dataset']['root'], self._config.config['dataset']['overrides'])
     
-        logger.debug('Dataset info: {}'.format(self._loader))
-        for f in self._loader.key_paths():
-            if not os.path.exists(f):
-                raise FileNotFoundError('File/directory "{}" does not exist or is not readable!'.format(f))
-
-        # this is optional(?) so just warn 
-        if not os.path.exists(self._loader.mibig_json_dir):
-            logger.warning('mibig_json_dir "{}" does not exist or is not readable!'.format(self._loader.mibig_json_dir))
-
         self._spectra = []
         self._bgcs = []
         self._gcfs = []
@@ -123,6 +111,7 @@ class NPLinker(object):
         self._mibig_bgc_dict = {}
 
         self._bgc_lookup = {}
+        self._spec_lookup = {}
 
         self._datalinks = None
         self._linkfinder = None
@@ -180,43 +169,17 @@ class NPLinker(object):
             True if successful, False otherwise
         """
 
-        logger.debug('load_spectra({})'.format(self._loader.mgf_file))
-        self._spectra = load_spectra(self._loader.mgf_file)
+        if not self._loader.load():
+            return False
 
-        logger.debug('load_edges({})'.format(self._loader.edges_file))
-        load_edges(self._spectra, self._loader.edges_file)
+        self._spectra = self._loader.spectra
+        self._molfams = self._loader.molfams
+        self._bgcs = self._loader.bgcs
+        self._gcfs = self._loader.gcfs
+        self._mibig_bgc_dict = self._loader.mibig_bgc_dict
+        self._strains = self._loader.strains
 
-        # families = make_families(self.spectra) # TODO?
-        logger.debug('load_metadata({})'.format(self._loader.nodes_file))
-        self._metadata = load_metadata(self._spectra, self._loader.nodes_file)
-
-        input_files, ann_files = [], []
-        logger.debug('make_mibig_bgc_dict({})'.format(self._loader.mibig_json_dir))
-        self._mibig_bgc_dict = make_mibig_bgc_dict(self._loader.mibig_json_dir)
-
-        # TODO can this just be modified to search all folders in the root path instead of hardcoding them?
-        for folder in NPLinker.FOLDERS:
-            fam_file = os.path.join(self._loader.bigscape_dir, folder)
-            cluster_file = glob.glob(fam_file + os.sep + folder + "_clustering*")
-            print('cluster files: {}'.format(fam_file + os.sep + folder + '_clustering*'))
-            annotation_files = glob.glob(fam_file + os.sep + "Network_*")
-            # TODO which folders are supposed to exist? is it a critical error if some of them
-            # don't appear in a dataset???
-            if len(annotation_files) > 0:
-                input_files.append(cluster_file[0])
-                ann_files.append(annotation_files[0])
-            else:
-                logger.warning('Missing tsv file for folder: {}'.format(folder))
-
-        logger.debug('loadBGC_from_cluster_files(antismash_dir={})'.format(self._loader.antismash_dir))
-        self._gcfs, self._bgcs, self._strains = loadBGC_from_cluster_files(
-                                                input_files,
-                                                ann_files,
-                                                antismash_dir=self._loader.antismash_dir, 
-                                                antismash_format=self._config.config['dataset']['antismash_format'],
-                                                mibig_bgc_dict=self._mibig_bgc_dict)
-
-
+        logger.debug('Generating lookup tables')
         self._bgc_lookup = {}
         for i, bgc in enumerate(self._bgcs):
             self._bgc_lookup[bgc.name] = i
@@ -224,6 +187,14 @@ class NPLinker(object):
         self._gcf_lookup = {}
         for i, gcf in enumerate(self._gcfs):
             self._gcf_lookup[gcf.id] = i
+
+        self._spec_lookup = {}
+        for i, spec in enumerate(self._spectra):
+            self._spec_lookup[spec.spectrum_id] = i
+
+        self._molfam_lookup = {}
+        for i, molfam in enumerate(self._molfams):
+            self._molfam_lookup[molfam.id] = i
 
         logger.debug('load_data: completed')
         return True
@@ -289,6 +260,8 @@ class NPLinker(object):
         for i in range(random_count):
             self._generate_scores(rdatalinks[i], rlinkfinders[i])
         
+        logger.debug('Finished generating randomised scores')
+        # TODO this can be a bit slow?
         # create a set of dicts indexed by class to store the matrices
         self._random_scores = {}
         for m in self.scoring.enabled():
@@ -310,6 +283,7 @@ class NPLinker(object):
                     rand_scores[MolecularFamily] = np.c_[rand_scores[MolecularFamily], rlinkfinders[i].get_scores(m.name, 'fam-gcf')]
 
             self._random_scores[m.name] = rand_scores
+        logger.debug('Scoring matrices created')
 
         self.clear_links()
         return True
@@ -555,10 +529,10 @@ class NPLinker(object):
         logger.error('Bad input type in _get_links_percentile??')
         return None
 
-    def get_common_strains(self, objects_a, objects_b):
+    def get_common_strains(self, objects_a, objects_b, filter_no_shared=True):
         # this is a dict with structure:
         #   (Spectrum/MolecularFamily, GCF) => list of strain indices
-        common_strains = self._datalinks.common_strains(objects_a, objects_b)
+        common_strains = self._datalinks.common_strains(objects_a, objects_b, filter_no_shared)
 
         # replace the lists of strain indices with actual strain objects
         for objpair in common_strains.keys():
@@ -575,6 +549,12 @@ class NPLinker(object):
 
         return self._bgcs[self._bgc_lookup[name]]
 
+    def lookup_spectrum(self, name):
+        if name not in self._spec_lookup:
+            return None
+
+        return self._spectra[self._spec_lookup[name]]
+
     @property
     def strains(self):
         return self._strains
@@ -590,6 +570,10 @@ class NPLinker(object):
     @property
     def spectra(self):
         return self._spectra
+
+    @property
+    def molfams(self):
+        return self._molfams
 
     @property
     def metadata(self):

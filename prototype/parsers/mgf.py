@@ -19,7 +19,7 @@ class MS1(object):
         self.name = "{}_{}".format(self.mz, self.rt)
 
     def __str__(self):
-        return self.name
+        return 'MS1(name={}, mz={}, id={}, rt={})'.format(self.name, self.mz, self.rt, self.id)
 
 # Abstract loader class
 # *load_spectra* functions are too long, refactor and split when having time
@@ -480,6 +480,7 @@ class LoadMGF(Loader):
                                     else:
                                         doc_name = 'document_{}'.format(ms1_id)
                                 metadata[doc_name] = temp_metadata.copy()
+                                # TODO this overrides the original format of MS1.name attribute?
                                 new_ms1.name = doc_name
                                 ms1.append(new_ms1)
 

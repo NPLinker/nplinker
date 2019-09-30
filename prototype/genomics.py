@@ -1,26 +1,50 @@
 import csv, glob, os, json
+
 import numpy as np
 
 import aa_pred
 from genomics_utilities import get_known_cluster_blast
+from genomics_utilities import get_smiles
+
+from logconfig import LogConfig
+logger = LogConfig.getLogger(__file__)
 
 class BGC(object):
-    def __init__(self, strain, name, bigscape_class, product_prediction):
+    def __init__(self, id, strain, name, bigscape_class, product_prediction, description=None):
+        self.id = id
         self.strain = strain
         self.name = name
         self.bigscape_class = bigscape_class
         self.product_prediction = product_prediction
         self.parent = None
+        self.description = description
 
         self.antismash_file = None
         self._aa_predictions = None
         self._known_cluster_blast = None
+        self._smiles = None
+        self._smiles_parsed = False
+
+        self.edges = []
 
     def __repr__(self):
         return str(self)
 
     def __str__(self):
-        return self.name + "(" + str(self.strain) + ")"
+        return self.__class__.__name__ + "(name=" + self.name + ", strain=" + str(self.strain) + ")"
+    
+    @property
+    def smiles(self):
+        if self._smiles is not None or self._smiles_parsed: 
+            return self._smiles
+
+        if self.antismash_file is None:
+            return None 
+    
+        self._smiles = get_smiles(self)
+        self._smiles_parsed = True
+        logger.debug('SMILES for {} = {}'.format(self, self._smiles))
+        return self._smiles
 
     @property
     def aa_predictions(self):
@@ -41,9 +65,10 @@ class BGC(object):
 
 
 class GCF(object):
-    def __init__(self, gcf_id):
+    def __init__(self, gcf_id, gnps_class):
         self.id = -1
         self.gcf_id = gcf_id
+        self.gnps_class = gnps_class
         try:
             self.short_gcf_id = gcf_id.split(os.sep)[-1]
         except:
@@ -55,7 +80,7 @@ class GCF(object):
         self.strains_lookup = None
 
     def __str__(self):
-        return 'GCF(id={}, short_gcf_id={})'.format(self.id, self.short_gcf_id)
+        return 'GCF(id={}, class={}, gcf_id={})'.format(self.id, self.gnps_class, self.short_gcf_id)
 
     def __repr__(self):
         return str(self)
@@ -126,10 +151,10 @@ class RandomGCF(object):
 
 class MiBIGBGC(BGC):
 
-    def __init__(self, name, product_prediction):
-        super(MiBIGBGC, self).__init__(None, name, None, product_prediction)
+    def __init__(self, id, name, product_prediction):
+        super(MiBIGBGC, self).__init__(id, name, name, None, product_prediction)
 
-def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=None, antismash_format='flat', mibig_bgc_dict=None):
+def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir, antismash_filenames, antismash_format='default', mibig_bgc_dict=None):
     strain_id_dict = {}
     strain_dict = {}
     gcf_dict = {}
@@ -144,6 +169,15 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
             strain_id_dict[line[0]] = line[1]
 
     metadata = {}
+    # parse the annotation files (<dataset>/bigscape/<cluster_name>/Network_Annotations_<cluster_name>.tsv
+    # these contain fields:
+    # - BGC name/ID [0]
+    # - "Accession ID" [1]
+    # - Description [2]
+    # - Product prediction [3]
+    # - Bigscape class [4]
+    # - Organism [5]
+    # - Taxonomy [6]
     for a in ann_file_list:
         with open(a, 'rU') as f:
             reader = csv.reader(f, delimiter='\t')
@@ -152,30 +186,44 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
                 metadata[line[0]] = line
 
     num_mibig = 0
+    num_missing_antismash = 0
 
+    bgc_lookup = {}
+
+    # "network files" are the various <class>_clustering_c0.xx.tsv files
+    # - BGC name
+    # - cluster ID
     for filename in network_file_list:
+        gnps_class = os.path.split(filename)[-1]
+        gnps_class = gnps_class[:gnps_class.index('_')]
         with open(filename, 'rU') as f:
-            print('filename', filename)
             reader = csv.reader(f, delimiter='\t')
             heads = next(reader)
             for line in reader:
                 name = line[0]
-                family = filename + ":" + line[1]
+                #family = os.path.split(filename)[-1] + ":" + line[1]
+                family_id = int(line[1])
                 if name.startswith("BGC"):
                     strain_name = 'MiBIG'
                 else:
+                    # TODO is this doing the correct thing in all cases??
                     try:
                         try:
                             strain_name = strain_id_dict[name.split('_')[0]]
                         except:
                             strain_name = strain_id_dict[name.split('.')[0]]
                     except:
-                        print("NO STRAIN %s" % name)
+                        # logger.warning("strain lookup failed for '%s'" % name)
+                        if '_' in name:
+                            strain_name = name.split('_')[0] 
+                        else:
+                            strain_name = name.split('.')[0]
 
                 if strain_name not in strain_dict:
                     new_strain = strain_name
                     strain_dict[strain_name] = new_strain
                     strain_list.append(new_strain)
+
                 strain = strain_dict[strain_name]
                 tokens = name.split('.')
                 clusterid = tokens[-1]
@@ -189,36 +237,76 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir=N
                 # make a BGC object
                 # the same BGC objects might be made more than once
                 # because they appear in multiple clusterings
+                # TODO should this happen? Any reason to have duplicate objects
+                # representing the same strain? 
                 if not strain_name == 'MiBIG':
-                    new_bgc = BGC(strain, name, bigscape_class, product_prediction)
+                    new_bgc = BGC(len(bgc_list), strain, name, bigscape_class, product_prediction, description)
                     if antismash_dir:
                         if antismash_format == 'flat':
                             antismash_filename = os.path.join(antismash_dir, new_bgc.name + '.gbk')
                             if not os.path.exists(antismash_filename):
-                                print('Error: missing antismash file: {}'.format(antismash_filename))
-                                return None, None, None
+                                logger.warn('!!! Missing antismash file: {}'.format(antismash_filename))
+                                num_missing_antismash += 1
+                                # return None, None, None
                             new_bgc.antismash_file = antismash_filename
                         else:
-                            new_bgc.antismash_file = find_antismash_file(antismash_dir, new_bgc.name)
+                            new_bgc.antismash_file = antismash_filenames.get(new_bgc.name, None)
+                            if new_bgc.antismash_file is None:
+                                logger.warning('Failed to find an antiSMASH file for {}'.format(new_bgc.name))
+                                num_missing_antismash += 1
                     bgc_list.append(new_bgc)
                 else:
                     num_mibig += 1
-                    if mibig_bgc_dict:
+                    # TODO should this not attempt to create any MiBIGBGC's if the dict
+                    # is not supplied??
+                    # TODO any reason not to supply the metadata fields that aren't set by
+                    # make_mibig_bgc_dict since metadata_line is available here?
+                    if mibig_bgc_dict is not None:
                         try:
                             new_bgc = mibig_bgc_dict[name.split('.')[0]]
-                        except:
-                            new_bgc = MiBIGBGC(name, product_prediction)
-                    # TODO add to bgc_list too???
-                
+                        except KeyError:
+                            new_bgc = MiBIGBGC(len(bgc_list), name, product_prediction)
 
-                if not family in gcf_dict:
-                    new_gcf = GCF(family)
-                    gcf_dict[family] = new_gcf
+                    new_bgc.bigscape_class = bigscape_class
+                    new_bgc.description = description
+                    # TODO should add to bgc_list too???
+                    bgc_list.append(new_bgc)
+
+                if family_id not in gcf_dict:
+                    new_gcf = GCF(family_id, gnps_class)
+                    gcf_dict[family_id] = new_gcf
                     gcf_list.append(new_gcf)
-                gcf_dict[family].add_bgc(new_bgc)
+                gcf_dict[family_id].add_bgc(new_bgc)
 
-    print('# mibig BGCs = {}, # bgcs = {}'.format(num_mibig, len(bgc_list)))
+                bgc_lookup[new_bgc.name] = new_bgc
+    
+    if num_missing_antismash > 0:
+        logger.warn('{}/{} antiSMASH files could not be found!'.format(num_missing_antismash, len(bgc_list)))
+        # print(list(antismash_filenames.keys()))
+
+    # TODO the threshold/cutoff (the ".30" part) should be configurable 
+    for filename in network_file_list:
+        path, nfilename = os.path.split(filename)
+        nfilename = nfilename.replace('_clustering_c0.30.tsv', '_c0.30.network')
+        nfilename = os.path.join(path, nfilename)
+        if not os.path.exists(nfilename):
+            logger.debug('No .network file "{}" to match "{}", skipping'.format(nfilename, filename))
+            continue
+
+        with open(nfilename, 'rU') as f:
+            reader = csv.reader(f, delimiter='\t')
+            heads = next(reader)
+            # try to look up bgc IDs
+            for line in reader:
+                bgc_src = bgc_lookup[line[0]]
+                bgc_dst = bgc_lookup[line[1]]
+
+                bgc_src.edges.append(bgc_dst.id)
+
+    print('# MiBIG BGCs = {}, non-MiBIG BGCS = {}, total bgcs = {}, GCFs = {}'.format(
+                        num_mibig, len(bgc_list) - num_mibig, len(bgc_list), len(gcf_dict)))
     # Assign unique ids (int)
+    # TODO do this above
     for i, gcf in enumerate(gcf_list):
         gcf.id = i
     return gcf_list, bgc_list, strain_list
@@ -235,12 +323,12 @@ def find_antismash_file_flat(antismash_dir, bgc_name):
         print("NOOO",bgc_name)
         return None
 
-
-def find_antismash_file(antismash_dir, bgc_name):
+def find_antismash_file_old(antismash_dir, bgc_name):
     subdirs = [s.split(os.sep)[-1] for s in glob.glob(antismash_dir + os.sep+'*')]
     if bgc_name.startswith('BGC'):
         print("No file for MiBIG BGC")
         return None # MiBIG BGC
+
     # this code is nasty... :-)
     name_tokens = bgc_name.split('_')
     found = False
@@ -273,6 +361,9 @@ def find_antismash_file(antismash_dir, bgc_name):
         return None
     return antismash_name
 
+#
+# not currently used!
+#
 def loadBGC_from_node_files(file_list):
     strain_id_dict = {}
     with open('strain_ids.csv', 'r') as f:
@@ -360,10 +451,15 @@ def load_mibig_library_json(mibig_json_directory):
             mibig[bgc_id] = json.load(f)
     return mibig
 
+# TODO this will need to have consistent bgc.id values if called
+# separately during the loading process, and/or have existing
+# MiBIGBGC objects merged with this set...
 def make_mibig_bgc_dict(mibig_json_directory):
     mibig_dict = load_mibig_library_json(mibig_json_directory)
     mibig_bgc_dict = {}
+    i = 0
     for name, data in list(mibig_dict.items()):
-        new_bgc = MiBIGBGC(data['general_params']['mibig_accession'], data['general_params']['biosyn_class'])
+        new_bgc = MiBIGBGC(i, data['general_params']['mibig_accession'], data['general_params']['biosyn_class'])
         mibig_bgc_dict[data['general_params']['mibig_accession']] = new_bgc
+        i += 1
     return mibig_bgc_dict
