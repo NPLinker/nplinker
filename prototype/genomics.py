@@ -284,7 +284,7 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir, 
         logger.warn('{}/{} antiSMASH files could not be found!'.format(num_missing_antismash, len(bgc_list)))
         # print(list(antismash_filenames.keys()))
 
-    # TODO bigscape .network files to get BGC edges
+    # TODO the threshold/cutoff (the ".30" part) should be configurable 
     for filename in network_file_list:
         path, nfilename = os.path.split(filename)
         nfilename = nfilename.replace('_clustering_c0.30.tsv', '_c0.30.network')
