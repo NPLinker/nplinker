@@ -79,14 +79,19 @@ class NPLinkerHelper(object):
         self.bgc_data[fid] = bgc_data
 
         bgc_edge_data = {'start': [], 'end': [], 'mibig': [], 'xs': [], 'ys': []}
-        ec = 0
+        bgc_edge_lookup = {}
         for i in range(len(edges_start)):
             start_index = edges_start[i]
             end_index = edges_end[i]
 
+            li = len(bgc_edge_data['xs'])
+            for index in [start_index, end_index]:
+                if index not in bgc_edge_lookup:
+                    bgc_edge_lookup[index] = [(li, start_index if index == end_index else start_index)]
+                else:
+                    bgc_edge_lookup[index].append((li, start_index if index == end_index else start_index))
+
             bgc_edge_data['mibig'].append(bgc_data['mibig'][start_index] or bgc_data['mibig'][end_index])
-            if(bgc_data['mibig'][start_index] or bgc_data['mibig'][end_index]):
-                ec +=1
 
             bgc_edge_data['start'].append(start_index)
             bgc_edge_data['end'].append(end_index)
@@ -97,6 +102,7 @@ class NPLinkerHelper(object):
         self.bgc_edge_data = {}
         self.bgc_edge_data[fid] = bgc_edge_data
         self.bgc_positions = nodes_xy
+        self.bgc_edge_lookup = bgc_edge_lookup
 
     def _construct_spec_data(self, fid, nodes_xy, edges_start, edges_end):
         # self.spec_data is the same as self.bgc_data above, but holding spectrum
@@ -141,9 +147,17 @@ class NPLinkerHelper(object):
                 self.spec_data['fill'].append(cmap[fam_lookup[self.spec_data['family'][i]]])
 
         spec_edge_data = {'start': [], 'end': [], 'singleton': [], 'xs': [], 'ys': []}
+        spec_edge_lookup = {}
         for i in range(len(edges_start)):
             start_index = edges_start[i]
             end_index = edges_end[i]
+
+            li = len(spec_edge_data['xs'])
+            for index in [start_index, end_index]:
+                if index not in spec_edge_lookup:
+                    spec_edge_lookup[index] = [(li, start_index if index == end_index else start_index)]
+                else:
+                    spec_edge_lookup[index].append((li, start_index if index == end_index else start_index))
 
             spec_edge_data['singleton'].append(self.spec_data['singleton'][start_index] or self.spec_data['singleton'][end_index])
 
@@ -156,6 +170,41 @@ class NPLinkerHelper(object):
         print('# edges = {}'.format(len(spec_edge_data['start'])))
         self.spec_edge_data = spec_edge_data
         self.spec_positions = nodes_xy
+        self.spec_edge_lookup = spec_edge_lookup
+
+    def get_bgc_edges(self, selected_node_indices):
+        """
+        Given a list of selected BGC indices, return a list of edge indices
+        so that only the appropriate subset of edges are shown as part of the 
+        selection. 
+        """
+        edgeset = set()
+        for n_index in selected_node_indices:
+            if n_index in self.bgc_edge_lookup:
+                # value is a list of (edge index, node index) tuples
+                node_edge_info = self.bgc_edge_lookup[n_index]
+                # to avoid "dangling" edges, also filter out any edges between 
+                # nodes that are not both in the selected set
+                edgeset.update([ni[0] for ni in node_edge_info if ni[1] in selected_node_indices and ni[1] != n_index])
+
+        return list(edgeset)
+
+    def get_spec_edges(self, selected_node_indices):
+        """
+        Given a list of selected spectrum indices, return a list of edge indices
+        so that only the appropriate subset of edges are shown as part of the 
+        selection. 
+        """
+        edgeset = set()
+        for n_index in selected_node_indices:
+            if n_index in self.spec_edge_lookup:
+                # value is a list of (edge index, node index) tuples
+                node_edge_info = self.spec_edge_lookup[n_index]
+                # to avoid "dangling" edges, also filter out any edges between 
+                # nodes that are not both in the selected set
+                edgeset.update([ni[0] for ni in node_edge_info if ni[1] in selected_node_indices and ni[1] != n_index])
+
+        return list(edgeset)
 
     def plot_x_range(self, extended=False, padding=1.2):
         return (-self.nx_scale * padding, self.nx_scale) 
