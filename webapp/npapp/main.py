@@ -761,7 +761,6 @@ class NPLinkerBokeh(object):
             sel_indices = self.ds_bgc.selected.indices
             for i in range(len(sel_indices)):
                 bgcs.append(nplinker.lookup_bgc(self.bgc_data['name'][sel_indices[i]]))
-            print("DEBUG", bgcs)
         else:
             sel_indices = self.ds_spec.selected.indices
             for i in range(len(sel_indices)):
