@@ -333,12 +333,6 @@ class NPLinkerHelper(object):
                         # TODO is this right thing to do here?
                         bgc_data['strain'].append(bgc.strain if bgc.strain is not None else 'MiBIGBGC') 
 
-                        # TODO this approach can potentially be used to distinguish different types of 
-                        # BGC by applying different markers
-                        # if isinstance(bgc, MiBIGBGC):
-                        #     bgc_data['marker'].append('circle')
-                        # else:
-                        #     bgc_data['marker'].append('diamond')
                         gcf_obj = self.nplinker.lookup_bgc(name).parent
                         self.available_gcfs[fid].add(gcf_obj)
                         gcf_id = gcf_obj.id
@@ -375,7 +369,6 @@ class NPLinkerHelper(object):
             headers = next(csvr)
             for l in csvr:
                 (name, x, y) = l
-                # self.spec_data['radius'].append(0.4)
                 spec = self.nplinker.lookup_spectrum(name)
                 if spec is None:
                     print('*** LOOKUP FAILED: spec name={}'.format(name))
@@ -416,7 +409,6 @@ class NPLinkerHelper(object):
         for fid in self.bgc_data.keys():
             self.bgc_indices[fid] = {}
             for i, bgc_name in enumerate(self.bgc_data[fid]['name']):
-                # self.bgc_indices[fid][bgc_name] = i
                 self.bgc_indices[fid][self.nplinker.lookup_bgc(bgc_name)] = i
 
         # provide a way to quickly look up the list of GCFs containing a particular BGC
