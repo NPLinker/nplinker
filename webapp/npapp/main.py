@@ -974,8 +974,12 @@ class NPLinkerBokeh(object):
             # clear any selection on the "output" plot
             if self.score_helper.gen_to_met():
                 self.ds_spec.selected.indices = []
+                self.ds_edges_spec.selected.indices = []
+                self.ren_spec.edge_renderer.visible = True
             else:
                 self.ds_bgc.selected.indices = []
+                self.ds_edges_bgc.selected.indices = []
+                self.ren_bgc.edge_renderer.visible = True
             self.update_alert('No links found for last selection', 'danger')
 
         self.debug_log('update_results')
@@ -989,11 +993,12 @@ class NPLinkerBokeh(object):
         if len(new) > 0:
             # get links for the selected BGCs and update the plots
             self.get_links()
-
-            # TODO select correct edges (might have some nodes filtered out / added)
         else:
             # if selection is now empty, clear the selection on the spectra plot too
             self.ds_spec.selected.indices = []
+            self.ds_edges_spec.selected.indices = []
+            self.ren_spec.edge_renderer.visible = True
+            self.ren_bgc.edge_renderer.visible = True
 
             self.update_results()
 
@@ -1008,6 +1013,9 @@ class NPLinkerBokeh(object):
         else:
             # if selection is now empty, clear the selection on the BGC plot too
             self.ds_bgc.selected.indices = []
+            self.ds_edges_bgc.selected.indices = []
+            self.ren_bgc.edge_renderer.visible = True
+            self.ren_spec.edge_renderer.visible = True
 
             self.update_results()
 
@@ -1031,6 +1039,8 @@ class NPLinkerBokeh(object):
         self.ds_spec.selected.indices = []
         self.ds_edges_bgc.selected.indices = []
         self.ds_edges_spec.selected.indices = []
+        self.ren_bgc.edge_renderer.visible = True
+        self.ren_spec.edge_renderer.visible = True
 
     def get_scoring_mode_text(self):
         return SCO_MODE_NAMES[self.score_helper.mode]
