@@ -1380,6 +1380,9 @@ class NPLinkerBokeh(object):
             indices = [self.nh.spec_indices[spec.spectrum_id] for spec in results]
             self.ds_spec.selected.indices = indices
 
+    def reset_button_callback(self):
+        self.clear_selections()
+
     def bokeh_layout(self):
         widgets = []
         self.results_div = Div(text='', name='results_div', width_policy='max', height_policy='fit')
@@ -1442,6 +1445,9 @@ class NPLinkerBokeh(object):
 
         # "reset everything" button
         self.reset_button = Button(name='reset_button', label='Reset state', button_type='danger', sizing_mode='scale_width')
+        # this is used to clear the selection, which isn't done by faking the reset event from the
+        # javascript callback below for some reason...
+        self.reset_button.on_click(self.reset_button_callback)
         # no python method to reset plots, for some reason...
         self.reset_button.js_on_click(CustomJS(args=dict(fig_bgc=self.fig_bgc, fig_spec=self.fig_spec), 
                                                code=""" 
