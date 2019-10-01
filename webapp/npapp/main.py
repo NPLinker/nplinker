@@ -917,10 +917,9 @@ class NPLinkerBokeh(object):
                         bgcs = [bgc for bgc in gcf.bgc_list]
                         for n in bgcs:
                             try:
-                                score_obj_indices.add(self.bgc_indices[n])
+                                score_obj_indices.add(self.bgc_indices[n.name])
                             except KeyError:
-                                self.debug_log('Warning: missing index for BGC: {} in GCF: {}'.format(n, gcf))
-                                print(list(self.bgc_indices.keys()))
+                                self.debug_log('Warning: missing index for BGC: {} in GCF: {}'.format(n.name, gcf))
                     score_obj_indices = list(score_obj_indices)
 
                 # add these indices to the overall set
