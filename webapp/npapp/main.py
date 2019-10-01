@@ -944,10 +944,29 @@ class NPLinkerBokeh(object):
     def update_ui_post_scoring(self, selected_indices):
         if len(self.score_helper.objs_with_links) > 0:
             # take the indexes of the corresponding spectra from the datasource and highlight on the other plot
+            # also need to hide edges manually
             if self.score_helper.gen_to_met():
+                # first select the set of nodes on the linked plot (spectra here)
                 self.ds_spec.selected.indices = list(selected_indices)
+                # then also select the associated set of edges on the same plot
+                self.ds_edges_spec.selected.indices = self.nh.get_spec_edges(selected_indices)
+                # hide the renderer to show no edges if none are selected (otherwise they all appear)
+                self.ren_spec.edge_renderer.visible = len(self.ds_edges_spec.selected.indices) > 0
+                # finally, need to select the set of edges associated with the nodes on 
+                # the source plot (BGCs here), or hide them all if none selected
+                self.ds_edges_bgc.selected.indices = self.nh.get_bgc_edges(self.ds_bgc.selected.indices)
+                self.ren_bgc.edge_renderer.visible = len(self.ds_edges_bgc.selected.indices) > 0
             else:
+                # first select the set of nodes on the linked plot (BGCs here)
                 self.ds_bgc.selected.indices = list(selected_indices)
+                # then also select tee associated set of edges on the same plot
+                self.ds_edges_bgc.selected.indices = self.nh.get_bgc_edges(selected_indices)
+                # hide the renderer if no edges visible
+                self.ren_bgc.edge_renderer.visible = len(self.ds_edges_bgc.selected.indices) > 0
+                # finally, need to select the set of edges associated with the nodes on
+                # the source plot (spectra here), or hide them all if none selected
+                self.ds_edges_spec.selected.indices = self.nh.get_spec_edges(self.ds_spec.selected.indices)
+                self.ren_spec.edge_renderer.visible = len(self.ds_edges_spec.selected.indices) > 0
 
             self.update_alert('{} objects with links found'.format(len(self.score_helper.objs_with_scores)), 'primary')
         else:
