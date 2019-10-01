@@ -367,7 +367,9 @@ class NPLinkerBokeh(object):
                                                        line_color=None),
                                           selection_glyph=Circle(radius=radius,
                                                                  radius_dimension='max',
-                                                                 fill_color='red', # TODO seems to use some pale colour here if 'fill' set???
+                                                                 # TODO seems to use some pale colour here if 'fill' set???
+                                                                 # TODO it is actually using the mibig BGC colours, so another bokeh bug
+                                                                 fill_color='red',
                                                                  fill_alpha=1,
                                                                  line_color=None),
                                           nonselection_glyph=Circle(radius=radius,
@@ -376,11 +378,6 @@ class NPLinkerBokeh(object):
                                                                     fill_alpha=0.0,
                                                                     line_alpha=0.0,
                                                                     line_color=None),
-                                          # hover_glyph=Circle(size=radius*50,
-                                          #                    radius_dimension='max',
-                                          #                    fill_color='fill',
-                                          #                    line_color='#000000',
-                                          #                    line_width=2),
                                           view=self.bgc_datasource_view)
 
         bgr.edge_renderer = GlyphRenderer(data_source=self.bgc_edges_datasource, 
@@ -400,10 +397,8 @@ class NPLinkerBokeh(object):
                                                                        line_alpha=0),
                                           view=self.bgc_edges_datasource_view)
 
-        # uncomment this and add a "hover_glyph" above if wanting to highlight hovered nodes+edges
-        # bgr.inspection_policy = NodesAndLinkedEdges()
-        bgr.selection_policy = NodesAndLinkedEdges()
-        # bgr.selection_policy = NodesOnly()
+        bgr.inspection_policy = NodesOnly()
+        bgr.selection_policy = NodesOnly()
 
         f_bgc.renderers.append(bgr)
         r_bgc = bgr
@@ -459,20 +454,16 @@ class NPLinkerBokeh(object):
                                                        line_color=None),
                                           selection_glyph=Circle(radius=radius,
                                                                  radius_dimension='max',
-                                                                 fill_color='fill', 
+                                                                 # TODO bug as above
+                                                                 fill_color='red', 
                                                                  fill_alpha=0.9,
                                                                  line_color=None),
                                           nonselection_glyph=Circle(radius=radius,
                                                                     radius_dimension='max',
                                                                     fill_color='#333333',
                                                                     fill_alpha=0.0,
-                                                                    line_alpha=0.0,
+                                                                    line_alpha=1.0,
                                                                     line_color=None),
-                                          # hover_glyph=Circle(size=radius*50,
-                                          #                    radius_dimension='max',
-                                          #                    fill_color='fill',
-                                          #                    line_color='#000000',
-                                          #                    line_width=2),
                                           view=self.spec_datasource_view)
 
         sgr.edge_renderer = GlyphRenderer(data_source=self.spec_edges_datasource, 
@@ -492,10 +483,8 @@ class NPLinkerBokeh(object):
                                                                        line_alpha=0),
                                           view=self.spec_edges_datasource_view)
 
-        # uncomment this and add a "hover_glyph" above if wanting to highlight hovered nodes+edges
-        # sgr.inspection_policy = NodesAndLinkedEdges()
-        sgr.selection_policy = NodesAndLinkedEdges()
-        # sgr.selection_policy = NodesOnly()
+        sgr.inspection_policy = NodesOnly()
+        sgr.selection_policy = NodesOnly()
 
         f_spec.renderers.append(sgr)
         r_spec = sgr
