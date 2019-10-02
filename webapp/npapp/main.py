@@ -11,7 +11,7 @@ from bokeh.models.renderers import GraphRenderer, GlyphRenderer
 from bokeh.models.graphs import StaticLayoutProvider, NodesAndLinkedEdges, NodesOnly
 from bokeh.events import LODEnd, LODStart, Reset
 
-from metabolomics import Spectrum,MolecularFamily
+from metabolomics import Spectrum, MolecularFamily, SingletonFamily
 from genomics import GCF, BGC, MiBIGBGC
 
 from searching import SEARCH_OPTIONS, Searcher
@@ -292,6 +292,7 @@ class NPLinkerBokeh(object):
 
         # hide singletons by default (spec_nonsingleton_indices holds the indices of all spectra with non-singleton families)
         # ie the IndexFilter accepts a list of indices that you want to *show*
+        self.hide_singletons = True
         self.spec_nonsingleton_indices = [i for i in range(len(self.spec_datasource.data['x'])) if not self.spec_datasource.data['singleton'][i]]
         self.spec_index_filter = IndexFilter(self.spec_nonsingleton_indices)
         self.spec_datasource_view = CDSView(source=self.spec_datasource, filters=[self.spec_index_filter])
@@ -300,6 +301,7 @@ class NPLinkerBokeh(object):
         self.spec_edges_datasource_view = CDSView(source=self.spec_edges_datasource, filters=[self.spec_edges_index_filter])
 
         # same for MiBIG BGCs
+        self.hide_mibig = True
         self.bgc_nonmibig_indices = [i for i in range(len(self.bgc_datasource.data['x'])) if not self.bgc_datasource.data['mibig'][i]]
         self.bgc_index_filter = IndexFilter(self.bgc_nonmibig_indices)
         self.bgc_datasource_view = CDSView(source=self.bgc_datasource, filters=[self.bgc_index_filter])
@@ -952,12 +954,27 @@ class NPLinkerBokeh(object):
 
             # final step here is to take the remaining list of scoring objects and map them
             # back to indices on the plot so they can be highlighted
+            # NOTE: extra step required if hide_singletons/hide_mibig are True. in this situation
+            # need to filter out such objects from results too
             self.debug_log('finding indices')
+            objs_to_remove = []
             for link_obj in objs_with_links:
                 score_obj_indices = []
                 if mode == SCO_MODE_BGC_SPEC or mode == SCO_MODE_GCF_SPEC:
                     # for these modes, we can just lookup spectrum indices directly
                     score_obj_indices = []
+
+                    # if not showing singleton families on the plot, shouldn't show spectra
+                    # from these families in the results, so filter them out here
+                    score_data = objs_with_scores[link_obj] if not self.hide_singletons\
+                                                            else [(spec, score) for (spec, score) in objs_with_scores[link_obj]\
+                                                                  if not isinstance(spec.family, SingletonFamily)]
+                    self.debug_log('Number of excluded spectra: {}'.format(len(objs_with_scores[link_obj]) - len(score_data)))
+                    self.debug_log('Number remaining: {}'.format(len(score_data)))
+                    if len(score_data) == 0:
+                        objs_to_remove.append(link_obj)
+                    objs_with_scores[link_obj] = score_data
+
                     for (spec, score) in objs_with_scores[link_obj]:
                         if spec.spectrum_id not in self.spec_indices:
                             self.debug_log('Warning: missing index for Spectrum: {}'.format(spec))
@@ -968,8 +985,25 @@ class NPLinkerBokeh(object):
                     # here we have a list of GCFs, but the plot shows BGCs. so in order
                     # to highlight the BGCs, need to iterate over the list of GCFs 
                     score_obj_indices = set()
+
+                    # if not showing MiBIG BGCs on the plot, filter out any GCFs that only
+                    # contain MiBIG BGCs here
+                    if self.hide_mibig:
+                        score_data = []
+                        for (gcf, score) in objs_with_scores[link_obj]:
+                            # include only GCFs with at least 1 non-MiBIG BGC
+                            if not gcf.only_mibig:
+                                score_data.append((gcf, score))
+                        self.debug_log('Number of excluded GCFs: {}'.format(len(objs_with_scores[link_obj]) - len(score_data)))
+                        self.debug_log('Number remaining: {}'.format(len(score_data)))
+                        if len(score_data) == 0:
+                            objs_to_remove.append(link_obj)
+                        objs_with_scores[link_obj] = score_data
+
                     for gcf, _ in objs_with_scores[link_obj]:
-                        bgcs = [bgc for bgc in gcf.bgc_list]
+                        # get list of BGCs from the GCF. if we're not showing MiBIG BGCs and these
+                        # are the only ones in this GCF, don't show it 
+                        bgcs = gcf.bgc_list if not self.hide_mibig else gcf.non_mibig_bgcs
                         for n in bgcs:
                             try:
                                 score_obj_indices.add(self.bgc_indices[n.name])
@@ -977,8 +1011,17 @@ class NPLinkerBokeh(object):
                                 self.debug_log('Warning: missing index for BGC: {} in GCF: {}'.format(n.name, gcf))
                     score_obj_indices = list(score_obj_indices)
 
+
                 # add these indices to the overall set
                 selected.update(score_obj_indices)
+
+        # remove any linked objects which now have no links due to hidden objects being filtered out
+        if len(objs_to_remove) > 0:
+            self.debug_log('FINAL: removing {} objects which now have no links'.format(len(objs_to_remove)))
+            for link_obj in objs_to_remove:
+                del objs_with_scores[link_obj]
+                objs_with_links.remove(link_obj)
+        self.debug_log('After filtering out hidden objects, num of objects={}'.format(len(objs_with_scores)))
 
         self.debug_log('All filtering completed, remaining objs={}'.format(len(objs_with_links)))
         # at the end of the scoring process, we end up with 3 important data structures:
@@ -1131,22 +1174,26 @@ class NPLinkerBokeh(object):
             self.ren_bgc.edge_renderer.view.filters = []
             self.fig_bgc.x_range.start, self.fig_bgc.x_range.end = self.nh.plot_x_range(True)
             self.fig_bgc.y_range.start, self.fig_bgc.y_range.end = self.nh.plot_y_range(True)
+            self.hide_mibig = False
         elif PLOT_MIBIG_BGCS in old and PLOT_MIBIG_BGCS not in new:
             self.ren_bgc.node_renderer.view.filters = [self.bgc_index_filter]
             self.ren_bgc.edge_renderer.view.filters = [self.bgc_edges_index_filter]
             self.fig_bgc.x_range.start, self.fig_bgc.x_range.end = self.nh.plot_x_range(False)
             self.fig_bgc.y_range.start, self.fig_bgc.y_range.end = self.nh.plot_y_range(False)
+            self.hide_mibig = True
 
         if PLOT_SINGLETONS in new:
             self.ren_spec.node_renderer.view.filters = []
             self.ren_spec.edge_renderer.view.filters = []
             self.fig_spec.x_range.start, self.fig_spec.x_range.end = self.nh.plot_x_range(True)
             self.fig_spec.y_range.start, self.fig_spec.y_range.end = self.nh.plot_y_range(True)
+            self.hide_singletons = False
         elif PLOT_SINGLETONS in old and PLOT_SINGLETONS not in new:
             self.ren_spec.node_renderer.view.filters = [self.spec_index_filter]
             self.ren_spec.edge_renderer.view.filters = [self.spec_edges_index_filter]
             self.fig_spec.x_range.start, self.fig_spec.x_range.end = self.nh.plot_x_range(False)
             self.fig_spec.y_range.start, self.fig_spec.y_range.end = self.nh.plot_y_range(False)
+            self.hide_mibig = True
 
         if PLOT_PRESERVE_COLOUR in new and PLOT_PRESERVE_COLOUR not in old:
             self.ren_bgc.selection_glyph.fill_color = 'fill'

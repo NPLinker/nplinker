@@ -58,7 +58,7 @@ def name_scoring(spectral_like, gcf_like, mibig_map):
         print("No annotations")
         return None, None
 
-    mibig_bgcs = gcf_like.get_mibig_bgcs()
+    mibig_bgcs = gcf_like.mibig_bgcs
     if len(mibig_bgcs) == 0:
         print("no mibig")
         return None, None
