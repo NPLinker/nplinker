@@ -406,15 +406,53 @@ class NPLinkerBokeh(object):
         self.bgc_zoom = ZoomHandler(f_bgc, r_bgc.node_renderer)
 
         hover_callback_code = """
+            // these are the currently hovered indices, which can seemingly include
+            // markers that are non-visible
             var indices = cb_data.index.indices;
+
+            // access data_source.data via cb_data.renderer.data_source.data
 
             if (indices.length > 0)
             {
-                $(output_div_id).html('<small>' + multi_prefix + indices.length + multi_suffix + '</small>');
+                let ds = cb_data.renderer.data_source;
+                // selected (as opposed to hovered/inspected) indices
+                let selected_indices = ds.selected.indices;
+                // data source column names
+                let keys = Object.keys(ds.data);
+
+                // check if this is the genomics or metabolomics plot using the column names
+                let colname = (keys.indexOf('gcf') == -1) ? 'name' : 'gcf';
+                let objtype = (colname == 'gcf') ? 'GCF ID(s): ' : 'Spectrum ID(s): ';
+
+                // idea here is to display info about the object(s) being hovered over, 
+                // subject to these conditions:
+                // - if there are no selected points, can respond to any indices being hovered
+                // - if there ARE selected points, only want to respond to those indices (otherwise
+                //  what happens is that the non-visible nonselected glyphs can still trigger the 
+                //  callback output, and that is very confusing!)
+
+                let ids = null;
+                // if nothing is selected, simply retrieve the IDs of the hovered objects
+                if(selected_indices.length == 0) {
+                    ids = indices.map(element => ds.data[colname][element]);
+                } else {
+                    // otherwise only include those ids that are also selected
+                    let available_indices = indices.filter(element => selected_indices.includes(element));
+                    ids = available_indices.map(element => ds.data[colname][element]);
+                }
+
+                if(ids.length == 0) {
+                    $(output_div_id).html('<small>' + empty_text + '</small><br/><small>&nbsp;</small>');
+                    return;
+                }
+
+                let ohtml = '<small>' + multi_prefix + indices.length + multi_suffix + '</small>';
+                ohtml += '<br/><small>' + objtype + '<strong>' + ids.join() + '</strong></small>';
+                $(output_div_id).html(ohtml);
             } 
             else
             {
-                $(output_div_id).html('<small>' + empty_text + '</small>');
+                $(output_div_id).html('<small>' + empty_text + '</small><br/><small>&nbsp;</small>');
             }
         """
 
