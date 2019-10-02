@@ -578,7 +578,7 @@ class NPLinkerBokeh(object):
 
             spec_hdr_id = 'spec_result_header_{}_{}'.format(pgindex, j)
             spec_body_id = 'spec_body_{}_{}'.format(pgindex, j)
-            spec_title = 'Spectrum(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.id, score, len(shared_strains))
+            spec_title = 'Spectrum(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.spectrum_id, score, len(shared_strains))
             if len(spec.annotations) > 0:
                 spec_title += ', annotations={}'.format(','.join(list(ann[0] for ann in spec.annotations)))
 
