@@ -369,7 +369,7 @@ class NPLinkerBokeh(object):
                                                                  radius_dimension='max',
                                                                  # TODO seems to use some pale colour here if 'fill' set???
                                                                  # TODO it is actually using the mibig BGC colours, so another bokeh bug
-                                                                 fill_color='red',
+                                                                 fill_color='fill',
                                                                  fill_alpha=1,
                                                                  line_color=None),
                                           nonselection_glyph=Circle(radius=radius,
@@ -504,7 +504,7 @@ class NPLinkerBokeh(object):
                                           selection_glyph=Circle(radius=radius,
                                                                  radius_dimension='max',
                                                                  # TODO bug as above
-                                                                 fill_color='red', 
+                                                                 fill_color='fill', 
                                                                  fill_alpha=0.9,
                                                                  line_color=None),
                                           nonselection_glyph=Circle(radius=radius,
