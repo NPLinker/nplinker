@@ -35,9 +35,9 @@ INACTIVE_BG_ALPHA = 0.555
 SCORING_GEN_TO_MET = 'TO <------ FROM'
 SCORING_MET_TO_GEN = 'FROM ------> TO'
 
-PLOT_TOGGLES = ['Enable alpha-blending', 'Enable colormaps', 'Show MiBIG BGCs', 'Show singleton families', 'Preserve colours when selecting', 'Only show results with shared strains']
-PLOT_ALPHA, PLOT_CMAP, PLOT_MIBIG_BGCS, PLOT_SINGLETONS, PLOT_PRESERVE_COLOUR, PLOT_ONLY_SHARED_STRAINS = range(len(PLOT_TOGGLES))
-PLOT_TOGGLES_ENUM = [PLOT_ALPHA, PLOT_CMAP, PLOT_MIBIG_BGCS, PLOT_SINGLETONS, PLOT_PRESERVE_COLOUR, PLOT_ONLY_SHARED_STRAINS]
+PLOT_TOGGLES = ['Show MiBIG BGCs', 'Show singleton families', 'Preserve colours when selecting', 'Only show results with shared strains']
+PLOT_MIBIG_BGCS, PLOT_SINGLETONS, PLOT_PRESERVE_COLOUR, PLOT_ONLY_SHARED_STRAINS = range(len(PLOT_TOGGLES))
+PLOT_TOGGLES_ENUM = [PLOT_MIBIG_BGCS, PLOT_SINGLETONS, PLOT_PRESERVE_COLOUR, PLOT_ONLY_SHARED_STRAINS]
 
 GENOMICS_SCORING_MODES = ['manual', 'GCF']
 METABOLOMICS_SCORING_MODES = ['manual', 'MolFam']
@@ -1116,12 +1116,6 @@ class NPLinkerBokeh(object):
         self.get_links()
 
     def plot_toggles_callback(self, attr, old, new):
-        # self.ren_bgc.glyph.fill_alpha = 0.6 if PLOT_ALPHA in new else 1.0
-        # self.ren_spec.glyph.fill_alpha = 0.6 if PLOT_ALPHA in new else 1.0
-
-        # self.ren_bgc.glyph.fill_color = 'fill' if PLOT_CMAP in new else '#449944'
-        # self.ren_spec.glyph.fill_color = 'fill' if PLOT_CMAP in new else '#444499'
-
         if PLOT_MIBIG_BGCS in new and PLOT_MIBIG_BGCS not in old:
             self.ren_bgc.node_renderer.view.filters = []
             self.ren_bgc.edge_renderer.view.filters = []
@@ -1452,7 +1446,7 @@ class NPLinkerBokeh(object):
         # bgc plot selected by default so enable the selection change listener
         self.ds_bgc.selected.on_change('indices', self.bgc_selchanged)
 
-        self.plot_toggles = CheckboxGroup(active=[PLOT_CMAP, PLOT_PRESERVE_COLOUR, PLOT_ONLY_SHARED_STRAINS], labels=PLOT_TOGGLES, name='plot_toggles')
+        self.plot_toggles = CheckboxGroup(active=[PLOT_PRESERVE_COLOUR, PLOT_ONLY_SHARED_STRAINS], labels=PLOT_TOGGLES, name='plot_toggles')
         self.plot_toggles.on_change('active', self.plot_toggles_callback)
         widgets.append(self.plot_toggles)
 
