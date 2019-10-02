@@ -549,6 +549,9 @@ class NPLinkerBokeh(object):
             self.set_tap_behavior(self.fig_bgc, 'inspect')
             self.set_tap_behavior(self.fig_spec, 'select')
 
+            self.fig_spec.outline_line_color = 'navy'
+            self.fig_spec.outline_line_width = 2
+            self.fig_bgc.outline_line_color = None
         else:
             if 'indices' in self.ds_spec.selected._callbacks and len(self.ds_spec.selected._callbacks['indices']) > 0:
                 self.configure_spec_selchanged_listener(False)
@@ -562,6 +565,10 @@ class NPLinkerBokeh(object):
 
             self.set_tap_behavior(self.fig_bgc, 'select')
             self.set_tap_behavior(self.fig_spec, 'inspect')
+
+            self.fig_bgc.outline_line_color = 'navy'
+            self.fig_bgc.outline_line_width = 2
+            self.fig_spec.outline_line_color = None
 
     def generate_gcf_spec_result(self, pgindex, gcf, links):
         # generate a GCF >> Spectra nested list
