@@ -234,13 +234,9 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir, 
                 bigscape_class = metadata_line[4]
                 product_prediction = metadata_line[3]
 
-                # make a BGC object
-                # the same BGC objects might be made more than once
-                # because they appear in multiple clusterings
-                # TODO should this happen? Any reason to have duplicate objects
-                # representing the same strain? 
+                # make a BGC object, reusing existing objects if they represent the same physical thing
                 if not strain_name == 'MiBIG':
-                    new_bgc = BGC(len(bgc_list), strain, name, bigscape_class, product_prediction, description)
+                    new_bgc = bgc_lookup.get(name, BGC(len(bgc_list), strain, name, bigscape_class, product_prediction, description))
                     if antismash_dir:
                         if antismash_format == 'flat':
                             antismash_filename = os.path.join(antismash_dir, new_bgc.name + '.gbk')
