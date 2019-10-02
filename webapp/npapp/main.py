@@ -421,8 +421,10 @@ class NPLinkerBokeh(object):
                 let keys = Object.keys(ds.data);
 
                 // check if this is the genomics or metabolomics plot using the column names
-                let colname = (keys.indexOf('gcf') == -1) ? 'name' : 'gcf';
-                let objtype = (colname == 'gcf') ? 'GCF ID(s): ' : 'Spectrum ID(s): ';
+                let gen_mode = keys.indexOf('gcf') != -1;
+                let obj_col = gen_mode ? 'gcf' : 'name';
+                let parent_col = gen_mode ? 'gcf' : 'family';
+                let objtype = gen_mode ? 'GCF ID(s): ' : 'Spectrum ID(s): ';
 
                 // idea here is to display info about the object(s) being hovered over, 
                 // subject to these conditions:
@@ -431,34 +433,43 @@ class NPLinkerBokeh(object):
                 //  what happens is that the non-visible nonselected glyphs can still trigger the 
                 //  callback output, and that is very confusing!)
 
-                let ids = null;
-                // if nothing is selected, simply retrieve the IDs of the hovered objects
-                if(selected_indices.length == 0) {
-                    ids = indices.map(element => ds.data[colname][element]);
+                let objects = null;
+                let parents = null;
+                if(selected_indices.length > 0) {
+                    // only include those ids that are also selected
+                    indices = indices.filter(element => selected_indices.includes(element));
+                }
+                objects = indices.map(element => ds.data[obj_col][element]);
+                parents = indices.map(element => ds.data[parent_col][element]);
+
+                // now to update the text in the output divs
+                // 1st div: show either "(nothing under cursor)" or "x BGCs in y GCFs" / "x spectra in y MolFams"
+                if(objects.length == 0) {
+                    $(output_div_id).html('<small>' + empty_text + '</small>');
                 } else {
-                    // otherwise only include those ids that are also selected
-                    let available_indices = indices.filter(element => selected_indices.includes(element));
-                    ids = available_indices.map(element => ds.data[colname][element]);
-                }
+                    let ohtml = '<small>';
+                    // remove dups
+                    objects = objects.filter((element, index) => objects.indexOf(element) === index);
+                    parents = parents.filter((element, index) => parents.indexOf(element) === index);
 
-                if(ids.length == 0) {
-                    $(output_div_id).html('<small>' + empty_text + '</small><br/><small>&nbsp;</small>');
-                    return;
+                    if(gen_mode) {
+                        ohtml += objects.length + ' BGCs in ' + parents.length + ' GCFs';
+                    } else {
+                        ohtml += objects.length + ' spectra in ' + parents.length + ' MolFams';
+                    }
+                    ohtml += '<small>';
+                    $(output_div_id_ext).html('<small>' + objtype + '<strong>' + objects.join() + '</strong></small>');
+                    $(output_div_id).html(ohtml);
                 }
-
-                let ohtml = '<small>' + multi_prefix + indices.length + multi_suffix + '</small>';
-                ohtml += '<br/><small>' + objtype + '<strong>' + ids.join() + '</strong></small>';
-                $(output_div_id).html(ohtml);
             } 
             else
             {
-                $(output_div_id).html('<small>' + empty_text + '</small><br/><small>&nbsp;</small>');
+                $(output_div_id).html('<small>' + empty_text + '</small>');
             }
         """
 
         callback = CustomJS(args={'output_div_id': '#bgc_hover_info', 
-                                    'multi_prefix': 'Click to select ', 
-                                    'multi_suffix' : ' BGCs', 
+                                  'output_div_id_ext': '#bgc_hover_info_ext',
                                     'empty_text' : '(nothing under cursor)'}, 
                                     code=hover_callback_code)
         hover_bgc = HoverTool(tooltips=None, callback=callback, renderers=[bgr.node_renderer])
@@ -531,8 +542,7 @@ class NPLinkerBokeh(object):
 
         # hover_spec = HoverTool(tooltips=[('index', '$index'), ('Spectra name', '@name')])
         callback = CustomJS(args={'output_div_id': '#spec_hover_info', 
-                                    'multi_prefix': 'Click to select ', 
-                                    'multi_suffix' : ' spectra', 
+                                  'output_div_id_ext': '#spec_hover_info_ext',
                                     'empty_text' : '(nothing under cursor)'}, 
                                     code=hover_callback_code)
         hover_spec = HoverTool(tooltips=None, callback=callback, renderers=[sgr.node_renderer])

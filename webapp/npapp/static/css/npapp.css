@@ -40,6 +40,10 @@
     text-align: center;
 }
 
+#spec_hover_info_ext, #bgc_hover_info_ext { 
+    text-align: center;
+}
+
 #mb_mode > .bk-root {
     float: right;
 }
