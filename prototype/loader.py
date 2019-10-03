@@ -31,6 +31,8 @@ class DatasetLoader(object):
     ANTISMASH_FMT_FLAT      = 'flat'
     ANTISMASH_FMTS          = [ANTISMASH_FMT_DEFAULT, ANTISMASH_FMT_FLAT]
 
+    BIGSCAPE_CUTOFF_DEFAULT = 30
+
     # keys for overriding metabolomics data elements
     OR_NODES        = 'nodes_file'
     OR_EDGES        = 'edges_file'
@@ -46,11 +48,14 @@ class DatasetLoader(object):
     # bigscape classes
     BIGSCAPE_CLASSES = ['NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs', 'Saccharides', 'Terpene']
 
-    def __init__(self, root, overrides, antismash_format=ANTISMASH_FMT_DEFAULT):
-        logger.debug('DatasetLoader({})'.format(root))
-        self._root = root
-        self._overrides = overrides
-        self._antismash_format = antismash_format
+    def __init__(self, config_data):
+        self._config = config_data
+        self._dataset = config_data['dataset']
+        self._overrides = self._dataset['overrides']
+        self._antismash_format = self._dataset.get('antismash_format', self.ANTISMASH_FMT_DEFAULT)
+        self._bigscape_cutoff = self._dataset.get('bigscape_cutoff', self.BIGSCAPE_CUTOFF_DEFAULT)
+        self._root = self._config['dataset']['root']
+        logger.debug('DatasetLoader({})'.format(self._root))
 
         # check antismash format is recognised
 
@@ -58,32 +63,32 @@ class DatasetLoader(object):
         # they all seem to exist (but don't parse anything yet)
         
         # 1. MET: <root>/clusterinfo_summary/<some UID>.tsv / nodes_file=<override>
-        self.nodes_file = overrides.get(self.OR_NODES, find_via_glob(os.path.join(root, 'clusterinfo_summary', '*.tsv'), self.OR_NODES))
+        self.nodes_file = self._overrides.get(self.OR_NODES, find_via_glob(os.path.join(self._root, 'clusterinfo_summary', '*.tsv'), self.OR_NODES))
 
         # 2. MET: <root>/networkedges_selfloop/<some UID>.tsv / edges_file=<override>
-        self.edges_file = overrides.get(self.OR_EDGES, find_via_glob(os.path.join(root, 'networkedges_selfloop', '*.selfloop'), self.OR_EDGES))
+        self.edges_file = self._overrides.get(self.OR_EDGES, find_via_glob(os.path.join(self._root, 'networkedges_selfloop', '*.selfloop'), self.OR_EDGES))
 
         # 3. MET: <root>/*.csv / extra_nodes_file=<override>
-        self.extra_nodes_file = overrides.get(self.OR_EXTRA_NODES, find_via_glob(os.path.join(root, '*.csv'), self.OR_EXTRA_NODES, optional=True))
+        self.extra_nodes_file = self._overrides.get(self.OR_EXTRA_NODES, find_via_glob(os.path.join(self._root, '*.csv'), self.OR_EXTRA_NODES, optional=True))
 
         # 4. MET: <root>/spectra/specs_ms.mgf / mgf_file=<override>
-        self.mgf_file = overrides.get(self.OR_MGF, os.path.join(root, 'spectra', 'specs_ms.mgf'))
+        self.mgf_file = self._overrides.get(self.OR_MGF, os.path.join(self._root, 'spectra', 'specs_ms.mgf'))
 
         # 5. MET: <root>/metadata_table/metadata_table-<number>.txt / metadata_table_file=<override>
-        self.metadata_table_file = overrides.get(self.OR_METADATA, find_via_glob(os.path.join(root, 'metadata_table', 'metadata_table*.txt'), self.OR_METADATA, optional=True))
+        self.metadata_table_file = self._overrides.get(self.OR_METADATA, find_via_glob(os.path.join(self._root, 'metadata_table', 'metadata_table*.txt'), self.OR_METADATA, optional=True))
 
         # 6. MET: <root>/quantification_table/quantification_table-<number>.csv / quantification_table_file=<override>
-        self.quantification_table_file = overrides.get(self.OR_QUANT, find_via_glob(os.path.join(root, 'quantification_table', 'quantification_table*.csv'), self.OR_QUANT, optional=True))
+        self.quantification_table_file = self._overrides.get(self.OR_QUANT, find_via_glob(os.path.join(self._root, 'quantification_table', 'quantification_table*.csv'), self.OR_QUANT, optional=True))
 
         # 7. GEN: <root>/antismash / antismash_dir=<override>
-        self.antismash_dir = overrides.get(self.OR_ANTISMASH, os.path.join(root, 'antismash'))
+        self.antismash_dir = self._overrides.get(self.OR_ANTISMASH, os.path.join(self._root, 'antismash'))
         self.antismash_cache = {}
 
         # 8. GEN: <root>/bigscape / bigscape_dir=<override>
-        self.bigscape_dir = overrides.get(self.OR_BIGSCAPE, os.path.join(root, 'bigscape'))
+        self.bigscape_dir = self._overrides.get(self.OR_BIGSCAPE, os.path.join(self._root, 'bigscape'))
 
         # 9. GEN: <root>/mibig_json / mibig_json_dir=<override>
-        self.mibig_json_dir = overrides.get(self.OR_MIBIG_JSON, os.path.join(root, 'mibig_json'))
+        self.mibig_json_dir = self._overrides.get(self.OR_MIBIG_JSON, os.path.join(self._root, 'mibig_json'))
 
         for f in self.required_paths():
             if not os.path.exists(f):
@@ -110,29 +115,30 @@ class DatasetLoader(object):
         logger.debug('make_families generated {} molfams'.format(len(self.molfams)))
 
         # and now genomics
-        input_files, ann_files = [], []
+        cluster_files, anno_files = [], []
         logger.debug('make_mibig_bgc_dict({})'.format(self.mibig_json_dir))
         self.mibig_bgc_dict = make_mibig_bgc_dict(self.mibig_json_dir)
         logger.debug('mibig_bgc_dict has {} entries'.format(len(self.mibig_bgc_dict)))
 
         # TODO can this just be modified to search all folders in the root path instead of hardcoding them?
         for folder in self.BIGSCAPE_CLASSES:
-            fam_file = os.path.join(self.bigscape_dir, folder)
-            # TODO: the "_c0.xx.tsv" part of the filename is a similarity threshold of some sort
-            # - use "_c0.30" for now 
-            # - eventually allow the value to be set in config file (e.g. can 
-            #   select "50" there and it will parse the "..._c0.50.tsv" file)
-            # should only one of them be parsed or...?
-            threshold = 30
-            cluster_file = glob.glob(fam_file + os.sep + folder + "_clustering_c0.{:02d}.tsv".format(threshold))
-            annotation_files = glob.glob(fam_file + os.sep + "Network_*")
-            # TODO which folders are supposed to exist? is it a critical error if some of them
-            # don't appear in a dataset???
-            if len(annotation_files) > 0:
-                input_files.append(cluster_file[0])
-                ann_files.append(annotation_files[0])
-            else:
-                logger.warning('Missing tsv file for folder: {}'.format(folder))
+            folder_path = os.path.join(self.bigscape_dir, folder)
+            cutoff_filename = '{}_clustering_c0.{:02d}.tsv'.format(folder, self._bigscape_cutoff)
+            cluster_filename = os.path.join(folder_path, cutoff_filename)
+            annotation_filename = os.path.join(folder_path, 'Network_Annotations_{}.tsv'.format(folder))
+
+            if not os.path.exists(annotation_filename) or not os.path.exists(cluster_filename):
+                # TODO which folders are supposed to exist? is it a critical error if some of them
+                # don't appear in a dataset???
+                logger.warning('Missing annotation/cluster tsv files in folder: {}'.format(folder_path))
+                continue
+
+            cluster_files.append(cluster_filename)
+            anno_files.append(annotation_filename)
+
+        # no files found here indicates a problem!
+        if len(anno_files) == 0:
+            raise Exception('Failed to find any BIGSCAPE files under "{}" (incorrect cutoff value? currently set to {})'.format(self.bigscape_dir, self._bigscape_cutoff))
 
         # generate a cache of antismash filenames to make matching them to BGC objects easier
         self.antismash_cache = {}
@@ -151,8 +157,8 @@ class DatasetLoader(object):
 
         logger.debug('loadBGC_from_cluster_files(antismash_dir={})'.format(self.antismash_dir))
         self.gcfs, self.bgcs, self.strains = loadBGC_from_cluster_files(
-                                                input_files,
-                                                ann_files,
+                                                cluster_files,
+                                                anno_files,
                                                 antismash_dir=self.antismash_dir,
                                                 antismash_filenames=self.antismash_cache,
                                                 antismash_format=self._antismash_format,

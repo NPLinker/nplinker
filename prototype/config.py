@@ -26,7 +26,8 @@ class Args(object):
         self.parser.add_argument('-l', '--loglevel', help='Logging verbosity level: DEBUG, INFO, WARNING, ERROR', metavar='loglevel')
         self.parser.add_argument('-f', '--logfile', help='Redirect logging from stdout to this file', metavar='logfile')
 
-        self.parser.add_argument('--antismash-format', help='Antismash file format (currently must be "flat"!)', metavar='format')
+        self.parser.add_argument('--antismash-format', help='Antismash file format ("default" or "flat"!', metavar='format')
+        self.parser.add_argument('--bigscape-cutoff', help='BIGSCAPE clustering cutoff threshold', metavar='cutoff')
         self.parser.add_argument('--repro-file', help='Filename to store reproducibility data in', metavar='filename')
 
         self.parser.add_argument('-r', '--scoring.random', help='Number of randomized instances to create during scoring', metavar='num')

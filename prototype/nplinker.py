@@ -100,7 +100,7 @@ class NPLinker(object):
 
         # this object takes care of figuring out the locations of all the relevant files/folders
         # and will show error/warning if any missing (depends if optional or not)
-        self._loader = DatasetLoader(self._config.config['dataset']['root'], self._config.config['dataset']['overrides'])
+        self._loader = DatasetLoader(self._config.config)
     
         self._spectra = []
         self._bgcs = []

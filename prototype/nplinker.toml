@@ -37,6 +37,13 @@ root = "<root directory of dataset>"
 # flat = all .gbk files placed in a single flat directory
 antismash_format = "default"
 
+# you can optionally set the BIGSCAPE clustering cutoff value here. the default value
+# is 30, but any of the valid BIGSCAPE clustering thresholds can be used assuming the
+# corresponding files exist in the dataset. Also note that it's possible to change this
+# value after the dataset has initially been loaded, which will cause only the affected
+# data to be reloaded.
+#bigscape_cutoff = 30
+
 # can also override any combination of individual file paths as required (empty
 # paths are ignored)
 [dataset.overrides]
