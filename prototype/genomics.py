@@ -163,7 +163,7 @@ class MiBIGBGC(BGC):
     def __init__(self, id, name, product_prediction):
         super(MiBIGBGC, self).__init__(id, name, name, None, product_prediction)
 
-def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir, antismash_filenames, antismash_format='default', mibig_bgc_dict=None):
+def loadBGC_from_cluster_files(cluster_file_list, ann_file_list, network_file_list, antismash_dir, antismash_filenames, antismash_format='default', mibig_bgc_dict=None):
     strain_id_dict = {}
     strain_dict = {}
     gcf_dict = {}
@@ -199,10 +199,10 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir, 
 
     bgc_lookup = {}
 
-    # "network files" are the various <class>_clustering_c0.xx.tsv files
+    # "cluster files" are the various <class>_clustering_c0.xx.tsv files
     # - BGC name
     # - cluster ID
-    for filename in network_file_list:
+    for filename in cluster_file_list:
         gnps_class = os.path.split(filename)[-1]
         gnps_class = gnps_class[:gnps_class.index('_')]
         with open(filename, 'rU') as f:
@@ -289,16 +289,9 @@ def loadBGC_from_cluster_files(network_file_list, ann_file_list, antismash_dir, 
         logger.warn('{}/{} antiSMASH files could not be found!'.format(num_missing_antismash, len(bgc_list)))
         # print(list(antismash_filenames.keys()))
 
-    # TODO the threshold/cutoff (the ".30" part) should be configurable 
+    logger.debug('Loading .network files')
     for filename in network_file_list:
-        path, nfilename = os.path.split(filename)
-        nfilename = nfilename.replace('_clustering_c0.30.tsv', '_c0.30.network')
-        nfilename = os.path.join(path, nfilename)
-        if not os.path.exists(nfilename):
-            logger.debug('No .network file "{}" to match "{}", skipping'.format(nfilename, filename))
-            continue
-
-        with open(nfilename, 'rU') as f:
+        with open(filename, 'rU') as f:
             reader = csv.reader(f, delimiter='\t')
             heads = next(reader)
             # try to look up bgc IDs

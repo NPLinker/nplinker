@@ -157,7 +157,7 @@ class NPLinker(object):
             pickle.dump(self._repro_data, repro_file)
             logger.info('Saving reproducibility data to {}'.format(filename))
 
-    def load_data(self):
+    def load_data(self, new_bigscape_cutoff=None):
         """Loads the basic components of a dataset.
 
         This method is responsible for loading the various pieces of the supplied dataset into
@@ -169,8 +169,18 @@ class NPLinker(object):
             True if successful, False otherwise
         """
 
-        if not self._loader.load():
-            return False
+        # clear any existing link/score data
+        self.clear_links()
+
+        # typical case where load_data is being called with no params
+        if new_bigscape_cutoff is None:
+            logger.debug('load_data (normal case, full load)')
+            if not self._loader.load():
+                return False
+        else:
+            logger.debug('load_data with new cutoff = {}'.format(new_bigscape_cutoff))
+            self._loader._bigscape_cutoff = new_bigscape_cutoff
+            self._loader._load_genomics()
 
         self._spectra = self._loader.spectra
         self._molfams = self._loader.molfams
@@ -179,7 +189,7 @@ class NPLinker(object):
         self._mibig_bgc_dict = self._loader.mibig_bgc_dict
         self._strains = self._loader.strains
 
-        logger.debug('Generating lookup tables')
+        logger.debug('Generating lookup tables: genomics')
         self._bgc_lookup = {}
         for i, bgc in enumerate(self._bgcs):
             self._bgc_lookup[bgc.name] = i
@@ -188,16 +198,21 @@ class NPLinker(object):
         for i, gcf in enumerate(self._gcfs):
             self._gcf_lookup[gcf.id] = i
 
-        self._spec_lookup = {}
-        for i, spec in enumerate(self._spectra):
-            self._spec_lookup[spec.spectrum_id] = i
+        # don't need to do these two if cutoff changed (indicating genomics data
+        # was reloaded but not metabolomics)
+        if new_bigscape_cutoff is None:
+            logger.debug('Generating lookup tables: metabolomics')
+            self._spec_lookup = {}
+            for i, spec in enumerate(self._spectra):
+                self._spec_lookup[spec.spectrum_id] = i
 
-        self._molfam_lookup = {}
-        for i, molfam in enumerate(self._molfams):
-            self._molfam_lookup[molfam.id] = i
+            self._molfam_lookup = {}
+            for i, molfam in enumerate(self._molfams):
+                self._molfam_lookup[molfam.id] = i
 
         logger.debug('load_data: completed')
         return True
+
 
     def _generate_scores(self, dl, lf):
         # if metcalf scoring enabled

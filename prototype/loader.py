@@ -100,22 +100,17 @@ class DatasetLoader(object):
 
     def load(self):
         # metabolomics stuff first
-        logger.debug('load_spectra({})'.format(self.mgf_file))
-        self.spectra = load_spectra(self.mgf_file)
-
-        spec_dict = {spec.spectrum_id : spec for spec in self.spectra}
-
-        logger.debug('load_edges({})'.format(self.edges_file))
-        self.spectra = load_edges(self.edges_file, self.spectra, spec_dict)
-
-        logger.debug('load_metadata({})'.format(self.nodes_file))
-        self.spectra, self.strains = load_metadata(self.nodes_file, self.extra_nodes_file, self.spectra, spec_dict)
-
-        self.molfams = make_families(self.spectra) # TODO?
-        logger.debug('make_families generated {} molfams'.format(len(self.molfams)))
+        if not self._load_metabolomics():
+            return False
 
         # and now genomics
-        cluster_files, anno_files = [], []
+        if not self._load_genomics():
+            return False
+
+        return True
+
+    def _load_genomics(self):
+        cluster_files, anno_files, network_files = [], [], []
         logger.debug('make_mibig_bgc_dict({})'.format(self.mibig_json_dir))
         self.mibig_bgc_dict = make_mibig_bgc_dict(self.mibig_json_dir)
         logger.debug('mibig_bgc_dict has {} entries'.format(len(self.mibig_bgc_dict)))
@@ -126,8 +121,10 @@ class DatasetLoader(object):
             cutoff_filename = '{}_clustering_c0.{:02d}.tsv'.format(folder, self._bigscape_cutoff)
             cluster_filename = os.path.join(folder_path, cutoff_filename)
             annotation_filename = os.path.join(folder_path, 'Network_Annotations_{}.tsv'.format(folder))
+            network_filename = os.path.join(folder_path, '{}_c0.{:02d}.network'.format(folder, self._bigscape_cutoff))
 
-            if not os.path.exists(annotation_filename) or not os.path.exists(cluster_filename):
+            existing = list(filter(os.path.exists, [cluster_filename, annotation_filename, network_filename]))
+            if len(existing) < 3:
                 # TODO which folders are supposed to exist? is it a critical error if some of them
                 # don't appear in a dataset???
                 logger.warning('Missing annotation/cluster tsv files in folder: {}'.format(folder_path))
@@ -135,6 +132,7 @@ class DatasetLoader(object):
 
             cluster_files.append(cluster_filename)
             anno_files.append(annotation_filename)
+            network_files.append(network_filename)
 
         # no files found here indicates a problem!
         if len(anno_files) == 0:
@@ -159,11 +157,27 @@ class DatasetLoader(object):
         self.gcfs, self.bgcs, self.strains = loadBGC_from_cluster_files(
                                                 cluster_files,
                                                 anno_files,
+                                                network_files,
                                                 antismash_dir=self.antismash_dir,
                                                 antismash_filenames=self.antismash_cache,
                                                 antismash_format=self._antismash_format,
                                                 mibig_bgc_dict=self.mibig_bgc_dict)
+        return True
 
+    def _load_metabolomics(self):
+        logger.debug('load_spectra({})'.format(self.mgf_file))
+        self.spectra = load_spectra(self.mgf_file)
+
+        spec_dict = {spec.spectrum_id : spec for spec in self.spectra}
+
+        logger.debug('load_edges({})'.format(self.edges_file))
+        self.spectra = load_edges(self.edges_file, self.spectra, spec_dict)
+
+        logger.debug('load_metadata({})'.format(self.nodes_file))
+        self.spectra, self.strains = load_metadata(self.nodes_file, self.extra_nodes_file, self.spectra, spec_dict)
+
+        self.molfams = make_families(self.spectra)
+        logger.debug('make_families generated {} molfams'.format(len(self.molfams)))
         return True
 
     def required_paths(self):
