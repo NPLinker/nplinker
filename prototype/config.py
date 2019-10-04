@@ -1,6 +1,5 @@
 import argparse
 import os
-import glob
 from types import SimpleNamespace
 from shutil import copyfile
 from collections import Mapping

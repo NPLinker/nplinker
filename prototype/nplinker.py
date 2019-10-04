@@ -1,6 +1,4 @@
 import sys
-import os
-import glob
 import logging
 import pickle
 
@@ -9,7 +7,6 @@ import numpy as np
 from metabolomics import Spectrum
 from metabolomics import MolecularFamily
 
-import genomics
 from genomics import GCF
 
 from data_linking import DataLinks
@@ -18,7 +15,7 @@ from data_linking import LinkLikelihood
 from data_linking import LinkFinder
 from data_linking import SCORING_METHODS
 
-from config import Config, ScoringConfig, Args
+from config import Config, Args
 from loader import DatasetLoader
 
 from logconfig import LogConfig
