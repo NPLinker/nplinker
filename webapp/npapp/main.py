@@ -85,6 +85,69 @@ TMPL_SEARCH = open(os.path.join(os.path.dirname(__file__), 'templates/tmpl.basic
 
 TMPL_SEARCH_ON_CLICK = open(os.path.join(os.path.dirname(__file__), 'templates/tmpl.onclick.search.py.html')).read()
 
+HOVER_CALLBACK_CODE = """
+    // these are the currently hovered indices, which can seemingly include
+    // markers that are non-visible
+    var indices = cb_data.index.indices;
+
+    // access data_source.data via cb_data.renderer.data_source.data
+
+    if (indices.length > 0)
+    {
+        let ds = cb_data.renderer.data_source;
+        // selected (as opposed to hovered/inspected) indices
+        let selected_indices = ds.selected.indices;
+        // data source column names
+        let keys = Object.keys(ds.data);
+
+        // check if this is the genomics or metabolomics plot using the column names
+        let gen_mode = keys.indexOf('gcf') != -1;
+        let obj_col = gen_mode ? 'gcf' : 'name';
+        let parent_col = gen_mode ? 'gcf' : 'family';
+        let objtype = gen_mode ? 'GCF ID(s): ' : 'Spectrum ID(s): ';
+
+        // idea here is to display info about the object(s) being hovered over, 
+        // subject to these conditions:
+        // - if there are no selected points, can respond to any indices being hovered
+        // - if there ARE selected points, only want to respond to those indices (otherwise
+        //  what happens is that the non-visible nonselected glyphs can still trigger the 
+        //  callback output, and that is very confusing!)
+
+        let objects = null;
+        let parents = null;
+        if(selected_indices.length > 0) {
+            // only include those ids that are also selected
+            indices = indices.filter(element => selected_indices.includes(element));
+        }
+        objects = indices.map(element => ds.data[obj_col][element]);
+        parents = indices.map(element => ds.data[parent_col][element]);
+
+        // now to update the text in the output divs
+        // 1st div: show either "(nothing under cursor)" or "x BGCs in y GCFs" / "x spectra in y MolFams"
+        if(objects.length == 0) {
+            $(output_div_id).html('<small>' + empty_text + '</small>');
+        } else {
+            let ohtml = '<small>';
+            // remove dups
+            objects = objects.filter((element, index) => objects.indexOf(element) === index);
+            parents = parents.filter((element, index) => parents.indexOf(element) === index);
+
+            if(gen_mode) {
+                ohtml += objects.length + ' BGCs in ' + parents.length + ' GCFs';
+            } else {
+                ohtml += objects.length + ' spectra in ' + parents.length + ' MolFams';
+            }
+            ohtml += '<small>';
+            $(output_div_id_ext).html('<small>' + objtype + '<strong>' + objects.join() + '</strong></small>');
+            $(output_div_id).html(ohtml);
+        }
+    } 
+    else
+    {
+        $(output_div_id).html('<small>' + empty_text + '</small>');
+    }
+"""
+
 def get_radius(datasource):
     # this aims to set a sensible initial radius based on the dimensions of the plot
     minx = min(datasource.data['x'])
@@ -284,30 +347,15 @@ class NPLinkerBokeh(object):
         self.bgc_tsne_id = '<networkx>'
         self.bgc_tsne_id_list = list(self.nh.bgc_data.keys())
 
-        self.bgc_datasource = ColumnDataSource(data=self.nh.bgc_data[self.bgc_tsne_id])
-        self.bgc_edges_datasource = ColumnDataSource(data=self.nh.bgc_edge_data[self.bgc_tsne_id])
-
-        self.spec_datasource = ColumnDataSource(data=self.nh.spec_data)
-        self.spec_edges_datasource = ColumnDataSource(data=self.nh.spec_edge_data)
-
         # hide singletons by default (spec_nonsingleton_indices holds the indices of all spectra with non-singleton families)
         # ie the IndexFilter accepts a list of indices that you want to *show*
         self.hide_singletons = True
-        self.spec_nonsingleton_indices = [i for i in range(len(self.spec_datasource.data['x'])) if not self.spec_datasource.data['singleton'][i]]
-        self.spec_index_filter = IndexFilter(self.spec_nonsingleton_indices)
-        self.spec_datasource_view = CDSView(source=self.spec_datasource, filters=[self.spec_index_filter])
-        self.spec_edges_nonsingleton_indices = [i for i in range(len(self.spec_edges_datasource.data['singleton'])) if not self.spec_edges_datasource.data['singleton'][i]]
-        self.spec_edges_index_filter = IndexFilter(self.spec_edges_nonsingleton_indices)
-        self.spec_edges_datasource_view = CDSView(source=self.spec_edges_datasource, filters=[self.spec_edges_index_filter])
 
         # same for MiBIG BGCs
         self.hide_mibig = True
-        self.bgc_nonmibig_indices = [i for i in range(len(self.bgc_datasource.data['x'])) if not self.bgc_datasource.data['mibig'][i]]
-        self.bgc_index_filter = IndexFilter(self.bgc_nonmibig_indices)
-        self.bgc_datasource_view = CDSView(source=self.bgc_datasource, filters=[self.bgc_index_filter])
-        self.bgc_edges_nonmibig_indices = [i for i in range(len(self.bgc_edges_datasource.data['mibig'])) if not self.bgc_edges_datasource.data['mibig'][i]]
-        self.bgc_edges_index_filter = IndexFilter(self.bgc_edges_nonmibig_indices)
-        self.bgc_edges_datasource_view = CDSView(source=self.bgc_edges_datasource, filters=[self.bgc_edges_index_filter])
+
+        self._configure_metabolomics()
+        self._configure_genomics()
 
         self.bgc_zoom = None
         self.spec_zoom = None
@@ -316,6 +364,26 @@ class NPLinkerBokeh(object):
         self.filter_no_shared_strains = True
 
         self.searcher = Searcher(self.nh.nplinker)
+
+    def _configure_metabolomics(self):
+        self.spec_datasource = ColumnDataSource(data=self.nh.spec_data)
+        self.spec_edges_datasource = ColumnDataSource(data=self.nh.spec_edge_data)
+        self.spec_nonsingleton_indices = [i for i in range(len(self.spec_datasource.data['x'])) if not self.spec_datasource.data['singleton'][i]]
+        self.spec_index_filter = IndexFilter(self.spec_nonsingleton_indices)
+        self.spec_datasource_view = CDSView(source=self.spec_datasource, filters=[self.spec_index_filter])
+        self.spec_edges_nonsingleton_indices = [i for i in range(len(self.spec_edges_datasource.data['singleton'])) if not self.spec_edges_datasource.data['singleton'][i]]
+        self.spec_edges_index_filter = IndexFilter(self.spec_edges_nonsingleton_indices)
+        self.spec_edges_datasource_view = CDSView(source=self.spec_edges_datasource, filters=[self.spec_edges_index_filter])
+
+    def _configure_genomics(self):
+        self.bgc_datasource = ColumnDataSource(data=self.nh.bgc_data[self.bgc_tsne_id])
+        self.bgc_edges_datasource = ColumnDataSource(data=self.nh.bgc_edge_data[self.bgc_tsne_id])
+        self.bgc_nonmibig_indices = [i for i in range(len(self.bgc_datasource.data['x'])) if not self.bgc_datasource.data['mibig'][i]]
+        self.bgc_index_filter = IndexFilter(self.bgc_nonmibig_indices)
+        self.bgc_datasource_view = CDSView(source=self.bgc_datasource, filters=[self.bgc_index_filter])
+        self.bgc_edges_nonmibig_indices = [i for i in range(len(self.bgc_edges_datasource.data['mibig'])) if not self.bgc_edges_datasource.data['mibig'][i]]
+        self.bgc_edges_index_filter = IndexFilter(self.bgc_edges_nonmibig_indices)
+        self.bgc_edges_datasource_view = CDSView(source=self.bgc_edges_datasource, filters=[self.bgc_edges_index_filter])
 
     @property
     def bgc_data(self):
@@ -345,7 +413,7 @@ class NPLinkerBokeh(object):
     def bgc_indices(self):
         return self.nh.bgc_indices[self.bgc_tsne_id]
 
-    def create_plots(self):
+    def create_genomics_plot(self):
         radius = get_radius(self.bgc_datasource)
 
         f_bgc = figure(tools=TOOLS, 
@@ -360,7 +428,6 @@ class NPLinkerBokeh(object):
         bgr.layout_provider = StaticLayoutProvider(graph_layout=self.nh.bgc_positions)
         # setting GraphRenderer attributes like this avoids a rendering bug
         # (vs setting individually)
-        print('radius is {}'.format(radius))
         bgr.node_renderer = GlyphRenderer(data_source=self.bgc_datasource,
                                           glyph=Circle(radius=radius,
                                                        radius_dimension='max',
@@ -369,8 +436,6 @@ class NPLinkerBokeh(object):
                                                        line_color=None),
                                           selection_glyph=Circle(radius=radius,
                                                                  radius_dimension='max',
-                                                                 # TODO seems to use some pale colour here if 'fill' set???
-                                                                 # TODO it is actually using the mibig BGC colours, so another bokeh bug
                                                                  fill_color='fill',
                                                                  fill_alpha=1,
                                                                  line_color=None),
@@ -407,81 +472,26 @@ class NPLinkerBokeh(object):
 
         self.bgc_zoom = ZoomHandler(f_bgc, r_bgc.node_renderer)
 
-        hover_callback_code = """
-            // these are the currently hovered indices, which can seemingly include
-            // markers that are non-visible
-            var indices = cb_data.index.indices;
-
-            // access data_source.data via cb_data.renderer.data_source.data
-
-            if (indices.length > 0)
-            {
-                let ds = cb_data.renderer.data_source;
-                // selected (as opposed to hovered/inspected) indices
-                let selected_indices = ds.selected.indices;
-                // data source column names
-                let keys = Object.keys(ds.data);
-
-                // check if this is the genomics or metabolomics plot using the column names
-                let gen_mode = keys.indexOf('gcf') != -1;
-                let obj_col = gen_mode ? 'gcf' : 'name';
-                let parent_col = gen_mode ? 'gcf' : 'family';
-                let objtype = gen_mode ? 'GCF ID(s): ' : 'Spectrum ID(s): ';
-
-                // idea here is to display info about the object(s) being hovered over, 
-                // subject to these conditions:
-                // - if there are no selected points, can respond to any indices being hovered
-                // - if there ARE selected points, only want to respond to those indices (otherwise
-                //  what happens is that the non-visible nonselected glyphs can still trigger the 
-                //  callback output, and that is very confusing!)
-
-                let objects = null;
-                let parents = null;
-                if(selected_indices.length > 0) {
-                    // only include those ids that are also selected
-                    indices = indices.filter(element => selected_indices.includes(element));
-                }
-                objects = indices.map(element => ds.data[obj_col][element]);
-                parents = indices.map(element => ds.data[parent_col][element]);
-
-                // now to update the text in the output divs
-                // 1st div: show either "(nothing under cursor)" or "x BGCs in y GCFs" / "x spectra in y MolFams"
-                if(objects.length == 0) {
-                    $(output_div_id).html('<small>' + empty_text + '</small>');
-                } else {
-                    let ohtml = '<small>';
-                    // remove dups
-                    objects = objects.filter((element, index) => objects.indexOf(element) === index);
-                    parents = parents.filter((element, index) => parents.indexOf(element) === index);
-
-                    if(gen_mode) {
-                        ohtml += objects.length + ' BGCs in ' + parents.length + ' GCFs';
-                    } else {
-                        ohtml += objects.length + ' spectra in ' + parents.length + ' MolFams';
-                    }
-                    ohtml += '<small>';
-                    $(output_div_id_ext).html('<small>' + objtype + '<strong>' + objects.join() + '</strong></small>');
-                    $(output_div_id).html(ohtml);
-                }
-            } 
-            else
-            {
-                $(output_div_id).html('<small>' + empty_text + '</small>');
-            }
-        """
 
         callback = CustomJS(args={'output_div_id': '#bgc_hover_info', 
                                   'output_div_id_ext': '#bgc_hover_info_ext',
                                     'empty_text' : '(nothing under cursor)'}, 
-                                    code=hover_callback_code)
+                                    code=HOVER_CALLBACK_CODE)
         hover_bgc = HoverTool(tooltips=None, callback=callback, renderers=[bgr.node_renderer])
         f_bgc.add_tools(hover_bgc)
         # TODO workaround for an apparent bug
         # see https://github.com/bokeh/bokeh/issues/9237
         f_bgc.add_tools(HoverTool(tooltips=None))
 
-        # create the MolFam figure in the same way as above
+        self.fig_bgc = f_bgc
+        self.ren_bgc = r_bgc
+        self.hover_bgc = hover_bgc
+        self.ds_bgc = self.ren_bgc.node_renderer.data_source
+        self.ds_edges_bgc = self.ren_bgc.edge_renderer.data_source
+        
+        return f_bgc, r_bgc
 
+    def create_metabolomics_plot(self):
         radius = get_radius(self.spec_datasource)
 
         f_spec = figure(tools=TOOLS, 
@@ -496,7 +506,6 @@ class NPLinkerBokeh(object):
         sgr.layout_provider = StaticLayoutProvider(graph_layout=self.nh.spec_positions)
         # setting GraphRenderer attributes like this avoids a rendering bug
         # (vs setting individually)
-        print('radius is {}'.format(radius))
         sgr.node_renderer = GlyphRenderer(data_source=self.spec_datasource,
                                           glyph=Circle(radius=radius,
                                                        radius_dimension='max',
@@ -505,7 +514,6 @@ class NPLinkerBokeh(object):
                                                        line_color=None),
                                           selection_glyph=Circle(radius=radius,
                                                                  radius_dimension='max',
-                                                                 # TODO bug as above
                                                                  fill_color='fill', 
                                                                  fill_alpha=0.9,
                                                                  line_color=None),
@@ -546,27 +554,20 @@ class NPLinkerBokeh(object):
         callback = CustomJS(args={'output_div_id': '#spec_hover_info', 
                                   'output_div_id_ext': '#spec_hover_info_ext',
                                     'empty_text' : '(nothing under cursor)'}, 
-                                    code=hover_callback_code)
+                                    code=HOVER_CALLBACK_CODE)
         hover_spec = HoverTool(tooltips=None, callback=callback, renderers=[sgr.node_renderer])
         f_spec.add_tools(hover_spec)
         # TODO workaround for an apparent bug
         # see https://github.com/bokeh/bokeh/issues/9237
         f_spec.add_tools(HoverTool(tooltips=None))
 
-        self.fig_bgc = f_bgc
         self.fig_spec = f_spec
-        self.ren_bgc = r_bgc
         self.ren_spec = r_spec
-        self.hover_bgc = hover_bgc
         self.hover_spec = hover_spec
-
-        self.ds_bgc = self.ren_bgc.node_renderer.data_source
         self.ds_spec = self.ren_spec.node_renderer.data_source
-        self.ds_edges_bgc = self.ren_bgc.edge_renderer.data_source
         self.ds_edges_spec = self.ren_spec.edge_renderer.data_source
-        self.set_inactive_plot(self.fig_spec)
 
-        return f_bgc, r_bgc, f_spec, r_spec
+        return f_spec, r_spec
 
     def set_tap_behavior(self, plot, btype):
         # this basically prevents clicks from selecting anything on the plot
@@ -1642,7 +1643,8 @@ class NPLinkerBokeh(object):
 # server_lifecycle.py adds a .nh attr to the current Document instance, use that
 # to access the already-created NPLinker instance plus the TSNE data
 nb = NPLinkerBokeh(curdoc().nh)
-nb.create_plots()
+nb.create_metabolomics_plot()
+nb.create_genomics_plot()
+nb.set_inactive_plot(nb.fig_spec)
 nb.bokeh_layout()
 nb.update_alert('Initialised OK!', 'success')
-
