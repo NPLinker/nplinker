@@ -1268,7 +1268,7 @@ class NPLinkerBokeh(object):
         # start of main tab content
         gcf_body += '<div class="tab-pane show active" id="gcf_{}_main" role="tabpanel">'.format(gcf.id)
         gcf_body += '<ul>'
-        for attr in ['id', 'short_gcf_id']:
+        for attr in ['id', 'gcf_id', 'gnps_class']:
             gcf_body += '<li><strong>{}</strong>: {}</li>'.format(attr, getattr(gcf, attr))
 
         # add strain information
@@ -1361,7 +1361,7 @@ class NPLinkerBokeh(object):
         for i, gcf in enumerate(gcfs):
             gcf_hdr_id = 'gcf_search_header_{}'.format(i)
             gcf_body_id = 'gcf_search_body_{}'.format(i)
-            gcf_title = 'GCF(id={}, gcf_id={}, strains={})'.format(gcf.id, gcf.short_gcf_id, len(gcf.bgc_list))
+            gcf_title = 'GCF(id={}, gcf_id={}, strains={})'.format(gcf.id, gcf.gcf_id, len(gcf.bgc_list))
             gcf_body = self.generate_gcf_info(gcf)
             body += TMPL_SEARCH.format(hdr_id=gcf_hdr_id, hdr_color='dddddd', btn_target=gcf_body_id, btn_text=gcf_title, 
                                 result_index=str(i), body_id=gcf_body_id, body_parent='accordionSearch', body_body=gcf_body)

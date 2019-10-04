@@ -65,13 +65,10 @@ class BGC(object):
 
 
 class GCF(object):
-    def __init__(self, gcf_id, gnps_class):
-        self.id = -1
+    def __init__(self, id, gcf_id, gnps_class):
+        self.id = id
         self.gcf_id = gcf_id
         self.gnps_class = gnps_class
-        # TODO worth keeping this? if os.sep isn't in the 
-        # gcf_id, this effectively just does "short_gcf_id = gcf_id"...
-        self.short_gcf_id = gcf_id.split(os.sep)[-1] 
         self.bgc_list = []
         self.random_gcf = None
 
@@ -79,7 +76,7 @@ class GCF(object):
         self.strains_lookup = None
 
     def __str__(self):
-        return 'GCF(id={}, class={}, gcf_id={})'.format(self.id, self.gnps_class, self.short_gcf_id)
+        return 'GCF(id={}, class={}, gcf_id={})'.format(self.id, self.gnps_class, self.gcf_id)
 
     def __repr__(self):
         return str(self)
@@ -197,6 +194,7 @@ def loadBGC_from_cluster_files(cluster_file_list, ann_file_list, network_file_li
     num_missing_antismash = 0
 
     bgc_lookup = {}
+    internal_gcf_id = 0
 
     # "cluster files" are the various <class>_clustering_c0.xx.tsv files
     # - BGC name
@@ -274,9 +272,10 @@ def loadBGC_from_cluster_files(cluster_file_list, ann_file_list, network_file_li
                     bgc_list.append(new_bgc)
 
                 if family_id not in gcf_dict:
-                    new_gcf = GCF(family_id, gnps_class)
+                    new_gcf = GCF(internal_gcf_id, family_id, gnps_class)
                     gcf_dict[family_id] = new_gcf
                     gcf_list.append(new_gcf)
+                    internal_gcf_id += 1
                 gcf_dict[family_id].add_bgc(new_bgc)
 
                 bgc_lookup[new_bgc.name] = new_bgc
@@ -299,10 +298,6 @@ def loadBGC_from_cluster_files(cluster_file_list, ann_file_list, network_file_li
 
     print('# MiBIG BGCs = {}, non-MiBIG BGCS = {}, total bgcs = {}, GCFs = {}'.format(
                         num_mibig, len(bgc_list) - num_mibig, len(bgc_list), len(gcf_dict)))
-    # Assign unique ids (int)
-    # TODO do this above
-    for i, gcf in enumerate(gcf_list):
-        gcf.id = i
     return gcf_list, bgc_list, strain_list
 
 def load_mibig_map(filename='mibig_gnps_links_q3_loose.csv'):
