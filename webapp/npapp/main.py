@@ -1,18 +1,18 @@
 import os
 
-from bokeh.models.widgets import RadioGroup, Slider, Div, CheckboxButtonGroup, Select, CheckboxGroup
-from bokeh.models.widgets import Toggle, Button, DataTable, TableColumn, TextInput
-from bokeh.layouts import row, column, widgetbox
+from bokeh.models.widgets import RadioGroup, Slider, Div, Select, CheckboxGroup
+from bokeh.models.widgets import Toggle, Button, TextInput
+from bokeh.layouts import row
 from bokeh.models import CustomJS
 from bokeh.plotting import figure, curdoc
 from bokeh.models import ColumnDataSource, HoverTool, TapTool, CDSView, IndexFilter, MultiLine
 from bokeh.models.markers import Circle
 from bokeh.models.renderers import GraphRenderer, GlyphRenderer
-from bokeh.models.graphs import StaticLayoutProvider, NodesAndLinkedEdges, NodesOnly
+from bokeh.models.graphs import StaticLayoutProvider, NodesOnly
 from bokeh.events import LODEnd, LODStart, Reset
 
 from metabolomics import Spectrum, MolecularFamily, SingletonFamily
-from genomics import GCF, BGC, MiBIGBGC
+from genomics import GCF, BGC
 
 from searching import SEARCH_OPTIONS, Searcher
 
@@ -967,7 +967,7 @@ class NPLinkerBokeh(object):
                     # if not showing singleton families on the plot, shouldn't show spectra
                     # from these families in the results, so filter them out here
                     score_data = objs_with_scores[link_obj] if not self.hide_singletons\
-                                                            else [(spec, score) for (spec, score) in objs_with_scores[link_obj]\
+                                                            else [(spec, score) for (spec, score) in objs_with_scores[link_obj]
                                                                   if not isinstance(spec.family, SingletonFamily)]
                     self.debug_log('Number of excluded spectra: {}'.format(len(objs_with_scores[link_obj]) - len(score_data)))
                     self.debug_log('Number remaining: {}'.format(len(score_data)))
@@ -1578,7 +1578,7 @@ class NPLinkerBokeh(object):
         widgets.append(self.search_input)
 
         # TODO can use this to convert selections in the table to selections on the plot
-        self.foo = ColumnDataSource(data={'data': [1,2,3,4,5]})
+        self.foo = ColumnDataSource(data={'data': [1, 2, 3, 4, 5]})
         # self.foo.on_change('data', lambda a, o, n: print('FOO', a, o, n))
         self.search_button = Button(name='search_button', label='Search', button_type='primary', sizing_mode='scale_width')
         # conveniently on_click seems to get called after js_on_click, so we can do stuff on the 
