@@ -1,10 +1,8 @@
 import csv
-import os
 
 import numpy as np
 
 from parsers.mgf import LoadMGF
-
 from logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
@@ -208,20 +206,20 @@ def mols_to_spectra(ms2, metadata):
 
     return spectra
 
-def load_additional_annotations(spectra,annotation_file,id_field,annotation_field):
-    with open(annotation_file,'r') as f:
-        reader = csv.reader(f,delimiter = '\t')
+def load_additional_annotations(spectra, annotation_file, id_field, annotation_field):
+    with open(annotation_file, 'r') as f:
+        reader = csv.reader(f, delimiter='\t')
         heads = next(reader)
         source_id_idx = heads.index(id_field)
         annotation_idx = heads.index(annotation_field)
         new_annotations = {}
         for line in reader:
-            new_annotations[line[source_id_idx]] = (line[annotation_idx],annotation_file)
+            new_annotations[line[source_id_idx]] = (line[annotation_idx], annotation_file)
     for s in spectra:
         found_comp = set()
         if s.spectrum_id in new_annotations:
             compound = new_annotations[s.spectrum_id][0]
-            if not compound in found_comp:
+            if compound not in found_comp:
                 s.annotations.append(new_annotations[s.spectrum_id])
                 found_comp.add(new_annotations[s.spectrum_id][0])
             
@@ -298,7 +296,7 @@ def load_edges(edges_file, spectra, spec_dict):
 
     with open(edges_file, 'rU') as f:
         reader = csv.reader(f, delimiter='\t')
-        heads = next(reader)
+        next(reader) # skip headers
         for line in reader:
             spec1_id = int(line[0])
             spec2_id = int(line[1])
@@ -345,10 +343,10 @@ class RandomMolecularFamily(object):
 
     def has_strain(self, strain):
         for spectrum in self.molecular_family.spectra:
-            try:
+            if hasattr(spectrum, 'random_spectrum'):
                 if spectrum.random_spectrum.has_strain(strain):
                     return True
-            except:
+            else:
                 print("Spectrum objects need random spectra attached for this functionality")
 
         return False
@@ -405,7 +403,7 @@ def read_aa_losses(filename):
     aa_losses = {}
     with open(filename, 'rU') as f:
         reader = csv.reader(f, delimiter=',')
-        header = next(reader)
+        next(reader) # skip headers
         for line in reader:
             if len(line) == 0:
                 continue
