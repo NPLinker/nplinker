@@ -441,4 +441,12 @@ def on_session_created(session_context):
     context object and add the NPLinkerHelper instance as an attribute.
     """
     print('on_session_created')
+    args = session_context.request.arguments
+    if 'cutoff' in args:
+        val = int(args['cutoff'][0])
+        if val != nh.nplinker.bigscape_cutoff():
+            print('*** Updating cutoff value to {} and reloading data'.format(val))
+            nh.nplinker.load_data(new_bigscape_cutoff=val)
+            nh.nplinker.process_dataset()
+            nh.load_genomics()
     setattr(session_context._document, 'nh', nh)
