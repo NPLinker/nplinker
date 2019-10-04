@@ -24,6 +24,8 @@ class NPLinkerHelper(object):
     """
     def __init__(self):
         LogConfig.setLogLevelStr('DEBUG')
+        self.nx_scale = 11
+        self.data_dir = os.path.join(os.path.dirname(__file__), 'data')
 
     def _construct_bgc_data(self, fid, nodes_xy, edges_start, edges_end):
         # self.bgc_data in the TSNE code is a dict of dicts, indexed by TSNE
@@ -216,8 +218,12 @@ class NPLinkerHelper(object):
         return (-self.nx_scale * 3 * padding, self.nx_scale)
 
     def load(self):
-        data_dir = os.path.join(os.path.dirname(__file__), 'data')
+        self.load_nplinker()
 
+        self.load_genomics()
+        self.load_metabolomics()
+
+    def load_nplinker(self):
         # initialise nplinker and load the dataset, using a config file in the webapp dir
         self.nplinker = NPLinker(os.path.join(os.path.dirname(__file__), 'nplinker_webapp.toml'))
         if not self.nplinker.load_data():
@@ -225,7 +231,7 @@ class NPLinkerHelper(object):
 
         # TODO this should be handled better/elsewhere?
         # hacky
-        mibig_file = os.path.join(data_dir, 'mibig_gnps_links_q1.csv')
+        mibig_file = os.path.join(self.data_dir, 'mibig_gnps_links_q1.csv')
         mibig_map = load_mibig_map(mibig_file)
         # mibig_bgcs = [MiBIGBGC(name, product) for (name, product) in mibig_map.items()]
         # c = len(self.nplinker.bgcs)
@@ -236,28 +242,27 @@ class NPLinkerHelper(object):
         if not self.nplinker.process_dataset():
             raise Exception('Failed to process dataset')
 
-        # construct plots based on networkx layouts, feeding in data from nplinker object
-        self.nx_scale = 11
-
-        print('Creating genomics graph')
-        gen_points, gen_edges = create_genomics_graph(self.nplinker.bgcs, width=self.nx_scale * 2, mibig=True, split_mibig=True)
-        gen_edge_start = gen_edges['start']
-        gen_edge_end = gen_edges['end']
-
+    def load_metabolomics(self):
         print('Creating metabolomics graph')
         met_points, met_edges = create_metabolomics_graph(self.nplinker.spectra, width=self.nx_scale * 2, singletons=True, split_singletons=True)
         met_edge_start = met_edges['start']
         met_edge_end = met_edges['end']
 
         fid = '<networkx>' # to replace previous BGC TSNE file selection for now
-
-        self._construct_bgc_data(fid, gen_points, gen_edge_start, gen_edge_end)
         self._construct_spec_data(fid, met_points, met_edge_start, met_edge_end)
 
-        # lookup stuff
         self.spec_indices = {}
         for i, spec in enumerate(self.spec_data['name']):
             self.spec_indices[spec] = i
+
+    def load_genomics(self):
+        print('Creating genomics graph')
+        gen_points, gen_edges = create_genomics_graph(self.nplinker.bgcs, width=self.nx_scale * 2, mibig=True, split_mibig=True)
+        gen_edge_start = gen_edges['start']
+        gen_edge_end = gen_edges['end']
+
+        fid = '<networkx>' # to replace previous BGC TSNE file selection for now
+        self._construct_bgc_data(fid, gen_points, gen_edge_start, gen_edge_end)
 
         self.bgc_indices = {}
         for fid in self.bgc_data.keys():
@@ -275,8 +280,6 @@ class NPLinkerHelper(object):
                     self.bgc_gcf_lookup[bgc] = set([gcf])
 
     def load_tsne(self):
-        data_dir = os.path.join(os.path.dirname(__file__), 'data')
-
         # initialise nplinker and load the dataset, using a config file in the webapp dir
         self.nplinker = NPLinker(os.path.join(os.path.dirname(__file__), 'nplinker_webapp.toml'))
         if not self.nplinker.load_data():
@@ -284,7 +287,7 @@ class NPLinkerHelper(object):
 
         # TODO this should be handled better/elsewhere?
         # hacky
-        mibig_file = os.path.join(data_dir, 'mibig_gnps_links_q1.csv')
+        mibig_file = os.path.join(self.data_dir, 'mibig_gnps_links_q1.csv')
         mibig_map = load_mibig_map(mibig_file)
         # mibig_bgcs = [MiBIGBGC(name, product) for (name, product) in mibig_map.items()]
         # c = len(self.nplinker.bgcs)
