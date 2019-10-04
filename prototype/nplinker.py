@@ -154,6 +154,10 @@ class NPLinker(object):
             pickle.dump(self._repro_data, repro_file)
             logger.info('Saving reproducibility data to {}'.format(filename))
 
+    def bigscape_cutoff(self):
+        """Returns the current BiGSCAPE clustering cutoff value"""
+        return self._loader._bigscape_cutoff
+
     def load_data(self, new_bigscape_cutoff=None):
         """Loads the basic components of a dataset.
 
