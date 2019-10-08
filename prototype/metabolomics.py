@@ -229,7 +229,6 @@ def load_additional_annotations(spectra, annotation_file, id_field, annotation_f
 def load_db_results_annotations(spectra, spec_dict, db_result_files):
     for path in db_result_files:
         logger.debug('Loading db_result file: {}'.format(path))
-        all_data = {}
         with open(path, 'r') as f:
             reader = csv.reader(f, delimiter='\t')
             headers = next(reader)
@@ -244,7 +243,6 @@ def load_db_results_annotations(spectra, spec_dict, db_result_files):
 
                 for c in range(1, len(line), 1):
                     spec.annotations[headers[c]] = line[c]
-                print(spec.spectrum_id, spec.annotations)
 
     return spectra
 
