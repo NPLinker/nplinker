@@ -993,7 +993,7 @@ class NPLinkerBokeh(object):
                         score_data = []
                         for (gcf, score) in objs_with_scores[link_obj]:
                             # include only GCFs with at least 1 non-MiBIG BGC
-                            if not gcf.only_mibig:
+                            if not gcf.only_mibig():
                                 score_data.append((gcf, score))
                         self.debug_log('Number of excluded GCFs: {}'.format(len(objs_with_scores[link_obj]) - len(score_data)))
                         self.debug_log('Number remaining: {}'.format(len(score_data)))
@@ -1016,13 +1016,13 @@ class NPLinkerBokeh(object):
                 # add these indices to the overall set
                 selected.update(score_obj_indices)
 
-        # remove any linked objects which now have no links due to hidden objects being filtered out
-        if len(objs_to_remove) > 0:
-            self.debug_log('FINAL: removing {} objects which now have no links'.format(len(objs_to_remove)))
-            for link_obj in objs_to_remove:
-                del objs_with_scores[link_obj]
-                objs_with_links.remove(link_obj)
-        self.debug_log('After filtering out hidden objects, num of objects={}'.format(len(objs_with_scores)))
+            # remove any linked objects which now have no links due to hidden objects being filtered out
+            if len(objs_to_remove) > 0:
+                self.debug_log('FINAL: removing {} objects which now have no links'.format(len(objs_to_remove)))
+                for link_obj in objs_to_remove:
+                    del objs_with_scores[link_obj]
+                    objs_with_links.remove(link_obj)
+            self.debug_log('After filtering out hidden objects, num of objects={}'.format(len(objs_with_scores)))
 
         self.debug_log('All filtering completed, remaining objs={}'.format(len(objs_with_links)))
         # at the end of the scoring process, we end up with 3 important data structures:
