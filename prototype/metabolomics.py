@@ -42,7 +42,7 @@ class Spectrum(object):
         self.edges = []
         self.family = None
         self.random_spectrum = None
-        self.annotations = []
+        self.annotations = {}
 
         self._losses = None
 
@@ -51,14 +51,14 @@ class Spectrum(object):
     def annotation_from_metadata(self):
         key = 'LibraryID'
         if key in self.metadata:
-            self.annotations.append((key, 'gnps'))
+            self.annotations[key] = 'gnps'
 
     def get_metadata_value(self, key):
         val = self.metadata.get(key, None)
         return val
 
     def is_library(self):
-        return len(self.annotations) > 0 and self.annotations[0][1] == 'gnps'
+        return 'LibraryID' in self.annotations and self.annotations['LibraryID'] == 'gnps'
 
     @property
     def strain_list(self):
@@ -206,6 +206,7 @@ def mols_to_spectra(ms2, metadata):
 
     return spectra
 
+# TODO this will need updated if still useful
 def load_additional_annotations(spectra, annotation_file, id_field, annotation_field):
     with open(annotation_file, 'r') as f:
         reader = csv.reader(f, delimiter='\t')
@@ -222,9 +223,32 @@ def load_additional_annotations(spectra, annotation_file, id_field, annotation_f
             if compound not in found_comp:
                 s.annotations.append(new_annotations[s.spectrum_id])
                 found_comp.add(new_annotations[s.spectrum_id][0])
-            
 
-def load_metadata(nodes_file, extra_nodes_file, spectra, spec_dict):
+# load one or more .tsv files from DB_result directory in a dataset, appending
+# data to matched spectra in .annotations dict
+def load_db_results_annotations(spectra, spec_dict, db_result_files):
+    for path in db_result_files:
+        logger.debug('Loading db_result file: {}'.format(path))
+        all_data = {}
+        with open(path, 'r') as f:
+            reader = csv.reader(f, delimiter='\t')
+            headers = next(reader)
+        
+            for line in reader:
+                scan_id = int(line[0])
+                if scan_id not in spec_dict:
+                    logger.warning('Unknown spectrum ID found in DB_result file (ID={})'.format(scan_id))
+                    continue
+
+                spec = spec_dict[scan_id]
+
+                for c in range(1, len(line), 1):
+                    spec.annotations[headers[c]] = line[c]
+                print(spec.spectrum_id, spec.annotations)
+
+    return spectra
+
+def load_metadata(nodes_file, extra_nodes_file, spectra, spec_dict, db_result_files):
     # to collect all strains from this source for later use
     strains = set()
 
@@ -287,6 +311,10 @@ def load_metadata(nodes_file, extra_nodes_file, spectra, spec_dict):
             spectrum.metadata[k] = md_convert(v)
 
         spectrum.annotation_from_metadata()
+
+    # annotations from DB_result matches
+    logger.info('Loading annotations from GNPS database matches')
+    spectra = load_db_results_annotations(spectra, spec_dict, db_result_files)
 
     return spectra, strains
 
