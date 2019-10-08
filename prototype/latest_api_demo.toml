@@ -30,7 +30,7 @@ repro_file = ""
 #   |- bigscape/<classes subfolders> (BiG-SCAPE clustering/annotation files in their subfolders)
 [dataset]
 # if the dataset has the expected directory structure, this is all that's required
-root = "/mnt/archive/nplinker_data/carnegie_new"
+root = "/mnt/archive/nplinker_data/crusemann_new"
 
 # antismash file structure. Should be either 'default' or 'flat'. 
 # default = the standard structure with nested subdirectories
