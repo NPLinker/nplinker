@@ -106,11 +106,11 @@ class GCF(object):
 
     @property
     def non_mibig_bgcs(self):
-        return list(filter(lambda bgc: not isinstance(bgc, MiBIGBGC)))
+        return list(filter(lambda bgc: not isinstance(bgc, MiBIGBGC), self.bgc_list))
 
     @property
     def mibig_bgcs(self):
-        return list(filter(lambda bgc: isinstance(bgc, MiBIGBGC)))
+        return list(filter(lambda bgc: isinstance(bgc, MiBIGBGC), self.bgc_list))
 
     @property
     def num_mibig_bgcs(self):
