@@ -638,7 +638,7 @@ class NPLinkerBokeh(object):
             spec_body_id = 'spec_body_{}_{}'.format(pgindex, j)
             spec_title = 'Spectrum(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.spectrum_id, score, len(shared_strains))
             if len(spec.annotations) > 0:
-                spec_title += ', annotations={}'.format(','.join(list(ann[0] for ann in spec.annotations)))
+                spec_title += ', annotations={}'.format(len(spec.annotations))
 
             spec_body = self.generate_spec_info(spec, shared_strains)
 
@@ -1336,8 +1336,8 @@ class NPLinkerBokeh(object):
 
         if len(spec.annotations) > 0:
             spec_body += '<strong>Annotations:</strong><ul>'
-            for a, b in spec.annotations:
-                spec_body += '<li><strong><span class="annotation">{}</span></strong> ({})</li>'.format(a, b)
+            for k, v in spec.annotations.items():
+                spec_body += '<li><strong><span class="annotation">{}</span></strong> ({})</li>'.format(k, v)
         spec_body += '</ul>'
         return spec_body
 
