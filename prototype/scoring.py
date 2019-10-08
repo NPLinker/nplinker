@@ -51,10 +51,11 @@ def hg_scoring(spectral_like, gcf_like, strains):
     r = scipy.stats.hypergeom.sf(pos_in_sample, M, n, N, 1)
     return r, None
 
+# TODO needs updating due to annotation changes
 def name_scoring(spectral_like, gcf_like, mibig_map):
     score = 0
     metadata = None
-    if len(spectral_like.annotations) == 0:
+    if spectral_like.empty_default_annotations():
         print("No annotations")
         return None, None
 
@@ -63,7 +64,7 @@ def name_scoring(spectral_like, gcf_like, mibig_map):
         print("no mibig")
         return None, None
 
-    for annotation in spectral_like.annotations:
+    for annotation in spectral_like.get_annotations():
         for mibig in mibig_bgcs:
             short_mibig = mibig.name.split('.')[0]
             if short_mibig in mibig_map:
@@ -83,10 +84,11 @@ def match(spectral_annotation, mibig_name):
             return metadata
     return False
 
+# TODO needs updating due to annotation changes
 def knownclusterblast_scoring(spectral_like, gcf_like, mibig_map):
     score = 0
     metadata = None
-    if len(spectral_like.annotations) == 0:
+    if spectral_like.empty_default_annotations():
         print("No annotations")
         return None, None
     kcb = []
@@ -100,7 +102,7 @@ def knownclusterblast_scoring(spectral_like, gcf_like, mibig_map):
     if len(kcb) == 0:
         return None, None
     total_score = 0
-    for annotation in spectral_like.annotations:
+    for annotation in spectral_like.get_annotations():
         for mibig, score in kcb:
             short_mibig = mibig.split('_')[0]
             if short_mibig in mibig_map:

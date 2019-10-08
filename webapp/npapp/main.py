@@ -637,8 +637,9 @@ class NPLinkerBokeh(object):
             spec_hdr_id = 'spec_result_header_{}_{}'.format(pgindex, j)
             spec_body_id = 'spec_body_{}_{}'.format(pgindex, j)
             spec_title = 'Spectrum(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.spectrum_id, score, len(shared_strains))
-            if len(spec.annotations) > 0:
-                spec_title += ', annotations={}'.format(len(spec.annotations))
+            num_anno_sets = len(spec.get_annotations()) + len(spec.get_gnps_annotations())
+            if num_anno_sets > 0:
+                spec_title += ', annotation sets={}'.format(num_anno_sets)
 
             spec_body = self.generate_spec_info(spec, shared_strains)
 
@@ -651,7 +652,7 @@ class NPLinkerBokeh(object):
             spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, spec.to_jcamp_str())
 
             hdr_color = 'ffe0b5'
-            if len(spec.annotations) > 0:
+            if num_anno_sets > 0:
                 hdr_color = 'ffb5e0'
             body += TMPL_ON_CLICK.format(hdr_id=spec_hdr_id, hdr_color=hdr_color, btn_target=spec_body_id, btn_onclick=spec_onclick, btn_id=spec_btn_id, 
                                          btn_text=spec_title, body_id=spec_body_id, body_parent='accordion_gcf_{}'.format(pgindex), body_body=spec_body)
@@ -1334,10 +1335,16 @@ class NPLinkerBokeh(object):
 
             spec_body += '</li>'
 
-        if len(spec.annotations) > 0:
-            spec_body += '<strong>Annotations:</strong><ul>'
-            for k, v in spec.annotations.items():
-                spec_body += '<li><strong><span class="annotation">{}</span></strong> ({})</li>'.format(k, v)
+        if len(spec.get_annotations()) > 0:
+            for def_anno in spec.get_annotations():
+                spec_body += '<strong>Default annotations:</strong><ul>'
+                for k, v in def_anno.items():
+                    spec_body += '<li><strong><span class="annotation">{}</span></strong> ({})</li>'.format(k, v)
+        if len(spec.get_gnps_annotations()) > 0:
+            for gnps_anno in spec.get_gnps_annotations():
+                spec_body += '<strong>GNPS annotations:</strong><ul>'
+                for k, v in gnps_anno.items():
+                    spec_body += '<li><strong><span class="annotation">{}</span></strong> ({})</li>'.format(k, v)
         spec_body += '</ul>'
         return spec_body
 
