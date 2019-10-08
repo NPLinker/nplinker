@@ -40,6 +40,7 @@ class DatasetLoader(object):
     OR_MGF          = 'mgf_file'
     OR_METADATA     = 'metadata_table_file'
     OR_QUANT        = 'quantification_table_file'
+    OR_DB_RESULT    = 'db_result_dir'
     # and the same for genomics data
     OR_ANTISMASH    = 'antismash_dir'
     OR_BIGSCAPE     = 'bigscape_dir'
@@ -80,23 +81,26 @@ class DatasetLoader(object):
         # 6. MET: <root>/quantification_table/quantification_table-<number>.csv / quantification_table_file=<override>
         self.quantification_table_file = self._overrides.get(self.OR_QUANT, find_via_glob(os.path.join(self._root, 'quantification_table', 'quantification_table*.csv'), self.OR_QUANT, optional=True))
 
-        # 7. GEN: <root>/antismash / antismash_dir=<override>
+        # 7. MET: <root>/DB_result/*.tsv / db_result_dir=<override>
+        self.db_result_dir = self._overrides.get(self.OR_DB_RESULT, os.path.join(self._root, 'DB_result'))
+
+        # 8. GEN: <root>/antismash / antismash_dir=<override>
         self.antismash_dir = self._overrides.get(self.OR_ANTISMASH, os.path.join(self._root, 'antismash'))
         self.antismash_cache = {}
 
-        # 8. GEN: <root>/bigscape / bigscape_dir=<override>
+        # 9. GEN: <root>/bigscape / bigscape_dir=<override>
         self.bigscape_dir = self._overrides.get(self.OR_BIGSCAPE, os.path.join(self._root, 'bigscape'))
 
-        # 9. GEN: <root>/mibig_json / mibig_json_dir=<override>
+        # 10. GEN: <root>/mibig_json / mibig_json_dir=<override>
         self.mibig_json_dir = self._overrides.get(self.OR_MIBIG_JSON, os.path.join(self._root, 'mibig_json'))
 
         for f in self.required_paths():
             if not os.path.exists(f):
                 raise FileNotFoundError('File/directory "{}" does not exist or is not readable!'.format(f))
 
-        # this is optional so just warn 
-        if not os.path.exists(self.mibig_json_dir):
-            logger.warning('mibig_json_dir "{}" does not exist or is not readable!'.format(self.mibig_json_dir))
+        for f in self.optional_paths():
+            if not os.path.exists(f):
+                logger.warning('Optional file/directory "{}" does not exist or is not readable!'.format(f))
 
     def load(self):
         # metabolomics stuff first
@@ -174,15 +178,20 @@ class DatasetLoader(object):
         self.spectra = load_edges(self.edges_file, self.spectra, spec_dict)
 
         logger.debug('load_metadata({})'.format(self.nodes_file))
-        self.spectra, self.strains = load_metadata(self.nodes_file, self.extra_nodes_file, self.spectra, spec_dict)
+        db_result_files = []
+        if os.path.exists(self.db_result_dir):
+            db_result_files = [os.path.join(self.db_result_dir, f) for f in os.listdir(self.db_result_dir) if f.lower().endswith('.tsv')]
+        self.spectra, self.strains = load_metadata(self.nodes_file, self.extra_nodes_file, self.spectra, spec_dict, db_result_files)
 
         self.molfams = make_families(self.spectra)
         logger.debug('make_families generated {} molfams'.format(len(self.molfams)))
         return True
 
     def required_paths(self):
-        # return [self.nodes_file, self.edges_file, self.extra_nodes_file, self.mgf_file, self.metadata_table_file, self.quantification_table_file, self.antismash_dir, self.bigscape_dir]
         return [self.nodes_file, self.edges_file, self.mgf_file, self.antismash_dir, self.bigscape_dir]
+
+    def optional_paths(self):
+        return [self.db_result_dir, self.mibig_json_dir]
 
     def __repr__(self):
         return 'Root={}\n   MGF={}\n   EDGES={}\n   NODES={}\n   BIGSCAPE={}\n   ANTISMASH={}\n'.format(
