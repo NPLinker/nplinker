@@ -19,6 +19,91 @@ JCAMP = '##TITLE={}\\n' +\
         '{}\\n' +\
         '##END=\\n'
 
+# just a thin wrapper around dict, other types of annotation should add more
+# useful stuff on top
+class AnnotationSet(object):
+
+    def __init__(self, data=None):
+        self._data = data or {}
+
+    def __setitem__(self, key, value):
+        self._data[key] = value
+
+    def __getitem__(self, key):
+        return self.data[key]
+
+    def items(self):
+        return self._data.items()
+
+    def keys(self):
+        return self._data.keys()
+
+    def values(self):
+        return self._data.values()
+
+    def __len__(self):
+        return self(self._data)
+
+class GNPSAnnotationSet(AnnotationSet):
+
+    K_NAME     = 'Compound_Name'
+    K_ORGANISM = 'Organism'
+    K_SCORE    = 'MQScore'
+    K_ID       = 'SpectrumID'
+
+    KEYS = ['Compound_Name', 'Organism', 'MQScore', 'SpectrumID']
+
+    PLOT_URL = 'https://metabolomics-usi.ucsd.edu/{}/?usi=mzspec:GNPSLIBRARY:{}'
+
+    def __init__(self, data):
+        super(GNPSAnnotationSet, self).__init__(data)
+        for k in GNPSAnnotationSet.KEYS:
+            if k not in self._data:
+                raise Exception('GNPSAnnotationSet missing field "{}"'.format(k))
+
+    @classmethod
+    def from_gnpsmatch(cls, gnps_line_dict):
+        data = {k: gnps_line_dict[k] for k in GNPSAnnotationSet.KEYS}
+        return cls(data)
+
+    @property
+    def name(self):
+        return self._data[self.K_NAME]
+
+    @property
+    def organism(self):
+        return self._data[self.K_ORGANISM]
+
+    @property
+    def score(self):
+        return self._data[self.K_SCORE]
+
+    @property
+    def id(self):
+        return self._data[self.K_ID]
+
+    @property
+    def png_url(self):
+        return self.PLOT_URL.format('png', self.id)
+
+    @property
+    def svg_url(self):
+        return self.PLOT_URL.format('svg', self.id)
+
+    @property
+    def spec_url(self):
+        return self.PLOT_URL.format('spectrum', self.id)
+
+    @property
+    def json_url(self):
+        return self.PLOT_URL.format('json', self.id)
+
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        return 'GNPSAnnotation(id={}, score={}, name={}, organism={})'.format(self.id, self.score, self.name, self.organism)
+
 class Spectrum(object):
     
     METADATA_BLACKLIST = set(['AllOrganisms', 'LibraryID', 'RTStdErr', 'RTMean', 'AllGroups', 'DefaultGroups',
@@ -42,23 +127,43 @@ class Spectrum(object):
         self.edges = []
         self.family = None
         self.random_spectrum = None
-        self.annotations = {}
-
+        # every Spectrum gets a default and initially empty AnnotationSet
+        self._annotations = {AnnotationSet: [AnnotationSet()], 
+                             GNPSAnnotationSet: []}
         self._losses = None
-
         self._jcamp = None
 
+    # TODO is this useful???
     def annotation_from_metadata(self):
         key = 'LibraryID'
         if key in self.metadata:
-            self.annotations[key] = 'gnps'
+            self._annotations[AnnotationSet][0][key] = 'gnps'
+
+    def empty_default_annotations(self):
+        return len(self._annotations[AnnotationSet][0]) == 0
+
+    def has_gnps_annotations(self):
+        return len(self._annotations[GNPSAnnotationSet]) > 0
+
+    def add_annotation_set(self, anno_set):
+        if type(anno_set) not in self._annotations:
+            raise Exception('Unknown annotation set type: {}'.format(type(anno_set)))
+
+        self._annotations[type(anno_set)].append(anno_set)
 
     def get_metadata_value(self, key):
         val = self.metadata.get(key, None)
         return val
 
+    def get_annotations(self):
+        return self._annotations[AnnotationSet]
+
+    def get_gnps_annotations(self):
+        return self._annotations[GNPSAnnotationSet]
+
     def is_library(self):
-        return 'LibraryID' in self.annotations and self.annotations['LibraryID'] == 'gnps'
+        # TODO as above, is this doing anything useful? preserving old behaviour for now
+        return 'LibraryID' in self._annotations[0] and self._annotations[0]['LibraryID'] == 'gnps'
 
     @property
     def strain_list(self):
@@ -206,7 +311,7 @@ def mols_to_spectra(ms2, metadata):
 
     return spectra
 
-# TODO this will need updated if still useful
+# TODO this will need updated if still useful due to annotations changes recently
 def load_additional_annotations(spectra, annotation_file, id_field, annotation_field):
     with open(annotation_file, 'r') as f:
         reader = csv.reader(f, delimiter='\t')
@@ -225,7 +330,7 @@ def load_additional_annotations(spectra, annotation_file, id_field, annotation_f
                 found_comp.add(new_annotations[s.spectrum_id][0])
 
 # load one or more .tsv files from DB_result directory in a dataset, appending
-# data to matched spectra in .annotations dict
+# data to matched spectra as GNPSAnnotationSet instances
 def load_db_results_annotations(spectra, spec_dict, db_result_files):
     for path in db_result_files:
         logger.debug('Loading db_result file: {}'.format(path))
@@ -241,8 +346,11 @@ def load_db_results_annotations(spectra, spec_dict, db_result_files):
 
                 spec = spec_dict[scan_id]
 
+                data = {}
                 for c in range(1, len(line), 1):
-                    spec.annotations[headers[c]] = line[c]
+                    data[headers[c]] = line[c]
+
+                spec.add_annotation_set(GNPSAnnotationSet.from_gnpsmatch(data))
 
     return spectra
 
