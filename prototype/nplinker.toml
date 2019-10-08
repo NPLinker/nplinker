@@ -24,6 +24,7 @@ repro_file = ""
 #   |- metadata_table/metadata_table-00000.txt (TODO)
 #   |- networkedges_selfloop/<UID>.selfloop (the "edges" file for spectra network)
 #   |- quantification_table/quantification_table-00000.csv (original MS1 data, optional? TODO)
+#   |- DB_result/*.tsv (GNPS matches for spectra, optional)
 #   |- "extra" spectrum metadata .csv file TODO
 #       (GENOMICS DATA)
 #   |- antismash/*.gbk (antiSMASH GenBank files for the BGCs in the dataset)
@@ -65,6 +66,9 @@ antismash_format = "default"
 
 # quantification table filename. This path is passed to glob.glob, default is <root>/quantification_table/quantification_table-*.csv
 #quantification_table_file = ""
+
+# GNPS DB_result directory, default is <root>/DB_result
+#db_result_dir = ""
 
 # Antismash data directory, default is <root>/antismash
 #antismash_dir = ""
