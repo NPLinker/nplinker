@@ -79,6 +79,8 @@ networkx = "*"
 xdg = "*"
 toml = "*"
 bokeh = "==1.3.4"
+jsonpickle = "*"
+sortedcontainers = "*"
 
 [requires]
 python_version = "3.7"
