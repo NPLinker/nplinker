@@ -517,34 +517,36 @@ class LinkFinder(object):
         
         # Compute the expected values for all possible values of spec and gcf strains
         # we need the total number of strains
-        _,n_strains = self.M_gcf_strain.shape
-        expected_metcalf = np.zeros(n_strains+1)
-        variance_metcalf = np.zeros(n_strains+1)
-        from scipy.stats import hypergeom # maybe needs moving?
-        for n in range(n_strains+1):
-            for m in range(n_strains+1):
-                max_overlap = min(n,m)
-                min_overlap = max(0,n+m-n_strains) # minimum possible strain overlap
-                expected_value = 0
-                expected_sq = 0
-                for o in range(min_overlap,max_overlap+1):
-                    o_prob = hypergeom.pmf(o,n_strains,n,m)
-                    # compute metcalf for n strains in type 1 and m in gcf
-                    score = o * both
-                    score += type1_not_gcf*(n-o)
-                    score += gcf_not_type1*(m-o)
-                    score += not_type1_not_gcf * (n_strains - (n+m-o))
-                    expected_value += o_prob*score
-                    expected_sq += o_prob*(score**2)
-                expected_metcalf[n,m] = expected_value
-                variance_metcalf[n,m] = expected_sq - expected_value**2
-        # now, we would like an option to take any actual score an subtract the 
-        # expected value and then divide by the square root of the variance
-        # e.g. if we have a score computed between a type 1 object that has 
-        # 3 strains, and a gcf with 6 strains, we should use the expected value 
-        # at expected_metcalf[3,6] and sqrt of the variance in the same position
-        # 
-
+        try:
+            _,n_strains = self.M_gcf_strain.shape
+            expected_metcalf = np.zeros(n_strains+1)
+            variance_metcalf = np.zeros(n_strains+1)
+            from scipy.stats import hypergeom # maybe needs moving?
+            for n in range(n_strains+1):
+                for m in range(n_strains+1):
+                    max_overlap = min(n,m)
+                    min_overlap = max(0,n+m-n_strains) # minimum possible strain overlap
+                    expected_value = 0
+                    expected_sq = 0
+                    for o in range(min_overlap,max_overlap+1):
+                        o_prob = hypergeom.pmf(o,n_strains,n,m)
+                        # compute metcalf for n strains in type 1 and m in gcf
+                        score = o * both
+                        score += type1_not_gcf*(n-o)
+                        score += gcf_not_type1*(m-o)
+                        score += not_type1_not_gcf * (n_strains - (n+m-o))
+                        expected_value += o_prob*score
+                        expected_sq += o_prob*(score**2)
+                    expected_metcalf[n,m] = expected_value
+                    variance_metcalf[n,m] = expected_sq - expected_value**2
+            # now, we would like an option to take any actual score an subtract the 
+            # expected value and then divide by the square root of the variance
+            # e.g. if we have a score computed between a type 1 object that has 
+            # 3 strains, and a gcf with 6 strains, we should use the expected value 
+            # at expected_metcalf[3,6] and sqrt of the variance in the same position
+            # 
+        except:
+            pass
 
         if type == 'spec-gcf':
             metcalf_scores = np.zeros(data_links.M_spec_gcf.shape)
