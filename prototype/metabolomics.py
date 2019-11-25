@@ -1,4 +1,5 @@
 import csv
+import math
 
 import numpy as np
 
@@ -104,6 +105,20 @@ class GNPSAnnotationSet(AnnotationSet):
     def __str__(self):
         return 'GNPSAnnotation(id={}, score={}, name={}, organism={})'.format(self.id, self.score, self.name, self.organism)
 
+
+def sqrt_normalise(peaks):
+    temp = []
+    total = 0.0
+    for mz,intensity in peaks:
+        temp.append((mz,math.sqrt(intensity)))
+        total += intensity
+    norm_facc = math.sqrt(total)
+    normalised_peaks = []
+    for mz,intensity in temp:
+        normalised_peaks.append((mz,intensity/norm_facc))
+    return normalised_peaks
+
+
 class Spectrum(object):
     
     METADATA_BLACKLIST = set(['AllOrganisms', 'LibraryID', 'RTStdErr', 'RTMean', 'AllGroups', 'DefaultGroups',
@@ -115,6 +130,7 @@ class Spectrum(object):
     def __init__(self, id, peaks, spectrum_id, precursor_mz, parent_mz=None, rt=None):
         self.id = id
         self.peaks = sorted(peaks, key=lambda x: x[0]) # ensure sorted by mz
+        self.normalised_peaks = sqrt_normalise(self.peaks) # useful later
         self.n_peaks = len(self.peaks)
         self.max_ms2_intensity = max([intensity for mz, intensity in self.peaks])
         self.total_ms2_intensity = sum([intensity for mz, intensity in self.peaks])
