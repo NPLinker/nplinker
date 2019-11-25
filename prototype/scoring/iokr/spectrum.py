@@ -48,6 +48,8 @@ class MSSpectrum(object):
         self.raw_parentmass = mgf_dict['params']['pepmass'][0]
         self.inchi = None
         self.id = None
+        if 'smiles' in mgf_dict['params']:
+            self.smiles = mgf_dict['params']['smiles']
 
         spec = []
         for a in zip(mgf_dict['m/z array'], mgf_dict['intensity array']):
