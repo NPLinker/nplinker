@@ -15,21 +15,9 @@ def headers_match_gnps(headers):
             return False
     return True
 
-    @property
-    def png_url(self):
-        return self.PLOT_URL.format('png', self.id)
-
-    @property
-    def svg_url(self):
-        return self.PLOT_URL.format('svg', self.id)
-
-    @property
-    def spec_url(self):
-        return self.PLOT_URL.format('spectrum', self.id)
-
-    @property
-    def json_url(self):
-        return self.PLOT_URL.format('json', self.id)
+# url_type: spectrum, png, svg, json
+def gnps_url(id, url_type='spectrum'):
+    return GNPS_URL_FORMAT.format('png', id)
 
 def load_annotations(root, config, spectra, spec_dict):
     if not os.path.exists(root):
