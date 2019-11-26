@@ -23,15 +23,16 @@ try:
 except ImportError:
     print('Warning: plotting functionality will not be available (missing matplotlib and/or seaborn)')
 
-from genomics import GCF
-from metabolomics import Spectrum
-from metabolomics import MolecularFamily
+from .genomics import GCF
+from .metabolomics import Spectrum
+from .metabolomics import MolecularFamily
 
-import data_linking_functions as DL_functions
+from .data_linking_functions import calc_correlation_matrix, calc_likelihood_matrix
+from .data_linking_functions import pair_prob, pair_prob_hg, link_prob, pair_prob_approx
 
 SCORING_METHODS = ['metcalf', 'likescore', 'hg']
 
-from logconfig import LogConfig
+from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
 class DataLinks(object):
@@ -127,8 +128,10 @@ class DataLinks(object):
         bigscape_bestguess = []
         for i, gcf in enumerate(gcf_list):
             bigscape_class = []
-            for m in range(0, len(gcf_list[i].bgc_list)):
-                bigscape_class.append(gcf_list[i].bgc_list[m].bigscape_class)
+            # for m in range(0, len(gcf_list[i].bgc_list)):
+            for i, bgc in enumerate(gcf_list[i].bgcs):
+                # bigscape_class.append(gcf_list[i].bgc_list[m].bigscape_class)
+                bigscape_class.append(bgc.bigscape_class)
                 class_counter = Counter(bigscape_class)
                 
             # try not to select "Others":   
@@ -170,7 +173,6 @@ class DataLinks(object):
     def matrix_strain_spec(self, spectra, strain_list):
         # Collect co-ocurences in M_strains_specs matrix
 
-        strain_list = [str(x) for x in strain_list]
         M_spec_strain = np.zeros((len(spectra), len(strain_list)))
         for i, spectrum in enumerate(spectra):
             for j, s in enumerate(strain_list):
@@ -181,7 +183,7 @@ class DataLinks(object):
         # extend mapping tables:
         self.mapping_spec["no of strains"] =  np.sum(self.M_spec_strain, axis=1)
         self.mapping_strain["no of spectra"] =  np.sum(self.M_spec_strain, axis=0)
-        self.mapping_strain["strain name"] = strain_list
+        self.mapping_strain["strain name"] = [str(s) for s in strain_list]
 
     def data_family_mapping(self, include_singletons=False):
         # Create M_fam_strain matrix that gives co-occurences between mol. families and strains
@@ -319,7 +321,7 @@ class DataLinks(object):
         logger.debug("Calculating correlation matrices of type: {}".format(type))
 
         # Calculate correlation matrix from co-occurence matrices
-        M_type1_gcf, M_type1_notgcf, M_nottype1_gcf, M_nottype1_notgcf = DL_functions.calc_correlation_matrix(M_type1_strain, self.M_gcf_strain)
+        M_type1_gcf, M_type1_notgcf, M_nottype1_gcf, M_nottype1_notgcf = calc_correlation_matrix(M_type1_strain, self.M_gcf_strain)
 
         # return results:
         if type == 'spec-gcf':
@@ -433,7 +435,7 @@ class LinkLikelihood(object):
         logger.debug("Calculating likelihood matrices of type: {}".format(type))
         # Calculate likelihood matrices using calc_likelihood_matrix()
         P_type2_given_type1, P_type2_not_type1, P_type1_given_type2, \
-            P_type1_not_type2 = DL_functions.calc_likelihood_matrix(M_type1_cond,
+            P_type1_not_type2 = calc_likelihood_matrix(M_type1_cond,
                                                                               data_links.M_gcf_strain,
                                                                               M_type1_type2,
                                                                               M_type1_nottype2,
@@ -515,6 +517,7 @@ class LinkFinder(object):
         Calculate metcalf scores from DataLinks() co-occurence matrices
         """
         
+        # TODO expected value scoring stuff
         # Compute the expected values for all possible values of spec and gcf strains
         # we need the total number of strains
         try:
@@ -740,7 +743,7 @@ class LinkFinder(object):
         
         # Calculate the hypergeometric probability (as before)
         for i in range(link_candidates.shape[1]):
-             link_candidates[9, i] = DL_functions.pair_prob_hg(link_candidates[6,i],
+             link_candidates[9, i] = pair_prob_hg(link_candidates[6,i],
                                                             num_strains,
                                                             Nx_list[link_candidates[1,i]],
                                                             Ny_list[int(link_candidates[0,i])])
@@ -753,7 +756,7 @@ class LinkFinder(object):
             # find set of strains which contain GCF with id link_candidates[1,i] 
             XG = np.where(data_links.M_gcf_strain[id_gcf , :] == 1)[0]
                                                            
-            link_candidates[10,i] = DL_functions.pair_prob_approx(P_str, XG,
+            link_candidates[10,i] = pair_prob_approx(P_str, XG,
                                                             int(Ny_list[id_spec]),
                                                             int(link_candidates[6,i]))
             # Calculate the link specific probability
@@ -762,7 +765,7 @@ class LinkFinder(object):
                 XGS = np.where((data_links.M_gcf_strain[id_gcf, :] == 1) & (data_links.M_spec_strain[id_spec, :] == 1))[0]
             elif type == 'fam-gcf':
                 XGS = np.where((data_links.M_gcf_strain[id_gcf, :] == 1) & (data_links.M_fam_strain[id_spec, :] == 1))[0]
-            link_candidates[11,i] = DL_functions.link_prob(P_str, XGS,
+            link_candidates[11,i] = link_prob(P_str, XGS,
                                                            int(Nx_list[id_gcf]),
                                                            int(Ny_list[id_spec]), num_strains)
             

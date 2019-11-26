@@ -4,21 +4,18 @@ import pickle
 
 import numpy as np
 
-from metabolomics import Spectrum
-from metabolomics import MolecularFamily
+from .metabolomics import Spectrum
+from .metabolomics import MolecularFamily
 
-from genomics import GCF
+from .genomics import GCF
 
-from data_linking import DataLinks
-from data_linking import RandomisedDataLinks
-from data_linking import LinkLikelihood
-from data_linking import LinkFinder
-from data_linking import SCORING_METHODS
+from .data_linking import DataLinks, RandomisedDataLinks, LinkLikelihood
+from .data_linking import LinkFinder, SCORING_METHODS
 
-from config import Config, Args
-from loader import DatasetLoader
+from .config import Config, Args
+from .loader import DatasetLoader
 
-from logconfig import LogConfig
+from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
 class NPLinker(object):
@@ -102,7 +99,7 @@ class NPLinker(object):
         self._spectra = []
         self._bgcs = []
         self._gcfs = []
-        self._strains = []
+        self._strains = None
         self._metadata = {}
         self._families = []
         self._mibig_bgc_dict = {}
@@ -189,6 +186,7 @@ class NPLinker(object):
         self._gcfs = self._loader.gcfs
         self._mibig_bgc_dict = self._loader.mibig_bgc_dict
         self._strains = self._loader.strains
+        self._product_types = self._loader.product_types
 
         logger.debug('Generating lookup tables: genomics')
         self._bgc_lookup = {}
@@ -542,7 +540,7 @@ class NPLinker(object):
 
             return [perc_results]
 
-        logger.error('Bad input type in _get_links_percentile??')
+        logger.error('Bad input type in _get_links_percentile?? ({})'.format(input_type))
         return None
 
     def get_common_strains(self, objects_a, objects_b, filter_no_shared=True):
@@ -552,7 +550,7 @@ class NPLinker(object):
 
         # replace the lists of strain indices with actual strain objects
         for objpair in common_strains.keys():
-            common_strains[objpair] = [self._strains[x] for x in common_strains[objpair]]
+            common_strains[objpair] = [self._strains.lookup_index(x) for x in common_strains[objpair]]
     
         return common_strains
 
@@ -598,6 +596,13 @@ class NPLinker(object):
     @property
     def mibig_bgc_dict(self):
         return self._mibig_bgc_dict
+
+    @property
+    def product_types(self):
+        """
+        Returns a list of the available BiGSCAPE product types in current dataset
+        """
+        return self._product_types
 
     @property
     def datalinks(self):

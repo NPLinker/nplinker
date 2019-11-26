@@ -7,9 +7,9 @@ from collections import Mapping
 import toml
 from xdg import XDG_CONFIG_HOME
 
-from data_linking import SCORING_METHODS
+from .data_linking import SCORING_METHODS
 
-from logconfig import LogConfig
+from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
 class Args(object):
@@ -76,7 +76,7 @@ class Config(object):
         if not os.path.exists(self.default_config_path):
             logger.debug('Creating default config file')
             os.makedirs(os.path.join(XDG_CONFIG_HOME, 'nplinker'), exist_ok=True)
-            copyfile(os.path.join(os.path.dirname(__file__), Config.DEFAULT_CONFIG), self.default_config_path)
+            copyfile(os.path.join(os.path.dirname(__file__), 'data', Config.DEFAULT_CONFIG), self.default_config_path)
 
         # load the default per-user config file, then check for one provided as an argument
         # and if present use it to override the defaults

@@ -2,7 +2,7 @@ import os
 
 from Bio import SeqIO
 
-from logconfig import LogConfig
+from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
 def get_known_cluster_blast(bgc):

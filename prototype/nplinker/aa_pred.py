@@ -3,7 +3,7 @@ import os
 
 from Bio import SeqIO
 
-from aalist import AA_LIST as AA_CODES
+from .aalist import AA_LIST as AA_CODES
 
 
 # AA_CODES_ISO contains codes that should map to 
