@@ -8,23 +8,80 @@ import scipy.stats
 # - both
 METCALF_WEIGHTS = [1, 0, -10, 10]
 
-def metcalf_scoring(spectral_like, gcf_like, strains, both=10, met_not_gcf=-10, gcf_not_met=0, neither=1):
-    cum_score = 0
-    shared_strains = set()
-    for strain in strains:
-        in_spec = spectral_like.has_strain(strain)
-        in_gcf = gcf_like.has_strain(strain)
-        if in_spec and in_gcf:
-            cum_score += both
-            shared_strains.add(strain)
-        if in_spec and not in_gcf:
-            cum_score += met_not_gcf
-        if in_gcf and not in_spec:
-            cum_score += gcf_not_met
-        if not in_gcf and not in_spec:
-            cum_score += neither
 
-    return cum_score, shared_strains
+METCALF_EXPECTED_CACHE = None
+METCALF_VARIANCE_CACHE = None
+
+
+def metcalf_count(n, m, overlap, N, in_both, spec_not_gen, gen_not_spec, neither):
+    # compute metcalf score for n strains in spectrum
+    # m strains in gcf
+    # where overlap of them are the same
+    score = overlap * in_both
+    score += spec_not_gen*(n-overlap)
+    score += gen_not_spec*(m-overlap)
+    score += neither * (N - (n + m - overlap))
+    return score
+
+
+def metcalf_expected_count(met, gcf, overlap, N, both, met_not_gcf, gcf_not_met, neither):
+    # Compute the expected value of the Metcalf score for the given MF/GCF sizes
+    global METCALF_EXPECTED_CACHE
+    global METCALF_VARIANCE_CACHE
+
+    cache_size = (N, N)
+    if METCALF_EXPECTED_CACHE is None or METCALF_EXPECTED_CACHE.shape != cache_size:
+        METCALF_EXPECTED_CACHE = np.zeros(cache_size)
+        METCALF_VARIANCE_CACHE = np.zeros(cache_size)
+
+    if METCALF_EXPECTED_CACHE[met, gcf] != 0.0 or METCALF_VARIANCE_CACHE[met, gcf] != 0.0:
+        expected = METCALF_EXPECTED_CACHE[met, gcf]
+        variance = METCALF_VARIANCE_CACHE[met, gcf]
+        return expected, variance
+
+    min_overlap = max(0, met + gcf - N)
+    max_overlap = min(met, gcf)
+    this_e = 0
+    this_e2 = 0
+    for o in range(int(min_overlap), int(max_overlap)+1):
+        o_prob = scipy.stats.hypergeom.pmf(o, N, met, gcf)
+        score = metcalf_count(met, gcf, o, N, both, met_not_gcf, gcf_not_met, neither)
+        this_e += o_prob*score
+        this_e2 += o_prob*(score**2)
+                
+    expected = this_e
+    variance = this_e2 - this_e**2
+    # degenerate example...
+    if variance == 0:
+        variance = 1
+
+    METCALF_EXPECTED_CACHE[met, gcf] = expected
+    METCALF_VARIANCE_CACHE[met, gcf] = variance
+
+    return expected, variance
+
+
+def metcalf_scoring(spectral_like, gcf_like, strains, both=10, met_not_gcf=-10, gcf_not_met=0, neither=1, standardised=False):
+    """
+    Calculate the Metcalf score for the provided objects
+    strains should be a list of strain names
+    """
+    N = len(strains)
+
+    mf_strains = list(set([x for x, y in spectral_like.metadata.items() if y != 0]).intersection(strains))
+    gcf_strains = list(set(gcf_like.strains).intersection(strains))
+
+    n = len(mf_strains)
+    m = len(gcf_strains)
+    o = len(set(mf_strains).intersection(gcf_strains))
+    actual_score = metcalf_count(n, m, o, N, both, met_not_gcf, gcf_not_met, neither)
+
+    if standardised:
+        expected, variance = metcalf_expected_count(n, m, o, N, both, met_not_gcf, gcf_not_met, neither)
+        actual_score = (actual_score - expected) / np.sqrt(variance)
+
+    return actual_score
+
 
 def hg_scoring(spectral_like, gcf_like, strains):
     spectral_count = 0
