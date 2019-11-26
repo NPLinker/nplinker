@@ -87,7 +87,6 @@ def load_annotations(root, config, spectra, spec_dict):
                         data['{}_url'.format(t)] = GNPS_URL_FORMAT.format(t, data['SpectrumID'])
                     # TODO will there only ever be a single entry here?
                     spec.add_annotations(GNPS_KEY, data)
-                    print(spec)
             else:
                 logger.debug('Parsing general annotations from {}'.format(af))
                 # this is a general annotations file, so rely purely on the user-provided columns
