@@ -11,11 +11,11 @@ from bokeh.models import ColumnDataSource
 # TODO probably will need changed at some point!
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../prototype'))
 
-from nplinker import NPLinker
-from genomics import load_mibig_map, MiBIGBGC
-from metabolomics import SingletonFamily
-from logconfig import LogConfig
-from layout import create_genomics_graph, create_metabolomics_graph
+from nplinker.nplinker import NPLinker
+from nplinker.genomics import load_mibig_map, MiBIGBGC
+from nplinker.metabolomics import SingletonFamily
+from nplinker.logconfig import LogConfig
+from nplinker.layout import create_genomics_graph, create_metabolomics_graph
 
 class NPLinkerHelper(object):
     """
@@ -53,7 +53,7 @@ class NPLinkerHelper(object):
             
             bgc_data['name'].append(bgc.name)
             # TODO is this right thing to do here?
-            bgc_data['strain'].append(bgc.strain if bgc.strain is not None else 'MiBIGBGC') 
+            bgc_data['strain'].append(bgc.strain.id if bgc.strain is not None else 'MiBIGBGC') 
             bgc_data['mibig'].append(isinstance(bgc, MiBIGBGC))
             bgcindex += 1
             gcf_obj = bgc.parent
@@ -273,7 +273,7 @@ class NPLinkerHelper(object):
         # provide a way to quickly look up the list of GCFs containing a particular BGC
         self.bgc_gcf_lookup = {}
         for gcf in self.nplinker.gcfs:
-            for bgc in gcf.bgc_list:
+            for bgc in gcf.bgcs:
                 if bgc in self.bgc_gcf_lookup:
                     self.bgc_gcf_lookup[bgc].add(gcf)
                 else:
@@ -417,7 +417,7 @@ class NPLinkerHelper(object):
         # provide a way to quickly look up the list of GCFs containing a particular BGC
         self.bgc_gcf_lookup = {}
         for gcf in self.nplinker.gcfs:
-            for bgc in gcf.bgc_list:
+            for bgc in gcf.bgcs:
                 if bgc in self.bgc_gcf_lookup:
                     self.bgc_gcf_lookup[bgc].add(gcf)
                 else:
