@@ -2,11 +2,13 @@ import csv, glob, os, json
 
 import numpy as np
 
-import aa_pred
-from genomics_utilities import get_known_cluster_blast
-from genomics_utilities import get_smiles
+from .aa_pred import predict_aa
+from .genomics_utilities import get_known_cluster_blast
+from .genomics_utilities import get_smiles
 
-from logconfig import LogConfig
+from .strains import Strain, StrainCollection
+
+from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
 class BGC(object):
@@ -53,7 +55,7 @@ class BGC(object):
         if self._aa_predictions is None:
             self._aa_predictions = {}
             if self.antismash_file is not None:
-                for p in aa_pred.predict_aa(self.antismash_file):
+                for p in predict_aa(self.antismash_file):
                     self._aa_predictions[p[0]] = p[1]
         return [self._aa_predictions]
 
@@ -69,11 +71,13 @@ class GCF(object):
         self.id = id
         self.gcf_id = gcf_id
         self.gnps_class = gnps_class
-        self.bgc_list = []
+        self.bgcs = set()
+        self.classes = set()
         self.random_gcf = None
 
         self._aa_predictions = None
-        self.strains_lookup = None
+        self.strains = StrainCollection()
+        self.strains_lookup = {}
 
     def __str__(self):
         return 'GCF(id={}, class={}, gcf_id={})'.format(self.id, self.gnps_class, self.gcf_id)
@@ -82,35 +86,34 @@ class GCF(object):
         return str(self)
 
     def add_bgc(self, bgc):
-        self.bgc_list.append(bgc)
+        self.bgcs.add(bgc)
+        self.classes.add(bgc.bigscape_class)
         bgc.parent = self
+        self.strains.add(bgc.strain)
+        self.strains_lookup[bgc.strain] = bgc
 
-    @property
-    def strains(self):
-        return [bgc.strain for bgc in self.bgc_list]
+    def has_strain(self, strain):
+        return strain in self.strains
+
+    def bgc_for_strain(self, strain):
+        return self.strains_lookup[strain]
 
     def only_mibig(self):
-        return len(self.bgc_list) == self.num_mibig_bgcs
+        return len(self.bgcs) == self.num_mibig_bgcs
 
     def has_mibig(self):
         return self.num_mibig_bgcs > 0
-
-    def has_strain(self, strain):
-        for bgc in self.bgc_list:
-            if bgc.strain == strain:
-                return True
-        return False
 
     def add_random(self, bgc_list):
         self.random_gcf = RandomGCF(self, bgc_list)
 
     @property
     def non_mibig_bgcs(self):
-        return list(filter(lambda bgc: not isinstance(bgc, MiBIGBGC), self.bgc_list))
+        return list(filter(lambda bgc: not isinstance(bgc, MiBIGBGC), self.bgcs))
 
     @property
     def mibig_bgcs(self):
-        return list(filter(lambda bgc: isinstance(bgc, MiBIGBGC), self.bgc_list))
+        return list(filter(lambda bgc: isinstance(bgc, MiBIGBGC), self.bgcs))
 
     @property
     def num_mibig_bgcs(self):
@@ -118,7 +121,7 @@ class GCF(object):
 
     @property
     def num_non_mibig_bgcs(self):
-        return len(self.bgc_list) - self.num_mibig_bgcs
+        return len(self.bgcs) - self.num_mibig_bgcs
 
     @property
     def aa_predictions(self):
@@ -127,63 +130,46 @@ class GCF(object):
         """
         if self._aa_predictions is None:
             bgc_aa_prob = []
-            for bgc_count, bgc in enumerate(self.bgc_list):
+            for bgc_count, bgc in enumerate(self.bgcs):
                 bgc_aa_prob.extend(bgc.aa_predictions)
             self._aa_predictions = bgc_aa_prob
 
         return self._aa_predictions
 
-
 class RandomGCF(object):
 
     def __init__(self, real_gcf, bgc_list):
         self.real_gcf = real_gcf
+        self.strains = StrainCollection()
         n_bgc = self.real_gcf.num_non_mibig_bgcs
-        print(n_bgc)
         # select n_bgc bgcs from the bgc_list
-        # (convert back to list for consistency with GCF)
-        self.bgc_list = list(np.random.choice(bgc_list, n_bgc, replace=False))
-
-    @property
-    def strains(self):
-        return [bgc.strain for bgc in self.bgc_list]
+        for bgc in list(np.random.choice(bgc_list, n_bgc, replace=False)):
+            self.strains.add(bgc.strain)
 
     def has_strain(self, strain):
-        for bgc in self.bgc_list:
-            if bgc.strain == strain:
-                return True
-        return False
+        return strain in self.strains
 
 class MiBIGBGC(BGC):
 
-    def __init__(self, id, name, product_prediction):
-        super(MiBIGBGC, self).__init__(id, name, name, None, product_prediction)
+    def __init__(self, id, strain, name, product_prediction):
+        super(MiBIGBGC, self).__init__(id, strain, name, None, product_prediction)
 
-def loadBGC_from_cluster_files(cluster_file_list, ann_file_list, network_file_list, antismash_dir, antismash_filenames, antismash_format='default', mibig_bgc_dict=None):
-    strain_id_dict = {}
-    strain_dict = {}
+def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, network_file_dict, mibig_bgc_dict, antismash_dir, antismash_filenames, antismash_format='default'):
     gcf_dict = {}
     gcf_list = []
-    strain_list = []
     bgc_list = []
-
-    # TODO might need to change this later depending on packaging etc
-    with open(os.path.join(os.path.dirname(__file__), 'strain_ids.csv'), 'r') as f:
-        reader = csv.reader(f)
-        for line in reader:
-            strain_id_dict[line[0]] = line[1]
-
     metadata = {}
+
     # parse the annotation files (<dataset>/bigscape/<cluster_name>/Network_Annotations_<cluster_name>.tsv
     # these contain fields:
     # - BGC name/ID [0]
     # - "Accession ID" [1]
     # - Description [2]
     # - Product prediction [3]
-    # - Bigscape class [4]
+    # - Bigscape product type/class [4]
     # - Organism [5]
     # - Taxonomy [6]
-    for a in ann_file_list:
+    for a in ann_file_dict.values():
         with open(a, 'rU') as f:
             reader = csv.reader(f, delimiter='\t')
             next(reader) # skip headers
@@ -199,7 +185,7 @@ def loadBGC_from_cluster_files(cluster_file_list, ann_file_list, network_file_li
     # "cluster files" are the various <class>_clustering_c0.xx.tsv files
     # - BGC name
     # - cluster ID
-    for filename in cluster_file_list:
+    for product_type, filename in cluster_file_dict.items():
         gnps_class = os.path.split(filename)[-1]
         gnps_class = gnps_class[:gnps_class.index('_')]
         with open(filename, 'rU') as f:
@@ -209,28 +195,17 @@ def loadBGC_from_cluster_files(cluster_file_list, ann_file_list, network_file_li
                 name = line[0]
                 #family = os.path.split(filename)[-1] + ":" + line[1]
                 family_id = int(line[1])
-                if name.startswith("BGC"):
-                    strain_name = 'MiBIG'
+                if name.startswith('BGC'):
+                    # removing the .<digit> suffix
+                    nname = name[:name.index('.')]
+                    strain = strains.lookup(nname)
+                    if strain is None:
+                        raise Exception('Unknown MiBIG BGC: {} / {}'.format(name, nname))
                 else:
-                    # TODO is this doing the correct thing in all cases??
-                    try:
-                        try:
-                            strain_name = strain_id_dict[name.split('_')[0]]
-                        except KeyError:
-                            strain_name = strain_id_dict[name.split('.')[0]]
-                    except KeyError:
-                        # logger.warning("strain lookup failed for '%s'" % name)
-                        if '_' in name:
-                            strain_name = name.split('_')[0]
-                        else:
-                            strain_name = name.split('.')[0]
-
-                if strain_name not in strain_dict:
-                    new_strain = strain_name
-                    strain_dict[strain_name] = new_strain
-                    strain_list.append(new_strain)
-
-                strain = strain_dict[strain_name]
+                    nname = name[:name.index('.')]
+                    strain = strains.lookup(nname)
+                    if strain is None:
+                        raise Exception('Unknown strain ID: {} / {}'.format(name, nname))
 
                 metadata_line = metadata[name]
                 description = metadata_line[2]
@@ -238,7 +213,8 @@ def loadBGC_from_cluster_files(cluster_file_list, ann_file_list, network_file_li
                 product_prediction = metadata_line[3]
 
                 # make a BGC object, reusing existing objects if they represent the same physical thing
-                if not strain_name == 'MiBIG':
+                # if not strain_name == 'MiBIG':
+                if not strain.id.startswith('BGC'):
                     new_bgc = bgc_lookup.get(name, BGC(len(bgc_list), strain, name, bigscape_class, product_prediction, description))
                     if antismash_dir:
                         if antismash_format == 'flat':
@@ -256,19 +232,15 @@ def loadBGC_from_cluster_files(cluster_file_list, ann_file_list, network_file_li
                     bgc_list.append(new_bgc)
                 else:
                     num_mibig += 1
-                    # TODO should this not attempt to create any MiBIGBGC's if the dict
-                    # is not supplied??
                     # TODO any reason not to supply the metadata fields that aren't set by
                     # make_mibig_bgc_dict since metadata_line is available here?
-                    if mibig_bgc_dict is not None:
-                        try:
-                            new_bgc = mibig_bgc_dict[name.split('.')[0]]
-                        except KeyError:
-                            new_bgc = MiBIGBGC(len(bgc_list), name, product_prediction)
+                    try:
+                        new_bgc = mibig_bgc_dict[strain.id]
+                    except KeyError:
+                        raise Exception('Unknown MiBIG: {}'.format(strain.id))
 
                     new_bgc.bigscape_class = bigscape_class
                     new_bgc.description = description
-                    # TODO should add to bgc_list too???
                     bgc_list.append(new_bgc)
 
                 if family_id not in gcf_dict:
@@ -276,6 +248,7 @@ def loadBGC_from_cluster_files(cluster_file_list, ann_file_list, network_file_li
                     gcf_dict[family_id] = new_gcf
                     gcf_list.append(new_gcf)
                     internal_gcf_id += 1
+
                 gcf_dict[family_id].add_bgc(new_bgc)
 
                 bgc_lookup[new_bgc.name] = new_bgc
@@ -285,7 +258,7 @@ def loadBGC_from_cluster_files(cluster_file_list, ann_file_list, network_file_li
         # print(list(antismash_filenames.keys()))
 
     logger.debug('Loading .network files')
-    for filename in network_file_list:
+    for filename in network_file_dict.values():
         with open(filename, 'rU') as f:
             reader = csv.reader(f, delimiter='\t')
             next(reader) # skip headers
@@ -298,7 +271,7 @@ def loadBGC_from_cluster_files(cluster_file_list, ann_file_list, network_file_li
 
     print('# MiBIG BGCs = {}, non-MiBIG BGCS = {}, total bgcs = {}, GCFs = {}'.format(
                         num_mibig, len(bgc_list) - num_mibig, len(bgc_list), len(gcf_dict)))
-    return gcf_list, bgc_list, strain_list
+    return gcf_list, bgc_list
 
 def load_mibig_map(filename='mibig_gnps_links_q3_loose.csv'):
     mibig_map = {}
@@ -325,15 +298,16 @@ def load_mibig_library_json(mibig_json_directory):
             mibig[bgc_id] = json.load(f)
     return mibig
 
-# TODO this will need to have consistent bgc.id values if called
-# separately during the loading process, and/or have existing
-# MiBIGBGC objects merged with this set...
-def make_mibig_bgc_dict(mibig_json_directory):
+def make_mibig_bgc_dict(strains, mibig_json_directory):
     mibig_dict = load_mibig_library_json(mibig_json_directory)
     mibig_bgc_dict = {}
     i = 0
     for name, data in list(mibig_dict.items()):
-        new_bgc = MiBIGBGC(i, data['general_params']['mibig_accession'], data['general_params']['biosyn_class'])
-        mibig_bgc_dict[data['general_params']['mibig_accession']] = new_bgc
+        accession = data['general_params']['mibig_accession']
+        biosyn_class = data['general_params']['biosyn_class']
+        strain = Strain(accession)
+        new_bgc = MiBIGBGC(i, strain, accession, biosyn_class)
+        mibig_bgc_dict[accession] = new_bgc
+        strains.add(strain)
         i += 1
     return mibig_bgc_dict
