@@ -1,7 +1,7 @@
 import networkx as nx
 import numpy as np
 
-from genomics import MiBIGBGC
+from .genomics import MiBIGBGC
 
 def _edges_dict_from_networkx(graph):
     return {'start': [x[0] for x in graph.edges()], 'end': [x[1] for x in graph.edges()]}
