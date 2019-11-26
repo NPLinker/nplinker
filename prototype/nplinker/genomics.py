@@ -36,6 +36,10 @@ class BGC(object):
         return self.__class__.__name__ + "(name=" + self.name + ", strain=" + str(self.strain) + ")"
     
     @property
+    def is_mibig(self):
+        return self.name.startswith('BGC')
+
+    @property
     def smiles(self):
         if self._smiles is not None or self._smiles_parsed: 
             return self._smiles
@@ -88,6 +92,7 @@ class GCF(object):
     def add_bgc(self, bgc):
         self.bgcs.add(bgc)
         self.classes.add(bgc.bigscape_class)
+        # TODO possible to have multiple parents??
         bgc.parent = self
         self.strains.add(bgc.strain)
         self.strains_lookup[bgc.strain] = bgc
@@ -157,7 +162,6 @@ class MiBIGBGC(BGC):
 def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, network_file_dict, mibig_bgc_dict, antismash_dir, antismash_filenames, antismash_format='default'):
     gcf_dict = {}
     gcf_list = []
-    bgc_list = []
     metadata = {}
 
     # parse the annotation files (<dataset>/bigscape/<cluster_name>/Network_Annotations_<cluster_name>.tsv
@@ -180,7 +184,10 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
     num_missing_antismash = 0
 
     bgc_lookup = {}
+    internal_bgc_id = len(mibig_bgc_dict) # start numbering BGCs from here
     internal_gcf_id = 0
+
+    bgc_list = [v for v in mibig_bgc_dict.values()]
 
     # "cluster files" are the various <class>_clustering_c0.xx.tsv files
     # - BGC name
@@ -200,12 +207,19 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                     nname = name[:name.index('.')]
                     strain = strains.lookup(nname)
                     if strain is None:
-                        raise Exception('Unknown MiBIG BGC: {} / {}'.format(name, nname))
+                        raise Exception('Unknown MiBIG BGC: original={} / parsed={}'.format(name, nname))
                 else:
                     nname = name[:name.index('.')]
                     strain = strains.lookup(nname)
                     if strain is None:
-                        raise Exception('Unknown strain ID: {} / {}'.format(name, nname))
+                        # TODO hack to get crusemann working
+                        for i in range(1, 3, 1):
+                            tmp = '{}.{}'.format(nname, i)
+                            strain = strains.lookup(tmp)
+                            if strain is not None:
+                                break
+                        if strain is None:
+                            raise Exception('Unknown strain ID: original={} / parsed={}'.format(name, nname))
 
                 metadata_line = metadata[name]
                 description = metadata_line[2]
@@ -213,9 +227,15 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                 product_prediction = metadata_line[3]
 
                 # make a BGC object, reusing existing objects if they represent the same physical thing
-                # if not strain_name == 'MiBIG':
                 if not strain.id.startswith('BGC'):
-                    new_bgc = bgc_lookup.get(name, BGC(len(bgc_list), strain, name, bigscape_class, product_prediction, description))
+                    if name in bgc_lookup:
+                        new_bgc = bgc_lookup.get(name)
+                    else:
+                        # create a new BGC, increment internal ID and add to the list
+                        new_bgc = BGC(internal_bgc_id, strain, name, bigscape_class, product_prediction, description)
+                        internal_bgc_id += 1
+                        bgc_list.append(new_bgc)
+
                     if antismash_dir:
                         if antismash_format == 'flat':
                             antismash_filename = os.path.join(antismash_dir, new_bgc.name + '.gbk')
@@ -229,7 +249,6 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                             if new_bgc.antismash_file is None:
                                 logger.warning('Failed to find an antiSMASH file for {}'.format(new_bgc.name))
                                 num_missing_antismash += 1
-                    bgc_list.append(new_bgc)
                 else:
                     num_mibig += 1
                     # TODO any reason not to supply the metadata fields that aren't set by
@@ -257,6 +276,19 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
         logger.warn('{}/{} antiSMASH files could not be found!'.format(num_missing_antismash, len(bgc_list)))
         # print(list(antismash_filenames.keys()))
 
+    print('# MiBIG BGCs = {}, non-MiBIG BGCS = {}, total bgcs = {}, GCFs = {}'.format(
+                        num_mibig, len(bgc_list) - num_mibig, len(bgc_list), len(gcf_dict)))
+
+    # filter out irrelevant MiBIG BGCs (and MiBIG-only GCFs)
+    bgc_list, gcf_list = filter_mibig_bgcs(bgc_list, gcf_list, mibig_bgc_dict)
+    # update lookup table as well
+    bgc_lookup = {bgc.name: bgc for bgc in bgc_list}
+
+    print('# MiBIG BGCs = {}, non-MiBIG BGCS = {}, total bgcs = {}, GCFs = {}'.format(
+                        num_mibig, len(bgc_list) - num_mibig, len(bgc_list), len(gcf_list)))
+
+    # load edge info - note that this should be done AFTER the filtering step above
+    # so that it won't leave us with edges for BGCs that are no longer present
     logger.debug('Loading .network files')
     for filename in network_file_dict.values():
         with open(filename, 'rU') as f:
@@ -264,14 +296,56 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
             next(reader) # skip headers
             # try to look up bgc IDs
             for line in reader:
+                for i in range(2):
+                    if line[i].startswith('BGC'):
+                        # removing the .<digit> suffix
+                        line[i] = line[i][:line[i].index('.')]
+
+                if line[0] not in bgc_lookup or line[1] not in bgc_lookup:
+                    # should indicate that one or both of these BGCs have been filtered out above
+                    continue
                 bgc_src = bgc_lookup[line[0]]
                 bgc_dst = bgc_lookup[line[1]]
-
                 bgc_src.edges.append(bgc_dst.id)
 
-    print('# MiBIG BGCs = {}, non-MiBIG BGCS = {}, total bgcs = {}, GCFs = {}'.format(
-                        num_mibig, len(bgc_list) - num_mibig, len(bgc_list), len(gcf_dict)))
     return gcf_list, bgc_list
+
+def filter_mibig_bgcs(bgcs, gcfs, mibig_bgc_dict):
+    # remove the following MiBIG BGCs:
+    # - parent attr is None (indicating never added to a GCF)
+    # - any instances in a GCF with no other non-MiBIG BGCs
+    to_remove_gcfs = set()
+    to_remove_bgcs = set()
+    for gcf in gcfs:
+        # can ignore any with no MiBIGs
+        if gcf.num_mibig_bgcs == 0:
+            continue
+        # now know this GCF has >0 MiBIG BGCs. Next step is to
+        # check number of non-MiBIG BGCs, and if this is not at 
+        # least 1, throw away both GCF and BGC(s)
+        if gcf.num_non_mibig_bgcs == 0:
+            to_remove_gcfs.add(gcf)
+            for bgc in gcf.bgcs:
+                to_remove_bgcs.add(bgc)
+
+    logger.info('Filtering MiBIG BGCs: removing {} GCFs and {} BGCs'.format(len(to_remove_gcfs), len(to_remove_bgcs)))
+
+    # for GCFs just remove those that appear in to_remove_gcfs
+    new_gcf_list = [gcf for gcf in gcfs if gcf not in to_remove_gcfs]
+    # for BGCs do similar but also get rid of the objects never added to a GCF in the first place
+    new_bgc_list = [bgc for bgc in bgcs if bgc not in to_remove_bgcs and bgc.parent is not None]
+
+    # keep internal IDs consecutive 
+    # TODO does this actually break anything if not done?
+    for i in range(len(new_bgc_list)):
+        new_bgc_list[i].id = i
+        if new_bgc_list[i].parent is None:
+            raise Exception(new_bgc_list[i])
+
+    for i in range(len(new_gcf_list)):
+        new_gcf_list[i].id = i
+
+    return new_bgc_list, new_gcf_list
 
 def load_mibig_map(filename='mibig_gnps_links_q3_loose.csv'):
     mibig_map = {}
