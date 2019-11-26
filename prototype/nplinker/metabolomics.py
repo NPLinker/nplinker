@@ -1,10 +1,13 @@
 import csv
-import math
 
 import numpy as np
 
-from parsers.mgf import LoadMGF
-from logconfig import LogConfig
+from .parsers.mgf import LoadMGF
+from .strains import StrainCollection
+from .annotations import GNPS_KEY
+from .utils import sqrt_normalise
+
+from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
 JCAMP = '##TITLE={}\\n' +\
@@ -20,117 +23,12 @@ JCAMP = '##TITLE={}\\n' +\
         '{}\\n' +\
         '##END=\\n'
 
-# just a thin wrapper around dict, other types of annotation should add more
-# useful stuff on top
-class AnnotationSet(object):
-
-    def __init__(self, data=None):
-        self._data = data or {}
-
-    def __setitem__(self, key, value):
-        self._data[key] = value
-
-    def __getitem__(self, key):
-        return self.data[key]
-
-    def items(self):
-        return self._data.items()
-
-    def keys(self):
-        return self._data.keys()
-
-    def values(self):
-        return self._data.values()
-
-    def __len__(self):
-        return self(self._data)
-
-class GNPSAnnotationSet(AnnotationSet):
-
-    K_NAME     = 'Compound_Name'
-    K_ORGANISM = 'Organism'
-    K_SCORE    = 'MQScore'
-    K_ID       = 'SpectrumID'
-
-    KEYS = ['Compound_Name', 'Organism', 'MQScore', 'SpectrumID']
-
-    PLOT_URL = 'https://metabolomics-usi.ucsd.edu/{}/?usi=mzspec:GNPSLIBRARY:{}'
-
-    def __init__(self, data):
-        super(GNPSAnnotationSet, self).__init__(data)
-        for k in GNPSAnnotationSet.KEYS:
-            if k not in self._data:
-                raise Exception('GNPSAnnotationSet missing field "{}"'.format(k))
-
-    @classmethod
-    def from_gnpsmatch(cls, gnps_line_dict):
-        data = {k: gnps_line_dict[k] for k in GNPSAnnotationSet.KEYS}
-        return cls(data)
-
-    @property
-    def name(self):
-        return self._data[self.K_NAME]
-
-    @property
-    def organism(self):
-        return self._data[self.K_ORGANISM]
-
-    @property
-    def score(self):
-        return self._data[self.K_SCORE]
-
-    @property
-    def id(self):
-        return self._data[self.K_ID]
-
-    @property
-    def png_url(self):
-        return self.PLOT_URL.format('png', self.id)
-
-    @property
-    def svg_url(self):
-        return self.PLOT_URL.format('svg', self.id)
-
-    @property
-    def spec_url(self):
-        return self.PLOT_URL.format('spectrum', self.id)
-
-    @property
-    def json_url(self):
-        return self.PLOT_URL.format('json', self.id)
-
-    def __repr__(self):
-        return str(self)
-
-    def __str__(self):
-        return 'GNPSAnnotation(id={}, score={}, name={}, organism={})'.format(self.id, self.score, self.name, self.organism)
-
-
-def sqrt_normalise(peaks):
-    temp = []
-    total = 0.0
-    for mz,intensity in peaks:
-        temp.append((mz,math.sqrt(intensity)))
-        total += intensity
-    norm_facc = math.sqrt(total)
-    normalised_peaks = []
-    for mz,intensity in temp:
-        normalised_peaks.append((mz,intensity/norm_facc))
-    return normalised_peaks
-
-
 class Spectrum(object):
     
-    METADATA_BLACKLIST = set(['AllOrganisms', 'LibraryID', 'RTStdErr', 'RTMean', 'AllGroups', 'DefaultGroups',
-                            'precursor mass', 'parent mass', 'ProteoSAFeClusterLink', 'precursor intensity', 'sum(precursor intensity)',
-                              'precursormass', 'parentmass', 'singlechargeprecursormass', 'cluster index', 'number of spectra', 
-                              'UniqueFileSourcesCount', 'EvenOdd', 'charge', 'precursor charge', 'RTConsensus', 'SumPeakIntensity',
-                              'componentindex', 'row ID', 'row m/z', 'row retention time'])
-
     def __init__(self, id, peaks, spectrum_id, precursor_mz, parent_mz=None, rt=None):
         self.id = id
         self.peaks = sorted(peaks, key=lambda x: x[0]) # ensure sorted by mz
-        self.normalised_peaks = sqrt_normalise(self.peaks) # useful later
+        self.normalized_peaks = sqrt_normalise(self.peaks) # useful later
         self.n_peaks = len(self.peaks)
         self.max_ms2_intensity = max([intensity for mz, intensity in self.peaks])
         self.total_ms2_intensity = sum([intensity for mz, intensity in self.peaks])
@@ -141,72 +39,53 @@ class Spectrum(object):
         self.parent_mz = parent_mz
         self.metadata = {}
         self.edges = []
+        # this is a dict indexed by Strain objects (the strains found in this Spectrum), with 
+        # the values being dicts of the form {growth_medium: peak intensity} for the parent strain
+        self.strains = {}
         self.family = None
         self.random_spectrum = None
-        # every Spectrum gets a default and initially empty AnnotationSet
-        self._annotations = {AnnotationSet: [AnnotationSet()], 
-                             GNPSAnnotationSet: []}
+        # a dict indexed by filename, or "gnps" 
+        self.annotations = {}
         self._losses = None
         self._jcamp = None
 
-    # TODO is this useful???
-    def annotation_from_metadata(self):
-        key = 'LibraryID'
-        if key in self.metadata:
-            self._annotations[AnnotationSet][0][key] = 'gnps'
+    def add_strain(self, strain, growth_medium, peak_intensity):
+        if strain in self.strains and growth_medium in self.strains[strain]:
+            raise Exception('Clash: {} {}'.format(strain, growth_medium))
+        
+        if strain not in self.strains:
+            self.strains[strain] = {}
 
-    def empty_default_annotations(self):
-        return len(self._annotations[AnnotationSet][0]) == 0
+        self.strains[strain].update({growth_medium: peak_intensity})
+        
+    def is_library(self):
+        return GNPS_KEY in self.annotations
 
-    def has_gnps_annotations(self):
-        return len(self._annotations[GNPSAnnotationSet]) > 0
+    def add_annotations(self, key, data):
+        self.annotations[key] = data
 
-    def add_annotation_set(self, anno_set):
-        if type(anno_set) not in self._annotations:
-            raise Exception('Unknown annotation set type: {}'.format(type(anno_set)))
+    def append_annotations(self, key, data):
+        if key not in self.annotations:
+            self.annotations[key] = []
+        self.annotations[key].append(data)
 
-        self._annotations[type(anno_set)].append(anno_set)
+    def has_annotations(self):
+        return len(self.annotations) > 0
 
     def get_metadata_value(self, key):
         val = self.metadata.get(key, None)
         return val
 
-    def get_annotations(self):
-        return self._annotations[AnnotationSet]
-
-    def get_gnps_annotations(self):
-        return self._annotations[GNPSAnnotationSet]
-
-    def is_library(self):
-        # TODO as above, is this doing anything useful? preserving old behaviour for now
-        return 'LibraryID' in self._annotations[0] and self._annotations[0]['LibraryID'] == 'gnps'
-
     @property
     def strain_list(self):
-        return [k for k in self.metadata.keys() if self.has_strain(k)]
+        return self.strains.keys()
 
     @property
     def strain_set(self):
-        return set([k for k in self.metadata.keys() if self.has_strain(k)])
+        return set(self.strains.keys())
 
     def has_strain(self, strain):
-        if strain in Spectrum.METADATA_BLACKLIST:
-            return False
-
-        # XXX TODO 
-        # TEMPORARY for carnegie
-        if strain.startswith('GNPSGROUP'):
-            return False
-
-        strain_val = self.metadata.get(strain, 0)
-        #  TODO this can throw an exception if a value is a non-integer or None...
-        try:
-            if strain_val > 0:
-                return True
-        except TypeError:
-            # logger.debug('Warning: has_strain({}) failed because metadata.get returned "{}" (type({}))'.format(strain, strain_val, type(strain_val)))
-            pass
-        return False
+        return strain in self.strains
 
     def to_jcamp_str(self, force_refresh=False):
         if self._jcamp is not None and not force_refresh:
@@ -216,22 +95,11 @@ class Spectrum(object):
         self._jcamp = JCAMP.format(str(self), self.n_peaks, peakdata)
         return self._jcamp
 
-    # def print_spectrum(self):
-    #     print()
-    #     print(self.file_name,self.spectrum_id)
-    #     for i,(mz,intensity) in enumerate(self.peaks):
-    #         print(i,mz,intensity,self.normalised_peaks[i][1])
-
-    # def plot(self,xlim = None,**kwargs):
-    #     plot_spectrum(self.peaks,xlim=xlim,title = "{} {} (m/z= {})".format(self.file_name,self.scan_number,self.parent_mz),**kwargs)
-
-
     def add_random(self, strain_prob_dict):
         self.random_spectrum = RandomSpectrum(self, strain_prob_dict)
 
     def __str__(self):
-        # return "Spectrum {} with {} peaks, max_ms2_intensity {}".format(self.spectrum_id,self.n_peaks,self.max_ms2_intensity)
-        return "Spectrum(id={}, spectrum_id={})".format(self.id, self.spectrum_id)
+        return "Spectrum(id={}, spectrum_id={}, strains={})".format(self.id, self.spectrum_id, len(self.strains))
 
     def __repr__(self):
         return str(self)
@@ -327,62 +195,106 @@ def mols_to_spectra(ms2, metadata):
 
     return spectra
 
-# TODO this will need updated if still useful due to annotations changes recently
-def load_additional_annotations(spectra, annotation_file, id_field, annotation_field):
-    with open(annotation_file, 'r') as f:
+def md_convert(val):
+    """Try to convert raw metadata values from text to integer, then float"""
+    try:
+        return int(val)
+    except (ValueError, TypeError):
+        try:
+            return float(val)
+        except (ValueError, TypeError):
+            if val.lower() == 'n/a':
+                return None
+    return val
+
+def parse_mzxml_header(hdr, strains, md_table):
+    # ignore any non-"Peak area" columns
+    # TODO can this be ".mzML" too??
+    if hdr.find('.mzXML Peak area') == -1:
+        return (None, None)
+
+    # these columns should be named "<strain>_<growth media>.mzXML Peak area"
+    #   e.g. KRD178_ISP3.mzXML Peak area
+    #   (OR  KRD_178_ISP3.mzXML Peak area)
+    # want to extract both strain ID (assumed to be everything up to final underscore)
+    # and the growth media
+    identifier = hdr[:hdr.index('.')]
+    strain_name = None
+    growth_medium = '<default>' # TODO what happens if not parsed?
+    tokens = identifier.split('_')
+    
+    # treat the text as a strain ID and carry on)
+    if len(tokens) == 1:
+        strain_name = identifier
+    elif len(tokens) == 2:
+        # this might be <strain>_<growthmedia> OR <strain>_<strain_pt2> 
+        # (e.g. KR7_178 instead of KRD178)
+        if tokens[0] in strains:
+            strain_name = tokens[0]
+            growth_medium = tokens[1]
+        else:
+            # check if the original strain is known
+            if strain_name not in strains:
+                # try removing the underscore
+                if ''.join(tokens) in strains:
+                    strain_name = ''.join(tokens)
+                else:
+                    raise Exception('Failed to parse header: {}'.format(hdr))
+    elif len(tokens) == 3:
+        # this should always(?) be <strain>_<strainpt2>_<growthmedia>
+        strain_name = ''.join(tokens[:2])
+        growth_medium = tokens[2]
+    else:
+        raise Exception('Unknown mzXML header format: {}'.format(hdr))
+
+    # found at least one case where these were different cases (m1 vs M1)
+    if growth_medium is not None:
+        growth_medium = growth_medium.upper()
+
+    # check the final strain_name is valid
+    if strain_name not in strains:
+        # if this check fails, it could mean a missing strain ID mapping, which should
+        # throw an immediate exception. however there could be some identifiers which
+        # are not strains and these should just be ignored. 
+
+        # if we have a metadata table file, and the parsed strain name does NOT
+        # appear in it, this indicates it's not a strain, so we should ignore it
+        if md_table is not None and identifier not in md_table:
+            # ignore this completely
+            return (None, None)
+
+        # throw an exception in case of unknown strain
+        raise Exception('Unknown strain identifier: {} (parsed from {})'.format(strain_name, hdr))
+
+    return (strain_name, growth_medium)
+
+def parse_metadata_table(filename):
+    """Parses the metadata table file from GNPS"""
+    if filename is None: 
+        return None
+
+    table = {}
+    with open(filename, 'r') as f:
         reader = csv.reader(f, delimiter='\t')
-        heads = next(reader)
-        source_id_idx = heads.index(id_field)
-        annotation_idx = heads.index(annotation_field)
-        new_annotations = {}
+        headers = next(reader)
+
         for line in reader:
-            new_annotations[line[source_id_idx]] = (line[annotation_idx], annotation_file)
-    for s in spectra:
-        found_comp = set()
-        if s.spectrum_id in new_annotations:
-            compound = new_annotations[s.spectrum_id][0]
-            if compound not in found_comp:
-                s.annotations.append(new_annotations[s.spectrum_id])
-                found_comp.add(new_annotations[s.spectrum_id][0])
+            # only non-BLANK entries
+            if line[1] != 'BLANK':
+                table[line[0].replace('.mzXML', '')] = line[1]
 
-# load one or more .tsv files from DB_result directory in a dataset, appending
-# data to matched spectra as GNPSAnnotationSet instances
-def load_db_results_annotations(spectra, spec_dict, db_result_files):
-    for path in db_result_files:
-        logger.debug('Loading db_result file: {}'.format(path))
-        with open(path, 'r') as f:
-            reader = csv.reader(f, delimiter='\t')
-            headers = next(reader)
-        
-            for line in reader:
-                scan_id = int(line[0])
-                if scan_id not in spec_dict:
-                    logger.warning('Unknown spectrum ID found in DB_result file (ID={})'.format(scan_id))
-                    continue
+    return table
 
-                spec = spec_dict[scan_id]
-
-                data = {}
-                for c in range(1, len(line), 1):
-                    data[headers[c]] = line[c]
-
-                spec.add_annotation_set(GNPSAnnotationSet.from_gnpsmatch(data))
-
-    return spectra
-
-def load_metadata(nodes_file, extra_nodes_file, spectra, spec_dict, db_result_files):
-    # to collect all strains from this source for later use
-    strains = set()
+def load_metadata(strains, nodes_file, extra_nodes_file, metadata_table_file, spectra, spec_dict):
+    # parse metadata table file, if provided
+    md_table = parse_metadata_table(metadata_table_file)
 
     nodes_lines = {}
     # get a list of the lines in each file, indexed by the "cluster index" and "row ID" fields 
     # (TODO correct/necessary - does ordering always remain consistent in both files?
-
     with open(nodes_file, 'rU') as f:
         reader = csv.reader(f, delimiter='\t')
         headers = next(reader)
-        strains.update(headers) # TODO should be whitelisting instead?
-        
         ci_index = headers.index('cluster index')
 
         for line in reader:
@@ -391,11 +303,12 @@ def load_metadata(nodes_file, extra_nodes_file, spectra, spec_dict, db_result_fi
                 tmp[headers[i]] = v
             nodes_lines[int(line[ci_index])] = tmp
 
+    # TODO is this now mandatory?
     if extra_nodes_file is not None:
+        print(extra_nodes_file)
         with open(extra_nodes_file, 'rU') as f:
             reader = csv.reader(f, delimiter=',')
             headers = next(reader)
-            strains.update(headers) # TODO again
 
             ri_index = headers.index('row ID')
 
@@ -411,34 +324,28 @@ def load_metadata(nodes_file, extra_nodes_file, spectra, spec_dict, db_result_fi
     else:
         logger.debug('No extra_nodes_file found')
 
-    def md_convert(val):
-        try:
-            return int(val)
-        except (ValueError, TypeError):
-            try:
-                return float(val)
-            except (ValueError, TypeError):
-                if val.lower() == 'n/a':
-                    return None
-        return val
-
+    # for each spectrum 
     for l in nodes_lines.keys():
         spectrum = spec_dict[l]
         # TODO better way of filtering/converting all this stuff down to what's relevant?
+        # could search for each strain ID in column title but would be slower?
         for k, v in nodes_lines[l].items():
-            if 'Peak area' in k:
-                k = k.replace('.mzXML Peak area', '')
-                if '_' in k:
-                    k = k[:k.index('_')]
-            spectrum.metadata[k] = md_convert(v)
+            # if the value is a "0", ignore immediately
+            if v == "0":
+                continue
+            (strain_name, growth_medium) = parse_mzxml_header(k, strains, md_table)
+            if strain_name is None:
+                continue 
+            # add a strain object if the value is a float > 0
+            v = md_convert(v)
+            if strain_name in strains and isinstance(v, float) and v > 0:
+                # find the strain object, and add the growth medium + intensity to it
+                strain = strains.lookup(strain_name)
+                spectrum.add_strain(strain, growth_medium, v)
 
-        spectrum.annotation_from_metadata()
+            spectrum.metadata[k] = v
 
-    # annotations from DB_result matches
-    logger.info('Loading annotations from GNPS database matches')
-    spectra = load_db_results_annotations(spectra, spec_dict, db_result_files)
-
-    return spectra, strains
+    return spectra
 
 def load_edges(edges_file, spectra, spec_dict):
 
@@ -472,6 +379,7 @@ class MolecularFamily(object):
         self.id = -1 
         self.family_id = family_id
         self.spectra = []
+        self.family = None
         self.random_molecular_family = RandomMolecularFamily(self)
 
     def has_strain(self, strain):
@@ -511,6 +419,7 @@ class SingletonFamily(MolecularFamily):
 # TODO this should be better integrated with rest of the loading process
 # so that spec.family is never set to a primitive then replaced by an
 # object only if this method is called
+# (this is now called every time at least)
 def make_families(spectra):
     families = []
     family_dict = {}
