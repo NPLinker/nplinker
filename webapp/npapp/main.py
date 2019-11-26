@@ -264,7 +264,7 @@ class ScoringHelper(object):
                 scoring_objs.update(gcfs_for_bgc)
 
                 for gcf in gcfs_for_bgc:
-                    all_bgcs.update(gcf.bgc_list)
+                    all_bgcs.update(gcf.bgcs)
 
             print('Selection of {} BGCs => {} GCFs'.format(len(bgcs), len(scoring_objs)))
             self.gcfs = list(scoring_objs)
@@ -1005,7 +1005,7 @@ class NPLinkerBokeh(object):
                     for gcf, _ in objs_with_scores[link_obj]:
                         # get list of BGCs from the GCF. if we're not showing MiBIG BGCs and these
                         # are the only ones in this GCF, don't show it 
-                        bgcs = gcf.bgc_list if not self.hide_mibig else gcf.non_mibig_bgcs
+                        bgcs = gcf.bgcs if not self.hide_mibig else gcf.non_mibig_bgcs
                         for n in bgcs:
                             try:
                                 score_obj_indices.add(self.bgc_indices[n.name])
@@ -1275,9 +1275,9 @@ class NPLinkerBokeh(object):
 
         # add strain information
         if shared_strains is not None and len(shared_strains) > 0:
-            gcf_body += '<li><strong>strains (total={}, shared={})</strong>: '.format(len(gcf.bgc_list), len(shared_strains))
+            gcf_body += '<li><strong>strains (total={}, shared={})</strong>: '.format(len(gcf.bgcs), len(shared_strains))
 
-            non_shared = [s.strain for s in gcf.bgc_list if s.strain not in shared_strains]
+            non_shared = [s.strain for s in gcf.bgcs if s.strain not in shared_strains]
 
             for s in shared_strains:
                 gcf_body += '<span style="background-color: #AAFFAA">{}</span>, '.format(s)
@@ -1286,9 +1286,9 @@ class NPLinkerBokeh(object):
 
             gcf_body += '</li>'
         else:
-            gcf_body += '<li><strong>strains (total={}, shared=0)</strong>: '.format(len(gcf.bgc_list))
+            gcf_body += '<li><strong>strains (total={}, shared=0)</strong>: '.format(len(gcf.bgcs))
 
-            for s in gcf.bgc_list:
+            for s in gcf.bgcs:
                 gcf_body += '<span>{}</span>, '.format(s)
 
             gcf_body += '</li>'
@@ -1303,7 +1303,7 @@ class NPLinkerBokeh(object):
         gcf_body += '<table class="table table-responsive table-striped" id="gcf_{}_bgc_table"><thead><tr>'.format(gcf.id)
         gcf_body += ''.join('<th scope="col">{}</th>'.format(x) for x in fields)
         gcf_body += '</thead><tbody>'
-        for bgc in gcf.bgc_list:
+        for bgc in gcf.bgcs:
             gcf_body += '<tr><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td></tr>'.format(*list(getattr(bgc, x) for x in fields))
         gcf_body += '</tbody></table>'
         gcf_body += '</div></div>'
@@ -1369,7 +1369,7 @@ class NPLinkerBokeh(object):
         for i, gcf in enumerate(gcfs):
             gcf_hdr_id = 'gcf_search_header_{}'.format(i)
             gcf_body_id = 'gcf_search_body_{}'.format(i)
-            gcf_title = 'GCF(id={}, gcf_id={}, strains={})'.format(gcf.id, gcf.gcf_id, len(gcf.bgc_list))
+            gcf_title = 'GCF(id={}, gcf_id={}, strains={})'.format(gcf.id, gcf.gcf_id, len(gcf.bgcs))
             gcf_body = self.generate_gcf_info(gcf)
             body += TMPL_SEARCH.format(hdr_id=gcf_hdr_id, hdr_color='dddddd', btn_target=gcf_body_id, btn_text=gcf_title, 
                                 result_index=str(i), body_id=gcf_body_id, body_parent='accordionSearch', body_body=gcf_body)
@@ -1481,7 +1481,7 @@ class NPLinkerBokeh(object):
             # of all the BGC indices corresponding to these GCFs
             bgcs = set()
             for gcf in results:
-                bgcs.update(gcf.bgc_list)
+                bgcs.update(gcf.bgcs)
             indices = [self.nh.bgc_indices[self.bgc_tsne_id][bgc.name] for bgc in bgcs]
             self.ds_bgc.selected.indices = indices
         elif isinstance(results[0], Spectrum):
