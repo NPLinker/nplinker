@@ -37,7 +37,7 @@ class NPLinkerHelper(object):
         # this is usually a dict with one entry per TSNE filename, and contains
         # a set of available GCF objects within each TSNE projection
         self.available_gcfs = {fid: set()}
-        bgc_data = {'index': [], 'x': [], 'y': [], 'strain': [], 'name': [], 'gcf': [], 'mibig': []}
+        bgc_data = {'index': [], 'x': [], 'y': [], 'strain': [], 'name': [], 'gcf': [], 'gcf_name': [], 'mibig': []}
         uniq_gcfs = set()
         gcf_lookup = {}
         bgcindex = 0
