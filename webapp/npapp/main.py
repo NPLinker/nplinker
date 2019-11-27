@@ -1,7 +1,7 @@
 import os
 
 from bokeh.models.widgets import RadioGroup, Slider, Div, Select, CheckboxGroup
-from bokeh.models.widgets import Toggle, Button, TextInput
+from bokeh.models.widgets import Toggle, Button, TextInput, PreText
 from bokeh.layouts import row
 from bokeh.models import CustomJS
 from bokeh.plotting import figure, curdoc
@@ -1520,6 +1520,9 @@ class NPLinkerBokeh(object):
     def reset_button_callback(self):
         self.clear_selections()
 
+    def gnps_params_select_callback(self, attr, old, new):
+        self.gnps_params_value.text = '<strong>{}</strong> = {}'.format(new, self.nh.nplinker.gnps_params[new])
+
     def bokeh_layout(self):
         widgets = []
         self.results_div = Div(text='', name='results_div', width_policy='max', height_policy='fit')
@@ -1654,6 +1657,31 @@ class NPLinkerBokeh(object):
 
         self.search_regex = CheckboxGroup(labels=['Use regexes?'], active=[0], name='search_regex', sizing_mode='scale_width')
         widgets.append(self.search_regex)
+
+        self.dataset_description_pre = PreText(text=self.nh.nplinker.dataset_description, sizing_mode='scale_both', name='dataset_description_pre')
+        widgets.append(self.dataset_description_pre)
+
+        gnps_params = self.nh.nplinker.gnps_params 
+        defval = 'uuid' if 'uuid' in gnps_params else None
+        self.gnps_params_select = Select(options=list(gnps_params.keys()), value=defval, name='gnps_params_select', css_classes=['nolabel'], sizing_mode='scale_height')
+        self.gnps_params_select.on_change('value', self.gnps_params_select_callback)
+        widgets.append(self.gnps_params_select)
+
+        if defval is not None:
+            deftext = '<strong>{}</strong> = {}'.format(defval, self.nh.nplinker.gnps_params[defval])
+        else:
+            deftext = None
+        self.gnps_params_value = Div(text=deftext, sizing_mode='scale_height', name='gnps_params_value')
+        widgets.append(self.gnps_params_value)
+
+        other_info = '<table class="table table-responsive table-striped" id="other_info_table"><thead><tr>'
+        other_info += '<th scope="col">Name</th><th scope="col">Value</th></tr>'
+        other_info += '</thead><tbody>'
+        other_info += '<tr><td>{}</td><td>{}</td></tr>'.format('BiGSCAPE clustering cutoff', self.nh.nplinker.bigscape_cutoff)
+        other_info += '</tbody></table>'
+        self.other_info_div = Div(text=other_info, sizing_mode='scale_height', name='other_info_div')
+        widgets.append(self.other_info_div)
+
 
         widgets.append(self.fig_spec)
         widgets.append(self.fig_bgc)

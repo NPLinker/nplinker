@@ -134,6 +134,9 @@
                     <a class="nav-link" id="searchTab" data-toggle="tab" href="#search_results_div" role="tab" aria-controls="search_results_div" aria-selected="false">Search</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" id="descTab" data-toggle="tab" href="#dataset_description_div" role="tab" aria-controls="dataset_description_div" aria-selected="false">Dataset information</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" id="debugOut" data-toggle="tab" href="#debug_out_div" role="tab" aria-controls="debug_out_div" aria-selected="false">Log</a>
                 </li>
             </ul>
@@ -242,6 +245,49 @@
                             </div>
                         </div>
                         <div class="col-md-1"></div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="dataset_description_div" role="tabpanel" aria-labelledby="descTab">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-3"></div>
+                            <div class="col-md-6">
+                                <h4>Dataset description text</h4>
+                                {{ embed(roots.dataset_description_pre) }}
+                            </div>
+                            <div class="col-md-3"></div>
+                        </div>
+                    </div>
+                    <hr width="40%"/>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-3"></div>
+                            <div class="col-md-6">
+                                <h4>GNPS parameters</h4>
+                            </div>
+                            <div class="col-md-3"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3"></div>
+                            <div class="col-md-3">
+                                {{ embed(roots.gnps_params_select) }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ embed(roots.gnps_params_value) }}
+                            </div>
+                        </div>
+                    </div>
+                    <hr width="40%"/>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-3"></div>
+                            <div class="col-md-6">
+                                <h4>Other information</h4>
+                                {{ embed(roots.other_info_div) }}
+                            </div>
+                            <div class="col-md-3"></div>
+                        </div>
                     </div>
                 </div>
 
