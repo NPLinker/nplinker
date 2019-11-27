@@ -195,7 +195,7 @@ class NPLinker(object):
         
         self._gcf_lookup = {}
         for i, gcf in enumerate(self._gcfs):
-            self._gcf_lookup[gcf.id] = i
+            self._gcf_lookup[gcf.gcf_id] = i
 
         # don't need to do these two if cutoff changed (indicating genomics data
         # was reloaded but not metabolomics)
@@ -562,6 +562,12 @@ class NPLinker(object):
             return None
 
         return self._bgcs[self._bgc_lookup[name]]
+
+    def lookup_gcf(self, gcf_id):
+        if gcf_id not in self._gcf_lookup:
+            return None
+
+        return self._gcfs[self._gcf_lookup[gcf_id]]
 
     def lookup_spectrum(self, name):
         if name not in self._spec_lookup:
