@@ -1416,11 +1416,12 @@ class NPLinkerBokeh(object):
         return body
 
     def generate_search_output_molfam(self, molfams):
-        return ''
+        # TODO
+        return '<strong>Not working yet :(</strong>'
 
     def generate_search_output(self, results):
         # TEMP XXX TODO
-        if isinstance(results[0], BGC):
+        if len(results) > 0 and isinstance(results[0], BGC):
             # removing BGCs that don't appear in current TSNE
             results = [r for r in results if r in self.nh.bgc_indices[self.bgc_tsne_id]]
             self.searcher.results = results
