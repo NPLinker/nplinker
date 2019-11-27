@@ -63,6 +63,7 @@ class NPLinkerHelper(object):
                 gcf_lookup[gcf_id] = len(uniq_gcfs)
                 uniq_gcfs.add(gcf_id)
             bgc_data['gcf'].append(gcf_id)
+            bgc_data['gcf_name'].append(gcf_obj.gcf_id)
 
         total = len(uniq_gcfs)
         cmap = []
