@@ -204,7 +204,7 @@ class DatasetLoader(object):
         logger.debug('Cache generation took {:.3f}s'.format(time.time() - t))
 
         logger.debug('loadBGC_from_cluster_files(antismash_dir={})'.format(self.antismash_dir))
-        self.gcfs, self.bgcs = loadBGC_from_cluster_files(
+        self.gcfs, self.bgcs, self.strains = loadBGC_from_cluster_files(
                                                 self.strains,
                                                 cluster_files,
                                                 anno_files,

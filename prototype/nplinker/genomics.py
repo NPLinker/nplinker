@@ -84,7 +84,7 @@ class GCF(object):
         self.strains_lookup = {}
 
     def __str__(self):
-        return 'GCF(id={}, class={}, gcf_id={})'.format(self.id, self.gnps_class, self.gcf_id)
+        return 'GCF(id={}, class={}, gcf_id={}, strains={})'.format(self.id, self.gnps_class, self.gcf_id, len(self.strains))
 
     def __repr__(self):
         return str(self)
@@ -275,16 +275,15 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
         logger.warn('{}/{} antiSMASH files could not be found!'.format(num_missing_antismash, len(bgc_list)))
         # print(list(antismash_filenames.keys()))
 
-    print('# MiBIG BGCs = {}, non-MiBIG BGCS = {}, total bgcs = {}, GCFs = {}'.format(
-                        num_mibig, len(bgc_list) - num_mibig, len(bgc_list), len(gcf_dict)))
+    print('# MiBIG BGCs = {}, non-MiBIG BGCS = {}, total bgcs = {}, GCFs = {}, strains={}'.format(
+                        num_mibig, len(bgc_list) - num_mibig, len(bgc_list), len(gcf_dict), len(strains)))
 
     # filter out irrelevant MiBIG BGCs (and MiBIG-only GCFs)
-    bgc_list, gcf_list = filter_mibig_bgcs(bgc_list, gcf_list, mibig_bgc_dict)
+    bgc_list, gcf_list, strains = filter_mibig_bgcs(bgc_list, gcf_list, strains)
     # update lookup table as well
     bgc_lookup = {bgc.name: bgc for bgc in bgc_list}
 
-    print('# MiBIG BGCs = {}, non-MiBIG BGCS = {}, total bgcs = {}, GCFs = {}'.format(
-                        num_mibig, len(bgc_list) - num_mibig, len(bgc_list), len(gcf_list)))
+    print('# after filtering, total bgcs = {}, GCFs = {}, strains={}'.format(len(bgc_list), len(gcf_list), len(strains)))
 
     # load edge info - note that this should be done AFTER the filtering step above
     # so that it won't leave us with edges for BGCs that are no longer present
@@ -307,9 +306,9 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                 bgc_dst = bgc_lookup[line[1]]
                 bgc_src.edges.append(bgc_dst.id)
 
-    return gcf_list, bgc_list
+    return gcf_list, bgc_list, strains
 
-def filter_mibig_bgcs(bgcs, gcfs, mibig_bgc_dict):
+def filter_mibig_bgcs(bgcs, gcfs, strains):
     # remove the following MiBIG BGCs:
     # - parent attr is None (indicating never added to a GCF)
     # - any instances in a GCF with no other non-MiBIG BGCs
@@ -326,6 +325,11 @@ def filter_mibig_bgcs(bgcs, gcfs, mibig_bgc_dict):
             to_remove_gcfs.add(gcf)
             for bgc in gcf.bgcs:
                 to_remove_bgcs.add(bgc)
+                strains.remove(bgc.strain)
+
+    for bgc in bgcs:
+        if bgc.parent is None:
+            strains.remove(bgc.strain)
 
     logger.info('Filtering MiBIG BGCs: removing {} GCFs and {} BGCs'.format(len(to_remove_gcfs), len(to_remove_bgcs)))
 
@@ -344,7 +348,7 @@ def filter_mibig_bgcs(bgcs, gcfs, mibig_bgc_dict):
     for i in range(len(new_gcf_list)):
         new_gcf_list[i].id = i
 
-    return new_bgc_list, new_gcf_list
+    return new_bgc_list, new_gcf_list, strains
 
 def load_mibig_map(filename='mibig_gnps_links_q3_loose.csv'):
     mibig_map = {}
