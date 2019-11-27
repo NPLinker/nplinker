@@ -637,9 +637,8 @@ class NPLinkerBokeh(object):
             spec_hdr_id = 'spec_result_header_{}_{}'.format(pgindex, j)
             spec_body_id = 'spec_body_{}_{}'.format(pgindex, j)
             spec_title = 'Spectrum(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.spectrum_id, score, len(shared_strains))
-            num_anno_sets = len(spec.get_annotations()) + len(spec.get_gnps_annotations())
-            if num_anno_sets > 0:
-                spec_title += ', annotation sets={}'.format(num_anno_sets)
+            if spec.has_annotations():
+                spec_title += ', # annotations={}'.format(len(spec.annotations))
 
             spec_body = self.generate_spec_info(spec, shared_strains)
 
@@ -652,7 +651,7 @@ class NPLinkerBokeh(object):
             spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, spec.to_jcamp_str())
 
             hdr_color = 'ffe0b5'
-            if num_anno_sets > 0:
+            if len(spec.annotations) > 0:
                 hdr_color = 'ffb5e0'
             body += TMPL_ON_CLICK.format(hdr_id=spec_hdr_id, hdr_color=hdr_color, btn_target=spec_body_id, btn_onclick=spec_onclick, btn_id=spec_btn_id, 
                                          btn_text=spec_title, body_id=spec_body_id, body_parent='accordion_gcf_{}'.format(pgindex), body_body=spec_body)
@@ -1280,16 +1279,16 @@ class NPLinkerBokeh(object):
             non_shared = [s.strain for s in gcf.bgcs if s.strain not in shared_strains]
 
             for s in shared_strains:
-                gcf_body += '<span style="background-color: #AAFFAA">{}</span>, '.format(s)
+                gcf_body += '<span style="background-color: #AAFFAA">{}</span>, '.format(s.id)
             for s in non_shared:
-                gcf_body += '<span style="background-color: #DDDDDD">{}</span>, '.format(s)
+                gcf_body += '<span style="background-color: #DDDDDD">{}</span>, '.format(s.id)
 
             gcf_body += '</li>'
         else:
             gcf_body += '<li><strong>strains (total={}, shared=0)</strong>: '.format(len(gcf.bgcs))
 
             for s in gcf.bgcs:
-                gcf_body += '<span>{}</span>, '.format(s)
+                gcf_body += '<span>{}</span>, '.format(s.strain.id)
 
             gcf_body += '</li>'
 
@@ -1322,28 +1321,24 @@ class NPLinkerBokeh(object):
             non_shared = [s for s in spec.strain_list if s not in shared_strains]
 
             for s in shared_strains:
-                spec_body += '<span style="background-color: #AAFFAA">{}</span>, '.format(s)
+                spec_body += '<span style="background-color: #AAFFAA">{}</span>, '.format(s.id)
             for s in non_shared:
-                spec_body += '<span style="background-color: #DDDDDD">{}</span>, '.format(s)
+                spec_body += '<span style="background-color: #DDDDDD">{}</span>, '.format(s.id)
 
             spec_body += '</li>'
         else:
             spec_body += '<li><strong>strains (total={}, shared=0)</strong>: '.format(len(spec.strain_list))
 
             for s in spec.strain_list:
-                spec_body += '<span>{}</span>, '.format(s)
+                spec_body += '<span>{}</span>, '.format(s.id)
 
             spec_body += '</li>'
 
-        if len(spec.get_annotations()) > 0:
-            for def_anno in spec.get_annotations():
-                spec_body += '<strong>Default annotations:</strong><ul>'
-                for k, v in def_anno.items():
-                    spec_body += '<li><strong><span class="annotation">{}</span></strong> ({})</li>'.format(k, v)
-        if len(spec.get_gnps_annotations()) > 0:
-            for gnps_anno in spec.get_gnps_annotations():
-                spec_body += '<strong>GNPS annotations:</strong><ul>'
-                for k, v in gnps_anno.items():
+        if len(spec.annotations) > 0:
+            # keys of spec.annotations indicate the source file: "gnps" or an actual filename
+            for anno_src, anno_data in spec.get_annotations():
+                spec_body += '<strong>Annotations [{}]:</strong><ul>'.format(anno_src)
+                for k, v in anno_data:
                     spec_body += '<li><strong><span class="annotation">{}</span></strong> ({})</li>'.format(k, v)
         spec_body += '</ul>'
         return spec_body
