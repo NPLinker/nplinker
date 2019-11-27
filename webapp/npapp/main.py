@@ -90,20 +90,21 @@ HOVER_CALLBACK_CODE = """
     // markers that are non-visible
     var indices = cb_data.index.indices;
 
+    // data source column names
+    let ds = cb_data.renderer.data_source;
+    let keys = Object.keys(ds.data);
+    // check if this is the genomics or metabolomics plot using the column names
+    let gen_mode = keys.indexOf('gcf') != -1;
+
     // access data_source.data via cb_data.renderer.data_source.data
 
     if (indices.length > 0)
     {
-        let ds = cb_data.renderer.data_source;
         // selected (as opposed to hovered/inspected) indices
         let selected_indices = ds.selected.indices;
-        // data source column names
-        let keys = Object.keys(ds.data);
 
-        // check if this is the genomics or metabolomics plot using the column names
-        let gen_mode = keys.indexOf('gcf') != -1;
-        let obj_col = gen_mode ? 'gcf' : 'name';
-        let parent_col = gen_mode ? 'gcf' : 'family';
+        let obj_col = gen_mode ? 'index' : 'index';
+        let parent_col = gen_mode ? 'gcf_name' : 'family';
         let objtype = gen_mode ? 'GCF ID(s): ' : 'Spectrum ID(s): ';
 
         // idea here is to display info about the object(s) being hovered over, 
@@ -126,6 +127,7 @@ HOVER_CALLBACK_CODE = """
         // 1st div: show either "(nothing under cursor)" or "x BGCs in y GCFs" / "x spectra in y MolFams"
         if(objects.length == 0) {
             $(output_div_id).html('<small>' + empty_text + '</small>');
+            $(output_div_id_ext).html('');
         } else {
             let ohtml = '<small>';
             // remove dups
@@ -134,17 +136,36 @@ HOVER_CALLBACK_CODE = """
 
             if(gen_mode) {
                 ohtml += objects.length + ' BGCs in ' + parents.length + ' GCFs';
+
+                var bgcs = '<strong>BGCs</strong>: ';
+                var gcfs = '<strong>GCFs</strong>: ';
+                for(var i=0;i<objects.length;i++) {
+                    bgcs += ds.data['name'][objects[i]] + ',';
+                    gcfs += ds.data['gcf_name'][objects[i]] + ',';
+                }
+                $(output_div_id_ext).html('<small>' + bgcs + '<br/>' + gcfs + '</small>');
             } else {
                 ohtml += objects.length + ' spectra in ' + parents.length + ' MolFams';
+
+                var specs = '<strong>Spectra</strong>: ';
+                var fams = '<strong>MolFams</strong>: ';
+                for(var i=0;i<objects.length;i++) {
+                    specs += ds.data['name'][objects[i]] + ',';
+                    fams += ds.data['family'][objects[i]] + ',';
+                }
+                $(output_div_id_ext).html('<small>' + specs + '<br/>' + fams + '</small>');
             }
             ohtml += '<small>';
-            $(output_div_id_ext).html('<small>' + objtype + '<strong>' + objects.join() + '</strong></small>');
             $(output_div_id).html(ohtml);
         }
     } 
     else
     {
         $(output_div_id).html('<small>' + empty_text + '</small>');
+        if(gen_mode)
+            $(output_div_id_ext).html('<small><strong>BGCs</strong>: <br/><strong>GCFs</strong>:</small>');
+        else
+            $(output_div_id_ext).html('<small><strong>Spectra</strong>: <br/><strong>MolFams</strong>:</small>');
     }
 """
 
