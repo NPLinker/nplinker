@@ -393,7 +393,7 @@ class MolecularFamily(object):
         self.spectra.append(spectrum)
 
     def __str__(self):
-        return "Molecular family with {} spectra".format(len(self.spectra))
+        return 'MolFam(family_id={}, spectra={})'.format(self.family_id, len(self.spectra))
 
 class RandomMolecularFamily(object):
     def __init__(self, molecular_family):
