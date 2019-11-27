@@ -1357,7 +1357,7 @@ class NPLinkerBokeh(object):
 
         if len(spec.annotations) > 0:
             # keys of spec.annotations indicate the source file: "gnps" or an actual filename
-            for anno_src, anno_data in spec.get_annotations():
+            for anno_src, anno_data in spec.annotations:
                 spec_body += '<strong>Annotations [{}]:</strong><ul>'.format(anno_src)
                 for k, v in anno_data:
                     spec_body += '<li><strong><span class="annotation">{}</span></strong> ({})</li>'.format(k, v)
