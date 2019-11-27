@@ -1,6 +1,7 @@
 import os
 import glob
 import time
+import xml.etree.ElementTree as ET
 
 from .metabolomics import load_spectra
 from .metabolomics import load_edges
@@ -51,6 +52,9 @@ class DatasetLoader(object):
     OR_BIGSCAPE     = 'bigscape_dir'
     OR_MIBIG_JSON   = 'mibig_json_dir'
     OR_STRAINS      = 'strain_mappings_file'
+    # misc files
+    OR_PARAMS       = 'gnps_params_file'
+    OR_DESCRIPTION  = 'description_file'
 
     BIGSCAPE_PRODUCT_TYPES = ['NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs', 'Saccharides', 'Terpene']
 
@@ -82,7 +86,7 @@ class DatasetLoader(object):
         # 4. MET: <root>/*.csv / extra_nodes_file=<override>
         # TODO is the glob input OK? 
         # => wait for updated dataset with latest output format
-        self.extra_nodes_file = self._overrides.get(self.OR_EXTRA_NODES, find_via_glob(os.path.join(self._root, '*_quant.csv'), self.OR_EXTRA_NODES, optional=True))
+        self.extra_nodes_file = self._overrides.get(self.OR_EXTRA_NODES, find_via_glob(os.path.join(self._root, 'quantification_table_reformatted', '*.csv'), self.OR_EXTRA_NODES, optional=False))
 
         # 5. MET: <root>/spectra/specs_ms.mgf / mgf_file=<override>
         self.mgf_file = self._overrides.get(self.OR_MGF, os.path.join(self._root, 'spectra', 'specs_ms.mgf'))
@@ -107,6 +111,12 @@ class DatasetLoader(object):
         # 11. GEN: <root>/mibig_json / mibig_json_dir=<override>
         self.mibig_json_dir = self._overrides.get(self.OR_MIBIG_JSON, os.path.join(self._root, 'mibig_json'))
 
+        # 12. MISC: <root>/params.xml
+        self.params_file = os.path.join(self._root, 'params.xml')
+
+        # 12. MISC: <root>/description.txt
+        self.description_file = os.path.join(self._root, 'description.txt')
+
         for f in self.required_paths():
             if not os.path.exists(f):
                 raise FileNotFoundError('File/directory "{}" does not exist or is not readable!'.format(f))
@@ -126,7 +136,29 @@ class DatasetLoader(object):
         if not self._load_genomics():
             return False
 
+        self._load_optional()
+
         return True
+
+    def _load_optional(self):
+        self.gnps_params = {}
+        if os.path.exists(self.params_file):
+            logger.debug('Loading params.xml')
+            tree = ET.parse(self.params_file)
+            root = tree.getroot()
+            # this file has a simple structure:
+            # <parameters>
+            #   <parameter name="something">value</parameter>
+            # </parameters>
+            for param in root:
+                self.gnps_params[param.attrib['name']] = param.text
+
+            logger.debug('Parsed {} GNPS params'.format(len(self.gnps_params)))
+
+        self.description_text = '<no description>'
+        if os.path.exists(self.description_file):
+            self.description_text = open(self.description_file, 'r').read()
+            logger.debug('Parsed description text')
 
     def _load_genomics(self):
         logger.debug('make_mibig_bgc_dict({})'.format(self.mibig_json_dir))

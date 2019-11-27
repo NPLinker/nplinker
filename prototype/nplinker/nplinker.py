@@ -151,6 +151,17 @@ class NPLinker(object):
             pickle.dump(self._repro_data, repro_file)
             logger.info('Saving reproducibility data to {}'.format(filename))
 
+    @property
+    def gnps_params(self):
+        """Returns a dict containing data from GNPS params.xml (if available)"""
+        return self._loader.gnps_params
+
+    @property
+    def dataset_description(self):
+        """Returns a string containing the content of any supplied description.txt file"""
+        return self._loader.description_text
+
+    @property
     def bigscape_cutoff(self):
         """Returns the current BiGSCAPE clustering cutoff value"""
         return self._loader._bigscape_cutoff
