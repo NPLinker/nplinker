@@ -45,6 +45,16 @@ class StrainCollection(object):
         for alias in strain.aliases:
             self._lookup[alias] = strain
 
+    def remove(self, strain):
+        if strain.id not in self._lookup:
+            print(strain.id)
+            return
+
+        self._strains.remove(strain)
+        del self._lookup[strain.id]
+        for alias in strain.aliases:
+            del self._lookup[alias]
+
     def __contains__(self, strain_id):
         if isinstance(strain_id, str):
             return strain_id in self._lookup
