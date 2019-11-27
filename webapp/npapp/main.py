@@ -1398,7 +1398,7 @@ class NPLinkerBokeh(object):
         for i, spec in enumerate(spectra):
             spec_hdr_id = 'spec_search_header_{}'.format(i)
             spec_body_id = 'spec_search_body_{}'.format(i)
-            spec_title = 'Spectrum(id={}, strains={})'.format(spec.id, len(spec.strain_list))
+            spec_title = 'Spectrum(spectrum_id={}, strains={})'.format(spec.spectrum_id, len(spec.strain_list))
 
             spec_body = self.generate_spec_info(spec)
 
