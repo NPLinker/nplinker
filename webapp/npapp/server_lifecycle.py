@@ -225,7 +225,9 @@ class NPLinkerHelper(object):
 
     def load_nplinker(self):
         # initialise nplinker and load the dataset, using a config file in the webapp dir
-        self.nplinker = NPLinker(os.path.join(os.path.dirname(__file__), 'nplinker_webapp.toml'))
+        datapath = os.getenv('NPLINKER_CONFIG', os.path.join(os.path.join(os.path.dirname(__file__), 'nplinker_webapp.toml')))
+        print('DATAPATH: {}'.format(datapath))
+        self.nplinker = NPLinker(datapath)
         if not self.nplinker.load_data():
             raise Exception('Failed to load data')
 
