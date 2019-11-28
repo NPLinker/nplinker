@@ -62,6 +62,7 @@ def load_annotations(root, config, spectra, spec_dict):
 
                 scans_index = headers.index(GNPS_INDEX_COLUMN)
 
+                # each line should be a different spec ID here
                 for line in rdr:
                     # read the scan ID column and get the corresponding Spectrum object
                     scan_id = int(line[scans_index])
@@ -85,17 +86,23 @@ def load_annotations(root, config, spectra, spec_dict):
                     # also insert useful URLs
                     for t in ['png', 'json', 'svg', 'spectrum']:
                         data['{}_url'.format(t)] = GNPS_URL_FORMAT.format(t, data['SpectrumID'])
-                    # TODO will there only ever be a single entry here?
-                    spec.add_annotations(GNPS_KEY, data)
+
+                    spec.add_annotations(GNPS_KEY, [data])
             else:
                 logger.debug('Parsing general annotations from {}'.format(af))
                 # this is a general annotations file, so rely purely on the user-provided columns
+                if filename not in ac:
+                    logger.warning('Failed to parse annotations from "{}", no config info supplied in {}'.format(filename, config))
+                    continue
+
                 index_col, data_cols = ac[filename]
                 if index_col not in headers:
                     raise Exception('Annotation index column "{}" not found in file "{}"!'.format(index_col, filename))
 
                 spec_id_index = headers.index(index_col)
 
+                # note that might have multiple lines for the same spec ID! 
+                spec_annotations = {}
                 for line in rdr:
                     scan_id = int(line[spec_id_index])
                     if scan_id not in spec_dict:
@@ -103,14 +110,20 @@ def load_annotations(root, config, spectra, spec_dict):
                         continue
 
                     spec = spec_dict[scan_id]
+                    if spec not in spec_annotations:
+                        spec_annotations[spec] = []
+
                     data = {}
                     for dc in data_cols:
                         if dc not in headers:
                             logger.warning('Column lookup failed for "{}"'.format(dc))
                             continue
                         data[dc] = line[headers.index(dc)]
+                    spec_annotations[spec].append(data)
 
-                    spec.append_annotations(filename, data)
+                logger.debug('Adding annotation data to {} spectra'.format(len(spec_annotations)))
+                for spec, anno in spec_annotations.items():
+                    spec.set_annotations(filename, anno)
 
     return spectra
 
