@@ -445,7 +445,7 @@ def on_session_created(session_context):
     """
     print('on_session_created')
     args = session_context.request.arguments
-    # TODO this reloading is a bit broken atm
+    # TODO this should ideally not change the cutoff for every session?
     if 'cutoff' in args:
         val = int(args['cutoff'][0])
         if val != nh.nplinker.bigscape_cutoff:
