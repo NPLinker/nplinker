@@ -188,7 +188,13 @@ class NPLinker(object):
                 return False
         else:
             logger.debug('load_data with new cutoff = {}'.format(new_bigscape_cutoff))
+            # 1. change the cutoff (which by itself doesn't do anything)
             self._loader._bigscape_cutoff = new_bigscape_cutoff
+            # 2. reload the strain mappings (MiBIG filtering may have removed strains
+            # that were originally present, need to restore them all so the filtering
+            # won't break when it runs again in next stage)
+            self._loader._load_strain_mappings()
+            # 3. reload the genomics data with the new cutoff applied
             self._loader._load_genomics()
 
         self._spectra = self._loader.spectra
