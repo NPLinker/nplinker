@@ -64,6 +64,9 @@ class Spectrum(object):
     def add_annotations(self, key, data):
         self.annotations[key] = data
 
+    def set_annotations(self, key, data):
+        self.annotations[key] = data
+
     def append_annotations(self, key, data):
         if key not in self.annotations:
             self.annotations[key] = []
