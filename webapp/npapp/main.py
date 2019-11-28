@@ -1357,7 +1357,7 @@ class NPLinkerBokeh(object):
 
         if len(spec.annotations) > 0:
             # keys of spec.annotations indicate the source file: "gnps" or an actual filename
-            for anno_src, anno_data in spec.annotations:
+            for anno_src, anno_data in spec.annotations.items():
                 spec_body += '<strong>Annotations [{}]:</strong><ul>'.format(anno_src)
                 for k, v in anno_data:
                     spec_body += '<li><strong><span class="annotation">{}</span></strong> ({})</li>'.format(k, v)
@@ -1421,10 +1421,10 @@ class NPLinkerBokeh(object):
 
     def generate_search_output(self, results):
         # TEMP XXX TODO
-        if len(results) > 0 and isinstance(results[0], BGC):
-            # removing BGCs that don't appear in current TSNE
-            results = [r for r in results if r in self.nh.bgc_indices[self.bgc_tsne_id]]
-            self.searcher.results = results
+        # if len(results) > 0 and isinstance(results[0], BGC):
+        #     # removing BGCs that don't appear in current TSNE
+        #     results = [r for r in results if r in self.nh.bgc_indices[self.bgc_tsne_id]]
+        #     self.searcher.results = results
 
         hdr = '<h4>{} results found</h4>'.format(len(results))
         if len(results) == 0:
