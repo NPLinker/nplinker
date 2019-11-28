@@ -65,7 +65,7 @@ class Searcher(object):
 
         mode = self.name_to_mode(mode)
         if mode == SEARCH_OPT_BGC_STRAIN:
-            results = [bgc for bgc in self.npl.bgcs if self.textmatch(needle, bgc.strain, use_re)]
+            results = [bgc for bgc in self.npl.bgcs if self.textmatch(needle, bgc.strain.id, use_re)]
         elif mode == SEARCH_OPT_BGC_NAME:
             results = [bgc for bgc in self.npl.bgcs if self.textmatch(needle, bgc.name, use_re)]
         elif mode == SEARCH_OPT_BGC_BIGSCAPE_CLASS:
