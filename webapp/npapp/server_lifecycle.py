@@ -7,9 +7,9 @@ import pickle
 import bokeh.palettes as bkp
 from bokeh.models import ColumnDataSource
 
-# add path to nplinker/prototype 
-# TODO probably will need changed at some point!
+# add path to nplinker/prototype (for local dev)
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../prototype'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../../nplinker/prototype'))
 
 from nplinker.nplinker import NPLinker
 from nplinker.genomics import load_mibig_map, MiBIGBGC
@@ -260,7 +260,7 @@ class NPLinkerHelper(object):
 
     def load_genomics(self):
         print('Creating genomics graph')
-        gen_points, gen_edges = create_genomics_graph(self.nplinker.bgcs, width=self.nx_scale * 2, mibig=True, split_mibig=True)
+        gen_points, gen_edges = create_genomics_graph(self.nplinker.bgcs, width=self.nx_scale * 2, mibig=True, split_mibig=False)
         gen_edge_start = gen_edges['start']
         gen_edge_end = gen_edges['end']
 
@@ -445,9 +445,10 @@ def on_session_created(session_context):
     """
     print('on_session_created')
     args = session_context.request.arguments
+    # TODO this reloading is a bit broken atm
     if 'cutoff' in args:
         val = int(args['cutoff'][0])
-        if val != nh.nplinker.bigscape_cutoff():
+        if val != nh.nplinker.bigscape_cutoff:
             print('*** Updating cutoff value to {} and reloading data'.format(val))
             nh.nplinker.load_data(new_bigscape_cutoff=val)
             nh.nplinker.process_dataset()
