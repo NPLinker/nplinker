@@ -13,6 +13,7 @@ from bokeh.events import LODEnd, LODStart, Reset
 
 from nplinker.metabolomics import Spectrum, MolecularFamily, SingletonFamily
 from nplinker.genomics import GCF, BGC
+from nplinker.annotations import gnps_url
 
 from searching import SEARCH_OPTIONS, Searcher
 
@@ -1354,14 +1355,25 @@ class NPLinkerBokeh(object):
                 spec_body += '<span>{}</span>, '.format(s.id)
 
             spec_body += '</li>'
+        spec_body += '</ul>'
 
         if len(spec.annotations) > 0:
             # keys of spec.annotations indicate the source file: "gnps" or an actual filename
-            for anno_src, anno_data in spec.annotations.items():
-                spec_body += '<strong>Annotations [{}]:</strong><ul>'.format(anno_src)
-                for k, v in anno_data:
-                    spec_body += '<li><strong><span class="annotation">{}</span></strong> ({})</li>'.format(k, v)
-        spec_body += '</ul>'
+            for anno_src, anno_list in spec.annotations.items():
+                spec_body += '<hr width="80%"/>'
+                spec_body += '<strong>{} annotations:</strong><ul>'.format(anno_src)
+                for item in anno_list:
+                    spec_body += '<ul>'
+                    content = []
+                    for k, v in item.items():
+                        if k.endswith('_url'):
+                            v = '<a href="{}" target="_blank">{}</a>'.format(v, k)
+                        elif v.startswith('CCMSLIB'):
+                            v = '<a href="{}" target="_blank">{}</a>'.format(gnps_url(v), v)
+                        content.append('<strong><span class="annotation">{}</span></strong> = {}'.format(k, v))
+                    spec_body += '<li>' + ', '.join(content) + '</li>'
+                    spec_body += '</ul>'
+                spec_body += '</ul>'
         return spec_body
 
     def generate_molfam_info(self, molfam, shared_strains=[]):
