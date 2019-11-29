@@ -13,7 +13,7 @@ from bokeh.events import LODEnd, LODStart, Reset
 
 from nplinker.metabolomics import Spectrum, MolecularFamily, SingletonFamily
 from nplinker.genomics import GCF, BGC
-from nplinker.annotations import gnps_url
+from nplinker.annotations import gnps_url, GNPS_KEY
 
 from searching import SEARCH_OPTIONS, Searcher
 

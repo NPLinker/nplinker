@@ -87,7 +87,10 @@ def load_annotations(root, config, spectra, spec_dict):
                     for t in ['png', 'json', 'svg', 'spectrum']:
                         data['{}_url'.format(t)] = GNPS_URL_FORMAT.format(t, data['SpectrumID'])
 
-                    spec.add_annotations(GNPS_KEY, [data])
+                    if GNPS_KEY in spec.annotations:
+                        # TODO is this actually an error or can it happen normally?
+                        raise Exception('Multiple GNPS annotations for Spectrum {}!'.format(spec.spectrum_id))
+                    spec.set_annotations(GNPS_KEY, [data])
             else:
                 logger.debug('Parsing general annotations from {}'.format(af))
                 # this is a general annotations file, so rely purely on the user-provided columns

@@ -58,19 +58,19 @@ class Spectrum(object):
 
         self.strains[strain].update({growth_medium: peak_intensity})
         
+    @property
     def is_library(self):
         return GNPS_KEY in self.annotations
-
-    def add_annotations(self, key, data):
-        self.annotations[key] = data
 
     def set_annotations(self, key, data):
         self.annotations[key] = data
 
-    def append_annotations(self, key, data):
-        if key not in self.annotations:
-            self.annotations[key] = []
-        self.annotations[key].append(data)
+    @property
+    def gnps_annotations(self):
+        if GNPS_KEY not in self.annotations:
+            return None
+
+        return self.annotations[GNPS_KEY][0]
 
     def has_annotations(self):
         return len(self.annotations) > 0
