@@ -37,7 +37,7 @@ class NPLinkerHelper(object):
         # this is usually a dict with one entry per TSNE filename, and contains
         # a set of available GCF objects within each TSNE projection
         self.available_gcfs = {fid: set()}
-        bgc_data = {'index': [], 'x': [], 'y': [], 'strain': [], 'name': [], 'gcf': [], 'gcf_name': [], 'mibig': []}
+        bgc_data = {'index': [], 'x': [], 'y': [], 'strain': [], 'name': [], 'gcf': [], 'gcf_name': [], 'mibig': [], 'prodtype': []}
         uniq_gcfs = set()
         gcf_lookup = {}
         bgcindex = 0
@@ -64,20 +64,31 @@ class NPLinkerHelper(object):
                 uniq_gcfs.add(gcf_id)
             bgc_data['gcf'].append(gcf_id)
             bgc_data['gcf_name'].append(gcf_obj.gcf_id)
+            bgc_data['prodtype'].append(gcf_obj.product_type)
 
         total = len(uniq_gcfs)
         cmap = []
-        while total > 0:
-            c = bkp.d3['Category20c'][20]
-            total -= len(c)
-            cmap.extend(c)
+        # colour by GCF
+        # while total > 0:
+        #     c = bkp.d3['Category20c'][20]
+        #     total -= len(c)
+        #     cmap.extend(c)
+        #bgc_data['fill'] = []
+        #for i in range(len(bgc_data['name'])):
+        #    if bgc_data['mibig'][i] == True:
+        #        bgc_data['fill'].append('#e2e0c0')
+        #    else:
+        #        bgc_data['fill'].append(cmap[gcf_lookup[bgc_data['gcf'][i]]])
 
+        # colour by product type
         bgc_data['fill'] = []
+        prodtypes = self.nplinker.product_types
+        cmap = bkp.d3['Category10'][len(prodtypes)+1]
         for i in range(len(bgc_data['name'])):
             if bgc_data['mibig'][i] == True:
-                bgc_data['fill'].append('#e2e0c0')
+                bgc_data['fill'].append(cmap[-1])
             else:
-                bgc_data['fill'].append(cmap[gcf_lookup[bgc_data['gcf'][i]]])
+                bgc_data['fill'].append(cmap[prodtypes.index(bgc_data['prodtype'][i])])
             
         self.bgc_data[fid] = bgc_data
 
