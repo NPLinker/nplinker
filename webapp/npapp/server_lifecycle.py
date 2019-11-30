@@ -90,6 +90,7 @@ class NPLinkerHelper(object):
             else:
                 bgc_data['fill'].append(cmap[prodtypes.index(bgc_data['prodtype'][i])])
             
+        self.bgc_cmap = {pt: cmap[prodtypes.index(pt)] for pt in prodtypes}
         self.bgc_data[fid] = bgc_data
 
         bgc_edge_data = {'start': [], 'end': [], 'mibig': [], 'xs': [], 'ys': []}
@@ -164,26 +165,30 @@ class NPLinkerHelper(object):
         #         self.spec_data['fill'].append(cmap[fam_lookup[self.spec_data['family'][i]]])
 
         # colouring by parent mass
+        parent_mass_categories = [(None, 150), (150, 300), (300, 500), (500, 700), (700, 900), (900, 1100), (1100, None)]
         def mass_to_cmap_index(pm):
-            if pm < 150:
-                return 0
-            elif pm >= 150 and pm < 300:
-                return 1
-            elif pm >= 300 and pm < 500:
-                return 2
-            elif pm >= 500 and pm < 700:
-                return 3
-            elif pm >= 700 and pm < 900:
-                return 4
-            elif pm >= 900 and pm < 1100:
-                return 5
-            else:
-                return 6
+            for i in range(len(parent_mass_categories)):
+                pmin, pmax = parent_mass_categories[i]
+                if pmax is None:
+                    return i
+                if pm >= pmax:
+                    continue
+                if (pmin is not None and pm > pmin) or pmin is None:
+                    return i
 
         cmap = bkp.d3['Category10'][7]
         self.spec_data['fill'] = []
         for i in range(len(self.spec_data['name'])):
             self.spec_data['fill'].append(cmap[mass_to_cmap_index(self.spec_data['parent_mass'][i])])
+        self.spec_cmap = []
+        for i, limits in enumerate(parent_mass_categories):
+            pmin, pmax = limits
+            if pmin is not None and pmax is not None:
+                self.spec_cmap.append(('{:.0f}--{:.0f}'.format(pmin, pmax), cmap[i]))
+            elif pmin is None:
+                self.spec_cmap.append(('< {:.0f}'.format(pmax), cmap[i]))
+            elif pmax is None:
+                self.spec_cmap.append(('> {:.0f}'.format(pmin), cmap[i]))
 
         spec_edge_data = {'start': [], 'end': [], 'singleton': [], 'xs': [], 'ys': []}
         spec_edge_lookup = {}

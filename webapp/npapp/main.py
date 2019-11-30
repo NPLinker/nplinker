@@ -1694,6 +1694,19 @@ class NPLinkerBokeh(object):
         self.other_info_div = Div(text=other_info, sizing_mode='scale_height', name='other_info_div')
         widgets.append(self.other_info_div)
 
+        legend_bgc_text = '<table><thead><tr><td><strong>Product type</strong></td></tr></thead><tbody>'
+        for pt in self.nh.nplinker.product_types:
+            legend_bgc_text += '<tr style="background-color: {}"><td>{}</td></tr>'.format(self.nh.bgc_cmap[pt], pt)
+        legend_bgc_text += '</tbody></table>'
+        self.legend_bgc = Div(text=legend_bgc_text, sizing_mode='stretch_width', name='legend_bgc')
+        widgets.append(self.legend_bgc)
+
+        legend_spec_text = '<table><thead><tr><td><strong>Parent mass</strong></td></tr></thead><tbody>'
+        for text, colour in self.nh.spec_cmap:
+            legend_spec_text += '<tr style="background-color: {}"><td>{}</td></tr>'.format(colour, text)
+        legend_spec_text += '</tbody></table>'
+        self.legend_spec = Div(text=legend_spec_text, sizing_mode='stretch_width', name='legend_spec')
+        widgets.append(self.legend_spec)
 
         widgets.append(self.fig_spec)
         widgets.append(self.fig_bgc)
