@@ -697,7 +697,7 @@ class NPLinkerBokeh(object):
             # construct a similar object info card header for this GCF
             gcf_hdr_id = 'gcf_result_header_{}_{}'.format(pgindex, j)
             gcf_body_id = 'gcf_body_{}_{}'.format(pgindex, j)
-            gcf_title = 'GCF(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(gcf.id, score, len(shared_strains))
+            gcf_title = 'GCF(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(gcf.gcf_id, score, len(shared_strains))
             gcf_body = self.generate_gcf_info(gcf, shared_strains)
             body += TMPL.format(hdr_id=gcf_hdr_id, hdr_color='ffe0b5', btn_target=gcf_body_id, btn_text=gcf_title, 
                                 body_id=gcf_body_id, body_parent='accordion_spec_{}'.format(pgindex), body_body=gcf_body)
@@ -722,7 +722,7 @@ class NPLinkerBokeh(object):
 
         # iterate over every GCF and its associated set of linked objects + scores
         for gcf, spec_scores in self.score_helper.objs_with_scores.items():
-            title = '{} spectra linked to GCF(id={})'.format(len(spec_scores), gcf.id)
+            title = '{} spectra linked to GCF(id={})'.format(len(spec_scores), gcf.gcf_id)
             hdr_id = 'gcf_result_header_{}'.format(pgindex)
             body_id = 'gcf_result_body_{}'.format(pgindex)
 
@@ -1397,7 +1397,7 @@ class NPLinkerBokeh(object):
         for i, gcf in enumerate(gcfs):
             gcf_hdr_id = 'gcf_search_header_{}'.format(i)
             gcf_body_id = 'gcf_search_body_{}'.format(i)
-            gcf_title = 'GCF(id={}, gcf_id={}, strains={})'.format(gcf.id, gcf.gcf_id, len(gcf.bgcs))
+            gcf_title = 'GCF(gcf_id={}, strains={})'.format(gcf.gcf_id, len(gcf.bgcs))
             gcf_body = self.generate_gcf_info(gcf)
             body += TMPL_SEARCH.format(hdr_id=gcf_hdr_id, hdr_color='dddddd', btn_target=gcf_body_id, btn_text=gcf_title, 
                                 result_index=str(i), body_id=gcf_body_id, body_parent='accordionSearch', body_body=gcf_body)
