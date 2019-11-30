@@ -75,7 +75,7 @@ class Searcher(object):
         elif mode == SEARCH_OPT_BGC_DESCRIPTION:
             results = [bgc for bgc in self.npl.bgcs if self.textmatch(needle, bgc.description, use_re)]
         elif mode == SEARCH_OPT_GCF_STRAINS:
-            results = [gcf for gcf in self.npl.gcfs if self.textmatch_list(needle, [bgc.strain for bgc in gcf.bgc_list], use_re)]
+            results = [gcf for gcf in self.npl.gcfs if self.textmatch_list(needle, [bgc.strain.id for bgc in gcf.bgcs], use_re)]
         elif mode == SEARCH_OPT_GCF_ID:
             results = [gcf for gcf in self.npl.gcfs if self.textmatch(needle, str(gcf.gcf_id), use_re)]
         elif mode == SEARCH_OPT_SPEC_STRAINS:
