@@ -1343,16 +1343,16 @@ class NPLinkerBokeh(object):
             non_shared = [s for s in spec.strain_list if s not in shared_strains]
 
             for s in shared_strains:
-                spec_body += '<span style="background-color: #AAFFAA">{}</span>, '.format(s.id)
+                spec_body += '<span style="background-color: #AAFFAA">{} ({})</span>, '.format(s.id, spec.get_growth_medium(s))
             for s in non_shared:
-                spec_body += '<span style="background-color: #DDDDDD">{}</span>, '.format(s.id)
+                spec_body += '<span style="background-color: #DDDDDD">{} ({})</span>, '.format(s.id, spec.get_growth_medium(s))
 
             spec_body += '</li>'
         else:
             spec_body += '<li><strong>strains (total={}, shared=0)</strong>: '.format(len(spec.strain_list))
 
             for s in spec.strain_list:
-                spec_body += '<span>{}</span>, '.format(s.id)
+                spec_body += '<span>{} ({})</span>, '.format(s.id, spec.get_growth_medium(s))
 
             spec_body += '</li>'
         spec_body += '</ul>'
