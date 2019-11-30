@@ -1291,7 +1291,7 @@ class NPLinkerBokeh(object):
         # start of main tab content
         gcf_body += '<div class="tab-pane show active" id="gcf_{}_main" role="tabpanel">'.format(gcf.id)
         gcf_body += '<ul>'
-        for attr in ['id', 'gcf_id', 'gnps_class']:
+        for attr in ['id', 'gcf_id', 'product_type']:
             gcf_body += '<li><strong>{}</strong>: {}</li>'.format(attr, getattr(gcf, attr))
 
         # add strain information
