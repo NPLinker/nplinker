@@ -121,7 +121,7 @@ class NPLinkerHelper(object):
     def _construct_spec_data(self, fid, nodes_xy, edges_start, edges_end):
         # self.spec_data is the same as self.bgc_data above, but holding spectrum
         # info rather than BGC info...
-        self.spec_data = {'index': [], 'x': [], 'y': [], 'name': [], 'family': [], 'singleton': []}
+        self.spec_data = {'index': [], 'x': [], 'y': [], 'name': [], 'family': [], 'singleton': [], 'parent_mass': []}
         uniq_fams = set()
         fam_lookup = {}
 
@@ -137,6 +137,7 @@ class NPLinkerHelper(object):
             self.spec_data['name'].append(spec.spectrum_id)
             self.spec_data['family'].append(family)
             self.spec_data['singleton'].append(isinstance(spec.family, SingletonFamily))
+            self.spec_data['parent_mass'].append(spec.parent_mz)
             specindex += 1
             # precache JCAMP data
             spec.to_jcamp_str()
@@ -146,19 +147,43 @@ class NPLinkerHelper(object):
 
         print('Unique families: {}'.format(len(uniq_fams)))
         total = len(uniq_fams)
-        cmap = []
-        while total > 0:
-            c = bkp.d3['Category20'][20]
-            total -= len(c)
-            cmap.extend(c)
 
+        # colouring by MolFam
+        # cmap = []
+        # while total > 0:
+        #     c = bkp.d3['Category20'][20]
+        #     total -= len(c)
+        #     cmap.extend(c)
+
+        # self.spec_data['fill'] = []
+        # for i in range(len(self.spec_data['name'])):
+        #     # fix singletons to a single obvious colour
+        #     if self.spec_data['family'][i] == '-1':
+        #         self.spec_data['fill'].append('#000000')
+        #     else:
+        #         self.spec_data['fill'].append(cmap[fam_lookup[self.spec_data['family'][i]]])
+
+        # colouring by parent mass
+        def mass_to_cmap_index(pm):
+            if pm < 150:
+                return 0
+            elif pm >= 150 and pm < 300:
+                return 1
+            elif pm >= 300 and pm < 500:
+                return 2
+            elif pm >= 500 and pm < 700:
+                return 3
+            elif pm >= 700 and pm < 900:
+                return 4
+            elif pm >= 900 and pm < 1100:
+                return 5
+            else:
+                return 6
+
+        cmap = bkp.d3['Category10'][7]
         self.spec_data['fill'] = []
         for i in range(len(self.spec_data['name'])):
-            # fix singletons to a single obvious colour
-            if self.spec_data['family'][i] == '-1':
-                self.spec_data['fill'].append('#000000')
-            else:
-                self.spec_data['fill'].append(cmap[fam_lookup[self.spec_data['family'][i]]])
+            self.spec_data['fill'].append(cmap[mass_to_cmap_index(self.spec_data['parent_mass'][i])])
 
         spec_edge_data = {'start': [], 'end': [], 'singleton': [], 'xs': [], 'ys': []}
         spec_edge_lookup = {}
