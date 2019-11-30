@@ -658,7 +658,7 @@ class NPLinkerBokeh(object):
 
             spec_hdr_id = 'spec_result_header_{}_{}'.format(pgindex, j)
             spec_body_id = 'spec_body_{}_{}'.format(pgindex, j)
-            spec_title = 'Spectrum(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.spectrum_id, score, len(shared_strains))
+            spec_title = 'Spectrum(parent_mass={:.4f}, id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.parent_mz, spec.spectrum_id, score, len(shared_strains))
             if spec.has_annotations():
                 spec_title += ', # annotations={}'.format(len(spec.annotations))
 
@@ -1410,7 +1410,7 @@ class NPLinkerBokeh(object):
         for i, spec in enumerate(spectra):
             spec_hdr_id = 'spec_search_header_{}'.format(i)
             spec_body_id = 'spec_search_body_{}'.format(i)
-            spec_title = 'Spectrum(spectrum_id={}, strains={})'.format(spec.spectrum_id, len(spec.strain_list))
+            spec_title = 'Spectrum(parent_mass={:.4f}, id={}, strains={})'.format(spec.parent_mz, spec.spectrum_id, len(spec.strain_list))
 
             spec_body = self.generate_spec_info(spec)
 
