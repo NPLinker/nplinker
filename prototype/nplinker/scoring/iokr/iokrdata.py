@@ -8,7 +8,7 @@ from . import mk_fprints
 from . import spectrum
 from . import spectrum_filters
 
-from logconfig import LogConfig
+from nplinker.logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
 def normalise_kernel(matrix):

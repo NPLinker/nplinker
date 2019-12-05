@@ -1,8 +1,8 @@
-from metabolomics import Spectrum
+from nplinker.metabolomics import Spectrum
 from . iokr import nplinker_iokr
 from . iokr.spectrum import MSSpectrum
 
-from logconfig import LogConfig 
+from nplinker.logconfig import LogConfig 
 logger = LogConfig.getLogger(__file__)
 
 def run_iokr_ranking(spec, bgc_list):
