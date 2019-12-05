@@ -65,7 +65,7 @@ class Searcher(object):
 
         mode = self.name_to_mode(mode)
         if mode == SEARCH_OPT_BGC_STRAIN:
-            results = [bgc for bgc in self.npl.bgcs if self.textmatch(needle, bgc.strain, use_re)]
+            results = [bgc for bgc in self.npl.bgcs if self.textmatch(needle, bgc.strain.id, use_re)]
         elif mode == SEARCH_OPT_BGC_NAME:
             results = [bgc for bgc in self.npl.bgcs if self.textmatch(needle, bgc.name, use_re)]
         elif mode == SEARCH_OPT_BGC_BIGSCAPE_CLASS:
@@ -77,7 +77,7 @@ class Searcher(object):
         elif mode == SEARCH_OPT_GCF_STRAINS:
             results = [gcf for gcf in self.npl.gcfs if self.textmatch_list(needle, [bgc.strain for bgc in gcf.bgc_list], use_re)]
         elif mode == SEARCH_OPT_GCF_ID:
-            results = [gcf for gcf in self.npl.gcfs if self.textmatch(needle, gcf.gcf_id, use_re)]
+            results = [gcf for gcf in self.npl.gcfs if self.textmatch(needle, str(gcf.gcf_id), use_re)]
         elif mode == SEARCH_OPT_SPEC_STRAINS:
             results = [spec for spec in self.npl.spectra if self.textmatch_list(needle, spec.strain_list, use_re)]
         elif mode == SEARCH_OPT_SPEC_FAMILY:
@@ -85,7 +85,12 @@ class Searcher(object):
             results = [spec for spec in self.npl.spectra if self.textmatch(needle, spec.family, use_re, not use_re)]
         elif mode == SEARCH_OPT_SPEC_ID:
             # if not in regex mode here, probably want to use exact matching
-            results = [spec for spec in self.npl.spectra if self.textmatch(needle, str(spec.id), use_re, not use_re)]
+            results = [spec for spec in self.npl.spectra if self.textmatch(needle, str(spec.spectrum_id), use_re, not use_re)]
+        elif mode == SEARCH_OPT_MOLFAM_FAMILY:
+            results = [fam for fam in self.npl.molfams if self.textmatch(needle, str(fam.family_id), use_re, not use_re)]
+        elif mode == SEARCH_OPT_MOLFAM_SPECTRA:
+            # TODO
+            results = []
 
         print('found {} results'.format(len(results)))
         self.results = results

@@ -7,15 +7,15 @@ import pickle
 import bokeh.palettes as bkp
 from bokeh.models import ColumnDataSource
 
-# add path to nplinker/prototype 
-# TODO probably will need changed at some point!
+# add path to nplinker/prototype (for local dev)
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../prototype'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../../nplinker/prototype'))
 
-from nplinker import NPLinker
-from genomics import load_mibig_map, MiBIGBGC
-from metabolomics import SingletonFamily
-from logconfig import LogConfig
-from layout import create_genomics_graph, create_metabolomics_graph
+from nplinker.nplinker import NPLinker
+from nplinker.genomics import load_mibig_map, MiBIGBGC
+from nplinker.metabolomics import SingletonFamily
+from nplinker.logconfig import LogConfig
+from nplinker.layout import create_genomics_graph, create_metabolomics_graph
 
 class NPLinkerHelper(object):
     """
@@ -37,7 +37,7 @@ class NPLinkerHelper(object):
         # this is usually a dict with one entry per TSNE filename, and contains
         # a set of available GCF objects within each TSNE projection
         self.available_gcfs = {fid: set()}
-        bgc_data = {'index': [], 'x': [], 'y': [], 'strain': [], 'name': [], 'gcf': [], 'mibig': []}
+        bgc_data = {'index': [], 'x': [], 'y': [], 'strain': [], 'name': [], 'gcf': [], 'gcf_name': [], 'mibig': []}
         uniq_gcfs = set()
         gcf_lookup = {}
         bgcindex = 0
@@ -53,7 +53,7 @@ class NPLinkerHelper(object):
             
             bgc_data['name'].append(bgc.name)
             # TODO is this right thing to do here?
-            bgc_data['strain'].append(bgc.strain if bgc.strain is not None else 'MiBIGBGC') 
+            bgc_data['strain'].append(bgc.strain.id if bgc.strain is not None else 'MiBIGBGC') 
             bgc_data['mibig'].append(isinstance(bgc, MiBIGBGC))
             bgcindex += 1
             gcf_obj = bgc.parent
@@ -63,6 +63,7 @@ class NPLinkerHelper(object):
                 gcf_lookup[gcf_id] = len(uniq_gcfs)
                 uniq_gcfs.add(gcf_id)
             bgc_data['gcf'].append(gcf_id)
+            bgc_data['gcf_name'].append(gcf_obj.gcf_id)
 
         total = len(uniq_gcfs)
         cmap = []
@@ -225,7 +226,9 @@ class NPLinkerHelper(object):
 
     def load_nplinker(self):
         # initialise nplinker and load the dataset, using a config file in the webapp dir
-        self.nplinker = NPLinker(os.path.join(os.path.dirname(__file__), 'nplinker_webapp.toml'))
+        datapath = os.getenv('NPLINKER_CONFIG', os.path.join(os.path.join(os.path.dirname(__file__), 'nplinker_webapp.toml')))
+        print('DATAPATH: {}'.format(datapath))
+        self.nplinker = NPLinker(datapath)
         if not self.nplinker.load_data():
             raise Exception('Failed to load data')
 
@@ -257,7 +260,7 @@ class NPLinkerHelper(object):
 
     def load_genomics(self):
         print('Creating genomics graph')
-        gen_points, gen_edges = create_genomics_graph(self.nplinker.bgcs, width=self.nx_scale * 2, mibig=True, split_mibig=True)
+        gen_points, gen_edges = create_genomics_graph(self.nplinker.bgcs, width=self.nx_scale * 2, mibig=True, split_mibig=False)
         gen_edge_start = gen_edges['start']
         gen_edge_end = gen_edges['end']
 
@@ -273,7 +276,7 @@ class NPLinkerHelper(object):
         # provide a way to quickly look up the list of GCFs containing a particular BGC
         self.bgc_gcf_lookup = {}
         for gcf in self.nplinker.gcfs:
-            for bgc in gcf.bgc_list:
+            for bgc in gcf.bgcs:
                 if bgc in self.bgc_gcf_lookup:
                     self.bgc_gcf_lookup[bgc].add(gcf)
                 else:
@@ -417,7 +420,7 @@ class NPLinkerHelper(object):
         # provide a way to quickly look up the list of GCFs containing a particular BGC
         self.bgc_gcf_lookup = {}
         for gcf in self.nplinker.gcfs:
-            for bgc in gcf.bgc_list:
+            for bgc in gcf.bgcs:
                 if bgc in self.bgc_gcf_lookup:
                     self.bgc_gcf_lookup[bgc].add(gcf)
                 else:
@@ -442,9 +445,10 @@ def on_session_created(session_context):
     """
     print('on_session_created')
     args = session_context.request.arguments
+    # TODO this should ideally not change the cutoff for every session?
     if 'cutoff' in args:
         val = int(args['cutoff'][0])
-        if val != nh.nplinker.bigscape_cutoff():
+        if val != nh.nplinker.bigscape_cutoff:
             print('*** Updating cutoff value to {} and reloading data'.format(val))
             nh.nplinker.load_data(new_bigscape_cutoff=val)
             nh.nplinker.process_dataset()
