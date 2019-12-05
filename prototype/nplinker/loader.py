@@ -65,6 +65,7 @@ class DatasetLoader(object):
         self._antismash_format = self._dataset.get('antismash_format', self.ANTISMASH_FMT_DEFAULT)
         self._bigscape_cutoff = self._dataset.get('bigscape_cutoff', self.BIGSCAPE_CUTOFF_DEFAULT)
         self._root = self._config['dataset']['root']
+        self.datadir = os.path.join(os.path.dirname(__file__), 'data')
         logger.debug('DatasetLoader({})'.format(self._root))
 
         # check antismash format is recognised
@@ -275,7 +276,7 @@ class DatasetLoader(object):
         # packaged with nplinker itself 
         self.strains = StrainCollection()
 
-        global_strain_id_file = os.path.join(os.path.dirname(__file__), 'data', 'strain_id_mapping.csv')
+        global_strain_id_file = os.path.join(self.datadir, 'strain_id_mapping.csv')
         self.strains.add_from_file(global_strain_id_file)
         logger.info('Loaded global strain IDs ({} total)'.format(len(self.strains)))
 
