@@ -13,6 +13,12 @@ METCALF_EXPECTED_CACHE = None
 METCALF_VARIANCE_CACHE = None
 
 
+def metcalf_std_count(*arg):
+    raw = metcalf_count(*arg)
+    exp, std = metcalf_expected_count(*arg)
+    return (raw - exp) / np.sqrt(std)
+
+
 def metcalf_count(n, m, overlap, N, in_both, spec_not_gen, gen_not_spec, neither):
     # compute metcalf score for n strains in spectrum
     # m strains in gcf
