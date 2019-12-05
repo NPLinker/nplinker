@@ -87,7 +87,7 @@ class DatasetLoader(object):
         # 4. MET: <root>/*.csv / extra_nodes_file=<override>
         # TODO is the glob input OK? 
         # => wait for updated dataset with latest output format
-        self.extra_nodes_file = self._overrides.get(self.OR_EXTRA_NODES, find_via_glob(os.path.join(self._root, 'quantification_table_reformatted', '*.csv'), self.OR_EXTRA_NODES, optional=False))
+        self.extra_nodes_file = self._overrides.get(self.OR_EXTRA_NODES, find_via_glob(os.path.join(self._root, 'quantification_table_reformatted', '*.csv'), self.OR_EXTRA_NODES, optional=True))
 
         # 5. MET: <root>/spectra/specs_ms.mgf / mgf_file=<override>
         self.mgf_file = self._overrides.get(self.OR_MGF, os.path.join(self._root, 'spectra', 'specs_ms.mgf'))
