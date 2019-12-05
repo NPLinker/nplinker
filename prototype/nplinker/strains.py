@@ -47,7 +47,6 @@ class StrainCollection(object):
 
     def remove(self, strain):
         if strain.id not in self._lookup:
-            print(strain.id)
             return
 
         self._strains.remove(strain)
