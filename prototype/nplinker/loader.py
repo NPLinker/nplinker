@@ -65,6 +65,7 @@ class DatasetLoader(object):
         self._antismash_format = self._dataset.get('antismash_format', self.ANTISMASH_FMT_DEFAULT)
         self._bigscape_cutoff = self._dataset.get('bigscape_cutoff', self.BIGSCAPE_CUTOFF_DEFAULT)
         self._root = self._config['dataset']['root']
+        self.datadir = os.path.join(os.path.dirname(__file__), 'data')
         logger.debug('DatasetLoader({})'.format(self._root))
 
         # check antismash format is recognised
@@ -86,7 +87,7 @@ class DatasetLoader(object):
         # 4. MET: <root>/*.csv / extra_nodes_file=<override>
         # TODO is the glob input OK? 
         # => wait for updated dataset with latest output format
-        self.extra_nodes_file = self._overrides.get(self.OR_EXTRA_NODES, find_via_glob(os.path.join(self._root, 'quantification_table_reformatted', '*.csv'), self.OR_EXTRA_NODES, optional=False))
+        self.extra_nodes_file = self._overrides.get(self.OR_EXTRA_NODES, find_via_glob(os.path.join(self._root, 'quantification_table_reformatted', '*.csv'), self.OR_EXTRA_NODES, optional=True))
 
         # 5. MET: <root>/spectra/specs_ms.mgf / mgf_file=<override>
         self.mgf_file = self._overrides.get(self.OR_MGF, os.path.join(self._root, 'spectra', 'specs_ms.mgf'))
@@ -275,7 +276,7 @@ class DatasetLoader(object):
         # packaged with nplinker itself 
         self.strains = StrainCollection()
 
-        global_strain_id_file = os.path.join(os.path.dirname(__file__), 'data', 'strain_id_mapping.csv')
+        global_strain_id_file = os.path.join(self.datadir, 'strain_id_mapping.csv')
         self.strains.add_from_file(global_strain_id_file)
         logger.info('Loaded global strain IDs ({} total)'.format(len(self.strains)))
 

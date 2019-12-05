@@ -37,7 +37,7 @@ class NPLinkerHelper(object):
         # this is usually a dict with one entry per TSNE filename, and contains
         # a set of available GCF objects within each TSNE projection
         self.available_gcfs = {fid: set()}
-        bgc_data = {'index': [], 'x': [], 'y': [], 'strain': [], 'name': [], 'gcf': [], 'gcf_name': [], 'mibig': []}
+        bgc_data = {'index': [], 'x': [], 'y': [], 'strain': [], 'name': [], 'gcf': [], 'gcf_name': [], 'mibig': [], 'prodtype': []}
         uniq_gcfs = set()
         gcf_lookup = {}
         bgcindex = 0
@@ -64,21 +64,33 @@ class NPLinkerHelper(object):
                 uniq_gcfs.add(gcf_id)
             bgc_data['gcf'].append(gcf_id)
             bgc_data['gcf_name'].append(gcf_obj.gcf_id)
+            bgc_data['prodtype'].append(gcf_obj.product_type)
 
         total = len(uniq_gcfs)
         cmap = []
-        while total > 0:
-            c = bkp.d3['Category20c'][20]
-            total -= len(c)
-            cmap.extend(c)
+        # colour by GCF
+        # while total > 0:
+        #     c = bkp.d3['Category20c'][20]
+        #     total -= len(c)
+        #     cmap.extend(c)
+        #bgc_data['fill'] = []
+        #for i in range(len(bgc_data['name'])):
+        #    if bgc_data['mibig'][i] == True:
+        #        bgc_data['fill'].append('#e2e0c0')
+        #    else:
+        #        bgc_data['fill'].append(cmap[gcf_lookup[bgc_data['gcf'][i]]])
 
+        # colour by product type
         bgc_data['fill'] = []
+        prodtypes = self.nplinker.product_types
+        cmap = bkp.d3['Category10'][len(prodtypes)+1]
         for i in range(len(bgc_data['name'])):
             if bgc_data['mibig'][i] == True:
-                bgc_data['fill'].append('#e2e0c0')
+                bgc_data['fill'].append(cmap[-1])
             else:
-                bgc_data['fill'].append(cmap[gcf_lookup[bgc_data['gcf'][i]]])
+                bgc_data['fill'].append(cmap[prodtypes.index(bgc_data['prodtype'][i])])
             
+        self.bgc_cmap = {pt: cmap[prodtypes.index(pt)] for pt in prodtypes}
         self.bgc_data[fid] = bgc_data
 
         bgc_edge_data = {'start': [], 'end': [], 'mibig': [], 'xs': [], 'ys': []}
@@ -110,7 +122,7 @@ class NPLinkerHelper(object):
     def _construct_spec_data(self, fid, nodes_xy, edges_start, edges_end):
         # self.spec_data is the same as self.bgc_data above, but holding spectrum
         # info rather than BGC info...
-        self.spec_data = {'index': [], 'x': [], 'y': [], 'name': [], 'family': [], 'singleton': []}
+        self.spec_data = {'index': [], 'x': [], 'y': [], 'name': [], 'family': [], 'singleton': [], 'parent_mass': []}
         uniq_fams = set()
         fam_lookup = {}
 
@@ -126,6 +138,7 @@ class NPLinkerHelper(object):
             self.spec_data['name'].append(spec.spectrum_id)
             self.spec_data['family'].append(family)
             self.spec_data['singleton'].append(isinstance(spec.family, SingletonFamily))
+            self.spec_data['parent_mass'].append(spec.parent_mz)
             specindex += 1
             # precache JCAMP data
             spec.to_jcamp_str()
@@ -135,19 +148,47 @@ class NPLinkerHelper(object):
 
         print('Unique families: {}'.format(len(uniq_fams)))
         total = len(uniq_fams)
-        cmap = []
-        while total > 0:
-            c = bkp.d3['Category20'][20]
-            total -= len(c)
-            cmap.extend(c)
 
+        # colouring by MolFam
+        # cmap = []
+        # while total > 0:
+        #     c = bkp.d3['Category20'][20]
+        #     total -= len(c)
+        #     cmap.extend(c)
+
+        # self.spec_data['fill'] = []
+        # for i in range(len(self.spec_data['name'])):
+        #     # fix singletons to a single obvious colour
+        #     if self.spec_data['family'][i] == '-1':
+        #         self.spec_data['fill'].append('#000000')
+        #     else:
+        #         self.spec_data['fill'].append(cmap[fam_lookup[self.spec_data['family'][i]]])
+
+        # colouring by parent mass
+        parent_mass_categories = [(None, 150), (150, 300), (300, 500), (500, 700), (700, 900), (900, 1100), (1100, None)]
+        def mass_to_cmap_index(pm):
+            for i in range(len(parent_mass_categories)):
+                pmin, pmax = parent_mass_categories[i]
+                if pmax is None:
+                    return i
+                if pm >= pmax:
+                    continue
+                if (pmin is not None and pm > pmin) or pmin is None:
+                    return i
+
+        cmap = bkp.d3['Category10'][7]
         self.spec_data['fill'] = []
         for i in range(len(self.spec_data['name'])):
-            # fix singletons to a single obvious colour
-            if self.spec_data['family'][i] == '-1':
-                self.spec_data['fill'].append('#000000')
-            else:
-                self.spec_data['fill'].append(cmap[fam_lookup[self.spec_data['family'][i]]])
+            self.spec_data['fill'].append(cmap[mass_to_cmap_index(self.spec_data['parent_mass'][i])])
+        self.spec_cmap = []
+        for i, limits in enumerate(parent_mass_categories):
+            pmin, pmax = limits
+            if pmin is not None and pmax is not None:
+                self.spec_cmap.append(('{:.0f}--{:.0f}'.format(pmin, pmax), cmap[i]))
+            elif pmin is None:
+                self.spec_cmap.append(('< {:.0f}'.format(pmax), cmap[i]))
+            elif pmax is None:
+                self.spec_cmap.append(('> {:.0f}'.format(pmin), cmap[i]))
 
         spec_edge_data = {'start': [], 'end': [], 'singleton': [], 'xs': [], 'ys': []}
         spec_edge_lookup = {}
@@ -232,16 +273,6 @@ class NPLinkerHelper(object):
         if not self.nplinker.load_data():
             raise Exception('Failed to load data')
 
-        # TODO this should be handled better/elsewhere?
-        # hacky
-        mibig_file = os.path.join(self.data_dir, 'mibig_gnps_links_q1.csv')
-        mibig_map = load_mibig_map(mibig_file)
-        # mibig_bgcs = [MiBIGBGC(name, product) for (name, product) in mibig_map.items()]
-        # c = len(self.nplinker.bgcs)
-        # self.nplinker._bgcs.extend(mibig_bgcs)
-        # for i, mb in enumerate(mibig_bgcs):
-        #     self.nplinker._bgc_lookup[mb.name] = i + c
-
         if not self.nplinker.process_dataset():
             raise Exception('Failed to process dataset')
 
@@ -287,16 +318,6 @@ class NPLinkerHelper(object):
         self.nplinker = NPLinker(os.path.join(os.path.dirname(__file__), 'nplinker_webapp.toml'))
         if not self.nplinker.load_data():
             raise Exception('Failed to load data')
-
-        # TODO this should be handled better/elsewhere?
-        # hacky
-        mibig_file = os.path.join(self.data_dir, 'mibig_gnps_links_q1.csv')
-        mibig_map = load_mibig_map(mibig_file)
-        # mibig_bgcs = [MiBIGBGC(name, product) for (name, product) in mibig_map.items()]
-        # c = len(self.nplinker.bgcs)
-        # self.nplinker._bgcs.extend(mibig_bgcs)
-        # for i, mb in enumerate(mibig_bgcs):
-        #     self.nplinker._bgc_lookup[mb.name] = i + c
 
         if not self.nplinker.process_dataset():
             raise Exception('Failed to process dataset')

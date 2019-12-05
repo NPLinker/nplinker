@@ -90,6 +90,13 @@ class Spectrum(object):
     def has_strain(self, strain):
         return strain in self.strains
 
+    def get_growth_medium(self, strain):
+        if strain not in self.strains:
+            return None
+
+        gms = self.strains[strain]
+        return list(gms.keys())[0]
+
     def to_jcamp_str(self, force_refresh=False):
         if self._jcamp is not None and not force_refresh:
             return self._jcamp

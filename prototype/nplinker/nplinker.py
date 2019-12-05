@@ -152,6 +152,11 @@ class NPLinker(object):
             logger.info('Saving reproducibility data to {}'.format(filename))
 
     @property
+    def data_dir(self):
+        """Returns path to nplinker/data directory (files packaged with the app itself)"""
+        return self._loader.datadir
+
+    @property
     def gnps_params(self):
         """Returns a dict containing data from GNPS params.xml (if available)"""
         return self._loader.gnps_params

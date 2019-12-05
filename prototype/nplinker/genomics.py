@@ -71,10 +71,10 @@ class BGC(object):
 
 
 class GCF(object):
-    def __init__(self, id, gcf_id, gnps_class):
+    def __init__(self, id, gcf_id, product_type):
         self.id = id
         self.gcf_id = gcf_id
-        self.gnps_class = gnps_class
+        self.product_type = product_type
         self.bgcs = set()
         self.classes = set()
         self.random_gcf = None
@@ -84,7 +84,7 @@ class GCF(object):
         self.strains_lookup = {}
 
     def __str__(self):
-        return 'GCF(id={}, class={}, gcf_id={}, strains={})'.format(self.id, self.gnps_class, self.gcf_id, len(self.strains))
+        return 'GCF(id={}, class={}, gcf_id={}, strains={})'.format(self.id, self.product_type, self.gcf_id, len(self.strains))
 
     def __repr__(self):
         return str(self)
@@ -193,8 +193,8 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
     # - BGC name
     # - cluster ID
     for product_type, filename in cluster_file_dict.items():
-        gnps_class = os.path.split(filename)[-1]
-        gnps_class = gnps_class[:gnps_class.index('_')]
+        product_type = os.path.split(filename)[-1]
+        product_type = product_type[:product_type.index('_')]
         with open(filename, 'rU') as f:
             reader = csv.reader(f, delimiter='\t')
             next(reader) # skip headers
@@ -262,7 +262,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                     new_bgc.description = description
 
                 if family_id not in gcf_dict:
-                    new_gcf = GCF(internal_gcf_id, family_id, gnps_class)
+                    new_gcf = GCF(internal_gcf_id, family_id, product_type)
                     gcf_dict[family_id] = new_gcf
                     gcf_list.append(new_gcf)
                     internal_gcf_id += 1
@@ -381,7 +381,7 @@ def make_mibig_bgc_dict(strains, mibig_json_directory):
     i = 0
     for name, data in list(mibig_dict.items()):
         accession = data['general_params']['mibig_accession']
-        biosyn_class = data['general_params']['biosyn_class']
+        biosyn_class = data['general_params']['biosyn_class'][0]
         strain = Strain(accession)
         new_bgc = MiBIGBGC(i, strain, accession, biosyn_class)
         mibig_bgc_dict[accession] = new_bgc

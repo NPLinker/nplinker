@@ -658,7 +658,7 @@ class NPLinkerBokeh(object):
 
             spec_hdr_id = 'spec_result_header_{}_{}'.format(pgindex, j)
             spec_body_id = 'spec_body_{}_{}'.format(pgindex, j)
-            spec_title = 'Spectrum(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.spectrum_id, score, len(shared_strains))
+            spec_title = 'Spectrum(parent_mass={:.4f}, id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.parent_mz, spec.spectrum_id, score, len(shared_strains))
             if spec.has_annotations():
                 spec_title += ', # annotations={}'.format(len(spec.annotations))
 
@@ -697,7 +697,7 @@ class NPLinkerBokeh(object):
             # construct a similar object info card header for this GCF
             gcf_hdr_id = 'gcf_result_header_{}_{}'.format(pgindex, j)
             gcf_body_id = 'gcf_body_{}_{}'.format(pgindex, j)
-            gcf_title = 'GCF(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(gcf.id, score, len(shared_strains))
+            gcf_title = 'GCF(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(gcf.gcf_id, score, len(shared_strains))
             gcf_body = self.generate_gcf_info(gcf, shared_strains)
             body += TMPL.format(hdr_id=gcf_hdr_id, hdr_color='ffe0b5', btn_target=gcf_body_id, btn_text=gcf_title, 
                                 body_id=gcf_body_id, body_parent='accordion_spec_{}'.format(pgindex), body_body=gcf_body)
@@ -722,7 +722,7 @@ class NPLinkerBokeh(object):
 
         # iterate over every GCF and its associated set of linked objects + scores
         for gcf, spec_scores in self.score_helper.objs_with_scores.items():
-            title = '{} spectra linked to GCF(id={})'.format(len(spec_scores), gcf.id)
+            title = '{} spectra linked to GCF(id={})'.format(len(spec_scores), gcf.gcf_id)
             hdr_id = 'gcf_result_header_{}'.format(pgindex)
             body_id = 'gcf_result_body_{}'.format(pgindex)
 
@@ -1291,7 +1291,7 @@ class NPLinkerBokeh(object):
         # start of main tab content
         gcf_body += '<div class="tab-pane show active" id="gcf_{}_main" role="tabpanel">'.format(gcf.id)
         gcf_body += '<ul>'
-        for attr in ['id', 'gcf_id', 'gnps_class']:
+        for attr in ['id', 'gcf_id', 'product_type']:
             gcf_body += '<li><strong>{}</strong>: {}</li>'.format(attr, getattr(gcf, attr))
 
         # add strain information
@@ -1343,16 +1343,16 @@ class NPLinkerBokeh(object):
             non_shared = [s for s in spec.strain_list if s not in shared_strains]
 
             for s in shared_strains:
-                spec_body += '<span style="background-color: #AAFFAA">{}</span>, '.format(s.id)
+                spec_body += '<span style="background-color: #AAFFAA">{} ({})</span>, '.format(s.id, spec.get_growth_medium(s))
             for s in non_shared:
-                spec_body += '<span style="background-color: #DDDDDD">{}</span>, '.format(s.id)
+                spec_body += '<span style="background-color: #DDDDDD">{} ({})</span>, '.format(s.id, spec.get_growth_medium(s))
 
             spec_body += '</li>'
         else:
             spec_body += '<li><strong>strains (total={}, shared=0)</strong>: '.format(len(spec.strain_list))
 
             for s in spec.strain_list:
-                spec_body += '<span>{}</span>, '.format(s.id)
+                spec_body += '<span>{} ({})</span>, '.format(s.id, spec.get_growth_medium(s))
 
             spec_body += '</li>'
         spec_body += '</ul>'
@@ -1397,7 +1397,7 @@ class NPLinkerBokeh(object):
         for i, gcf in enumerate(gcfs):
             gcf_hdr_id = 'gcf_search_header_{}'.format(i)
             gcf_body_id = 'gcf_search_body_{}'.format(i)
-            gcf_title = 'GCF(id={}, gcf_id={}, strains={})'.format(gcf.id, gcf.gcf_id, len(gcf.bgcs))
+            gcf_title = 'GCF(gcf_id={}, strains={})'.format(gcf.gcf_id, len(gcf.bgcs))
             gcf_body = self.generate_gcf_info(gcf)
             body += TMPL_SEARCH.format(hdr_id=gcf_hdr_id, hdr_color='dddddd', btn_target=gcf_body_id, btn_text=gcf_title, 
                                 result_index=str(i), body_id=gcf_body_id, body_parent='accordionSearch', body_body=gcf_body)
@@ -1410,7 +1410,7 @@ class NPLinkerBokeh(object):
         for i, spec in enumerate(spectra):
             spec_hdr_id = 'spec_search_header_{}'.format(i)
             spec_body_id = 'spec_search_body_{}'.format(i)
-            spec_title = 'Spectrum(spectrum_id={}, strains={})'.format(spec.spectrum_id, len(spec.strain_list))
+            spec_title = 'Spectrum(parent_mass={:.4f}, id={}, strains={})'.format(spec.parent_mz, spec.spectrum_id, len(spec.strain_list))
 
             spec_body = self.generate_spec_info(spec)
 
@@ -1694,6 +1694,19 @@ class NPLinkerBokeh(object):
         self.other_info_div = Div(text=other_info, sizing_mode='scale_height', name='other_info_div')
         widgets.append(self.other_info_div)
 
+        legend_bgc_text = '<table><thead><tr><td><strong>Product type</strong></td></tr></thead><tbody>'
+        for pt in self.nh.nplinker.product_types:
+            legend_bgc_text += '<tr style="background-color: {}"><td>{}</td></tr>'.format(self.nh.bgc_cmap[pt], pt)
+        legend_bgc_text += '</tbody></table>'
+        self.legend_bgc = Div(text=legend_bgc_text, sizing_mode='stretch_width', name='legend_bgc')
+        widgets.append(self.legend_bgc)
+
+        legend_spec_text = '<table><thead><tr><td><strong>Parent mass</strong></td></tr></thead><tbody>'
+        for text, colour in self.nh.spec_cmap:
+            legend_spec_text += '<tr style="background-color: {}"><td>{}</td></tr>'.format(colour, text)
+        legend_spec_text += '</tbody></table>'
+        self.legend_spec = Div(text=legend_spec_text, sizing_mode='stretch_width', name='legend_spec')
+        widgets.append(self.legend_spec)
 
         widgets.append(self.fig_spec)
         widgets.append(self.fig_bgc)
