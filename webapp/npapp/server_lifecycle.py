@@ -273,16 +273,6 @@ class NPLinkerHelper(object):
         if not self.nplinker.load_data():
             raise Exception('Failed to load data')
 
-        # TODO this should be handled better/elsewhere?
-        # hacky
-        mibig_file = os.path.join(self.data_dir, 'mibig_gnps_links_q1.csv')
-        mibig_map = load_mibig_map(mibig_file)
-        # mibig_bgcs = [MiBIGBGC(name, product) for (name, product) in mibig_map.items()]
-        # c = len(self.nplinker.bgcs)
-        # self.nplinker._bgcs.extend(mibig_bgcs)
-        # for i, mb in enumerate(mibig_bgcs):
-        #     self.nplinker._bgc_lookup[mb.name] = i + c
-
         if not self.nplinker.process_dataset():
             raise Exception('Failed to process dataset')
 
@@ -328,16 +318,6 @@ class NPLinkerHelper(object):
         self.nplinker = NPLinker(os.path.join(os.path.dirname(__file__), 'nplinker_webapp.toml'))
         if not self.nplinker.load_data():
             raise Exception('Failed to load data')
-
-        # TODO this should be handled better/elsewhere?
-        # hacky
-        mibig_file = os.path.join(self.data_dir, 'mibig_gnps_links_q1.csv')
-        mibig_map = load_mibig_map(mibig_file)
-        # mibig_bgcs = [MiBIGBGC(name, product) for (name, product) in mibig_map.items()]
-        # c = len(self.nplinker.bgcs)
-        # self.nplinker._bgcs.extend(mibig_bgcs)
-        # for i, mb in enumerate(mibig_bgcs):
-        #     self.nplinker._bgc_lookup[mb.name] = i + c
 
         if not self.nplinker.process_dataset():
             raise Exception('Failed to process dataset')
