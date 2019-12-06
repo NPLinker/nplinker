@@ -28,7 +28,7 @@ class Spectrum(object):
     def __init__(self, id, peaks, spectrum_id, precursor_mz, parent_mz=None, rt=None):
         self.id = id
         self.peaks = sorted(peaks, key=lambda x: x[0]) # ensure sorted by mz
-        self.normalized_peaks = sqrt_normalise(self.peaks) # useful later
+        self.normalised_peaks = sqrt_normalise(self.peaks) # useful later
         self.n_peaks = len(self.peaks)
         self.max_ms2_intensity = max([intensity for mz, intensity in self.peaks])
         self.total_ms2_intensity = sum([intensity for mz, intensity in self.peaks])
