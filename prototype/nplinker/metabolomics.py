@@ -295,13 +295,42 @@ def parse_metadata_table(filename):
 
     return table
 
-def load_metadata(strains, nodes_file, extra_nodes_file, metadata_table_file, spectra, spec_dict):
-    # parse metadata table file, if provided
-    md_table = parse_metadata_table(metadata_table_file)
+def _load_metadata_old(strains, nodes_file, spec_dict):
+    spec_info = {}
 
-    nodes_lines = {}
+    with open(nodes_file, 'rU') as f:
+        reader = csv.reader(f, delimiter='\t')
+        headers = next(reader)
+        ci_index = headers.index('cluster index')
+
+        for line in reader:
+            ci = int(line[ci_index])
+            metadata = {headers[i]: line[i] for i in range(len(line)) if i != ci_index}
+            spec_info[ci] = metadata
+
+    logger.info('Merged nodes data (old-style), total lines = {}'.format(len(spec_info)))
+
+    for spec_id, spec_data in spec_info.items():
+        spectrum = spec_dict[spec_id]
+
+        for k, v in spec_data.items():
+            # if value is a "0", ignore immediately
+            if v == "0":
+                continue
+            v = md_convert(v)
+            # if header indicates this is a strain and it is present in the current
+            # spectra, add that info 
+            if k in strains and v == 1:
+                strain = strains.lookup(k)
+                spectrum.add_strain(strain, None, v)
+
+            spectrum.metadata[k] = v
+    return spec_info
+
+def _load_metadata_new(strains, nodes_file, extra_nodes_file, spec_dict, md_table):
+    spec_info = {}
+
     # get a list of the lines in each file, indexed by the "cluster index" and "row ID" fields 
-    # (TODO correct/necessary - does ordering always remain consistent in both files?
     with open(nodes_file, 'rU') as f:
         reader = csv.reader(f, delimiter='\t')
         headers = next(reader)
@@ -311,35 +340,30 @@ def load_metadata(strains, nodes_file, extra_nodes_file, metadata_table_file, sp
             tmp = {}
             for i, v in enumerate(line):
                 tmp[headers[i]] = v
-            nodes_lines[int(line[ci_index])] = tmp
+            spec_info[int(line[ci_index])] = tmp
 
-    # TODO is this now mandatory?
-    if extra_nodes_file is not None:
-        print(extra_nodes_file)
-        with open(extra_nodes_file, 'rU') as f:
-            reader = csv.reader(f, delimiter=',')
-            headers = next(reader)
+    with open(extra_nodes_file, 'rU') as f:
+        reader = csv.reader(f, delimiter=',')
+        headers = next(reader)
 
-            ri_index = headers.index('row ID')
+        ri_index = headers.index('row ID')
 
-            for line in reader:
-                ri = int(line[ri_index])
-                assert(ri in nodes_lines)
-                tmp = {}
-                for i, v in enumerate(line):
-                    tmp[headers[i]] = v
-                nodes_lines[ri].update(tmp)
+        for line in reader:
+            ri = int(line[ri_index])
+            assert(ri in spec_info)
+            tmp = {}
+            for i, v in enumerate(line):
+                tmp[headers[i]] = v
+            spec_info[ri].update(tmp)
 
-        logger.debug('Merged nodes data, total lines = {}'.format(len(nodes_lines)))
-    else:
-        logger.debug('No extra_nodes_file found')
+    logger.info('Merged nodes data (new-style), total lines = {}'.format(len(spec_info)))
 
     # for each spectrum 
-    for l in nodes_lines.keys():
-        spectrum = spec_dict[l]
+    for spec_id, spec_data in spec_info.items():
+        spectrum = spec_dict[spec_id]
         # TODO better way of filtering/converting all this stuff down to what's relevant?
         # could search for each strain ID in column title but would be slower?
-        for k, v in nodes_lines[l].items():
+        for k, v in spec_data.items():
             # if the value is a "0", ignore immediately
             if v == "0":
                 continue
@@ -354,6 +378,26 @@ def load_metadata(strains, nodes_file, extra_nodes_file, metadata_table_file, sp
                 spectrum.add_strain(strain, growth_medium, v)
 
             spectrum.metadata[k] = v
+    return spec_info
+
+def load_metadata(strains, nodes_file, extra_nodes_file, metadata_table_file, spectra, spec_dict):
+    # this code is complicated by the need to support the Crusemann dataset, which is in a
+    # different format to more recent datasets (and any expected future datasets).
+    # with the new style datasets, ALL of the following should typically be present:
+    #  - nodes_files
+    #  - extra_nodes_file
+    #  - metadata_table_file 
+    # but for crusemann we only have the nodes_file, which has a different set of columns
+    # than in the standard case, so it has to be parsed differently 
+
+    # load the rest of the data depending on presence/absence of files
+    if extra_nodes_file is None:
+        logger.warning('Assuming Crusemann-style dataset!')
+        spec_info = _load_metadata_old(strains, nodes_file, spec_dict)
+    else:
+        # parse metadata table file, if provided
+        md_table = parse_metadata_table(metadata_table_file)
+        spec_info = _load_metadata_new(strains, nodes_file, extra_nodes_file, spec_dict, md_table)
 
     return spectra
 
