@@ -35,7 +35,7 @@ def metcalf_expected_count(met, gcf, overlap, N, both, met_not_gcf, gcf_not_met,
     global METCALF_EXPECTED_CACHE
     global METCALF_VARIANCE_CACHE
 
-    cache_size = (N, N)
+    cache_size = (N + 1, N + 1)
     if METCALF_EXPECTED_CACHE is None or METCALF_EXPECTED_CACHE.shape != cache_size:
         METCALF_EXPECTED_CACHE = np.zeros(cache_size)
         METCALF_VARIANCE_CACHE = np.zeros(cache_size)
@@ -74,7 +74,7 @@ def metcalf_scoring(spectral_like, gcf_like, strains, both=10, met_not_gcf=-10, 
     """
     N = len(strains)
 
-    mf_strains = list(set([x for x, y in spectral_like.metadata.items() if y != 0]).intersection(strains))
+    mf_strains = list(set(spectral_like.strains).intersection(strains))
     gcf_strains = list(set(gcf_like.strains).intersection(strains))
 
     n = len(mf_strains)
