@@ -320,7 +320,7 @@ def _load_metadata_old(strains, nodes_file, spec_dict):
             v = md_convert(v)
             # if header indicates this is a strain and it is present in the current
             # spectra, add that info 
-            if k in strains and v == 1:
+            if k in strains:
                 strain = strains.lookup(k)
                 spectrum.add_strain(strain, None, v)
 
