@@ -139,7 +139,21 @@ class DatasetLoader(object):
 
         self._load_optional()
 
+        # Restrict strain list to only relevant strains
+        self._filter_strains()
+
         return True
+
+    def _filter_strains(self):
+        """
+        Filter strain population to only strains present in both genomic and molecular data
+        TODO: Maybe there should be an option to specify which strains are used, both so we can
+            selectively exclude strains, and include strains that are missing from either side.
+        """
+        bgc_strains = set([x.strain for x in self.bgcs])
+        spectrum_strains = set().union(*[x.strains for x in self.spectra])
+        common_strains = bgc_strains.intersection(spectrum_strains)
+        self.strains.filter(common_strains)
 
     def _load_optional(self):
         self.gnps_params = {}
