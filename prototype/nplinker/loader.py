@@ -66,6 +66,7 @@ class DatasetLoader(object):
         self._bigscape_cutoff = self._dataset.get('bigscape_cutoff', self.BIGSCAPE_CUTOFF_DEFAULT)
         self._root = self._config['dataset']['root']
         self.datadir = os.path.join(os.path.dirname(__file__), 'data')
+        self.dataset_id = os.path.split(self._root)[-1]
         logger.debug('DatasetLoader({})'.format(self._root))
 
         # check antismash format is recognised
@@ -155,6 +156,7 @@ class DatasetLoader(object):
         spectrum_strains = set().union(*[x.strains for x in self.spectra])
         common_strains = bgc_strains.intersection(spectrum_strains)
         self.strains.filter(common_strains)
+        logger.info('Strains filtered down to total of {}'.format(len(self.strains)))
 
     def _load_optional(self):
         self.gnps_params = {}
