@@ -37,6 +37,8 @@ class Spectrum(object):
         self.rt = rt
         self.precursor_mz = precursor_mz
         self.parent_mz = parent_mz
+        self.gnps_id = None # CCMSLIB...
+        # TODO should add intensity here too
         self.metadata = {}
         self.edges = []
         # this is a dict indexed by Strain objects (the strains found in this Spectrum), with 
@@ -48,6 +50,7 @@ class Spectrum(object):
         self.annotations = {}
         self._losses = None
         self._jcamp = None
+
 
     def add_strain(self, strain, growth_medium, peak_intensity):
         if strain in self.strains and growth_medium in self.strains[strain]:
@@ -126,6 +129,36 @@ class Spectrum(object):
         else:
             return 0
 
+    # from molnet repo
+    def keep_top_k(self, k=6, mz_range=50):
+        # only keep peaks that are in the top k in += mz_range
+        start_pos = 0
+        new_peaks = []
+        for mz, intensity in self.peaks:
+            while self.peaks[start_pos][0] < mz - mz_range:
+                start_pos += 1
+            end_pos = start_pos
+
+            n_bigger = 0
+            while end_pos < len(self.peaks) and self.peaks[end_pos][0] <= mz + mz_range:
+                if self.peaks[end_pos][1] > intensity:
+                    n_bigger += 1
+                end_pos += 1
+
+            if n_bigger < k:
+                new_peaks.append((mz, intensity))
+
+        self.peaks = new_peaks
+        self.n_peaks = len(self.peaks)
+        if self.n_peaks > 0:
+            self.normalised_peaks = sqrt_normalise(self.peaks)
+            self.max_ms2_intensity = max([intensity for mz, intensity in self.peaks])
+            self.total_ms2_intensity = sum([intensity for mz, intensity in self.peaks])
+        else:
+            self.normalised_peaks = []
+            self.max_ms2_intensity = 0.0
+            self.total_ms2_intensity = 0.0
+
     @property
     def losses(self):
         """
@@ -193,8 +226,10 @@ class RandomSpectrum(object):
 
 def load_spectra(mgf_file):
     ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([mgf_file])
-    print("Loaded {} molecules".format(len(ms1)))
+    logger.info("load_spectra loaded {} molecules".format(len(ms1)))
     return mols_to_spectra(ms2, metadata)
+
+from .annotations import GNPS_KEY, GNPS_DATA_COLUMNS, create_gnps_annotation
 
 def mols_to_spectra(ms2, metadata):
     ms2_dict = {}
@@ -207,6 +242,15 @@ def mols_to_spectra(ms2, metadata):
     for i, m in enumerate(ms2_dict.keys()):
         new_spectrum = Spectrum(i, ms2_dict[m], int(m.name), metadata[m.name]['precursormass'], metadata[m.name]['parentmass'])
         new_spectrum.metadata = metadata[m.name]
+        # add GNPS ID if in metadata under SPECTRUMID (this doesn't seem to be in regular MGF files
+        # from GNPS, but *is* in the rosetta mibig MGF)
+        # note: LoadMGF seems to lowercase (some) metadata keys?
+        if 'spectrumid' in new_spectrum.metadata:
+            # add an annotation for consistency, if not already there
+            if not GNPS_KEY in new_spectrum.annotations:
+                gnps_anno = {k: None for k in GNPS_DATA_COLUMNS}
+                gnps_anno['SpectrumID'] = new_spectrum.metadata['spectrumid']
+                create_gnps_annotation(new_spectrum, gnps_anno)
         spectra.append(new_spectrum)
 
     return spectra
