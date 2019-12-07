@@ -77,12 +77,10 @@ class KCBParser(object):
                 assert current_bgc_id == self.mibig_bgcs[i][0] # they should be in the same order
                 table_pos = detail.index('Table of genes, locations, strands and annotations of subject cluster:')
                 pos = detail.index('Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):')
-                print(detail[table_pos:pos])
                 for line in detail[pos+1:]:
                     tokens = line.split()
                     bgc_id = tokens[0]
 
-                    # is this corect place for this line?
                     self.hits[current_bgc_id].append({'source_bgc_gene': tokens[0], 
                                                       'mibig_bgc_gene': tokens[1],
                                                       'identity_percent': int(tokens[2]),
@@ -94,8 +92,7 @@ class KCBParser(object):
         if bgc.antismash_file is None:
             return None
 
-        base_path = os.sep.join(bgc.antismash_file.split(os.sep)[:-1])
-        base_path = os.path.join(base_path, 'knownclusterblast')
+        base_path = os.path.join(os.path.dirname(bgc.antismash_file), 'knownclusterblast')
         genbank_file = bgc.antismash_file.split(os.sep)[-1]
         # remove the "regionXXX" and turn it into "_cXXX"
         tokens = genbank_file.split('region')
