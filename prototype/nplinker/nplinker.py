@@ -152,6 +152,16 @@ class NPLinker(object):
             logger.info('Saving reproducibility data to {}'.format(filename))
 
     @property
+    def root_dir(self):
+        """Returns path to nplinker external dataset directory (user-configured)"""
+        return self._loader._root
+
+    @property
+    def dataset_id(self):
+        """Returns dataset "ID", currently just last component of the directory path"""
+        return self._loader.dataset_id
+
+    @property
     def data_dir(self):
         """Returns path to nplinker/data directory (files packaged with the app itself)"""
         return self._loader.datadir
