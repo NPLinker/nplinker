@@ -19,6 +19,19 @@ def headers_match_gnps(headers):
 def gnps_url(id, url_type='spectrum'):
     return GNPS_URL_FORMAT.format('png', id)
 
+def create_gnps_annotation(spec, gnps_anno):
+    # also insert useful URLs
+    for t in ['png', 'json', 'svg', 'spectrum']:
+        gnps_anno['{}_url'.format(t)] = GNPS_URL_FORMAT.format(t, gnps_anno['SpectrumID'])
+
+    if GNPS_KEY in spec.annotations:
+        # TODO is this actually an error or can it happen normally?
+        raise Exception('Multiple GNPS annotations for Spectrum {}!'.format(spec.spectrum_id))
+
+    spec.set_annotations(GNPS_KEY, [gnps_anno])
+    # shortcut, useful for rosetta code
+    spec.gnps_id = gnps_anno['SpectrumID']
+
 def load_annotations(root, config, spectra, spec_dict):
     if not os.path.exists(root):
         logger.debug('Annotation directory not found ({})'.format(root))
@@ -83,14 +96,7 @@ def load_annotations(root, config, spectra, spec_dict):
                             continue
                         data[dc] = line[headers.index(dc)]
 
-                    # also insert useful URLs
-                    for t in ['png', 'json', 'svg', 'spectrum']:
-                        data['{}_url'.format(t)] = GNPS_URL_FORMAT.format(t, data['SpectrumID'])
-
-                    if GNPS_KEY in spec.annotations:
-                        # TODO is this actually an error or can it happen normally?
-                        raise Exception('Multiple GNPS annotations for Spectrum {}!'.format(spec.spectrum_id))
-                    spec.set_annotations(GNPS_KEY, [data])
+                    create_gnps_annotation(spec, data)
             else:
                 logger.debug('Parsing general annotations from {}'.format(af))
                 # this is a general annotations file, so rely purely on the user-provided columns
