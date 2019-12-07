@@ -120,6 +120,12 @@ class Spectrum(object):
         else:
             return -1
 
+    def __lt__(self,other):
+        if self.parent_mz <= other.parent_mz:
+            return 1
+        else:
+            return 0
+
     @property
     def losses(self):
         """
