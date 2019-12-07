@@ -188,7 +188,8 @@ class Rosetta(object):
             logger.info('Found pickled bgc_hits for dataset {}!'.format(self._dataset_id))
             with open(self._bgchits_pickle_path, 'rb') as f:
                 self._bgc_hits, self._mibig2bgc = pickle.load(f)
-        self._generate_bgc_hits(bgcs)
+        else:
+            self._generate_bgc_hits(bgcs)
 
         # finally construct the list of rosetta hits
         self._collect_rosetta_hits()
