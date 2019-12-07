@@ -1,57 +1,56 @@
-# some code for spectral library things
+from sortedcontainers import SortedList
 
-from .scoring_functions import fast_cosine, fast_cosine_shift
+from .rosetta_functions import fast_cosine, fast_cosine_shift
+from ...metabolomics import load_spectra
+
+from ...logconfig import LogConfig
+logger = LogConfig.getLogger(__file__)
 
 class SpecLib(object):
-    def __init__(self,mgf_file):
+    def __init__(self, mgf_file):
         self.mgf_file = mgf_file
-        self.spectra = None
+        self.spectra = []
 
-    def _load_mgf(self,id_field='SPECTRUMID'):
-        from mnet_utilities import load_mgf
-        self.spectra = load_mgf(self.mgf_file,id_field = id_field)
-        for k,v in self.spectra.items():
-            v.spectrum_id = k
+    def _load_mgf(self):
+        self.spectra = load_spectra(self.mgf_file)
+        self.sort()
+        # self.spectra = load_mgf(self.mgf_file, id_field=id_field)
+        # for k,v in self.spectra.items():
+        #     v.spectrum_id = k
+
+    def sort(self):
+        # make a sorted list for quick precursor matching
+        self.sorted_spectra = [s for s in self.spectra]
+        self.sorted_spectra.sort()
 
     def get_n_spec(self):
         return len(self.spectra)
 
-    def get_keys(self):
-        return list(self.spectra.keys())
+    def get_ids(self):
+        return list(s.spectrum_id for s in self.spectra)
 
     def get_n_peaks(self):
-        return [s.n_peaks for s in self.spectra.values()]
+        return [s.n_peaks for s in self.spectra]
 
     def filter(self):
         # top_k_filter
         n_done = 0
-        for s_id,spec in self.spectra.items():
+        for spec in self.spectra:
             spec.keep_top_k()
             n_done += 1
             if n_done % 100 == 0:
-                print("Filtered {}".format(n_done))
+                logger.info('SpecLib filtered {}/{}, {:.2f}%'.format(n_done, len(self.spectra), 100 * (n_done / len(self.spectra))))
 
-    
-    def spectral_match(self,query,
-            scoring_function = fast_cosine,
-            ms2_tol = 0.2,
-            min_match_peaks = 1,
-            ms1_tol = 0.2,
-            score_thresh = 0.7):
-        # make a sorted list for quick precursor matching
-        spec_list = [s for s in self.spectra.values()]
-        spec_list.sort()
-        candidates = self._candidates(spec_list,query.precursor_mz,ms1_tol)
+    def spectral_match(self, query, scoring_function=fast_cosine, ms2_tol=0.2, min_match_peaks=1, ms1_tol=0.2, score_thresh=0.7):
+        candidates = self._candidates(self.sorted_spectra, query.precursor_mz, ms1_tol)
         hits = []
         for c in candidates:
-            sc,_ = scoring_function(query,c,ms2_tol,min_match_peaks)
+            sc,_ = scoring_function(query, c, ms2_tol, min_match_peaks)
             if sc >= score_thresh:
-                hits.append((c.spectrum_id,sc))
+                hits.append((c.gnps_id, sc))
         return hits
-
         
-    def _candidates(self,mz_list,query_mz,ms1_tol):
-        from sortedcontainers import SortedList
+    def _candidates(self, mz_list, query_mz, ms1_tol):
         pmz_list = SortedList([m.precursor_mz for m in mz_list])
         lower = query_mz - ms1_tol
         upper = query_mz + ms1_tol
