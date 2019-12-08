@@ -44,6 +44,8 @@ def create_metabolomics_graph(spectra, width=10, iterations=100, singletons=Fals
 
             g.add_node(spec.id)
             for e_iid, e_sid, e_cosine in spec.edges:
+                if spectra[e_iid].family_id == -1 and not singletons:
+                    continue 
                 g.add_node(e_iid)
                 g.add_edge(spec.id, e_iid)
         print('Graph: nodes={}, edges={}'.format(g.number_of_nodes(), g.number_of_edges()))
@@ -81,6 +83,8 @@ def create_genomics_graph(bgcs, width=10, iterations=100, mibig=False, split_mib
                 continue
             g.add_node(bgc.id)
             for obgc_id in bgc.edges:
+                if isinstance(bgcs[obgc_id], MiBIGBGC) and not mibig:
+                    continue
                 g.add_node(obgc_id)
                 g.add_edge(bgc.id, obgc_id)
         print('Graph: nodes={}, edges={}'.format(g.number_of_nodes(), g.number_of_edges()))
