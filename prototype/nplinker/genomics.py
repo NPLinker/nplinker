@@ -27,7 +27,7 @@ class BGC(object):
         self._smiles = None
         self._smiles_parsed = False
 
-        self.edges = []
+        self.edges = set()
 
     def __repr__(self):
         return str(self)
@@ -302,9 +302,10 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                 if line[0] not in bgc_lookup or line[1] not in bgc_lookup:
                     # should indicate that one or both of these BGCs have been filtered out above
                     continue
+
                 bgc_src = bgc_lookup[line[0]]
                 bgc_dst = bgc_lookup[line[1]]
-                bgc_src.edges.append(bgc_dst.id)
+                bgc_src.edges.add(bgc_dst.id)
 
     return gcf_list, bgc_list, strains
 
