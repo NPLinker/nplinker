@@ -275,7 +275,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
         logger.warn('{}/{} antiSMASH files could not be found!'.format(num_missing_antismash, len(bgc_list)))
         # print(list(antismash_filenames.keys()))
 
-    print('# MiBIG BGCs = {}, non-MiBIG BGCS = {}, total bgcs = {}, GCFs = {}, strains={}'.format(
+    logger.info('# MiBIG BGCs = {}, non-MiBIG BGCS = {}, total bgcs = {}, GCFs = {}, strains={}'.format(
                         num_mibig, len(bgc_list) - num_mibig, len(bgc_list), len(gcf_dict), len(strains)))
 
     # filter out irrelevant MiBIG BGCs (and MiBIG-only GCFs)
@@ -283,7 +283,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
     # update lookup table as well
     bgc_lookup = {bgc.name: bgc for bgc in bgc_list}
 
-    print('# after filtering, total bgcs = {}, GCFs = {}, strains={}'.format(len(bgc_list), len(gcf_list), len(strains)))
+    logger.info('# after filtering, total bgcs = {}, GCFs = {}, strains={}'.format(len(bgc_list), len(gcf_list), len(strains)))
 
     # load edge info - note that this should be done AFTER the filtering step above
     # so that it won't leave us with edges for BGCs that are no longer present
@@ -368,7 +368,7 @@ def load_mibig_map(filename='mibig_gnps_links_q3_loose.csv'):
 def load_mibig_library_json(mibig_json_directory):
     mibig = {}
     files = glob.glob(mibig_json_directory + os.sep + '*.json')
-    print("Found {} MiBIG json files".format(len(files)))
+    logger.info("Found {} MiBIG json files".format(len(files)))
     for file in files:
         with open(file, 'r') as f:
             bgc_id = file.split(os.sep)[-1].split('.')[0]
