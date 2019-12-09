@@ -123,7 +123,7 @@ class Loader(object):
         """
         self.ms1_peaks = []
         self.user_cols_names = []
-        with open(self.peaklist, 'rU') as f:
+        with open(self.peaklist, 'r') as f:
             heads = f.readline()
 
             # add this in case peaklist file is separated by ';'

@@ -348,7 +348,7 @@ def parse_metadata_table(filename):
 def _load_metadata_old(strains, nodes_file, spec_dict):
     spec_info = {}
 
-    with open(nodes_file, 'rU') as f:
+    with open(nodes_file, 'r') as f:
         reader = csv.reader(f, delimiter='\t')
         headers = next(reader)
         ci_index = headers.index('cluster index')
@@ -381,7 +381,7 @@ def _load_metadata_new(strains, nodes_file, extra_nodes_file, spec_dict, md_tabl
     spec_info = {}
 
     # get a list of the lines in each file, indexed by the "cluster index" and "row ID" fields 
-    with open(nodes_file, 'rU') as f:
+    with open(nodes_file, 'r') as f:
         reader = csv.reader(f, delimiter='\t')
         headers = next(reader)
         ci_index = headers.index('cluster index')
@@ -392,7 +392,7 @@ def _load_metadata_new(strains, nodes_file, extra_nodes_file, spec_dict, md_tabl
                 tmp[headers[i]] = v
             spec_info[int(line[ci_index])] = tmp
 
-    with open(extra_nodes_file, 'rU') as f:
+    with open(extra_nodes_file, 'r') as f:
         reader = csv.reader(f, delimiter=',')
         headers = next(reader)
 
@@ -455,7 +455,7 @@ def load_edges(edges_file, spectra, spec_dict):
 
     logger.debug('loading edges file: {} [{} spectra from MGF]'.format(edges_file, len(spectra)))
 
-    with open(edges_file, 'rU') as f:
+    with open(edges_file, 'r') as f:
         reader = csv.reader(f, delimiter='\t')
         next(reader) # skip headers
         for line in reader:
@@ -564,7 +564,7 @@ def read_aa_losses(filename):
     Read AA losses from data file. (assume fixed structure...)
     """
     aa_losses = {}
-    with open(filename, 'rU') as f:
+    with open(filename, 'r') as f:
         reader = csv.reader(f, delimiter=',')
         next(reader) # skip headers
         for line in reader:
