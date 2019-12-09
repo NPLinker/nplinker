@@ -436,7 +436,35 @@ class NPLinker(object):
             logger.debug('_get_links for metcalf scoring')
             results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, None)
             # if using percentile option, need to filter the links based on that before continuing...
-            results = self._get_links_percentile(input_type, objects, results, scoring_method.name, scoring_method.sig_percentile)
+            if len(self._rdatalinks) > 0:
+                results = self._get_links_percentile(input_type, objects, results, scoring_method.name, scoring_method.sig_percentile)
+            # if using standardised scores, do that now
+            if scoring_method.standardised:
+                # results is a (3, x) array for spec/molfam input, where (1, :) gives src obj ID, (2, :) gives
+                # dst obj ID, and (3, :) gives scores
+                # for GCFs you get [spec, molfam] with above substructure
+
+                # TODO molfam support... !
+
+                # TODO this "works" but is a total mess, cleanup and comment!!!
+
+                # make type1_objects always be spectra. if input is spectra, just use "objects", otherwise create from R_DST_ID
+                type1_objects = objects if input_type == Spectrum else [self.spectra[int(index)] for index in results[0][self.R_DST_ID]]
+                # other objs should be "objects" if input is GCF, otherwise create from R_DST_ID
+                other_objs = objects if input_type == GCF else [self._gcfs[int(index)] for index in results[0][self.R_DST_ID]]
+                assert(isinstance(type1_objects[0], Spectrum))
+                assert(isinstance(other_objs[0], GCF))
+                result_index = 2
+                for i, type1_obj in enumerate(type1_objects):
+                    met_strains = len(list(set(type1_obj.strains).intersection(self._strains)))
+                    for j, other_obj in enumerate(other_objs):
+                        gen_strains = len(list(set(other_obj.strains).intersection(self._strains)))
+                        expected = self._linkfinder.metcalf_expected[met_strains][gen_strains]
+                        variance = self._linkfinder.metcalf_variance[met_strains][gen_strains]
+                        k = i if input_type == GCF else j
+                        results[0][self.R_SCORE][k] = (results[0][self.R_SCORE][k] - expected) / np.sqrt(variance)
+
+
         elif scoring_method.name == 'likescore':
             results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, scoring_method.cutoff)
         elif scoring_method.name == 'hg':
