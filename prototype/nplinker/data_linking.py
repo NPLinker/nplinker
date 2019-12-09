@@ -161,8 +161,7 @@ class DataLinks(object):
 
         for i, strain  in enumerate(strain_list):
             for m, gcf in enumerate(gcf_list):
-                in_gcf = gcf.has_strain(strain)
-                if in_gcf:
+                if gcf.has_strain(strain):
                     M_gcf_strain[m,i] = 1
 
         self.M_gcf_strain = M_gcf_strain
@@ -179,7 +178,7 @@ class DataLinks(object):
                 if spectrum.has_strain(s):
                     M_spec_strain[i,j] = 1
         self.M_spec_strain = M_spec_strain
-        
+
         # extend mapping tables:
         self.mapping_spec["no of strains"] =  np.sum(self.M_spec_strain, axis=1)
         self.mapping_strain["no of spectra"] =  np.sum(self.M_spec_strain, axis=0)
@@ -488,6 +487,10 @@ class LinkFinder(object):
         self.link_candidates_gcf_spec = []
         self.link_candidates_gcf_fam = []
 
+        # metcalf caching
+        self.metcalf_expected = None
+        self.metcalf_variance = None
+
     def get_scores(self, method, type_):
         if method == 'metcalf':
             if type_ == 'spec-gcf':
@@ -517,39 +520,41 @@ class LinkFinder(object):
         Calculate metcalf scores from DataLinks() co-occurence matrices
         """
         
-        # TODO expected value scoring stuff
         # Compute the expected values for all possible values of spec and gcf strains
         # we need the total number of strains
-        try:
-            _,n_strains = self.M_gcf_strain.shape
-            expected_metcalf = np.zeros(n_strains+1)
-            variance_metcalf = np.zeros(n_strains+1)
-            from scipy.stats import hypergeom # maybe needs moving?
+        _ ,n_strains = data_links.M_gcf_strain.shape
+        if self.metcalf_expected is None:
+            sz = (n_strains + 1, n_strains + 1)
+            self.metcalf_expected = np.zeros(sz)
+            self.metcalf_variance = np.zeros(sz)
+
             for n in range(n_strains+1):
                 for m in range(n_strains+1):
-                    max_overlap = min(n,m)
-                    min_overlap = max(0,n+m-n_strains) # minimum possible strain overlap
+                    max_overlap = min(n, m)
+                    min_overlap = max(0, n + m - n_strains) # minimum possible strain overlap
                     expected_value = 0
                     expected_sq = 0
-                    for o in range(min_overlap,max_overlap+1):
-                        o_prob = hypergeom.pmf(o,n_strains,n,m)
+                    for o in range(min_overlap, max_overlap + 1):
+                        o_prob = hypergeom.pmf(o, n_strains, n, m)
                         # compute metcalf for n strains in type 1 and m in gcf
                         score = o * both
-                        score += type1_not_gcf*(n-o)
-                        score += gcf_not_type1*(m-o)
-                        score += not_type1_not_gcf * (n_strains - (n+m-o))
-                        expected_value += o_prob*score
-                        expected_sq += o_prob*(score**2)
-                    expected_metcalf[n,m] = expected_value
-                    variance_metcalf[n,m] = expected_sq - expected_value**2
-            # now, we would like an option to take any actual score an subtract the 
-            # expected value and then divide by the square root of the variance
-            # e.g. if we have a score computed between a type 1 object that has 
-            # 3 strains, and a gcf with 6 strains, we should use the expected value 
-            # at expected_metcalf[3,6] and sqrt of the variance in the same position
-            # 
-        except:
-            pass
+                        score += type1_not_gcf * (n - o)
+                        score += gcf_not_type1 * (m - o)
+                        score += not_type1_not_gcf * (n_strains - (n + m - o))
+                        expected_value += o_prob * score
+                        expected_sq += o_prob * (score ** 2)
+
+                    self.metcalf_expected[n, m] = expected_value
+                    expected_sq = expected_sq - expected_value ** 2
+                    if expected_sq < 1e-09:
+                        expected_sq = 1
+                    self.metcalf_variance[n, m] = expected_sq
+
+        # now, we would like an option to take any actual score an subtract the 
+        # expected value and then divide by the square root of the variance
+        # e.g. if we have a score computed between a type 1 object that has 
+        # 3 strains, and a gcf with 6 strains, we should use the expected value 
+        # at expected_metcalf[3,6] and sqrt of the variance in the same position
 
         if type == 'spec-gcf':
             metcalf_scores = np.zeros(data_links.M_spec_gcf.shape)
@@ -558,7 +563,7 @@ class LinkFinder(object):
                               + data_links.M_notspec_gcf * gcf_not_type1
                               + data_links.M_notspec_notgcf * not_type1_not_gcf)
             self.metcalf_spec_gcf = metcalf_scores
-            
+
         elif type == 'fam-gcf':
             metcalf_scores = np.zeros(data_links.M_fam_gcf.shape)
             metcalf_scores = (data_links.M_fam_gcf * both
@@ -826,10 +831,7 @@ class LinkFinder(object):
             link_levels = [0, 1]
             
             # Get necessary ids
-            input_ids = np.zeros(query_size)
-            for i, gcf in enumerate(input_object):
-                input_ids[i] = gcf.id
-            input_ids =  input_ids.astype(int)
+            input_ids = [gcf.id for gcf in input_object]
             
             if main_score == 'likescore':
                 likescores = [self.likescores_spec_gcf[:, input_ids],
@@ -843,13 +845,8 @@ class LinkFinder(object):
 
         # If Spectrum:
         elif isinstance(input_object[0], Spectrum):
-            
             # Get necessary ids
-            input_ids = np.zeros(query_size)
-            mapping_spec_id = data_links.mapping_spec["original spec-id"]
-            for i, spectrum in enumerate(input_object):
-                input_ids[i] = np.where(mapping_spec_id == int(spectrum.id))[0]
-            input_ids =  input_ids.astype(int)
+            input_ids = [spec.id for spec in input_object]
 
             input_type = "spec"
             link_levels = [0]
