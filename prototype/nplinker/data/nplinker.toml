@@ -98,12 +98,14 @@ antismash_format = "default"
 [scoring]
 # number of randomized instances to create during scoring
 # increasing this number will slow down the scoring process!
-random_count = 3
+random_count = 0
 
 # metcalf scoring
 [scoring.metcalf]
 sig_percentile = 99
 enabled = true
+# use "expected value" scores
+standardised = true
 
 # hypergeometric scoring
 [scoring.hg]
