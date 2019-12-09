@@ -299,12 +299,12 @@ class NPLinker(object):
             random_count = self.scoring.random_count
 
         logger.debug('Generating {} randomised instances for scoring'.format(random_count))
-        rdatalinks = [RandomisedDataLinks.from_datalinks(self._datalinks, True) for x in range(random_count)]
-        rlinkfinders = [LinkFinder() for x in range(random_count)]
+        self._rdatalinks = [RandomisedDataLinks.from_datalinks(self._datalinks, True) for x in range(random_count)]
+        self._rlinkfinders = [LinkFinder() for x in range(random_count)]
         logger.debug('Generating randomised scores, enabled methods={}'.format(self.scoring.enabled()))
         
         for i in range(random_count):
-            self._generate_scores(rdatalinks[i], rlinkfinders[i])
+            self._generate_scores(self._rdatalinks[i], self._rlinkfinders[i])
         
         logger.debug('Finished generating randomised scores')
         # TODO this can be a bit slow?
