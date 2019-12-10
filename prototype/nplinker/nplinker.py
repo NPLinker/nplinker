@@ -9,7 +9,7 @@ from .metabolomics import MolecularFamily
 
 from .genomics import GCF
 
-from .data_linking import DataLinks, RandomisedDataLinks, LinkLikelihood
+from .data_linking import DataLinks, LinkLikelihood
 from .data_linking import LinkFinder, SCORING_METHODS
 
 from .config import Config, Args
