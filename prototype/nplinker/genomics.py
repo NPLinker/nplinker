@@ -63,13 +63,6 @@ class BGC(object):
                     self._aa_predictions[p[0]] = p[1]
         return [self._aa_predictions]
 
-    @property
-    def known_cluster_blast(self):
-        if self._known_cluster_blast is None:
-            self._known_cluster_blast = get_known_cluster_blast(self)
-        return self._known_cluster_blast
-
-
 class GCF(object):
     def __init__(self, id, gcf_id, product_type):
         self.id = id
