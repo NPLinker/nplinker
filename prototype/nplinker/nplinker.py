@@ -264,18 +264,10 @@ class NPLinker(object):
             lf.likelihood_scoring(dl, ll, type='spec-gcf')
             lf.likelihood_scoring(dl, ll, type='fam-gcf')
 
-    def process_dataset(self, random_count=None):
+    def process_dataset(self):
         """Construct the DataLinks and LinkFinder objects from the loaded dataset.
 
-        Deals with initialising all the objects used for scoring/linking, and also
-        currently manages the creation of randomised scoring matrices for the different
-        object types. 
-
-        Args:
-            random_count: number of randomised instances to create. The default "None"
-                effectively means "use the previously configured value" (e.g. from a
-                configuration file). Otherwise the value must be >0, and will override
-                and previously configured value.
+        Deals with initialising all the objects used for scoring/linking.
         """
 
         if len(self._spectra) == 0 or len(self._gcfs) == 0 or len(self._strains) == 0:
@@ -291,44 +283,6 @@ class NPLinker(object):
         logger.debug('Generating scores, enabled methods={}'.format(self.scoring.enabled()))
         self._generate_scores(self._datalinks, self._linkfinder)
 
-        # create the randomised scoring matrices, and stack them together for later use
-        if random_count is not None and random_count < 1:
-            raise Exception('random_count must be None or >0 (value={})'.format(random_count))
-
-        if random_count is None:
-            random_count = self.scoring.random_count
-
-        logger.debug('Generating {} randomised instances for scoring'.format(random_count))
-        self._rdatalinks = [RandomisedDataLinks.from_datalinks(self._datalinks, True) for x in range(random_count)]
-        self._rlinkfinders = [LinkFinder() for x in range(random_count)]
-        logger.debug('Generating randomised scores, enabled methods={}'.format(self.scoring.enabled()))
-        
-        for i in range(random_count):
-            self._generate_scores(self._rdatalinks[i], self._rlinkfinders[i])
-        
-        logger.debug('Finished generating randomised scores')
-        # TODO this can be a bit slow?
-        # create a set of dicts indexed by class to store the matrices
-        self._random_scores = {}
-        for m in self.scoring.enabled():
-            rand_scores = \
-            {
-                Spectrum:           np.zeros((len(self._spectra), 0)),
-                MolecularFamily:    np.zeros((len(self._families), 0)),
-                GCF:                {
-                                        Spectrum:           np.zeros((0, len(self._gcfs))),
-                                        MolecularFamily:    np.zeros((0, len(self._gcfs))),
-                                    }
-            }
-
-            for i in range(random_count):
-                rand_scores[GCF][Spectrum] = np.r_[rand_scores[GCF][Spectrum], rlinkfinders[i].get_scores(m.name, 'spec-gcf')]
-                rand_scores[GCF][MolecularFamily] = np.r_[rand_scores[GCF][MolecularFamily], rlinkfinders[i].get_scores(m.name, 'fam-gcf')]
-                rand_scores[Spectrum] = np.c_[rand_scores[Spectrum], rlinkfinders[i].get_scores(m.name, 'spec-gcf')]
-                if len(self._families) > 0:
-                    rand_scores[MolecularFamily] = np.c_[rand_scores[MolecularFamily], rlinkfinders[i].get_scores(m.name, 'fam-gcf')]
-
-            self._random_scores[m.name] = rand_scores
         logger.debug('Scoring matrices created')
 
         self.clear_links()
@@ -431,14 +385,9 @@ class NPLinker(object):
 
         # TODO this block can probably be simplified 
         if scoring_method.name == 'metcalf':
-            if scoring_method.sig_percentile < 0 or scoring_method.sig_percentile > 100:
-                raise Exception('sig_percentile invalid! Expected 0-100, got {}'.format(scoring_method.sig_percentile))
-            logger.debug('_get_links for metcalf scoring')
-            results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, None)
-            # if using percentile option, need to filter the links based on that before continuing...
-            if len(self._rdatalinks) > 0:
-                results = self._get_links_percentile(input_type, objects, results, scoring_method.name, scoring_method.sig_percentile)
-            # if using standardised scores, do that now
+            logger.debug('_get_links for metcalf scoring, standardised={}'.format(scoring_method.standardised))
+            results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, scoring_method.cutoff)
+            # if using standardised scores, adjust the raw scores now
             if scoring_method.standardised:
                 # results is a (3, x) array for spec/molfam input, where (1, :) gives src obj ID, (2, :) gives
                 # dst obj ID, and (3, :) gives scores
@@ -678,13 +627,6 @@ class NPLinker(object):
         return self._datalinks
 
     @property
-    def rdatalinks(self):
-        """
-        Returns the list of RandomisedDataLinks objects
-        """
-        return self._rdatalinks
-
-    @property
     def scoring(self):
         """
         Returns the ScoringConfig object used to manipulate the scoring process
@@ -731,7 +673,7 @@ if __name__ == "__main__":
     npl.scoring.metcalf.enabled = True
 
     # generate all datalinks objects etc
-    if not npl.process_dataset(random_count=1):
+    if not npl.process_dataset():
         print('Failed to process dataset')
         sys.exit(-1)
 
