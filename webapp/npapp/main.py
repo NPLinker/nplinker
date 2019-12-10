@@ -658,7 +658,7 @@ class NPLinkerBokeh(object):
 
             spec_hdr_id = 'spec_result_header_{}_{}'.format(pgindex, j)
             spec_body_id = 'spec_body_{}_{}'.format(pgindex, j)
-            spec_title = 'Spectrum(parent_mass={:.4f}, id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.parent_mz, spec.spectrum_id, score, len(shared_strains))
+            spec_title = 'Spectrum(parent_mass={:.4f}, id={}), score=<strong>{:.4f}</strong>, shared strains=<strong>{}</strong>'.format(spec.parent_mz, spec.spectrum_id, score, len(shared_strains))
             if spec.has_annotations():
                 spec_title += ', # annotations={}'.format(len(spec.annotations))
 
@@ -697,7 +697,7 @@ class NPLinkerBokeh(object):
             # construct a similar object info card header for this GCF
             gcf_hdr_id = 'gcf_result_header_{}_{}'.format(pgindex, j)
             gcf_body_id = 'gcf_body_{}_{}'.format(pgindex, j)
-            gcf_title = 'GCF(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(gcf.gcf_id, score, len(shared_strains))
+            gcf_title = 'GCF(id={}), score=<strong>{:.4f}</strong>, shared strains=<strong>{}</strong>'.format(gcf.gcf_id, score, len(shared_strains))
             gcf_body = self.generate_gcf_info(gcf, shared_strains)
             body += TMPL.format(hdr_id=gcf_hdr_id, hdr_color='ffe0b5', btn_target=gcf_body_id, btn_text=gcf_title, 
                                 body_id=gcf_body_id, body_parent='accordion_spec_{}'.format(pgindex), body_body=gcf_body)
