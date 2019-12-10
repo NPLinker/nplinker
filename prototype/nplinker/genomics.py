@@ -3,7 +3,6 @@ import csv, glob, os, json
 import numpy as np
 
 from .aa_pred import predict_aa
-from .genomics_utilities import get_known_cluster_blast
 from .genomics_utilities import get_smiles
 
 from .strains import Strain, StrainCollection
