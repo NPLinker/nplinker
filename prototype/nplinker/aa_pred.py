@@ -19,7 +19,7 @@ class AntiSmashFile(object):
         self.raw_data = []
         self.filename = filename
 
-        with open(filename, 'rU') as f:
+        with open(filename, 'r') as f:
             for record in SeqIO.parse(f, 'gb'):
                 self.raw_data.append(AntiSmashRecord(record))
 

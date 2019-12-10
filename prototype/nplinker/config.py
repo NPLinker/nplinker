@@ -127,7 +127,6 @@ class ScoringConfig(object):
             scoringdict[m]['name'] = m
             self._methods[m] = SimpleNamespace(**scoringdict[m])
             setattr(self, m, self._methods[m])
-        self.random_count = scoringdict['random_count']
 
     def get(self, m):
         if m in self._methods:

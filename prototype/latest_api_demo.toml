@@ -2,10 +2,10 @@
 root = "/mnt/archive/nplinker_data/current/carnegie_mibig_27112019"
 [dataset.overrides]
 [scoring]
-random_count = 1
 [scoring.metcalf]
-sig_percentile = 99
 enabled = true
+standardised = true
+cutoff = 1.0
 [scoring.hg]
 prob = 0.99
 enabled = false
