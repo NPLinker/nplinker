@@ -1,7 +1,7 @@
 import os
 
 from bokeh.models.widgets import RadioGroup, Slider, Div, Select, CheckboxGroup
-from bokeh.models.widgets import Toggle, Button, TextInput
+from bokeh.models.widgets import Toggle, Button, TextInput, PreText
 from bokeh.layouts import row
 from bokeh.models import CustomJS
 from bokeh.plotting import figure, curdoc
@@ -11,8 +11,9 @@ from bokeh.models.renderers import GraphRenderer, GlyphRenderer
 from bokeh.models.graphs import StaticLayoutProvider, NodesOnly
 from bokeh.events import LODEnd, LODStart, Reset
 
-from metabolomics import Spectrum, MolecularFamily, SingletonFamily
-from genomics import GCF, BGC
+from nplinker.metabolomics import Spectrum, MolecularFamily, SingletonFamily
+from nplinker.genomics import GCF, BGC
+from nplinker.annotations import gnps_url, GNPS_KEY
 
 from searching import SEARCH_OPTIONS, Searcher
 
@@ -90,20 +91,21 @@ HOVER_CALLBACK_CODE = """
     // markers that are non-visible
     var indices = cb_data.index.indices;
 
+    // data source column names
+    let ds = cb_data.renderer.data_source;
+    let keys = Object.keys(ds.data);
+    // check if this is the genomics or metabolomics plot using the column names
+    let gen_mode = keys.indexOf('gcf') != -1;
+
     // access data_source.data via cb_data.renderer.data_source.data
 
     if (indices.length > 0)
     {
-        let ds = cb_data.renderer.data_source;
         // selected (as opposed to hovered/inspected) indices
         let selected_indices = ds.selected.indices;
-        // data source column names
-        let keys = Object.keys(ds.data);
 
-        // check if this is the genomics or metabolomics plot using the column names
-        let gen_mode = keys.indexOf('gcf') != -1;
-        let obj_col = gen_mode ? 'gcf' : 'name';
-        let parent_col = gen_mode ? 'gcf' : 'family';
+        let obj_col = gen_mode ? 'index' : 'index';
+        let parent_col = gen_mode ? 'gcf_name' : 'family';
         let objtype = gen_mode ? 'GCF ID(s): ' : 'Spectrum ID(s): ';
 
         // idea here is to display info about the object(s) being hovered over, 
@@ -126,6 +128,7 @@ HOVER_CALLBACK_CODE = """
         // 1st div: show either "(nothing under cursor)" or "x BGCs in y GCFs" / "x spectra in y MolFams"
         if(objects.length == 0) {
             $(output_div_id).html('<small>' + empty_text + '</small>');
+            $(output_div_id_ext).html('');
         } else {
             let ohtml = '<small>';
             // remove dups
@@ -134,17 +137,36 @@ HOVER_CALLBACK_CODE = """
 
             if(gen_mode) {
                 ohtml += objects.length + ' BGCs in ' + parents.length + ' GCFs';
+
+                var bgcs = '<strong>BGCs</strong>: ';
+                var gcfs = '<strong>GCFs</strong>: ';
+                for(var i=0;i<objects.length;i++) {
+                    bgcs += ds.data['name'][objects[i]] + ',';
+                    gcfs += ds.data['gcf_name'][objects[i]] + ',';
+                }
+                $(output_div_id_ext).html('<small>' + bgcs + '<br/>' + gcfs + '</small>');
             } else {
                 ohtml += objects.length + ' spectra in ' + parents.length + ' MolFams';
+
+                var specs = '<strong>Spectra</strong>: ';
+                var fams = '<strong>MolFams</strong>: ';
+                for(var i=0;i<objects.length;i++) {
+                    specs += ds.data['name'][objects[i]] + ',';
+                    fams += ds.data['family'][objects[i]] + ',';
+                }
+                $(output_div_id_ext).html('<small>' + specs + '<br/>' + fams + '</small>');
             }
             ohtml += '<small>';
-            $(output_div_id_ext).html('<small>' + objtype + '<strong>' + objects.join() + '</strong></small>');
             $(output_div_id).html(ohtml);
         }
     } 
     else
     {
         $(output_div_id).html('<small>' + empty_text + '</small>');
+        if(gen_mode)
+            $(output_div_id_ext).html('<small><strong>BGCs</strong>: <br/><strong>GCFs</strong>:</small>');
+        else
+            $(output_div_id_ext).html('<small><strong>Spectra</strong>: <br/><strong>MolFams</strong>:</small>');
     }
 """
 
@@ -264,7 +286,7 @@ class ScoringHelper(object):
                 scoring_objs.update(gcfs_for_bgc)
 
                 for gcf in gcfs_for_bgc:
-                    all_bgcs.update(gcf.bgc_list)
+                    all_bgcs.update(gcf.bgcs)
 
             print('Selection of {} BGCs => {} GCFs'.format(len(bgcs), len(scoring_objs)))
             self.gcfs = list(scoring_objs)
@@ -636,10 +658,9 @@ class NPLinkerBokeh(object):
 
             spec_hdr_id = 'spec_result_header_{}_{}'.format(pgindex, j)
             spec_body_id = 'spec_body_{}_{}'.format(pgindex, j)
-            spec_title = 'Spectrum(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.spectrum_id, score, len(shared_strains))
-            num_anno_sets = len(spec.get_annotations()) + len(spec.get_gnps_annotations())
-            if num_anno_sets > 0:
-                spec_title += ', annotation sets={}'.format(num_anno_sets)
+            spec_title = 'Spectrum(parent_mass={:.4f}, id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.parent_mz, spec.spectrum_id, score, len(shared_strains))
+            if spec.has_annotations():
+                spec_title += ', # annotations={}'.format(len(spec.annotations))
 
             spec_body = self.generate_spec_info(spec, shared_strains)
 
@@ -652,7 +673,7 @@ class NPLinkerBokeh(object):
             spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, spec.to_jcamp_str())
 
             hdr_color = 'ffe0b5'
-            if num_anno_sets > 0:
+            if len(spec.annotations) > 0:
                 hdr_color = 'ffb5e0'
             body += TMPL_ON_CLICK.format(hdr_id=spec_hdr_id, hdr_color=hdr_color, btn_target=spec_body_id, btn_onclick=spec_onclick, btn_id=spec_btn_id, 
                                          btn_text=spec_title, body_id=spec_body_id, body_parent='accordion_gcf_{}'.format(pgindex), body_body=spec_body)
@@ -676,7 +697,7 @@ class NPLinkerBokeh(object):
             # construct a similar object info card header for this GCF
             gcf_hdr_id = 'gcf_result_header_{}_{}'.format(pgindex, j)
             gcf_body_id = 'gcf_body_{}_{}'.format(pgindex, j)
-            gcf_title = 'GCF(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(gcf.id, score, len(shared_strains))
+            gcf_title = 'GCF(id={}), score=<strong>{}</strong>, shared strains=<strong>{}</strong>'.format(gcf.gcf_id, score, len(shared_strains))
             gcf_body = self.generate_gcf_info(gcf, shared_strains)
             body += TMPL.format(hdr_id=gcf_hdr_id, hdr_color='ffe0b5', btn_target=gcf_body_id, btn_text=gcf_title, 
                                 body_id=gcf_body_id, body_parent='accordion_spec_{}'.format(pgindex), body_body=gcf_body)
@@ -701,7 +722,7 @@ class NPLinkerBokeh(object):
 
         # iterate over every GCF and its associated set of linked objects + scores
         for gcf, spec_scores in self.score_helper.objs_with_scores.items():
-            title = '{} spectra linked to GCF(id={})'.format(len(spec_scores), gcf.id)
+            title = '{} spectra linked to GCF(id={})'.format(len(spec_scores), gcf.gcf_id)
             hdr_id = 'gcf_result_header_{}'.format(pgindex)
             body_id = 'gcf_result_body_{}'.format(pgindex)
 
@@ -1005,7 +1026,7 @@ class NPLinkerBokeh(object):
                     for gcf, _ in objs_with_scores[link_obj]:
                         # get list of BGCs from the GCF. if we're not showing MiBIG BGCs and these
                         # are the only ones in this GCF, don't show it 
-                        bgcs = gcf.bgc_list if not self.hide_mibig else gcf.non_mibig_bgcs
+                        bgcs = gcf.bgcs if not self.hide_mibig else gcf.non_mibig_bgcs
                         for n in bgcs:
                             try:
                                 score_obj_indices.add(self.bgc_indices[n.name])
@@ -1270,26 +1291,26 @@ class NPLinkerBokeh(object):
         # start of main tab content
         gcf_body += '<div class="tab-pane show active" id="gcf_{}_main" role="tabpanel">'.format(gcf.id)
         gcf_body += '<ul>'
-        for attr in ['id', 'gcf_id', 'gnps_class']:
+        for attr in ['id', 'gcf_id', 'product_type']:
             gcf_body += '<li><strong>{}</strong>: {}</li>'.format(attr, getattr(gcf, attr))
 
         # add strain information
         if shared_strains is not None and len(shared_strains) > 0:
-            gcf_body += '<li><strong>strains (total={}, shared={})</strong>: '.format(len(gcf.bgc_list), len(shared_strains))
+            gcf_body += '<li><strong>strains (total={}, shared={})</strong>: '.format(len(gcf.bgcs), len(shared_strains))
 
-            non_shared = [s.strain for s in gcf.bgc_list if s.strain not in shared_strains]
+            non_shared = [s.strain for s in gcf.bgcs if s.strain not in shared_strains]
 
             for s in shared_strains:
-                gcf_body += '<span style="background-color: #AAFFAA">{}</span>, '.format(s)
+                gcf_body += '<span style="background-color: #AAFFAA">{}</span>, '.format(s.id)
             for s in non_shared:
-                gcf_body += '<span style="background-color: #DDDDDD">{}</span>, '.format(s)
+                gcf_body += '<span style="background-color: #DDDDDD">{}</span>, '.format(s.id)
 
             gcf_body += '</li>'
         else:
-            gcf_body += '<li><strong>strains (total={}, shared=0)</strong>: '.format(len(gcf.bgc_list))
+            gcf_body += '<li><strong>strains (total={}, shared=0)</strong>: '.format(len(gcf.bgcs))
 
-            for s in gcf.bgc_list:
-                gcf_body += '<span>{}</span>, '.format(s)
+            for s in gcf.bgcs:
+                gcf_body += '<span>{}</span>, '.format(s.strain.id)
 
             gcf_body += '</li>'
 
@@ -1303,7 +1324,7 @@ class NPLinkerBokeh(object):
         gcf_body += '<table class="table table-responsive table-striped" id="gcf_{}_bgc_table"><thead><tr>'.format(gcf.id)
         gcf_body += ''.join('<th scope="col">{}</th>'.format(x) for x in fields)
         gcf_body += '</thead><tbody>'
-        for bgc in gcf.bgc_list:
+        for bgc in gcf.bgcs:
             gcf_body += '<tr><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td></tr>'.format(*list(getattr(bgc, x) for x in fields))
         gcf_body += '</tbody></table>'
         gcf_body += '</div></div>'
@@ -1322,30 +1343,37 @@ class NPLinkerBokeh(object):
             non_shared = [s for s in spec.strain_list if s not in shared_strains]
 
             for s in shared_strains:
-                spec_body += '<span style="background-color: #AAFFAA">{}</span>, '.format(s)
+                spec_body += '<span style="background-color: #AAFFAA">{} ({})</span>, '.format(s.id, spec.get_growth_medium(s))
             for s in non_shared:
-                spec_body += '<span style="background-color: #DDDDDD">{}</span>, '.format(s)
+                spec_body += '<span style="background-color: #DDDDDD">{} ({})</span>, '.format(s.id, spec.get_growth_medium(s))
 
             spec_body += '</li>'
         else:
             spec_body += '<li><strong>strains (total={}, shared=0)</strong>: '.format(len(spec.strain_list))
 
             for s in spec.strain_list:
-                spec_body += '<span>{}</span>, '.format(s)
+                spec_body += '<span>{} ({})</span>, '.format(s.id, spec.get_growth_medium(s))
 
             spec_body += '</li>'
-
-        if len(spec.get_annotations()) > 0:
-            for def_anno in spec.get_annotations():
-                spec_body += '<strong>Default annotations:</strong><ul>'
-                for k, v in def_anno.items():
-                    spec_body += '<li><strong><span class="annotation">{}</span></strong> ({})</li>'.format(k, v)
-        if len(spec.get_gnps_annotations()) > 0:
-            for gnps_anno in spec.get_gnps_annotations():
-                spec_body += '<strong>GNPS annotations:</strong><ul>'
-                for k, v in gnps_anno.items():
-                    spec_body += '<li><strong><span class="annotation">{}</span></strong> ({})</li>'.format(k, v)
         spec_body += '</ul>'
+
+        if len(spec.annotations) > 0:
+            # keys of spec.annotations indicate the source file: "gnps" or an actual filename
+            for anno_src, anno_list in spec.annotations.items():
+                spec_body += '<hr width="80%"/>'
+                spec_body += '<strong>{} annotations:</strong><ul>'.format(anno_src)
+                for item in anno_list:
+                    spec_body += '<ul>'
+                    content = []
+                    for k, v in item.items():
+                        if k.endswith('_url'):
+                            v = '<a href="{}" target="_blank">{}</a>'.format(v, k)
+                        elif v.startswith('CCMSLIB'):
+                            v = '<a href="{}" target="_blank">{}</a>'.format(gnps_url(v), v)
+                        content.append('<strong><span class="annotation">{}</span></strong> = {}'.format(k, v))
+                    spec_body += '<li>' + ', '.join(content) + '</li>'
+                    spec_body += '</ul>'
+                spec_body += '</ul>'
         return spec_body
 
     def generate_molfam_info(self, molfam, shared_strains=[]):
@@ -1369,7 +1397,7 @@ class NPLinkerBokeh(object):
         for i, gcf in enumerate(gcfs):
             gcf_hdr_id = 'gcf_search_header_{}'.format(i)
             gcf_body_id = 'gcf_search_body_{}'.format(i)
-            gcf_title = 'GCF(id={}, gcf_id={}, strains={})'.format(gcf.id, gcf.gcf_id, len(gcf.bgc_list))
+            gcf_title = 'GCF(gcf_id={}, strains={})'.format(gcf.gcf_id, len(gcf.bgcs))
             gcf_body = self.generate_gcf_info(gcf)
             body += TMPL_SEARCH.format(hdr_id=gcf_hdr_id, hdr_color='dddddd', btn_target=gcf_body_id, btn_text=gcf_title, 
                                 result_index=str(i), body_id=gcf_body_id, body_parent='accordionSearch', body_body=gcf_body)
@@ -1382,7 +1410,7 @@ class NPLinkerBokeh(object):
         for i, spec in enumerate(spectra):
             spec_hdr_id = 'spec_search_header_{}'.format(i)
             spec_body_id = 'spec_search_body_{}'.format(i)
-            spec_title = 'Spectrum(id={}, strains={})'.format(spec.id, len(spec.strain_list))
+            spec_title = 'Spectrum(parent_mass={:.4f}, id={}, strains={})'.format(spec.parent_mz, spec.spectrum_id, len(spec.strain_list))
 
             spec_body = self.generate_spec_info(spec)
 
@@ -1400,14 +1428,15 @@ class NPLinkerBokeh(object):
         return body
 
     def generate_search_output_molfam(self, molfams):
-        return ''
+        # TODO
+        return '<strong>Not working yet :(</strong>'
 
     def generate_search_output(self, results):
         # TEMP XXX TODO
-        if isinstance(results[0], BGC):
-            # removing BGCs that don't appear in current TSNE
-            results = [r for r in results if r in self.nh.bgc_indices[self.bgc_tsne_id]]
-            self.searcher.results = results
+        # if len(results) > 0 and isinstance(results[0], BGC):
+        #     # removing BGCs that don't appear in current TSNE
+        #     results = [r for r in results if r in self.nh.bgc_indices[self.bgc_tsne_id]]
+        #     self.searcher.results = results
 
         hdr = '<h4>{} results found</h4>'.format(len(results))
         if len(results) == 0:
@@ -1481,7 +1510,7 @@ class NPLinkerBokeh(object):
             # of all the BGC indices corresponding to these GCFs
             bgcs = set()
             for gcf in results:
-                bgcs.update(gcf.bgc_list)
+                bgcs.update(gcf.bgcs)
             indices = [self.nh.bgc_indices[self.bgc_tsne_id][bgc.name] for bgc in bgcs]
             self.ds_bgc.selected.indices = indices
         elif isinstance(results[0], Spectrum):
@@ -1502,6 +1531,9 @@ class NPLinkerBokeh(object):
 
     def reset_button_callback(self):
         self.clear_selections()
+
+    def gnps_params_select_callback(self, attr, old, new):
+        self.gnps_params_value.text = '<strong>{}</strong> = {}'.format(new, self.nh.nplinker.gnps_params[new])
 
     def bokeh_layout(self):
         widgets = []
@@ -1637,6 +1669,44 @@ class NPLinkerBokeh(object):
 
         self.search_regex = CheckboxGroup(labels=['Use regexes?'], active=[0], name='search_regex', sizing_mode='scale_width')
         widgets.append(self.search_regex)
+
+        self.dataset_description_pre = PreText(text=self.nh.nplinker.dataset_description, sizing_mode='scale_both', name='dataset_description_pre')
+        widgets.append(self.dataset_description_pre)
+
+        gnps_params = self.nh.nplinker.gnps_params 
+        defval = 'uuid' if 'uuid' in gnps_params else None
+        self.gnps_params_select = Select(options=list(gnps_params.keys()), value=defval, name='gnps_params_select', css_classes=['nolabel'], sizing_mode='scale_height')
+        self.gnps_params_select.on_change('value', self.gnps_params_select_callback)
+        widgets.append(self.gnps_params_select)
+
+        if defval is not None:
+            deftext = '<strong>{}</strong> = {}'.format(defval, self.nh.nplinker.gnps_params[defval])
+        else:
+            deftext = None
+        self.gnps_params_value = Div(text=deftext, sizing_mode='scale_height', name='gnps_params_value')
+        widgets.append(self.gnps_params_value)
+
+        other_info = '<table class="table table-responsive table-striped" id="other_info_table"><thead><tr>'
+        other_info += '<th scope="col">Name</th><th scope="col">Value</th></tr>'
+        other_info += '</thead><tbody>'
+        other_info += '<tr><td>{}</td><td>{}</td></tr>'.format('BiGSCAPE clustering cutoff', self.nh.nplinker.bigscape_cutoff)
+        other_info += '</tbody></table>'
+        self.other_info_div = Div(text=other_info, sizing_mode='scale_height', name='other_info_div')
+        widgets.append(self.other_info_div)
+
+        legend_bgc_text = '<table><thead><tr><td><strong>Product type</strong></td></tr></thead><tbody>'
+        for pt in self.nh.nplinker.product_types:
+            legend_bgc_text += '<tr style="background-color: {}"><td>{}</td></tr>'.format(self.nh.bgc_cmap[pt], pt)
+        legend_bgc_text += '</tbody></table>'
+        self.legend_bgc = Div(text=legend_bgc_text, sizing_mode='stretch_width', name='legend_bgc')
+        widgets.append(self.legend_bgc)
+
+        legend_spec_text = '<table><thead><tr><td><strong>Parent mass</strong></td></tr></thead><tbody>'
+        for text, colour in self.nh.spec_cmap:
+            legend_spec_text += '<tr style="background-color: {}"><td>{}</td></tr>'.format(colour, text)
+        legend_spec_text += '</tbody></table>'
+        self.legend_spec = Div(text=legend_spec_text, sizing_mode='stretch_width', name='legend_spec')
+        widgets.append(self.legend_spec)
 
         widgets.append(self.fig_spec)
         widgets.append(self.fig_bgc)

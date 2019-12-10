@@ -1,0 +1,15 @@
+loglevel = "DEBUG"
+[dataset]
+root = "/mnt/archive/nplinker_data/current/crusemann_26112019"
+[dataset.overrides]
+[scoring]
+random_count = 1
+[scoring.metcalf]
+sig_percentile = 99
+enabled = true
+[scoring.hg]
+prob = 0.99
+enabled = false
+[scoring.likescore]
+cutoff = 0.8
+enabled = false

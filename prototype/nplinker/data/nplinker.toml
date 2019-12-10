@@ -1,0 +1,117 @@
+# NPLinker configuration file
+# ---------------------------
+
+# general options
+# log level (DEBUG/INFO/WARNING/ERROR)
+loglevel = "INFO"
+logfile = ""
+repro_file = ""
+
+# Dataset configuration
+# ---------------------
+#
+# Generally speaking the dataset layout the application expects matches the structure
+# of the output from a GNPS job with TODO TODO TODO settings, plus a few extra
+# files from other sources. If you have a dataset in the required structure, 
+# typically all you will need to do is tell nplinker where the root directory
+# is located. Otherwise you can customise the locations of the individual elements
+# using the various override settings below. 
+#
+# The layout is as follows (see the documentation for more details):
+# <root>
+#   |- strain_mapping.csv (strain ID mappings)
+#   |   (METABOLOMICS DATA)
+#   |- clusterinfo_summary/<UID>.tsv (spectrum metadata)
+#   |- metadata_table/metadata_table-00000.txt (TODO)
+#   |- networkedges_selfloop/<UID>.selfloop (the "edges" file for spectra network)
+#   |- quantification_table_reformatted/<UID>.csv ("extra" spectrum metadata - TODO proper name for this?)
+#   |- DB_result/*.tsv (GNPS and other spectral annotation files, optional)
+#   |- DB_result/annotations.tsv (annotation data to extract from each file, see docs for details)
+#   |- params.xml (optional, params.xml from GNPS job output)
+#       (GENOMICS DATA)
+#   |- antismash/*.gbk (antiSMASH GenBank files for the BGCs in the dataset)
+#   |- bigscape/<classes subfolders> (BiG-SCAPE clustering/annotation files in their subfolders)
+#       (MISC DATA)
+#   |- description.txt (a freeform optional text file containing information about a dataset)
+[dataset]
+# if the dataset has the expected directory structure, this is all that's required
+root = "<root directory of dataset>"
+
+# antismash file structure. Should be either 'default' or 'flat'. 
+# default = the standard structure with nested subdirectories
+# flat = all .gbk files placed in a single flat directory
+antismash_format = "default"
+
+# you can optionally set the BIGSCAPE clustering cutoff value here. the default value
+# is 30, but any of the valid BIGSCAPE clustering thresholds can be used assuming the
+# corresponding files exist in the dataset. Also note that it's possible to change this
+# value after the dataset has initially been loaded, which will cause only the affected
+# data to be reloaded.
+#bigscape_cutoff = 30
+
+# can also override any combination of individual file paths as required (empty
+# paths are ignored)
+[dataset.overrides]
+# strain ID mapping filename, default is <root>/strain_mapping.csv
+#strain_mappings_file = ""
+
+# MGF filename. This path is passed to glob.glob, default is <root>/spectra/*.mgf
+#mgf_file = ""
+
+# nodes filename. This path is passed to glob.glob, default is <root>/clusterinfo_summary/*.tsv
+#nodes_file = ""
+
+# don't know what to call this yet? TODO
+# "extra" spectrum metadata file, default is <root>/*_quant.csv
+#extra_nodes_file = ""
+
+# edges filename. This path is passed to glob.glob, default is <root>/networkedges_selfloop/*.selfloop
+#edges_file = ""
+
+# metadata table filename. This path is passed to glob.glob, default is <root>/metadata_table/metadata_table-*.txt
+#metadata_table_file = ""
+
+# quantification table filename. This path is passed to glob.glob, default is <root>/quantification_table/quantification_table-*.csv
+#quantification_table_file = ""
+
+# GNPS spectral annotations directory, default is <root>/DB_result
+#annotations_dir = ""
+
+# annotation configuration file, default is <root>/annotations.tsv
+#annotations_config_file = ""
+
+# Antismash data directory, default is <root>/antismash
+#antismash_dir = ""
+
+# bigscape directory, default is <root>/bigscape
+# it's expected that the various class subdirectory (NRPS etc) will exist at this location.
+# within each class subdirectory, there should be a Network_Annotations_<class>.tsv file plus
+# a set of <class>_clustering_<params>.tsv files
+#bigscape_dir = ""
+
+# directory containing MiBIG .json files, default is <root>/mibig_json
+# (if needed, download the appropriate version of the archive in JSON format
+# from https://mibig.secondarymetabolites.org/download and extract the contents)
+#mibig_json_dir = ""
+
+# Scoring configuration
+[scoring]
+# number of randomized instances to create during scoring
+# increasing this number will slow down the scoring process!
+random_count = 3
+
+# metcalf scoring
+[scoring.metcalf]
+sig_percentile = 99
+enabled = true
+
+# hypergeometric scoring
+[scoring.hg]
+prob = 0.99
+enabled = false
+
+# likescore scoring
+[scoring.likescore]
+cutoff = 0.8
+enabled = false
+
