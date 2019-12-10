@@ -163,8 +163,8 @@ class Rosetta(object):
                     total_hit_identity += identity_percent / 100.0
                 score = total_hit_identity / n_mibig_genes
                 scores[mibig_id] = score
-            processed[hit] = scores
-        return scores
+            processed[bgc] = scores
+        return processed
 
     def run(self, spectra, bgcs, ms1_tol=100, score_thresh=0.5):
         # check if we have a pickled SpecLib object first...
