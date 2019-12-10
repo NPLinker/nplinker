@@ -156,6 +156,11 @@ class DatasetLoader(object):
         spectrum_strains = set().union(*[x.strains for x in self.spectra])
         common_strains = bgc_strains.intersection(spectrum_strains)
         self.strains.filter(common_strains)
+        # this makes metcalf standardised scoring a bit more efficient
+        for gcf in self.gcfs:
+            gcf.dataset_strains = set(gcf.strains).intersection(self.strains)
+        for spec in self.spectra:
+            spec.dataset_strains = set(spec.strains.keys()).intersection(self.strains)
         logger.info('Strains filtered down to total of {}'.format(len(self.strains)))
 
     def _load_optional(self):
