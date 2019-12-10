@@ -380,11 +380,14 @@ class NPLinker(object):
 
         if scoring_method.name == 'metcalf':
             logger.debug('_get_links for metcalf scoring, standardised={}'.format(scoring_method.standardised))
-            # this step is always required, just to get the basic Metcalf scores...
-            results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, scoring_method.cutoff)
+            if not scoring_method.standardised:
+                # get the basic Metcalf scores and carry on
+                results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, scoring_method.cutoff)
+            else:
+                # get the basic Metcalf scores BUT ignore the cutoff value here as it should only be applied to 
+                # the final scores, not the original ones
+                results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, None)
 
-            # ... now if using standardised scores, update the basic ones
-            if scoring_method.standardised:
                 # TODO molfam support still missing here (as in data_linking.py)
 
                 # results is a (3, x) array for spec/molfam input, where (1, :) gives src obj ID, (2, :) gives
@@ -401,14 +404,30 @@ class NPLinker(object):
 
                 # apply score update to each spec:gcf pairing and update the corresponding entry in results
                 # (the metcalf_expected and metcalf_variance matrices should have been calculated already)
+                new_src, new_dst, new_res = [], [], []
+
                 for i, type1_obj in enumerate(type1_objects):
                     met_strains = len(type1_obj.dataset_strains)
                     for j, other_obj in enumerate(other_objs):
                         gen_strains = len(other_obj.dataset_strains) 
                         expected = self._linkfinder.metcalf_expected[met_strains][gen_strains]
                         variance = self._linkfinder.metcalf_variance[met_strains][gen_strains]
+
                         k = i if input_type == GCF else j
-                        results[0][self.R_SCORE][k] = (results[0][self.R_SCORE][k] - expected) / np.sqrt(variance)
+                        
+                        final_score = (results[0][self.R_SCORE][k] - expected) / np.sqrt(variance)
+                        
+                        # apply the scoring cutoff here
+                        if scoring_method.cutoff is None or (final_score >= scoring_method.cutoff):
+                            new_src.append(results[0][self.R_SRC_ID][k])
+                            new_dst.append(results[0][self.R_DST_ID][k])
+                            new_res.append(final_score)
+                    
+                # overwrite original "results" with equivalent new data structure
+                results = [np.array([new_src, new_dst, new_res])]
+                if input_type == GCF:
+                    # TODO molfam...
+                    results.append(np.zeros((3, 0)))
 
         elif scoring_method.name == 'likescore':
             results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, scoring_method.cutoff)
