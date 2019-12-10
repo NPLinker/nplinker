@@ -378,41 +378,37 @@ class NPLinker(object):
         datalinks = datalinks or self._datalinks
         input_type = type(objects[0])
 
-        # if using the randomised scores to generate a significance threshold for the links, 
-        # then just call get_links without a cutoff value so it will return all scores
-        # for the given objects, which we can then apply the perecentile threshold to (this
-        # seemed easier than modifying the LinkFinder implementation)
-
-        # TODO this block can probably be simplified 
         if scoring_method.name == 'metcalf':
             logger.debug('_get_links for metcalf scoring, standardised={}'.format(scoring_method.standardised))
+            # this step is always required, just to get the basic Metcalf scores...
             results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, scoring_method.cutoff)
-            # if using standardised scores, adjust the raw scores now
+
+            # ... now if using standardised scores, update the basic ones
             if scoring_method.standardised:
+                # TODO molfam support still missing here (as in data_linking.py)
+
                 # results is a (3, x) array for spec/molfam input, where (1, :) gives src obj ID, (2, :) gives
                 # dst obj ID, and (3, :) gives scores
                 # for GCFs you get [spec, molfam] with above substructure
 
-                # TODO molfam support... !
-
-                # TODO this "works" but is a total mess, cleanup and comment!!!
-
-                # make type1_objects always be spectra. if input is spectra, just use "objects", otherwise create from R_DST_ID
+                # make type1_objects always == spectra. if input is spectra, just use "objects",
+                # otherwise build a list using the object IDs in the results array
                 type1_objects = objects if input_type == Spectrum else [self.spectra[int(index)] for index in results[0][self.R_DST_ID]]
-                # other objs should be "objects" if input is GCF, otherwise create from R_DST_ID
+
+                # other objs should be "objects" if input is GCF, otherwise create 
+                # from the results array as above
                 other_objs = objects if input_type == GCF else [self._gcfs[int(index)] for index in results[0][self.R_DST_ID]]
-                assert(isinstance(type1_objects[0], Spectrum))
-                assert(isinstance(other_objs[0], GCF))
-                result_index = 2
+
+                # apply score update to each spec:gcf pairing and update the corresponding entry in results
+                # (the metcalf_expected and metcalf_variance matrices should have been calculated already)
                 for i, type1_obj in enumerate(type1_objects):
-                    met_strains = len(list(set(type1_obj.strains).intersection(self._strains)))
+                    met_strains = len(type1_obj.dataset_strains)
                     for j, other_obj in enumerate(other_objs):
-                        gen_strains = len(list(set(other_obj.strains).intersection(self._strains)))
+                        gen_strains = len(other_obj.dataset_strains) 
                         expected = self._linkfinder.metcalf_expected[met_strains][gen_strains]
                         variance = self._linkfinder.metcalf_variance[met_strains][gen_strains]
                         k = i if input_type == GCF else j
                         results[0][self.R_SCORE][k] = (results[0][self.R_SCORE][k] - expected) / np.sqrt(variance)
-
 
         elif scoring_method.name == 'likescore':
             results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, scoring_method.cutoff)
