@@ -377,12 +377,10 @@ def load_metadata(nodes_file, extra_nodes_file, spectra, spec_dict, db_result_fi
     nodes_lines = {}
     # get a list of the lines in each file, indexed by the "cluster index" and "row ID" fields 
     # (TODO correct/necessary - does ordering always remain consistent in both files?
-
     with open(nodes_file, 'rU') as f:
         reader = csv.reader(f, delimiter='\t')
         headers = next(reader)
         strains.update(headers) # TODO should be whitelisting instead?
-        
         ci_index = headers.index('cluster index')
 
         for line in reader:
@@ -390,6 +388,7 @@ def load_metadata(nodes_file, extra_nodes_file, spectra, spec_dict, db_result_fi
             for i, v in enumerate(line):
                 tmp[headers[i]] = v
             nodes_lines[int(line[ci_index])] = tmp
+
 
     if extra_nodes_file is not None:
         with open(extra_nodes_file, 'rU') as f:
