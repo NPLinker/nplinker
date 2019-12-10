@@ -339,43 +339,6 @@ class DataLinks(object):
     # class data_links OUTPUT functions
     # TODO add output functions (e.g. to search for mappings of individual specs, gcfs etc.)
 
-class RandomisedDataLinks(DataLinks):
-    """Simple subclass of DataLinks that randomly shuffles the strains within
-        the strains to spectra matrices (to be used for generating random
-        scoring output as point of comparison with real scores) """
-
-    @classmethod
-    def from_datalinks(cls, datalinks, find_correlations=True):
-        self = cls()
-        # check if load_data has been called
-        if len(datalinks.M_spec_strain) == 0 or len(datalinks.M_gcf_strain) == 0:
-            raise Exception('DataLinks object not initialised (call load_data first)')
-
-        # create copies of the data structures required
-        self.M_gcf_strain = datalinks.M_gcf_strain.copy()
-        self.M_spec_strain = datalinks.M_spec_strain.copy()
-        self.mapping_strain = datalinks.mapping_strain.copy()
-        self.mapping_spec = datalinks.mapping_spec.copy()
-
-        # shuffle matrix/matrices
-        self._shuffle_cols(self.M_spec_strain)
-        # self._shuffle_cols(self.M_gcf_strain)
-
-        # can now run find_correlations with the shuffled matrices
-        if find_correlations:
-            self.find_correlations()
-
-        return self
-
-    def _shuffle_cols(self, m):
-        # shuffle the columns a gcf/spec-strain matrix so that each strain remains 
-        # present in the same number of now-random objects.
-        # np.random.shuffle only operates on first axis of multi-axis arrays, so
-        # take transpose to get columns here instead.
-        for col in m.T:
-            np.random.shuffle(col)
-
-
 class LinkLikelihood(object):
     """
     Class to:
