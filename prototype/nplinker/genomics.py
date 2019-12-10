@@ -74,6 +74,7 @@ class GCF(object):
         self._aa_predictions = None
         self.strains = StrainCollection()
         self.strains_lookup = {}
+        self.dataset_strains = None 
 
     def __str__(self):
         return 'GCF(id={}, class={}, gcf_id={}, strains={})'.format(self.id, self.product_type, self.gcf_id, len(self.strains))

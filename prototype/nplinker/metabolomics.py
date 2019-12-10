@@ -44,6 +44,7 @@ class Spectrum(object):
         # this is a dict indexed by Strain objects (the strains found in this Spectrum), with 
         # the values being dicts of the form {growth_medium: peak intensity} for the parent strain
         self.strains = {}
+        self.dataset_strains = None
         self.family = None
         self.random_spectrum = None
         # a dict indexed by filename, or "gnps" 
