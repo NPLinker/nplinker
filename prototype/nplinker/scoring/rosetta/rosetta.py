@@ -27,7 +27,7 @@ class RosettaHit(object):
 
 class Rosetta(object):
 
-    def __init__(self, data_path, root_path, dataset_id):
+    def __init__(self, data_path, root_path, dataset_id, ignore_genomic_cache = False):
         self._mgf_data = {}
         self._csv_data = {}
         self._mgf_path = os.path.join(data_path, 'matched_mibig_gnps_update.mgf')
@@ -35,6 +35,7 @@ class Rosetta(object):
         self._data_path = data_path
         self._root_path = root_path
         self._dataset_id = dataset_id
+        self._ignore_genomic_cache = ignore_genomic_cache
         self._pickle_dir = os.path.join(root_path, 'rosetta')
         if not os.path.exists(self._pickle_dir):
             os.makedirs(self._pickle_dir, exist_ok=True)
@@ -155,10 +156,10 @@ class Rosetta(object):
             mibig_bgcs = list(hit.keys())
             scores = {}
             for mibig_id in mibig_bgcs:
-                n_source_genes = len(hit[mibig_id][0]['all_bgc_genes'])
-                n_mibig_genes = len(hit[mibig_id][0]['all_mibig_genes'])
+                n_source_genes = len(hit[mibig_id]['all_bgc_genes'])
+                n_mibig_genes = len(hit[mibig_id]['all_mibig_genes'])
                 total_hit_identity = 0
-                for hit_gene in hit[mibig_id]:
+                for hit_gene in hit[mibig_id]['individual_hits']:
                     identity_percent = hit_gene['identity_percent']
                     total_hit_identity += identity_percent / 100.0
                 score = total_hit_identity / n_mibig_genes
@@ -184,7 +185,7 @@ class Rosetta(object):
             self._load_csv(self._csv_path)
 
         # collect bgc hits
-        if os.path.exists(self._bgchits_pickle_path):
+        if os.path.exists(self._bgchits_pickle_path) and not self._ignore_genomic_cache:
             logger.info('Found pickled bgc_hits for dataset {}!'.format(self._dataset_id))
             with open(self._bgchits_pickle_path, 'rb') as f:
                 self._bgc_hits, self._mibig2bgc = pickle.load(f)
