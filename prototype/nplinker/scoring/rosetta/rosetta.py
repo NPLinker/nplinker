@@ -13,14 +13,21 @@ logger = LogConfig.getLogger(__file__)
 
 class RosettaHit(object):
 
-    def __init__(self, spec, gnps_id, mibig_id, bgc):
+    def __init__(self, spec, gnps_id, mibig_id, bgc, spec_match_score, bgc_match_score):
         self.spec = spec
         self.gnps_id = gnps_id
         self.mibig_id = mibig_id
         self.bgc = bgc
+        self.spec_match_score = spec_match_score
+        self.bgc_match_score = bgc_match_score
 
     def __str__(self):
-        return 'RosettaHit: {}<-->{} via ({}, {})'.format(self.spec.spectrum_id, self.bgc.name, self.gnps_id, self.mibig_id)
+        return 'RosettaHit: {}<-->{} via ({} ({:.3f}), {} ({:.3f}))'.format(self.spec.spectrum_id, 
+                                                                            self.bgc.name, 
+                                                                            self.gnps_id, 
+                                                                            self.spec_match_score,
+                                                                            self.mibig_id,
+                                                                            self.bgc_match_score)
 
     def __repr__(self):
         return str(self)
@@ -127,12 +134,15 @@ class Rosetta(object):
 
     def _collect_rosetta_hits(self):
         self._rosetta_hits = []
+        bgc_summary_scores = self.generate_bgc_summary_scores()
         for spec, data in self._spec_hits.items():
             for gnps_id, score in data:
                 for mibig_id in self._gnps2mibig[gnps_id]:
                     if mibig_id in self._mibig2bgc:
                         for bgc in self._mibig2bgc[mibig_id]:
-                            self._rosetta_hits.append(RosettaHit(spec, gnps_id, mibig_id, bgc))
+                            # get the bgc score
+                            bgc_score = bgc_summary_scores[bgc][mibig_id]
+                            self._rosetta_hits.append(RosettaHit(spec, gnps_id, mibig_id, bgc, score, bgc_score))
         logger.info('Found {} rosetta hits!'.format(len(self._rosetta_hits)))
 
     def generate_bgc_summary_scores(self):
