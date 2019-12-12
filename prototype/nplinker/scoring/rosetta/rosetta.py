@@ -13,21 +13,28 @@ logger = LogConfig.getLogger(__file__)
 
 class RosettaHit(object):
 
-    def __init__(self, spec, gnps_id, mibig_id, bgc):
+    def __init__(self, spec, gnps_id, mibig_id, bgc, spec_match_score, bgc_match_score):
         self.spec = spec
         self.gnps_id = gnps_id
         self.mibig_id = mibig_id
         self.bgc = bgc
+        self.spec_match_score = spec_match_score
+        self.bgc_match_score = bgc_match_score
 
     def __str__(self):
-        return 'RosettaHit: {}<-->{} via ({}, {})'.format(self.spec.spectrum_id, self.bgc.name, self.gnps_id, self.mibig_id)
+        return 'RosettaHit: {}<-->{} via ({} ({:.3f}), {} ({:.3f}))'.format(self.spec.spectrum_id, 
+                                                                            self.bgc.name, 
+                                                                            self.gnps_id, 
+                                                                            self.spec_match_score,
+                                                                            self.mibig_id,
+                                                                            self.bgc_match_score)
 
     def __repr__(self):
         return str(self)
 
 class Rosetta(object):
 
-    def __init__(self, data_path, root_path, dataset_id):
+    def __init__(self, data_path, root_path, dataset_id, ignore_genomic_cache = False):
         self._mgf_data = {}
         self._csv_data = {}
         self._mgf_path = os.path.join(data_path, 'matched_mibig_gnps_update.mgf')
@@ -35,6 +42,7 @@ class Rosetta(object):
         self._data_path = data_path
         self._root_path = root_path
         self._dataset_id = dataset_id
+        self._ignore_genomic_cache = ignore_genomic_cache
         self._pickle_dir = os.path.join(root_path, 'rosetta')
         if not os.path.exists(self._pickle_dir):
             os.makedirs(self._pickle_dir, exist_ok=True)
@@ -126,12 +134,15 @@ class Rosetta(object):
 
     def _collect_rosetta_hits(self):
         self._rosetta_hits = []
+        bgc_summary_scores = self.generate_bgc_summary_scores()
         for spec, data in self._spec_hits.items():
             for gnps_id, score in data:
                 for mibig_id in self._gnps2mibig[gnps_id]:
                     if mibig_id in self._mibig2bgc:
                         for bgc in self._mibig2bgc[mibig_id]:
-                            self._rosetta_hits.append(RosettaHit(spec, gnps_id, mibig_id, bgc))
+                            # get the bgc score
+                            bgc_score = bgc_summary_scores[bgc][mibig_id]
+                            self._rosetta_hits.append(RosettaHit(spec, gnps_id, mibig_id, bgc, score, bgc_score))
         logger.info('Found {} rosetta hits!'.format(len(self._rosetta_hits)))
 
     def generate_bgc_summary_scores(self):
@@ -155,10 +166,10 @@ class Rosetta(object):
             mibig_bgcs = list(hit.keys())
             scores = {}
             for mibig_id in mibig_bgcs:
-                n_source_genes = len(hit[mibig_id][0]['all_bgc_genes'])
-                n_mibig_genes = len(hit[mibig_id][0]['all_mibig_genes'])
+                n_source_genes = len(hit[mibig_id]['all_bgc_genes'])
+                n_mibig_genes = len(hit[mibig_id]['all_mibig_genes'])
                 total_hit_identity = 0
-                for hit_gene in hit[mibig_id]:
+                for hit_gene in hit[mibig_id]['individual_hits']:
                     identity_percent = hit_gene['identity_percent']
                     total_hit_identity += identity_percent / 100.0
                 score = total_hit_identity / n_mibig_genes
@@ -184,7 +195,7 @@ class Rosetta(object):
             self._load_csv(self._csv_path)
 
         # collect bgc hits
-        if os.path.exists(self._bgchits_pickle_path):
+        if os.path.exists(self._bgchits_pickle_path) and not self._ignore_genomic_cache:
             logger.info('Found pickled bgc_hits for dataset {}!'.format(self._dataset_id))
             with open(self._bgchits_pickle_path, 'rb') as f:
                 self._bgc_hits, self._mibig2bgc = pickle.load(f)
