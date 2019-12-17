@@ -20,8 +20,17 @@ class AntiSmashFile(object):
         self.filename = filename
 
         with open(filename, 'rU') as f:
+            # antiSMASH 5 vs. 4 output is vastly different
             for record in SeqIO.parse(f, 'gb'):
-                self.raw_data.append(AntiSmashRecord(record))
+                if 'structured_comment' in record.annotations:
+                    as_version = record.annotations['structured_comment']['antiSMASH-Data']['Version']
+                    as_major_version = as_version.split('.')[0]
+                    if as_major_version == '5':
+                        self.raw_data.append(AntiSmash5Record(record))
+                    else:
+                        raise ValueError('Invalid antiSMASH version: {}'.format(as_version))
+                else:
+                    self.raw_data.append(AntiSmashRecord(record))
 
     def get_spec(self):
         for r in self.raw_data:
@@ -37,6 +46,52 @@ class AntiSmashFile(object):
 
     def get_prob(self, aa):
         return [x.get_prob(aa) for x in self.raw_data]
+
+
+class AntiSmash5Record(object):
+    def __init__(self, seq_record):
+        self.raw_data = seq_record
+        self.description = self.raw_data.description
+
+        clusters = [x for x in self.raw_data.features if x.type == 'cand_cluster']
+
+        products = []
+        for prod_list in [x.qualifiers['product'] for x in clusters]:
+            for prod in prod_list:
+                products.append(prod)
+
+        smiles = []
+        for smiles_list in [x.qualifiers['SMILES'] for x in clusters]:
+            for s in smiles_list:
+                smiles.append(s)
+
+        asdomains = [x for x in self.raw_data.features if x.type == 'aSDomain']
+        asdomains_with_predictions = [x for x in asdomains if 'specificity' in x.qualifiers]
+        asdomains_with_predictions_known = [x for x in asdomains_with_predictions if 'AMP-binding' in x.qualifiers['aSDomain']]
+
+        self.products = products
+        self.smiles = smiles
+        self.asdomains_with_predictions_known = asdomains_with_predictions_known
+
+        self.specificities = []
+        specificities_listed = [x.qualifiers['specificity'] for x in asdomains_with_predictions_known]
+        for specificities_single_list in specificities_listed:
+            for specificity in specificities_single_list:
+                if specificity.startswith('consensus: '):
+                    self.specificities.append(specificity.split()[1])
+
+    def get_prob(self, aa):
+        if aa in self.specificities:
+            return 1.0
+        else:
+            return 0.0
+
+    def get_spec(self):
+        for aa in set(self.specificities):
+            if aa in AA_CODES:
+                yield aa
+            elif aa in AA_CODES_ISO:
+                yield AA_CODES_ISO[aa]
 
 
 class AntiSmashRecord(object):
