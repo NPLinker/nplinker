@@ -3,7 +3,6 @@ import csv, glob, os, json
 import numpy as np
 
 from .aa_pred import predict_aa
-from .genomics_utilities import get_known_cluster_blast
 from .genomics_utilities import get_smiles
 
 from .strains import Strain, StrainCollection
@@ -63,13 +62,6 @@ class BGC(object):
                     self._aa_predictions[p[0]] = p[1]
         return [self._aa_predictions]
 
-    @property
-    def known_cluster_blast(self):
-        if self._known_cluster_blast is None:
-            self._known_cluster_blast = get_known_cluster_blast(self)
-        return self._known_cluster_blast
-
-
 class GCF(object):
     def __init__(self, id, gcf_id, product_type):
         self.id = id
@@ -82,6 +74,7 @@ class GCF(object):
         self._aa_predictions = None
         self.strains = StrainCollection()
         self.strains_lookup = {}
+        self.dataset_strains = None 
 
     def __str__(self):
         return 'GCF(id={}, class={}, gcf_id={}, strains={})'.format(self.id, self.product_type, self.gcf_id, len(self.strains))
@@ -175,7 +168,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
     # - Organism [5]
     # - Taxonomy [6]
     for a in ann_file_dict.values():
-        with open(a, 'rU') as f:
+        with open(a, 'r') as f:
             reader = csv.reader(f, delimiter='\t')
             next(reader) # skip headers
             for line in reader:
@@ -196,7 +189,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
     for product_type, filename in cluster_file_dict.items():
         product_type = os.path.split(filename)[-1]
         product_type = product_type[:product_type.index('_')]
-        with open(filename, 'rU') as f:
+        with open(filename, 'r') as f:
             reader = csv.reader(f, delimiter='\t')
             next(reader) # skip headers
             for line in reader:
@@ -290,7 +283,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
     # so that it won't leave us with edges for BGCs that are no longer present
     logger.debug('Loading .network files')
     for filename in network_file_dict.values():
-        with open(filename, 'rU') as f:
+        with open(filename, 'r') as f:
             reader = csv.reader(f, delimiter='\t')
             next(reader) # skip headers
             # try to look up bgc IDs
@@ -354,7 +347,7 @@ def filter_mibig_bgcs(bgcs, gcfs, strains):
 
 def load_mibig_map(filename='mibig_gnps_links_q3_loose.csv'):
     mibig_map = {}
-    with open(filename, 'rU') as f:
+    with open(filename, 'r') as f:
         reader = csv.reader(f)
         next(reader) # skip headers
 

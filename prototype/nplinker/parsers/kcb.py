@@ -62,30 +62,37 @@ class KCBParser(object):
                         break
             # do some processing on the blocks
             # firstly, extract the genes from the BGC -- stored in the first block
+            # these are the gene names in the BGC
             for line in top_block:
                 tokens = line.split()
                 self.bgc_genes.add(tokens[0])
-            # secondly, extract the BGCs that are mentioned here
+            # secondly, extract the MiBIG BGCs that are mentioned here
             for line in second_block:
                 tokens = line.split()
                 bgc_id = tokens[1]
                 bgc_product_name = tokens[2]
                 self.mibig_bgcs.append((bgc_id,bgc_product_name))
             for i,detail in enumerate(details):
-                current_bgc_id = detail[0].split()[1]
-                self.hits[current_bgc_id] = []
+                current_bgc_id = detail[0].split()[1] # this is the MiBIG ID, e.g. BGC0001666
+                self.hits[current_bgc_id] = {}
+                self.hits[current_bgc_id]['all_bgc_genes'] = self.bgc_genes
+
                 assert current_bgc_id == self.mibig_bgcs[i][0] # they should be in the same order
                 table_pos = detail.index('Table of genes, locations, strands and annotations of subject cluster:')
                 pos = detail.index('Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):')
+                # get the list of all of the genes within the MiBIG BGC
+                all_mibig_genes = []
+                for line in detail[table_pos+1:pos]:
+                    all_mibig_genes.append(line.split()[0])
+                self.hits[current_bgc_id]['all_mibig_genes'] = all_mibig_genes
+                self.hits[current_bgc_id]['individual_hits'] = []
                 for line in detail[pos+1:]:
                     tokens = line.split()
                     bgc_id = tokens[0]
-
-                    self.hits[current_bgc_id].append({'source_bgc_gene': tokens[0], 
+                    self.hits[current_bgc_id]['individual_hits'].append({'source_bgc_gene': tokens[0], 
                                                       'mibig_bgc_gene': tokens[1],
                                                       'identity_percent': int(tokens[2]),
-                                                      'blast_score': int(tokens[3]),
-                                                      'all_bgc_genes': self.bgc_genes})
+                                                      'blast_score': int(tokens[3])})
 
     @staticmethod
     def get_kcb_filename_from_bgc(bgc):

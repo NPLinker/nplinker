@@ -19,7 +19,7 @@ class AntiSmashFile(object):
         self.raw_data = []
         self.filename = filename
 
-        with open(filename, 'rU') as f:
+        with open(filename, 'r') as f:
             # antiSMASH 5 vs. 4 output is vastly different
             for record in SeqIO.parse(f, 'gb'):
                 if 'structured_comment' in record.annotations:

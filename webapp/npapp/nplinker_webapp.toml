@@ -2,14 +2,15 @@ loglevel = "DEBUG"
 logfile = ""
 repro_file = ""
 [dataset]
-root = "/mnt/archive/nplinker_data/current/carnegie_mibig_27112019"
-bigscape_cutoff = 65
+#root = "/mnt/archive/nplinker_data/current/carnegie_mibig_27112019"
+root = "/mnt/archive/nplinker_data/current/crusemann_26112019"
+bigscape_cutoff = 30
 [dataset.overrides]
 [scoring]
-random_count = 1
 [scoring.metcalf]
-sig_percentile = 99
+cutoff = 1.0
 enabled = true
+standardised = true
 [scoring.hg]
 prob = 0.99
 enabled = false
