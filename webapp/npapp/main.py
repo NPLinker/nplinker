@@ -1143,7 +1143,7 @@ class NPLinkerBokeh(object):
     def metcalf_standardised_callback(self, attr, old, new):
         if self.nh.nplinker.scoring.metcalf == new:
             return
-        self.nh.nplinker.scoring.metcalf.standardised = new
+        self.nh.nplinker.scoring.metcalf.standardised = (new == 1)
         self.get_links()
 
     def metcalf_cutoff_callback(self, attr, old, new):
@@ -1574,7 +1574,7 @@ class NPLinkerBokeh(object):
         widgets.append(self.scoring_method_group)
 
         # metcalf stuff
-        self.metcalf_standardised = RadioGroup(labels=['Basic metcalf scoring', 'Expected-value metcalf scoring'], name='metcalf_standardised', active=0, sizing_mode='scale_width')
+        self.metcalf_standardised = RadioGroup(labels=['Basic metcalf scoring', 'Expected-value metcalf scoring'], name='metcalf_standardised', active=1 if self.nh.nplinker.scoring.metcalf.standardised else 0, sizing_mode='scale_width')
         self.metcalf_standardised.on_change('active', self.metcalf_standardised_callback)
         widgets.append(self.metcalf_standardised)
         self.metcalf_cutoff = Slider(start=0, end=100, value=int(self.nh.nplinker.scoring.metcalf.cutoff), step=1, title='[metcalf] cutoff = ')
