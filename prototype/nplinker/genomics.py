@@ -129,7 +129,8 @@ class GCF(object):
         if self._aa_predictions is None:
             bgc_aa_prob = []
             for bgc_count, bgc in enumerate(self.bgcs):
-                bgc_aa_prob.extend(bgc.aa_predictions)
+                if not bgc.name.startswith('BGC'):
+                    bgc_aa_prob.extend(bgc.aa_predictions)
             self._aa_predictions = bgc_aa_prob
 
         return self._aa_predictions
