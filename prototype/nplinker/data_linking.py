@@ -794,7 +794,7 @@ class LinkFinder(object):
             link_levels = [0, 1]
             
             # Get necessary ids
-            input_ids = [gcf.id for gcf in input_object]
+            input_ids = np.array([gcf.id for gcf in input_object], dtype=np.int32)
             
             if main_score == 'likescore':
                 likescores = [self.likescores_spec_gcf[:, input_ids],
@@ -809,7 +809,7 @@ class LinkFinder(object):
         # If Spectrum:
         elif isinstance(input_object[0], Spectrum):
             # Get necessary ids
-            input_ids = [spec.id for spec in input_object]
+            input_ids = np.array([spec.id for spec in input_object], dtype=np.int32)
 
             input_type = "spec"
             link_levels = [0]
@@ -868,20 +868,36 @@ class LinkFinder(object):
 
             link_candidates = np.zeros((3, candidate_ids[0].shape[0]))
             
-            if query_size == 1:
-                link_candidates[0, :] = input_ids  # input id
-                if input_type == 'gcf':
-                    link_candidates[1, :] = candidate_ids[0].astype(int)  # output id
-                else:
-                    link_candidates[1, :] = candidate_ids[1].astype(int)  # output id
-            else:
-                if input_type == 'gcf':
-                    link_candidates[0, :] = input_ids[candidate_ids[1]]  # input id
-                    link_candidates[1, :] = candidate_ids[0].astype(int)  # output id
-                else:
-                    link_candidates[0, :] = input_ids[candidate_ids[0]]  # input id
-                    link_candidates[1, :] = candidate_ids[1].astype(int)  # output id
+            # this is supposed to construct a (3, x) array, where:
+            # - 1st index gives list of source/input object IDs
+            # - 2nd index gives list of destination/link object IDs
+            # - 3rd index gives list of scores for the link between the given pair of objects
+            # - x = number of links found
             
+            # if there is only a single object given as input, things are pretty simple here:
+            if query_size == 1:
+                # first, can set every index of the input object ID array to the
+                # single object ID we've been give
+                link_candidates[0, :] = input_ids  
+                # then, based on input type copy the other object IDs from candidate_ids
+                if input_type == 'gcf':
+                    link_candidates[1, :] = candidate_ids[0].astype(int)
+                else:
+                    link_candidates[1, :] = candidate_ids[1].astype(int)
+            else:
+                # if there is a list of input objects, things are slightly more complex
+                # - the "input IDs" element of the output array now needs to be set by
+                #   a lookup into the original input_ids array based on candidate_ids
+                # - the "output IDs" element is taken directly from the other element
+                #   of candidate IDs
+                if input_type == 'gcf':
+                    link_candidates[0, :] = input_ids[candidate_ids[1].astype(int)]
+                    link_candidates[1, :] = candidate_ids[0].astype(int)
+                else:
+                    link_candidates[0, :] = input_ids[candidate_ids[0].astype(int)]
+                    link_candidates[1, :] = candidate_ids[1].astype(int)
+            
+            # finally, copy in the actual scores too
             if main_score == 'likescore':
                 link_candidates[2, :] = likescores[linklevel][candidate_ids]
             elif main_score == 'metcalf':
@@ -892,9 +908,6 @@ class LinkFinder(object):
             links.append(link_candidates)
 
         return links
-
-
-
 
     def create_cytoscape_files(self, data_links,
                                network_filename,
