@@ -236,8 +236,8 @@ class Downloader(object):
 
 if __name__ == "__main__":
     # salinispora dataset (only one that actually works)
-    # d = Downloader('MSV000079284')
-    # d.get()
+    d = Downloader('MSV000079284')
+    d.get()
 
     # all_ids = ['MSV000078995',
     #         'MSV000082831',
