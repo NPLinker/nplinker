@@ -19,6 +19,9 @@ class Downloader(object):
     ANTISMASH_DB_PAGE_URL = 'https://antismash-db.secondarymetabolites.org/output/{}'
     ANTISMASH_DB_DOWNLOAD_URL = 'https://antismash-db.secondarymetabolites.org/output/{}/{}'
 
+    NCBI_GENBANK_LOOKUP_URL = 'https://www.ncbi.nlm.nih.gov/nuccore/{}?report=docsum'
+    NCBI_ASSEMBLY_LOOKUP_URL = 'https://www.ncbi.nlm.nih.gov/assembly?LinkName=nuccore_assembly&from_uid={}'
+
     def __init__(self, project_id, force_download=False):
         self.gnps_massive_id = project_id
         self.pairedomics_id = None
@@ -90,22 +93,41 @@ class Downloader(object):
 
         for i, gr in enumerate(genome_records):
             label = gr['genome_label']
-            if 'RefSeq_accession' not in gr['genome_ID']:
-                print(gr)
+            if 'RefSeq_accession' in gr['genome_ID']:
+                accession = gr['genome_ID']['RefSeq_accession']
+                # TODO does original value need preserved
+                accession = accession[:accession.rindex('.')]
+                if accession in missing_files:
+                    logger.warning('Not attempting to download data for accession={}'.format(accession))
+                    continue
+            
+                logger.info('Checking for antismash data {}/{}, accession={}'.format(i+1, len(genome_records), accession))
+                if self._download_antismash_zip(accession):
+                    found += 1
+                else:
+                    missing_files.add(accession)
+
+            elif 'GenBank_accession' in gr['genome_ID']:
+                accession = gr['genome_ID']['GenBank_accession']
+                try:
+                    refseq_accession = self._get_refseq_from_genbank(accession)
+                except:
+                    logger.warning('Failed resolving GenBank accession {}'.format(accession))
+                    continue
+
+                if refseq_accession in missing_files:
+                    logger.warning('Not attempting to download data for accession={}'.format(refseq_accession))
+                    continue
+
+                logger.info('Checking for antismash data {}/{}, accession={}'.format(i+1, len(genome_records), refseq_accession))
+                if self._download_antismash_zip(refseq_accession):
+                    found += 1
+                else:
+                    missing_files.add(refseq_accession)
+
+            else:
                 logger.warning('Missing RefSeq_accession label for {}'.format(label))
                 continue
-            accession = gr['genome_ID']['RefSeq_accession']
-            # TODO does original value need preserved
-            accession = accession[:accession.rindex('.')]
-            if accession in missing_files:
-                logger.warning('Not attempting to download data for accession={}'.format(accession))
-                continue
-
-            logger.info('Checking for antismash data {}/{}, accession={}'.format(i+1, len(genome_records), accession))
-            if self._download_antismash_zip(accession):
-                found += 1
-            else:
-                missing_files.add(accession)
 
         with open(missing_cache_file, 'w') as f:
             for mf in missing_files:
@@ -114,6 +136,46 @@ class Downloader(object):
         print('Obtained {}/{} sets of genome data'.format(found, len(genome_records)))
         if found == 0:
             raise Exception('Failed to download ANY genome data!')
+
+    def _get_refseq_from_genbank(self, genbank_id):
+        """
+        Super hacky way of trying to resolve the GenBank accession into RefSeq accession.
+        """
+        logger.info('Attempting to resolve RefSeq accession from Genbank accession {}'.format(genbank_id))
+        # genbank id => genbank seq => refseq
+
+        # The GenBank accession can have several formats:
+        # 1: BAFR00000000.1
+        # 2: NZ_BAGG00000000.1
+        # 3: NC_016887.1
+        # Case 1 is the default.
+        if '_' in genbank_id:
+            # case 2
+            if len(genbank_id.split('_')[-1].split('.')[0]) == 12:
+                genbank_id = genbank_id.split('_')[-1]
+            # case 3
+            else:
+                genbank_id = genbank_id.lower() 
+
+        # Look up genbank ID
+        url = Downloader.NCBI_GENBANK_LOOKUP_URL.format(genbank_id)
+        resp = httpx.get(url)
+        soup = BeautifulSoup(resp.content, 'html.parser')
+        ids = soup.find('dl', {'class': 'rprtid'})
+        for field_idx, field in enumerate(ids.findChildren()):
+            if field.getText().strip() == 'GI:':
+                seq_id = ids.findChildren()[field_idx + 1].getText().strip()
+                break
+
+        # Look up assembly
+        url = Downloader.NCBI_ASSEMBLY_LOOKUP_URL.format(seq_id)
+        resp = httpx.get(url)
+        soup = BeautifulSoup(resp.content, 'html.parser')
+        title_href = soup.find('p', {'class': 'title'}).a['href']
+        refseq_id = title_href.split('/')[-1].split('.')[0]
+
+        return refseq_id
+
 
     def _download_antismash_zip(self, accession_id):
         # save files as <accession>.zip to avoid having to repeat above lookup every time
@@ -236,7 +298,8 @@ class Downloader(object):
 
 if __name__ == "__main__":
     # salinispora dataset (only one that actually works)
-    d = Downloader('MSV000079284')
+    # d = Downloader('MSV000079284')
+    d = Downloader('MSV000084771')
     d.get()
 
     # all_ids = ['MSV000078995',
