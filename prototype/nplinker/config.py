@@ -21,7 +21,8 @@ class Args(object):
         self.parser = argparse.ArgumentParser(description='nplinker arguments', epilog='Note: command-line arguments will override '
                                               'arguments from configuration files')
         self.parser.add_argument('-c', '--config', help='Path to a .toml configuration file', metavar='path')
-        self.parser.add_argument('-d', '--dataset.root', help='Root path for the dataset to be loaded', metavar='path')
+        self.parser.add_argument('-d', '--dataset.root', help='Root path for the dataset to be loaded', metavar='root')
+        self.parser.add_argument('-p', '--dataset.platform_id', help='A paired omics platform project ID to load', metavar='platform_id')
         self.parser.add_argument('-l', '--loglevel', help='Logging verbosity level: DEBUG, INFO, WARNING, ERROR', metavar='loglevel')
         self.parser.add_argument('-f', '--logfile', help='Redirect logging from stdout to this file', metavar='logfile')
 
@@ -109,13 +110,24 @@ class Config(object):
         if 'dataset' not in config:
             raise Exception('No dataset defined in configuration!')
 
-        if 'dataset.root' in config:
-            root = config['dataset.root']
-            logger.debug('Dataset root is being set to "{}"'.format(root))
-            config['dataset']['root'] = root
-            del config['dataset.root']
+        root = config['dataset']['root']
+        platform_id = config['dataset']['platform_id']
+        # if we've been given a project ID, it always overrides any
+        # provided "root" value. if no ID, must have a valid root directory
+        if platform_id is not None:
+            logger.info('Selected platform project ID {}'.format(platform_id))
+        else:
             if root is None or not os.path.exists(root):
                 raise Exception('Dataset path "{}" not found or not accessible'.format(root))
+            logger.info('Loading from local data in directory {}'.format(root))
+
+        # if 'dataset.root' in config:
+        #     root = config['dataset.root']
+        #     logger.debug('Dataset root is being set to "{}"'.format(root))
+        #     config['dataset']['root'] = root
+        #     del config['dataset.root']
+        #     if root is None or not os.path.exists(root):
+        #         raise Exception('Dataset path "{}" not found or not accessible'.format(root))
 
         self.config = config
 
