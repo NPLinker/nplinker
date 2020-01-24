@@ -27,7 +27,8 @@ class NPLinker(object):
     # - R_SCORE: the score for the link between a pair of objects
     R_SRC_ID, R_DST_ID, R_SCORE = range(3)
 
-    def __init__(self, userconfig=None):
+    def __init__(self, userconfig=None, platform_id=None):
+        # TODO update docstring
         """Initialise an NPLinker instance, automatically loading a dataset and generating scores.
 
         NPLinker instances can be configured in multiple ways, in ascending order of priority:
@@ -82,6 +83,10 @@ class NPLinker(object):
             userconfig = {'config': userconfig}
         elif not isinstance(userconfig, dict):
             raise Exception('Invalid type for userconfig (should be None/str/dict, found "{}")'.format(type(userconfig)))
+
+        if platform_id is not None:
+            logger.debug('Setting project ID to {}'.format(platform_id))
+            userconfig['dataset'] = {'platform_id': platform_id }
 
         self._config = Config(userconfig)
 
@@ -158,7 +163,9 @@ class NPLinker(object):
 
     @property
     def dataset_id(self):
-        """Returns dataset "ID", currently just last component of the directory path"""
+        """Returns dataset "ID". For local datasets this will just be the last component
+        of the directory path, but for platform datasets it will be the platform 
+        project ID"""
         return self._loader.dataset_id
 
     @property
@@ -199,6 +206,8 @@ class NPLinker(object):
         # typical case where load_data is being called with no params
         if new_bigscape_cutoff is None:
             logger.debug('load_data (normal case, full load)')
+            self._loader.validate()
+
             if not self._loader.load():
                 return False
         else:
