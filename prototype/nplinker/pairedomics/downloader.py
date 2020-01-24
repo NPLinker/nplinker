@@ -15,6 +15,8 @@ from ..strains import StrainCollection, Strain
 from ..logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
+from .runbigscape import run_bigscape
+
 class Downloader(object):
 
     PAIREDOMICS_PROJECT_DATA_ENDPOINT = 'http://pairedomicsdata.bioinformatics.nl/api/projects'
@@ -89,9 +91,19 @@ class Downloader(object):
         self._parse_genome_labels(self.project_json['project']['genome_metabolome_links'], self.project_json['project']['genomes'])
         self._generate_strain_mappings()
         self._download_mibig_json() # TODO version
+        self._run_bigscape() # TODO optional flag?
 
     def _is_new_gnps_format(self, directory):
         return os.path.exists(os.path.join(directory, 'qiime2_output'))
+
+    def _run_bigscape(self):
+        # TODO this currently assumes docker environment, allow customisation?
+        # TODO also meed option to skip if you already have manual results
+        logger.info('Running BiG-SCAPE...')
+        try:
+            run_bigscape('/app/BiG-SCAPE/bigscape.py', os.path.join(self.project_file_cache, 'antismash'), os.path.join(self.project_file_cache, 'bigscape'), '/app', cutoffs=[0.3])
+        except Exception as e:
+            logger.warning('Failed to run BiG-SCAPE on antismash data, error was "{}"'.format(e))
 
     def _generate_strain_mappings(self):
         # first time downloading, this file will not exist, should only need done once
