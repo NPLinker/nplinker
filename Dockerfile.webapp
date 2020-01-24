@@ -3,8 +3,8 @@ FROM nplinkerbase:latest
 
 SHELL ["/bin/bash", "-c"]
 
-COPY prototype /app
-COPY webapp /app
+COPY prototype /app/prototype
+COPY webapp /app/webapp
 
 WORKDIR /app
 
