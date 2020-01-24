@@ -9,7 +9,24 @@ repro_file = ""
 
 # Dataset configuration
 # ---------------------
+# NPLinker supports two basic methods for loading datasets:
+# 
+#   1. All files stored locally
+#   2. Some/all files retrieved from the paired omics platform (http://pairedomicsdata.bioinformatics.nl/)
 #
+# The method you want to use determines the values that should be populated in 
+# the [dataset] section below. If working with a purely local dataset, nplinker
+# defaults to looking for all the necessary files in a single directory, given
+# by the "root" parameter. 
+#
+# Alternatively, to load metabolomics data from the paired platform, leave the 
+# "root" parameter empty and set the "platform_id" parameter to that of the 
+# project ID on the platform (a value beginning with "MSV"). 
+#
+# For more details see below. 
+#
+# 1. Loading local datasets
+# -------------------------
 # Generally speaking the dataset layout the application expects matches the structure
 # of the output from a GNPS job with TODO TODO TODO settings, plus a few extra
 # files from other sources. If you have a dataset in the required structure, 
@@ -33,13 +50,38 @@ repro_file = ""
 #   |- bigscape/<classes subfolders> (BiG-SCAPE clustering/annotation files in their subfolders)
 #       (MISC DATA)
 #   |- description.txt (a freeform optional text file containing information about a dataset)
+#
+# 2. Loading platform datasets
+# ----------------------------
+# Given a platform ID, nplinker will retrieve the metabolomics data using the 
+# GNPS task ID. By default, it will also attempt to retrieve any available 
+# genomics data from the antismash database using the RefSeq accession labels 
+# in the platform project data. 
+# 
+# However, if you have local antismash results instead, you should also set the
+# location of those files using the "antismash_dir" parameter in the 
+# [dataset.overrides] section. nplinker can optionally also run bigscape on 
+# these results during the loading process. If you already have bigscape results
+# you can additionally set the "bigscape_dir" parameter to the appropriate 
+# location to skip this step. 
+#
+# All files are download and extracted to ~/nplinker_data 
+# 
+# TODO more detail
 [dataset]
 # if the dataset has the expected directory structure, this is all that's required
+# NOTE: only set one of root and platform_id!
 root = "<root directory of dataset>"
+
+# if you want to load data from the paired omics platform, give the project ID 
+# here (e.g. "MSV000079284")
+# NOTE: only set one of root and platform_id:
+platform_id = ""
 
 # antismash file structure. Should be either 'default' or 'flat'. 
 # default = the standard structure with nested subdirectories
 # flat = all .gbk files placed in a single flat directory
+# TODO: is "flat" required any more? 
 antismash_format = "default"
 
 # you can optionally set the BIGSCAPE clustering cutoff value here. the default value
