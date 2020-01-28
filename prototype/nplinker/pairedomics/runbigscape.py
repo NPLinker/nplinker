@@ -13,7 +13,7 @@ def run_bigscape(bigscape_py_path, antismash_path, output_path, pfam_path, cutof
 
     if os.path.exists(os.path.join(output_path, 'completed')):
         logger.info('BiG-SCAPE appears to have been run already, skipping!')
-        # logger.info('To force re-run, delete {}'.format(os.path.join(output_path, 'completed')))
+        logger.info('To force re-run, delete {}'.format(os.path.join(output_path, 'completed')))
         return True
 
     try:
