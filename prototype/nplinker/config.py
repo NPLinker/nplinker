@@ -114,7 +114,7 @@ class Config(object):
         platform_id = config['dataset']['platform_id']
         # if we've been given a project ID, it always overrides any
         # provided "root" value. if no ID, must have a valid root directory
-        if platform_id is not None:
+        if platform_id is not None and len(platform_id) > 0:
             logger.info('Selected platform project ID {}'.format(platform_id))
         else:
             if root is None or not os.path.exists(root):
