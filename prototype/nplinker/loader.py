@@ -71,7 +71,10 @@ class DatasetLoader(object):
         self._remote_loading = len(self._platform_id) > 0
         self.datadir = os.path.join(os.path.dirname(__file__), 'data')
         self.dataset_id = os.path.split(self._root)[-1] if not self._remote_loading else self._platform_id
-        self._downloader = Downloader(self._platform_id)
+        if self._remote_loading:
+            self._downloader = Downloader(self._platform_id)
+        else:
+            self._downloader = None
         logger.debug('DatasetLoader({}, {}, {})'.format(self._root, self._platform_id, self._remote_loading))
 
     def validate(self):
@@ -94,8 +97,8 @@ class DatasetLoader(object):
         # 2. MET: <root>/clusterinfo_summary/<some UID>.tsv / nodes_file=<override>
         self.nodes_file = self._overrides.get(self.OR_NODES) or find_via_glob(os.path.join(self._root, 'clusterinfo*', '*.tsv'), self.OR_NODES)
 
-        # 3. MET: <root>/networkedges_selfloop/<some UID>.tsv / edges_file=<override>
-        self.edges_file = self._overrides.get(self.OR_EDGES) or find_via_glob(os.path.join(self._root, 'networkedges_selfloop', '*.pairsinfo') or find_via_glob(os.path.join(self._root, 'networkedges_selfloop', '*.selfloop')), self.OR_EDGES)
+        # 3. MET: <root>/networkedges_selfloop/<some UID>.selfloop (new) or .pairsinfo (old) / edges_file=<override>
+        self.edges_file = self._overrides.get(self.OR_EDGES) or find_via_glob(os.path.join(self._root, 'networkedges_selfloop', '*.pairsinfo'), self.OR_EDGES, optional=True) or find_via_glob(os.path.join(self._root, 'networkedges_selfloop', '*.selfloop'), self.OR_EDGES, optional=True)
 
         # 4. MET: <root>/*.csv / extra_nodes_file=<override>
         # TODO is the glob input OK? 
