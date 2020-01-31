@@ -71,6 +71,52 @@ def create_metabolomics_graph(spectra, width=10, iterations=100, singletons=Fals
 
         return gn_layout, _combined_edges_dict(gn, gs)
 
+def create_genomics_graph_product_types(bgcs, prodtypes, width=10, iterations=100, mibig=False, split_mibig=False):
+    if not mibig and split_mibig:
+        raise Exception('mibig must be True if split_mibig is True')
+        
+    if not split_mibig:
+        graphdata = {pt: nx.Graph() for pt in prodtypes}
+        print('Constructing single combined graph, mibig={}'.format(mibig))
+        g = nx.Graph()
+        for bgc in bgcs:
+            if isinstance(bgc, MiBIGBGC) and not mibig:
+                continue
+            g = graphdata[bgc.bigscape_class]
+            g.add_node(bgc.id)
+            for obgc_id in bgc.edges:
+                if isinstance(bgcs[obgc_id], MiBIGBGC) and not mibig:
+                    continue
+                # only add the edge if it goes to another BGC of the same product type
+                if bgcs[obgc_id].bigscape_class != bgc.bigscape_class:
+                    continue
+                g.add_node(obgc_id)
+                g.add_edge(bgc.id, obgc_id)
+        for pt in prodtypes:
+            print('[{}]'.format(pt))
+            g = graphdata[pt]
+            print('  --> Graph: nodes={}, edges={}'.format(g.number_of_nodes(), g.number_of_edges()))
+        return _layout_molnet(g, width, iterations), _edges_dict_from_networkx(g)
+    else:
+        print('Constructing split-graph, mibig={}'.format(mibig))
+        gn = nx.Graph()
+        gs = nx.Graph()
+        
+        for bgc in bgcs:
+            g = gs if isinstance(bgc, MiBIGBGC) else gn
+            g.add_node(bgc.id)
+            for obgc_id in bgc.edges:
+                g.add_node(obgc_id)
+                g.add_edge(bgc.id, obgc_id)
+            
+        print('Graph normal: nodes={}, edges={}'.format(gn.number_of_nodes(), gn.number_of_edges()))
+        print('Graph singletons: nodes={}, edges={}'.format(gs.number_of_nodes(), gs.number_of_edges()))
+        # dict of node ID: (x,y) entries
+        gn_layout = _layout_molnet(gn, width, iterations)
+        gs_layout = _layout_molnet(gs, width, iterations, offset=(0, -width * 1.1))
+        gn_layout.update(gs_layout)
+        return gn_layout, _combined_edges_dict(gn, gs)
+
 def create_genomics_graph(bgcs, width=10, iterations=100, mibig=False, split_mibig=False):
     if not mibig and split_mibig:
         raise Exception('mibig must be True if split_mibig is True')

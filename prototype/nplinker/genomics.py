@@ -213,7 +213,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                             if strain is not None:
                                 break
                         if strain is None:
-                            raise Exception('Unknown strain ID: original={} / parsed={}'.format(name, nname))
+                            raise Exception('Unknown strain ID: original={} / parsed={} (from file {})'.format(name, nname, filename))
 
                 metadata_line = metadata[name]
                 description = metadata_line[2]

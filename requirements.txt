@@ -9,3 +9,7 @@ pandas
 matplotlib
 bokeh
 cython
+sortedcontainers
+httpx
+progress
+beautifulsoup4

@@ -17,6 +17,8 @@ from nplinker.annotations import gnps_url, GNPS_KEY
 
 from searching import SEARCH_OPTIONS, Searcher
 
+from tables_init import setup_data_tables
+
 # TODO all of this code doesn't have to be in the same module, could benefit from splitting up by
 # functionality (e.g. scoring, searching, UI, ...)
 
@@ -1720,6 +1722,9 @@ class NPLinkerBokeh(object):
 
         widgets.append(self.fig_spec)
         widgets.append(self.fig_bgc)
+
+        print('Loading data tables stuff')
+        widgets.extend(setup_data_tables(self.nh))
 
         for w in widgets:
             curdoc().add_root(w)

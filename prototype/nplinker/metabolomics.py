@@ -55,7 +55,7 @@ class Spectrum(object):
 
     def add_strain(self, strain, growth_medium, peak_intensity):
         if strain in self.strains and growth_medium in self.strains[strain]:
-            raise Exception('Clash: {} {}'.format(strain, growth_medium))
+            raise Exception('Clash: {} / {} {}'.format(self, strain, growth_medium))
         
         if strain not in self.strains:
             self.strains[strain] = {}
@@ -346,6 +346,58 @@ def parse_metadata_table(filename):
 
     return table
 
+# load metadata from the old-style paired platform TSV format
+def _load_metadata_old_platform(strains, nodes_file, spec_dict, growth_media):
+    spec_info = {}
+
+    # each line of this file represents a metabolite. the columns representing
+    # strain IDs are *ignored* here in favour of parsing the AllFiles column, 
+    # which lists the .mzXML files the molecule was found in, plus the scan 
+    # number in each file. Also want to get the componentindex column, this is
+    # the molecular family (if any, -1 = None?)
+    with open(nodes_file, 'r') as f:
+        reader = csv.reader(f, delimiter='\t')
+        headers = next(reader)
+        clu_index_index = headers.index('cluster index')
+        comp_index_index = headers.index('componentindex')
+        allfiles_index = headers.index('AllFiles')
+
+        li = 1
+        for line in reader:
+            # get the values of the important columns
+            clu_index = int(line[clu_index_index]) 
+            comp_index = int(line[comp_index_index])
+            allfiles = line[allfiles_index].split('###')
+            metadata = {'cluster_index': clu_index, 'componentindex': comp_index, 'files': {}}
+            seen_files = set()
+            for data in allfiles:
+                if len(data) < 3:
+                    continue
+
+                # TODO: is scan number important for anything?
+                # TODO: does it only matter if a molecule appears in a file, not how
+                # many times it appears???
+
+                # each entry in the allfiles list will be <mzXML filename>:<scan number>
+                mzxml, scan_num = data.split(':')
+                scan_num = int(scan_num)
+                # TODO re above
+                if mzxml in seen_files:
+                    continue
+                seen_files.add(mzxml)
+                metadata['files'][mzxml] = scan_num
+
+                # should have a strain alias for the mxXML file to lookup here
+                strain = strains.lookup(mzxml)
+                if strain is not None:
+                    # TODO growth_medium stuff a bit messy
+                    spec_dict[clu_index].add_strain(strain, list(growth_media[strain.id])[0], 1)
+            spec_info[clu_index] = metadata
+            li += 1
+
+    return spec_info
+
+# load metadata from the old Crusemann or Crusemann-like dataset
 def _load_metadata_old(strains, nodes_file, spec_dict):
     spec_info = {}
 
@@ -431,24 +483,28 @@ def _load_metadata_new(strains, nodes_file, extra_nodes_file, spec_dict, md_tabl
             spectrum.metadata[k] = v
     return spec_info
 
-def load_metadata(strains, nodes_file, extra_nodes_file, metadata_table_file, spectra, spec_dict):
+def load_metadata(growth_media, strains, nodes_file, extra_nodes_file, metadata_table_file, spectra, spec_dict):
     # this code is complicated by the need to support the Crusemann dataset, which is in a
     # different format to more recent datasets (and any expected future datasets).
     # with the new style datasets, ALL of the following should typically be present:
-    #  - nodes_files
+    #  - nodes_file
     #  - extra_nodes_file
     #  - metadata_table_file 
     # but for crusemann we only have the nodes_file, which has a different set of columns
     # than in the standard case, so it has to be parsed differently 
 
-    # load the rest of the data depending on presence/absence of files
-    if extra_nodes_file is None:
-        logger.warning('Assuming Crusemann-style dataset!')
-        spec_info = _load_metadata_old(strains, nodes_file, spec_dict)
+    if not growth_media:
+        # load the rest of the data depending on presence/absence of files
+        if extra_nodes_file is None:
+            logger.warning('Assuming Crusemann-style dataset!')
+            spec_info = _load_metadata_old(strains, nodes_file, spec_dict)
+        else:
+            # parse metadata table file, if provided
+            md_table = parse_metadata_table(metadata_table_file)
+            spec_info = _load_metadata_new(strains, nodes_file, extra_nodes_file, spec_dict, md_table)
     else:
-        # parse metadata table file, if provided
-        md_table = parse_metadata_table(metadata_table_file)
-        spec_info = _load_metadata_new(strains, nodes_file, extra_nodes_file, spec_dict, md_table)
+        # TODO "new-style" data
+        spec_info = _load_metadata_old_platform(strains, nodes_file, spec_dict, growth_media)
 
     return spectra
 

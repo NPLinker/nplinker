@@ -1,0 +1,44 @@
+# create an Ubuntu image with nplinker dependencies installed, but not the 
+# nplinker code itself
+FROM ubuntu:19.04
+
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
+SHELL ["/bin/bash", "-c"]
+WORKDIR /app
+
+# use mirrors for apt, much faster than the default
+RUN sed -i -e 's/http:\/\/archive.ubuntu.com\/ubuntu/mirror:\/\/mirrors.ubuntu.com\/mirrors.txt/' /etc/apt/sources.list
+
+# install a few things with apt to get started
+RUN apt-get update -y
+RUN apt-get install -yq wget curl git
+
+# add the paths where conda and bigscape will be installed to PATH
+ENV PATH="/app/conda/bin:/app/BiG-SCAPE:${PATH}"
+
+# clone and set up BiG-SCAPE
+RUN git clone https://git.wur.nl/medema-group/BiG-SCAPE.git && chmod +x BiG-SCAPE/*.py && chmod a+w BiG-SCAPE/domains_color_file.tsv
+
+# copy over some installer/archive files
+COPY dockerfiles/Miniconda3-latest-Linux-x86_64.sh /app
+COPY dockerfiles/Pfam-A.hmm.gz /app
+COPY dockerfiles/bokeh-1.3.5.dev3+5.ge5c1c99e1.dirty-py3-none-any.whl /app
+
+# install Miniconda in batch mode to /app/conda
+RUN chmod +x Miniconda3-latest-Linux-x86_64.sh && ./Miniconda3-latest-Linux-x86_64.sh -b -p /app/conda
+
+# create a conda env using the spec from BiG-SCAPE repo
+RUN /app/conda/bin/conda env create -f BiG-SCAPE/environment.yml 
+
+# within the environment:
+# - extract and process Pfam database
+# - install nplinker deps using conda/pip
+# - install patched version of bokeh
+RUN source activate bigscape\
+        && gunzip Pfam-A.hmm.gz\
+        && hmmpress Pfam-A.hmm\
+        && conda install pip tornado toml networkx progress beautifulsoup4 pandas\
+        && pip install httpx xdg\
+        && pip install -v /app/bokeh-1.3.5.dev3+5.ge5c1c99e1.dirty-py3-none-any.whl
