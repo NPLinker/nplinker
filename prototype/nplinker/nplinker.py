@@ -188,7 +188,7 @@ class NPLinker(object):
         """Returns the current BiGSCAPE clustering cutoff value"""
         return self._loader._bigscape_cutoff
 
-    def load_data(self, new_bigscape_cutoff=None):
+    def load_data(self, new_bigscape_cutoff=None, met_only=False):
         """Loads the basic components of a dataset.
 
         This method is responsible for loading the various pieces of the supplied dataset into
@@ -208,7 +208,7 @@ class NPLinker(object):
             logger.debug('load_data (normal case, full load)')
             self._loader.validate()
 
-            if not self._loader.load():
+            if not self._loader.load(met_only):
                 return False
         else:
             logger.debug('load_data with new cutoff = {}'.format(new_bigscape_cutoff))
