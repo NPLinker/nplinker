@@ -98,10 +98,12 @@ class Downloader(object):
         self._run_bigscape() # TODO optional flag?
 
     def _is_new_gnps_format(self, directory):
+        # TODO this should test for existence of quantification table instead
         return os.path.exists(os.path.join(directory, 'qiime2_output'))
 
     def _run_bigscape(self):
         # TODO this currently assumes docker environment, allow customisation?
+        # can check if in container with: https://stackoverflow.com/questions/20010199/how-to-determine-if-a-process-runs-inside-lxc-docker
         # TODO also meed option to skip if you already have manual results
         logger.info('Running BiG-SCAPE...')
         try:
@@ -123,7 +125,10 @@ class Downloader(object):
                     strain_alias = os.path.splitext(f)[0]
                     strain_alias = strain_alias[:strain_alias.index('.')]
                     # print('mapping {} => {}'.format(strain_alias, self.strains.lookup(strain_name)))
-                    self.strains.lookup(strain_name).add_alias(strain_alias)
+                    if self.strains.lookup(strain_name) is not None:
+                        self.strains.lookup(strain_name).add_alias(strain_alias)
+                    else:
+                        logger.warning('Failed to lookup strain name: {}'.format(strain_name))
             self.strains.save_to_file(self.strain_mappings_file)
         else:
             logger.info('Strain mappings already generated')
@@ -184,7 +189,8 @@ class Downloader(object):
 
         logger.info('Obtained {}/{} sets of genome data'.format(found, len(genome_records)))
         if found == 0:
-            raise Exception('Failed to download ANY genome data!')
+            # raise Exception('Failed to download ANY genome data!')
+            logger.warning('Failed to download ANY genome data!')
 
     def _get_refseq_from_genbank(self, genbank_id):
         """
@@ -347,6 +353,10 @@ class Downloader(object):
         for rec in gen_records:
             label = rec['genome_label']
             # TODO other accessions?
+            # what happen if this is missing?
+            if not 'RefSeq_accession' in rec['genome_ID']:
+                logger.warning('Failed to extract genome label')
+                continue
             accession = rec['genome_ID']['RefSeq_accession']
             accession = accession[:accession.rindex('.')]
             if label in temp:
@@ -395,12 +405,18 @@ class Downloader(object):
         logger.info('Extracting files to {}'.format(self.project_file_cache))
         # extract the contents to the file cache folder. only want some of the files
         # so pick them out and only extract those:
-        # - .mgf in root
+        # - root/spectra/*.mgf 
         # - root/clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.tsv
         # - root/networkedges_selfloop/*.pairsinfo
+        # - root/quantification_table*
+        # - root/metadata_table*
+        # - root/DB_result*
         for member in mbzip.namelist():
             if member.startswith('clusterinfosummarygroup_attributes_withIDs_withcomponentID')\
-                or member.startswith('networkedges_selfloop'):
+                or member.startswith('networkedges_selfloop')\
+                or member.startswith('quantification_table')\
+                or member.startswith('metadata_table')\
+                or member.startswith('DB_result'):
                     mbzip.extract(member, path=self.project_file_cache)
             # move the MGF file to a /spectra subdirectory to better fit expected structure
             elif member.endswith('.mgf'):
