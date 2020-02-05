@@ -257,6 +257,24 @@ def predict_aa(filename):
             res = item.get_prob(aa)
             yield aa, res
 
+def read_aa_losses(filename):
+    """
+    Read AA losses from data file. (assume fixed structure...)
+    """
+    aa_losses = {}
+    with open(filename, 'r') as f:
+        reader = csv.reader(f, delimiter=',')
+        next(reader) # skip headers
+        for line in reader:
+            if len(line) == 0:
+                continue
+            aa_id = line[1]
+            aa_mono = float(line[4])
+            aa_avg = float(line[5])
+            aa_losses[aa_id.lower()] = (aa_mono, aa_avg)
+
+    return aa_losses
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('Predict AA specificity for gbk file')

@@ -615,21 +615,3 @@ def make_families(spectra):
 
     logger.debug('make_families: {} molams + {} singletons'.format(fams, singles))
     return families
-
-def read_aa_losses(filename):
-    """
-    Read AA losses from data file. (assume fixed structure...)
-    """
-    aa_losses = {}
-    with open(filename, 'r') as f:
-        reader = csv.reader(f, delimiter=',')
-        next(reader) # skip headers
-        for line in reader:
-            if len(line) == 0:
-                continue
-            aa_id = line[1]
-            aa_mono = float(line[4])
-            aa_avg = float(line[5])
-            aa_losses[aa_id.lower()] = (aa_mono, aa_avg)
-
-    return aa_losses
