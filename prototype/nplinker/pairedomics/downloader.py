@@ -78,6 +78,10 @@ class Downloader(object):
         self.project_file_cache = os.path.join(self.local_file_cache, self.gnps_massive_id)
         os.makedirs(self.project_file_cache, exist_ok=True)
 
+        # placeholder directories
+        for d in ['antismash', 'bigscape']:
+            os.makedirs(os.path.join(self.project_file_cache, d), exist_ok=True)
+
         with open(os.path.join(self.project_file_cache, 'platform_data.json'), 'w') as f:
             f.write(str(self.project_json))
 
