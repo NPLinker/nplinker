@@ -95,7 +95,12 @@ class NPLinker(object):
         logfile = self._config.config['logfile']
         if len(logfile) > 0:
             logfile_dest = logging.FileHandler(logfile)
-            LogConfig.setLogDestination(logfile_dest)
+            # if we want to log to stdout plus logfile, add the new destination
+            if self._config.config.get('log_to_stdout', True): # default to True
+                LogConfig.addLogDestination(logfile_dest)
+            else:
+                # otherwise overwrite the default stdout destination
+                LogConfig.setLogDestination(logfile_dest)
 
         # this object takes care of figuring out the locations of all the relevant files/folders
         # and will show error/warning if any missing (depends if optional or not)
