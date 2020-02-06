@@ -115,7 +115,6 @@ class NPLinker(object):
         self._datalinks = None
         self._linkfinder = None
 
-        self._random_scores = {}
         self._links = {}
 
         self._repro_data = {}
@@ -522,70 +521,6 @@ class NPLinker(object):
 
         return list(scores_found)
 
-    def _get_links_percentile(self, input_type, objects, results, scoring_method_name, sig_percentile):
-        # self._random_scores contains the randomised and stacked scores for each given type of 
-        # object, so pull those out and apply np.percentile with the given threshold to the correct 
-        # matrices here. the results object from get_links will contain *ALL* potential candiate
-        # links at this stage - e.g. for a Spectrum input, it will return all GCFs
-
-        # retrieve the IDS for all the supplied objects
-        obj_ids = [obj.id for obj in objects]
-
-        if input_type == GCF:
-            # 2-element list returned with spec-gcf, fam-gcf results
-            results_spec, results_fam = results
-
-            # lookup the appropriate random scores
-            rand_spec_scores = self._random_scores[scoring_method_name][input_type][Spectrum]
-            rand_fam_scores = self._random_scores[scoring_method_name][input_type][MolecularFamily]
-
-            # calculate the threshold values for each input object
-            spec_perc_thresholds = [np.percentile(rand_spec_scores[:, id], sig_percentile) for id in obj_ids]
-            fam_perc_thresholds = [np.percentile(rand_fam_scores[:, id], sig_percentile) for id in obj_ids]
-
-            perc_results = [np.zeros((3, 0)), np.zeros((3, 0))]
-
-            data = [(results_spec, spec_perc_thresholds, len(self._spectra))]
-            data.append((results_fam, fam_perc_thresholds, len(self._families)))
-
-            for d, (full_results, thresholds, num_objs) in enumerate(data):
-                for i in range(len(objects)):
-                    # want to get the indices of full_results where a) the source ID matches the
-                    # current object and b) the score exceeds the threshold for that object
-                    obj_indices = np.intersect1d(np.where(full_results[NPLinker.R_SCORE, :] >= thresholds[i]),
-                                                 np.where(full_results[NPLinker.R_SRC_ID, :] == objects[i].id))
-
-                    # concat the selected columns to the final result
-                    perc_results[d] = np.c_[perc_results[d], full_results[:, obj_indices]]
-
-            return [perc_results[0], perc_results[1]]
-
-        elif input_type == Spectrum or input_type == MolecularFamily:
-            # here results will be a list which in turn contains a single array, so just extract that
-            results = results[0]
-
-            # lookup the appropriate random scores
-            rand_scores = self._random_scores[scoring_method_name][input_type]
-
-            # calculate the threshold values for each input object
-            perc_thresholds = [np.percentile(rand_scores[id, :], sig_percentile) for id in obj_ids]
-
-            perc_results = np.zeros((3, 0))
-
-            for i in range(len(objects)):
-                # want to get the indices of full_results where a) the source ID matches the
-                # current object and b) the score exceeds the threshold for that object
-                obj_indices = np.intersect1d(np.where(results[NPLinker.R_SCORE, :] >= perc_thresholds[i]),
-                                             np.where(results[NPLinker.R_SRC_ID, :] == obj_ids[i]))
-
-                # build up a new matrix containing only the sufficiently high scoring columns
-                perc_results = np.c_[perc_results, results[:, obj_indices]]
-
-            return [perc_results]
-
-        logger.error('Bad input type in _get_links_percentile?? ({})'.format(input_type))
-        return None
-
     def get_common_strains(self, objects_a, objects_b, filter_no_shared=True):
         # this is a dict with structure:
         #   (Spectrum/MolecularFamily, GCF) => list of strain indices
@@ -713,9 +648,6 @@ if __name__ == "__main__":
 
     # pick a GCF to get links for
     test_gcf = npl.gcfs[8]
-
-    # set metcalf scoring significance percentile to 99%
-    npl.scoring.metcalf.sig_percentile = 99
 
     # call get_links and set the scoring method to metcalf by referencing the 
     # scoring.metcalf object
