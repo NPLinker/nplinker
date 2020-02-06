@@ -4,7 +4,11 @@
 # general options
 # log level (DEBUG/INFO/WARNING/ERROR)
 loglevel = "INFO"
+# if you want to redirect log messages from stdout to a file, set a valid path here
 logfile = ""
+# and if you still want to see log messages on stdout in addition to writing to
+# the logfile, set this to true
+log_to_stdout = true
 repro_file = ""
 
 # Dataset configuration
