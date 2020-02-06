@@ -379,9 +379,9 @@ class Downloader(object):
             accession = rec['genome_ID']['RefSeq_accession']
             accession = accession[:accession.rindex('.')]
             if label in temp:
-                temp[label].add_alias(accession)
+                temp[label].append(accession)
             else:
-                temp[label] = Strain(label)
+                temp[label] = [accession]
                 gc += 1
 
         logger.info('Extracted {} strains from JSON (met={}, gen={})'.format(len(temp), mc, gc))
