@@ -338,11 +338,29 @@ class Downloader(object):
         temp = {}
         mc, gc = 0, 0
 
+        # this method is supposed to extract the fields from the JSON data 
+        # which map strain names to mzXML files on the metabolomics side, 
+        # and to BGCs on the genomics side, and use that data to build a set
+        # of NPLinker Strain objects for the current dataset
+
+        # metabolomics: each of the JSON records should contain a field named
+        # "genome_label", which is the one that should be used as the canonical
+        # name for this strain by nplinker. Another field is called "metabolomics_file",
+        # and this contains a URL to the corresponding mzXML file. so we want to
+        # create a set of mappings from one to the other, with the complication that
+        # there might be mappings from 2 or more mzXMLs to a single strain. 
+        # also should record the growth medium using the "sample_preparation_label" field. 
         for rec in met_records:
+            # this is the global strain identifier we should use
             label = rec['genome_label']
+            # only want to record the actual filename of the mzXML URL
             filename = os.path.split(rec['metabolomics_file'])[1]
-            temp[label] = Strain(label)
-            temp[label].add_alias(filename)
+
+            # add the mzXML mapping for this strain
+            if label in temp:
+                temp[label].append(filename)
+            else:
+                temp[label] = [filename]
             mc += 1
 
             if label in self.growth_media:
@@ -357,6 +375,7 @@ class Downloader(object):
             if not 'RefSeq_accession' in rec['genome_ID']:
                 logger.warning('Failed to extract genome label')
                 continue
+
             accession = rec['genome_ID']['RefSeq_accession']
             accession = accession[:accession.rindex('.')]
             if label in temp:
@@ -366,7 +385,10 @@ class Downloader(object):
                 gc += 1
 
         logger.info('Extracted {} strains from JSON (met={}, gen={})'.format(len(temp), mc, gc))
-        for strain in temp.values():
+        for strain_label, strain_aliases in temp.items():
+            strain = Strain(strain_label)
+            for alias in strain_aliases:
+                strain.add_alias(alias)
             self.strains.add(strain)
 
     def _download_metabolomics_zipfile(self, gnps_task_id):
