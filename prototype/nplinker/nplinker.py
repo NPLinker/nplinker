@@ -111,7 +111,7 @@ class NPLinker(object):
         self._gcfs = []
         self._strains = None
         self._metadata = {}
-        self._families = []
+        self._molfams = []
         self._mibig_bgc_dict = {}
 
         self._bgc_lookup = {}
@@ -407,17 +407,24 @@ class NPLinker(object):
                 # dst obj ID, and (3, :) gives scores
                 # for GCFs you get [spec, molfam] with above substructure
 
+                # NOTE: need to use sets here because if the "else" cases are executed 
+                # can get lots of duplicate object IDs which messes everything up
 
-                # NOTE: need to use sets here because if the "else" cases are executed can get lots of duplicate
-                # object IDs which messes everything up
+                spectra_input = (input_type == Spectrum)
 
                 # make type1_objects always == spectra. if input is spectra, just use "objects",
                 # otherwise build a list using the object IDs in the results array
-                type1_objects = objects if input_type == Spectrum else {self.spectra[int(index)] for index in results[0][self.R_DST_ID]}
+                type1_objects = objects if spectra_input else {self.spectra[int(index)] for index in results[0][self.R_DST_ID]}
 
                 # other objs should be "objects" if input is GCF, otherwise create 
                 # from the results array as above
-                other_objs = objects if input_type == GCF else {self._gcfs[int(index)] for index in results[0][self.R_DST_ID]}
+                other_objs = objects if not spectra_input else {self._gcfs[int(index)] for index in results[0][self.R_DST_ID]}
+
+                # build a lookup table for pairs of object IDs and their index in the results array
+                if spectra_input:
+                    pairs_lookup = {(results[0][self.R_SRC_ID][i], results[0][self.R_DST_ID][i]): i for i in range(len(results[0][self.R_SRC_ID]))}
+                else:
+                    pairs_lookup = {(results[0][self.R_DST_ID][i], results[0][self.R_SRC_ID][i]): i for i in range(len(results[0][self.R_SRC_ID]))}
 
                 # apply score update to each spec:gcf pairing and update the corresponding entry in results
                 # (the metcalf_expected and metcalf_variance matrices should have been calculated already)
@@ -434,12 +441,15 @@ class NPLinker(object):
                         expected = self._linkfinder.metcalf_expected[met_strains][gen_strains]
                         variance_sqrt = self._linkfinder.metcalf_variance_sqrt[met_strains][gen_strains]
 
-                        k = i if input_type == GCF else j
-                        
+                        # now need to extract the original score for this particular pair of objects. 
+                        # this requires figuring out the correct index into the results array for the pair,
+                        # using the lookup table constructed above
+                        k = pairs_lookup[(type1_obj.id, other_obj.id)]
+
                         # calculate the final score based on the basic Metcalf score for these two
                         # particular objects
                         final_score = (results[0][self.R_SCORE][k] - expected) / variance_sqrt
-                        
+
                         # finally apply the scoring cutoff and store the result
                         if scoring_method.cutoff is None or (final_score >= scoring_method.cutoff):
                             new_src.append(results[0][self.R_SRC_ID][k])
@@ -448,6 +458,7 @@ class NPLinker(object):
                     
                 # overwrite original "results" with equivalent new data structure
                 results = [np.array([new_src, new_dst, new_res])]
+
                 if input_type == GCF:
                     # TODO molfam...
                     results.append(np.zeros((3, 0)))
@@ -462,68 +473,56 @@ class NPLinker(object):
         scores_found = set()
 
         if input_type == GCF:
-            logger.debug('get_links: result type is GCF, inputs={}, results={}'.format(len(objects), len(results)))
+            logger.debug('get_links: result type is GCF, inputs={}, results={}'.format(len(objects), results[0].shape))
             # for GCF input, results contains two arrays of shape (3, x), 
             # which contain spec-gcf and fam-gcf links respectively 
             result_gcf_spec, result_gcf_fam = results[0], results[1]
 
             for res, type_ in [(result_gcf_spec, Spectrum), (result_gcf_fam, MolecularFamily)]:
                 if res.shape[1] == 0:
-                    logger.debug('Found no links for {} GCFs of type {}'.format(len(objects), type_))
+                    logger.debug('Found no links for {} input objects'.format(len(objects)))
                     continue # no results
-
-
-                # TODO: self._families is never populated atm, so this breaks with MolecularFamily results!
-                if type_ == MolecularFamily:
-                    logger.warning('FIXME: MolecularFamily support')
-                    continue
-                logger.debug('Found {} links for {} GCFs of type {}'.format(res.shape[1], len(objects), type_))
-
-                lookup = {gcf.id: objects.index(gcf) for gcf in objects}
 
                 # for each entry in the results (each Spectrum or MolecularFamily)
                 for j in range(res.shape[1]):
                     # extract the ID of the object and get the object itself
-                    obj_id = int(res[NPLinker.R_DST_ID, j])
-                    obj = self._spectra[obj_id] if type_ == Spectrum else self._families[obj_id]
+                    obj_id = int(res[self.R_DST_ID, j])
+                    obj = self._spectra[obj_id] if type_ == Spectrum else self._molfams[obj_id]
 
-                    # retrieve the GCF object too
-                    index = lookup[res[NPLinker.R_SRC_ID, j]]
-                    gcf = objects[index]
+                    # retrieve the GCF object too (can use its internal ID to index
+                    # directly into the .gcfs list)
+                    gcf = self._gcfs[int(res[self.R_SRC_ID][j])]
 
                     # finally, create the entry in self._links and record that this GCF
                     # has at least one link associated with it
-                    self._store_object_links(gcf, obj, res[NPLinker.R_SCORE, j], scoring_method)
+                    self._store_object_links(gcf, obj, res[self.R_SCORE, j], scoring_method)
                     scores_found.add(gcf)
 
         else:
-            logger.debug('get_links: result type is Spectrum/MolFam, inputs={}, results={}'.format(len(objects), len(results)))
+            logger.debug('get_links: result type is Spectrum/MolFam, inputs={}, results={}'.format(len(objects), results[0].shape))
             # for non-GCF input, result is a list containing a single array, shape (3, x)
             # where x is the total number of links found
             results = results[0]
             if results.shape[1] == 0:
-                logger.debug('Found no links for {}'.format(objects))
+                logger.debug('Found no links for {} input objects'.format(len(objects)))
                 return []
-
-            logger.debug('Found {} links for {} Spectra/MolFams'.format(results.shape[1], len(objects)))
-
-            lookup = {obj.id: objects.index(obj) for obj in objects}
 
             # for each entry in the results (each GCF)
             for j in range(results.shape[1]):
-                # extract the ID of the GCF and use that to get the object
-                gcf_id = int(results[NPLinker.R_DST_ID, j])
-                gcf = self._gcfs[gcf_id]
+                # extract the ID of the GCF and use that to get the object itself
+                gcf = self._gcfs[int(results[self.R_DST_ID, j])]
 
-                # retrieve the source object similarly
-                index = lookup[results[NPLinker.R_SRC_ID, j]]
-                obj = objects[index]
+                # retrieve the Spec/MolFam object too (can use its internal ID to index
+                # directly into the appropriate list)
+                obj_id = int(results[self.R_DST_ID, j])
+                obj = self._spectra[obj_id] if input_type == Spectrum else self._molfams[obj_id]
 
                 # finally, create the entry in self._links and record that this Spectrum or
                 # MolecularFamily has at least one link associated with it
-                self._store_object_links(obj, gcf, results[NPLinker.R_SCORE, j], scoring_method)
+                self._store_object_links(obj, gcf, results[self.R_SCORE, j], scoring_method)
                 scores_found.add(obj)
 
+        logger.debug('get_links: {}/{} input objects have links'.format(len(scores_found), len(objects)))
         return list(scores_found)
 
     def get_common_strains(self, objects_a, objects_b, filter_no_shared=True):
