@@ -6,10 +6,18 @@ class LogConfig(object):
     active_loggers = {}
     logfmt = '%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d, %(message)s'
     default_loglevel = logging.INFO
+    # default destination for new Loggers
     default_logdest = logging.StreamHandler(sys.stdout)
+    # additional destinations to be added to new Loggers
+    additional_logdests = []
 
     @staticmethod
     def getLogger(obj, level=default_loglevel, dest=default_logdest):
+        """Return a logging.Logger associated with the object <obj>.
+
+        The Logger's level and dest values will be set to the corresponding
+        parameters passed to this method.
+        """
         if obj in LogConfig.active_loggers:
             return LogConfig.active_loggers[obj]
 
@@ -22,12 +30,18 @@ class LogConfig(object):
 
     @staticmethod
     def setLogLevel(level):
+        """Apply a new log level value to all loggers created by getLogger"""
         LogConfig.default_loglevel = level
         for logger in LogConfig.active_loggers.values():
             logger.setLevel(level)
 
     @staticmethod
     def setLogLevelStr(level):
+        """Apply a new log level value to all loggers created by getLogger
+
+        Identical to setLogLevel but parameter is a string instead of a
+        constant from the logging module (e.g. "INFO", "DEBUG")
+        """
         if not hasattr(logging, level):
             raise Exception('Unknown/invalid loglevel "{}"'.format(level))
 
@@ -36,9 +50,15 @@ class LogConfig(object):
     @staticmethod
     def setLogDestination(dest):
         LogConfig.default_logdest = dest
-        if isinstance(dest, str):
-            dest = logging.FileHandler(dest)
+        LogConfig.additional_logdests = []
         dest.setFormatter(logging.Formatter(LogConfig.logfmt))
         for logger in LogConfig.active_loggers.values():
             logger.handlers = []
+            logger.addHandler(dest)
+
+    @staticmethod
+    def addLogDestination(dest):
+        LogConfig.additional_logdests.append(dest)
+        dest.setFormatter(logging.Formatter(LogConfig.logfmt))
+        for logger in LogConfig.active_loggers.values():
             logger.addHandler(dest)

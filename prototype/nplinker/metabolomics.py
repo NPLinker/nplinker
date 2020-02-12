@@ -600,6 +600,9 @@ def load_clusterinfo_fbmn(strains, nodes_file, extra_nodes_file, md_table_file, 
             # if the value is a "0", ignore immediately
             if v == "0":
                 continue
+
+            # TODO this will probably need updating for platform data (should already
+            # have a set of strain names...)
             (strain_name, growth_medium) = parse_mzxml_header(k, strains, md_table)
             if strain_name is None:
                 continue 

@@ -25,15 +25,14 @@ class Args(object):
         self.parser.add_argument('-p', '--dataset.platform_id', help='A paired omics platform project ID to load', metavar='platform_id')
         self.parser.add_argument('-l', '--loglevel', help='Logging verbosity level: DEBUG, INFO, WARNING, ERROR', metavar='loglevel')
         self.parser.add_argument('-f', '--logfile', help='Redirect logging from stdout to this file', metavar='logfile')
+        self.parser.add_argument('-s', '--log_to_stdout', help='keep logging to stdout even if --logfile used', metavar='log_to_stdout')
 
         self.parser.add_argument('--antismash-format', help='Antismash file format ("default" or "flat"!', metavar='format')
         self.parser.add_argument('--bigscape-cutoff', help='BIGSCAPE clustering cutoff threshold', metavar='cutoff')
         self.parser.add_argument('--repro-file', help='Filename to store reproducibility data in', metavar='filename')
 
-        self.parser.add_argument('-r', '--scoring.random', help='Number of randomized instances to create during scoring', metavar='num')
         # TODO better just leaving these in config file?
         self.parser.add_argument('--scoring.metcalf.enabled', type=bool_checker, help='Metcalf scoring enabled/disabled', metavar='true|false')
-        self.parser.add_argument('--scoring.metcalf.sig_percentile', type=int, help='Metcalf scoring percentile threshold value (0-100)', metavar='val')
         self.parser.add_argument('--scoring.hg.enabled', type=bool_checker, help='Hypergeometric scoring enabled/disabled', metavar='true|false')
 
         self.parser.add_argument('--scoring.hg.prob', type=float, help='Hypergeometric scoring threshold (0-1.0)', metavar='val')
