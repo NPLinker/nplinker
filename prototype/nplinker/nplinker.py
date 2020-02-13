@@ -473,7 +473,7 @@ class NPLinker(object):
         scores_found = set()
 
         if input_type == GCF:
-            logger.debug('get_links: result type is GCF, inputs={}, results={}'.format(len(objects), results[0].shape))
+            logger.debug('get_links: input_type=GCF, result_type=Spec/MolFam, inputs={}, results={}'.format(len(objects), results[0].shape))
             # for GCF input, results contains two arrays of shape (3, x), 
             # which contain spec-gcf and fam-gcf links respectively 
             result_gcf_spec, result_gcf_fam = results[0], results[1]
@@ -499,10 +499,11 @@ class NPLinker(object):
                     scores_found.add(gcf)
 
         else:
-            logger.debug('get_links: result type is Spectrum/MolFam, inputs={}, results={}'.format(len(objects), results[0].shape))
+            logger.debug('get_links: input_type=Spec/MolFam, result_type=GCF, inputs={}, results={}'.format(len(objects), results[0].shape))
             # for non-GCF input, result is a list containing a single array, shape (3, x)
             # where x is the total number of links found
             results = results[0]
+            print(results)
             if results.shape[1] == 0:
                 logger.debug('Found no links for {} input objects'.format(len(objects)))
                 return []
@@ -514,7 +515,7 @@ class NPLinker(object):
 
                 # retrieve the Spec/MolFam object too (can use its internal ID to index
                 # directly into the appropriate list)
-                obj_id = int(results[self.R_DST_ID, j])
+                obj_id = int(results[self.R_SRC_ID, j])
                 obj = self._spectra[obj_id] if input_type == Spectrum else self._molfams[obj_id]
 
                 # finally, create the entry in self._links and record that this Spectrum or
