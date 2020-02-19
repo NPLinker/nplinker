@@ -54,14 +54,18 @@ class Spectrum(object):
         self._losses = None
         self._jcamp = None
 
-
     def add_strain(self, strain, growth_medium, peak_intensity):
-        if strain in self.strains and growth_medium in self.strains[strain]:
-            raise Exception('Clash: {} / {} {}'.format(self, strain, growth_medium))
-        
         if strain not in self.strains:
             self.strains[strain] = {}
 
+        # TODO temp workaround for crusemann issues
+        if growth_medium is None:
+            self.strains[strain].update({'unknown_medium_{}'.format(len(self.strains[strain])): peak_intensity})
+            return
+
+        if strain in self.strains and growth_medium in self.strains[strain]:
+            raise Exception('Clash: {} / {} {}'.format(self, strain, growth_medium))
+        
         self.strains[strain].update({growth_medium: peak_intensity})
         
     @property
@@ -529,9 +533,9 @@ def load_clusterinfo_old(gnps_format, strains, filename, spec_dict):
                 # else:
                 #     print('{} ===> {}'.format(mzxml, strain))
 
-                # TODO growth_medium stuff a bit messy
-                # if strain is not None:
-                #     spec_dict[clu_index].add_strain(strain, list(growth_media[strain.id])[0], 1)
+                if strain is not None:
+                    # TODO this need fixed somehow (missing growth medium info)
+                    spec_dict[clu_index].add_strain(strain, None, 1)
                 
                 # update metadata on Spectrum object
                 spec_dict[clu_index].metadata.update(metadata)
