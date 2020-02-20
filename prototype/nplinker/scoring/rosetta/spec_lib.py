@@ -1,7 +1,8 @@
 from sortedcontainers import SortedList
 
 from .rosetta_functions import fast_cosine, fast_cosine_shift
-from ...metabolomics import load_spectra
+from ...parsers.mgf import LoadMGF
+from ...metabolomics import mols_to_spectra
 
 from ...logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
@@ -12,11 +13,9 @@ class SpecLib(object):
         self.spectra = []
 
     def _load_mgf(self):
-        self.spectra = load_spectra(self.mgf_file)
+        ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([self.mgf_file])
+        self.spectra = mols_to_spectra(ms2, metadata)
         self.sort()
-        # self.spectra = load_mgf(self.mgf_file, id_field=id_field)
-        # for k,v in self.spectra.items():
-        #     v.spectrum_id = k
 
     def sort(self):
         # make a sorted list for quick precursor matching
