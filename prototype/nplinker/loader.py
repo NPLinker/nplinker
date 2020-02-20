@@ -3,17 +3,16 @@ import glob
 import time
 import xml.etree.ElementTree as ET
 
-from .metabolomics import load_spectra
-from .metabolomics import load_edges
-from .metabolomics import load_metadata
-from .metabolomics import make_families
+from .metabolomics import load_dataset
 
 from .genomics import loadBGC_from_cluster_files
 from .genomics import make_mibig_bgc_dict
 
 from .annotations import load_annotations
 
-from .strains import StrainCollection
+from .strains import StrainCollection, Strain
+
+from .pairedomics.downloader import Downloader
 
 from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
@@ -29,6 +28,22 @@ def find_via_glob(path, file_type, optional=False):
 
         logger.warn('WARNING: unable to find {} in path "{}"'.format(file_type, path))
         return None
+
+def find_via_glob_alts(paths, file_type, optional=False):
+    filename = None
+    for path in paths:
+        try:
+            filename = glob.glob(path)[0]
+            break
+        except (OSError, IndexError) as e:
+            continue
+
+    if filename is None and not optional:
+        raise Exception('ERROR: unable to find {} in {} paths: ({})'.format(file_type, len(paths), paths))
+    elif filename is None:
+        logger.warning('WARNING: unable to find {} in {} paths: ({})'.format(file_type, len(paths), paths))
+
+    return filename
 
 class DatasetLoader(object):
 
@@ -65,54 +80,84 @@ class DatasetLoader(object):
         self._antismash_format = self._dataset.get('antismash_format', self.ANTISMASH_FMT_DEFAULT)
         self._bigscape_cutoff = self._dataset.get('bigscape_cutoff', self.BIGSCAPE_CUTOFF_DEFAULT)
         self._root = self._config['dataset']['root']
+        self._platform_id = self._config['dataset']['platform_id']
+        self._remote_loading = len(self._platform_id) > 0
         self.datadir = os.path.join(os.path.dirname(__file__), 'data')
-        self.dataset_id = os.path.split(self._root)[-1]
-        logger.debug('DatasetLoader({})'.format(self._root))
+        self.dataset_id = os.path.split(self._root)[-1] if not self._remote_loading else self._platform_id
+        if self._remote_loading:
+            self._downloader = Downloader(self._platform_id)
+        else:
+            self._downloader = None
+        self.bgcs, self.gcfs, self.spectra, self.molfams = [], [], [], []
+        self.mibig_bgc_dict = {}
+        self.product_types = []
+        logger.debug('DatasetLoader({}, {}, {})'.format(self._root, self._platform_id, self._remote_loading))
 
+    def validate(self):
         # check antismash format is recognised
         if self._antismash_format not in self.ANTISMASH_FMTS:
             raise Exception('Unknown antismash format: {}'.format(self._antismash_format))
+
+        # if remote loading mode, need to download the data here
+        if self._remote_loading:
+            self._root = self._downloader.project_file_cache
+            logger.debug('remote loading mode, configuring root={}'.format(self._root))
+            self._downloader.get()
 
         # construct the paths and filenames required to load everything else and check 
         # they all seem to exist (but don't parse anything yet)
 
         # 1. strain mapping are used for everything else so
-        self.strain_mappings_file = self._overrides.get(self.OR_STRAINS, os.path.join(self._root, 'strain_mappings.csv'))
+        self.strain_mappings_file = self._overrides.get(self.OR_STRAINS) or os.path.join(self._root, 'strain_mappings.csv')
         
-        # 2. MET: <root>/clusterinfo_summary/<some UID>.tsv / nodes_file=<override>
-        self.nodes_file = self._overrides.get(self.OR_NODES, find_via_glob(os.path.join(self._root, 'clusterinfo_summary', '*.tsv'), self.OR_NODES))
+        # 2. MET: <root>/clusterinfo_summary/<some UID>.tsv (or .clustersummary apparently...) / nodes_file=<override>
+        self.nodes_file = self._overrides.get(self.OR_NODES) or find_via_glob_alts([os.path.join(self._root, 'clusterinfo*', '*.tsv'),
+                                                                                    os.path.join(self._root, 'clusterinfo*', '*.clustersummary')],
+                                                                                   self.OR_NODES)
+        #find_via_glob(os.path.join(self._root, 'clusterinfo*', '*.tsv'), self.OR_NODES)
 
-        # 3. MET: <root>/networkedges_selfloop/<some UID>.tsv / edges_file=<override>
-        self.edges_file = self._overrides.get(self.OR_EDGES, find_via_glob(os.path.join(self._root, 'networkedges_selfloop', '*.selfloop'), self.OR_EDGES))
+        # 3. MET: <root>/networkedges_selfloop/<some UID>.selfloop (new) or .pairsinfo (old) / edges_file=<override>
+        self.edges_file = self._overrides.get(self.OR_EDGES) or find_via_glob_alts([os.path.join(self._root, 'networkedges_selfloop', '*.pairsinfo'),
+                                                                                    os.path.join(self._root, 'networkedges_selfloop', '*.selfloop')],
+                                                                                    self.OR_EDGES)
 
         # 4. MET: <root>/*.csv / extra_nodes_file=<override>
         # TODO is the glob input OK? 
         # => wait for updated dataset with latest output format
         # NOTE: only optional for Crusemann or Crusemann-like dataset format!
-        self.extra_nodes_file = self._overrides.get(self.OR_EXTRA_NODES, find_via_glob(os.path.join(self._root, 'quantification_table_reformatted', '*.csv'), self.OR_EXTRA_NODES, optional=True))
+        self.extra_nodes_file = self._overrides.get(self.OR_EXTRA_NODES) or find_via_glob(os.path.join(self._root, 'quantification_table_reformatted', '*.csv'), self.OR_EXTRA_NODES, optional=True)
 
         # 5. MET: <root>/spectra/specs_ms.mgf / mgf_file=<override>
-        self.mgf_file = self._overrides.get(self.OR_MGF, os.path.join(self._root, 'spectra', 'specs_ms.mgf'))
+        self.mgf_file = self._overrides.get(self.OR_MGF) or find_via_glob(os.path.join(self._root, 'spectra', '*.mgf'), self.OR_MGF)
 
         # 6. MET: <root>/metadata_table/metadata_table-<number>.txt / metadata_table_file=<override>
-        self.metadata_table_file = self._overrides.get(self.OR_METADATA, find_via_glob(os.path.join(self._root, 'metadata_table', 'metadata_table*.txt'), self.OR_METADATA, optional=True))
+        self.metadata_table_file = self._overrides.get(self.OR_METADATA) or find_via_glob(os.path.join(self._root, 'metadata_table', 'metadata_table*.txt'), self.OR_METADATA, optional=True)
 
         # 7. MET: <root>/quantification_table/quantification_table-<number>.csv / quantification_table_file=<override>
-        self.quantification_table_file = self._overrides.get(self.OR_QUANT, find_via_glob(os.path.join(self._root, 'quantification_table', 'quantification_table*.csv'), self.OR_QUANT, optional=True))
+        self.quantification_table_file = self._overrides.get(self.OR_QUANT) or find_via_glob(os.path.join(self._root, 'quantification_table', 'quantification_table*.csv'), self.OR_QUANT, optional=True)
 
         # 8. MET: <root>/DB_result/*.tsv / annotations_dir=<override>
-        self.annotations_dir = self._overrides.get(self.OR_ANNO, os.path.join(self._root, 'DB_result'))
-        self.annotations_config_file = self._overrides.get(self.OR_ANNO_CONFIG, os.path.join(self._root, 'DB_result', 'annotations.tsv'))
+        self.annotations_dir = self._overrides.get(self.OR_ANNO) or os.path.join(self._root, 'DB_result')
+        self.annotations_config_file = self._overrides.get(self.OR_ANNO_CONFIG) or os.path.join(self._root, 'DB_result', 'annotations.tsv')
         
         # 9. GEN: <root>/antismash / antismash_dir=<override>
-        self.antismash_dir = self._overrides.get(self.OR_ANTISMASH, os.path.join(self._root, 'antismash'))
+        self.antismash_dir = self._overrides.get(self.OR_ANTISMASH) or os.path.join(self._root, 'antismash')
         self.antismash_cache = {}
 
         # 10. GEN: <root>/bigscape / bigscape_dir=<override>
-        self.bigscape_dir = self._overrides.get(self.OR_BIGSCAPE, os.path.join(self._root, 'bigscape'))
+        self.bigscape_dir = self._overrides.get(self.OR_BIGSCAPE) or os.path.join(self._root, 'bigscape')
+        # what we really want here is the subdirectory containing the network/annotation fiies, 
+        # but in case this is the path to the top level bigscape output, try to figure it out automatically
+        if not os.path.exists(os.path.join(self.bigscape_dir, 'NRPS')):
+            logger.info('Trying to discover correct bigscape directory under {}'.format(self.bigscape_dir))
+            for root, dirs, files in os.walk(self.bigscape_dir):
+                if 'Network_Annotations_Full.tsv' in files:
+                    logger.info('Found network files directory: {}'.format(root))
+                    self.bigscape_dir = root
+                    break
 
         # 11. GEN: <root>/mibig_json / mibig_json_dir=<override>
-        self.mibig_json_dir = self._overrides.get(self.OR_MIBIG_JSON, os.path.join(self._root, 'mibig_json'))
+        self.mibig_json_dir = self._overrides.get(self.OR_MIBIG_JSON) or os.path.join(self._root, 'mibig_json')
 
         # 12. MISC: <root>/params.xml
         self.params_file = os.path.join(self._root, 'params.xml')
@@ -128,7 +173,7 @@ class DatasetLoader(object):
             if not os.path.exists(f):
                 logger.warning('Optional file/directory "{}" does not exist or is not readable!'.format(f))
 
-    def load(self):
+    def load(self, met_only=False):
         # load strain mappings first
         if not self._load_strain_mappings():
             return False
@@ -136,13 +181,14 @@ class DatasetLoader(object):
         if not self._load_metabolomics():
             return False
 
-        if not self._load_genomics():
+        if not met_only and not self._load_genomics():
             return False
 
         self._load_optional()
 
         # Restrict strain list to only relevant strains
-        self._filter_strains()
+        if not met_only:
+            self._filter_strains()
 
         return True
 
@@ -271,23 +317,11 @@ class DatasetLoader(object):
         return True
 
     def _load_metabolomics(self):
-        logger.debug('load_spectra({})'.format(self.mgf_file))
-        self.spectra = load_spectra(self.mgf_file)
-
-        spec_dict = {spec.spectrum_id : spec for spec in self.spectra}
-
-        logger.debug('load_edges({})'.format(self.edges_file))
-        self.spectra = load_edges(self.edges_file, self.spectra, spec_dict)
-
-        logger.debug('load_metadata({})'.format(self.nodes_file))
-        self.spectra = load_metadata(self.strains, self.nodes_file, self.extra_nodes_file, self.metadata_table_file, self.spectra, spec_dict)
+        spec_dict, self.spectra, self.molfams = load_dataset(self.strains, self.mgf_file, self.edges_file, self.nodes_file, self.quantification_table_file, self.metadata_table_file)
 
         # load any available annotations from GNPS or user-provided files
         logger.info('Loading provided annotation files ({})'.format(self.annotations_dir))
         self.spectra = load_annotations(self.annotations_dir, self.annotations_config_file, self.spectra, spec_dict)
-
-        self.molfams = make_families(self.spectra)
-        logger.debug('make_families generated {} molfams'.format(len(self.molfams)))
         return True
 
     def _load_strain_mappings(self):
@@ -299,7 +333,7 @@ class DatasetLoader(object):
         self.strains = StrainCollection()
 
         global_strain_id_file = os.path.join(self.datadir, 'strain_id_mapping.csv')
-        self.strains.add_from_file(global_strain_id_file)
+        # self.strains.add_from_file(global_strain_id_file)
         logger.info('Loaded global strain IDs ({} total)'.format(len(self.strains)))
 
         # now load the dataset mapping in the same way

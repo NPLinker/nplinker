@@ -513,6 +513,8 @@ class LinkFinder(object):
                         expected_sq = 1
                     self.metcalf_variance[n, m] = expected_sq
 
+            self.metcalf_variance_sqrt = np.sqrt(self.metcalf_variance)
+
         # now, we would like an option to take any actual score an subtract the 
         # expected value and then divide by the square root of the variance
         # e.g. if we have a score computed between a type 1 object that has 

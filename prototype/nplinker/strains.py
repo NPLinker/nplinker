@@ -1,3 +1,4 @@
+import os
 import csv
 
 from .logconfig import LogConfig
@@ -85,6 +86,10 @@ class StrainCollection(object):
         return self._lookup[strain_id]
 
     def add_from_file(self, filename):
+        if not os.path.exists(filename):
+            logger.warning('strain mappings file not found: {}'.format(filename))
+            return
+
         with open(filename, 'r') as f:
             reader = csv.reader(f)
             for ids in reader:
@@ -94,6 +99,12 @@ class StrainCollection(object):
                 for id in ids[1:]:
                     strain.add_alias(id)
                 self.add(strain)
+
+    def save_to_file(self, filename):
+        with open(filename, 'w') as f:
+            for strain in self._strains:
+                ids = [strain.id] + list(strain.aliases)
+                f.write(','.join(ids) + '\n')
 
     def __len__(self):
         return len(self._strains)

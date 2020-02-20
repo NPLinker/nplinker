@@ -21,18 +21,18 @@ class Args(object):
         self.parser = argparse.ArgumentParser(description='nplinker arguments', epilog='Note: command-line arguments will override '
                                               'arguments from configuration files')
         self.parser.add_argument('-c', '--config', help='Path to a .toml configuration file', metavar='path')
-        self.parser.add_argument('-d', '--dataset.root', help='Root path for the dataset to be loaded', metavar='path')
+        self.parser.add_argument('-d', '--dataset.root', help='Root path for the dataset to be loaded', metavar='root')
+        self.parser.add_argument('-p', '--dataset.platform_id', help='A paired omics platform project ID to load', metavar='platform_id')
         self.parser.add_argument('-l', '--loglevel', help='Logging verbosity level: DEBUG, INFO, WARNING, ERROR', metavar='loglevel')
         self.parser.add_argument('-f', '--logfile', help='Redirect logging from stdout to this file', metavar='logfile')
+        self.parser.add_argument('-s', '--log_to_stdout', help='keep logging to stdout even if --logfile used', metavar='log_to_stdout')
 
         self.parser.add_argument('--antismash-format', help='Antismash file format ("default" or "flat"!', metavar='format')
         self.parser.add_argument('--bigscape-cutoff', help='BIGSCAPE clustering cutoff threshold', metavar='cutoff')
         self.parser.add_argument('--repro-file', help='Filename to store reproducibility data in', metavar='filename')
 
-        self.parser.add_argument('-r', '--scoring.random', help='Number of randomized instances to create during scoring', metavar='num')
         # TODO better just leaving these in config file?
         self.parser.add_argument('--scoring.metcalf.enabled', type=bool_checker, help='Metcalf scoring enabled/disabled', metavar='true|false')
-        self.parser.add_argument('--scoring.metcalf.sig_percentile', type=int, help='Metcalf scoring percentile threshold value (0-100)', metavar='val')
         self.parser.add_argument('--scoring.hg.enabled', type=bool_checker, help='Hypergeometric scoring enabled/disabled', metavar='true|false')
 
         self.parser.add_argument('--scoring.hg.prob', type=float, help='Hypergeometric scoring threshold (0-1.0)', metavar='val')
@@ -109,13 +109,24 @@ class Config(object):
         if 'dataset' not in config:
             raise Exception('No dataset defined in configuration!')
 
-        if 'dataset.root' in config:
-            root = config['dataset.root']
-            logger.debug('Dataset root is being set to "{}"'.format(root))
-            config['dataset']['root'] = root
-            del config['dataset.root']
+        root = config['dataset']['root']
+        platform_id = config['dataset']['platform_id']
+        # if we've been given a project ID, it always overrides any
+        # provided "root" value. if no ID, must have a valid root directory
+        if platform_id is not None and len(platform_id) > 0:
+            logger.info('Selected platform project ID {}'.format(platform_id))
+        else:
             if root is None or not os.path.exists(root):
                 raise Exception('Dataset path "{}" not found or not accessible'.format(root))
+            logger.info('Loading from local data in directory {}'.format(root))
+
+        # if 'dataset.root' in config:
+        #     root = config['dataset.root']
+        #     logger.debug('Dataset root is being set to "{}"'.format(root))
+        #     config['dataset']['root'] = root
+        #     del config['dataset.root']
+        #     if root is None or not os.path.exists(root):
+        #         raise Exception('Dataset path "{}" not found or not accessible'.format(root))
 
         self.config = config
 

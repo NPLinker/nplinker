@@ -27,7 +27,8 @@ class NPLinker(object):
     # - R_SCORE: the score for the link between a pair of objects
     R_SRC_ID, R_DST_ID, R_SCORE = range(3)
 
-    def __init__(self, userconfig=None):
+    def __init__(self, userconfig=None, platform_id=None):
+        # TODO update docstring
         """Initialise an NPLinker instance, automatically loading a dataset and generating scores.
 
         NPLinker instances can be configured in multiple ways, in ascending order of priority:
@@ -83,6 +84,10 @@ class NPLinker(object):
         elif not isinstance(userconfig, dict):
             raise Exception('Invalid type for userconfig (should be None/str/dict, found "{}")'.format(type(userconfig)))
 
+        if platform_id is not None:
+            logger.debug('Setting project ID to {}'.format(platform_id))
+            userconfig['dataset'] = {'platform_id': platform_id }
+
         self._config = Config(userconfig)
 
         # configure logging based on the supplied config params
@@ -90,7 +95,12 @@ class NPLinker(object):
         logfile = self._config.config['logfile']
         if len(logfile) > 0:
             logfile_dest = logging.FileHandler(logfile)
-            LogConfig.setLogDestination(logfile_dest)
+            # if we want to log to stdout plus logfile, add the new destination
+            if self._config.config.get('log_to_stdout', True): # default to True
+                LogConfig.addLogDestination(logfile_dest)
+            else:
+                # otherwise overwrite the default stdout destination
+                LogConfig.setLogDestination(logfile_dest)
 
         # this object takes care of figuring out the locations of all the relevant files/folders
         # and will show error/warning if any missing (depends if optional or not)
@@ -101,7 +111,7 @@ class NPLinker(object):
         self._gcfs = []
         self._strains = None
         self._metadata = {}
-        self._families = []
+        self._molfams = []
         self._mibig_bgc_dict = {}
 
         self._bgc_lookup = {}
@@ -110,7 +120,6 @@ class NPLinker(object):
         self._datalinks = None
         self._linkfinder = None
 
-        self._random_scores = {}
         self._links = {}
 
         self._repro_data = {}
@@ -158,7 +167,9 @@ class NPLinker(object):
 
     @property
     def dataset_id(self):
-        """Returns dataset "ID", currently just last component of the directory path"""
+        """Returns dataset "ID". For local datasets this will just be the last component
+        of the directory path, but for platform datasets it will be the platform 
+        project ID"""
         return self._loader.dataset_id
 
     @property
@@ -181,7 +192,7 @@ class NPLinker(object):
         """Returns the current BiGSCAPE clustering cutoff value"""
         return self._loader._bigscape_cutoff
 
-    def load_data(self, new_bigscape_cutoff=None):
+    def load_data(self, new_bigscape_cutoff=None, met_only=False):
         """Loads the basic components of a dataset.
 
         This method is responsible for loading the various pieces of the supplied dataset into
@@ -199,7 +210,9 @@ class NPLinker(object):
         # typical case where load_data is being called with no params
         if new_bigscape_cutoff is None:
             logger.debug('load_data (normal case, full load)')
-            if not self._loader.load():
+            self._loader.validate()
+
+            if not self._loader.load(met_only):
                 return False
         else:
             logger.debug('load_data with new cutoff = {}'.format(new_bigscape_cutoff))
@@ -394,30 +407,50 @@ class NPLinker(object):
                 # dst obj ID, and (3, :) gives scores
                 # for GCFs you get [spec, molfam] with above substructure
 
+                # NOTE: need to use sets here because if the "else" cases are executed 
+                # can get lots of duplicate object IDs which messes everything up
+
+                spectra_input = (input_type == Spectrum)
+
                 # make type1_objects always == spectra. if input is spectra, just use "objects",
                 # otherwise build a list using the object IDs in the results array
-                type1_objects = objects if input_type == Spectrum else [self.spectra[int(index)] for index in results[0][self.R_DST_ID]]
+                type1_objects = objects if spectra_input else {self.spectra[int(index)] for index in results[0][self.R_DST_ID]}
 
                 # other objs should be "objects" if input is GCF, otherwise create 
                 # from the results array as above
-                other_objs = objects if input_type == GCF else [self._gcfs[int(index)] for index in results[0][self.R_DST_ID]]
+                other_objs = objects if not spectra_input else {self._gcfs[int(index)] for index in results[0][self.R_DST_ID]}
+
+                # build a lookup table for pairs of object IDs and their index in the results array
+                if spectra_input:
+                    pairs_lookup = {(results[0][self.R_SRC_ID][i], results[0][self.R_DST_ID][i]): i for i in range(len(results[0][self.R_SRC_ID]))}
+                else:
+                    pairs_lookup = {(results[0][self.R_DST_ID][i], results[0][self.R_SRC_ID][i]): i for i in range(len(results[0][self.R_SRC_ID]))}
 
                 # apply score update to each spec:gcf pairing and update the corresponding entry in results
                 # (the metcalf_expected and metcalf_variance matrices should have been calculated already)
                 new_src, new_dst, new_res = [], [], []
 
+                # iterating over spectra
                 for i, type1_obj in enumerate(type1_objects):
                     met_strains = len(type1_obj.dataset_strains)
+                    # iterating over GCFs
                     for j, other_obj in enumerate(other_objs):
                         gen_strains = len(other_obj.dataset_strains) 
-                        expected = self._linkfinder.metcalf_expected[met_strains][gen_strains]
-                        variance = self._linkfinder.metcalf_variance[met_strains][gen_strains]
 
-                        k = i if input_type == GCF else j
-                        
-                        final_score = (results[0][self.R_SCORE][k] - expected) / np.sqrt(variance)
-                        
-                        # apply the scoring cutoff here
+                        # lookup expected + variance values based on strain counts 
+                        expected = self._linkfinder.metcalf_expected[met_strains][gen_strains]
+                        variance_sqrt = self._linkfinder.metcalf_variance_sqrt[met_strains][gen_strains]
+
+                        # now need to extract the original score for this particular pair of objects. 
+                        # this requires figuring out the correct index into the results array for the pair,
+                        # using the lookup table constructed above
+                        k = pairs_lookup[(type1_obj.id, other_obj.id)]
+
+                        # calculate the final score based on the basic Metcalf score for these two
+                        # particular objects
+                        final_score = (results[0][self.R_SCORE][k] - expected) / variance_sqrt
+
+                        # finally apply the scoring cutoff and store the result
                         if scoring_method.cutoff is None or (final_score >= scoring_method.cutoff):
                             new_src.append(results[0][self.R_SRC_ID][k])
                             new_dst.append(results[0][self.R_DST_ID][k])
@@ -425,6 +458,7 @@ class NPLinker(object):
                     
                 # overwrite original "results" with equivalent new data structure
                 results = [np.array([new_src, new_dst, new_res])]
+
                 if input_type == GCF:
                     # TODO molfam...
                     results.append(np.zeros((3, 0)))
@@ -439,133 +473,58 @@ class NPLinker(object):
         scores_found = set()
 
         if input_type == GCF:
-            logger.debug('get_links: result type is GCF, inputs={}, results={}'.format(len(objects), len(results)))
+            logger.debug('get_links: input_type=GCF, result_type=Spec/MolFam, inputs={}, results={}'.format(len(objects), results[0].shape))
             # for GCF input, results contains two arrays of shape (3, x), 
             # which contain spec-gcf and fam-gcf links respectively 
             result_gcf_spec, result_gcf_fam = results[0], results[1]
 
             for res, type_ in [(result_gcf_spec, Spectrum), (result_gcf_fam, MolecularFamily)]:
                 if res.shape[1] == 0:
-                    logger.debug('Found no links for {}, [{}]'.format(objects, type_))
+                    logger.debug('Found no links for {} input objects'.format(len(objects)))
                     continue # no results
-
-
-                # TODO: self._families is never populated atm, so this breaks with MolecularFamily results!
-                if type_ == MolecularFamily:
-                    logger.warning('FIXME: MolecularFamily support')
-                    continue
-                logger.debug('Found {} links for {}, [{}]'.format(res.shape[1], objects, type_))
-
-                lookup = {gcf.id: objects.index(gcf) for gcf in objects}
 
                 # for each entry in the results (each Spectrum or MolecularFamily)
                 for j in range(res.shape[1]):
                     # extract the ID of the object and get the object itself
-                    obj_id = int(res[NPLinker.R_DST_ID, j])
-                    obj = self._spectra[obj_id] if type_ == Spectrum else self._families[obj_id]
+                    obj_id = int(res[self.R_DST_ID, j])
+                    obj = self._spectra[obj_id] if type_ == Spectrum else self._molfams[obj_id]
 
-                    # retrieve the GCF object too
-                    index = lookup[res[NPLinker.R_SRC_ID, j]]
-                    gcf = objects[index]
+                    # retrieve the GCF object too (can use its internal ID to index
+                    # directly into the .gcfs list)
+                    gcf = self._gcfs[int(res[self.R_SRC_ID][j])]
 
                     # finally, create the entry in self._links and record that this GCF
                     # has at least one link associated with it
-                    self._store_object_links(gcf, obj, res[NPLinker.R_SCORE, j], scoring_method)
+                    self._store_object_links(gcf, obj, res[self.R_SCORE, j], scoring_method)
                     scores_found.add(gcf)
 
         else:
-            logger.debug('get_links: result type is Spectrum/MolFam, inputs={}, results={}'.format(len(objects), len(results)))
+            logger.debug('get_links: input_type=Spec/MolFam, result_type=GCF, inputs={}, results={}'.format(len(objects), results[0].shape))
             # for non-GCF input, result is a list containing a single array, shape (3, x)
             # where x is the total number of links found
             results = results[0]
+            print(results)
             if results.shape[1] == 0:
-                logger.debug('Found no links for {}'.format(objects))
+                logger.debug('Found no links for {} input objects'.format(len(objects)))
                 return []
-
-            logger.debug('Found {} links for {}'.format(results.shape[1], objects))
-
-            lookup = {obj.id: objects.index(obj) for obj in objects}
 
             # for each entry in the results (each GCF)
             for j in range(results.shape[1]):
-                # extract the ID of the GCF and use that to get the object
-                gcf_id = int(results[NPLinker.R_DST_ID, j])
-                gcf = self._gcfs[gcf_id]
+                # extract the ID of the GCF and use that to get the object itself
+                gcf = self._gcfs[int(results[self.R_DST_ID, j])]
 
-                # retrieve the source object similarly
-                index = lookup[results[NPLinker.R_SRC_ID, j]]
-                obj = objects[index]
+                # retrieve the Spec/MolFam object too (can use its internal ID to index
+                # directly into the appropriate list)
+                obj_id = int(results[self.R_SRC_ID, j])
+                obj = self._spectra[obj_id] if input_type == Spectrum else self._molfams[obj_id]
 
                 # finally, create the entry in self._links and record that this Spectrum or
                 # MolecularFamily has at least one link associated with it
-                self._store_object_links(obj, gcf, results[NPLinker.R_SCORE, j], scoring_method)
+                self._store_object_links(obj, gcf, results[self.R_SCORE, j], scoring_method)
                 scores_found.add(obj)
 
+        logger.debug('get_links: {}/{} input objects have links'.format(len(scores_found), len(objects)))
         return list(scores_found)
-
-    def _get_links_percentile(self, input_type, objects, results, scoring_method_name, sig_percentile):
-        # self._random_scores contains the randomised and stacked scores for each given type of 
-        # object, so pull those out and apply np.percentile with the given threshold to the correct 
-        # matrices here. the results object from get_links will contain *ALL* potential candiate
-        # links at this stage - e.g. for a Spectrum input, it will return all GCFs
-
-        # retrieve the IDS for all the supplied objects
-        obj_ids = [obj.id for obj in objects]
-
-        if input_type == GCF:
-            # 2-element list returned with spec-gcf, fam-gcf results
-            results_spec, results_fam = results
-
-            # lookup the appropriate random scores
-            rand_spec_scores = self._random_scores[scoring_method_name][input_type][Spectrum]
-            rand_fam_scores = self._random_scores[scoring_method_name][input_type][MolecularFamily]
-
-            # calculate the threshold values for each input object
-            spec_perc_thresholds = [np.percentile(rand_spec_scores[:, id], sig_percentile) for id in obj_ids]
-            fam_perc_thresholds = [np.percentile(rand_fam_scores[:, id], sig_percentile) for id in obj_ids]
-
-            perc_results = [np.zeros((3, 0)), np.zeros((3, 0))]
-
-            data = [(results_spec, spec_perc_thresholds, len(self._spectra))]
-            data.append((results_fam, fam_perc_thresholds, len(self._families)))
-
-            for d, (full_results, thresholds, num_objs) in enumerate(data):
-                for i in range(len(objects)):
-                    # want to get the indices of full_results where a) the source ID matches the
-                    # current object and b) the score exceeds the threshold for that object
-                    obj_indices = np.intersect1d(np.where(full_results[NPLinker.R_SCORE, :] >= thresholds[i]),
-                                                 np.where(full_results[NPLinker.R_SRC_ID, :] == objects[i].id))
-
-                    # concat the selected columns to the final result
-                    perc_results[d] = np.c_[perc_results[d], full_results[:, obj_indices]]
-
-            return [perc_results[0], perc_results[1]]
-
-        elif input_type == Spectrum or input_type == MolecularFamily:
-            # here results will be a list which in turn contains a single array, so just extract that
-            results = results[0]
-
-            # lookup the appropriate random scores
-            rand_scores = self._random_scores[scoring_method_name][input_type]
-
-            # calculate the threshold values for each input object
-            perc_thresholds = [np.percentile(rand_scores[id, :], sig_percentile) for id in obj_ids]
-
-            perc_results = np.zeros((3, 0))
-
-            for i in range(len(objects)):
-                # want to get the indices of full_results where a) the source ID matches the
-                # current object and b) the score exceeds the threshold for that object
-                obj_indices = np.intersect1d(np.where(results[NPLinker.R_SCORE, :] >= perc_thresholds[i]),
-                                             np.where(results[NPLinker.R_SRC_ID, :] == obj_ids[i]))
-
-                # build up a new matrix containing only the sufficiently high scoring columns
-                perc_results = np.c_[perc_results, results[:, obj_indices]]
-
-            return [perc_results]
-
-        logger.error('Bad input type in _get_links_percentile?? ({})'.format(input_type))
-        return None
 
     def get_common_strains(self, objects_a, objects_b, filter_no_shared=True):
         # this is a dict with structure:
@@ -694,9 +653,6 @@ if __name__ == "__main__":
 
     # pick a GCF to get links for
     test_gcf = npl.gcfs[8]
-
-    # set metcalf scoring significance percentile to 99%
-    npl.scoring.metcalf.sig_percentile = 99
 
     # call get_links and set the scoring method to metcalf by referencing the 
     # scoring.metcalf object

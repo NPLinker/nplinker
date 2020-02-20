@@ -61,6 +61,9 @@ class Searcher(object):
     def search(self, mode, text, use_re=True):
         # TODO all modes
         results = []
+
+        # make sure no extra whitespace
+        text = text.strip()
         needle = text if not use_re else re.compile(text)
 
         mode = self.name_to_mode(mode)

@@ -1,11 +1,12 @@
+import os
 import csv
 
 import numpy as np
 
 from .parsers.mgf import LoadMGF
 from .strains import StrainCollection
-from .annotations import GNPS_KEY
 from .utils import sqrt_normalise
+from .annotations import GNPS_KEY, GNPS_DATA_COLUMNS, create_gnps_annotation
 
 from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
@@ -45,6 +46,7 @@ class Spectrum(object):
         # the values being dicts of the form {growth_medium: peak intensity} for the parent strain
         self.strains = {}
         self.dataset_strains = None
+        self.family_id = -1
         self.family = None
         self.random_spectrum = None
         # a dict indexed by filename, or "gnps" 
@@ -52,14 +54,18 @@ class Spectrum(object):
         self._losses = None
         self._jcamp = None
 
-
     def add_strain(self, strain, growth_medium, peak_intensity):
-        if strain in self.strains and growth_medium in self.strains[strain]:
-            raise Exception('Clash: {} {}'.format(strain, growth_medium))
-        
         if strain not in self.strains:
             self.strains[strain] = {}
 
+        # TODO temp workaround for crusemann issues
+        if growth_medium is None:
+            self.strains[strain].update({'unknown_medium_{}'.format(len(self.strains[strain])): peak_intensity})
+            return
+
+        if strain in self.strains and growth_medium in self.strains[strain]:
+            raise Exception('Clash: {} / {} {}'.format(self, strain, growth_medium))
+        
         self.strains[strain].update({growth_medium: peak_intensity})
         
     @property
@@ -225,12 +231,97 @@ class RandomSpectrum(object):
     def has_strain(self, strain):
         return strain in self.strain_set
 
-def load_spectra(mgf_file):
-    ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([mgf_file])
-    logger.info("load_spectra loaded {} molecules".format(len(ms1)))
-    return mols_to_spectra(ms2, metadata)
 
-from .annotations import GNPS_KEY, GNPS_DATA_COLUMNS, create_gnps_annotation
+class MolecularFamily(object):
+    def __init__(self, family_id):
+        self.id = -1 
+        self.family_id = family_id
+        self.spectra = []
+        self.family = None
+        self.random_molecular_family = RandomMolecularFamily(self)
+
+    def has_strain(self, strain):
+        for spectrum in self.spectra:
+            if spectrum.has_strain(strain):
+                return True
+
+        return False
+
+    def add_spectrum(self, spectrum):
+        self.spectra.append(spectrum)
+
+    def __str__(self):
+        return 'MolFam(family_id={}, spectra={})'.format(self.family_id, len(self.spectra))
+
+class RandomMolecularFamily(object):
+    def __init__(self, molecular_family):
+        self.molecular_family = molecular_family
+
+    def has_strain(self, strain):
+        for spectrum in self.molecular_family.spectra:
+            if hasattr(spectrum, 'random_spectrum'):
+                if spectrum.random_spectrum.has_strain(strain):
+                    return True
+            else:
+                print("Spectrum objects need random spectra attached for this functionality")
+
+        return False
+
+class SingletonFamily(MolecularFamily):
+    def __init__(self):
+        super(SingletonFamily, self).__init__(-1)
+
+    def __str__(self):
+        return "Singleton molecular family"
+
+#
+# methods for parsing metabolomics data files
+#
+
+GNPS_FORMAT_UNKNOWN         = 'unknown'
+GNPS_FORMAT_OLD_ALLFILES    = 'allfiles'
+GNPS_FORMAT_OLD_UNIQUEFILES = 'uniquefiles'
+GNPS_FORMAT_NEW_FBMN        = 'fbmn'
+
+def get_headers(filename, delimiters=['\t', ',']):
+    headers = None
+    with open(filename, 'r') as f:
+        headers = f.readline()
+        for dl in delimiters:
+            if len(headers.split(dl)) < 2:
+                continue
+            headers = headers.split(dl)
+            break
+    return headers
+
+def identify_gnps_format(filename, has_quant_table):
+    headers = get_headers(filename)
+    
+    if headers is None:
+        return GNPS_FORMAT_UNKNOWN
+    
+    # first, check for AllFiles
+    if 'AllFiles' in headers:
+        # this should be an old-style dataset like Crusemann, with a single .tsv file
+        # containing all the necessary info. The AllFiles column should contain pairs
+        # of mzXML filenames and scan numbers in this format:
+        #   filename1:scannumber1###filename2:scannumber2###... 
+        return GNPS_FORMAT_OLD_ALLFILES
+    elif 'UniqueFileSources' in headers:
+        # this is a slightly newer-style dataset, e.g. MSV000084771 on the platform
+        # it still just has a single .tsv file, but AllFiles is apparently replaced
+        # with a UniqueFileSources column. There is also a UniqueFileSourcesCount 
+        # column which just indicates the number of entries in the UniqueFileSources
+        # column. If there are multiple entries the delimiter is a | character
+        return GNPS_FORMAT_OLD_UNIQUEFILES
+    elif has_quant_table:
+        # if there is no AllFiles/UniqueFileSources, but we DO have a quantification
+        # table file, that should indicate a new-style dataset like Carnegie
+        # TODO check for the required header columns here too
+        return GNPS_FORMAT_NEW_FBMN
+    else:
+        # if we don't match any of the above cases then it's not a recognised format
+        return GNPS_FORMAT_UNKNOWN
 
 def mols_to_spectra(ms2, metadata):
     ms2_dict = {}
@@ -256,8 +347,68 @@ def mols_to_spectra(ms2, metadata):
 
     return spectra
 
+def load_edges(edges_file, spec_dict):
+    logger.debug('loading edges file: {} [{} spectra from MGF]'.format(edges_file, len(spec_dict)))
+    with open(edges_file, 'r') as f:
+        reader = csv.reader(f, delimiter='\t')
+        headers = next(reader) 
+        try:
+            cid1_index = headers.index('CLUSTERID1')
+            cid2_index = headers.index('CLUSTERID2')
+            cos_index = headers.index('Cosine')
+            fam_index = headers.index('ComponentIndex')
+        except ValueError as ve:
+            raise Exception('Unknown or missing column(s) in edges file: {}'.format(edges_file))
+
+        for line in reader:
+            spec1_id = int(line[cid1_index])
+            spec2_id = int(line[cid2_index])
+            cosine = float(line[cos_index])
+            family = int(line[fam_index])
+
+            spec1 = spec_dict[spec1_id]
+            spec2 = spec_dict[spec2_id]
+
+            if family != -1: # singletons
+                spec1.family_id = family
+                spec2.family_id = family
+
+                spec1.edges.append((spec2.id, spec2.spectrum_id, cosine))
+                spec2.edges.append((spec1.id, spec1.spectrum_id, cosine))
+            else:
+                spec1.family_id = family
+
+def messy_strain_naming_lookup(mzxml, strains):
+    if mzxml in strains:
+        # life is simple!
+        return strains.lookup(mzxml)
+
+    # 1. knock off the .mzXML and try again
+    mzxml_no_ext = os.path.splitext(mzxml)[0]
+    if mzxml_no_ext in strains:
+        return strains.lookup(mzxml_no_ext)
+
+    # 2. if that doesn't work, try using everything up to the first -/_
+    underscore_index = mzxml_no_ext.find('_')
+    hyphen_index = mzxml_no_ext.find('-')
+    mzxml_trunc_underscore = mzxml_no_ext if underscore_index == -1 else mzxml_no_ext[:underscore_index]
+    mzxml_trunc_hyphen = mzxml_no_ext if hyphen_index == -1 else mzxml_no_ext[:hyphen_index]
+    if underscore_index != -1 and mzxml_trunc_underscore in strains:
+        return strains.lookup(mzxml_trunc_underscore)
+    if hyphen_index != -1 and mzxml_trunc_hyphen in strains:
+        return strains.lookup(mzxml_trunc_hyphen)
+
+    # 3. in the case of original Crusemann dataset, many of the filenames seem to
+    # match up to real strains with the initial "CN" missing ???
+    for mzxml_trunc in [mzxml_trunc_hyphen, mzxml_trunc_underscore]:
+        if 'CN' + mzxml_trunc in strains:
+            return strains.lookup('CN' + mzxml_trunc)
+
+    # give up
+    return None
+
 def md_convert(val):
-    """Try to convert raw metadata values from text to integer, then float"""
+    """Try to convert raw metadata values from text to integer, then float if that fails"""
     try:
         return int(val)
     except (ValueError, TypeError):
@@ -329,6 +480,70 @@ def parse_mzxml_header(hdr, strains, md_table):
 
     return (strain_name, growth_medium)
 
+def load_clusterinfo_old(gnps_format, strains, filename, spec_dict):
+    # each line of this file represents a metabolite. 
+    # columns representing strain IDs are *ignored* here in favour of parsing
+    # .mzXML filenames from either the AllFiles or UniqueFileSources column.
+    # both of these list the .mzXML files the molecule was found in (plus the scan 
+    # number in the file in the AllFiles case)
+    with open(filename, 'r') as f:
+        reader = csv.reader(f, delimiter='\t')
+        headers = next(reader)
+        clu_index_index = headers.index('cluster index')
+        if gnps_format == GNPS_FORMAT_OLD_ALLFILES:
+            mzxml_index = headers.index('AllFiles')
+        elif gnps_format == GNPS_FORMAT_OLD_UNIQUEFILES:
+            mzxml_index = headers.index('UniqueFileSources')
+        else:
+            raise Exception('Unexpected GNPS format {}'.format(gnps_format))
+
+        unknown_strains = {}
+        for line in reader:
+            # get the values of the important columns
+            clu_index = int(line[clu_index_index]) 
+            if gnps_format == GNPS_FORMAT_OLD_UNIQUEFILES:
+                mzxmls = line[mzxml_index].split('|')
+            else:
+                mzxmls = line[mzxml_index].split('###')
+
+            metadata = {'cluster_index': clu_index, 'files': {}}
+            seen_files = set()
+
+            for data in mzxmls:
+                # TODO ok to ignore scan number if available?
+                mzxml = data if gnps_format == GNPS_FORMAT_OLD_UNIQUEFILES else data.split(':')[0]
+
+                # TODO is this OK/sensible?
+                if mzxml in seen_files:
+                    continue
+                seen_files.add(mzxml)
+
+                # add to the list of files for this molecule
+                metadata['files'][mzxml] = mzxml
+
+                # should have a strain alias for the mxXML file to lookup here (in theory at least)
+                strain = messy_strain_naming_lookup(mzxml, strains)
+                if strain is None:
+                    # TODO: how to handle this? can't just give up, simply warn?
+                    if mzxml not in unknown_strains:
+                        logger.warning('Unknown strain: {} for cluster index {}'.format(mzxml, clu_index))
+                        unknown_strains[mzxml] = 1
+                    else:
+                        unknown_strains[mzxml] += 1
+                # else:
+                #     print('{} ===> {}'.format(mzxml, strain))
+
+                if strain is not None:
+                    # TODO this need fixed somehow (missing growth medium info)
+                    spec_dict[clu_index].add_strain(strain, None, 1)
+                
+                # update metadata on Spectrum object
+                spec_dict[clu_index].metadata.update(metadata)
+
+    if len(unknown_strains) > 0:
+        logger.warning('{} unknown strains were detected a total of {} times'.format(len(unknown_strains), sum(unknown_strains.values())))
+
+# TODO just required to get growth media?
 def parse_metadata_table(filename):
     """Parses the metadata table file from GNPS"""
     if filename is None: 
@@ -346,40 +561,11 @@ def parse_metadata_table(filename):
 
     return table
 
-def _load_metadata_old(strains, nodes_file, spec_dict):
+def load_clusterinfo_fbmn(strains, nodes_file, extra_nodes_file, md_table_file, spec_dict):
     spec_info = {}
 
-    with open(nodes_file, 'r') as f:
-        reader = csv.reader(f, delimiter='\t')
-        headers = next(reader)
-        ci_index = headers.index('cluster index')
-
-        for line in reader:
-            ci = int(line[ci_index])
-            metadata = {headers[i]: line[i] for i in range(len(line)) if i != ci_index}
-            spec_info[ci] = metadata
-
-    logger.info('Merged nodes data (old-style), total lines = {}'.format(len(spec_info)))
-
-    for spec_id, spec_data in spec_info.items():
-        spectrum = spec_dict[spec_id]
-
-        for k, v in spec_data.items():
-            # if value is a "0", ignore immediately
-            if v == "0":
-                continue
-            v = md_convert(v)
-            # if header indicates this is a strain and it is present in the current
-            # spectra, add that info 
-            if k in strains:
-                strain = strains.lookup(k)
-                spectrum.add_strain(strain, None, v)
-
-            spectrum.metadata[k] = v
-    return spec_info
-
-def _load_metadata_new(strains, nodes_file, extra_nodes_file, spec_dict, md_table):
-    spec_info = {}
+    # parse metadata table if available
+    md_table = parse_metadata_table(md_table_file)
 
     # get a list of the lines in each file, indexed by the "cluster index" and "row ID" fields 
     with open(nodes_file, 'r') as f:
@@ -418,6 +604,9 @@ def _load_metadata_new(strains, nodes_file, extra_nodes_file, spec_dict, md_tabl
             # if the value is a "0", ignore immediately
             if v == "0":
                 continue
+
+            # TODO this will probably need updating for platform data (should already
+            # have a set of strain names...)
             (strain_name, growth_medium) = parse_mzxml_header(k, strains, md_table)
             if strain_name is None:
                 continue 
@@ -431,107 +620,46 @@ def _load_metadata_new(strains, nodes_file, extra_nodes_file, spec_dict, md_tabl
             spectrum.metadata[k] = v
     return spec_info
 
-def load_metadata(strains, nodes_file, extra_nodes_file, metadata_table_file, spectra, spec_dict):
-    # this code is complicated by the need to support the Crusemann dataset, which is in a
-    # different format to more recent datasets (and any expected future datasets).
-    # with the new style datasets, ALL of the following should typically be present:
-    #  - nodes_files
-    #  - extra_nodes_file
-    #  - metadata_table_file 
-    # but for crusemann we only have the nodes_file, which has a different set of columns
-    # than in the standard case, so it has to be parsed differently 
+def load_dataset(strains, mgf_file, edges_file, nodes_file, quant_table_file=None, metadata_table_file=None):
+    # common steps to all formats of GNPS data:
+    #   - parse the MGF file to create a set of Spectrum objects
+    #   - parse the edges file and update the spectra with that data
 
-    # load the rest of the data depending on presence/absence of files
-    if extra_nodes_file is None:
-        logger.warning('Assuming Crusemann-style dataset!')
-        spec_info = _load_metadata_old(strains, nodes_file, spec_dict)
+    # build a set of Spectrum objects by parsing the MGF file
+    ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([mgf_file])
+    logger.info('{} molecules parsed from MGF file'.format(len(ms1)))
+    spectra = mols_to_spectra(ms2, metadata)
+    # above returns a list, create a dict indexed by spectrum_id to make
+    # the rest of the parsing a bit simpler
+    spec_dict = {spec.spectrum_id : spec for spec in spectra}
+
+    # add edges info to the spectra
+    load_edges(edges_file, spec_dict)
+
+    gnps_format = identify_gnps_format(nodes_file, quant_table_file is not None)
+    print(nodes_file, quant_table_file is None)
+    if gnps_format == GNPS_FORMAT_UNKNOWN:
+        raise Exception('Unknown/unsupported GNPS data format')
+
+    # now things depend on the dataset format
+    # if we don't have a quantification table, must be older-style dataset (or unknown format)
+    if gnps_format != GNPS_FORMAT_NEW_FBMN and quant_table_file is None:
+        logger.info('Found older-style GNPS dataset, no quantification table')
+        load_clusterinfo_old(gnps_format, strains, nodes_file, spec_dict)
     else:
-        # parse metadata table file, if provided
-        md_table = parse_metadata_table(metadata_table_file)
-        spec_info = _load_metadata_new(strains, nodes_file, extra_nodes_file, spec_dict, md_table)
+        logger.info('quantification table exists, new-style GNPS dataset')
+        load_clusterinfo_fbmn(strains, nodes_file, quant_table_file, metadata_table_file, spec_dict)
 
-    return spectra
+    molfams = make_families(spectra)
+    return spec_dict, spectra, molfams
 
-def load_edges(edges_file, spectra, spec_dict):
-
-    logger.debug('loading edges file: {} [{} spectra from MGF]'.format(edges_file, len(spectra)))
-
-    with open(edges_file, 'r') as f:
-        reader = csv.reader(f, delimiter='\t')
-        next(reader) # skip headers
-        for line in reader:
-            spec1_id = int(line[0])
-            spec2_id = int(line[1])
-            cosine = float(line[4])
-            family = int(line[6])
-
-            spec1 = spec_dict[spec1_id]
-            spec2 = spec_dict[spec2_id]
-
-            if family != -1: # singletons
-                spec1.family = family
-                spec2.family = family
-
-                spec1.edges.append((spec2.id, spec2.spectrum_id, cosine))
-                spec2.edges.append((spec1.id, spec1.spectrum_id, cosine))
-            else:
-                spec1.family = family
-
-    return spectra
-
-class MolecularFamily(object):
-    def __init__(self, family_id):
-        self.id = -1 
-        self.family_id = family_id
-        self.spectra = []
-        self.family = None
-        self.random_molecular_family = RandomMolecularFamily(self)
-
-    def has_strain(self, strain):
-        for spectrum in self.spectra:
-            if spectrum.has_strain(strain):
-                return True
-
-        return False
-
-    def add_spectrum(self, spectrum):
-        self.spectra.append(spectrum)
-
-    def __str__(self):
-        return 'MolFam(family_id={}, spectra={})'.format(self.family_id, len(self.spectra))
-
-class RandomMolecularFamily(object):
-    def __init__(self, molecular_family):
-        self.molecular_family = molecular_family
-
-    def has_strain(self, strain):
-        for spectrum in self.molecular_family.spectra:
-            if hasattr(spectrum, 'random_spectrum'):
-                if spectrum.random_spectrum.has_strain(strain):
-                    return True
-            else:
-                print("Spectrum objects need random spectra attached for this functionality")
-
-        return False
-
-class SingletonFamily(MolecularFamily):
-    def __init__(self):
-        super(SingletonFamily, self).__init__(-1)
-
-    def __str__(self):
-        return "Singleton molecular family"
-
-# TODO this should be better integrated with rest of the loading process
-# so that spec.family is never set to a primitive then replaced by an
-# object only if this method is called
-# (this is now called every time at least)
 def make_families(spectra):
     families = []
     family_dict = {}
     family_index = 0
     fams, singles = 0, 0
     for spectrum in spectra:
-        family_id = spectrum.family
+        family_id = spectrum.family_id
         if family_id == -1: # singleton
             new_family = SingletonFamily()
             new_family.id = family_index
@@ -559,21 +687,3 @@ def make_families(spectra):
 
     logger.debug('make_families: {} molams + {} singletons'.format(fams, singles))
     return families
-
-def read_aa_losses(filename):
-    """
-    Read AA losses from data file. (assume fixed structure...)
-    """
-    aa_losses = {}
-    with open(filename, 'r') as f:
-        reader = csv.reader(f, delimiter=',')
-        next(reader) # skip headers
-        for line in reader:
-            if len(line) == 0:
-                continue
-            aa_id = line[1]
-            aa_mono = float(line[4])
-            aa_avg = float(line[5])
-            aa_losses[aa_id.lower()] = (aa_mono, aa_avg)
-
-    return aa_losses

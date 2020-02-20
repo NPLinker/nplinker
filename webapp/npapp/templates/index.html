@@ -10,6 +10,9 @@
     <script src="npapp/static/js/popper.min.js" type="text/javascript"></script>
     <script src="npapp/static/js/bootstrap.min.js" type="text/javascript"></script>
     <script src="npapp/static/js/ChemDoodleWeb.js" type="text/javascript"></script>
+    <script src="npapp/static/js/alasql.min.js" type="text/javascript"></script>
+    <script src="npapp/static/js/tables_linker.js" type="text/javascript"></script>
+    <script src="npapp/static/js/tables_main.js" type="text/javascript"></script>
     <script type="text/javascript">
         // this function is used to load and display ChemDoodle spectrum plots in 
         // the result accordion elements. It is triggered by onclick handlers on each
@@ -94,7 +97,6 @@
         <div class="col-md-5">
             {{ embed(roots.fig_spec) }}
         </div>
-        pass
         <div class="col-md-5">
             {{ embed(roots.fig_bgc) }}
         </div>
@@ -300,6 +302,28 @@
 
         </div>
         <div class="col-lg-1"></div>
+    </div>
+
+    <hr/>
+    <div class="row">
+        <div class="col-lg-12">
+            <h4>Tables stuff</h4>
+            {{ embed(roots.load_tables) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            {{ embed(roots.table_molfams) }}
+        </div>
+        <div class="col-md-3">
+            {{ embed(roots.table_spectra) }}
+        </div>
+        <div class="col-md-3">
+            {{ embed(roots.table_bgcs) }}
+        </div>
+        <div class="col-md-3">
+            {{ embed(roots.table_gcfs) }}
+        </div>
     </div>
 
 </div>

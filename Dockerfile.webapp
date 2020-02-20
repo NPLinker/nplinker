@@ -1,0 +1,27 @@
+# using the nplinkerbase image, add the nplinker app itself on top 
+FROM nplinkerbase:latest
+
+SHELL ["/bin/bash", "-c"]
+
+COPY prototype /app/prototype
+COPY webapp /app/webapp
+
+WORKDIR /app
+
+ENV LANG "en_GB.UTF-8"
+ENV LOCALE "C"
+# set a HOME variable because things often break if it's left unset
+ENV HOME "/data"
+ENV DATA "/data"
+# tell the webapp to look for a config called nplinker.toml in /data,
+# which should be an external volume
+ENV NPLINKER_CONFIG "/data/nplinker.toml"
+
+# default bokeh server port
+EXPOSE 5006/tcp
+
+# run the webapp
+# TODO need to have a way to run the downloader part here 
+CMD cd /app && source activate bigscape && bokeh serve webapp/npapp --dev 
+
+# append this if not using port 5006 externally: --allow-websocket-origin=localhost:5010 
