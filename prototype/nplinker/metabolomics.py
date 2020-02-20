@@ -243,6 +243,13 @@ class MolecularFamily(object):
 
         return False
 
+    @property
+    def strains(self):
+        strains = set([])
+        for spectrum in self.spectra:
+            strains = strains.union(spectrum.strains)
+        return strains
+
     def add_spectrum(self, spectrum):
         self.spectra.append(spectrum)
 
