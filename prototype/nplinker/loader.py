@@ -173,7 +173,7 @@ class DatasetLoader(object):
             if not os.path.exists(f):
                 logger.warning('Optional file/directory "{}" does not exist or is not readable!'.format(f))
 
-    def load(self, met_only=False):
+    def load(self, met_only):
         # load strain mappings first
         if not self._load_strain_mappings():
             return False
