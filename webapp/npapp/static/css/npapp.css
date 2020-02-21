@@ -1,3 +1,8 @@
+.result-placeholder {
+    padding: 10px;
+    margin: 10px;
+    background-color: #ddd;
+}
 .bk-root {
     width: 100%;
     max-width: 100%;
