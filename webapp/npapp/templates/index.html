@@ -92,35 +92,87 @@
             {{ embed(roots.reset_button) }}
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-1">{{ embed(roots.legend_spec) }}</div>
-        <div class="col-md-5">
-            {{ embed(roots.fig_spec) }}
+    <div class="row" style="margin-top: 15px; margin-bottom: 15px;">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <ul class="nav nav-tabs nav-pills nav-fill" id="modeTabs", role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" role="tab" data-toggle="tab" href="#modes_tab_plots">View plots</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" role="tab" data-toggle="tab" href="#modes_tab_tables">View tables</a>
+                </li>
+            </ul>
         </div>
-        <div class="col-md-5">
-            {{ embed(roots.fig_bgc) }}
-        </div>
-        <div class="col-md-1">{{ embed(roots.legend_bgc) }}</div>
+        <div class="col-md-2"></div>
     </div>
-    <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-lg-5">
-            <div id="spec_hover_info"></div>
+    <div class="tab-content" id="modeTabsContent">
+        <div class="tab-pane show active" id="modes_tab_plots">
+            <div class="row">
+                <div class="col-md-1">{{ embed(roots.legend_spec) }}</div>
+                <div class="col-md-5">
+                    {{ embed(roots.fig_spec) }}
+                </div>
+                <div class="col-md-5">
+                    {{ embed(roots.fig_bgc) }}
+                </div>
+                <div class="col-md-1">{{ embed(roots.legend_bgc) }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-1"></div>
+                <div class="col-lg-5">
+                    <div id="spec_hover_info"></div>
+                </div>
+                <div class="col-lg-5">
+                    <div id="bgc_hover_info"></div>
+                </div>
+                <div class="col-md-1"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-1"></div>
+                <div class="col-lg-5">
+                    <div id="spec_hover_info_ext"></div>
+                </div>
+                <div class="col-lg-5">
+                    <div id="bgc_hover_info_ext"></div>
+                </div>
+                <div class="col-md-1"></div>
+            </div>
         </div>
-        <div class="col-lg-5">
-            <div id="bgc_hover_info"></div>
+        <div class="tab-pane" id="modes_tab_tables">
+            <div class="row">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    {{ embed(roots.load_tables) }}
+                </div>
+                <div class="col-md-4"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-3">
+                    {{ embed(roots.tables_score_met) }}
+                </div>
+                <div class="col-md-3">
+                    {{ embed(roots.tables_score_gen) }}
+                </div>
+                <div class="col-md-3"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    {{ embed(roots.table_molfams) }}
+                </div>
+                <div class="col-md-3">
+                    {{ embed(roots.table_spectra) }}
+                </div>
+                <div class="col-md-3">
+                    {{ embed(roots.table_bgcs) }}
+                </div>
+                <div class="col-md-3">
+                    {{ embed(roots.table_gcfs) }}
+                </div>
+            </div>
+
         </div>
-        <div class="col-md-1"></div>
-    </div>
-    <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-lg-5">
-            <div id="spec_hover_info_ext"></div>
-        </div>
-        <div class="col-lg-5">
-            <div id="bgc_hover_info_ext"></div>
-        </div>
-        <div class="col-md-1"></div>
     </div>
 </div>
 
@@ -129,7 +181,7 @@
     <div class="row">
         <div class="col-lg-1"></div>
         <div class="col-lg-10">
-            <ul class="nav nav-tabs" id="mainTab" role="tablist">
+            <ul class="nav nav-tabs nav-fill" id="mainTab" role="tablist">
                 <li class="nav-item">
                     <a class="nav-link active" id="scoringTab" data-toggle="tab" href="#scoring_div" role="tab" aria-controls="scoring_div" aria-selected="true">Scoring</a>
                 </li>
@@ -187,6 +239,8 @@
                     <div class="row">
                         <div class="col-md-1"></div>
                         <div class="col-md-10">
+                            <hr/>
+                            <h4>Results:</h4>
                             <div class="accordion" id="accordionResults">
                                 {{ embed(roots.results_div) }}
                             </div>
@@ -303,28 +357,5 @@
         </div>
         <div class="col-lg-1"></div>
     </div>
-
-    <hr/>
-    <div class="row">
-        <div class="col-lg-12">
-            <h4>Tables stuff</h4>
-            {{ embed(roots.load_tables) }}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-3">
-            {{ embed(roots.table_molfams) }}
-        </div>
-        <div class="col-md-3">
-            {{ embed(roots.table_spectra) }}
-        </div>
-        <div class="col-md-3">
-            {{ embed(roots.table_bgcs) }}
-        </div>
-        <div class="col-md-3">
-            {{ embed(roots.table_gcfs) }}
-        </div>
-    </div>
-
 </div>
 {% endblock %}

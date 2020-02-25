@@ -180,7 +180,7 @@ class Rosetta(object):
     def run(self, spectra, bgcs, ms1_tol=100, score_thresh=0.5):
         # check if we have a pickled SpecLib object first...
         if os.path.exists(self._speclib_pickle_path):
-            logger.info('Found pickled SpecLib for dataset {}!'.format(self._dataset_id))
+            logger.info('Found pickled SpecLib for dataset {} at {}!'.format(self._dataset_id, self._speclib_pickle_path))
             with open(self._speclib_pickle_path, 'rb') as f:
                 self.speclib = pickle.load(f)
         else:
