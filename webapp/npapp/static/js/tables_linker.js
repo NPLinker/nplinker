@@ -1,7 +1,10 @@
 class Linker {
     constructor(tablesInfo) {
-        console.log('Linker initiliasing');
-        console.log(tablesInfo);
+        if (this.loaded) {
+            console.log('WARNING: Linker already initialised');
+            return;
+        }
+        console.log('Linker init');
         this.tablesInfo = tablesInfo;
 
         // precompute stuff that won't change
@@ -9,16 +12,14 @@ class Linker {
         this.fieldNames = this.getFieldNames();
         this.tableIdToIdColumnMap = this.getTableIdToIdColumnMap();
 
-        console.log("IDCOL");
-        console.log("%o", this.tableIdToIdColumnMap);
-
         // selections will change depending on what the user has chosen on screen
         this.selections = this.emptySelections();
         this.numSelected = this.countNumSelected();
         this.totalSelected = this.getTotalSelected()
         this.queryResult = null;
         this.sqlManager = new SqlManager(this.tablesInfo);
-        console.log('Linker initiliased');
+        console.log('Linker init complete');
+        this.loaded = true;
     }
 
     getDefaultConstraints() {
@@ -224,12 +225,12 @@ class SqlManager {
         tablesInfo.forEach(function (t) {
             // Create table
             let sql = "CREATE TABLE " + t['tableName'];
-            console.log(sql);
+            // console.log(sql);
             alasql(sql);
             // Create index
             if (t['options']['pk'] !== undefined) {
                 sql = "CREATE UNIQUE INDEX tmp ON " + t['tableName'] + "(" + t['options']['pk'] + ")";
-                console.log(sql);
+                // console.log(sql);
                 alasql(sql);
             }
             // Add data
@@ -394,7 +395,7 @@ class SqlManager {
         });
 
         const sqlQuery = this.makeSQLquery(tablesInfo, skipConstraints);
-        console.log(sqlQuery);
+        // console.log(sqlQuery);
         const compiledSQLQuery = alasql.compile(sqlQuery);
 
         return compiledSQLQuery(selectedConstraints);
@@ -406,7 +407,7 @@ class SqlManager {
         const fieldNames = tableFieldNames['fieldNames'].map(x => prefix + x);
 
         const sqlQuery = "SELECT DISTINCT " + fieldNames.join(", ") + " FROM ?";
-        console.log(sqlQuery);
+        // console.log(sqlQuery);
         const temp = alasql(sqlQuery, [dataSource]);
 
         temp.map(x => { // for each row in the sql results
