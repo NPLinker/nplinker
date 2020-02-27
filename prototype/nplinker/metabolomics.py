@@ -598,6 +598,12 @@ def load_clusterinfo_fbmn(strains, nodes_file, extra_nodes_file, md_table_file, 
     # for each spectrum 
     for spec_id, spec_data in spec_info.items():
         spectrum = spec_dict[spec_id]
+    
+        # this is only for Carnegie atm, but should work for other datasets too?
+        if 'ATTRIBUTE_SampleType' in spec_data:
+            st = spec_data['ATTRIBUTE_SampleType'].split(',')
+            spectrum.metadata['ATTRIBUTE_SampleType'] = st
+
         # TODO better way of filtering/converting all this stuff down to what's relevant?
         # could search for each strain ID in column title but would be slower?
         for k, v in spec_data.items():
