@@ -18,6 +18,7 @@ from nplinker.annotations import gnps_url, GNPS_KEY
 from searching import SEARCH_OPTIONS, Searcher
 
 from tables_init import TableData
+from tables_functions import NA
 
 # TODO all of this code doesn't have to be in the same module, could benefit from splitting up by
 # functionality (e.g. scoring, searching, UI, ...)
@@ -859,7 +860,7 @@ class NPLinkerBokeh(object):
         # (i think the reason this is marked TODO is because it currently
         # wouldn't update cached scores if the scoring method was changed
         # or reconfigured (e.g. with a new threshold))
-        nplinker.clear_links() # TODO hack
+        # nplinker.clear_links() # TODO hack
         current_method = nplinker.scoring.enabled()[self.scoring_method_group.active]
 
         # obtain a list of objects to be passed to the scoring function
@@ -899,7 +900,18 @@ class NPLinkerBokeh(object):
 
         self.display_links(objs_with_links, mode, self.results_div)
 
-    def display_links(self, objs_with_links, mode, div):
+    def display_links(self, objs_with_links, mode, div, include_only=None):
+        """
+        this method deals with various messy aspects of taking a list of objects
+        with links and building up the set of objects at the other end of the links,
+        subject to various type of filtering/constraints. 
+
+        optionally can be passed an "include_only" set of output-type objects 
+        (Spectrum/MolFam for GCF input, otherwise GCF), which will be used to
+        preemptively filter the available results before going any further. this
+        is currently used to make sure that when in tables mode the results don't
+        include any objects not displayed in the tables
+        """
         nplinker = self.nh.nplinker
         current_method = nplinker.scoring.enabled()[self.scoring_method_group.active]
         selected = set()
@@ -920,7 +932,13 @@ class NPLinkerBokeh(object):
             # create a dict with keys = input objects, values = link info for that object
             objs_with_scores = {}
             for link_obj in objs_with_links:
-                objs_with_scores[link_obj] = nplinker.links_for_obj(link_obj, current_method, type_=t)
+                # filter out objects not shown in tables
+                if include_only is not None:
+                    obj_links = nplinker.links_for_obj(link_obj, current_method, type_=t)
+                    filtered_obj_links = [(obj, score) for (obj, score) in obj_links if obj in include_only]
+                    objs_with_scores[link_obj] = filtered_obj_links
+                else:
+                    objs_with_scores[link_obj] = nplinker.links_for_obj(link_obj, current_method, type_=t)
 
             # if scoring from Spectra/MolFam to GCF, now need to walk through the list of 
             # results and exclude any which feature GCFs that do not appear in the current
@@ -1121,6 +1139,10 @@ class NPLinkerBokeh(object):
         """
         Callback for changes to the BGC datasource selected indices
         """
+        if self.suppress_selection_bgc:
+            print('IGNORING SELECTION spec_selchanged')
+            return
+
         # if the new selection contains any valid indices (it may be empty)
         if len(new) > 0:
             # get links for the selected BGCs and update the plots
@@ -1138,6 +1160,10 @@ class NPLinkerBokeh(object):
         """
         Callback for changes to the Spectra datasource selected indices
         """
+        if self.suppress_selection_spec:
+            print('IGNORING SELECTION spec_selchanged')
+            return
+
         # if the new selection contains any valid indices (it may be empty)
         if len(new) > 0:
             # get links for the selected spectra and update the plots
@@ -1356,6 +1382,7 @@ class NPLinkerBokeh(object):
         # TODO possibly going to need updated later
         if 'ATTRIBUTE_SampleType' in spec.metadata:
             spec_body += '<li><strong>SampleType</strong>: {}</li>'.format(', '.join(spec.metadata['ATTRIBUTE_SampleType']))
+
         # add strain information (possibly empty)
         if shared_strains is not None and len(shared_strains) > 0:
             spec_body += '<li><strong>strains (total={}, shared={})</strong>: '.format(len(spec.strain_list), len(shared_strains))
@@ -1555,6 +1582,169 @@ class NPLinkerBokeh(object):
     def gnps_params_select_callback(self, attr, old, new):
         self.gnps_params_value.text = '<strong>{}</strong> = {}'.format(new, self.nh.nplinker.gnps_params[new])
 
+    def tables_score_met_callback(self):
+        """
+        Handles clicks on the "Show scores for selected spectra" button (tables mode)
+        """
+        print('Currently selected spectra: {}'.format(len(self.table_data.spec_ds.data['spectrum_id'])))
+        print('Actual selections: {}'.format(len(self.table_data.spec_ds.selected.indices)))
+
+        # need to build a list of the NPLinker Spectrum objects corresponding to
+        # the set of objects currently listed in the table
+        # but first need to decide which set of spectra to use:
+        # - the user might have selected a MolFam, in which case the spec table will have
+        #   filtered down to show only the spectra in that family, BUT none of them will
+        #   actually be selected, so just take all visible entries
+        # - alternatively they might have selected a spectrum directly, in which case they
+        #   will all still be visible but we only want the selected indices
+
+        selected_spectra = []
+        if len(self.table_data.spec_ds.selected.indices) > 0:
+            # assume there's been an explicit selection and use those objects
+            for index in self.table_data.spec_ds.selected.indices:
+                sid = self.table_data.spec_ds.data['spec_pk'][index] # the internal nplinker ID
+                if sid == NA:
+                    continue
+                selected_spectra.append(self.nh.nplinker.spectra[sid])
+        else:
+            for sid in self.table_data.spec_ds.data['spec_pk']: # internal nplinker IDs
+                if sid == NA:
+                    continue
+                spec = self.nh.nplinker.spectra[sid] 
+                selected_spectra.append(spec)
+
+        # retrieve the currently active scoring method (for now this will always be metcalf)
+        current_method = self.nh.nplinker.scoring.enabled()[self.scoring_method_group.active]
+        
+        # call get_links, which returns the subset of input objects which have links
+        results = self.nh.nplinker.get_links(selected_spectra, scoring_method=current_method)
+
+        # next, need to display the results using the same code as for generating the 
+        # results from plot selections, but without actually triggering any unintended
+        # side-effects (changing the plot selections and so on)
+
+        # the plots are configured to update automatically when changes are made
+        # to their underlying datasource (e.g. new selections). want to avoid this
+        # happening here because in tables mode the plots aren't visible. this is 
+        # a quick hack that just prevents the selection callback from doing anything
+        # for the duration of this operation
+        # TODO this should be more decoupled anyway
+        self.suppress_selection_spec = True
+
+        # the next step, before actually displaying the links, is to make sure
+        # the webapp scoring mode is set to Spec->GCF. this is currently done by
+        # simulating a click on the appropriate radio button, which will handle
+        # the rest of the changes required
+        self.mb_mode_callback(None, None, 0)
+
+        # TODO another issue is that the various methods involved here tend to 
+        # refer to member variables directly instead of having parameters passed 
+        # in, which would make them easier to repurpose (i.e. they use self.ds_spec
+        # instead of a generic <datasource> parameter)
+        # 
+        # updated the set of selected indices on the spectral datasource (equivalent
+        # to the user having made the same selection via the plot)
+        self.ds_spec.selected.indices = [self.spec_indices[spec.spectrum_id] for spec in results]
+
+        # the ScoringHelper object expects to have this list of objects available so need to set that
+        self.score_helper.spectra = selected_spectra
+
+        # get the list of visible GCFs so we can filter out any others from the results
+        include_only = set([self.nh.nplinker.gcfs[gcf_id] for gcf_id in self.table_data.gcf_ds.data['gcf_pk'] if gcf_id != '-'])
+
+        # FINALLY, display the link information
+        self.display_links(results, mode=SCO_MODE_SPEC_GCF, div=self.results_div, include_only=include_only)
+
+        # and then remove the hacky workaround
+        self.suppress_selection_spec = False
+        
+    def tables_score_gen_callback(self):
+        """
+        Handles clicks on the "Show scores for selected GCFs" button (tables mode)
+        """
+        # need to build a list of the NPLinker GCF objects corresponding to
+        # the set of BGC objects currently listed in the table
+        # but first need to decide which set of objects to use:
+        # - the user might have selected a GCF, in which case the BGC table will have
+        #   filtered down to show only the BGCs in that family, BUT none of them will
+        #   actually be selected, so just take all visible entries
+        # - alternatively they might have selected a BGC directly, in which case they
+        #   will all still be visible but we only want the selected indices
+        selected_gcfs = []
+        selected_bgcs = []
+        gcfs = set() # to remove dups 
+
+        if len(self.table_data.bgc_ds.selected.indices) > 0:
+            # assume there's been an explicit selection and use those objects
+            for index in self.table_data.bgc_ds.selected.indices:
+                bgcid = self.table_data.bgc_ds.data['bgc_pk'][index] # internal nplinker ID
+                if bgcid == NA:
+                    continue
+                bgc = self.nh.nplinker.bgcs[bgcid]
+                selected_bgcs.append(bgc)
+                gcfs.add(bgc.parent)
+        else:
+            for bgcid in self.table_data.bgc_ds.data['bgc_pk']: # internal nplinker IDs
+                if bgcid == NA:
+                    continue
+                bgc = self.nh.nplinker.bgcs[bgcid]
+                selected_bgcs.append(bgc)
+                gcfs.add(bgc.parent)
+
+        selected_gcfs = list(gcfs)
+
+        # retrieve the currently active scoring method (for now this will always be metcalf)
+        current_method = self.nh.nplinker.scoring.enabled()[self.scoring_method_group.active]
+        
+        # call get_links, which returns the subset of input objects which have links
+        results = self.nh.nplinker.get_links(selected_gcfs, scoring_method=current_method)
+
+        # next, need to display the results using the same code as for generating the 
+        # results from plot selections, but without actually triggering any unintended
+        # side-effects (changing the plot selections and so on)
+
+        # the plots are configured to update automatically when changes are made
+        # to their underlying datasource (e.g. new selections). want to avoid this
+        # happening here because in tables mode the plots aren't visible. this is 
+        # a quick hack that just prevents the selection callback from doing anything
+        # for the duration of this operation
+        # TODO this should be more decoupled anyway
+        self.suppress_selection_bgc = True
+
+        # the next step, before actually displaying the links, is to make sure
+        # the webapp scoring mode is set to GCF->Spec. this is currently done by
+        # simulating a click on the appropriate radio button, which will handle
+        # the rest of the changes required
+        self.ge_mode_callback(None, None, 0)
+
+        # TODO another issue is that the various methods involved here tend to 
+        # refer to member variables directly instead of having parameters passed 
+        # in, which would make them easier to repurpose (i.e. they use self.ds_bgc
+        # instead of a generic <datasource> parameter)
+        # 
+        # updated the set of selected indices on the spectral datasource (equivalent
+        # to the user having made the same selection via the plot)
+        self.ds_bgc.selected.indices = [bgc.id for bgc in selected_bgcs]
+
+        # the ScoringHelper object expects to have this list of objects available so need to set that
+        self.score_helper.bgcs = selected_bgcs
+        self.score_helper.gcfs = selected_gcfs
+
+        # get the list of visible spectra so we can filter out any others from the results
+        # TODO MolFam mode...
+        include_only = set([self.nh.nplinker.spectra[spec_id] for spec_id in self.table_data.spec_ds.data['spec_pk'] if spec_id != '-'])
+
+        # FINALLY, display the link information
+        self.display_links(results, mode=SCO_MODE_BGC_SPEC, div=self.results_div, include_only=include_only)
+
+        # and then remove the hacky workaround
+        self.suppress_selection_bgc = False
+
+    def tables_reset_callback(self):
+        for dt in self.table_data.data_tables.values():
+            dt.selectable = True
+
+
     def bokeh_layout(self):
         widgets = []
         self.results_div = Div(text=RESULTS_PLACEHOLDER, name='results_div', width_policy='max', height_policy='fit')
@@ -1735,20 +1925,18 @@ class NPLinkerBokeh(object):
         widgets.append(self.fig_spec)
         widgets.append(self.fig_bgc)
 
-        if True:
-            print('Loading data tables stuff')
-            self.table_data = TableData(self)
-            self.table_data.setup()
-            widgets.extend(self.table_data.widgets)
-            # self.tables_results_div = Div(text=RESULTS_PLACEHOLDER, name='tables_results_div', width_policy='max', height_policy='fit')
-            # widgets.append(self.tables_results_div)
+        print('Loading data tables stuff')
+        self.table_data = TableData(self)
+        self.table_data.setup()
+        widgets.extend(self.table_data.widgets)
 
-            # callbacks for scoring buttons
-            self.table_data.tables_score_met.on_click(self.tables_score_met_callback)
-            self.table_data.tables_score_gen.on_click(self.tables_score_gen_callback)
-        else:
-            for n in ['load_tables', 'table_molfams', 'table_spectra', 'table_bgcs', 'table_gcfs', 'tables_score_met', 'tables_score_gen']:
-                widgets.append(Button(name=n))
+        # callbacks for scoring buttons
+        self.table_data.tables_score_met.on_click(self.tables_score_met_callback)
+        self.table_data.tables_score_gen.on_click(self.tables_score_gen_callback)
+
+        # and reset button
+        self.table_data.tables_reset.on_click(self.tables_reset_callback)
+
         for w in widgets:
             curdoc().add_root(w)
 
@@ -1758,9 +1946,27 @@ class NPLinkerBokeh(object):
 # server_lifecycle.py adds a .nh attr to the current Document instance, use that
 # to access the already-created NPLinker instance plus the TSNE data
 nb = NPLinkerBokeh(curdoc().nh)
-# nb.create_metabolomics_plot()
-# nb.create_genomics_plot()
 nb.create_plots()
 nb.set_inactive_plot(nb.fig_spec)
 nb.bokeh_layout()
 nb.update_alert('Initialised OK!', 'success')
+
+# second part of hack/workaround described in tables_init.py: 
+# define a callback function which checks if the linker init has been completed
+# (based on the target div text being set to 'LOADED'). 
+# if it has, it terminates the periodic callbacks, otherwise it modifies the 
+# text, which should trigger the CustomJS callback defined in tables_init.py 
+# (this may happen multiple times as the page loads in and bokeh is initialised,
+# which is why it has to be repeated as a periodic callback...)
+def tables_loading_callback():
+    # this should be true once the CustomJS callback that loads the table
+    # data has actually executed
+    if nb.table_data.dummydiv.text == 'LOADED':
+        curdoc().remove_periodic_callback(nb.workaround_callback)
+    else:
+        # otherwise just change the text of the hidden div to try
+        # and trigger the CustomJS callback (this will only work once
+        # the page has finished loading)
+        nb.table_data.dummydiv.text += 'o'
+# run this callback every 100ms until loading works
+nb.workaround_callback = curdoc().add_periodic_callback(tables_loading_callback, 100)

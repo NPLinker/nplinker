@@ -4,7 +4,7 @@ import pickle
 import pandas as pd
 
 from bokeh.models import Button, CustomJS, ColumnDataSource
-from bokeh.models.widgets import DataTable, TableColumn
+from bokeh.models.widgets import DataTable, TableColumn, Div
 
 from tables_functions import create_links, get_table_info, NA
 
@@ -14,7 +14,12 @@ class TableData(object):
         self.nh = nh
 
     def setup(self):
-        # get the metcalf scoring links between spectra:gcf and gcf:spectra pairs
+        """
+        This method sets up all the data structures needed to manage the tables
+        interface to the webapp
+        """
+
+        # first step: get the metcalf scoring links between spectra:gcf and gcf:spectra pairs
         self.spec_links = self.nh.nplinker.get_links(self.nh.nplinker.spectra, scoring_method=self.nh.nplinker.scoring.metcalf)
         self.gcf_links = self.nh.nplinker.get_links(self.nh.nplinker.gcfs, scoring_method=self.nh.nplinker.scoring.metcalf)
 
@@ -51,21 +56,36 @@ class TableData(object):
         self.spec_df = pd.DataFrame(self.spec_data)
         self.molfam_df = pd.DataFrame(self.molfam_data)
 
-        self.bgc_cols = [TableColumn(field='bgc_pk', title='ID'), TableColumn(field='name', title='BGC name'), TableColumn(field='product_type', title='Product type')]
-        self.gcf_cols = [TableColumn(field='gcf_pk', title='ID'), TableColumn(field='gcf_id', title='GCF ID'), TableColumn(field='product_type', title='Product type')]
-        self.spec_cols = [TableColumn(field='spec_pk', title='ID'), TableColumn(field='spectrum_id', title='Spectrum ID'), TableColumn(field='family', title='Family ID')]
-        self.molfam_cols = [TableColumn(field='molfam_pk', title='ID'), TableColumn(field='family_id', title='MolFam ID'), TableColumn(field='nspectra', title='#spectra')]
+        # currently setting fixed widths here, not ideal, but using auto-sizing seems to
+        # place limits on how far you can resize the columns for some reason...
+        self.bgc_cols = [TableColumn(field='bgc_pk', title='ID', width=15), 
+                         TableColumn(field='name', title='BGC name', width=220), 
+                         TableColumn(field='product_type', title='Product type', width=75)]
+
+        self.gcf_cols = [TableColumn(field='gcf_pk', title='ID', width=15), 
+                         TableColumn(field='gcf_id', title='GCF ID', width=75), 
+                         TableColumn(field='product_type', title='Product type', width=75)]
+
+        self.spec_cols = [TableColumn(field='spec_pk', title='ID', width=15), 
+                          TableColumn(field='spectrum_id', title='Spectrum ID', width=76), 
+                          TableColumn(field='family', title='Family ID', width=75)]
+
+        self.molfam_cols = [TableColumn(field='molfam_pk', title='ID', width=15), 
+                            TableColumn(field='family_id', title='MolFam ID', width=75), 
+                            TableColumn(field='nspectra', title='#spectra', width=75)]
 
         self.bgc_ds = ColumnDataSource(self.bgc_df)
         self.gcf_ds = ColumnDataSource(self.gcf_df)
         self.spec_ds = ColumnDataSource(self.spec_df)
         self.molfam_ds = ColumnDataSource(self.molfam_df)
 
-        self.bgc_dt = DataTable(source=self.bgc_ds, columns=self.bgc_cols, width=300, name='table_bgcs', visible=False)
-        self.gcf_dt = DataTable(source=self.gcf_ds, columns=self.gcf_cols, width=300, name='table_gcfs', visible=False)
-        self.spec_dt = DataTable(source=self.spec_ds, columns=self.spec_cols, width=300, name='table_spectra', visible=False)
-        self.molfam_dt = DataTable(source=self.molfam_ds, columns=self.molfam_cols, width=300, name='table_molfams', visible=False)
+        self.bgc_dt = DataTable(source=self.bgc_ds, columns=self.bgc_cols, name='table_bgcs', sizing_mode='scale_width', width=300, fit_columns=False, index_width=15)
+        self.gcf_dt = DataTable(source=self.gcf_ds, columns=self.gcf_cols, name='table_gcfs', sizing_mode='scale_width', width=300, fit_columns=False, index_width=15)
+        self.spec_dt = DataTable(source=self.spec_ds, columns=self.spec_cols, name='table_spectra', sizing_mode='scale_width', width=300, fit_columns=False, index_width=15)
+        self.molfam_dt = DataTable(source=self.molfam_ds, columns=self.molfam_cols, name='table_molfams', sizing_mode='scale_width', width=300, fit_columns=False, index_width=15)
 
+        # start building a list of widgets that the main module will add to the
+        # bokeh document object
         self.widgets = []
         self.widgets.append(self.bgc_dt)
         self.widgets.append(self.gcf_dt)
@@ -79,36 +99,79 @@ class TableData(object):
             'gcf_table': self.gcf_ds
         }
 
-        # custom JS callback codes to call the linker when a data table is clicked
-        code = """    
-            // get linker object    
+        self.data_tables = {
+            'molfam_table': self.molfam_dt, 
+            'spec_table': self.spec_dt,
+            'bgc_table': self.bgc_dt, 
+            'gcf_table': self.gcf_dt
+        }
+
+        # custom JS callback to call the linker when a data table is clicked
+        # (note only triggered for the table that's actually clicked, updates
+        # to the others don't trigger this)
+        code = """
+            // get linker object
             const linker = window.shared['linker'];
             if (!linker) {
                 alert('Please click Load Data first!');
                 cb_obj.indices = [];
                 return;
             }
+
+            console.log("js_on_change for %o", table_name);
+
+            // this is a hacky way to show that the tables on the opposite side
+            // from the clicked table are now "disabled", by setting the opacity
+            // to 50% via CSS (but only if something was actually selected)
+            if(cb_obj.indices.length > 0) {
+                if(table_name == "molfam_table" || table_name == "spec_table") {
+                    var tables = $(".gen-table");
+                    for(var i=0;i<tables.length;i++) {
+                        $('#' + tables[i].id).css('opacity', '50%');
+                    }
+                } else {
+                    var tables = $(".met-table");
+                    for(var i=0;i<tables.length;i++) {
+                        $('#' + tables[i].id).css('opacity', '50%');
+                    }
+                }
+            }
             
-            // set selections       
+            // propagate selections to the linker
             const selected_indices = cb_obj.indices;
-            console.log(table_name, selected_indices);
             linker.removeConstraints(table_name);
             for(let i = 0; i < selected_indices.length; i++) {
                 const idx = selected_indices[i];
-                console.log("%o %o %o", table_name, idx, data_sources[table_name]);
-                linker.addConstraint(table_name, idx, data_sources[table_name]);        
+                linker.addConstraint(table_name, idx, data_sources[table_name]);
             }
-            
+
             // query the linker and update data sources with the query result
             linker.query();
-            linker.updateDataSources(data_sources);    
+            linker.updateDataSources(data_sources);
         """
+
+        # make the genomics tables non-selectable when a metabolomics table is clicked
+        def met_tables_clicked(attr, old, new):
+            self.gcf_dt.selectable = False
+            self.bgc_dt.selectable = False
+
+        # make the metabolomics tables non-selectable when a genomics table is clicked
+        def gen_tables_clicked(attr, old, new):
+            self.molfam_dt.selectable = False
+            self.spec_dt.selectable = False
+
+        # NOTE: passing in DataTable widgets here in the same way as data_sources causes bokeh JS to throw weird exceptions... 
         self.molfam_ds.selected.js_on_change('indices', CustomJS(args={'table_name': 'molfam_table', 'data_sources': data_sources}, code=code))
         self.spec_ds.selected.js_on_change('indices', CustomJS(args={'table_name': 'spec_table', 'data_sources': data_sources}, code=code))
         self.bgc_ds.selected.js_on_change('indices', CustomJS(args={'table_name': 'bgc_table', 'data_sources': data_sources}, code=code))
         self.gcf_ds.selected.js_on_change('indices', CustomJS(args={'table_name': 'gcf_table', 'data_sources': data_sources}, code=code))
 
-        # pickle the links as they don't change for a given dataset and can take
+        self.molfam_ds.selected.on_change('indices', met_tables_clicked)
+        self.spec_ds.selected.on_change('indices', met_tables_clicked)
+        self.bgc_ds.selected.on_change('indices', gen_tables_clicked)
+        self.gcf_ds.selected.on_change('indices', gen_tables_clicked)
+
+        # pickle the links structs as they don't change for a given dataset and can take
         # some time to generate when the webapp is instantiated
         # TODO proper location for the pickled data file
         pickled_links = 'table_links_{}.pckl'.format(self.nh.nplinker.dataset_id)
@@ -144,36 +207,100 @@ class TableData(object):
         else:
             self.bgc_gcf, self.mf_spectra, self.spectra_bgc = pickle.load(open(pickled_links, 'rb'))
 
-        self.tables_score_met = Button(label='Show scores for selected spectra', name='tables_score_met', visible=False)
-        self.tables_score_gen = Button(label='Show scores for selected GCFs', name='tables_score_gen', visible=False)
+        # add the buttons to trigger scoring
+        self.tables_score_met = Button(label='Show scores for selected spectra', name='tables_score_met')
+        self.tables_score_gen = Button(label='Show scores for selected BGCs', name='tables_score_gen')
         self.widgets.append(self.tables_score_met)
         self.widgets.append(self.tables_score_gen)
 
-        # combine the data and link informations into a table info
-        # this will be passed to the linker object when the Load button is clicked
-        self.table_info = get_table_info(self.molfam_df, self.mf_spectra, self.spec_df, self.spectra_bgc, self.bgc_df, self.bgc_gcf, self.gcf_df)
-        table_widgets = [self.bgc_dt, self.gcf_dt, self.spec_dt, self.molfam_dt]
-        button_widgets = [self.tables_score_met, self.tables_score_gen]
-        self.load_tables = Button(label='Load table data', name='load_tables', sizing_mode='stretch_both')
-        self.load_tables.callback = CustomJS(args=dict(tableInfo=self.table_info, tableWidgets=table_widgets, buttonWidgets=button_widgets), code="""
-            // disable and hide the button
-            cb_obj.disabled = true;
-            cb_obj.visible = false;
+        # CustomJS callback code for resetting the selection (and opacity) states
+        # of all the tables 
+        reset_selection_code = """    
+            // get linker object    
+            const linker = window.shared['linker'];
+            if (!linker) {
+                alert('Please click Load Data first!');
+                cb_obj.indices = [];
+                return;
+            }
 
-            // create linker object and store in window.shared 
+            
+            // remove selections from all tables
+            var tablenames = ['molfam_table', 'spec_table', 'bgc_table', 'gcf_table'];
+            for(let t=0;t<tablenames.length;t++) {
+                const table = tablenames[t];
+                // TODO is this the best way to do this??
+                //linker.removeConstraints(table);
+                data_sources[table].selected.indices = [];
+                
+                // restore opacity
+                $('#' + table).css('opacity', '');
+            }
+            linker.query();
+            linker.updateDataSources(data_sources);
+
+        """
+        self.tables_reset = Button(label='Clear selections', name='tables_reset')
+        self.tables_reset.js_on_click(CustomJS(args={'data_sources': data_sources, 'data_tables': self.data_tables}, code=reset_selection_code))
+        self.widgets.append(self.tables_reset)
+
+        # combine the data and link informations into a list of dicts in the format the
+        # linker expects. this object is passed in to the linker by a callback after 
+        # the webapp loads (see below & main.py)
+        self.table_info = get_table_info(self.molfam_df, self.mf_spectra, self.spec_df, self.spectra_bgc, self.bgc_df, self.bgc_gcf, self.gcf_df)
+
+        # hack alert: bokeh doesn't provide any obvious way to trigger a JavaScript callback
+        # from Python code other than attaching a CustomJS object to a property of some 
+        # object, and then changing that property. This has limitations, such as not 
+        # working during the loading process. That's very annoying, because it makes it
+        # difficult to load the data into the tables (i.e. transferring data from 
+        # Python -> JS) without the original solution of asking the user to click a button
+        # to trigger the CustomJS callback necessary. 
+        #
+        # I finally found a very ugly but usable workaround thanks to this issue:
+        #    https://github.com/bokeh/bokeh/issues/8728
+        # which can be summed up as:
+        # 1. create an empty/hidden div on the page
+        # 2. attach the callback to be executed to its 'text' property
+        # 3. add a callback on the document object 
+        # 4. use *that* callback to modify the div text...
+        # 5. ... which then triggers the CustomJS callback... 
+        # 6. ... and finally remove the document callback 
+        # 
+        # Not very nice but it does work
+
+        # this is the empty div
+        self.dummydiv = Div(text='', name='dummydiv')
+        self.widgets.append(self.dummydiv)
+
+        # this callback is used to initialise the code behind the data tables, which 
+        # is all Javascript. It must be passed the set of tables constructed above,
+        # so that they can be used to populate the database that is ultimately used
+        # to do the filtering. The check for the loading already having been completed
+        # is required due to the really nasty workaround used to compensate for bokeh
+        # not having a nice way to trigger a CustomJS callback programatically from
+        # Python code (at least not on/as the page is loading).  
+        self.load_tables_callback = CustomJS(args=dict(dummyDiv=self.dummydiv, tableInfo=self.table_info), code="""
+            if (window.shared.hasOwnProperty('linker'))
+            {
+                console.log("Linker init already done!");
+                return;
+            }
+
+            // create linker object and store in window.shared
             const linker = new Linker(tableInfo);
             window.shared['linker'] = linker;
 
-            // make the tables and buttons visible
-            var i = 0;
-            for(; i<tableWidgets.length;i++) {
-                var table = tableWidgets[i];
-                table.visible = true;
-            }
-            i = 0;
-            for(; i<buttonWidgets.length;i++) {
-                var button = buttonWidgets[i];
-                button.visible = true;
-            }
+            // update div to indicate loading completed (this is used to
+            // cancel the periodic callbacks begun by the code in main.py)
+            // yes it's a mess
+            dummyDiv.text = 'LOADED';
+
+            // hide the CSS 'loading...' overlay
+            document.getElementById("overlay").style.display = "none";
         """)
-        self.widgets.append(self.load_tables)
+
+        # finally attach the callback to the text property of the empty div
+        # so that it will be triggered when the main.py callback updates 
+        # that property
+        self.dummydiv.js_on_change('text', self.load_tables_callback)
