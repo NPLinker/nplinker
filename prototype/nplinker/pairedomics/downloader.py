@@ -438,7 +438,8 @@ class Downloader(object):
                 or member.startswith('networkedges_selfloop')\
                 or member.startswith('quantification_table')\
                 or member.startswith('metadata_table')\
-                or member.startswith('DB_result'):
+                or member.startswith('DB_result')\
+                or member.startswith('result_specnets_DB'):
                     mbzip.extract(member, path=self.project_file_cache)
             # move the MGF file to a /spectra subdirectory to better fit expected structure
             elif member.endswith('.mgf'):
