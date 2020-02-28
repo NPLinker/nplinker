@@ -102,11 +102,22 @@ class KCBParser(object):
         base_path = os.path.join(os.path.dirname(bgc.antismash_file), 'knownclusterblast')
         genbank_file = bgc.antismash_file.split(os.sep)[-1]
         # remove the "regionXXX" and turn it into "_cXXX"
-        tokens = genbank_file.split('region')
-        number = int(tokens[1].split('.')[0])
-        start_name = tokens[0][:-1] # remove the last dot
-        start_name += '_c{}.txt'.format(number)
-        kcb_name = os.path.join(base_path, start_name)
+        if 'region' in genbank_file:
+            tokens = genbank_file.split('region')
+            number = int(tokens[1].split('.')[0])
+            start_name = tokens[0][:-1] # remove the last dot
+            start_name += '_c{}.txt'.format(number)
+            kcb_name = os.path.join(base_path, start_name)
+        elif 'cluster' in genbank_file:
+            tokens = genbank_file.split('.')
+            for t in tokens:
+                if t.startswith('cluster'):
+                    break
+            cluster_num = int(t[-3:])
+            filename = 'cluster{}.txt'.format(cluster_num)
+            kcb_name = os.path.join(base_path, filename)
+        else:
+            raise ValueError('Invalid file name {}'.format(genbank_file))
         return kcb_name
 
 if __name__ == "__main__":
