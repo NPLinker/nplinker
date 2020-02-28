@@ -97,17 +97,54 @@
         <div class="col-md-8">
             <ul class="nav nav-tabs nav-pills nav-fill" id="modeTabs", role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" role="tab" data-toggle="tab" href="#modes_tab_plots">View plots</a>
+                    <a class="nav-link active" role="tab" data-toggle="tab" href="#modes_tab_tables">Display tables</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" role="tab" data-toggle="tab" href="#modes_tab_tables">View tables</a>
+                    <a class="nav-link" role="tab" data-toggle="tab" href="#modes_tab_plots">Display plots</a>
                 </li>
             </ul>
         </div>
         <div class="col-md-2"></div>
     </div>
+    <div id="overlay">
+        <div id="overlay_text">Loading dataset, please wait...</div>
+    </div>
+    <!-- part of ridiculous workaround to load tables data without requiring user to
+        click the button first - see comments in main.py/tables_init.py -->
+    <div style="display: none">
+        {{ embed(roots.dummydiv) }}
+    </div>
     <div class="tab-content" id="modeTabsContent">
-        <div class="tab-pane show active" id="modes_tab_plots">
+        <div class="tab-pane show active" id="modes_tab_tables">
+            <div class="row">
+                <div class="col-md-3">
+                    {{ embed(roots.tables_reset) }}
+                </div>
+                <div class="col-md-3">
+                    {{ embed(roots.tables_score_met) }}
+                </div>
+                <div class="col-md-3">
+                    {{ embed(roots.tables_score_gen) }}
+                </div>
+                <div class="col-md-3"></div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 met-table" id="molfam_table">
+                    {{ embed(roots.table_molfams) }}
+                </div>
+                <div class="col-lg-3 met-table" id="spec_table">
+                    {{ embed(roots.table_spectra) }}
+                </div>
+                <div class="col-lg-3 gen-table" id="bgc_table">
+                    {{ embed(roots.table_bgcs) }}
+                </div>
+                <div class="col-lg-3 gen-table" id="gcf_table">
+                    {{ embed(roots.table_gcfs) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane" id="modes_tab_plots">
             <div class="row">
                 <div class="col-md-1">{{ embed(roots.legend_spec) }}</div>
                 <div class="col-md-5">
@@ -138,40 +175,6 @@
                 </div>
                 <div class="col-md-1"></div>
             </div>
-        </div>
-        <div class="tab-pane" id="modes_tab_tables">
-            <div class="row">
-                <div class="col-md-4"></div>
-                <div class="col-md-4">
-                    {{ embed(roots.load_tables) }}
-                </div>
-                <div class="col-md-4"></div>
-            </div>
-            <div class="row">
-                <div class="col-md-3"></div>
-                <div class="col-md-3">
-                    {{ embed(roots.tables_score_met) }}
-                </div>
-                <div class="col-md-3">
-                    {{ embed(roots.tables_score_gen) }}
-                </div>
-                <div class="col-md-3"></div>
-            </div>
-            <div class="row">
-                <div class="col-md-3">
-                    {{ embed(roots.table_molfams) }}
-                </div>
-                <div class="col-md-3">
-                    {{ embed(roots.table_spectra) }}
-                </div>
-                <div class="col-md-3">
-                    {{ embed(roots.table_bgcs) }}
-                </div>
-                <div class="col-md-3">
-                    {{ embed(roots.table_gcfs) }}
-                </div>
-            </div>
-
         </div>
     </div>
 </div>
