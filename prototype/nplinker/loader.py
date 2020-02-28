@@ -29,6 +29,20 @@ def find_via_glob(path, file_type, optional=False):
         logger.warn('WARNING: unable to find {} in path "{}"'.format(file_type, path))
         return None
 
+def find_via_glob_alts_dir(paths, file_type, optional=False):
+    path = None
+    for p in paths:
+        if os.path.exists(p):
+            path = p
+            break
+
+    if path is None and not optional:
+        raise Exception('ERROR: unable to find {} in {} paths: ({})'.format(file_type, len(paths), paths))
+    elif path is None:
+        logger.warning('WARNING: unable to find {} in {} paths: ({})'.format(file_type, len(paths), paths))
+
+    return path
+
 def find_via_glob_alts(paths, file_type, optional=False):
     filename = None
     for path in paths:
@@ -136,9 +150,11 @@ class DatasetLoader(object):
         # 7. MET: <root>/quantification_table/quantification_table-<number>.csv / quantification_table_file=<override>
         self.quantification_table_file = self._overrides.get(self.OR_QUANT) or find_via_glob(os.path.join(self._root, 'quantification_table', 'quantification_table*.csv'), self.OR_QUANT, optional=True)
 
-        # 8. MET: <root>/DB_result/*.tsv / annotations_dir=<override>
-        self.annotations_dir = self._overrides.get(self.OR_ANNO) or os.path.join(self._root, 'DB_result')
-        self.annotations_config_file = self._overrides.get(self.OR_ANNO_CONFIG) or os.path.join(self._root, 'DB_result', 'annotations.tsv')
+        # 8. MET: <root>/DB_result/*.tsv (new) or <root>/result_specnets_DB/*.tsv (old) / annotations_dir=<override>
+        self.annotations_dir = self._overrides.get(self.OR_ANNO) or find_via_glob_alts_dir([os.path.join(self._root, 'DB_result'),
+                                                                                        os.path.join(self._root, 'result_specnets_DB')],
+                                                                                       self.OR_ANNO)
+        self.annotations_config_file = self._overrides.get(self.OR_ANNO_CONFIG) or os.path.join(self.annotations_dir, 'annotations.tsv')
         
         # 9. GEN: <root>/antismash / antismash_dir=<override>
         self.antismash_dir = self._overrides.get(self.OR_ANTISMASH) or os.path.join(self._root, 'antismash')
