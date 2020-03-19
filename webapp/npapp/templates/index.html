@@ -106,13 +106,8 @@
         </div>
         <div class="col-md-2"></div>
     </div>
-    <div id="overlay">
+    <div id="overlay" style="display: none">
         <div id="overlay_text">Loading dataset, please wait...</div>
-    </div>
-    <!-- part of ridiculous workaround to load tables data without requiring user to
-        click the button first - see comments in main.py/tables_init.py -->
-    <div style="display: none">
-        {{ embed(roots.dummydiv) }}
     </div>
     <div class="tab-content" id="modeTabsContent">
         <div class="tab-pane show active" id="modes_tab_tables">
