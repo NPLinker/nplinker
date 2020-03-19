@@ -1950,23 +1950,3 @@ nb.create_plots()
 nb.set_inactive_plot(nb.fig_spec)
 nb.bokeh_layout()
 nb.update_alert('Initialised OK!', 'success')
-
-# second part of hack/workaround described in tables_init.py: 
-# define a callback function which checks if the linker init has been completed
-# (based on the target div text being set to 'LOADED'). 
-# if it has, it terminates the periodic callbacks, otherwise it modifies the 
-# text, which should trigger the CustomJS callback defined in tables_init.py 
-# (this may happen multiple times as the page loads in and bokeh is initialised,
-# which is why it has to be repeated as a periodic callback...)
-def tables_loading_callback():
-    # this should be true once the CustomJS callback that loads the table
-    # data has actually executed
-    if nb.table_data.dummydiv.text == 'LOADED':
-        curdoc().remove_periodic_callback(nb.workaround_callback)
-    else:
-        # otherwise just change the text of the hidden div to try
-        # and trigger the CustomJS callback (this will only work once
-        # the page has finished loading)
-        nb.table_data.dummydiv.text += 'o'
-# run this callback every 100ms until loading works
-nb.workaround_callback = curdoc().add_periodic_callback(tables_loading_callback, 100)
