@@ -128,9 +128,9 @@ class TableData(object):
             self.linker.updateDataSources(self.data_sources)
 
         self.molfam_ds.selected.on_change('indices', lambda a, b, c: table_callback('molfam_table'))
-        self.spec_ds.selected.on_change('indices', lambda a, b, c: table_callback('molfam_table'))
-        self.bgc_ds.selected.on_change('indices', lambda a, b, c: table_callback('molfam_table'))
-        self.gcf_ds.selected.on_change('indices', lambda a, b, c: table_callback('molfam_table'))
+        self.spec_ds.selected.on_change('indices', lambda a, b, c: table_callback('spec_table'))
+        self.bgc_ds.selected.on_change('indices', lambda a, b, c: table_callback('bgc_table'))
+        self.gcf_ds.selected.on_change('indices', lambda a, b, c: table_callback('gcf_table'))
 
         # pickle the links structs as they don't change for a given dataset and can take
         # some time to generate when the webapp is instantiated
