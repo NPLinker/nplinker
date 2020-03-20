@@ -181,8 +181,6 @@ class Linker:
 class SqlManager:
 
     def __init__(self, tablesInfo, path='linker.sqlite3'):
-        if os.path.exists(path):
-            os.unlink(path)
         self.db = sqlite3.connect(path)
         self.db.row_factory = sqlite3.Row
 
