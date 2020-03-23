@@ -127,6 +127,14 @@ class TableData(object):
             self.linker.query()
             self.linker.updateDataSources(self.data_sources)
 
+        def reset_tables_callback(unused):
+            for table_name, table_ds in self.data_sources.items():
+                table_ds.selected.indices = []
+                self.linker.removeConstraints(table_name)
+
+            self.linker.query()
+            self.linker.updateDataSources(self.data_sources)
+
         self.molfam_ds.selected.on_change('indices', lambda a, b, c: table_callback('molfam_table'))
         self.spec_ds.selected.on_change('indices', lambda a, b, c: table_callback('spec_table'))
         self.bgc_ds.selected.on_change('indices', lambda a, b, c: table_callback('bgc_table'))
@@ -187,6 +195,7 @@ class TableData(object):
         """
         self.tables_reset = Button(label='Clear selections', name='tables_reset')
         self.tables_reset.js_on_click(CustomJS(args={}, code=reset_selection_code))
+        self.tables_reset.on_click(reset_tables_callback)
         self.widgets.append(self.tables_reset)
 
         # combine the data and link informations into a list of dicts in the format the
