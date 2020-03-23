@@ -672,7 +672,7 @@ class NPLinkerBokeh(object):
             spec_body += '<center><canvas id="{}"></canvas></center>'.format(spec_plot_id)
 
             # note annoying escaping required here, TODO better way of doing this?
-            spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, spec.to_jcamp_str())
+            spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, ','.join(spec.peaks), spec.to_jcamp_str())
 
             hdr_color = 'ffe0b5'
             if len(spec.annotations) > 0:
