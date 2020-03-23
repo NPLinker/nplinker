@@ -196,13 +196,20 @@ class SqlManager:
     def initialiseTables(self, tablesInfo):
         for t in tablesInfo:
             columns = ', '.join(['{} text'.format(c) for c in t['tableData'][0].keys()])
-            sql = 'CREATE TABLE {} ({})'.format(t['tableName'], columns)
+            sql = 'CREATE TABLE IF NOT EXISTS {} ({})'.format(t['tableName'], columns)
             self.db.execute(sql)
             if 'pk' in t['options']:
-                sql = 'CREATE UNIQUE INDEX {}_index ON {} ({})'.format(t['tableName'], t['tableName'], t['options']['pk'])
+                sql = 'CREATE UNIQUE INDEX IF NOT EXISTS {}_index ON {} ({})'.format(t['tableName'], t['tableName'], t['options']['pk'])
                 self.db.execute(sql)
 
-        self.addNewData(tablesInfo)
+        # only add data if needed
+        cur = self.db.execute('SELECT COUNT({}) FROM {}'.format(tablesInfo[0]['options']['pk'], tablesInfo[0]['tableName']))
+        rowcount = cur.fetchone()[0]
+        if rowcount == 0:
+            print('Adding data to tables')
+            self.addNewData(tablesInfo)
+        else:
+            print('Tables already populated')
 
     def clearAlasqlTables(self, tablesInfo):
         for t in tablesInfo:
