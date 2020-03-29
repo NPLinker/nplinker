@@ -672,7 +672,7 @@ class NPLinkerBokeh(object):
             spec_body += '<center><canvas id="{}"></canvas></center>'.format(spec_plot_id)
 
             # note annoying escaping required here, TODO better way of doing this?
-            spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, ','.join(spec.peaks), spec.to_jcamp_str())
+            spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, spec.to_jcamp_str())
 
             hdr_color = 'ffe0b5'
             if len(spec.annotations) > 0:
@@ -1589,7 +1589,7 @@ class NPLinkerBokeh(object):
         print('Currently selected spectra: {}'.format(len(self.table_data.spec_ds.data['spectrum_id'])))
         print('Actual selections: {}'.format(len(self.table_data.spec_ds.selected.indices)))
 
-        if len(self.table_data.spec_ds.selected.indices) == 0:
+        if len(self.table_data.spec_ds.selected.indices) == 0 and len(self.table_data.molfam_ds.selected.indices) == 0:
             self.hidden_alert_thing.text = 'Error: no spectra have been selected!\n\n' +\
                                             'Running scoring on {} objects may take a long time!\n'.format(len(self.table_data.spec_ds.data['spectrum_id'])) +\
                                              'Please make some selections and then try again.'
@@ -1613,12 +1613,12 @@ class NPLinkerBokeh(object):
                 sid = self.table_data.spec_ds.data['spec_pk'][index] # the internal nplinker ID
                 if sid == NA:
                     continue
-                selected_spectra.append(self.nh.nplinker.spectra[sid])
+                selected_spectra.append(self.nh.nplinker.spectra[int(sid)])
         else:
             for sid in self.table_data.spec_ds.data['spec_pk']: # internal nplinker IDs
                 if sid == NA:
                     continue
-                spec = self.nh.nplinker.spectra[sid] 
+                spec = self.nh.nplinker.spectra[int(sid)] 
                 selected_spectra.append(spec)
 
         # retrieve the currently active scoring method (for now this will always be metcalf)
@@ -1674,7 +1674,7 @@ class NPLinkerBokeh(object):
         print('Currently selected bgcs: {}'.format(len(self.table_data.bgc_ds.data['bgc_pk'])))
         print('Actual selections: {}'.format(len(self.table_data.bgc_ds.selected.indices)))
 
-        if len(self.table_data.bgc_ds.selected.indices) == 0:
+        if len(self.table_data.bgc_ds.selected.indices) == 0 and len(self.table_data.gcf_ds.selected.indices) == 0:
             self.hidden_alert_thing.text = 'Error: no BGCs have been selected!\n\n' +\
                                             'Running scoring on {} objects may take a long time!\n'.format(len(self.table_data.bgc_ds.data['bgc_pk'])) +\
                                              'Please make some selections and then try again.'
@@ -1701,14 +1701,14 @@ class NPLinkerBokeh(object):
                 bgcid = self.table_data.bgc_ds.data['bgc_pk'][index] # internal nplinker ID
                 if bgcid == NA:
                     continue
-                bgc = self.nh.nplinker.bgcs[bgcid]
+                bgc = self.nh.nplinker.bgcs[int(bgcid)]
                 selected_bgcs.append(bgc)
                 gcfs.add(bgc.parent)
         else:
             for bgcid in self.table_data.bgc_ds.data['bgc_pk']: # internal nplinker IDs
                 if bgcid == NA:
                     continue
-                bgc = self.nh.nplinker.bgcs[bgcid]
+                bgc = self.nh.nplinker.bgcs[int(bgcid)]
                 selected_bgcs.append(bgc)
                 gcfs.add(bgc.parent)
 
@@ -1753,7 +1753,7 @@ class NPLinkerBokeh(object):
 
         # get the list of visible spectra so we can filter out any others from the results
         # TODO MolFam mode...
-        include_only = set([self.nh.nplinker.spectra[spec_id] for spec_id in self.table_data.spec_ds.data['spec_pk'] if spec_id != '-'])
+        include_only = set([self.nh.nplinker.spectra[int(spec_id)] for spec_id in self.table_data.spec_ds.data['spec_pk'] if spec_id != '-'])
 
         # FINALLY, display the link information
         self.display_links(results, mode=SCO_MODE_BGC_SPEC, div=self.results_div, include_only=include_only)
