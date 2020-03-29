@@ -200,7 +200,7 @@ class TableData(object):
         self.bgc_ds.selected.on_change('indices', lambda a, b, c: table_callback('bgc_table'))
         self.gcf_ds.selected.on_change('indices', lambda a, b, c: table_callback('gcf_table'))
 
-        set_opacity_code = """
+        selection_change_callback_code = """
             var value = '50%';
             if(source.selected.indices.length == 0)
                 value = '';
@@ -213,10 +213,10 @@ class TableData(object):
                 $('#gcf_table').css('opacity', value);
             }
         """
-        self.molfam_ds.selected.js_on_change('indices', CustomJS(code=set_opacity_code, args=dict(name='molfam_table', source=self.molfam_ds)))
-        self.spec_ds.selected.js_on_change('indices', CustomJS(code=set_opacity_code, args=dict(name='spec_table', source=self.spec_ds)))
-        self.bgc_ds.selected.js_on_change('indices', CustomJS(code=set_opacity_code, args=dict(name='bgc_table', source=self.bgc_ds)))
-        self.gcf_ds.selected.js_on_change('indices', CustomJS(code=set_opacity_code, args=dict(name='gcf_table', source=self.gcf_ds)))
+        self.molfam_ds.selected.js_on_change('indices', CustomJS(code=selection_change_callback_code, args=dict(name='molfam_table', source=self.molfam_ds)))
+        self.spec_ds.selected.js_on_change('indices', CustomJS(code=selection_change_callback_code, args=dict(name='spec_table', source=self.spec_ds)))
+        self.bgc_ds.selected.js_on_change('indices', CustomJS(code=selection_change_callback_code, args=dict(name='bgc_table', source=self.bgc_ds)))
+        self.gcf_ds.selected.js_on_change('indices', CustomJS(code=selection_change_callback_code, args=dict(name='gcf_table', source=self.gcf_ds)))
 
         # pickle the links structs as they don't change for a given dataset and can take
         # some time to generate when the webapp is instantiated
