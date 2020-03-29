@@ -165,11 +165,15 @@ class TableData(object):
             self.linker.removeConstraints(name)
 
             if name in ['bgc_table', 'gcf_table']:
-                self.molfam_dt.selectable = False
-                self.spec_dt.selectable = False
+                self.molfam_dt.selectable = len(selected_indices) == 0
+                self.spec_dt.selectable = len(selected_indices) == 0
+                self.bgc_dt.selectable = True
+                self.spec_dt.selectable = True
             else:
-                self.gcf_dt.selectable = False
-                self.bgc_dt.selectable = False
+                self.molfam_dt.selectable = True
+                self.spec_dt.selectable = True
+                self.gcf_dt.selectable = len(selected_indices) == 0
+                self.bgc_dt.selectable = len(selected_indices) == 0
 
             for idx in selected_indices:
                 self.linker.addConstraint(name, idx, self.data_sources[name])
@@ -185,10 +189,34 @@ class TableData(object):
             self.linker.query()
             self.linker.updateDataSources(self.data_sources)
 
+            self.molfam_dt.selectable = True
+            self.spec_dt.selectable = True
+            self.gcf_dt.selectable = True
+            self.bgc_dt.selectable = True
+
+
         self.molfam_ds.selected.on_change('indices', lambda a, b, c: table_callback('molfam_table'))
         self.spec_ds.selected.on_change('indices', lambda a, b, c: table_callback('spec_table'))
         self.bgc_ds.selected.on_change('indices', lambda a, b, c: table_callback('bgc_table'))
         self.gcf_ds.selected.on_change('indices', lambda a, b, c: table_callback('gcf_table'))
+
+        set_opacity_code = """
+            var value = '50%';
+            if(source.selected.indices.length == 0)
+                value = '';
+
+            if (name === 'bgc_table' || name === 'gcf_table') {
+                $('#spec_table').css('opacity', value);
+                $('#molfam_table').css('opacity', value);
+            } else {
+                $('#bgc_table').css('opacity', value);
+                $('#gcf_table').css('opacity', value);
+            }
+        """
+        self.molfam_ds.selected.js_on_change('indices', CustomJS(code=set_opacity_code, args=dict(name='molfam_table', source=self.molfam_ds)))
+        self.spec_ds.selected.js_on_change('indices', CustomJS(code=set_opacity_code, args=dict(name='spec_table', source=self.spec_ds)))
+        self.bgc_ds.selected.js_on_change('indices', CustomJS(code=set_opacity_code, args=dict(name='bgc_table', source=self.bgc_ds)))
+        self.gcf_ds.selected.js_on_change('indices', CustomJS(code=set_opacity_code, args=dict(name='gcf_table', source=self.gcf_ds)))
 
         # pickle the links structs as they don't change for a given dataset and can take
         # some time to generate when the webapp is instantiated
