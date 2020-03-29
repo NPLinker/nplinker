@@ -108,6 +108,56 @@ class TableData(object):
             'gcf_table': self.gcf_dt
         }
 
+        # https://stackoverflow.com/questions/31824124/is-there-a-way-to-save-bokeh-data-table-content
+        download_button_code = """
+            function table_to_csv(source) {
+                const columns = Object.keys(source.data)
+                const nrows = source.get_length()
+                const lines = [columns.join(',')]
+
+                for (let i = 0; i < nrows; i++) {
+                    let row = [];
+                    for (let j = 0; j < columns.length; j++) {
+                        const column = columns[j]
+                        row.push(source.data[column][i].toString())
+                    }
+                    lines.push(row.join(','))
+                }
+                return lines.join('\\n').concat('\\n')
+            }
+
+            const filename = name + '_data.csv'
+            filetext = table_to_csv(source)
+            const blob = new Blob([filetext], { type: 'text/csv;charset=utf-8;' })
+
+            //addresses IE
+            if (navigator.msSaveBlob) {
+                navigator.msSaveBlob(blob, filename)
+            } else {
+                const link = document.createElement('a')
+                link.href = URL.createObjectURL(blob)
+                link.download = filename
+                link.target = '_blank'
+                link.style.visibility = 'hidden'
+                link.dispatchEvent(new MouseEvent('click'))
+            }
+        """
+
+        self.molfam_dl_button = Button(label='Download MolFam data', name='molfam_dl_button')
+        self.spec_dl_button = Button(label='Download Spectrum data', name='spec_dl_button')
+        self.bgc_dl_button = Button(label='Download BGC data', name='bgc_dl_button')
+        self.gcf_dl_button = Button(label='Download GCF data', name='gcf_dl_button')
+
+        self.molfam_dl_button.callback = CustomJS(args=dict(name='molfam', source=self.molfam_ds), code=download_button_code)
+        self.spec_dl_button.callback = CustomJS(args=dict(name='spectrum', source=self.spec_ds), code=download_button_code)
+        self.bgc_dl_button.callback = CustomJS(args=dict(name='bgc', source=self.bgc_ds), code=download_button_code)
+        self.gcf_dl_button.callback = CustomJS(args=dict(name='gcf', source=self.gcf_ds), code=download_button_code)
+
+        self.widgets.append(self.molfam_dl_button)
+        self.widgets.append(self.spec_dl_button)
+        self.widgets.append(self.bgc_dl_button)
+        self.widgets.append(self.gcf_dl_button)
+
         def table_callback(name):
             cb_obj = self.data_sources[name]
             selected_indices = cb_obj.selected.indices
