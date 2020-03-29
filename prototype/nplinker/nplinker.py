@@ -7,20 +7,27 @@ import numpy as np
 from .metabolomics import Spectrum
 from .metabolomics import MolecularFamily
 
-from .genomics import GCF
-
-from .data_linking import DataLinks, LinkLikelihood
-from .data_linking import LinkFinder, SCORING_METHODS
+from .genomics import GCF, BGC
 
 from .config import Config, Args
 from .loader import DatasetLoader
+
+from .scoring.methods import MetcalfScoring, TestScoring
 
 from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
 class NPLinker(object):
 
-    OBJ_CLASSES = [Spectrum, MolecularFamily, GCF]
+    # allowable types for objects to be passed to scoring methods
+    OBJ_CLASSES = [Spectrum, MolecularFamily, GCF, BGC]
+
+    # enumeration of modes for get_links method
+    # - AND: results of multiple methods AND'ed together
+    # - OR: results of multiple methods OR'ed together
+    # - SEPARATE: results from multiple methods returned independently
+    MODE_AND, MODE_OR, MODE_SEPARATE = range(3)
+
     # enumeration for accessing results of LinkFinder.get_links, which are (3, num_links) arrays:
     # - R_SRC_ID: the ID of an object that was supplied as input to get_links
     # - R_DST_ID: the ID of an object that was discovered to have a link to an input object
@@ -117,10 +124,11 @@ class NPLinker(object):
         self._bgc_lookup = {}
         self._spec_lookup = {}
 
-        self._datalinks = None
-        self._linkfinder = None
+        self._scoring_methods = {}
+        self._scoring_methods[TestScoring.NAME] = TestScoring
+        self._scoring_methods[MetcalfScoring.NAME] = MetcalfScoring
 
-        self._links = {}
+        self._scoring_methods_setup_complete = {name: False for name in self._scoring_methods.keys()}
 
         self._repro_data = {}
         repro_file = self._config.config['repro_file']
@@ -203,16 +211,12 @@ class NPLinker(object):
         Returns:
             True if successful, False otherwise
         """
-
-        # clear any existing link/score data
-        self.clear_links()
-
         # typical case where load_data is being called with no params
         if new_bigscape_cutoff is None:
-            logger.debug('load_data (normal case, full load)')
+            logger.debug('load_data (normal case, full load, met_only={})'.format(met_only))
             self._loader.validate()
 
-            if not self._loader.load(met_only):
+            if not self._loader.load(met_only=met_only):
                 return False
         else:
             logger.debug('load_data with new cutoff = {}'.format(new_bigscape_cutoff))
@@ -257,275 +261,83 @@ class NPLinker(object):
         logger.debug('load_data: completed')
         return True
 
-
-    def _generate_scores(self, dl, lf):
-        # if metcalf scoring enabled
-        if self.scoring.metcalf.enabled:
-            lf.metcalf_scoring(dl, type='spec-gcf')
-            lf.metcalf_scoring(dl, type='fam-gcf')
-
-        # if hg scoring enabled
-        if self.scoring.hg.enabled:
-            lf.hg_scoring(dl, type='spec-gcf')
-            lf.hg_scoring(dl, type='fam-gcf')
-
-        # if likescore scoring enabled
-        if self.scoring.likescore.enabled:
-            ll = LinkLikelihood()
-            ll.calculate_likelihoods(dl, type='spec-gcf')
-            ll.calculate_likelihoods(dl, type='fam-gcf')
-            lf.likelihood_scoring(dl, ll, type='spec-gcf')
-            lf.likelihood_scoring(dl, ll, type='fam-gcf')
-
-    def process_dataset(self):
-        """Construct the DataLinks and LinkFinder objects from the loaded dataset.
-
-        Deals with initialising all the objects used for scoring/linking.
-        """
-
-        if len(self._spectra) == 0 or len(self._gcfs) == 0 or len(self._strains) == 0:
-            logger.info('process_dataset: calling load_data')
-            self.load_data()
-
-        self._datalinks = DataLinks()
-        self._datalinks.load_data(self._spectra, self._gcfs, self._strains)
-        self._datalinks.find_correlations()
-        self._linkfinder = LinkFinder()
-
-        # generate the actual scores from the standard DataLinks object
-        logger.debug('Generating scores, enabled methods={}'.format(self.scoring.enabled()))
-        self._generate_scores(self._datalinks, self._linkfinder)
-
-        logger.debug('Scoring matrices created')
-
-        self.clear_links()
-        return True
-
-    def clear_links(self):
-        """Clear any previously retrieved links"""
-        self._links = {}
-
-    def get_links(self, objects, scoring_method, datalinks=None):
-        """Collects sets of links between a given set of objects and their counterparts.
-
-        This method allows an application to pass in one or more objects of type GCF, Spectrum,
-        or MolecularFamily, and retrieve the set of links to their counterpart objects (e.g.
-        GCF for Spectrum input) that meet the scoring criteria for the selected scoring
-        method (see ScoringConfig class / self.scoring)
+    def get_links(self, input_objects, scoring_methods, combine_mode=MODE_AND):
+        """Find links for a set of input objects (BGCs/GCFs/Spectra/MolFams)
         
-        Returned scores can then be accessed using NPLinker.all_links or NPLinker.links_for_obj.
+        Given a set of input objects and 1 or more NPLinker scoring methods,
+        this method will return a dict mapping input objects with links to
+        the result(s) of the scoring method(s) selected. 
 
-        Args:
-            objects: An instance of one of the above types, or a list containing any mix of them.
-            scoring_method: selects the scoring method to be used (e.g. metcalf, likescore). The value
-                of this parameter should be one of the ScoringConfig.<method> members, which also contain the
-                configurable parameters for each method.
-            datalinks: The DataLinks instance used for scoring. Defaults to None, in which case the
-                standard internal DataLinks instance is used. 
+        The input objects can be any mix of the following types:
+            - BGC
+            - GCF
+            - Spectrum
+            - MolecularFamily
 
+        # TODO update once finished below
+        
         Returns:
-            If either a single instance or a list with uniform type is used as input, the return value
-            is a list containing the objects for which links were found to satisfy the scoring criteria.
-            In the case where a mixed list of objects is used, the return value will instead be a 3 element
-            list, containing the individual results for the classes GCF, Spectrum, and MolecularFamily 
-            (in that order). 
+            A dict keyed by objects from the input_objects list, but only containing
+            those objects that had links returned. The values of the dict will be
+            a set of the results from each of the enabled scoring methods for the
+            given object. The content of these results depends on the scoring method. 
         """
-        # single object, pass it straight through
-        if not isinstance(objects, list):
-            logger.debug('get_links: single object')
-            return self._get_links([objects], datalinks, scoring_method)
+        results_by_method = {}
+        object_counts = {}
 
-        # check if the list contains one or multiple types of object
-        type_counts = {NPLinker.OBJ_CLASSES[t]: 0 for t in range(len(NPLinker.OBJ_CLASSES))}
-        for o in objects:
-            try:
-                type_counts[type(o)] += 1
-            except KeyError:
-                raise Exception('Unsupported type passed to get_links ({})'.format(type(o)))
+        if isinstance(input_objects, list) and len(input_objects) == 0:
+            raise Exception('input_objects length must be > 0')
 
-        if max(type_counts.values()) == len(objects):
-            # if the list seems to have a uniform type, again pass straight through
-            logger.debug('get_links: uniformly typed list ({})'.format(type(objects[0])))
-            return self._get_links(objects, datalinks, scoring_method)
+        elif isinstance(scoring_methods, list) and  len(scoring_methods) == 0:
+            raise Exception('scoring_methods length must be > 0')
 
-        # finally, if it's a mix of objects, extract them into separate lists and call 
-        # the internal method multiple times instead
-        obj_lists = {t: [] for t in NPLinker.OBJ_CLASSES}
-        for o in objects:
-            obj_lists[type(o)].append(o)
+        # want everything to be in lists of lists
+        if not isinstance(input_objects, list) or (isinstance(input_objects, list) and not isinstance(input_objects[0], list)):
+            input_objects = [input_objects]
+        if not isinstance(scoring_methods, list):
+            scoring_methods = [scoring_methods]
 
-        # keep consistent ordering here: GCF, Spectrum, MolecularFamily
-        obj_lists = [obj_lists[GCF], obj_lists[Spectrum], obj_lists[MolecularFamily]]
+        logger.debug('get_links: {} object sets, {} methods'.format(len(input_objects), len(scoring_methods)))
 
-        results = [[] for t in NPLinker.OBJ_CLASSES]
-        logger.debug('get_links: multiple lists')
-        for i in range(len(NPLinker.OBJ_CLASSES)):
-            if len(obj_lists[i]) > 0:
-                results[i].append(self._get_links(obj_lists[i], datalinks, scoring_method))
+        # check if input_objects is a list of lists. if so there should be one
+        # entry for each supplied method for it to be a valid parameter
+        if isinstance(input_objects[0], list):
+            if len(input_objects) != len(scoring_methods):
+                raise Exception('Number of input_objects lists must match number of scoring_methods (found: {}, expected: {})'.format(len(input_objects), len(scoring_methods)))
 
-        return results
+        for i, method in enumerate(scoring_methods):
+            # do any one-off initialisation required by this method
+            if not self._scoring_methods_setup_complete[method.name]:
+                logger.debug('Doing one-time setup for {}'.format(method.name))
+                self._scoring_methods[method.name].setup(self)
 
-    def _store_object_links(self, src, dst, score, scoring_method):
-        # structure of self._links is:
-        # src objects as keys, values are scoring methods
-        #   scoring methods as keys, values are dst objects
-        #       dst objects as keys, values are link scores
-        if src not in self._links:
-            self._links[src] = {m: {} for m in SCORING_METHODS}
+            # should construct a dict of {object_with_link: <link_data>} entries
+            objects_for_method = input_objects[i]
+            logger.debug('Calling scoring method {} on {} objects'.format(method.name, len(objects_for_method)))
+            results = method.get_links(objects_for_method)
 
-        if scoring_method.name not in self._links[src]: 
-            raise Exception('Should never happen!')
-
-        self._links[src][scoring_method.name][dst] = score
-
-    def _get_links(self, objects, datalinks, scoring_method):
-        if len(objects) == 0:
-            return []
-
-        if self._linkfinder is None:
-            raise Exception('Need to call process_dataset first')
-
-        if scoring_method.name not in SCORING_METHODS:
-            raise Exception('unknown scoring method "{}"'.format(scoring_method.name))
-
-        datalinks = datalinks or self._datalinks
-        input_type = type(objects[0])
-
-        if scoring_method.name == 'metcalf':
-            logger.debug('_get_links for metcalf scoring, standardised={}'.format(scoring_method.standardised))
-            if not scoring_method.standardised:
-                # get the basic Metcalf scores and carry on
-                results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, scoring_method.cutoff)
-            else:
-                # get the basic Metcalf scores BUT ignore the cutoff value here as it should only be applied to 
-                # the final scores, not the original ones
-                results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, None)
-
-                # TODO molfam support still missing here (as in data_linking.py)
-
-                # results is a (3, x) array for spec/molfam input, where (1, :) gives src obj ID, (2, :) gives
-                # dst obj ID, and (3, :) gives scores
-                # for GCFs you get [spec, molfam] with above substructure
-
-                # NOTE: need to use sets here because if the "else" cases are executed 
-                # can get lots of duplicate object IDs which messes everything up
-
-                spectra_input = (input_type == Spectrum)
-
-                # make type1_objects always == spectra. if input is spectra, just use "objects",
-                # otherwise build a list using the object IDs in the results array
-                type1_objects = objects if spectra_input else {self.spectra[int(index)] for index in results[0][self.R_DST_ID]}
-
-                # other objs should be "objects" if input is GCF, otherwise create 
-                # from the results array as above
-                other_objs = objects if not spectra_input else {self._gcfs[int(index)] for index in results[0][self.R_DST_ID]}
-
-                # build a lookup table for pairs of object IDs and their index in the results array
-                if spectra_input:
-                    pairs_lookup = {(results[0][self.R_SRC_ID][i], results[0][self.R_DST_ID][i]): i for i in range(len(results[0][self.R_SRC_ID]))}
+            results_by_method[method] = results
+            for obj in results.keys():
+                if obj in object_counts:
+                    object_counts[obj] += 1
                 else:
-                    pairs_lookup = {(results[0][self.R_DST_ID][i], results[0][self.R_SRC_ID][i]): i for i in range(len(results[0][self.R_SRC_ID]))}
+                    object_counts[obj] = 1
 
-                # apply score update to each spec:gcf pairing and update the corresponding entry in results
-                # (the metcalf_expected and metcalf_variance matrices should have been calculated already)
-                new_src, new_dst, new_res = [], [], []
+        # results_by_method now contains method: results entries, where
+        # each <results> is a dict of <object>: <result> entries
+        # if using MODE_OR or MODE_SEPARATE, can just return this as-is, but for 
+        # MODE_AND need to go through the lists of objects in each method's results 
+        # and remove any that don't appear in all method results
+        if combine_mode == NPLinker.MODE_AND: # AND results from methods used
+            filtered_results = {method: {} for method in results_by_method.keys()}
+            keep_objects = set(obj for obj, count in object_counts.items() if count == len(scoring_methods))
+            for method, results in results_by_method.items():
+                filtered_results[method] = {obj: data for obj, data in results.items() if obj in keep_objects}
+            results_by_method = filtered_results
+        
+        return results_by_method
 
-                # iterating over spectra
-                for i, type1_obj in enumerate(type1_objects):
-                    met_strains = len(type1_obj.dataset_strains)
-                    # iterating over GCFs
-                    for j, other_obj in enumerate(other_objs):
-                        gen_strains = len(other_obj.dataset_strains) 
-
-                        # lookup expected + variance values based on strain counts 
-                        expected = self._linkfinder.metcalf_expected[met_strains][gen_strains]
-                        variance_sqrt = self._linkfinder.metcalf_variance_sqrt[met_strains][gen_strains]
-
-                        # now need to extract the original score for this particular pair of objects. 
-                        # this requires figuring out the correct index into the results array for the pair,
-                        # using the lookup table constructed above
-                        k = pairs_lookup[(type1_obj.id, other_obj.id)]
-
-                        # calculate the final score based on the basic Metcalf score for these two
-                        # particular objects
-                        final_score = (results[0][self.R_SCORE][k] - expected) / variance_sqrt
-
-                        # finally apply the scoring cutoff and store the result
-                        if scoring_method.cutoff is None or (final_score >= scoring_method.cutoff):
-                            new_src.append(results[0][self.R_SRC_ID][k])
-                            new_dst.append(results[0][self.R_DST_ID][k])
-                            new_res.append(final_score)
-                    
-                # overwrite original "results" with equivalent new data structure
-                results = [np.array([new_src, new_dst, new_res])]
-
-                if input_type == GCF:
-                    # TODO molfam...
-                    results.append(np.zeros((3, 0)))
-
-        elif scoring_method.name == 'likescore':
-            results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, scoring_method.cutoff)
-        elif scoring_method.name == 'hg':
-            results = self._linkfinder.get_links(datalinks, objects, scoring_method.name, scoring_method.prob)
-        else:
-            raise Exception('Not handled yet')
-
-        scores_found = set()
-
-        if input_type == GCF:
-            logger.debug('get_links: input_type=GCF, result_type=Spec/MolFam, inputs={}, results={}'.format(len(objects), results[0].shape))
-            # for GCF input, results contains two arrays of shape (3, x), 
-            # which contain spec-gcf and fam-gcf links respectively 
-            result_gcf_spec, result_gcf_fam = results[0], results[1]
-
-            for res, type_ in [(result_gcf_spec, Spectrum), (result_gcf_fam, MolecularFamily)]:
-                if res.shape[1] == 0:
-                    logger.debug('Found no links for {} input objects'.format(len(objects)))
-                    continue # no results
-
-                # for each entry in the results (each Spectrum or MolecularFamily)
-                for j in range(res.shape[1]):
-                    # extract the ID of the object and get the object itself
-                    obj_id = int(res[self.R_DST_ID, j])
-                    obj = self._spectra[obj_id] if type_ == Spectrum else self._molfams[obj_id]
-
-                    # retrieve the GCF object too (can use its internal ID to index
-                    # directly into the .gcfs list)
-                    gcf = self._gcfs[int(res[self.R_SRC_ID][j])]
-
-                    # finally, create the entry in self._links and record that this GCF
-                    # has at least one link associated with it
-                    self._store_object_links(gcf, obj, res[self.R_SCORE, j], scoring_method)
-                    scores_found.add(gcf)
-
-        else:
-            logger.debug('get_links: input_type=Spec/MolFam, result_type=GCF, inputs={}, results={}'.format(len(objects), results[0].shape))
-            # for non-GCF input, result is a list containing a single array, shape (3, x)
-            # where x is the total number of links found
-            results = results[0]
-            print(results)
-            if results.shape[1] == 0:
-                logger.debug('Found no links for {} input objects'.format(len(objects)))
-                return []
-
-            # for each entry in the results (each GCF)
-            for j in range(results.shape[1]):
-                # extract the ID of the GCF and use that to get the object itself
-                gcf = self._gcfs[int(results[self.R_DST_ID, j])]
-
-                # retrieve the Spec/MolFam object too (can use its internal ID to index
-                # directly into the appropriate list)
-                obj_id = int(results[self.R_SRC_ID, j])
-                obj = self._spectra[obj_id] if input_type == Spectrum else self._molfams[obj_id]
-
-                # finally, create the entry in self._links and record that this Spectrum or
-                # MolecularFamily has at least one link associated with it
-                self._store_object_links(obj, gcf, results[self.R_SCORE, j], scoring_method)
-                scores_found.add(obj)
-
-        logger.debug('get_links: {}/{} input objects have links'.format(len(scores_found), len(objects)))
-        return list(scores_found)
-
+    # TODO ref to self._datalinks
     def get_common_strains(self, objects_a, objects_b, filter_no_shared=True):
         # this is a dict with structure:
         #   (Spectrum/MolecularFamily, GCF) => list of strain indices
@@ -594,13 +406,6 @@ class NPLinker(object):
         return self._product_types
 
     @property
-    def datalinks(self):
-        """
-        Returns the main DataLinks object used for scoring etc
-        """
-        return self._datalinks
-
-    @property
     def scoring(self):
         """
         Returns the ScoringConfig object used to manipulate the scoring process
@@ -615,21 +420,17 @@ class NPLinker(object):
         return self._repro_data
 
     @property
-    def all_links(self):
+    def scoring_methods(self):
         """
-        Returns the links for all objects and scoring methods
+        Returns the set of available scoring method names
         """
-        return self._links
+        return list(self._scoring_methods.keys())
 
-    def links_for_obj(self, obj, scoring_method, sort=True, type_=None):
-        # the type_ part is only really useful for GCFs, to pick between MolFam/Spectrum results
-        if obj not in self._links:
-            logger.warning('No links found for supplied object. Either get_links was not called first or no results were found')
-            return None
-        links = [(obj, score) for obj, score in self._links[obj][scoring_method.name].items() if (type_ is None or isinstance(obj, type_))]
-        if sort:
-            links.sort(key=lambda x: x[1], reverse=True)
-        return links
+    def scoring_method(self, name):
+        """
+        Return an instance of the given scoring method
+        """
+        return self._scoring_methods.get(name, None)(self)
 
 if __name__ == "__main__":
     # can set default logging configuration this way...
@@ -642,6 +443,8 @@ if __name__ == "__main__":
     if not npl.load_data():
         print('Failed to load the dataset!')
         sys.exit(-1)
+
+    # TODO all this needs updated for new scoring 
 
     # make sure metcalf scoring is enabled 
     npl.scoring.metcalf.enabled = True
