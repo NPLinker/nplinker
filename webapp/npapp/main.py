@@ -1650,7 +1650,7 @@ class NPLinkerBokeh(object):
         self.score_helper.spectra = selected_spectra
 
         # get the list of visible GCFs so we can filter out any others from the results
-        include_only = set([self.nh.nplinker.gcfs[gcf_id] for gcf_id in self.table_data.gcf_ds.data['gcf_pk'] if gcf_id != '-'])
+        include_only = set([self.nh.nplinker.gcfs[int(gcf_id)] for gcf_id in self.table_data.gcf_ds.data['gcf_pk'] if gcf_id != '-'])
 
         # FINALLY, display the link information
         self.display_links(results, mode=SCO_MODE_SPEC_GCF, div=self.results_div, include_only=include_only)
