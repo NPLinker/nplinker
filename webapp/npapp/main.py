@@ -1589,6 +1589,15 @@ class NPLinkerBokeh(object):
         print('Currently selected spectra: {}'.format(len(self.table_data.spec_ds.data['spectrum_id'])))
         print('Actual selections: {}'.format(len(self.table_data.spec_ds.selected.indices)))
 
+        if len(self.table_data.spec_ds.selected.indices) == 0:
+            self.hidden_alert_thing.text = 'Error: no spectra have been selected!\n\n' +\
+                                            'Running scoring on {} objects may take a long time!\n'.format(len(self.table_data.spec_ds.data['spectrum_id'])) +\
+                                             'Please make some selections and then try again.'
+            # this resets the text without triggering the alert() again, so that NEXT time this happens
+            # the text-changed event will be fired by the above line. yes it's a mess
+            self.hidden_alert_thing.text = ''
+            return
+
         # need to build a list of the NPLinker Spectrum objects corresponding to
         # the set of objects currently listed in the table
         # but first need to decide which set of spectra to use:
@@ -1597,7 +1606,6 @@ class NPLinkerBokeh(object):
         #   actually be selected, so just take all visible entries
         # - alternatively they might have selected a spectrum directly, in which case they
         #   will all still be visible but we only want the selected indices
-
         selected_spectra = []
         if len(self.table_data.spec_ds.selected.indices) > 0:
             # assume there's been an explicit selection and use those objects
@@ -1662,6 +1670,19 @@ class NPLinkerBokeh(object):
         """
         Handles clicks on the "Show scores for selected GCFs" button (tables mode)
         """
+
+        print('Currently selected bgcs: {}'.format(len(self.table_data.bgc_ds.data['bgc_pk'])))
+        print('Actual selections: {}'.format(len(self.table_data.bgc_ds.selected.indices)))
+
+        if len(self.table_data.bgc_ds.selected.indices) == 0:
+            self.hidden_alert_thing.text = 'Error: no BGCs have been selected!\n\n' +\
+                                            'Running scoring on {} objects may take a long time!\n'.format(len(self.table_data.bgc_ds.data['bgc_pk'])) +\
+                                             'Please make some selections and then try again.'
+            # this resets the text without triggering the alert() again, so that NEXT time this happens
+            # the text-changed event will be fired by the above line. yes it's a mess
+            self.hidden_alert_thing.text = ''
+            return
+
         # need to build a list of the NPLinker GCF objects corresponding to
         # the set of BGC objects currently listed in the table
         # but first need to decide which set of objects to use:
@@ -1936,6 +1957,10 @@ class NPLinkerBokeh(object):
 
         # and reset button
         self.table_data.tables_reset.on_click(self.tables_reset_callback)
+
+        self.hidden_alert_thing = PreText(text='', name='hidden_alert', visible=False)
+        self.hidden_alert_thing.js_on_change('text', CustomJS(code='if(cb_obj.text.length > 0) alert(cb_obj.text);', args={}))
+        widgets.append(self.hidden_alert_thing)
 
         for w in widgets:
             curdoc().add_root(w)
