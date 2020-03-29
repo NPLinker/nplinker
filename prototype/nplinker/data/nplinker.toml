@@ -139,24 +139,3 @@ antismash_format = "default"
 # (if needed, download the appropriate version of the archive in JSON format
 # from https://mibig.secondarymetabolites.org/download and extract the contents)
 #mibig_json_dir = ""
-
-# Scoring configuration
-[scoring]
-
-# metcalf scoring
-[scoring.metcalf]
-cutoff = 1.0
-enabled = true
-# use "expected value" scores
-standardised = true
-
-# hypergeometric scoring
-[scoring.hg]
-prob = 0.99
-enabled = false
-
-# likescore scoring
-[scoring.likescore]
-cutoff = 0.8
-enabled = false
-
