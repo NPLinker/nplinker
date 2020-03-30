@@ -130,6 +130,8 @@ class NPLinker(object):
 
         self._scoring_methods_setup_complete = {name: False for name in self._scoring_methods.keys()}
 
+        self._datalinks = None 
+
         self._repro_data = {}
         repro_file = self._config.config['repro_file']
         if len(repro_file) > 0:
@@ -291,6 +293,8 @@ class NPLinker(object):
         elif isinstance(scoring_methods, list) and  len(scoring_methods) == 0:
             raise Exception('scoring_methods length must be > 0')
 
+        # TODO check scoring_methods only contains ScoringMethod-derived instances
+
         # want everything to be in lists of lists
         if not isinstance(input_objects, list) or (isinstance(input_objects, list) and not isinstance(input_objects[0], list)):
             input_objects = [input_objects]
@@ -335,11 +339,16 @@ class NPLinker(object):
             for method, results in results_by_method.items():
                 filtered_results[method] = {obj: data for obj, data in results.items() if obj in keep_objects}
             results_by_method = filtered_results
+
+        for method in results_by_method:
+            logger.debug('Method {} ==> {} results'.format(method.name, len(results_by_method[method])))
         
         return results_by_method
 
-    # TODO ref to self._datalinks
     def get_common_strains(self, objects_a, objects_b, filter_no_shared=True):
+        if not self._datalinks:
+            self._datalinks = self.scoring_method(MetcalfScoring.NAME).datalinks
+
         # this is a dict with structure:
         #   (Spectrum/MolecularFamily, GCF) => list of strain indices
         common_strains = self._datalinks.common_strains(objects_a, objects_b, filter_no_shared)
@@ -407,13 +416,6 @@ class NPLinker(object):
         return self._product_types
 
     @property
-    def scoring(self):
-        """
-        Returns the ScoringConfig object used to manipulate the scoring process
-        """
-        return self._config.scoring
-
-    @property
     def repro_data(self):
         """
         Returns the dict of reproducibility data
@@ -431,6 +433,10 @@ class NPLinker(object):
         """
         Return an instance of the given scoring method
         """
+        if not self._scoring_methods_setup_complete[name]:
+            self._scoring_methods[name].setup(self)
+            self._scoring_methods_setup_complete[name] = True
+
         return self._scoring_methods.get(name, None)(self)
 
 if __name__ == "__main__":
