@@ -273,9 +273,6 @@ class NPLinkerHelper(object):
         if not self.nplinker.load_data():
             raise Exception('Failed to load data')
 
-        if not self.nplinker.process_dataset():
-            raise Exception('Failed to process dataset')
-
     def load_metabolomics(self):
         print('Creating metabolomics graph')
         met_points, met_edges = create_metabolomics_graph(self.nplinker.spectra, width=self.nx_scale * 2, singletons=True, split_singletons=True)

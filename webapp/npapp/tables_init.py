@@ -21,8 +21,8 @@ class TableData(object):
         """
 
         # first step: get the metcalf scoring links between spectra:gcf and gcf:spectra pairs
-        self.spec_links = self.nh.nplinker.get_links(self.nh.nplinker.spectra, scoring_method=self.nh.nplinker.scoring.metcalf)
-        self.gcf_links = self.nh.nplinker.get_links(self.nh.nplinker.gcfs, scoring_method=self.nh.nplinker.scoring.metcalf)
+        self.spec_links = self.nh.nplinker.get_links(self.nh.nplinker.spectra, self.nh.nplinker.scoring_method('metcalf'))
+        self.gcf_links = self.nh.nplinker.get_links(self.nh.nplinker.gcfs, self.nh.nplinker.scoring_method('metcalf'))
 
         # construct pandas dataframes and bokeh datatables for each object class
         # (this is probably fast enough to not be worth pickling like the links)
