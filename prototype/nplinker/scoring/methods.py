@@ -188,7 +188,6 @@ class MetcalfScoring(ScoringMethod):
             # for non-GCF input, result is a list containing a single array, shape (3, x)
             # where x is the total number of links found
             results = results[0]
-            print(results)
             if results.shape[1] == 0:
                 logger.debug('Found no links for {} input objects'.format(len(objects)))
                 return []
