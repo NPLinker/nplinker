@@ -207,6 +207,6 @@ class MetcalfScoring(ScoringMethod):
                 scores_found.add(obj)
 
                 # save the scores
-                metcalf_results[obj] = SimpleNamespace(**{'src': obj, 'dst': gcf, 'score': res[self.npl.R_SCORE, j]})
+                metcalf_results[obj] = SimpleNamespace(**{'src': obj, 'dst': gcf, 'score': results[self.npl.R_SCORE, j]})
 
         return metcalf_results
