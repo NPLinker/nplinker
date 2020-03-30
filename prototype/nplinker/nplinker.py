@@ -310,6 +310,7 @@ class NPLinker(object):
             if not self._scoring_methods_setup_complete[method.name]:
                 logger.debug('Doing one-time setup for {}'.format(method.name))
                 self._scoring_methods[method.name].setup(self)
+                self._scoring_methods_setup_complete[method.name] = True
 
             # should construct a dict of {object_with_link: <link_data>} entries
             objects_for_method = input_objects[i]
