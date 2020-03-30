@@ -70,6 +70,10 @@ class MetcalfScoring(ScoringMethod):
         MetcalfScoring.LINKFINDER.metcalf_scoring(MetcalfScoring.DATALINKS, type='fam-gcf')
         logger.info('MetcalfScoring.setup completed')
 
+    @property
+    def datalinks(self):
+        return MetcalfScoring.DATALINKS
+
     def get_links(self, objects):
         # enforce constraint that the list must contain a set of identically typed objects
         if not all(isinstance(x, type(objects[0])) for x in objects):
@@ -181,7 +185,9 @@ class MetcalfScoring(ScoringMethod):
                     scores_found.add(gcf)
 
                     # save the scores
-                    metcalf_results[gcf] = SimpleNamespace(**{'src': gcf, 'dst': obj, 'score': res[self.npl.R_SCORE, j]})
+                    if gcf not in metcalf_results:
+                        metcalf_results[gcf] = []
+                    metcalf_results[gcf].append(SimpleNamespace(**{'src': gcf, 'dst': obj, 'score': res[self.npl.R_SCORE, j]}))
 
         else:
             logger.debug('MetcalfScoring: input_type=Spec/MolFam, result_type=GCF, inputs={}, results={}'.format(len(objects), results[0].shape))
@@ -206,6 +212,8 @@ class MetcalfScoring(ScoringMethod):
                 scores_found.add(obj)
 
                 # save the scores
-                metcalf_results[obj] = SimpleNamespace(**{'src': obj, 'dst': gcf, 'score': results[self.npl.R_SCORE, j]})
+                if obj not in metcalf_results:
+                    metcalf_results[obj] = []
+                metcalf_results[obj].append(SimpleNamespace(**{'src': obj, 'dst': gcf, 'score': results[self.npl.R_SCORE, j]}))
 
         return metcalf_results
