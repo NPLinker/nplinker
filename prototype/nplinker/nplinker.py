@@ -12,7 +12,7 @@ from .genomics import GCF, BGC
 from .config import Config, Args
 from .loader import DatasetLoader
 
-from .scoring.methods import MetcalfScoring, TestScoring
+from .scoring.methods import MetcalfScoring, TestScoring, LinkCollection
 
 from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
@@ -21,12 +21,6 @@ class NPLinker(object):
 
     # allowable types for objects to be passed to scoring methods
     OBJ_CLASSES = [Spectrum, MolecularFamily, GCF, BGC]
-
-    # enumeration of modes for get_links method
-    # - AND: results of multiple methods AND'ed together
-    # - OR: results of multiple methods OR'ed together
-    # - SEPARATE: results from multiple methods returned independently
-    MODE_AND, MODE_OR, MODE_SEPARATE = range(3)
 
     # enumeration for accessing results of LinkFinder.get_links, which are (3, num_links) arrays:
     # - R_SRC_ID: the ID of an object that was supplied as input to get_links
@@ -263,7 +257,7 @@ class NPLinker(object):
         logger.debug('load_data: completed')
         return True
 
-    def get_links(self, input_objects, scoring_methods, combine_mode=MODE_AND):
+    def get_links(self, input_objects, scoring_methods, and_mode=True):
         """Find links for a set of input objects (BGCs/GCFs/Spectra/MolFams)
         
         Given a set of input objects and 1 or more NPLinker scoring methods,
@@ -284,14 +278,18 @@ class NPLinker(object):
             a set of the results from each of the enabled scoring methods for the
             given object. The content of these results depends on the scoring method. 
         """
-        results_by_method = {}
-        object_counts = {}
 
         if isinstance(input_objects, list) and len(input_objects) == 0:
             raise Exception('input_objects length must be > 0')
 
         elif isinstance(scoring_methods, list) and  len(scoring_methods) == 0:
             raise Exception('scoring_methods length must be > 0')
+
+        # check if input_objects is a list of lists. if so there should be one
+        # entry for each supplied method for it to be a valid parameter
+        if isinstance(input_objects[0], list):
+            if len(input_objects) != len(scoring_methods):
+                raise Exception('Number of input_objects lists must match number of scoring_methods (found: {}, expected: {})'.format(len(input_objects), len(scoring_methods)))
 
         # TODO check scoring_methods only contains ScoringMethod-derived instances
 
@@ -303,11 +301,22 @@ class NPLinker(object):
 
         logger.debug('get_links: {} object sets, {} methods'.format(len(input_objects), len(scoring_methods)))
 
-        # check if input_objects is a list of lists. if so there should be one
-        # entry for each supplied method for it to be a valid parameter
-        if isinstance(input_objects[0], list):
-            if len(input_objects) != len(scoring_methods):
-                raise Exception('Number of input_objects lists must match number of scoring_methods (found: {}, expected: {})'.format(len(input_objects), len(scoring_methods)))
+        # copy the object set if required to make up the numbers
+        if len(input_objects) != len(scoring_methods):
+            if len(scoring_methods) < len(input_objects):
+                raise Exception('Number of scoring methods must be >= number of input object sets')
+            elif (len(scoring_methods) > len(input_objects)) and len(input_objects) != 1:
+                raise Exception('Mismatch between number of scoring methods and input objects ({} vs {})'.format(len(scoring_methods), len(input_objects)))
+            elif len(scoring_methods) > len(input_objects):
+                # this is a special case for convenience: pass in 1 set of objects and multiple methods,
+                # result is that set is used for all methods
+                logger.debug('Duplicating input object set')
+                while len(input_objects) < len(scoring_methods):
+                    input_objects.append(input_objects[0])
+                    logger.debug('Duplicating input object set')
+
+        object_counts = {}
+        link_collection = LinkCollection(and_mode)
 
         for i, method in enumerate(scoring_methods):
             # do any one-off initialisation required by this method
@@ -319,32 +328,34 @@ class NPLinker(object):
             # should construct a dict of {object_with_link: <link_data>} entries
             objects_for_method = input_objects[i]
             logger.debug('Calling scoring method {} on {} objects'.format(method.name, len(objects_for_method)))
-            results = method.get_links(objects_for_method)
+            link_collection = method.get_links(objects_for_method, link_collection)
 
-            results_by_method[method] = results
-            for obj in results.keys():
-                if obj in object_counts:
-                    object_counts[obj] += 1
-                else:
-                    object_counts[obj] = 1
+        if not self._datalinks:
+            self._datalinks = self.scoring_method(MetcalfScoring.NAME).datalinks
 
-        # results_by_method now contains method: results entries, where
-        # each <results> is a dict of <object>: <result> entries
-        # if using MODE_OR or MODE_SEPARATE, can just return this as-is, but for 
-        # MODE_AND need to go through the lists of objects in each method's results 
-        # and remove any that don't appear in all method results
-        if combine_mode == NPLinker.MODE_AND: # AND results from methods used
-            filtered_results = {method: {} for method in results_by_method.keys()}
-            keep_objects = set(obj for obj, count in object_counts.items() if count == len(scoring_methods))
-            for method, results in results_by_method.items():
-                filtered_results[method] = {obj: data for obj, data in results.items() if obj in keep_objects}
-            results_by_method = filtered_results
+        # populate shared strain info
+        # TODO more efficient version?
+        for source, link_data in link_collection.links.items():
+            targets = list(link_data.keys())
 
-        for method in results_by_method:
-            logger.debug('Method {} ==> {} results'.format(method.name, len(results_by_method[method])))
-        
-        return results_by_method
+            shared_strains = self._datalinks.common_strains([source], targets, True)
+            for objpair in shared_strains.keys():
+                shared_strains[objpair] = [self._strains.lookup_index(x) for x in shared_strains[objpair]]
 
+            if isinstance(source, BGC):
+                raise Exception('Not supported - TODO')
+            elif isinstance(source, GCF):
+                for target, link in link_data.items():
+                    if (target, source) in shared_strains:
+                        link.shared_strains = shared_strains[(target, source)]
+            else:
+                for target, link in link_data.items():
+                    if (source, target) in shared_strains:
+                        link.shared_strains = shared_strains[(source, target)]
+
+        return link_collection
+
+    # TODO remove?
     def get_common_strains(self, objects_a, objects_b, filter_no_shared=True):
         if not self._datalinks:
             self._datalinks = self.scoring_method(MetcalfScoring.NAME).datalinks

@@ -1,3 +1,4 @@
+import itertools
 import random
 from types import SimpleNamespace
 
@@ -9,6 +10,179 @@ from ..metabolomics import Spectrum, MolecularFamily
 
 from ..logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
+
+
+class LinkCollection(object):
+    """
+    TODO
+    """
+
+    def __init__(self, and_mode=True):
+        self._methods = set()
+        self._link_data = {}
+        self._targets = {}
+        self._and_mode = and_mode
+
+    def _add_links_from_method(self, method, object_links):
+        # object_links is a dict of <source: [ObjectLinks]>
+        if method in self._methods:
+            # this is probably an error...
+            raise Exception('Duplicate method found in LinkCollection: {}'.format(method.name))
+
+        # if this is the first set of results to be generated, can just dump
+        # them all straight in
+        if len(self._methods) == 0:
+            self._link_data = {k: v for k, v in object_links.items()}
+        else:
+            # if already some results added, in OR mode can just merge the new set
+            # with the existing set, but in AND mode need to ensure we end up with
+            # only results that appear in both sets
+            
+            if not self._and_mode:
+                self._merge_or_mode(object_links)
+            else:
+                self._merge_and_mode(object_links)
+
+        self._methods.add(method)
+
+    def _merge_and_mode(self, object_links):
+        # set of ObjectLinks common to existing + new results 
+        intersect1 = self._link_data.keys() & object_links.keys()
+
+        # iterate over the existing set of link info, remove entries for objects
+        # that aren't common to both that and the new set of info, and merge in
+        # any common links
+        to_remove = []
+        for source, existing_links in self._link_data.items():
+            if source not in intersect1:
+                to_remove.append(source)
+                continue
+
+            links_to_merge = object_links[source]
+            intersect2 = existing_links.keys() & links_to_merge.keys()
+            self._link_data[source] = {k: v for k, v in existing_links.items() if k in intersect2}
+
+            for target, object_link in object_links[source].items():
+                self._link_data[source][target]._merge(object_link)
+
+        for source in to_remove:
+            del self._link_data[source]
+
+    def _merge_or_mode(self, object_links):
+        for source, links in object_links.items():
+
+            # update the existing dict with the new entries that don't appear in it already
+            self._link_data[source].update({k: v for k, v in links.items() if k not in self._link_data[source]})
+
+            # now merge the remainder (common to both)
+            for target, object_link in links.items():
+                self._link_data[source][target]._merge(object_link)
+
+    def filter_no_shared_strains(self):
+        len_before = len(self._link_data)
+        self.filter_links(lambda x: len(x.shared_strains) > 0)
+        logger.debug('filter_no_shared_strains: {} => {}'.format(len_before, len(self._link_data)))
+
+    def filter_sources(self, callable_obj):
+        len_before = len(self._link_data)
+        self._link_data = {k: v for k, v in self._link_data.items() if callable_obj(k)}
+        logger.debug('filter_sources: {} => {}'.format(len_before, len(self._link_data)))
+
+    def filter_targets(self, callable_obj, sources=None):
+        to_remove = []
+        sources_list = self._link_data.keys() if sources is None else sources
+        for source in sources_list:
+            self._link_data[source] = {k: v for k, v in self._link_data[source].items() if callable_obj(k)}
+            # if there are now no links for this source, remove it completely
+            if len(self._link_data[source]) == 0:
+                to_remove.append(source)
+
+        for source in to_remove:
+            del self._link_data[source]
+
+    def filter_links(self, callable_obj, sources=None):
+        to_remove = []
+        sources_list = self._link_data.keys() if sources is None else sources
+        for source in sources_list:
+            self._link_data[source] = {k: v for k, v in self._link_data[source].items() if callable_obj(v)}
+            # if there are now no links for this source, remove it completely
+            if len(self._link_data[source]) == 0:
+                to_remove.append(source)
+
+        for source in to_remove:
+            del self._link_data[source]
+
+    def get_sorted_links(self, method, source, reverse=True):
+        links = [link for link in self._link_data[source].values() if method in link.methods]
+        return method.sort(links, reverse)
+
+    def get_all_targets(self):
+        return list(itertools.chain.from_iterable(self._link_data[x].keys() for x in self._link_data.keys()))
+
+    @property
+    def sources(self):
+        # the set of objects supplied as input, which have links 
+        return list(self._link_data.keys())
+
+    @property
+    def links(self):
+        return self._link_data
+
+    @property
+    def source_count(self):
+        return len(self._link_data)
+
+    @property
+    def method_count(self):
+        return len(self._methods)
+
+    def __len__(self):
+        return len(self._link_data)
+
+class ObjectLink(object):
+    """
+    TODO 
+    """
+    def __init__(self, source, target, method, data=None, shared_strains=[]):
+        self.source = source
+        self.target = target
+        self.shared_strains = shared_strains
+        self._method_data = {method: data}
+
+    def _merge(self, other_link):
+        self._method_data.update(other_link._method_data)
+        if len(self._method_data) == 3:
+            print(self._method_data)
+        assert(len(self._method_data) < 3)
+        return self
+
+    @property
+    def method_count(self):
+        return len(self._method_data)
+
+    @property
+    def methods(self):
+        return self._method_data.keys()
+
+    @property
+    def data(self, method):
+        return self._method_data[method]
+
+    def __getitem__(self, name):
+        if name in self._method_data:
+            return self._method_data[name]
+
+        return object.__getitem__(self, name)
+
+    def __hash__(self):
+        # return the nplinker internal ID as hash value (for set/dict etc)
+        return self.source.id
+
+    def __str__(self):
+        return 'ObjectLink(source={}, target={}, #methods={})'.format(self.source, self.target, len(self._method_data))
+
+    def __repr__(self):
+        return str(self)
 
 class ScoringMethod(object):
 
@@ -23,9 +197,13 @@ class ScoringMethod(object):
         """Perform any one-off initialisation required (will only be called once)"""
         pass
 
-    def get_links(self, objects):
+    def get_links(self, objects, link_collection):
         """Given a set of objects, return link information"""
         return {}
+
+    def sort(self, objects, reverse=True):
+        """Given a list of objects, return them sorted by link score"""
+        return objects
 
 class TestScoring(ScoringMethod):
 
@@ -33,20 +211,31 @@ class TestScoring(ScoringMethod):
 
     def __init__(self, npl):
         super(TestScoring, self).__init__(npl)
-        self.foo = 123
+        self.value = 0.5
+        self.mc = MetcalfScoring(npl)
 
     @staticmethod
     def setup(npl):
         logger.info('TestScoring setup')
 
-    def get_links(self, objects):
-        # randomly pick some objects and scores to return
-        results = {}
-        for obj in objects:
-            if random.random() > 0.5:
-                results[obj] = (random.random() * 10, self.foo)
+    def get_links(self, objects, link_collection):
+        mc_results = self.mc.get_links(objects, link_collection)
+        num_to_keep = int(len(mc_results) * self.value)
+        results = {obj: data for obj, data in list(mc_results.links.items())[:num_to_keep]}
+        for links in results.values():
+            for link in links.values():
+                # this is just to make things work properly for the test
+                # method, shouldn't do stuff like this normally 
+                link._method_data[self] = random.random()
+                del link._method_data[self.mc]
 
-        return results
+        logger.debug('TestScoring found {} results'.format(len(results)))
+        link_collection._add_links_from_method(self, results)
+        return link_collection
+
+    def sort(self, objects, reverse=True):
+        # nothing
+        return objects
 
 class MetcalfScoring(ScoringMethod):
 
@@ -74,7 +263,7 @@ class MetcalfScoring(ScoringMethod):
     def datalinks(self):
         return MetcalfScoring.DATALINKS
 
-    def get_links(self, objects):
+    def get_links(self, objects, link_collection):
         # enforce constraint that the list must contain a set of identically typed objects
         if not all(isinstance(x, type(objects[0])) for x in objects):
             raise Exception('MetcalfScoring: uniformly-typed list of objects is required')
@@ -168,7 +357,8 @@ class MetcalfScoring(ScoringMethod):
 
             for res, type_ in [(result_gcf_spec, Spectrum), (result_gcf_fam, MolecularFamily)]:
                 if res.shape[1] == 0:
-                    logger.debug('Found no links for {} input objects (type {})'.format(len(objects), type_))
+                    if type_ != MolecularFamily:
+                        logger.debug('Found no links for {} input objects (type {})'.format(len(objects), type_))
                     continue # no results
 
                 # for each entry in the results (each Spectrum or MolecularFamily)
@@ -186,8 +376,8 @@ class MetcalfScoring(ScoringMethod):
 
                     # save the scores
                     if gcf not in metcalf_results:
-                        metcalf_results[gcf] = []
-                    metcalf_results[gcf].append(SimpleNamespace(**{'src': gcf, 'dst': obj, 'score': res[self.npl.R_SCORE, j]}))
+                        metcalf_results[gcf] = {obj: []}
+                    metcalf_results[gcf][obj] = ObjectLink(gcf, obj,self, res[self.npl.R_SCORE, j])
 
         else:
             logger.debug('MetcalfScoring: input_type=Spec/MolFam, result_type=GCF, inputs={}, results={}'.format(len(objects), results[0].shape))
@@ -213,7 +403,13 @@ class MetcalfScoring(ScoringMethod):
 
                 # save the scores
                 if obj not in metcalf_results:
-                    metcalf_results[obj] = []
-                metcalf_results[obj].append(SimpleNamespace(**{'src': obj, 'dst': gcf, 'score': results[self.npl.R_SCORE, j]}))
+                    metcalf_results[obj] = {gcf: []}
+                metcalf_results[obj][gcf] = ObjectLink(obj, gcf, self, results[self.npl.R_SCORE, j])
 
-        return metcalf_results
+        logger.debug('MetcalfScoring found {} results'.format(len(metcalf_results)))
+        link_collection._add_links_from_method(self, metcalf_results)
+        return link_collection
+
+    def sort(self, objects, reverse=True):
+        # sort based on score
+        return sorted(objects, key=lambda objlink: objlink[self], reverse=reverse)
