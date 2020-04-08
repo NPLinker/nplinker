@@ -120,6 +120,10 @@ class LinkCollection(object):
         return list(itertools.chain.from_iterable(self._link_data[x].keys() for x in self._link_data.keys()))
 
     @property
+    def methods(self):
+        return self._methods
+
+    @property
     def sources(self):
         # the set of objects supplied as input, which have links 
         return list(self._link_data.keys())
