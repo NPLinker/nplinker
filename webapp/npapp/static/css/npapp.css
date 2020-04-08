@@ -97,4 +97,17 @@
   -ms-transform: translate(-50%,-50%);
 }
 
+/* tab styling */
+.nav-tabs .nav-link.active {
+    background-color: #0099ff;
+    color: #fff;
+    margin-left: 5px;
+    margin-right: 5px;
+}
 
+.nav-tabs .nav-link {
+    background-color: #999;
+    color: #fff;
+    margin-left: 5px;
+    margin-right: 5px;
+}
