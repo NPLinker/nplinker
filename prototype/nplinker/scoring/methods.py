@@ -201,6 +201,10 @@ class ScoringMethod(object):
         """Given a set of objects, return link information"""
         return {}
 
+    def format_data(self, data):
+        """Given whatever output data the method produces, return a readable string version"""
+        return ''
+
     def sort(self, objects, reverse=True):
         """Given a list of objects, return them sorted by link score"""
         return objects
@@ -232,6 +236,9 @@ class TestScoring(ScoringMethod):
         logger.debug('TestScoring found {} results'.format(len(results)))
         link_collection._add_links_from_method(self, results)
         return link_collection
+
+    def format_data(self, data):
+        return self.mc.format_data(data)
 
     def sort(self, objects, reverse=True):
         # nothing
@@ -409,6 +416,10 @@ class MetcalfScoring(ScoringMethod):
         logger.debug('MetcalfScoring found {} results'.format(len(metcalf_results)))
         link_collection._add_links_from_method(self, metcalf_results)
         return link_collection
+
+    def format_data(self, data):
+        # for metcalf the data will just be a floating point value (i.e. the score)
+        return '{:.4f}'.format(data)
 
     def sort(self, objects, reverse=True):
         # sort based on score
