@@ -54,6 +54,42 @@
 {% endblock %}
   
 {% block contents %}
+<div class="modal" id="metcalfModal" tabIndex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Metcalf scoring options</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                    {{ embed(roots.metcalf_standardised) }}
+                    {{ embed(roots.metcalf_cutoff) }}
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="testscoreModal" tabIndex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Testscore scoring options</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {{ embed(roots.testscore_value) }}
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container-fluid" style="margin-top: 10px">
     <div class="row" style="background-color: #fffdd2">
         <div class="col-md-3">
@@ -94,10 +130,10 @@
         <div class="col-md-8">
             <ul class="nav nav-tabs nav-pills nav-fill" id="modeTabs", role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" role="tab" data-toggle="tab" href="#modes_tab_tables">Display tables</a>
+                    <a class="nav-link active" role="tab" data-toggle="tab" href="#modes_tab_tables">Tables view</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" role="tab" data-toggle="tab" href="#modes_tab_plots">Display plots</a>
+                    <a class="nav-link" role="tab" data-toggle="tab" href="#modes_tab_plots">Plots view</a>
                 </li>
             </ul>
         </div>
@@ -237,14 +273,19 @@
                         </div>
                         <div class="col-md-1"></div>
                     </div>
-                    <div class="row" style="background-color: #ffffff">
+                    <div class="row">
                         <div class="col-md-1"></div>
                         <div class="col-lg-10">
                             <strong>Selected scoring method:</strong>
-                            {{ embed(roots.scoring_method_group) }}
-                            <strong>Method parameters</strong>
-                            {{ embed(roots.metcalf_standardised) }}
-                            {{ embed(roots.sliders) }}
+                            {{ embed(roots.scoring_method_checkboxes) }}
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {{ embed(roots.metcalf_scoring_button) }}
+                                        {{ embed(roots.testscore_scoring_button) }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-1"></div>
                     </div>
