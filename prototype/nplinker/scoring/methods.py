@@ -161,7 +161,6 @@ class ObjectLink(object):
     def methods(self):
         return self._method_data.keys()
 
-    @property
     def data(self, method):
         return self._method_data[method]
 
