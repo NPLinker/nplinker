@@ -255,8 +255,8 @@ class TableData(object):
             self.bgc_gcf, self.mf_spectra, self.spectra_bgc = pickle.load(open(pickled_links, 'rb'))
 
         # add the buttons to trigger scoring
-        self.tables_score_met = Button(label='Show scores for selected spectra', name='tables_score_met')
-        self.tables_score_gen = Button(label='Show scores for selected BGCs', name='tables_score_gen')
+        self.tables_score_met = Button(label='Show scores for selected spectra', name='tables_score_met', button_type='success')
+        self.tables_score_gen = Button(label='Show scores for selected BGCs', name='tables_score_gen', button_type='success')
         self.widgets.append(self.tables_score_met)
         self.widgets.append(self.tables_score_gen)
 
@@ -271,7 +271,7 @@ class TableData(object):
                 $('#' + table).css('opacity', '');
             }
         """
-        self.tables_reset = Button(label='Clear selections', name='tables_reset')
+        self.tables_reset = Button(label='Clear selections', name='tables_reset', button_type='danger')
         self.tables_reset.js_on_click(CustomJS(args={}, code=reset_selection_code))
         self.tables_reset.on_click(reset_tables_callback)
         self.widgets.append(self.tables_reset)
