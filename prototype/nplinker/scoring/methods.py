@@ -151,9 +151,6 @@ class ObjectLink(object):
 
     def _merge(self, other_link):
         self._method_data.update(other_link._method_data)
-        if len(self._method_data) == 3:
-            print(self._method_data)
-        assert(len(self._method_data) < 3)
         return self
 
     @property
