@@ -22,12 +22,6 @@ class NPLinker(object):
     # allowable types for objects to be passed to scoring methods
     OBJ_CLASSES = [Spectrum, MolecularFamily, GCF, BGC]
 
-    # enumeration for accessing results of LinkFinder.get_links, which are (3, num_links) arrays:
-    # - R_SRC_ID: the ID of an object that was supplied as input to get_links
-    # - R_DST_ID: the ID of an object that was discovered to have a link to an input object
-    # - R_SCORE: the score for the link between a pair of objects
-    R_SRC_ID, R_DST_ID, R_SCORE = range(3)
-
     def __init__(self, userconfig=None, platform_id=None):
         # TODO update docstring
         """Initialise an NPLinker instance, automatically loading a dataset and generating scores.
@@ -355,8 +349,32 @@ class NPLinker(object):
 
         return link_collection
 
-    # TODO remove?
     def get_common_strains(self, objects_a, objects_b, filter_no_shared=True):
+        """
+        Allows for retrieval of shared strains for arbitrary pairs of objects.
+
+        Takes two lists of objects as input. Typically one list will be MolecularFamily
+        or Spectrum objects and the other GCF (which list is which doesn't matter). The
+        return value is a dict mapping pairs of objects to lists of Strain objects 
+        shared by that pair. This list may be empty if filter_no_shared is False. If
+        filter_no_shared is True, every entry in the dict with no shared strains will
+        be removed before it is returned. 
+
+        Args:
+            objects_a: a list of Spectrum/MolecularFamily/GCF objects
+            objects_b: a list of Spectrum/MolecularFamily/GCF objects 
+            filter_no_shared: remove result entries if no shared strains exist
+
+        Returns:
+            A dict mapping pairs of objects (obj1, obj2) to lists of Strain objects.
+
+            NOTE: The ordering of the pairs is *fixed* to be (metabolomic, genomic). In
+            other words, if objects_a = [GCF1, GC2, ...] and objects_b = [Spectrum1, 
+            Spectrum2, ...], the object pairs will be (Spectrum1, GCF1), (Spectrum2,
+            GCF2), and so on. The same applies if objects_a and objects_b are swapped,
+            the metabolomic objects (Spectrum or MolecularFamily) will be the obj1
+            entry in each pair. 
+        """
         if not self._datalinks:
             self._datalinks = self.scoring_method(MetcalfScoring.NAME).datalinks
 
@@ -462,47 +480,32 @@ if __name__ == "__main__":
         print('Failed to load the dataset!')
         sys.exit(-1)
 
-    # TODO all this needs updated for new scoring 
+    # create a metcalf scoring object
+    mc = npl.scoring_method('metcalf')
+    # set a scoring cutoff threshold
+    mc.cutoff = 3.0
 
-    # make sure metcalf scoring is enabled 
-    npl.scoring.metcalf.enabled = True
+    # pick some GCFs to get links for
+    test_gcfs = npl.gcfs[:10]
 
-    # generate all datalinks objects etc
-    if not npl.process_dataset():
-        print('Failed to process dataset')
-        sys.exit(-1)
-
-    # pick a GCF to get links for
-    test_gcf = npl.gcfs[8]
-
-    # call get_links and set the scoring method to metcalf by referencing the 
-    # scoring.metcalf object
-    result = npl.get_links(test_gcf, scoring_method=npl.scoring.metcalf)
+    # tell nplinker to find links for this set of GCFs using metcalf scoring
+    results = npl.get_links(test_gcfs, mc)
 
     # check if any links were found
-    if test_gcf not in result:
+    if len(results) == 0:
         print('No links found!')
         sys.exit(0)
 
-    # retrieve the specific links for this object (get_links() supports passing
-    # multiple objects as input and so doesn't return them directly). since multiple
-    # scoring methods may be in use, need to supply the desired scoring object as a
-    # parameter. By default this will return objects of any available type (so Spectrum
-    # or MolecularFamily for GCF input), but the type_ parameter can be used to select
-    # a single class if needed.
-    test_gcf_links = npl.links_for_obj(test_gcf, npl.scoring.metcalf, type_=Spectrum)
+    # the "result" object will be a LinkCollection, holding all the information
+    # returned by the scoring method(s) used
+    print('{} total links found'.format(len(results)))
 
-    # print the objects (spectra in this example) and their scores
-    for obj, score in test_gcf_links:
-        print('{} : {}'.format(obj, score))
-        # also retrieve common strains. the return value here is a dict indexed
-        # by object tuples (either (Spectrum, GCF) or (MolecularFamily, GCF) depending
-        # on the inputs), with the values being lists of shared strains (strings)
-        common_strains = npl.get_common_strains(test_gcf, obj)
-        strain_names = list(common_strains.values())[0]
-        if len(strain_names) == 0:
-            print('   No shared strains!')
-        else:
-            print('   {} shared strains: {}'.format(len(strain_names), strain_names))
+    # display some information about each object and its links
+    for obj, result in results.links.items():
+        print('Results for object: {}, {} total links, {} methods used'.format(obj, len(result), results.method_count))
 
-    print('{} total links found'.format(len(test_gcf_links)))
+        # get links for this object, sorted by metcalf score
+        sorted_links = results.get_sorted_links(mc, obj)
+        for link_data in sorted_links:
+            print('  --> [{}] {} | {} | # shared_strains = {}'.format(','.join(method.name for method in link_data.methods), link_data.target, link_data[mc], len(link_data.shared_strains)))
+

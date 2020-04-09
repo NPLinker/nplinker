@@ -14,7 +14,13 @@ logger = LogConfig.getLogger(__file__)
 
 class LinkCollection(object):
     """
-    TODO
+    Class which stores the results of running one or more scoring methods. 
+
+    It provides access to the set of objects which were found to have links,
+    the set of objects linked to each of those objects, and the information
+    produced by the scoring method(s) about each link. 
+
+    There are also some useful utility methods to filter the original results. 
     """
 
     def __init__(self, and_mode=True):
@@ -145,7 +151,13 @@ class LinkCollection(object):
 
 class ObjectLink(object):
     """
-    TODO 
+    Class which stores information about a single link between two objects.
+
+    The information stored is basically:
+     - the "source" of the link (the original object provided as part of the input)
+     - the "target" of the link (the linked object)
+     - a possibly empty list of Strain objects shared between source and target
+     - the output of the scoring method(s) used for this link (e.g. a metcalf score)
     """
     def __init__(self, source, target, method, data=None, shared_strains=[]):
         self.source = source
@@ -250,6 +262,12 @@ class MetcalfScoring(ScoringMethod):
     LINKFINDER = None
     NAME = 'metcalf'
 
+    # enumeration for accessing results of LinkFinder.get_links, which are (3, num_links) arrays:
+    # - R_SRC_ID: the ID of an object that was supplied as input to get_links
+    # - R_DST_ID: the ID of an object that was discovered to have a link to an input object
+    # - R_SCORE: the score for the link between a pair of objects
+    R_SRC_ID, R_DST_ID, R_SCORE = range(3)
+
     def __init__(self, npl):
         super(MetcalfScoring, self).__init__(npl)
         self.cutoff = 1.0
@@ -304,17 +322,17 @@ class MetcalfScoring(ScoringMethod):
 
             # make type1_objects always == spectra. if input is spectra, just use "objects",
             # otherwise build a list using the object IDs in the results array
-            type1_objects = objects if spectra_input else {self.npl.spectra[int(index)] for index in results[0][self.npl.R_DST_ID]}
+            type1_objects = objects if spectra_input else {self.npl.spectra[int(index)] for index in results[0][self.R_DST_ID]}
 
             # other objs should be "objects" if input is GCF, otherwise create 
             # from the results array as above
-            other_objs = objects if not spectra_input else {self.npl._gcfs[int(index)] for index in results[0][self.npl.R_DST_ID]}
+            other_objs = objects if not spectra_input else {self.npl._gcfs[int(index)] for index in results[0][self.R_DST_ID]}
 
             # build a lookup table for pairs of object IDs and their index in the results array
             if spectra_input:
-                pairs_lookup = {(results[0][self.npl.R_SRC_ID][i], results[0][self.npl.R_DST_ID][i]): i for i in range(len(results[0][self.npl.R_SRC_ID]))}
+                pairs_lookup = {(results[0][self.R_SRC_ID][i], results[0][self.R_DST_ID][i]): i for i in range(len(results[0][self.R_SRC_ID]))}
             else:
-                pairs_lookup = {(results[0][self.npl.R_DST_ID][i], results[0][self.npl.R_SRC_ID][i]): i for i in range(len(results[0][self.npl.R_SRC_ID]))}
+                pairs_lookup = {(results[0][self.R_DST_ID][i], results[0][self.R_SRC_ID][i]): i for i in range(len(results[0][self.R_SRC_ID]))}
 
             # apply score update to each spec:gcf pairing and update the corresponding entry in results
             # (the metcalf_expected and metcalf_variance matrices should have been calculated already)
@@ -338,12 +356,12 @@ class MetcalfScoring(ScoringMethod):
 
                     # calculate the final score based on the basic Metcalf score for these two
                     # particular objects
-                    final_score = (results[0][self.npl.R_SCORE][k] - expected) / variance_sqrt
+                    final_score = (results[0][self.R_SCORE][k] - expected) / variance_sqrt
 
                     # finally apply the scoring cutoff and store the result
                     if self.cutoff is None or (final_score >= self.cutoff):
-                        new_src.append(results[0][self.npl.R_SRC_ID][k])
-                        new_dst.append(results[0][self.npl.R_DST_ID][k])
+                        new_src.append(results[0][self.R_SRC_ID][k])
+                        new_dst.append(results[0][self.R_DST_ID][k])
                         new_res.append(final_score)
                 
             # overwrite original "results" with equivalent new data structure
@@ -371,12 +389,12 @@ class MetcalfScoring(ScoringMethod):
                 # for each entry in the results (each Spectrum or MolecularFamily)
                 for j in range(res.shape[1]):
                     # extract the ID of the object and get the object itself
-                    obj_id = int(res[self.npl.R_DST_ID, j])
+                    obj_id = int(res[self.R_DST_ID, j])
                     obj = self.npl._spectra[obj_id] if type_ == Spectrum else self.npl._molfams[obj_id]
 
                     # retrieve the GCF object too (can use its internal ID to index
                     # directly into the .gcfs list)
-                    gcf = self.npl._gcfs[int(res[self.npl.R_SRC_ID][j])]
+                    gcf = self.npl._gcfs[int(res[self.R_SRC_ID][j])]
 
                     # record that this GCF has at least one link associated with it
                     scores_found.add(gcf)
@@ -384,7 +402,7 @@ class MetcalfScoring(ScoringMethod):
                     # save the scores
                     if gcf not in metcalf_results:
                         metcalf_results[gcf] = {obj: []}
-                    metcalf_results[gcf][obj] = ObjectLink(gcf, obj,self, res[self.npl.R_SCORE, j])
+                    metcalf_results[gcf][obj] = ObjectLink(gcf, obj,self, res[self.R_SCORE, j])
 
         else:
             logger.debug('MetcalfScoring: input_type=Spec/MolFam, result_type=GCF, inputs={}, results={}'.format(len(objects), results[0].shape))
@@ -398,11 +416,11 @@ class MetcalfScoring(ScoringMethod):
             # for each entry in the results (each GCF)
             for j in range(results.shape[1]):
                 # extract the ID of the GCF and use that to get the object itself
-                gcf = self.npl._gcfs[int(results[self.npl.R_DST_ID, j])]
+                gcf = self.npl._gcfs[int(results[self.R_DST_ID, j])]
 
                 # retrieve the Spec/MolFam object too (can use its internal ID to index
                 # directly into the appropriate list)
-                obj_id = int(results[self.npl.R_SRC_ID, j])
+                obj_id = int(results[self.R_SRC_ID, j])
                 obj = self.npl._spectra[obj_id] if input_type == Spectrum else self.npl._molfams[obj_id]
 
                 # record that this Spectrum or MolecularFamily has at least one link associated with it
@@ -411,7 +429,7 @@ class MetcalfScoring(ScoringMethod):
                 # save the scores
                 if obj not in metcalf_results:
                     metcalf_results[obj] = {gcf: []}
-                metcalf_results[obj][gcf] = ObjectLink(obj, gcf, self, results[self.npl.R_SCORE, j])
+                metcalf_results[obj][gcf] = ObjectLink(obj, gcf, self, results[self.R_SCORE, j])
 
         logger.debug('MetcalfScoring found {} results'.format(len(metcalf_results)))
         link_collection._add_links_from_method(self, metcalf_results)
