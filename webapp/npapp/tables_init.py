@@ -22,7 +22,7 @@ class TableData(object):
 
         # first step: get the metcalf scoring links between spectra:gcf and gcf:spectra pairs
         self.spec_links = self.nh.nplinker.get_links(self.nh.nplinker.spectra, self.nh.nplinker.scoring_method('metcalf'))
-        self.gcf_links = self.nh.nplinker.get_links(self.nh.nplinker.gcfs, self.nh.nplinker.scoring_method('metcalf'))
+        # self.gcf_links = self.nh.nplinker.get_links(self.nh.nplinker.gcfs, self.nh.nplinker.scoring_method('metcalf'))
 
         # construct pandas dataframes and bokeh datatables for each object class
         # (this is probably fast enough to not be worth pickling like the links)
@@ -241,13 +241,11 @@ class TableData(object):
 
             # 3. links between GCF<==>Spectrum objects based on metcalf scores, via BGCs
             spec_to_bgc_indices = []
-            for spectrum in self.spec_links:
-                # lookup the GCF that this spectrum has a link to 
-                linked_gcfs = self.nh.nplinker.links_for_obj(spectrum, self.nh.nplinker.scoring.metcalf)
-                for gcf, score in linked_gcfs:
+            for spec, result in self.spec_links.links.items():
+                for gcf, data in result.items():
                     #print('spec {} <==> gcf {}'.format(spectrum.id, gcf.id))
                     for bgc in gcf.bgcs:
-                        spec_to_bgc_indices.append((spectrum.id + 1, bgc.id + 1))
+                        spec_to_bgc_indices.append((spec.id + 1, bgc.id + 1))
             self.spectra_bgc = create_links(self.spec_df, self.bgc_df, 'spec_pk', 'bgc_pk', spec_to_bgc_indices)
 
             pickle.dump((self.bgc_gcf, self.mf_spectra, self.spectra_bgc), open(pickled_links, 'wb'))
