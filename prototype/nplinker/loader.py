@@ -90,7 +90,7 @@ class DatasetLoader(object):
     def __init__(self, config_data):
         self._config = config_data
         self._dataset = config_data['dataset']
-        self._overrides = self._dataset['overrides']
+        self._overrides = self._dataset.get('overrides', {})
         self._antismash_format = self._dataset.get('antismash_format', self.ANTISMASH_FMT_DEFAULT)
         self._bigscape_cutoff = self._dataset.get('bigscape_cutoff', self.BIGSCAPE_CUTOFF_DEFAULT)
         self._root = self._config['dataset']['root']
