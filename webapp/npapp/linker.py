@@ -2,7 +2,7 @@ import os
 import itertools
 from functools import reduce
 
-from supersqlite import sqlite3
+import sqlite3
 from natsort import natsorted
 
 from tables_functions import create_links, get_data, get_table_info
