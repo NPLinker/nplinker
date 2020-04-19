@@ -20,9 +20,11 @@ class TableData(object):
         interface to the webapp
         """
 
+        local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data', 'tables_links')
+        os.makedirs(local_cache, exist_ok=True)
+
         # first step: get the metcalf scoring links between spectra:gcf and gcf:spectra pairs
         self.spec_links = self.nh.nplinker.get_links(self.nh.nplinker.spectra, self.nh.nplinker.scoring_method('metcalf'))
-        # self.gcf_links = self.nh.nplinker.get_links(self.nh.nplinker.gcfs, self.nh.nplinker.scoring_method('metcalf'))
 
         # construct pandas dataframes and bokeh datatables for each object class
         # (this is probably fast enough to not be worth pickling like the links)
@@ -220,8 +222,7 @@ class TableData(object):
 
         # pickle the links structs as they don't change for a given dataset and can take
         # some time to generate when the webapp is instantiated
-        # TODO proper location for the pickled data file
-        pickled_links = 'table_links_{}.pckl'.format(self.nh.nplinker.dataset_id)
+        pickled_links = os.path.join(local_cache, 'table_links_{}.pckl'.format(self.nh.nplinker.dataset_id))
         if not os.path.exists(pickled_links):
             # 1. links between GCF and BGC objects
             # note the +1s are because the tables code uses 0 for NA
