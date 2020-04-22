@@ -112,6 +112,7 @@ class NPLinker(object):
         self._bgc_lookup = {}
         self._spec_lookup = {}
 
+        # TODO allow override in config file
         self._scoring_methods = {}
         self._scoring_methods[TestScoring.NAME] = TestScoring
         self._scoring_methods[MetcalfScoring.NAME] = MetcalfScoring
