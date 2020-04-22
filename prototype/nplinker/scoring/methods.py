@@ -211,7 +211,7 @@ class ScoringMethod(object):
 
     def get_links(self, objects, link_collection):
         """Given a set of objects, return link information"""
-        return {}
+        return link_collection
 
     def format_data(self, data):
         """Given whatever output data the method produces, return a readable string version"""
@@ -411,7 +411,7 @@ class MetcalfScoring(ScoringMethod):
             results = results[0]
             if results.shape[1] == 0:
                 logger.debug('Found no links for {} input objects'.format(len(objects)))
-                return []
+                return link_collection
 
             # for each entry in the results (each GCF)
             for j in range(results.shape[1]):
