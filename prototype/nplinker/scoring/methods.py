@@ -433,6 +433,7 @@ class MetcalfScoring(ScoringMethod):
 
         logger.debug('MetcalfScoring found {} results'.format(len(metcalf_results)))
         link_collection._add_links_from_method(self, metcalf_results)
+        logger.debug('MetcalfScoring: completed')
         return link_collection
 
     def format_data(self, data):
