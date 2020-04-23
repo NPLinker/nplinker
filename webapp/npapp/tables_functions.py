@@ -46,14 +46,14 @@ def get_data(label, max_items):
 
 
 def create_links(df1, df2, key1, key2, indices):
-    links = []
-
     # link entries in df1 and df2 to each other according to their indices
-    for idx1, idx2 in indices:
-        val1 = df1.loc[idx1][key1]
-        val2 = df2.loc[idx2][key2]
-        link = {key1: val1, key2: val2}
-        links.append(link)
+    # for idx1, idx2 in indices:
+    #     val1 = df1.loc[idx1][key1]
+    #     val2 = df2.loc[idx2][key2]
+    #     link = {key1: val1, key2: val2}
+    #     links.append(link)
+    # this is *much* faster than the above and should do the same thing...
+    links = [{key1: id1, key2: id2} for id1, id2 in indices]
 
     # make sure that there are no unlinked items
     # for items where no linking has been specified, we just link them to NA
