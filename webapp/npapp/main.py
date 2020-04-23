@@ -1709,6 +1709,7 @@ class NPLinkerBokeh(object):
         widgets.append(self.ge_mode_group)
 
         # scoring objects and related stuff
+        # TODO this should be drawn from nplinker config, not hardcoded here? or config file
         self.scoring_methods = ['metcalf', 'testscore']
         self.scoring_objects = {m: self.nh.nplinker.scoring_method(m) for m in self.scoring_methods}
 
@@ -1869,6 +1870,7 @@ class NPLinkerBokeh(object):
         self.table_data = TableData(self)
         self.table_data.setup()
         widgets.extend(self.table_data.widgets)
+        print('tables init completed')
 
         # callbacks for scoring buttons
         self.table_data.tables_score_met.on_click(self.tables_score_met_callback)
@@ -1880,11 +1882,13 @@ class NPLinkerBokeh(object):
         self.hidden_alert_thing = PreText(text='', name='hidden_alert', visible=False)
         self.hidden_alert_thing.js_on_change('text', CustomJS(code='if(cb_obj.text.length > 0) alert(cb_obj.text);', args={}))
         widgets.append(self.hidden_alert_thing)
+        print('layout done, adding widget roots')
 
         for w in widgets:
             curdoc().add_root(w)
 
         curdoc().title = 'nplinker webapp'
+        print('bokeh_layout method complete')
         # curdoc().theme = 'dark_minimal'
 
 # server_lifecycle.py adds a .nh attr to the current Document instance, use that
