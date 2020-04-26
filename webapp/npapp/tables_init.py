@@ -23,11 +23,6 @@ class TableData(object):
         local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data', 'tables_links')
         os.makedirs(local_cache, exist_ok=True)
 
-        # first step: get the metcalf scoring links between spectra:gcf and gcf:spectra pairs
-        metcalf_scoring = self.nh.nplinker.scoring_method('metcalf')
-        # TODO could make this configurable?
-        metcalf_scoring.cutoff = 1.0
-        self.spec_links = self.nh.nplinker.get_links(self.nh.nplinker.spectra, metcalf_scoring)
 
         # construct pandas dataframes and bokeh datatables for each object class
         # (this is probably fast enough to not be worth pickling like the links)
@@ -179,7 +174,7 @@ class TableData(object):
                 self.spec_dt.selectable = True
                 self.gcf_dt.selectable = len(selected_indices) == 0
                 self.bgc_dt.selectable = len(selected_indices) == 0
-
+    
             for idx in selected_indices:
                 self.linker.addConstraint(name, idx, self.data_sources[name])
 
@@ -227,6 +222,12 @@ class TableData(object):
         # some time to generate when the webapp is instantiated
         pickled_links = os.path.join(local_cache, 'table_links_{}.pckl'.format(self.nh.nplinker.dataset_id))
         if not os.path.exists(pickled_links):
+            # 0. get the metcalf scoring links between spectra:gcf and gcf:spectra pairs
+            metcalf_scoring = self.nh.nplinker.scoring_method('metcalf')
+            # TODO could make this configurable?
+            metcalf_scoring.cutoff = 2.0
+            spec_links = self.nh.nplinker.get_links(self.nh.nplinker.spectra, metcalf_scoring)
+
             # 1. links between GCF and BGC objects
             # note the +1s are because the tables code uses 0 for NA
             bgc_to_gcf_indices = []
@@ -245,7 +246,7 @@ class TableData(object):
 
             # 3. links between GCF<==>Spectrum objects based on metcalf scores, via BGCs
             spec_to_bgc_indices = []
-            for spec, result in self.spec_links.links.items():
+            for spec, result in spec_links.links.items():
                 for gcf, data in result.items():
                     #print('spec {} <==> gcf {}'.format(spectrum.id, gcf.id))
                     for bgc in gcf.bgcs:
