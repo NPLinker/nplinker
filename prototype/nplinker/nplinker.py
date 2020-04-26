@@ -326,9 +326,12 @@ class NPLinker(object):
             link_collection = method.get_links(objects_for_method, link_collection)
 
         if not self._datalinks:
+            logger.debug('Creating internal datalinks object')
             self._datalinks = self.scoring_method(MetcalfScoring.NAME).datalinks
+            logger.debug('Created internal datalinks object')
 
         # populate shared strain info
+        logger.debug('Calculating shared strain information...')
         # TODO more efficient version?
         for source, link_data in link_collection.links.items():
             targets = list(link_data.keys())
@@ -348,6 +351,7 @@ class NPLinker(object):
                     if (source, target) in shared_strains:
                         link.shared_strains = shared_strains[(source, target)]
 
+        logger.debug('Finished calculating shared strain information')
         return link_collection
 
     def get_common_strains(self, objects_a, objects_b, filter_no_shared=True):
