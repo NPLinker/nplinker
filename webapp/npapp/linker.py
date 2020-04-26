@@ -1,4 +1,5 @@
 import os
+import time
 import itertools
 from functools import reduce
 
@@ -82,6 +83,26 @@ class Linker:
         return [t['tableName'] for t in visible_tables]
 
     def query(self):
+        fieldNames = self.fieldNames
+        tableNames = self.getTableNames(self.tablesInfo)
+        tableData = {tableName: [] for tableName in tableNames}
+
+        # special case here if nothing is selected
+        if self.getTotalSelected() == 0:
+            # TODO could also check self.numSelected[tableName] == 0 to do individually
+
+            # normally this joins all the tables together, runs a query and then 
+            # splits the results back up into the individual tables for display. 
+            # however when you just want to clear/reset them to their original state
+            # it does a ton of useless work as the data required is already there in
+            # exactly the right format 
+            print('doing optimization of query')
+            for tableName in tableNames:
+                tableData[tableName] = self.sqlManager.simpleQuery(tableName, self.tableColumns[tableName])
+
+            self.queryResult = tableData
+            return
+
         constraints = self.makeConstraints()
 
         # this is a bit different from the original, because unlike alasql you
@@ -91,14 +112,12 @@ class Linker:
         # - construct and execute the same initial query as the original code uses...
         # - but wrap it into a "CREATE TEMP TABLES AS (<query>)" statement
         # - then run the other queries against this temporary table
+        t = time.time()
         self.sqlManager.createTempTable(self.tablesInfo, constraints)
+        print('createTempTable (totSel={}) took {:.2f}s'.format(self.getTotalSelected(), time.time() - t))
 
         # now do the equivalent of the prefixQuery method from the original, by 
         # running a SELECT DISTINCT query against the temp table, once per visible table
-
-        fieldNames = self.fieldNames
-        tableNames = self.getTableNames(self.tablesInfo)
-        tableData = {tableName: [] for tableName in tableNames}
 
         for tableName in tableNames:
             tableData[tableName] = self.sqlManager.prefixQuery(tableName, self.tableColumns[tableName])
@@ -195,7 +214,13 @@ class SqlManager:
 
     def initialiseTables(self, tablesInfo):
         for t in tablesInfo:
-            columns = ', '.join(['{} text'.format(c) for c in t['tableData'][0].keys()])
+            tableName = t['tableName']
+            # the tables which contain links can have INTEGER columns, leave the rest as TEXT
+            # (INTEGER might be faster?)
+            if tableName == 'bgc_gcf' or tableName == 'mf_spectra'or tableName == 'spectra_bgc':
+                columns = ', '.join(['{} INTEGER'.format(c) for c in t['tableData'][0].keys()])
+            else:
+                columns = ', '.join(['{} TEXT'.format(c) for c in t['tableData'][0].keys()])
             sql = 'CREATE TABLE IF NOT EXISTS {} ({})'.format(t['tableName'], columns)
             self.db.execute(sql)
             if 'pk' in t['options']:
@@ -223,10 +248,11 @@ class SqlManager:
             # etc
             cols = self.tableColumns[t['tableName']]
             with self.db:
+                allvals = []
+                stmt = 'INSERT INTO {} VALUES({})'.format(t['tableName'], ','.join('?' for c in cols))
                 for row in t['tableData']:
-                    vals = ', '.join(['"{}"'.format(row[c]) for c in cols])
-                    sql = 'INSERT INTO {} VALUES({})'.format(t['tableName'], vals)
-                    self.db.execute(sql)
+                    allvals.append([row[c] for c in cols])
+                self.db.executemany(stmt, allvals)
     
     def getFieldNames(self, tablesInfo):
         # this is meant to return a comma-separated list of '<table>.<col> AS table_col' 
@@ -318,6 +344,16 @@ class SqlManager:
 
     def makeWhereSubClauses(self):
         return list(map(lambda t: '{}.{}'.format(t['tableName'], t['constraintKeyName']), self.constraintTableConstraintKeyNames))
+
+    def simpleQuery(self, tableName, tableFieldNames):
+        sqlQuery = 'SELECT ' + ', '.join(tableFieldNames) + ' FROM {}'.format(tableName)
+        resultset = self.db.execute(sqlQuery)
+
+        data = []
+        for row in resultset:
+            data.append({f: row[f] for f in tableFieldNames})
+
+        return data
 
     def prefixQuery(self, tableName, tableFieldNames):
         # need to add the prefix to each of the column names here...
