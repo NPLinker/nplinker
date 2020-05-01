@@ -17,6 +17,8 @@ from nplinker.metabolomics import SingletonFamily
 from nplinker.logconfig import LogConfig
 from nplinker.layout import create_genomics_graph, create_metabolomics_graph
 
+from tables_init import TableData
+
 class NPLinkerHelper(object):
     """
     This is just a simple class to wrap up the various objects involved in 
@@ -265,6 +267,8 @@ class NPLinkerHelper(object):
         self.load_genomics()
         self.load_metabolomics()
 
+        self.load_tables()
+
     def load_nplinker(self):
         # initialise nplinker and load the dataset, using a config file in the webapp dir
         datapath = os.getenv('NPLINKER_CONFIG', os.path.join(os.path.join(os.path.dirname(__file__), 'nplinker_webapp.toml')))
@@ -309,6 +313,11 @@ class NPLinkerHelper(object):
                     self.bgc_gcf_lookup[bgc].add(gcf)
                 else:
                     self.bgc_gcf_lookup[bgc] = set([gcf])
+
+    def load_tables(self):
+        print('Loading tables data')
+        self.table_data = TableData(self)
+        self.table_data.setup()
 
     def load_tsne(self):
         # initialise nplinker and load the dataset, using a config file in the webapp dir

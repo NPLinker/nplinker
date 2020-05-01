@@ -1,5 +1,7 @@
 import os
 
+from threading import Thread
+
 from bokeh.models.widgets import RadioGroup, Slider, Div, Select, CheckboxGroup
 from bokeh.models.widgets import Toggle, Button, TextInput, PreText
 from bokeh.layouts import row
@@ -18,7 +20,6 @@ from nplinker.scoring.methods import LinkCollection
 
 from searching import SEARCH_OPTIONS, Searcher
 
-from tables_init import TableData
 from tables_functions import NA
 
 # TODO all of this code doesn't have to be in the same module, could benefit from splitting up by
@@ -1498,12 +1499,12 @@ class NPLinkerBokeh(object):
         """
         Handles clicks on the "Show scores for selected spectra" button (tables mode)
         """
-        print('Currently selected spectra: {}'.format(len(self.table_data.spec_ds.data['spectrum_id'])))
-        print('Actual selections: {}'.format(len(self.table_data.spec_ds.selected.indices)))
+        print('Currently selected spectra: {}'.format(len(self.nh.table_data.spec_ds.data['spectrum_id'])))
+        print('Actual selections: {}'.format(len(self.nh.table_data.spec_ds.selected.indices)))
 
-        if len(self.table_data.spec_ds.selected.indices) == 0 and len(self.table_data.molfam_ds.selected.indices) == 0:
+        if len(self.nh.table_data.spec_ds.selected.indices) == 0 and len(self.nh.table_data.molfam_ds.selected.indices) == 0:
             self.hidden_alert_thing.text = 'Error: no spectra have been selected!\n\n' +\
-                                            'Running scoring on {} objects may take a long time!\n'.format(len(self.table_data.spec_ds.data['spectrum_id'])) +\
+                                            'Running scoring on {} objects may take a long time!\n'.format(len(self.nh.table_data.spec_ds.data['spectrum_id'])) +\
                                              'Please make some selections and then try again.'
             # this resets the text without triggering the alert() again, so that NEXT time this happens
             # the text-changed event will be fired by the above line. yes it's a mess
@@ -1519,15 +1520,15 @@ class NPLinkerBokeh(object):
         # - alternatively they might have selected a spectrum directly, in which case they
         #   will all still be visible but we only want the selected indices
         selected_spectra = []
-        if len(self.table_data.spec_ds.selected.indices) > 0:
+        if len(self.nh.table_data.spec_ds.selected.indices) > 0:
             # assume there's been an explicit selection and use those objects
-            for index in self.table_data.spec_ds.selected.indices:
-                sid = self.table_data.spec_ds.data['spec_pk'][index] # the internal nplinker ID
+            for index in self.nh.table_data.spec_ds.selected.indices:
+                sid = self.nh.table_data.spec_ds.data['spec_pk'][index] # the internal nplinker ID
                 if sid == NA:
                     continue
                 selected_spectra.append(self.nh.nplinker.spectra[int(sid)])
         else:
-            for sid in self.table_data.spec_ds.data['spec_pk']: # internal nplinker IDs
+            for sid in self.nh.table_data.spec_ds.data['spec_pk']: # internal nplinker IDs
                 if sid == NA:
                     continue
                 spec = self.nh.nplinker.spectra[int(sid)] 
@@ -1572,7 +1573,7 @@ class NPLinkerBokeh(object):
         self.score_helper.spectra = selected_spectra
 
         # get the list of visible GCFs so we can filter out any others from the results
-        include_only = set([self.nh.nplinker.gcfs[int(gcf_id)] for gcf_id in self.table_data.gcf_ds.data['gcf_pk'] if gcf_id != '-'])
+        include_only = set([self.nh.nplinker.gcfs[int(gcf_id)] for gcf_id in self.nh.table_data.gcf_ds.data['gcf_pk'] if gcf_id != '-'])
 
         # FINALLY, display the link information
         self.display_links(results, mode=SCO_MODE_SPEC_GCF, div=self.results_div, include_only=include_only)
@@ -1585,12 +1586,12 @@ class NPLinkerBokeh(object):
         Handles clicks on the "Show scores for selected GCFs" button (tables mode)
         """
 
-        print('Currently selected bgcs: {}'.format(len(self.table_data.bgc_ds.data['bgc_pk'])))
-        print('Actual selections: {}'.format(len(self.table_data.bgc_ds.selected.indices)))
+        print('Currently selected bgcs: {}'.format(len(self.nh.table_data.bgc_ds.data['bgc_pk'])))
+        print('Actual selections: {}'.format(len(self.nh.table_data.bgc_ds.selected.indices)))
 
-        if len(self.table_data.bgc_ds.selected.indices) == 0 and len(self.table_data.gcf_ds.selected.indices) == 0:
+        if len(self.nh.table_data.bgc_ds.selected.indices) == 0 and len(self.nh.table_data.gcf_ds.selected.indices) == 0:
             self.hidden_alert_thing.text = 'Error: no BGCs have been selected!\n\n' +\
-                                            'Running scoring on {} objects may take a long time!\n'.format(len(self.table_data.bgc_ds.data['bgc_pk'])) +\
+                                            'Running scoring on {} objects may take a long time!\n'.format(len(self.nh.table_data.bgc_ds.data['bgc_pk'])) +\
                                              'Please make some selections and then try again.'
             # this resets the text without triggering the alert() again, so that NEXT time this happens
             # the text-changed event will be fired by the above line. yes it's a mess
@@ -1609,17 +1610,17 @@ class NPLinkerBokeh(object):
         selected_bgcs = []
         gcfs = set() # to remove dups 
 
-        if len(self.table_data.bgc_ds.selected.indices) > 0:
+        if len(self.nh.table_data.bgc_ds.selected.indices) > 0:
             # assume there's been an explicit selection and use those objects
-            for index in self.table_data.bgc_ds.selected.indices:
-                bgcid = self.table_data.bgc_ds.data['bgc_pk'][index] # internal nplinker ID
+            for index in self.nh.table_data.bgc_ds.selected.indices:
+                bgcid = self.nh.table_data.bgc_ds.data['bgc_pk'][index] # internal nplinker ID
                 if bgcid == NA:
                     continue
                 bgc = self.nh.nplinker.bgcs[int(bgcid)]
                 selected_bgcs.append(bgc)
                 gcfs.add(bgc.parent)
         else:
-            for bgcid in self.table_data.bgc_ds.data['bgc_pk']: # internal nplinker IDs
+            for bgcid in self.nh.table_data.bgc_ds.data['bgc_pk']: # internal nplinker IDs
                 if bgcid == NA:
                     continue
                 bgc = self.nh.nplinker.bgcs[int(bgcid)]
@@ -1667,7 +1668,7 @@ class NPLinkerBokeh(object):
 
         # get the list of visible spectra so we can filter out any others from the results
         # TODO MolFam mode...
-        include_only = set([self.nh.nplinker.spectra[int(spec_id)] for spec_id in self.table_data.spec_ds.data['spec_pk'] if spec_id != '-'])
+        include_only = set([self.nh.nplinker.spectra[int(spec_id)] for spec_id in self.nh.table_data.spec_ds.data['spec_pk'] if spec_id != '-'])
 
         # FINALLY, display the link information
         self.display_links(results, mode=SCO_MODE_BGC_SPEC, div=self.results_div, include_only=include_only)
@@ -1676,9 +1677,8 @@ class NPLinkerBokeh(object):
         self.suppress_selection_bgc = False
 
     def tables_reset_callback(self):
-        for dt in self.table_data.data_tables.values():
+        for dt in self.nh.table_data.data_tables.values():
             dt.selectable = True
-
 
     def bokeh_layout(self):
         widgets = []
@@ -1866,18 +1866,15 @@ class NPLinkerBokeh(object):
         widgets.append(self.fig_spec)
         widgets.append(self.fig_bgc)
 
-        print('Loading data tables stuff')
-        self.table_data = TableData(self)
-        self.table_data.setup()
-        widgets.extend(self.table_data.widgets)
-        print('tables init completed')
+        # tables widgets
+        widgets.extend(self.nh.table_data.widgets)
 
         # callbacks for scoring buttons
-        self.table_data.tables_score_met.on_click(self.tables_score_met_callback)
-        self.table_data.tables_score_gen.on_click(self.tables_score_gen_callback)
+        self.nh.table_data.tables_score_met.on_click(self.tables_score_met_callback)
+        self.nh.table_data.tables_score_gen.on_click(self.tables_score_gen_callback)
 
         # and reset button
-        self.table_data.tables_reset.on_click(self.tables_reset_callback)
+        self.nh.table_data.tables_reset.on_click(self.tables_reset_callback)
 
         self.hidden_alert_thing = PreText(text='', name='hidden_alert', visible=False)
         self.hidden_alert_thing.js_on_change('text', CustomJS(code='if(cb_obj.text.length > 0) alert(cb_obj.text);', args={}))
