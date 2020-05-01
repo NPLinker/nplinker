@@ -178,11 +178,10 @@ class Linker:
         # for i, row in enumerate(queryResult[tableName]):
         for i, row in enumerate(queryResult):
             for prop in row:
-                if prop in row: # ???
-                    value = row[prop]
-                    if prop not in newData:
-                        newData[prop] = []
-                    newData[prop].append(value)
+                value = row[prop]
+                if prop not in newData:
+                    newData[prop] = []
+                newData[prop].append(value)
 
         dataSource.data = newData
 
