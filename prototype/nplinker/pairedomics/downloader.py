@@ -100,7 +100,7 @@ class Downloader(object):
 
         self.strain_mappings_file = os.path.join(self.project_file_cache, 'strain_mappings.csv')
 
-    def get(self):
+    def get(self, do_bigscape, extra_bigscape_parameters):
         logger.info('Going to download the metabolomics data file')
 
         self._download_metabolomics_zipfile(self.gnps_task_id)
@@ -108,19 +108,22 @@ class Downloader(object):
         self._parse_genome_labels(self.project_json['genome_metabolome_links'], self.project_json['genomes'])
         self._generate_strain_mappings()
         self._download_mibig_json() # TODO version
-        self._run_bigscape() # TODO optional flag?
+        self._run_bigscape(do_bigscape, extra_bigscape_parameters) 
 
     def _is_new_gnps_format(self, directory):
         # TODO this should test for existence of quantification table instead
         return os.path.exists(os.path.join(directory, 'qiime2_output'))
 
-    def _run_bigscape(self):
+    def _run_bigscape(self, do_bigscape, extra_bigscape_parameters):
         # TODO this currently assumes docker environment, allow customisation?
         # can check if in container with: https://stackoverflow.com/questions/20010199/how-to-determine-if-a-process-runs-inside-lxc-docker
-        # TODO also meed option to skip if you already have manual results
-        logger.info('Running BiG-SCAPE...')
+        if not do_bigscape:
+            logger.info('BiG-SCAPE disabled by configuration, not running it')
+            return
+
+        logger.info('Running BiG-SCAPE! extra_bigscape_parameters="{}"'.format(extra_bigscape_parameters))
         try:
-            run_bigscape('/app/BiG-SCAPE/bigscape.py', os.path.join(self.project_file_cache, 'antismash'), os.path.join(self.project_file_cache, 'bigscape'), '/app', cutoffs=[0.3])
+            run_bigscape('/app/BiG-SCAPE/bigscape.py', os.path.join(self.project_file_cache, 'antismash'), os.path.join(self.project_file_cache, 'bigscape'), '/app', cutoffs=[0.3], extra_params=extra_bigscape_parameters)
         except Exception as e:
             logger.warning('Failed to run BiG-SCAPE on antismash data, error was "{}"'.format(e))
 
