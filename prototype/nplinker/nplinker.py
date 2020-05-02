@@ -21,6 +21,11 @@ class NPLinker(object):
 
     # allowable types for objects to be passed to scoring methods
     OBJ_CLASSES = [Spectrum, MolecularFamily, GCF, BGC]
+    # default set of enabled scoring methods
+    SCORING_METHODS =  {
+        MetcalfScoring.NAME: MetcalfScoring,
+        TestScoring.NAME: TestScoring
+                       }
 
     def __init__(self, userconfig=None, platform_id=None):
         # TODO update docstring
@@ -112,10 +117,12 @@ class NPLinker(object):
         self._bgc_lookup = {}
         self._spec_lookup = {}
 
-        # TODO allow override in config file
         self._scoring_methods = {}
-        self._scoring_methods[TestScoring.NAME] = TestScoring
-        self._scoring_methods[MetcalfScoring.NAME] = MetcalfScoring
+        config_methods = self._config.config.get('scoring_methods', [])
+        for name, method in NPLinker.SCORING_METHODS.items():
+            if len(config_methods) == 0 or name in config_methods:
+                self._scoring_methods[name] = method
+                logger.debug('Enabled scoring method: {}'.format(name))
 
         self._scoring_methods_setup_complete = {name: False for name in self._scoring_methods.keys()}
 
