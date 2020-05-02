@@ -11,6 +11,14 @@ logfile = ""
 log_to_stdout = true
 repro_file = ""
 
+# scoring_methods to be enabled. currently available:
+#   - metcalf
+#   - testscore
+#
+# TODO more
+# The default is to enable all available methods.
+scoring_methods = ["metcalf", "testscore"]
+
 # Dataset configuration
 # ---------------------
 # NPLinker supports two basic methods for loading datasets:
@@ -79,7 +87,7 @@ root = "<root directory of dataset>"
 
 # if you want to load data from the paired omics platform, give the project ID 
 # here (e.g. "MSV000079284")
-# NOTE: only set one of root and platform_id:
+# NOTE: only set one of root and platform_id!
 platform_id = ""
 
 # antismash file structure. Should be either 'default' or 'flat'. 
@@ -94,6 +102,48 @@ antismash_format = "default"
 # value after the dataset has initially been loaded, which will cause only the affected
 # data to be reloaded.
 #bigscape_cutoff = 30
+
+[docker]
+# this optional section contains various settings that only apply to the dockerised 
+# version of nplinker. The Docker image contains BiG-SCAPE, and this tool can be run
+# as part of the dataset loading process. If you want to enable/disable this, and 
+# configure the parameters used, this can be done by modifying the settings below. 
+
+# enable or disable running BiG-SCAPE on a dataset being used with the nplinker Docker
+# image. If false, you must have existing BiG-SCAPE results for your dataset in the 
+# format nplinker expects (described above). If true, the copy of BiG-SCAPE installed
+# in the Docker image will be run on the directory containing the antiSMASH data for
+# the selected dataset, using the parameters configured below. 
+# The default value is true
+run_bigscape = true
+
+# when BiG-SCAPE is executed by nplinker, it will automatically configure the following
+# parameters:
+#   -i/--inputdir
+#   -o/--outputdir
+#   --pfam_dir
+#   --clans-off
+# 
+# In addition, the --cutoffs parameter will default to:
+#   --cutoffs=0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7
+# 
+# If you wish to change the set of cutoffs, or set any of the other parameters
+# not listed above, you can do so by editing the value of this string. For example,
+# to use a smaller set of cutoffs and enable verbose mode:
+#   extra_bigscape_parameters = "--cutoffs 0.5,0.6 -v"
+extra_bigscape_parameters = ""
+
+# this optional section contains various settings that only affect the webapp interface
+# for nplinker. If you're not using it, you can leave this out of your configuration. 
+[webapp]
+# A fundamental part of the webapp is a set of tables which display objects in the dataset
+# that have been found to have links, based on the output of the Metcalf scoring method. 
+# The value of this parameter is the minimum Metcalf score that a link must have for its
+# associated objects to appear in the table. In other words, the higher this is set, the
+# smaller the number of objects that will remain to be displayed in the tables. This may
+# be useful for improving performance on larger datasets. 
+# The default value is 2.0
+tables_metcalf_threshold = 2.0
 
 # can also override any combination of individual file paths as required (empty
 # paths are ignored)
