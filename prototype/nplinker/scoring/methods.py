@@ -11,7 +11,6 @@ from ..metabolomics import Spectrum, MolecularFamily
 from ..logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
-
 class LinkCollection(object):
     """
     Class which stores the results of running one or more scoring methods. 
@@ -123,7 +122,7 @@ class LinkCollection(object):
         return method.sort(links, reverse)
 
     def get_all_targets(self):
-        return list(itertools.chain.from_iterable(self._link_data[x].keys() for x in self._link_data.keys()))
+        return list(set(itertools.chain.from_iterable(self._link_data[x].keys() for x in self._link_data.keys())))
 
     @property
     def methods(self):
