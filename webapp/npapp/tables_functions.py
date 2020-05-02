@@ -4,8 +4,8 @@ from bokeh.models import ColumnDataSource
 from bokeh.models.widgets import DataTable, TableColumn
 from natsort import natsorted, index_natsorted, order_by_index
 
-NA = '-'
-
+NA_ID = -1
+NA_TEXT = '-'
 
 def get_data(label, max_items):
     # generate some random data
@@ -15,10 +15,10 @@ def get_data(label, max_items):
     x3 = np.random.randint(low=1, high=100, size=max_items).tolist()
 
     # insert NAs to the first row
-    items.insert(0, NA)
-    x1.insert(0, NA)
-    x2.insert(0, NA)
-    x3.insert(0, NA)
+    items.insert(0, NA_ID)
+    x1.insert(0, NA_TEXT)
+    x2.insert(0, NA_TEXT)
+    x3.insert(0, NA_TEXT)
 
     # create pandas dataframe
     colname = '%s_pk' % label
@@ -45,16 +45,24 @@ def get_data(label, max_items):
     return df, ds, dt
 
 
-def create_links(df1, df2, key1, key2, indices):
+def create_links(df1, df2, key1, key2, indices, mappings1, mappings2):
     # link entries in df1 and df2 to each other according to their indices
-    # links = []
-    # for idx1, idx2 in indices:
-    #     val1 = df1.loc[idx1][key1]
-    #     val2 = df2.loc[idx2][key2]
-    #     link = {key1: val1, key2: val2}
-    #     links.append(link)
-    # this is *much* faster than the above and should do the same thing...
-    links = [{key1: id1 - 1, key2: id2 - 1} for id1, id2 in indices]
+    # key1/key2 are the names of the primary keys for the two tables we're
+    # creating links between. indices is a list of (ind1, ind2) tuples where
+    # each val is an index into the dataframe for the appropriate type of object.
+    # so for BGCs it's into the BGC dataframe etc. slightly complicated by the
+    # fact that each dataframe has a first entry set to the "NA" entry, 
+    # so counting the actual objects effectively starts from 1 not 0. 
+    # 
+    # this bit of code needs to create a list of dicts which say "the object in 
+    # dataframe 1 at index A is linked to the object in dataframe 2 at index B"
+    # each of the dicts should end up with 'pk_name': val_of_pk_for_object
+    #
+    # the pk in every case here is just the internal nplinker object ID, so 
+    # it boils down to inserting those. 
+    #
+    # TODO this could probably be done in a neater way
+    links = [{key1: mappings1[id1], key2: mappings2[id2]} for id1, id2 in indices]
 
     # make sure that there are no unlinked items
     # for items where no linking has been specified, we just link them to NA
@@ -66,21 +74,21 @@ def create_links(df1, df2, key1, key2, indices):
     # add the linking for unlinked items in df1 to NA
     for idx in unlinked_1:
         val1 = df1.loc[idx][key1]
-        val2 = NA
-        if val1 != NA:
+        val2 = NA_ID
+        if val1 != NA_ID:
             link = {key1: val1, key2: val2}
             links.append(link)
 
     # add the linking for unlinked items in df2 to NA
     for idx in unlinked_2:
-        val1 = NA
+        val1 = NA_ID
         val2 = df2.loc[idx][key2]
-        if val2 != NA:
+        if val2 != NA_ID:
             link = {key1: val1, key2: val2}
             links.append(link)
 
     # finally link NA to NA
-    link = {key1: NA, key2: NA}
+    link = {key1: NA_ID, key2: NA_ID}
     links.append(link)
 
     return links
