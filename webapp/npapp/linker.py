@@ -15,7 +15,7 @@ def getConstraintTablesConstraintKeyName(tablesInfo):
     return list(map(lambda t: {'tableName': t['tableName'], 'constraintKeyName': t['options']['pk']}, filter(isTableVisible, tablesInfo)))
 
 class Linker:
-    def __init__(self, tablesInfo, dataset_id):
+    def __init__(self, tablesInfo, dataset_id, path, do_init=False):
         self.tablesInfo = tablesInfo
 
         # use this to get consistent ordering of columns, can't rely on dicts
@@ -31,7 +31,7 @@ class Linker:
         self.numSelected = self.countNumSelected()
         self.totalSelected = self.getTotalSelected()
         self.queryResult = None
-        self.sqlManager = SqlManager(self.tablesInfo, '{}.sqlite3'.format(dataset_id))
+        self.sqlManager = SqlManager(self.tablesInfo, path, do_init)
 
     def getDefaultConstraints(self):
         ctables = getConstraintTablesConstraintKeyName(self.tablesInfo)
@@ -198,15 +198,20 @@ class Linker:
 
 class SqlManager:
 
-    def __init__(self, tablesInfo, path='linker.sqlite3'):
+    def __init__(self, tablesInfo, path='linker.sqlite3', do_init=False):
         self.db = sqlite3.connect(path)
         self.db.row_factory = sqlite3.Row
+
+        # useful for debugging
+        # self.db.set_trace_callback(print)
 
         # use this to get consistent ordering of columns, can't rely on dicts
         self.tableColumns = {t['tableName']: [x for x in t['tableData'][0].keys()] for t in tablesInfo}
         self.columnIndices = {t['tableName']: {x: i for i, x in enumerate(t['tableData'][0].keys())} for t in tablesInfo}
 
-        self.initialiseTables(tablesInfo)
+        if do_init:
+            print('SqlManager: Doing tables init')
+            self.initialiseTables(tablesInfo)
         self.firstTable = self.getFirstTable(tablesInfo)
         self.tableRelationships = self.getTableRelationships(tablesInfo)
         self.constraintTableConstraintKeyNames = getConstraintTablesConstraintKeyName(tablesInfo)
@@ -220,10 +225,22 @@ class SqlManager:
                 columns = ', '.join(['{} INTEGER'.format(c) for c in t['tableData'][0].keys()])
             else:
                 columns = ', '.join(['{} TEXT'.format(c) for c in t['tableData'][0].keys()])
+                columns = []
+                for c in t['tableData'][0].keys():
+                    if c.endswith('_pk'):
+                        columns.append('{} INTEGER PRIMARY KEY'.format(c))
+                    else:
+                        columns.append('{} TEXT'.format(c))
+                columns = ', '.join(columns)
+
             sql = 'CREATE TABLE IF NOT EXISTS {} ({})'.format(t['tableName'], columns)
             self.db.execute(sql)
             if 'pk' in t['options']:
                 sql = 'CREATE UNIQUE INDEX IF NOT EXISTS {}_index ON {} ({})'.format(t['tableName'], t['tableName'], t['options']['pk'])
+                self.db.execute(sql)
+            else:
+                colnames = list(t['tableData'][0].keys())
+                sql = 'CREATE UNIQUE INDEX IF NOT EXISTS {}_index on {} ({}, {})'.format(t['tableName'], t['tableName'], colnames[0], colnames[1])
                 self.db.execute(sql)
 
         # only add data if needed
@@ -263,9 +280,11 @@ class SqlManager:
         all_cols = ['{}.{} AS {}_{}'.format(table, col, table, col) for table, cols in tabledata for col in cols]
         return ', '.join(all_cols)
 
-    def assembleInnerJoinStatementFromRelationship(self, relationship):
+    def assembleInnerJoinStatementFromRelationship(self, relationship, gen_to_met):
         def parseRelationship(r):
             if 'with' in r:
+                if gen_to_met:
+                    return 'INNER JOIN {} ON {}.{} = {}.{} '.format(r['tableName'], r['with'], r['using'], r['tableName'], r['using'])
                 return 'INNER JOIN {} ON {}.{} = {}.{} '.format(r['with'], r['tableName'], r['using'], r['with'], r['using'])
             else:
                 return ''
@@ -282,13 +301,16 @@ class SqlManager:
 
         return innerJoinStatement
 
-    def makeSelectClause(self, tablesInfo):
+    def makeSelectClause(self, tablesInfo, gen_to_met):
         fieldNames = self.getFieldNames(tablesInfo)
-        selectClause = 'SELECT {} FROM {}'.format(fieldNames, self.firstTable)
-        return selectClause
+        if gen_to_met:
+            return  'SELECT {} FROM {}'.format(fieldNames, tablesInfo[-1]['tableName'])
+        return 'SELECT {} FROM {}'.format(fieldNames, self.firstTable)
 
-    def makeInnerJoinClause(self):
-        return ' '.join(map(self.assembleInnerJoinStatementFromRelationship, self.tableRelationships))
+    def makeInnerJoinClause(self, gen_to_met):
+        if gen_to_met:
+            return ' '.join(map(lambda x: self.assembleInnerJoinStatementFromRelationship(x, gen_to_met), reversed(self.tableRelationships)))
+        return ' '.join(map(lambda x: self.assembleInnerJoinStatementFromRelationship(x, gen_to_met), self.tableRelationships))
 
     def getFirstTable(self, tablesInfo):
         return tablesInfo[0]['tableName']
@@ -322,9 +344,9 @@ class SqlManager:
             tks.append(tk)
         return tks
 
-    def makeSQLquery(self, tablesInfo, skipConstraints):
-        selectClause = self.makeSelectClause(tablesInfo)
-        innerJoinClause = self.makeInnerJoinClause()
+    def makeSQLquery(self, tablesInfo, skipConstraints, gen_to_met):
+        selectClause = self.makeSelectClause(tablesInfo, gen_to_met)
+        innerJoinClause = self.makeInnerJoinClause(gen_to_met)
         whereClause = self.makeWhereClause(tablesInfo, skipConstraints)
         return ' '.join([selectClause, innerJoinClause, whereClause])
 
@@ -387,8 +409,16 @@ class SqlManager:
 
             skipConstraints.append(sc)
 
-        sqlQuery = self.makeSQLquery(tablesInfo, skipConstraints)
-        # HACK: replace any @(?) (alasql syntax) with standard placeholders
+        # HACK 1: check the query to see if we're going genomics->metabolomics or
+        # metabolomics->genomics (so the JOINs can be performed in reverse order if needed)
+        # skipConstraints is a 4-element list of bools corresponding to the 4 visible 
+        # tables. if a value is true it means to ignore that table when constructing the
+        # "constraints" for the query (the "WHERE" clauses). if BOTH of the first two
+        # values are True, we're going met->gen, otherwise gen->met
+        gen_to_met = skipConstraints[0] and skipConstraints[1]
+        sqlQuery = self.makeSQLquery(tablesInfo, skipConstraints, gen_to_met)
+
+        # HACK 2: replace any @(?) (alasql syntax) with standard placeholders
         c = 0
         while True:
             pos = sqlQuery.find('@(?)')
@@ -403,7 +433,11 @@ class SqlManager:
 
         # flatten the nested list of constraints into a simple list so it can be substituted 
         # into the query as normal
-        selectedConstraints = list(itertools.chain.from_iterable(selectedConstraints))
+        # TODO: note the casting to "int" here. for some reason the values can end
+        # up being np.int64 instances and that breaks the lookup vs the integers in
+        # the database (it gets treated as binary data). should figure out why that
+        # is happening
+        selectedConstraints = list(map(int, itertools.chain.from_iterable(selectedConstraints)))
 
         return self.db.execute(finalQuery, selectedConstraints)
 
@@ -441,6 +475,6 @@ if __name__ == "__main__":
 
     # sm = SqlManager(table_info)
 
-    linker = Linker(table_info)
+    linker = Linker(table_info, 'test', 'test.sqlite3')
 
 
