@@ -65,7 +65,12 @@ class DatasetLoader(object):
     ANTISMASH_FMT_FLAT      = 'flat'
     ANTISMASH_FMTS          = [ANTISMASH_FMT_DEFAULT, ANTISMASH_FMT_FLAT]
 
+    TABLES_CUTOFF_DEFAULT   = 2.0
+
     BIGSCAPE_CUTOFF_DEFAULT = 30
+
+    RUN_BIGSCAPE_DEFAULT = True
+    EXTRA_BIGSCAPE_PARAMS_DEFAULT = ""
 
     # keys for overriding metabolomics data elements
     OR_NODES        = 'nodes_file'
@@ -90,6 +95,8 @@ class DatasetLoader(object):
     def __init__(self, config_data):
         self._config = config_data
         self._dataset = config_data['dataset']
+        self._docker = config_data.get('docker', {})
+        self._webapp = config_data.get('webapp', {})
         self._overrides = self._dataset.get('overrides', {})
         self._antismash_format = self._dataset.get('antismash_format', self.ANTISMASH_FMT_DEFAULT)
         self._bigscape_cutoff = self._dataset.get('bigscape_cutoff', self.BIGSCAPE_CUTOFF_DEFAULT)
@@ -116,7 +123,7 @@ class DatasetLoader(object):
         if self._remote_loading:
             self._root = self._downloader.project_file_cache
             logger.debug('remote loading mode, configuring root={}'.format(self._root))
-            self._downloader.get()
+            self._downloader.get(self._docker.get('run_bigscape', self.RUN_BIGSCAPE_DEFAULT), self._docker.get('extra_bigscape_parameters', self.EXTRA_BIGSCAPE_PARAMS_DEFAULT))
 
         # construct the paths and filenames required to load everything else and check 
         # they all seem to exist (but don't parse anything yet)
@@ -367,6 +374,9 @@ class DatasetLoader(object):
 
     def optional_paths(self):
         return [self.annotations_dir]
+
+    def webapp_scoring_cutoff(self):
+        return self._webapp.get('tables_metcalf_threshold', self.TABLES_CUTOFF_DEFAULT)
 
     def __repr__(self):
         return 'Root={}\n   MGF={}\n   EDGES={}\n   NODES={}\n   BIGSCAPE={}\n   ANTISMASH={}\n'.format(
