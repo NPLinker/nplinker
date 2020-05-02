@@ -17,7 +17,7 @@ from nplinker.metabolomics import SingletonFamily
 from nplinker.logconfig import LogConfig
 from nplinker.layout import create_genomics_graph, create_metabolomics_graph
 
-from tables_init import TableData
+from tables_init import TableData, TableSessionData
 
 class NPLinkerHelper(object):
     """
@@ -481,3 +481,4 @@ def on_session_created(session_context):
             nh.nplinker.process_dataset()
             nh.load_genomics()
     setattr(session_context._document, 'nh', nh)
+    setattr(session_context._document, 'table_session_data', TableSessionData(nh.table_data))
