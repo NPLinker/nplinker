@@ -67,8 +67,8 @@ class TableData(object):
         # construct pandas dataframes and bokeh datatables for each object class
         # (this is probably fast enough to not be worth pickling like the links)
         self.bgc_data = dict(bgc_pk=[NA_ID], name=[NA_TEXT], product_type=[NA_TEXT])
-        self.gcf_data = dict(gcf_pk=[NA_ID], gcf_id=[NA_TEXT], product_type=[NA_TEXT], nbgcs=[NA_TEXT])
-        self.spec_data = dict(spec_pk=[NA_ID], spectrum_id=[NA_TEXT], family=[NA_TEXT])
+        self.gcf_data = dict(gcf_pk=[NA_ID], gcf_id=[NA_TEXT], product_type=[NA_TEXT], nbgcs=[NA_TEXT], metcalf_score=[NA_TEXT])
+        self.spec_data = dict(spec_pk=[NA_ID], spectrum_id=[NA_TEXT], family=[NA_TEXT], metcalf_score=[NA_TEXT])
         self.molfam_data = dict(molfam_pk=[NA_ID], family_id=[NA_TEXT], nspectra=[NA_TEXT])
 
         gcfs = sorted(gcfs, key=lambda gcf: gcf.id)
@@ -78,6 +78,7 @@ class TableData(object):
             self.gcf_data['gcf_id'].append(gcf.gcf_id)
             self.gcf_data['product_type'].append(gcf.product_type)
             self.gcf_data['nbgcs'].append(len(gcf.bgcs))
+            self.gcf_data['metcalf_score'].append(NA_TEXT)
             _gcf_indices[gcf] = len(_gcf_indices)
             for bgc in gcf.bgcs:
                 if bgc not in bgcs_seen:
@@ -96,6 +97,7 @@ class TableData(object):
             self.spec_data['spec_pk'].append(spec.id)
             self.spec_data['spectrum_id'].append(spec.spectrum_id)
             self.spec_data['family'].append(spec.family.family_id)
+            self.spec_data['metcalf_score'].append(NA_TEXT)
             _spec_indices[spec] = len(_spec_indices)
             if spec.family not in molfams_seen:
                 self.molfam_data['molfam_pk'].append(spec.family.id)
@@ -200,11 +202,14 @@ class TableSessionData(object):
 
         self.gcf_cols = [TableColumn(field='gcf_pk', title='ID', width=15), 
                          TableColumn(field='gcf_id', title='GCF ID', width=75), 
-                         TableColumn(field='product_type', title='Product type', width=75)]
+                         TableColumn(field='product_type', title='Product type', width=75),
+                         TableColumn(field='nbgcs', title='#bgcs', width=75), 
+                         TableColumn(field='metcalf_score', title='Metcalf score', width=75)]
 
         self.spec_cols = [TableColumn(field='spec_pk', title='ID', width=15), 
-                          TableColumn(field='spectrum_id', title='Spectrum ID', width=76), 
-                          TableColumn(field='family', title='Family ID', width=75)]
+                          TableColumn(field='spectrum_id', title='Spectrum ID', width=75), 
+                          TableColumn(field='family', title='Family ID', width=75),
+                          TableColumn(field='metcalf_score', title='Metcalf score', width=75)]
 
         self.molfam_cols = [TableColumn(field='molfam_pk', title='ID', width=15), 
                             TableColumn(field='family_id', title='MolFam ID', width=75), 
@@ -278,10 +283,10 @@ class TableSessionData(object):
             }
         """
 
-        self.molfam_dl_button = Button(label='Download MolFam data', name='molfam_dl_button')
-        self.spec_dl_button = Button(label='Download Spectrum data', name='spec_dl_button')
-        self.bgc_dl_button = Button(label='Download BGC data', name='bgc_dl_button')
-        self.gcf_dl_button = Button(label='Download GCF data', name='gcf_dl_button')
+        self.molfam_dl_button = Button(label='Download as CSV', name='molfam_dl_button')
+        self.spec_dl_button = Button(label='Download as CSV', name='spec_dl_button')
+        self.bgc_dl_button = Button(label='Download as CSV', name='bgc_dl_button')
+        self.gcf_dl_button = Button(label='Download as CSV', name='gcf_dl_button')
 
         self.molfam_dl_button.callback = CustomJS(args=dict(name='molfam', source=self.molfam_ds), code=download_button_code)
         self.spec_dl_button.callback = CustomJS(args=dict(name='spectrum', source=self.spec_ds), code=download_button_code)
@@ -344,6 +349,8 @@ class TableSessionData(object):
             self.spec_dt.selectable = True
             self.gcf_dt.selectable = True
             self.bgc_dt.selectable = True
+            self.tables_score_met.disabled = False
+            self.tables_score_gen.disabled = False
 
             self.resetting = False
 
@@ -351,6 +358,12 @@ class TableSessionData(object):
         self.spec_ds.selected.on_change('indices', lambda a, b, c: table_callback('spec_table'))
         self.bgc_ds.selected.on_change('indices', lambda a, b, c: table_callback('bgc_table'))
         self.gcf_ds.selected.on_change('indices', lambda a, b, c: table_callback('gcf_table'))
+
+        # the buttons to trigger scoring
+        self.tables_score_met = Button(label='Show scores for selected spectra', name='tables_score_met', button_type='success')
+        self.tables_score_gen = Button(label='Show scores for selected BGCs', name='tables_score_gen', button_type='success')
+        self.widgets.append(self.tables_score_met)
+        self.widgets.append(self.tables_score_gen)
 
         selection_change_callback_code = """
             var value = '50%';
@@ -360,22 +373,19 @@ class TableSessionData(object):
             if (name === 'bgc_table' || name === 'gcf_table') {
                 $('#spec_table').css('opacity', value);
                 $('#molfam_table').css('opacity', value);
+                btn_met.disabled = true;
+                btn_gen.disabled = false;
             } else {
                 $('#bgc_table').css('opacity', value);
                 $('#gcf_table').css('opacity', value);
+                btn_met.disabled = false;
+                btn_gen.disabled = true;
             }
         """
-        self.molfam_ds.selected.js_on_change('indices', CustomJS(code=selection_change_callback_code, args=dict(name='molfam_table', source=self.molfam_ds)))
-        self.spec_ds.selected.js_on_change('indices', CustomJS(code=selection_change_callback_code, args=dict(name='spec_table', source=self.spec_ds)))
-        self.bgc_ds.selected.js_on_change('indices', CustomJS(code=selection_change_callback_code, args=dict(name='bgc_table', source=self.bgc_ds)))
-        self.gcf_ds.selected.js_on_change('indices', CustomJS(code=selection_change_callback_code, args=dict(name='gcf_table', source=self.gcf_ds)))
-
-
-        # add the buttons to trigger scoring
-        self.tables_score_met = Button(label='Show scores for selected spectra', name='tables_score_met', button_type='success')
-        self.tables_score_gen = Button(label='Show scores for selected BGCs', name='tables_score_gen', button_type='success')
-        self.widgets.append(self.tables_score_met)
-        self.widgets.append(self.tables_score_gen)
+        self.molfam_ds.selected.js_on_change('indices', CustomJS(code=selection_change_callback_code, args=dict(name='molfam_table', btn_met=self.tables_score_met, btn_gen=self.tables_score_gen, source=self.molfam_ds)))
+        self.spec_ds.selected.js_on_change('indices', CustomJS(code=selection_change_callback_code, args=dict(name='spec_table', btn_met=self.tables_score_met, btn_gen=self.tables_score_gen, source=self.spec_ds)))
+        self.bgc_ds.selected.js_on_change('indices', CustomJS(code=selection_change_callback_code, args=dict(name='bgc_table', btn_met=self.tables_score_met, btn_gen=self.tables_score_gen, source=self.bgc_ds)))
+        self.gcf_ds.selected.js_on_change('indices', CustomJS(code=selection_change_callback_code, args=dict(name='gcf_table', btn_met=self.tables_score_met, btn_gen=self.tables_score_gen, source=self.gcf_ds)))
 
         # CustomJS callback code for resetting the selection (and opacity) states
         # of all the tables 
@@ -389,7 +399,7 @@ class TableSessionData(object):
             }
         """
         self.tables_reset = Button(label='Clear selections', name='tables_reset', button_type='danger')
-        self.tables_reset.js_on_click(CustomJS(args={}, code=reset_selection_code))
+        self.tables_reset.js_on_click(CustomJS(args=dict(), code=reset_selection_code))
         self.tables_reset.on_click(reset_tables_callback)
         self.widgets.append(self.tables_reset)
 

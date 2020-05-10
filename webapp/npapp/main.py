@@ -979,13 +979,6 @@ class NPLinkerBokeh(object):
         # add these indices to the overall set
         selected.update(score_obj_indices)
 
-        # at the end of the scoring process, we end up with 2 important data structures:
-        # - a subset of the input objects which have been determined to have links, plus their (filtered)
-        #   link information, for each method (scoring_results)
-        # - the dict containing shared strain information between those two sets of objects for each method 
-        #   (all_shared_strains)
-        # these are then passed to the ScoringHelper object where they can be retrieved by the functions 
-        # that are responsible for generating the output HTML etc
         if len(scoring_results) > 0:
             self.debug_log('set_results')
             self.score_helper.set_results(scoring_results)
@@ -1541,6 +1534,24 @@ class NPLinkerBokeh(object):
         # call get_links, which returns the subset of input objects which have links
         results = self.nh.nplinker.get_links(selected_spectra, current_methods)
 
+        # TODO quick attempt to display scores in the tables (for metcalf only for now)
+        metcalf_obj = self.scoring_objects['metcalf']
+        # check if metcalf scoring is enabled at the moment
+        if metcalf_obj in current_methods:
+            # create a dict mapping GCFs in the results to their scores
+            gcf_scores = {}
+            for spec, result in results.links.items():
+                for gcf, link_data in result.items():
+                    metcalf_score = link_data.data(metcalf_obj)
+                    gcf_scores[gcf] = metcalf_score
+
+            # get a list of the GCFs currently visible in the table (note that
+            # these are the actual GCF IDs, not the internal nplinker IDs)
+            visible_gcfs = map(int, self.table_session_data.gcf_ds.data['gcf_id'])
+
+            # update the data source with the scores
+            self.table_session_data.gcf_ds.data['metcalf_score'] = [gcf_scores[self.nh.nplinker.lookup_gcf(gcf_id)] for gcf_id in visible_gcfs]
+
         # next, need to display the results using the same code as for generating the 
         # results from plot selections, but without actually triggering any unintended
         # side-effects (changing the plot selections and so on)
@@ -1564,7 +1575,7 @@ class NPLinkerBokeh(object):
         # in, which would make them easier to repurpose (i.e. they use self.ds_spec
         # instead of a generic <datasource> parameter)
         # 
-        # updated the set of selected indices on the spectral datasource (equivalent
+        # update the set of selected indices on the spectral datasource (equivalent
         # to the user having made the same selection via the plot)
         # TODO need to allow for AND/OR here
         result_indices = [self.spec_indices[spec.spectrum_id] for spec in results.sources]
@@ -1635,6 +1646,24 @@ class NPLinkerBokeh(object):
         
         # call get_links, which returns the subset of input objects which have links
         results = self.nh.nplinker.get_links(selected_gcfs, current_methods)
+
+        # TODO quick attempt to display scores in the tables (for metcalf only for now)
+        metcalf_obj = self.scoring_objects['metcalf']
+        # check if metcalf scoring is enabled at the moment
+        if metcalf_obj in current_methods:
+            # create a dict mapping spectra in the results to their scores
+            spec_scores = {}
+            for gcf, result in results.links.items():
+                for spec, link_data in result.items():
+                    metcalf_score = link_data.data(metcalf_obj)
+                    spec_scores[spec] = metcalf_score
+
+            # get a list of the spectra currently visible in the table (note that
+            # these are the actual Spectrum IDs, not the internal nplinker IDs)
+            visible_spectra = map(int, self.table_session_data.spec_ds.data['spectrum_id'])
+
+            # update the data source with the scores
+            self.table_session_data.spec_ds.data['metcalf_score'] = [spec_scores[self.nh.nplinker.lookup_spectrum(spec_id)] for spec_id in visible_spectra]
 
         # next, need to display the results using the same code as for generating the 
         # results from plot selections, but without actually triggering any unintended
