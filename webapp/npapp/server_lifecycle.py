@@ -482,3 +482,9 @@ def on_session_created(session_context):
             nh.load_genomics()
     setattr(session_context._document, 'nh', nh)
     setattr(session_context._document, 'table_session_data', TableSessionData(nh.table_data))
+
+def on_session_destroyed(session_context):
+    print('on_session_destroyed')
+    session_data = getattr(session_context._document, 'table_session_data')
+    # closes the database connection used by the Linker class
+    session_data.linker.close()
