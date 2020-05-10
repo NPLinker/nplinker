@@ -464,6 +464,10 @@ def on_server_loaded(server_context):
     print('on_server_loaded')
     nh.load()
 
+    print('==================================')
+    print('NPLinker server loading completed!')
+    print('==================================')
+
 def on_session_created(session_context):
     """
     This is called for every new session that is created. To make the already-loaded
