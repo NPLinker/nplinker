@@ -5,9 +5,12 @@ import pandas as pd
 
 from bokeh.models import Button, CustomJS, ColumnDataSource
 from bokeh.models.widgets import DataTable, TableColumn, Div
+from bokeh.layouts import row
 
 from linker import Linker
 from tables_functions import create_links, get_table_info, NA_ID, NA_TEXT
+from tooltips import create_popover, wrap_popover
+from tooltips import TOOLTIP_CLEAR_SELECTIONS, TOOLTIP_BGC_SCORING, TOOLTIP_SPECTRA_SCORING
 
 class TableData(object):
 
@@ -349,8 +352,8 @@ class TableSessionData(object):
             self.spec_dt.selectable = True
             self.gcf_dt.selectable = True
             self.bgc_dt.selectable = True
-            self.tables_score_met.disabled = False
-            self.tables_score_gen.disabled = False
+            self.tables_score_met.disabled = True
+            self.tables_score_gen.disabled = True
 
             self.resetting = False
 
@@ -360,10 +363,10 @@ class TableSessionData(object):
         self.gcf_ds.selected.on_change('indices', lambda a, b, c: table_callback('gcf_table'))
 
         # the buttons to trigger scoring
-        self.tables_score_met = Button(label='Show scores for selected spectra', name='tables_score_met', button_type='success')
-        self.tables_score_gen = Button(label='Show scores for selected BGCs', name='tables_score_gen', button_type='success')
-        self.widgets.append(self.tables_score_met)
-        self.widgets.append(self.tables_score_gen)
+        self.tables_score_met = Button(label='Show scores for selected spectra', button_type='success', disabled=True)
+        self.tables_score_gen = Button(label='Show scores for selected BGCs', button_type='success', disabled=True)
+        self.widgets.append(wrap_popover(self.tables_score_met, create_popover(*TOOLTIP_SPECTRA_SCORING), 'tables_score_met'))
+        self.widgets.append(wrap_popover(self.tables_score_gen, create_popover(*TOOLTIP_BGC_SCORING), 'tables_score_gen'))
 
         selection_change_callback_code = """
             var value = '50%';
@@ -398,9 +401,9 @@ class TableSessionData(object):
                 $('#' + table).css('opacity', '');
             }
         """
-        self.tables_reset = Button(label='Clear selections', name='tables_reset', button_type='danger')
-        self.tables_reset.js_on_click(CustomJS(args=dict(), code=reset_selection_code))
-        self.tables_reset.on_click(reset_tables_callback)
-        self.widgets.append(self.tables_reset)
+        self.tables_reset_button = Button(label='Clear selections', button_type='danger')
+        self.tables_reset_button.js_on_click(CustomJS(args=dict(), code=reset_selection_code))
+        self.tables_reset_button.on_click(reset_tables_callback)
+        self.widgets.append(wrap_popover(self.tables_reset_button, create_popover(*TOOLTIP_CLEAR_SELECTIONS), 'tables_reset'))
 
         self.linker = Linker(self.data.table_info, self.data.nh.nplinker.dataset_id, os.path.join(self.data.local_cache, 'linker.sqlite3'))

@@ -22,6 +22,9 @@ from searching import SEARCH_OPTIONS, Searcher
 
 from tables_functions import NA_ID
 
+from tooltips import create_popover, wrap_popover
+from tooltips import TOOLTIP_TABLES_FILTERING
+
 # TODO all of this code doesn't have to be in the same module, could benefit from splitting up by
 # functionality (e.g. scoring, searching, UI, ...)
 
@@ -1763,7 +1766,7 @@ class NPLinkerBokeh(object):
         self.metcalf_standardised = RadioGroup(labels=['Basic Metcalf scoring', 'Standardised Metcalf scoring'], name='metcalf_standardised', active=1 if self.scoring_objects['metcalf'].standardised else 0, sizing_mode='scale_width')
         self.metcalf_standardised.on_change('active', self.metcalf_standardised_callback)
         widgets.append(self.metcalf_standardised)
-        self.metcalf_cutoff = Slider(start=0, end=100, value=int(self.scoring_objects['metcalf'].cutoff), step=1, title='[metcalf] cutoff = ', name='metcalf_cutoff')
+        self.metcalf_cutoff = Slider(start=0, end=10, value=int(self.scoring_objects['metcalf'].cutoff), step=1, title='[metcalf] cutoff = ', name='metcalf_cutoff')
         self.metcalf_cutoff.on_change('value', self.metcalf_cutoff_callback)
         widgets.append(self.metcalf_cutoff)
 
@@ -1771,6 +1774,10 @@ class NPLinkerBokeh(object):
         self.testscore_value = Slider(start=0, end=1, step=.01, value=self.scoring_objects['testscore'].value, title='Value parameter', name='testscore_value')
         self.testscore_value.on_change('value', self.testscore_value_callback)
         widgets.append(self.testscore_value)
+
+        metcalf_info_div = Div(name='metcalf_info', sizing_mode='scale_width', text='Tables contain objects with Metcalf score > {:.1f}'.format(self.nh.nplinker._loader.webapp_scoring_cutoff()))
+        self.metcalf_info = wrap_popover(metcalf_info_div, create_popover(*TOOLTIP_TABLES_FILTERING), 'metcalf_info')
+        widgets.append(self.metcalf_info)
 
         # for debug output etc 
         self.debug_div = Div(text="", name='debug_div', sizing_mode='scale_width')
@@ -1905,7 +1912,7 @@ class NPLinkerBokeh(object):
         self.table_session_data.tables_score_gen.on_click(self.tables_score_gen_callback)
 
         # and reset button
-        self.table_session_data.tables_reset.on_click(self.tables_reset_callback)
+        self.table_session_data.tables_reset_button.on_click(self.tables_reset_callback)
 
         self.hidden_alert_thing = PreText(text='', name='hidden_alert', visible=False)
         self.hidden_alert_thing.js_on_change('text', CustomJS(code='if(cb_obj.text.length > 0) alert(cb_obj.text);', args={}))

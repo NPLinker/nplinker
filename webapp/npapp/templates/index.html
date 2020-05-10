@@ -50,6 +50,24 @@
             var showall = $(table_id + " tr").show();
             var hidenotmatching = $(table_id + " tr:not(:contains('" + search_term + "'))").hide(); 
         }
+
+        // this is a hacky workaround from https://stackoverflow.com/questions/42794556/how-to-check-if-my-bokeh-server-application-is-completely-loaded-and-rendered
+        // doesn't seem to be anything better provided by bokeh yet...
+        old_log = console.log;
+        console.log = function(message) {
+            if(message.localeCompare('Bokeh items were rendered successfully') == 0) {
+                // above message indicates bokeh has loaded, use this to initialise 
+                // bootstrap popovers and remove the overlay
+                console.log = old_log;
+                $('[data-toggle="popover"]').popover();
+                $('.popover-dismiss').popover({
+                    trigger: 'focus'
+                });
+                $('#overlay').hide();
+            }
+            old_log.apply(console, arguments);
+        };
+
     </script>
 {% endblock %}
   
@@ -139,7 +157,7 @@
         </div>
         <div class="col-md-2"></div>
     </div>
-    <div id="overlay" style="display: none">
+    <div id="overlay" style="">
         <div id="overlay_text">Loading dataset, please wait...</div>
     </div>
     <div id="hidden_alert" style="display: none">
@@ -157,7 +175,9 @@
                 <div class="col-md-3">
                     {{ embed(roots.tables_score_gen) }}
                 </div>
-                <div class="col-md-3"></div>
+                <div class="col-md-3">
+                    {{ embed(roots.metcalf_info) }}
+                </div>
             </div>
             <div class="row">
                 <div class="col-lg-3 met-table" id="molfam_table">
@@ -276,7 +296,7 @@
                     <div class="row">
                         <div class="col-md-1"></div>
                         <div class="col-lg-10">
-                            <strong>Selected scoring method:</strong>
+                            <strong>Selected scoring methods:</strong>
                             {{ embed(roots.scoring_method_checkboxes) }}
                             <div class="container-fluid">
                                 <div class="row">
