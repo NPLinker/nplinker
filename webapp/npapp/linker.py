@@ -33,6 +33,9 @@ class Linker:
         self.queryResult = None
         self.sqlManager = SqlManager(self.tablesInfo, path, do_init)
 
+    def close(self):
+        self.sqlManager.close()
+
     def getDefaultConstraints(self):
         ctables = getConstraintTablesConstraintKeyName(self.tablesInfo)
         # this is just a list of dicts with {'tableName': ..., 'constraintKeyName': ...} entries 
@@ -216,6 +219,9 @@ class SqlManager:
         self.tableRelationships = self.getTableRelationships(tablesInfo)
         self.constraintTableConstraintKeyNames = getConstraintTablesConstraintKeyName(tablesInfo)
 
+    def close(self):
+        self.db.close()
+
     def initialiseTables(self, tablesInfo):
         for t in tablesInfo:
             tableName = t['tableName']
@@ -273,7 +279,6 @@ class SqlManager:
     def getFieldNames(self, tablesInfo):
         # this is meant to return a comma-separated list of '<table>.<col> AS table_col' 
         # entries for the 4 visible tables
-        
         visible_tables = filter(isTableVisible, tablesInfo)
         firstdatarows = map(lambda t: {'tableName': t['tableName'], 'firstDataRow': t['tableData'][0]}, visible_tables)
         tabledata = map(lambda x: (x['tableName'], list(x['firstDataRow'].keys())), firstdatarows)
