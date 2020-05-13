@@ -925,12 +925,13 @@ class NPLinkerBokeh(object):
         if include_only is not None:
             scoring_results.filter_targets(lambda x: x in include_only)
 
+        # TODO should probably remove this, or at least make it optional
         # 2. if the linked objects are GCFs, need to filter out those results for
         # which the GCFs are not currently "available" due to possible use of a
         # limited projection (this is tied to old TSNE plot projection stuff but
         # keeping it here in case still useful)
-        if mode == SCO_MODE_SPEC_GCF or mode == SCO_MODE_MOLFAM_GCF:
-            scoring_results.filter_targets(lambda x: x in self.nh.available_gcfs[self.bgc_tsne_id])
+        # if mode == SCO_MODE_SPEC_GCF or mode == SCO_MODE_MOLFAM_GCF:
+        #     scoring_results.filter_targets(lambda x: x in self.nh.available_gcfs[self.bgc_tsne_id])
 
         # 3. filter out any results with no shared strains, if that option is enabled
         if self.filter_no_shared_strains:
@@ -1787,8 +1788,12 @@ class NPLinkerBokeh(object):
         self.alert_div = Div(text="", name='alert_div')
         widgets.append(self.alert_div)
 
+        # header text
+        self.header_text = Div(text='<strong>NPLinker web app</strong> (loaded BGCs={}, GCFs={}, Spectra={}, MolFams={})'.format(len(self.nh.nplinker.bgcs), len(self.nh.nplinker.gcfs), len(self.nh.nplinker.spectra), len(self.nh.nplinker.molfams)), name='header_text', sizing_mode='scale_width')
+        widgets.append(self.header_text)
+
         # "reset everything" button
-        self.reset_button = Button(name='reset_button', label='Reset state', button_type='danger', sizing_mode='scale_width')
+        self.reset_button = Button(name='reset_button', label='Reset state', button_type='danger', sizing_mode='scale_width', visible=False)
         # this is used to clear the selection, which isn't done by faking the reset event from the
         # javascript callback below for some reason...
         self.reset_button.on_click(self.reset_button_callback)
