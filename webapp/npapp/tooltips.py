@@ -24,22 +24,22 @@ TOOLTIP_CLEAR_SELECTIONS = (
 
 TOOLTIP_DOWNLOAD_CSV_MOLFAM = (
     'Download CSV data',
-    """Click to download a CSV file containing the information currently visible in the table"""
+    """Download a CSV file containing the information currently visible in the MolFam table"""
 )
 
 TOOLTIP_DOWNLOAD_CSV_SPECTRA = (
     'Download CSV data',
-    """Click to download a CSV file containing the information currently visible in the table"""
+    """Download a CSV file containing the information currently visible in the Spectra table"""
 )
 
 TOOLTIP_DOWNLOAD_CSV_BGC = (
     'Download CSV data',
-    """Click to download a CSV file containing the information currently visible in the table"""
+    """Download a CSV file containing the information currently visible in the BGC table"""
 )
 
 TOOLTIP_DOWNLOAD_CSV_GCF = (
     'Download CSV data',
-    """Click to download a CSV file containing the information currently visible in the table"""
+    """Download a CSV file containing the information currently visible in the GCF table"""
 )
 
 TOOLTIP_RESULTS_AREA = (
