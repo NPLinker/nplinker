@@ -11,6 +11,7 @@ from linker import Linker
 from tables_functions import create_links, get_table_info, NA_ID, NA_TEXT
 from tooltips import create_popover, wrap_popover
 from tooltips import TOOLTIP_CLEAR_SELECTIONS, TOOLTIP_BGC_SCORING, TOOLTIP_SPECTRA_SCORING
+from tooltips import TOOLTIP_DOWNLOAD_CSV_BGC, TOOLTIP_DOWNLOAD_CSV_GCF, TOOLTIP_DOWNLOAD_CSV_SPECTRA, TOOLTIP_DOWNLOAD_CSV_MOLFAM
 
 class TableData(object):
 
@@ -286,20 +287,20 @@ class TableSessionData(object):
             }
         """
 
-        self.molfam_dl_button = Button(label='Download as CSV', name='molfam_dl_button')
-        self.spec_dl_button = Button(label='Download as CSV', name='spec_dl_button')
-        self.bgc_dl_button = Button(label='Download as CSV', name='bgc_dl_button')
-        self.gcf_dl_button = Button(label='Download as CSV', name='gcf_dl_button')
+        self.molfam_dl_button = Button(label='MolFams to CSV')
+        self.spec_dl_button = Button(label='Spectra to CSV')
+        self.bgc_dl_button = Button(label='BGCs to CSV')
+        self.gcf_dl_button = Button(label='GCFs to CSV')
+
+        self.widgets.append(wrap_popover(self.molfam_dl_button, create_popover(*TOOLTIP_DOWNLOAD_CSV_MOLFAM), 'molfam_dl_button'))
+        self.widgets.append(wrap_popover(self.spec_dl_button, create_popover(*TOOLTIP_DOWNLOAD_CSV_SPECTRA), 'spec_dl_button'))
+        self.widgets.append(wrap_popover(self.bgc_dl_button, create_popover(*TOOLTIP_DOWNLOAD_CSV_BGC), 'bgc_dl_button'))
+        self.widgets.append(wrap_popover(self.gcf_dl_button, create_popover(*TOOLTIP_DOWNLOAD_CSV_GCF), 'gcf_dl_button'))
 
         self.molfam_dl_button.callback = CustomJS(args=dict(name='molfam', source=self.molfam_ds), code=download_button_code)
         self.spec_dl_button.callback = CustomJS(args=dict(name='spectrum', source=self.spec_ds), code=download_button_code)
         self.bgc_dl_button.callback = CustomJS(args=dict(name='bgc', source=self.bgc_ds), code=download_button_code)
         self.gcf_dl_button.callback = CustomJS(args=dict(name='gcf', source=self.gcf_ds), code=download_button_code)
-
-        self.widgets.append(self.molfam_dl_button)
-        self.widgets.append(self.spec_dl_button)
-        self.widgets.append(self.bgc_dl_button)
-        self.widgets.append(self.gcf_dl_button)
 
         self.resetting = False
 
