@@ -111,8 +111,9 @@
 <div class="container-fluid" style="margin-top: 10px">
     <div class="row" style="background-color: #fffdd2">
         <div class="col-md-3">
+            {{ embed(roots.header_text) }}
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3" style="display: none">
             <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#optionsModal" aria-expanded="false" aria-controls="optionsModal" style="margin-top: 10px">
                 Options
             </button>
@@ -146,6 +147,7 @@
     <div class="row" style="margin-top: 15px; margin-bottom: 15px;">
         <div class="col-md-2"></div>
         <div class="col-md-8">
+            <!--
             <ul class="nav nav-tabs nav-pills nav-fill" id="modeTabs", role="tablist">
                 <li class="nav-item">
                     <a class="nav-link active" role="tab" data-toggle="tab" href="#modes_tab_tables">Tables view</a>
@@ -154,6 +156,7 @@
                     <a class="nav-link" role="tab" data-toggle="tab" href="#modes_tab_plots">Plots view</a>
                 </li>
             </ul>
+            -->
         </div>
         <div class="col-md-2"></div>
     </div>
