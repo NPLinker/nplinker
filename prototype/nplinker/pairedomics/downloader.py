@@ -59,13 +59,13 @@ class Downloader(object):
 
         # query the pairedomics webservice with the project ID to retrieve the data. unfortunately
         # this is not the MSV... ID, but an internal GUID string. To get that, first need to get the
-        # list of all projects, find the one with a 'GNPSMassIVE_ID' value matching the MSV... ID, and
+        # list of all projects, find the one with a 'metabolite_id' value matching the MSV... ID, and
         # then extract its '_id' value to get the GUID
 
         # find the specified project and store its ID
         for project in self.all_project_json['data']:
             pairedomics_id = project['_id']
-            gnps_massive_id = project['GNPSMassIVE_ID']
+            gnps_massive_id = project['metabolite_id']
 
             if gnps_massive_id == platform_id:
                 self.pairedomics_id = pairedomics_id
