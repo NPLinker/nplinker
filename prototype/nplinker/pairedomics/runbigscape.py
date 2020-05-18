@@ -35,7 +35,8 @@ def run_bigscape(bigscape_py_path, antismash_path, output_path, pfam_path, cutof
 
     # use default cutoffs if not overridden by user
     if extra_params is not None and extra_params.find('cutoffs') == -1:
-        args.append(['--cutoffs', ','.join(map(str, cutoffs))])
+        args.append('--cutoffs')
+        args.append(','.join(map(str, cutoffs)))
 
     # append the user supplied params, if any
     if extra_params is not None and len(extra_params) > 0:
