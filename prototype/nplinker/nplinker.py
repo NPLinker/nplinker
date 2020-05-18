@@ -163,7 +163,7 @@ class NPLinker(object):
         self._collect_repro_data()
         with open(filename, 'wb') as repro_file:
             # TODO is pickle the best format to use?
-            pickle.dump(self._repro_data, repro_file)
+            pickle.dump(self._repro_data, repro_file, protocol=4)
             logger.info('Saving reproducibility data to {}'.format(filename))
 
     @property

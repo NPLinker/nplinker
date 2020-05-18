@@ -46,7 +46,7 @@ class TableData(object):
             for path in [pickled_scores_path, pickled_links_path, database_path]:
                 if os.path.exists(path):
                     os.unlink(path)
-        pickle.dump(current_cutoff_val, open(last_cutoff_path, 'wb'))
+        pickle.dump(current_cutoff_val, open(last_cutoff_path, 'wb'), protocol=4)
 
         if not os.path.exists(pickled_scores_path):
             # get the metcalf scoring links between spectra:gcf and gcf:spectra pairs
@@ -54,7 +54,7 @@ class TableData(object):
             metcalf_scoring.cutoff = self.nh.nplinker._loader.webapp_scoring_cutoff()
             print('Metcalf tables cutoff is {}'.format(metcalf_scoring.cutoff))
             spec_links = self.nh.nplinker.get_links(self.nh.nplinker.spectra, metcalf_scoring)
-            pickle.dump(spec_links, open(pickled_scores_path, 'wb'))
+            pickle.dump(spec_links, open(pickled_scores_path, 'wb'), protocol=4)
         else:
             spec_links = pickle.load(open(pickled_scores_path, 'rb'))
 
@@ -180,7 +180,7 @@ class TableData(object):
             print(' + spectra_bgc')
 
             # pickle the data structs to avoid doing the above again
-            pickle.dump((self.bgc_gcf, self.mf_spectra, self.spectra_bgc), open(pickled_links_path, 'wb'))
+            pickle.dump((self.bgc_gcf, self.mf_spectra, self.spectra_bgc), open(pickled_links_path, 'wb'), protocol=4)
         else:
             self.bgc_gcf, self.mf_spectra, self.spectra_bgc = pickle.load(open(pickled_links_path, 'rb'))
 
