@@ -105,7 +105,7 @@ class Rosetta(object):
         logger.info('Finished generating SpecLib')
     
         with open(self._speclib_pickle_path, 'wb') as f:
-            pickle.dump(self.speclib, f)
+            pickle.dump(self.speclib, f, protocol=4)
 
     def _generate_bgc_hits(self, bgcs):
         self._bgc_hits = {}
@@ -130,7 +130,7 @@ class Rosetta(object):
 
         logger.info('Completed, {} BGC hits found'.format(len(self._bgc_hits)))
         with open(self._bgchits_pickle_path, 'wb') as f:
-            pickle.dump((self._bgc_hits, self._mibig2bgc), f)
+            pickle.dump((self._bgc_hits, self._mibig2bgc), f, protocol=4)
 
     def _collect_rosetta_hits(self):
         self._rosetta_hits = []

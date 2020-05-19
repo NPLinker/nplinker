@@ -1,5 +1,7 @@
 import os
 
+from threading import Thread
+
 from bokeh.models.widgets import RadioGroup, Slider, Div, Select, CheckboxGroup
 from bokeh.models.widgets import Toggle, Button, TextInput, PreText
 from bokeh.layouts import row
@@ -14,11 +16,14 @@ from bokeh.events import LODEnd, LODStart, Reset
 from nplinker.metabolomics import Spectrum, MolecularFamily, SingletonFamily
 from nplinker.genomics import GCF, BGC
 from nplinker.annotations import gnps_url, GNPS_KEY
+from nplinker.scoring.methods import LinkCollection
 
 from searching import SEARCH_OPTIONS, Searcher
 
-from tables_init import TableData
-from tables_functions import NA
+from tables_functions import NA_ID
+
+from tooltips import create_popover, wrap_popover
+from tooltips import TOOLTIP_TABLES_FILTERING
 
 # TODO all of this code doesn't have to be in the same module, could benefit from splitting up by
 # functionality (e.g. scoring, searching, UI, ...)
@@ -210,10 +215,8 @@ class ScoringHelper(object):
         self.spectra = []
         self.molfams = []
         self.inputs = set()
-        self.objs_with_links = []
-        self.objs_with_scores = {}
-        self.shared_strains = {}
-
+        self.scoring_results = LinkCollection()
+    
     def set_genomics(self):
         self.from_genomics = True
         self._update()
@@ -241,10 +244,8 @@ class ScoringHelper(object):
         else:
             self.mode = ScoringHelper.METABOLOMICS_LOOKUP[self.metabolomics_mode]
 
-    def set_results(self, objs_with_links, objs_with_scores, shared_strains):
-        self.objs_with_links = objs_with_links
-        self.objs_with_scores = objs_with_scores
-        self.shared_strains = shared_strains
+    def set_results(self, scoring_results):
+        self.scoring_results = scoring_results
 
     @property
     def mode_name(self):
@@ -375,10 +376,11 @@ class ZoomHandler(object):
 
 class NPLinkerBokeh(object):
 
-    def __init__(self, helper):
+    def __init__(self, helper, table_session_data):
         # handle the "helper" object from the server_lifecycle module, which deals
         # with loading the dataset and creating data ready to be wrapped in DataSources
         self.nh = helper
+        self.table_session_data = table_session_data
 
         # default to TSNE with all bgcs
         # NOTE: currently we're using the dynamically generated networkx layouts, TSNE stuff inactive
@@ -645,31 +647,37 @@ class NPLinkerBokeh(object):
             self.fig_bgc.outline_line_width = 2
             self.fig_spec.outline_line_color = None
 
-    def generate_gcf_spec_result(self, pgindex, gcf, links):
+    def generate_gcf_spec_result(self, pgindex, gcf, link_data):
         # generate a GCF >> Spectra nested list
 
         body = '<div class="accordion" id="accordion_gcf_{}">'.format(pgindex)
         # generate the body content of the card by iterating over the spectra it matched
-        for j, spec_score in enumerate(links):
-            spec, score = spec_score
+        j = 0
+        
+        # sort by metcalf scoring if possible 
+        # TODO this will need some more thought when other methods added!
+        if self.scoring_objects['metcalf'] in self.score_helper.scoring_results.methods:
+            sorted_links = self.score_helper.scoring_results.get_sorted_links(self.scoring_objects['metcalf'], gcf)
+        else:
+            sorted_links = link_data.values()
 
-            # if filtering out results with no shared strains is enabled, there should
-            # be no (spec, gcf) pairs not appearing in shared_strains. however might have
-            # the filtering disabled in which case will be pairs that don't appear
-            shared_strains = self.score_helper.shared_strains.get((spec, gcf), [])
+        for link in sorted_links:
+            spec = link.target
+            score = '[' + ', '.join('{}={}'.format(m.name, m.format_data(link[m])) for m in link.methods) + ']'
 
             spec_hdr_id = 'spec_result_header_{}_{}'.format(pgindex, j)
             spec_body_id = 'spec_body_{}_{}'.format(pgindex, j)
-            spec_title = 'Spectrum(parent_mass={:.4f}, id={}), score=<strong>{:.4f}</strong>, shared strains=<strong>{}</strong>'.format(spec.parent_mz, spec.spectrum_id, score, len(shared_strains))
+            spec_title = 'Spectrum(parent_mass={:.4f}, id={}), scores <strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.parent_mz, spec.spectrum_id, score, len(link.shared_strains))
             if spec.has_annotations():
                 spec_title += ', # annotations={}'.format(len(spec.annotations))
 
-            spec_body = self.generate_spec_info(spec, shared_strains)
+            spec_body = self.generate_spec_info(spec, link.shared_strains)
 
             # set up the chemdoodle plot so it appears when the entry is expanded 
             spec_btn_id = 'spec_btn_{}_{}'.format(pgindex, j)
             spec_plot_id = 'spec_plot_{}_{}'.format(pgindex, j)
             spec_body += '<center><canvas id="{}"></canvas></center>'.format(spec_plot_id)
+            span_badges = '&nbsp|&nbsp;'.join(['<span class="badge badge-info">{}</span>'.format(m.name) for m in link.methods])
 
             # note annoying escaping required here, TODO better way of doing this?
             spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, spec.to_jcamp_str())
@@ -678,31 +686,41 @@ class NPLinkerBokeh(object):
             if len(spec.annotations) > 0:
                 hdr_color = 'ffb5e0'
             body += TMPL_ON_CLICK.format(hdr_id=spec_hdr_id, hdr_color=hdr_color, btn_target=spec_body_id, btn_onclick=spec_onclick, btn_id=spec_btn_id, 
-                                         btn_text=spec_title, body_id=spec_body_id, body_parent='accordion_gcf_{}'.format(pgindex), body_body=spec_body)
+                                         btn_text=spec_title, span_badges=span_badges, body_id=spec_body_id, body_parent='accordion_gcf_{}'.format(pgindex), body_body=spec_body)
+            j += 1
 
         body += '</div>'
         return body
 
-    def generate_spec_gcf_result(self, pgindex, spec, links):
+    def generate_spec_gcf_result(self, pgindex, spec, link_data):
         # generate a Spectrum >> GCF nested list
 
         body = '<div class="accordion" id="accordion_spec_{}>'.format(pgindex)
         # now generate the body content of the card by iterating over the GCFs it matched
-        for j, gcf_score in enumerate(links):
-            gcf, score = gcf_score
+        
+        j = 0
 
-            # if filtering out results with no shared strains is enabled, there should
-            # be no (spec, gcf) pairs not appearing in shared_strains. however might have
-            # the filtering disabled in which case will be pairs that don't appear
-            shared_strains = self.score_helper.shared_strains.get((spec, gcf), [])
+        # sort by metcalf scoring if possible 
+        # TODO this will need some more thought when other methods added!
+        if self.scoring_objects['metcalf'] in self.score_helper.scoring_results.methods:
+            sorted_links = self.score_helper.scoring_results.get_sorted_links(self.scoring_objects['metcalf'], spec)
+        else:
+            sorted_links = link_data.values()
+
+        for link in sorted_links:
+            gcf= link.target
+            score = '[' + ', '.join('{}={}'.format(m.name, m.format_data(link[m])) for m in link.methods) + ']'
 
             # construct a similar object info card header for this GCF
             gcf_hdr_id = 'gcf_result_header_{}_{}'.format(pgindex, j)
             gcf_body_id = 'gcf_body_{}_{}'.format(pgindex, j)
-            gcf_title = 'GCF(id={}), score=<strong>{:.4f}</strong>, shared strains=<strong>{}</strong>'.format(gcf.gcf_id, score, len(shared_strains))
-            gcf_body = self.generate_gcf_info(gcf, shared_strains)
-            body += TMPL.format(hdr_id=gcf_hdr_id, hdr_color='ffe0b5', btn_target=gcf_body_id, btn_text=gcf_title, 
+            gcf_title = 'GCF(id={}), scores <strong>{}</strong>, shared strains=<strong>{}</strong>'.format(gcf.gcf_id, score, len(link.shared_strains))
+            gcf_body = self.generate_gcf_info(gcf, link.shared_strains)
+            span_badges = '&nbsp|&nbsp;'.join(['<span class="badge badge-info">{}</span>'.format(m.name) for m in link.methods])
+            body += TMPL.format(hdr_id=gcf_hdr_id, hdr_color='ffe0b5', btn_target=gcf_body_id, btn_text=gcf_title, span_badges=span_badges,
                                 body_id=gcf_body_id, body_parent='accordion_spec_{}'.format(pgindex), body_body=gcf_body)
+
+            j += 1
 
         body += '</div>'
         return body
@@ -718,31 +736,33 @@ class NPLinkerBokeh(object):
                 <collapsible list of spectra linked to GCF 2>
             ...
         """
-        content = '<h4>GCFs={}, linked spectra={}</h4>'.format(len(self.score_helper.gcfs), len(self.ds_spec.selected.indices))
         pgindex = 0
         unsorted = []
 
         # iterate over every GCF and its associated set of linked objects + scores
-        for gcf, spec_scores in self.score_helper.objs_with_scores.items():
-            title = '{} spectra linked to GCF(id={})'.format(len(spec_scores), gcf.gcf_id)
+        for gcf, link_data in self.score_helper.scoring_results.links.items():
             hdr_id = 'gcf_result_header_{}'.format(pgindex)
             body_id = 'gcf_result_body_{}'.format(pgindex)
+
+            title = '{} spectra linked to GCF(id={})'.format(len(link_data), gcf.gcf_id)
 
             # first part of the body content is basic info about the GCF itself
             body = self.generate_gcf_info(gcf)
             body += '<hr/><h5>Linked objects:</h5>'
             # the second part is the list of linked spectra for the GCF, which is
             # generated by calling this method
-            body += self.generate_gcf_spec_result(pgindex, gcf, spec_scores)
+            body += self.generate_gcf_spec_result(pgindex, gcf, link_data)
 
             # finally, store the complete generated HTML string in a list along with
             # the number of links this GCF has, so we can sort the eventual list
             # by number of links 
-            unsorted.append((len(spec_scores), TMPL.format(hdr_id=hdr_id, hdr_color='adeaad', 
-                                                           btn_target=body_id, btn_text=title, 
+            unsorted.append((len(link_data), TMPL.format(hdr_id=hdr_id, hdr_color='adeaad', 
+                                                           btn_target=body_id, btn_text=title, span_badges='',
                                                            body_id=body_id, body_parent='accordionResults', 
                                                            body_body=body)))
             pgindex += 1
+
+        content = '<h4>GCFs={}, linked spectra={}</h4>'.format(len(self.score_helper.scoring_results), len(self.ds_spec.selected.indices))
 
         for _, text in sorted(unsorted, key=lambda x: -x[0]):
             content += text
@@ -758,13 +778,15 @@ class NPLinkerBokeh(object):
         gcf_count = 0
         all_gcfs = set()
 
-        for spec, gcf_scores in self.score_helper.objs_with_scores.items():
-            title = '{} GCFs linked to {}'.format(len(gcf_scores), spec)
+        # for each original input object
+        for spec, link_data in self.score_helper.scoring_results.links.items():
             hdr_id = 'spec_result_header_{}'.format(pgindex)
             body_id = 'spec_result_body_{}'.format(pgindex)
 
-            # gcf_count += len(gcf_scores)
-            all_gcfs.update(gcf_score[0] for gcf_score in gcf_scores)
+            title = '{} GCFs linked to {}'.format(len(link_data), spec)
+
+            all_gcfs.update(link_data.keys())
+
 
             body = 'Spectrum information'
             body += self.generate_spec_info(spec)
@@ -777,16 +799,16 @@ class NPLinkerBokeh(object):
             onclick = 'setupPlot(\'{}\', \'{}\', \'{}\');'.format(btn_id, plot_id, spec.to_jcamp_str())
     
             body += '<hr/><h5>Linked objects:</h5>'
-            body += self.generate_spec_gcf_result(pgindex, spec, gcf_scores)
+            body += self.generate_spec_gcf_result(pgindex, spec, link_data)
 
-            unsorted.append((len(gcf_scores), TMPL_ON_CLICK.format(hdr_id=hdr_id, hdr_color='b4c4e8', 
+            unsorted.append((len(link_data), TMPL_ON_CLICK.format(hdr_id=hdr_id, hdr_color='b4c4e8', 
                                                          btn_target=body_id, btn_onclick=onclick, btn_id=btn_id, 
-                                                         btn_text=title, body_id=body_id, body_parent='accordionResults',
-                                                         body_body=body)))
+                                                         btn_text=title, span_badges='', body_id=body_id, 
+                                                         body_parent='accordionResults', body_body=body)))
 
             pgindex += 1
         
-        content = '<h4>Spectra={}, linked GCFs={}</h4>'.format(len(self.score_helper.spectra), len(all_gcfs))
+        content = '<h4>Spectra={}, linked GCFs={}</h4>'.format(len(self.score_helper.scoring_results), len(all_gcfs))
 
         for _, text in sorted(unsorted, key=lambda x: -x[0]):
             content += text
@@ -857,12 +879,6 @@ class NPLinkerBokeh(object):
             self.debug_log('No objects selected')
             return
 
-        # (i think the reason this is marked TODO is because it currently
-        # wouldn't update cached scores if the scoring method was changed
-        # or reconfigured (e.g. with a new threshold))
-        # nplinker.clear_links() # TODO hack
-        current_method = nplinker.scoring.enabled()[self.scoring_method_group.active]
-
         # obtain a list of objects to be passed to the scoring function
         scoring_objs = self.score_helper.generate_scoring_objects(bgcs, spectra, self.bgc_tsne_id)
         if scoring_objs is None:
@@ -893,198 +909,83 @@ class NPLinkerBokeh(object):
             self.debug_log('Finished updating selection')
             self.configure_bgc_selchanged_listener(True)
 
+        current_method = self.current_scoring_methods()
+        scoring_results = nplinker.get_links(scoring_objs, current_method)
 
-        # this method returns the input objects that have links based on the selected scoring parameters
-        # (ie it will be a (possibly complete, possibly empty) subset of the original list
-        objs_with_links = nplinker.get_links(scoring_objs, scoring_method=current_method)
+        self.display_links(scoring_results, mode, self.results_div)
 
-        self.display_links(objs_with_links, mode, self.results_div)
-
-    def display_links(self, objs_with_links, mode, div, include_only=None):
-        """
-        this method deals with various messy aspects of taking a list of objects
-        with links and building up the set of objects at the other end of the links,
-        subject to various type of filtering/constraints. 
-
-        optionally can be passed an "include_only" set of output-type objects 
-        (Spectrum/MolFam for GCF input, otherwise GCF), which will be used to
-        preemptively filter the available results before going any further. this
-        is currently used to make sure that when in tables mode the results don't
-        include any objects not displayed in the tables
-        """
+    def display_links(self, scoring_results, mode, div, include_only=None):
         nplinker = self.nh.nplinker
-        current_method = nplinker.scoring.enabled()[self.scoring_method_group.active]
+        current_methods = self.current_scoring_methods()
         selected = set()
+        all_shared_strains = {}
 
-        if len(objs_with_links) > 0:
-            # now we know which objects actually have links, want to obtain the 
-            # objects at the other end of those links
+        # 1. need to filter out linked objects that don't appear in the tables 
+        # in their current state
+        if include_only is not None:
+            scoring_results.filter_targets(lambda x: x in include_only)
 
-            # the type parameter limits the links returned by links_for_obj() to objects
-            # of the supplied class. Otherwise for example when scoring GCFs, it will
-            # return both Spectra and MolFams, and don't want to do that here
-            t = Spectrum
-            if mode == SCO_MODE_BGC_MOLFAM or mode == SCO_MODE_GCF_MOLFAM:
-                t = MolecularFamily
-            elif mode == SCO_MODE_SPEC_GCF or mode == SCO_MODE_MOLFAM_GCF:
-                t = GCF
+        # TODO should probably remove this, or at least make it optional
+        # 2. if the linked objects are GCFs, need to filter out those results for
+        # which the GCFs are not currently "available" due to possible use of a
+        # limited projection (this is tied to old TSNE plot projection stuff but
+        # keeping it here in case still useful)
+        # if mode == SCO_MODE_SPEC_GCF or mode == SCO_MODE_MOLFAM_GCF:
+        #     scoring_results.filter_targets(lambda x: x in self.nh.available_gcfs[self.bgc_tsne_id])
 
-            # create a dict with keys = input objects, values = link info for that object
-            objs_with_scores = {}
-            for link_obj in objs_with_links:
-                # filter out objects not shown in tables
-                if include_only is not None:
-                    obj_links = nplinker.links_for_obj(link_obj, current_method, type_=t)
-                    filtered_obj_links = [(obj, score) for (obj, score) in obj_links if obj in include_only]
-                    objs_with_scores[link_obj] = filtered_obj_links
-                else:
-                    objs_with_scores[link_obj] = nplinker.links_for_obj(link_obj, current_method, type_=t)
+        # 3. filter out any results with no shared strains, if that option is enabled
+        if self.filter_no_shared_strains:
+            scoring_results.filter_no_shared_strains()
 
-            # if scoring from Spectra/MolFam to GCF, now need to walk through the list of 
-            # results and exclude any which feature GCFs that do not appear in the current
-            # TSNE projection (this doesn't need done for the SCO_MODE_BGC_ and SCO_MODE_GCF_
-            # modes because in the former case only available GCFs will have been selected in
-            # the first place, and in the latter case unavailable GCFs have been filtered
-            # out already by calling generate_scoring_objects())
-            if mode == SCO_MODE_SPEC_GCF or mode == SCO_MODE_MOLFAM_GCF:
-                self.debug_log('Excluding GCFs from objs_with_scores')
-                for spec_or_fam in list(objs_with_scores.keys()):
-                    gcfs = [(gcf, score) for gcf, score in objs_with_scores[spec_or_fam] if gcf in self.nh.available_gcfs[self.bgc_tsne_id]]
+        # final step here is to take the remaining list of scoring objects and map them
+        # back to indices on the plot so they can be highlighted
+        # NOTE: extra step required if hide_singletons/hide_mibig are True. in this situation
+        # need to filter out such objects from results too
+        self.debug_log('finding indices')
+        objs_to_remove = []
+        score_obj_indices = []
+        if mode == SCO_MODE_BGC_SPEC or mode == SCO_MODE_GCF_SPEC:
+            # for these modes, we can just lookup spectrum indices directly
 
-                    # if this result now happens to have zero GCFs, remove it completely
-                    if len(gcfs) == 0:
-                        del objs_with_scores[spec_or_fam]
-                        objs_with_links.remove(spec_or_fam)
-                        self.debug_log('Removing result {}'.format(spec_or_fam))
-                    else:
-                        # otherwise just overwrite the original list
-                        objs_with_scores[spec_or_fam] = gcfs
+            # filter out spectra from singleton families if necessary
+            def filter_singletons(link):
+                return not isinstance(link.target.family, SingletonFamily)
+            if self.hide_singletons:
+                scoring_results.filter_links(filter_singletons)
 
-            # now want to retrieve shared strain information for all these objects. the filter_no_shared_strains 
-            # parameter determines whether results will be returned for links with no shared strains or not. 
-            otherobjs = set()
-            for link_obj, sco_data in objs_with_scores.items():
-                otherobjs.update(sco_obj for sco_obj, sco in sco_data)
-            shared_strains = self.nh.nplinker.get_common_strains(objs_with_links, list(otherobjs), self.filter_no_shared_strains)
+            for target in scoring_results.get_all_targets():
+                if target.spectrum_id not in self.spec_indices:
+                    self.debug_log('Warning: missing index for Spectrum: {}'.format(target))
+                    continue
+                score_obj_indices.append(self.spec_indices[target.spectrum_id])
+        elif mode == SCO_MODE_SPEC_GCF or mode == SCO_MODE_MOLFAM_GCF:
+            # here we have a list of GCFs, but the plot shows BGCs. so in order
+            # to highlight the BGCs, need to iterate over the list of GCFs 
+            score_obj_indices = set()
 
-            # the shared_strains dict is indexed by object pairs, ALWAYS with Spectra/MolFam
-            # as the first entry in the tuple. the next step in filtering the results 
-            # (if self.filter_no_shared_strains is True) is to go through the results and remove links where
-            # that pair does not appear in shared_strains
-            if self.filter_no_shared_strains:
-                self.debug_log('Filtering out results with no shared strains, initial num of objects={}'.format(len(objs_with_scores)))
+            # filter out GCFs that only contain MiBIG BGCs if necessary
+            def filter_mibig(gcf):
+                return not gcf.only_mibig()
+            if self.hide_mibig:
+                scoring_results.filter_targets(filter_mibig)
 
-                # as keys in shared_strains are always (Spectra, GCF) or (MolFam, GCF)
-                # pairs, need to swap link_obj/sco_obj if using a mode where GCFs are link_objs
-                key_swap = False
-                if mode == SCO_MODE_BGC_SPEC or mode == SCO_MODE_GCF_SPEC or mode == SCO_MODE_BGC_MOLFAM or mode == SCO_MODE_GCF_MOLFAM:
-                    key_swap = True
+            for target in scoring_results.get_all_targets():
+                # get list of BGCs from the GCF. if we're not showing MiBIG BGCs and these
+                # are the only ones in this GCF, don't show it 
+                bgcs = target.bgcs if not self.hide_mibig else target.non_mibig_bgcs
+                for n in bgcs:
+                    try:
+                        score_obj_indices.add(self.bgc_indices[n.name])
+                    except KeyError:
+                        self.debug_log('Warning: missing index for BGC: {} in GCF: {}'.format(n.name, target))
+            score_obj_indices = list(score_obj_indices)
 
-                objs_to_remove = []
-                # for each object which has links
-                for link_obj, sco_objs_and_scores in objs_with_scores.items():
-                    to_keep = set()
-                    for sco_obj, _ in sco_objs_and_scores:
-                        # check if each pairing has any shared strains and if so add to set
-                        key = (sco_obj, link_obj) if key_swap else (link_obj, sco_obj)
-                        if key in shared_strains:
-                            to_keep.add(sco_obj)
+        # add these indices to the overall set
+        selected.update(score_obj_indices)
 
-                    # rebuild list including only those in the set, removing any which now have zero links
-                    if len(to_keep) == 0:
-                        self.debug_log('No remaining linked objects for {}, removing it!'.format(link_obj))
-                        objs_to_remove.append(link_obj)
-                    else:
-                        objs_with_scores[link_obj] = [(sco_obj, score) for sco_obj, score in sco_objs_and_scores if sco_obj in to_keep]
-
-                if len(objs_to_remove) > 0:
-                    self.debug_log('Removing {} objects which now have no links'.format(len(objs_to_remove)))
-                    for link_obj in objs_to_remove:
-                        del objs_with_scores[link_obj]
-                        objs_with_links.remove(link_obj)
-                self.debug_log('After filtering out results with no shared strains, num of objects={}'.format(len(objs_with_scores)))
-
-            # final step here is to take the remaining list of scoring objects and map them
-            # back to indices on the plot so they can be highlighted
-            # NOTE: extra step required if hide_singletons/hide_mibig are True. in this situation
-            # need to filter out such objects from results too
-            self.debug_log('finding indices')
-            objs_to_remove = []
-            for link_obj in objs_with_links:
-                score_obj_indices = []
-                if mode == SCO_MODE_BGC_SPEC or mode == SCO_MODE_GCF_SPEC:
-                    # for these modes, we can just lookup spectrum indices directly
-                    score_obj_indices = []
-
-                    # if not showing singleton families on the plot, shouldn't show spectra
-                    # from these families in the results, so filter them out here
-                    score_data = objs_with_scores[link_obj] if not self.hide_singletons\
-                                                            else [(spec, score) for (spec, score) in objs_with_scores[link_obj]
-                                                                  if not isinstance(spec.family, SingletonFamily)]
-                    self.debug_log('Number of excluded spectra: {}'.format(len(objs_with_scores[link_obj]) - len(score_data)))
-                    self.debug_log('Number remaining: {}'.format(len(score_data)))
-                    if len(score_data) == 0:
-                        objs_to_remove.append(link_obj)
-                    objs_with_scores[link_obj] = score_data
-
-                    for (spec, score) in objs_with_scores[link_obj]:
-                        if spec.spectrum_id not in self.spec_indices:
-                            self.debug_log('Warning: missing index for Spectrum: {}'.format(spec))
-                            continue
-                        score_obj_indices.append(self.spec_indices[spec.spectrum_id])
-                    # score_obj_indices = [self.spec_indices[spec.spectrum_id] for (spec, score) in objs_with_scores[link_obj]]
-                elif mode == SCO_MODE_SPEC_GCF or mode == SCO_MODE_MOLFAM_GCF:
-                    # here we have a list of GCFs, but the plot shows BGCs. so in order
-                    # to highlight the BGCs, need to iterate over the list of GCFs 
-                    score_obj_indices = set()
-
-                    # if not showing MiBIG BGCs on the plot, filter out any GCFs that only
-                    # contain MiBIG BGCs here
-                    if self.hide_mibig:
-                        score_data = []
-                        for (gcf, score) in objs_with_scores[link_obj]:
-                            # include only GCFs with at least 1 non-MiBIG BGC
-                            if not gcf.only_mibig():
-                                score_data.append((gcf, score))
-                        self.debug_log('Number of excluded GCFs: {}'.format(len(objs_with_scores[link_obj]) - len(score_data)))
-                        self.debug_log('Number remaining: {}'.format(len(score_data)))
-                        if len(score_data) == 0:
-                            objs_to_remove.append(link_obj)
-                        objs_with_scores[link_obj] = score_data
-
-                    for gcf, _ in objs_with_scores[link_obj]:
-                        # get list of BGCs from the GCF. if we're not showing MiBIG BGCs and these
-                        # are the only ones in this GCF, don't show it 
-                        bgcs = gcf.bgcs if not self.hide_mibig else gcf.non_mibig_bgcs
-                        for n in bgcs:
-                            try:
-                                score_obj_indices.add(self.bgc_indices[n.name])
-                            except KeyError:
-                                self.debug_log('Warning: missing index for BGC: {} in GCF: {}'.format(n.name, gcf))
-                    score_obj_indices = list(score_obj_indices)
-
-
-                # add these indices to the overall set
-                selected.update(score_obj_indices)
-
-            # remove any linked objects which now have no links due to hidden objects being filtered out
-            if len(objs_to_remove) > 0:
-                self.debug_log('FINAL: removing {} objects which now have no links'.format(len(objs_to_remove)))
-                for link_obj in objs_to_remove:
-                    del objs_with_scores[link_obj]
-                    objs_with_links.remove(link_obj)
-            self.debug_log('After filtering out hidden objects, num of objects={}'.format(len(objs_with_scores)))
-
-        self.debug_log('All filtering completed, remaining objs={}'.format(len(objs_with_links)))
-        # at the end of the scoring process, we end up with 3 important data structures:
-        # - a subset of the input objects which have been determined to have links (objs_with_links)
-        # - the (filtered) set of objects that have links to those objects, with their scores (objs_with_scores)
-        # - the dict containing shared strain information between those two sets of objects (shared_strains)
-        # all of these should then be passed to the ScoringHelper object where they can be retrieved by the 
-        # functions that are responsible for generating the output HTML etc
-        if len(objs_with_links) > 0:
+        if len(scoring_results) > 0:
             self.debug_log('set_results')
-            self.score_helper.set_results(objs_with_links, objs_with_scores, shared_strains)
+            self.score_helper.set_results(scoring_results)
         else:
             self.score_helper.clear()
 
@@ -1092,7 +993,7 @@ class NPLinkerBokeh(object):
         self.update_ui_post_scoring(selected, div)
 
     def update_ui_post_scoring(self, selected_indices, div):
-        if len(self.score_helper.objs_with_links) > 0:
+        if len(self.score_helper.scoring_results) > 0:
             # take the indexes of the corresponding spectra from the datasource and highlight on the other plot
             # also need to hide edges manually
             if self.score_helper.gen_to_met():
@@ -1118,7 +1019,7 @@ class NPLinkerBokeh(object):
                 self.ds_edges_spec.selected.indices = self.nh.get_spec_edges(self.ds_spec.selected.indices)
                 self.ren_spec.edge_renderer.visible = len(self.ds_edges_spec.selected.indices) > 0
 
-            self.update_alert('{} objects with links found'.format(len(self.score_helper.objs_with_scores)), 'primary')
+            self.update_alert('{} objects with links found'.format(len(self.score_helper.scoring_results)), 'primary')
         else:
             self.debug_log('No links found!')
             # clear any selection on the "output" plot
@@ -1178,25 +1079,27 @@ class NPLinkerBokeh(object):
             self.update_results(self.results_div)
 
     def metcalf_standardised_callback(self, attr, old, new):
-        if self.nh.nplinker.scoring.metcalf == new:
+        obj = self.scoring_objects['metcalf']
+        # don't attempt to set the same value it already has 
+        # (this is using 0 = False, 1 = True)
+        if obj.standardised == new:
             return
-        self.nh.nplinker.scoring.metcalf.standardised = (new == 1)
+        obj.standardised = (new == 1)
         self.get_links()
 
     def metcalf_cutoff_callback(self, attr, old, new):
-        self.nh.nplinker.scoring.metcalf.cutoff = new
+        self.scoring_objects['metcalf'].cutoff = new
+        self.get_links()
+
+    def testscore_value_callback(self, attr, old, new):
+        self.scoring_objects['testscore'].value = new
         self.get_links()
         
-    def likescore_cutoff_callback(self, attr, old, new):
-        self.nh.nplinker.scoring.likescore.cutoff = new / 100.0
-        self.get_links()
-
-    def hg_prob_callback(self, attr, old, new):
-        self.nh.nplinker.scoring.hg.prob = new / 100.0
-        self.get_links()
-
     def scoring_method_callback(self, attr, old, new):
-        self.get_links()
+        # update visibility of buttons
+        for i in range(len(self.scoring_methods)):
+            self.scoring_method_buttons[self.scoring_methods[i]].visible = i in new
+        # self.get_links()
 
     def clear_selections(self):
         self.ds_bgc.selected.indices = []
@@ -1582,12 +1485,29 @@ class NPLinkerBokeh(object):
     def gnps_params_select_callback(self, attr, old, new):
         self.gnps_params_value.text = '<strong>{}</strong> = {}'.format(new, self.nh.nplinker.gnps_params[new])
 
+    def current_scoring_method_names(self):
+        print('NAMES', [self.scoring_methods[x] for x in self.scoring_method_checkboxes.active])
+        return [self.scoring_methods[x] for x in self.scoring_method_checkboxes.active]
+
+    def current_scoring_methods(self):
+        print('METHODS', [self.scoring_objects[x] for x in self.current_scoring_method_names()])
+        return [self.scoring_objects[x] for x in self.current_scoring_method_names()]
+
     def tables_score_met_callback(self):
         """
         Handles clicks on the "Show scores for selected spectra" button (tables mode)
         """
-        print('Currently selected spectra: {}'.format(len(self.table_data.spec_ds.data['spectrum_id'])))
-        print('Actual selections: {}'.format(len(self.table_data.spec_ds.selected.indices)))
+        print('Currently selected spectra: {}'.format(len(self.table_session_data.spec_ds.data['spectrum_id'])))
+        print('Actual selections: {}'.format(len(self.table_session_data.spec_ds.selected.indices)))
+
+        if len(self.table_session_data.spec_ds.selected.indices) == 0 and len(self.table_session_data.molfam_ds.selected.indices) == 0:
+            self.hidden_alert_thing.text = 'Error: no spectra have been selected!\n\n' +\
+                                            'Running scoring on {} objects may take a long time!\n'.format(len(self.table_session_data.spec_ds.data['spectrum_id'])) +\
+                                             'Please make some selections and then try again.'
+            # this resets the text without triggering the alert() again, so that NEXT time this happens
+            # the text-changed event will be fired by the above line. yes it's a mess
+            self.hidden_alert_thing.text = ''
+            return
 
         # need to build a list of the NPLinker Spectrum objects corresponding to
         # the set of objects currently listed in the table
@@ -1597,27 +1517,44 @@ class NPLinkerBokeh(object):
         #   actually be selected, so just take all visible entries
         # - alternatively they might have selected a spectrum directly, in which case they
         #   will all still be visible but we only want the selected indices
-
         selected_spectra = []
-        if len(self.table_data.spec_ds.selected.indices) > 0:
+        if len(self.table_session_data.spec_ds.selected.indices) > 0:
             # assume there's been an explicit selection and use those objects
-            for index in self.table_data.spec_ds.selected.indices:
-                sid = self.table_data.spec_ds.data['spec_pk'][index] # the internal nplinker ID
-                if sid == NA:
+            for index in self.table_session_data.spec_ds.selected.indices:
+                sid = self.table_session_data.spec_ds.data['spec_pk'][index] # the internal nplinker ID
+                if sid == NA_ID:
                     continue
-                selected_spectra.append(self.nh.nplinker.spectra[sid])
+                selected_spectra.append(self.nh.nplinker.spectra[int(sid)])
         else:
-            for sid in self.table_data.spec_ds.data['spec_pk']: # internal nplinker IDs
-                if sid == NA:
+            for sid in self.table_session_data.spec_ds.data['spec_pk']: # internal nplinker IDs
+                if sid == NA_ID:
                     continue
-                spec = self.nh.nplinker.spectra[sid] 
+                spec = self.nh.nplinker.spectra[int(sid)] 
                 selected_spectra.append(spec)
 
-        # retrieve the currently active scoring method (for now this will always be metcalf)
-        current_method = self.nh.nplinker.scoring.enabled()[self.scoring_method_group.active]
+        # retrieve the currently active scoring method(s)
+        current_methods = self.current_scoring_methods()
         
         # call get_links, which returns the subset of input objects which have links
-        results = self.nh.nplinker.get_links(selected_spectra, scoring_method=current_method)
+        results = self.nh.nplinker.get_links(selected_spectra, current_methods)
+
+        # TODO quick attempt to display scores in the tables (for metcalf only for now)
+        metcalf_obj = self.scoring_objects['metcalf']
+        # check if metcalf scoring is enabled at the moment
+        if metcalf_obj in current_methods:
+            # create a dict mapping GCFs in the results to their scores
+            gcf_scores = {}
+            for spec, result in results.links.items():
+                for gcf, link_data in result.items():
+                    metcalf_score = link_data.data(metcalf_obj)
+                    gcf_scores[gcf] = metcalf_score
+
+            # get a list of the GCFs currently visible in the table (note that
+            # these are the actual GCF IDs, not the internal nplinker IDs)
+            visible_gcfs = map(int, self.table_session_data.gcf_ds.data['gcf_id'])
+
+            # update the data source with the scores
+            self.table_session_data.gcf_ds.data['metcalf_score'] = [gcf_scores[self.nh.nplinker.lookup_gcf(gcf_id)] for gcf_id in visible_gcfs]
 
         # next, need to display the results using the same code as for generating the 
         # results from plot selections, but without actually triggering any unintended
@@ -1642,15 +1579,17 @@ class NPLinkerBokeh(object):
         # in, which would make them easier to repurpose (i.e. they use self.ds_spec
         # instead of a generic <datasource> parameter)
         # 
-        # updated the set of selected indices on the spectral datasource (equivalent
+        # update the set of selected indices on the spectral datasource (equivalent
         # to the user having made the same selection via the plot)
-        self.ds_spec.selected.indices = [self.spec_indices[spec.spectrum_id] for spec in results]
+        # TODO need to allow for AND/OR here
+        result_indices = [self.spec_indices[spec.spectrum_id] for spec in results.sources]
+        self.ds_spec.selected.indices = list(result_indices) 
 
         # the ScoringHelper object expects to have this list of objects available so need to set that
         self.score_helper.spectra = selected_spectra
 
         # get the list of visible GCFs so we can filter out any others from the results
-        include_only = set([self.nh.nplinker.gcfs[gcf_id] for gcf_id in self.table_data.gcf_ds.data['gcf_pk'] if gcf_id != '-'])
+        include_only = set([self.nh.nplinker.gcfs[int(gcf_id)] for gcf_id in self.table_session_data.gcf_ds.data['gcf_pk'] if gcf_id != '-'])
 
         # FINALLY, display the link information
         self.display_links(results, mode=SCO_MODE_SPEC_GCF, div=self.results_div, include_only=include_only)
@@ -1662,6 +1601,19 @@ class NPLinkerBokeh(object):
         """
         Handles clicks on the "Show scores for selected GCFs" button (tables mode)
         """
+
+        print('Currently selected bgcs: {}'.format(len(self.table_session_data.bgc_ds.data['bgc_pk'])))
+        print('Actual selections: {}'.format(len(self.table_session_data.bgc_ds.selected.indices)))
+
+        if len(self.table_session_data.bgc_ds.selected.indices) == 0 and len(self.table_session_data.gcf_ds.selected.indices) == 0:
+            self.hidden_alert_thing.text = 'Error: no BGCs have been selected!\n\n' +\
+                                            'Running scoring on {} objects may take a long time!\n'.format(len(self.table_session_data.bgc_ds.data['bgc_pk'])) +\
+                                             'Please make some selections and then try again.'
+            # this resets the text without triggering the alert() again, so that NEXT time this happens
+            # the text-changed event will be fired by the above line. yes it's a mess
+            self.hidden_alert_thing.text = ''
+            return
+
         # need to build a list of the NPLinker GCF objects corresponding to
         # the set of BGC objects currently listed in the table
         # but first need to decide which set of objects to use:
@@ -1674,30 +1626,48 @@ class NPLinkerBokeh(object):
         selected_bgcs = []
         gcfs = set() # to remove dups 
 
-        if len(self.table_data.bgc_ds.selected.indices) > 0:
+        if len(self.table_session_data.bgc_ds.selected.indices) > 0:
             # assume there's been an explicit selection and use those objects
-            for index in self.table_data.bgc_ds.selected.indices:
-                bgcid = self.table_data.bgc_ds.data['bgc_pk'][index] # internal nplinker ID
-                if bgcid == NA:
+            for index in self.table_session_data.bgc_ds.selected.indices:
+                bgcid = self.table_session_data.bgc_ds.data['bgc_pk'][index] # internal nplinker ID
+                if bgcid == NA_ID:
                     continue
-                bgc = self.nh.nplinker.bgcs[bgcid]
+                bgc = self.nh.nplinker.bgcs[int(bgcid)]
                 selected_bgcs.append(bgc)
                 gcfs.add(bgc.parent)
         else:
-            for bgcid in self.table_data.bgc_ds.data['bgc_pk']: # internal nplinker IDs
-                if bgcid == NA:
+            for bgcid in self.table_session_data.bgc_ds.data['bgc_pk']: # internal nplinker IDs
+                if bgcid == NA_ID:
                     continue
-                bgc = self.nh.nplinker.bgcs[bgcid]
+                bgc = self.nh.nplinker.bgcs[int(bgcid)]
                 selected_bgcs.append(bgc)
                 gcfs.add(bgc.parent)
 
         selected_gcfs = list(gcfs)
 
         # retrieve the currently active scoring method (for now this will always be metcalf)
-        current_method = self.nh.nplinker.scoring.enabled()[self.scoring_method_group.active]
+        current_methods = self.current_scoring_methods()
         
         # call get_links, which returns the subset of input objects which have links
-        results = self.nh.nplinker.get_links(selected_gcfs, scoring_method=current_method)
+        results = self.nh.nplinker.get_links(selected_gcfs, current_methods)
+
+        # TODO quick attempt to display scores in the tables (for metcalf only for now)
+        metcalf_obj = self.scoring_objects['metcalf']
+        # check if metcalf scoring is enabled at the moment
+        if metcalf_obj in current_methods:
+            # create a dict mapping spectra in the results to their scores
+            spec_scores = {}
+            for gcf, result in results.links.items():
+                for spec, link_data in result.items():
+                    metcalf_score = link_data.data(metcalf_obj)
+                    spec_scores[spec] = metcalf_score
+
+            # get a list of the spectra currently visible in the table (note that
+            # these are the actual Spectrum IDs, not the internal nplinker IDs)
+            visible_spectra = map(int, self.table_session_data.spec_ds.data['spectrum_id'])
+
+            # update the data source with the scores
+            self.table_session_data.spec_ds.data['metcalf_score'] = [spec_scores[self.nh.nplinker.lookup_spectrum(spec_id)] for spec_id in visible_spectra]
 
         # next, need to display the results using the same code as for generating the 
         # results from plot selections, but without actually triggering any unintended
@@ -1732,7 +1702,7 @@ class NPLinkerBokeh(object):
 
         # get the list of visible spectra so we can filter out any others from the results
         # TODO MolFam mode...
-        include_only = set([self.nh.nplinker.spectra[spec_id] for spec_id in self.table_data.spec_ds.data['spec_pk'] if spec_id != '-'])
+        include_only = set([self.nh.nplinker.spectra[int(spec_id)] for spec_id in self.table_session_data.spec_ds.data['spec_pk'] if spec_id != '-'])
 
         # FINALLY, display the link information
         self.display_links(results, mode=SCO_MODE_BGC_SPEC, div=self.results_div, include_only=include_only)
@@ -1741,9 +1711,8 @@ class NPLinkerBokeh(object):
         self.suppress_selection_bgc = False
 
     def tables_reset_callback(self):
-        for dt in self.table_data.data_tables.values():
+        for dt in self.table_session_data.data_tables.values():
             dt.selectable = True
-
 
     def bokeh_layout(self):
         widgets = []
@@ -1773,33 +1742,43 @@ class NPLinkerBokeh(object):
         self.ge_mode_group.on_change('active', self.ge_mode_callback)
         widgets.append(self.ge_mode_group)
 
-        self.scoring_method_group = RadioGroup(labels=[m for m in self.nh.nplinker.scoring.enabled_names()], active=0, name='scoring_method_group')
-        self.scoring_method_group.on_change('active', self.scoring_method_callback)
-        widgets.append(self.scoring_method_group)
+        # scoring objects and related stuff
+        # TODO this should be drawn from nplinker config, not hardcoded here? or config file
+        self.scoring_methods = ['metcalf', 'testscore']
+        self.scoring_objects = {m: self.nh.nplinker.scoring_method(m) for m in self.scoring_methods}
 
-        # metcalf stuff
-        self.metcalf_standardised = RadioGroup(labels=['Basic metcalf scoring', 'Expected-value metcalf scoring'], name='metcalf_standardised', active=1 if self.nh.nplinker.scoring.metcalf.standardised else 0, sizing_mode='scale_width')
+        # checkbox list of scoring methods to enable/disable them
+        self.scoring_method_checkboxes = CheckboxGroup(labels=[m for m in self.scoring_methods], active=[0], name='scoring_method_checkboxes')
+        self.scoring_method_checkboxes.on_change('active', self.scoring_method_callback)
+        widgets.append(self.scoring_method_checkboxes)
+
+        # buttons to show the modal dialogs for configuring each scoring method
+        self.scoring_method_buttons = {}
+        self.scoring_method_buttons['metcalf'] = Button(label='Configure Metcalf scoring', name='metcalf_scoring_button', button_type='primary')
+        self.scoring_method_buttons['testscore'] = Button(label='Configure testscore scoring', name='testscore_scoring_button', button_type='primary', visible=False)
+        widgets.extend(x for x in self.scoring_method_buttons.values())
+
+        # basic JS callbacks to show the modals that allow you to configure the enabled scoring methods
+        show_modal_callback = """ $('#' + modal_name).modal(); """
+        self.scoring_method_buttons['metcalf'].js_on_click(CustomJS(args=dict(modal_name='metcalfModal'), code=show_modal_callback))
+        self.scoring_method_buttons['testscore'].js_on_click(CustomJS(args=dict(modal_name='testscoreModal'), code=show_modal_callback))
+
+        # metcalf config objects
+        self.metcalf_standardised = RadioGroup(labels=['Basic Metcalf scoring', 'Standardised Metcalf scoring'], name='metcalf_standardised', active=1 if self.scoring_objects['metcalf'].standardised else 0, sizing_mode='scale_width')
         self.metcalf_standardised.on_change('active', self.metcalf_standardised_callback)
         widgets.append(self.metcalf_standardised)
-        self.metcalf_cutoff = Slider(start=0, end=100, value=int(self.nh.nplinker.scoring.metcalf.cutoff), step=1, title='[metcalf] cutoff = ')
+        self.metcalf_cutoff = Slider(start=0, end=10, value=int(self.scoring_objects['metcalf'].cutoff), step=1, title='[metcalf] cutoff = ', name='metcalf_cutoff')
         self.metcalf_cutoff.on_change('value', self.metcalf_cutoff_callback)
+        widgets.append(self.metcalf_cutoff)
 
-        # likescore
-        self.likescore_cutoff = Slider(start=0, end=100, value=int(100 * self.nh.nplinker.scoring.likescore.cutoff), step=1, title='[likescore] cutoff x 100 = ')
-        self.likescore_cutoff.on_change('value', self.likescore_cutoff_callback)
-        # hg
-        self.hg_prob = Slider(start=0, end=100, value=int(100 * self.nh.nplinker.scoring.hg.prob), step=1, title='[hg] prob x 100 = ')
-        self.hg_prob.on_change('value', self.hg_prob_callback)
+        # same for testscore
+        self.testscore_value = Slider(start=0, end=1, step=.01, value=self.scoring_objects['testscore'].value, title='Value parameter', name='testscore_value')
+        self.testscore_value.on_change('value', self.testscore_value_callback)
+        widgets.append(self.testscore_value)
 
-        active_sliders = []
-        if self.nh.nplinker.scoring.metcalf.enabled:
-            active_sliders.append(self.metcalf_cutoff)
-        if self.nh.nplinker.scoring.hg.enabled:
-            active_sliders.append(self.hg_prob)
-        if self.nh.nplinker.scoring.likescore.enabled:
-            active_sliders.append(self.likescore_cutoff)
-        self.sliders = row(active_sliders, name='sliders')
-        widgets.append(self.sliders)
+        metcalf_info_div = Div(name='metcalf_info', sizing_mode='scale_width', text='Tables contain objects with Metcalf score > {:.1f}'.format(self.nh.nplinker._loader.webapp_scoring_cutoff()))
+        self.metcalf_info = wrap_popover(metcalf_info_div, create_popover(*TOOLTIP_TABLES_FILTERING), 'metcalf_info')
+        widgets.append(self.metcalf_info)
 
         # for debug output etc 
         self.debug_div = Div(text="", name='debug_div', sizing_mode='scale_width')
@@ -1809,8 +1788,12 @@ class NPLinkerBokeh(object):
         self.alert_div = Div(text="", name='alert_div')
         widgets.append(self.alert_div)
 
+        # header text
+        self.header_text = Div(text='<strong>NPLinker web app</strong> (loaded BGCs={}, GCFs={}, Spectra={}, MolFams={})'.format(len(self.nh.nplinker.bgcs), len(self.nh.nplinker.gcfs), len(self.nh.nplinker.spectra), len(self.nh.nplinker.molfams)), name='header_text', sizing_mode='scale_width')
+        widgets.append(self.header_text)
+
         # "reset everything" button
-        self.reset_button = Button(name='reset_button', label='Reset state', button_type='danger', sizing_mode='scale_width')
+        self.reset_button = Button(name='reset_button', label='Reset state', button_type='danger', sizing_mode='scale_width', visible=False)
         # this is used to clear the selection, which isn't done by faking the reset event from the
         # javascript callback below for some reason...
         self.reset_button.on_click(self.reset_button_callback)
@@ -1925,48 +1908,33 @@ class NPLinkerBokeh(object):
         widgets.append(self.fig_spec)
         widgets.append(self.fig_bgc)
 
-        print('Loading data tables stuff')
-        self.table_data = TableData(self)
-        self.table_data.setup()
-        widgets.extend(self.table_data.widgets)
+        # tables widgets
+        self.table_session_data.setup()
+        widgets.extend(self.table_session_data.widgets)
 
         # callbacks for scoring buttons
-        self.table_data.tables_score_met.on_click(self.tables_score_met_callback)
-        self.table_data.tables_score_gen.on_click(self.tables_score_gen_callback)
+        self.table_session_data.tables_score_met.on_click(self.tables_score_met_callback)
+        self.table_session_data.tables_score_gen.on_click(self.tables_score_gen_callback)
 
         # and reset button
-        self.table_data.tables_reset.on_click(self.tables_reset_callback)
+        self.table_session_data.tables_reset_button.on_click(self.tables_reset_callback)
+
+        self.hidden_alert_thing = PreText(text='', name='hidden_alert', visible=False)
+        self.hidden_alert_thing.js_on_change('text', CustomJS(code='if(cb_obj.text.length > 0) alert(cb_obj.text);', args={}))
+        widgets.append(self.hidden_alert_thing)
+        print('layout done, adding widget roots')
 
         for w in widgets:
             curdoc().add_root(w)
 
         curdoc().title = 'nplinker webapp'
+        print('bokeh_layout method complete')
         # curdoc().theme = 'dark_minimal'
 
 # server_lifecycle.py adds a .nh attr to the current Document instance, use that
 # to access the already-created NPLinker instance plus the TSNE data
-nb = NPLinkerBokeh(curdoc().nh)
+nb = NPLinkerBokeh(curdoc().nh, curdoc().table_session_data)
 nb.create_plots()
 nb.set_inactive_plot(nb.fig_spec)
 nb.bokeh_layout()
 nb.update_alert('Initialised OK!', 'success')
-
-# second part of hack/workaround described in tables_init.py: 
-# define a callback function which checks if the linker init has been completed
-# (based on the target div text being set to 'LOADED'). 
-# if it has, it terminates the periodic callbacks, otherwise it modifies the 
-# text, which should trigger the CustomJS callback defined in tables_init.py 
-# (this may happen multiple times as the page loads in and bokeh is initialised,
-# which is why it has to be repeated as a periodic callback...)
-def tables_loading_callback():
-    # this should be true once the CustomJS callback that loads the table
-    # data has actually executed
-    if nb.table_data.dummydiv.text == 'LOADED':
-        curdoc().remove_periodic_callback(nb.workaround_callback)
-    else:
-        # otherwise just change the text of the hidden div to try
-        # and trigger the CustomJS callback (this will only work once
-        # the page has finished loading)
-        nb.table_data.dummydiv.text += 'o'
-# run this callback every 100ms until loading works
-nb.workaround_callback = curdoc().add_periodic_callback(tables_loading_callback, 100)

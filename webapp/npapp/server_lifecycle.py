@@ -17,6 +17,8 @@ from nplinker.metabolomics import SingletonFamily
 from nplinker.logconfig import LogConfig
 from nplinker.layout import create_genomics_graph, create_metabolomics_graph
 
+from tables_init import TableData, TableSessionData
+
 class NPLinkerHelper(object):
     """
     This is just a simple class to wrap up the various objects involved in 
@@ -265,6 +267,8 @@ class NPLinkerHelper(object):
         self.load_genomics()
         self.load_metabolomics()
 
+        self.load_tables()
+
     def load_nplinker(self):
         # initialise nplinker and load the dataset, using a config file in the webapp dir
         datapath = os.getenv('NPLINKER_CONFIG', os.path.join(os.path.join(os.path.dirname(__file__), 'nplinker_webapp.toml')))
@@ -272,9 +276,6 @@ class NPLinkerHelper(object):
         self.nplinker = NPLinker(datapath)
         if not self.nplinker.load_data():
             raise Exception('Failed to load data')
-
-        if not self.nplinker.process_dataset():
-            raise Exception('Failed to process dataset')
 
     def load_metabolomics(self):
         print('Creating metabolomics graph')
@@ -312,6 +313,11 @@ class NPLinkerHelper(object):
                     self.bgc_gcf_lookup[bgc].add(gcf)
                 else:
                     self.bgc_gcf_lookup[bgc] = set([gcf])
+
+    def load_tables(self):
+        print('Loading tables data')
+        self.table_data = TableData(self)
+        self.table_data.setup()
 
     def load_tsne(self):
         # initialise nplinker and load the dataset, using a config file in the webapp dir
@@ -458,6 +464,10 @@ def on_server_loaded(server_context):
     print('on_server_loaded')
     nh.load()
 
+    print('==================================')
+    print('NPLinker server loading completed!')
+    print('==================================')
+
 def on_session_created(session_context):
     """
     This is called for every new session that is created. To make the already-loaded
@@ -475,3 +485,10 @@ def on_session_created(session_context):
             nh.nplinker.process_dataset()
             nh.load_genomics()
     setattr(session_context._document, 'nh', nh)
+    setattr(session_context._document, 'table_session_data', TableSessionData(nh.table_data))
+
+def on_session_destroyed(session_context):
+    print('on_session_destroyed')
+    session_data = getattr(session_context._document, 'table_session_data')
+    # closes the database connection used by the Linker class
+    session_data.linker.close()

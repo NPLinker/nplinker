@@ -10,20 +10,17 @@
     <script src="npapp/static/js/popper.min.js" type="text/javascript"></script>
     <script src="npapp/static/js/bootstrap.min.js" type="text/javascript"></script>
     <script src="npapp/static/js/ChemDoodleWeb.js" type="text/javascript"></script>
-    <script src="npapp/static/js/alasql.min.js" type="text/javascript"></script>
-    <script src="npapp/static/js/tables_linker.js" type="text/javascript"></script>
-    <script src="npapp/static/js/tables_main.js" type="text/javascript"></script>
     <script type="text/javascript">
         // this function is used to load and display ChemDoodle spectrum plots in 
         // the result accordion elements. It is triggered by onclick handlers on each
         // of the Spectrum elements, and is passed in:
         //  - the ID of the button element that triggered the event
         //  - the ID of the DOM canvas element that should contain the plot
-        //  - the plot data in JCAMP format
+        //  - peak data in JCAMP format
         // if the plot has already been loaded it does nothing, otherwise it creates
         // and displays it, then removes the onclick handler so it shouldn't
         // get triggered again
-        function setupPlot(btn_id, plot_id, plot_data) {
+        function setupPlot(btn_id, plot_id, plot_data_jcamp) {
             console.log('setupPlot: %o', plot_id);
             // check if width nonzero as a way to find out if the plot is already created or not
             if($('#' + plot_id).width() > 0) {
@@ -32,7 +29,7 @@
             }
             var thePlot = new ChemDoodle.PerspectiveCanvas(plot_id, 400, 200);
             thePlot.specs.plots_color = '#FF0000';
-            var theSpec = ChemDoodle.readJCAMP(plot_data);
+            var theSpec = ChemDoodle.readJCAMP(plot_data_jcamp);
             theSpec.xUnits = 'm/z';
             theSpec.yUnits = 'Relative Abundance';
             thePlot.loadSpectrum(theSpec);
@@ -53,15 +50,70 @@
             var showall = $(table_id + " tr").show();
             var hidenotmatching = $(table_id + " tr:not(:contains('" + search_term + "'))").hide(); 
         }
+
+        // this is a hacky workaround from https://stackoverflow.com/questions/42794556/how-to-check-if-my-bokeh-server-application-is-completely-loaded-and-rendered
+        // doesn't seem to be anything better provided by bokeh yet...
+        old_log = console.log;
+        console.log = function(message) {
+            if(message.localeCompare('Bokeh items were rendered successfully') == 0) {
+                // above message indicates bokeh has loaded, use this to initialise 
+                // bootstrap popovers and remove the overlay
+                console.log = old_log;
+                $('[data-toggle="popover"]').popover();
+                $('.popover-dismiss').popover({
+                    trigger: 'focus'
+                });
+                $('#overlay').hide();
+            }
+            old_log.apply(console, arguments);
+        };
+
     </script>
 {% endblock %}
   
 {% block contents %}
+<div class="modal" id="metcalfModal" tabIndex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Metcalf scoring options</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                    {{ embed(roots.metcalf_standardised) }}
+                    {{ embed(roots.metcalf_cutoff) }}
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="testscoreModal" tabIndex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Testscore scoring options</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {{ embed(roots.testscore_value) }}
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container-fluid" style="margin-top: 10px">
     <div class="row" style="background-color: #fffdd2">
         <div class="col-md-3">
+            {{ embed(roots.header_text) }}
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3" style="display: none">
             <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#optionsModal" aria-expanded="false" aria-controls="optionsModal" style="margin-top: 10px">
                 Options
             </button>
@@ -95,24 +147,24 @@
     <div class="row" style="margin-top: 15px; margin-bottom: 15px;">
         <div class="col-md-2"></div>
         <div class="col-md-8">
+            <!--
             <ul class="nav nav-tabs nav-pills nav-fill" id="modeTabs", role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" role="tab" data-toggle="tab" href="#modes_tab_tables">Display tables</a>
+                    <a class="nav-link active" role="tab" data-toggle="tab" href="#modes_tab_tables">Tables view</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" role="tab" data-toggle="tab" href="#modes_tab_plots">Display plots</a>
+                    <a class="nav-link" role="tab" data-toggle="tab" href="#modes_tab_plots">Plots view</a>
                 </li>
             </ul>
+            -->
         </div>
         <div class="col-md-2"></div>
     </div>
-    <div id="overlay">
+    <div id="overlay" style="">
         <div id="overlay_text">Loading dataset, please wait...</div>
     </div>
-    <!-- part of ridiculous workaround to load tables data without requiring user to
-        click the button first - see comments in main.py/tables_init.py -->
-    <div style="display: none">
-        {{ embed(roots.dummydiv) }}
+    <div id="hidden_alert" style="display: none">
+        {{ embed(roots.hidden_alert) }}
     </div>
     <div class="tab-content" id="modeTabsContent">
         <div class="tab-pane show active" id="modes_tab_tables">
@@ -126,7 +178,9 @@
                 <div class="col-md-3">
                     {{ embed(roots.tables_score_gen) }}
                 </div>
-                <div class="col-md-3"></div>
+                <div class="col-md-3">
+                    {{ embed(roots.metcalf_info) }}
+                </div>
             </div>
             <div class="row">
                 <div class="col-lg-3 met-table" id="molfam_table">
@@ -140,6 +194,20 @@
                 </div>
                 <div class="col-lg-3 gen-table" id="gcf_table">
                     {{ embed(roots.table_gcfs) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3">
+                    {{ embed(roots.molfam_dl_button) }}
+                </div>
+                <div class="col-lg-3">
+                    {{ embed(roots.spec_dl_button) }}
+                </div>
+                <div class="col-lg-3">
+                    {{ embed(roots.bgc_dl_button) }}
+                </div>
+                <div class="col-lg-3">
+                    {{ embed(roots.gcf_dl_button) }}
                 </div>
             </div>
         </div>
@@ -203,7 +271,7 @@
             <div class="tab-content" id="mainTabContent">
                 <!-- scoring tab content -->
                 <div class="tab-pane  show active" id="scoring_div" role="tabpanel" aria-labelledby="scoringTab">
-                    <div class="row">
+                    <div class="row" style="display: none">
                         <div class="col-md-1"></div>
                         <div class="col-lg-4" style="text-align: right">
                             <h6 style="">Metabolomics scoring mode:</h6>
@@ -215,7 +283,7 @@
                         </div>
                         <div class="col-md-1"></div>
                     </div>
-                    <div class="row">
+                    <div class="row" style="display: none">
                         <div class="col-md-1"></div>
                         <div class="col-lg-4" id="mb_mode">
                             {{ embed(roots.mb_mode_group) }}
@@ -228,14 +296,19 @@
                         </div>
                         <div class="col-md-1"></div>
                     </div>
-                    <div class="row" style="background-color: #ffffff">
+                    <div class="row">
                         <div class="col-md-1"></div>
                         <div class="col-lg-10">
-                            <strong>Selected scoring method:</strong>
-                            {{ embed(roots.scoring_method_group) }}
-                            <strong>Method parameters</strong>
-                            {{ embed(roots.metcalf_standardised) }}
-                            {{ embed(roots.sliders) }}
+                            <strong>Selected scoring methods:</strong>
+                            {{ embed(roots.scoring_method_checkboxes) }}
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {{ embed(roots.metcalf_scoring_button) }}
+                                        {{ embed(roots.testscore_scoring_button) }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-1"></div>
                     </div>

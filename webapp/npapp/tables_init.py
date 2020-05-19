@@ -5,8 +5,13 @@ import pandas as pd
 
 from bokeh.models import Button, CustomJS, ColumnDataSource
 from bokeh.models.widgets import DataTable, TableColumn, Div
+from bokeh.layouts import row
 
-from tables_functions import create_links, get_table_info, NA
+from linker import Linker
+from tables_functions import create_links, get_table_info, NA_ID, NA_TEXT
+from tooltips import create_popover, wrap_popover
+from tooltips import TOOLTIP_CLEAR_SELECTIONS, TOOLTIP_BGC_SCORING, TOOLTIP_SPECTRA_SCORING
+from tooltips import TOOLTIP_DOWNLOAD_CSV_BGC, TOOLTIP_DOWNLOAD_CSV_GCF, TOOLTIP_DOWNLOAD_CSV_SPECTRA, TOOLTIP_DOWNLOAD_CSV_MOLFAM
 
 class TableData(object):
 
@@ -19,43 +24,180 @@ class TableData(object):
         interface to the webapp
         """
 
-        # first step: get the metcalf scoring links between spectra:gcf and gcf:spectra pairs
-        self.spec_links = self.nh.nplinker.get_links(self.nh.nplinker.spectra, scoring_method=self.nh.nplinker.scoring.metcalf)
-        self.gcf_links = self.nh.nplinker.get_links(self.nh.nplinker.gcfs, scoring_method=self.nh.nplinker.scoring.metcalf)
+        self.local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data', 'tables_links', self.nh.nplinker.dataset_id)
+        os.makedirs(self.local_cache, exist_ok=True)
+
+        pickled_scores_path = os.path.join(self.local_cache, 'scores.pckl')
+        last_cutoff_path = os.path.join(self.local_cache, 'cutoff.pckl')
+        pickled_links_path = os.path.join(self.local_cache, 'links.pckl')
+        database_path = os.path.join(self.local_cache, 'linker.sqlite3')
+
+        # need to handle the user changing the metcalf cutoff for the tables 
+        # in the config file between runs here, so the last used value is stored
+        # and compared against the current one. if it changes, have to regenerate
+        # all the data structs below
+        last_cutoff_val = None
+        current_cutoff_val = self.nh.nplinker._loader.webapp_scoring_cutoff()
+        if os.path.exists(last_cutoff_path):
+            last_cutoff_val = pickle.load(open(last_cutoff_path, 'rb'))
+
+        if last_cutoff_val != current_cutoff_val:
+            print('*** Metcalf cutoff for tables has been changed (old={}, new={}), will regenerate data structs'.format(last_cutoff_val, current_cutoff_val))
+            for path in [pickled_scores_path, pickled_links_path, database_path]:
+                if os.path.exists(path):
+                    os.unlink(path)
+        pickle.dump(current_cutoff_val, open(last_cutoff_path, 'wb'), protocol=4)
+
+        if not os.path.exists(pickled_scores_path):
+            # get the metcalf scoring links between spectra:gcf and gcf:spectra pairs
+            metcalf_scoring = self.nh.nplinker.scoring_method('metcalf')
+            metcalf_scoring.cutoff = self.nh.nplinker._loader.webapp_scoring_cutoff()
+            print('Metcalf tables cutoff is {}'.format(metcalf_scoring.cutoff))
+            spec_links = self.nh.nplinker.get_links(self.nh.nplinker.spectra, metcalf_scoring)
+            pickle.dump(spec_links, open(pickled_scores_path, 'wb'), protocol=4)
+        else:
+            spec_links = pickle.load(open(pickled_scores_path, 'rb'))
+
+
+        spectra = list(spec_links.links.keys())
+        gcfs = spec_links.get_all_targets()
+        bgcs = []
+        molfams = []
+
+        print('len(spec_links) = {}, gcfs={}'.format(len(spec_links), len(gcfs)))
+
+        _spec_indices, _gcf_indices, _bgc_indices, _molfam_indices = {NA_ID: 0}, {NA_ID: 0}, {NA_ID: 0}, {NA_ID: 0}
 
         # construct pandas dataframes and bokeh datatables for each object class
         # (this is probably fast enough to not be worth pickling like the links)
-        self.bgc_data = dict(bgc_pk=[NA], name=[NA], product_type=[NA])
-        self.gcf_data = dict(gcf_pk=[NA], gcf_id=[NA], product_type=[NA], nbgcs=[NA])
-        self.spec_data = dict(spec_pk=[NA], spectrum_id=[NA], family=[NA])
-        self.molfam_data = dict(molfam_pk=[NA], family_id=[NA], nspectra=[NA])
+        self.bgc_data = dict(bgc_pk=[NA_ID], name=[NA_TEXT], product_type=[NA_TEXT])
+        self.gcf_data = dict(gcf_pk=[NA_ID], gcf_id=[NA_TEXT], product_type=[NA_TEXT], nbgcs=[NA_TEXT], metcalf_score=[NA_TEXT])
+        self.spec_data = dict(spec_pk=[NA_ID], spectrum_id=[NA_TEXT], family=[NA_TEXT], metcalf_score=[NA_TEXT])
+        self.molfam_data = dict(molfam_pk=[NA_ID], family_id=[NA_TEXT], nspectra=[NA_TEXT])
 
-        for bgc in self.nh.nplinker.bgcs:
-            self.bgc_data['bgc_pk'].append(bgc.id)
-            self.bgc_data['name'].append(bgc.name)
-            self.bgc_data['product_type'].append(bgc.product_prediction)
-
-        for gcf in self.nh.nplinker.gcfs:
+        gcfs = sorted(gcfs, key=lambda gcf: gcf.id)
+        bgcs_seen = set()
+        for gcf in gcfs:
             self.gcf_data['gcf_pk'].append(gcf.id)
             self.gcf_data['gcf_id'].append(gcf.gcf_id)
             self.gcf_data['product_type'].append(gcf.product_type)
             self.gcf_data['nbgcs'].append(len(gcf.bgcs))
+            self.gcf_data['metcalf_score'].append(NA_TEXT)
+            _gcf_indices[gcf] = len(_gcf_indices)
+            for bgc in gcf.bgcs:
+                if bgc not in bgcs_seen:
+                    bgcs_seen.add(bgc)
+                    _bgc_indices[bgc] = len(bgcs_seen)
+                    bgcs.append(bgc)
 
-        for spec in self.nh.nplinker.spectra:
+        bgcs = sorted(bgcs, key=lambda bgc: bgc.id)
+        for bgc in bgcs:
+            self.bgc_data['bgc_pk'].append(bgc.id)
+            self.bgc_data['name'].append(bgc.name)
+            self.bgc_data['product_type'].append(bgc.product_prediction)
+
+        molfams_seen = set()
+        for spec in spectra:
             self.spec_data['spec_pk'].append(spec.id)
             self.spec_data['spectrum_id'].append(spec.spectrum_id)
             self.spec_data['family'].append(spec.family.family_id)
+            self.spec_data['metcalf_score'].append(NA_TEXT)
+            _spec_indices[spec] = len(_spec_indices)
+            if spec.family not in molfams_seen:
+                self.molfam_data['molfam_pk'].append(spec.family.id)
+                self.molfam_data['family_id'].append(spec.family.family_id)
+                self.molfam_data['nspectra'].append(len(spec.family.spectra))
+                molfams_seen.add(spec.family)
+                _molfam_indices[spec.family] = len(molfams)
+                molfams.append(spec.family)
 
-        for molfam in self.nh.nplinker.molfams:
-            self.molfam_data['molfam_pk'].append(molfam.id)
-            self.molfam_data['family_id'].append(molfam.family_id)
-            self.molfam_data['nspectra'].append(len(molfam.spectra))
 
         self.bgc_df = pd.DataFrame(self.bgc_data)
         self.gcf_df = pd.DataFrame(self.gcf_data)
         self.spec_df = pd.DataFrame(self.spec_data)
         self.molfam_df = pd.DataFrame(self.molfam_data)
 
+        bgcs = list(bgcs)
+        molfams = list(molfams)
+
+        print('DataFrames created')
+
+        # create links between GCF and BGC objects (or load pickled version)
+        # note the +1s are because the tables code uses 0 for NA
+        if not os.path.exists(pickled_links_path):
+            index_mappings_1, index_mappings_2 = {}, {}
+
+            print('Constructing link data structures')
+
+            bgc_to_gcf_indices = []
+            for gcf in gcfs:
+                for bgc in gcf.bgcs:
+                    if bgc not in bgcs_seen:
+                        continue
+                    # bgc_to_gcf_indices.append((bgc.id + 1, gcf.id + 1))
+                    bgc_to_gcf_indices.append((_bgc_indices[bgc] + 0, _gcf_indices[gcf] + 0))
+                    index_mappings_1[_bgc_indices[bgc] + 0] = bgc.id
+                    index_mappings_2[_gcf_indices[gcf] + 0] = gcf.id
+
+            self.bgc_gcf = create_links(self.bgc_df, self.gcf_df, 'bgc_pk', 'gcf_pk', bgc_to_gcf_indices, index_mappings_1, index_mappings_2)
+            print(' + bgc_gcf')
+
+            # links between Spectrum and MolFam objects
+            # note the +1s are because the tables code uses 0 for NA
+            index_mappings_1, index_mappings_2 = {}, {}
+            molfam_to_spec_indices = []
+            tmp = set(spectra)
+            # for molfam in self.nh.nplinker.molfams:
+            for molfam in molfams:
+                for spec in molfam.spectra:
+                    # molfam_to_spec_indices.append((molfam.id + 0, spec.id + 0))
+                    if spec not in tmp:
+                        continue
+                    molfam_to_spec_indices.append((_molfam_indices[molfam] + 0, _spec_indices[spec] + 0))
+                    index_mappings_1[_molfam_indices[molfam] + 0] = molfam.id
+                    index_mappings_2[_spec_indices[spec] + 0] = spec.id
+            self.mf_spectra = create_links(self.molfam_df, self.spec_df, 'molfam_pk', 'spec_pk', molfam_to_spec_indices, index_mappings_1, index_mappings_2)
+            print(' + mf_spectra')
+
+            # links between GCF<==>Spectrum objects based on metcalf scores, via BGCs
+            index_mappings_1, index_mappings_2 = {}, {}
+            spec_to_bgc_indices = []
+            tmp = set()
+            tmpbgcs = {}
+            for spec, result in spec_links.links.items():
+                for gcf, data in result.items():
+                    #print('spec {} <==> gcf {}'.format(spectrum.id, gcf.id))
+                    for bgc in gcf.bgcs:
+                        # spec_to_bgc_indices.append((spec.id + 0, bgc.id + 0))
+                        # avoid dup entries
+                        if (_spec_indices[spec] + 0, _bgc_indices[bgc] + 0) in tmp:
+                            continue
+                        spec_to_bgc_indices.append((_spec_indices[spec] + 0, _bgc_indices[bgc] + 0))
+                        tmp.add((_spec_indices[spec] + 0, _bgc_indices[bgc] + 0))
+                        index_mappings_1[_spec_indices[spec] + 0] = spec.id
+                        index_mappings_2[_bgc_indices[bgc] + 0] = bgc.id
+            self.spectra_bgc = create_links(self.spec_df, self.bgc_df, 'spec_pk', 'bgc_pk', spec_to_bgc_indices, index_mappings_1, index_mappings_2)
+            print(' + spectra_bgc')
+
+            # pickle the data structs to avoid doing the above again
+            pickle.dump((self.bgc_gcf, self.mf_spectra, self.spectra_bgc), open(pickled_links_path, 'wb'), protocol=4)
+        else:
+            self.bgc_gcf, self.mf_spectra, self.spectra_bgc = pickle.load(open(pickled_links_path, 'rb'))
+
+        # combine the data and link informations into a list of dicts in the format the
+        # linker class requires 
+        self.table_info = get_table_info(self.molfam_df, self.mf_spectra, self.spec_df, self.spectra_bgc, self.bgc_df, self.bgc_gcf, self.gcf_df)
+        Linker(self.table_info, self.nh.nplinker.dataset_id, database_path, do_init=True)
+
+        print('TableData setup completed')
+
+class TableSessionData(object):
+
+    def __init__(self, tabledata):
+        self.data = tabledata
+        self.widgets = []
+
+    def setup(self):
         # currently setting fixed widths here, not ideal, but using auto-sizing seems to
         # place limits on how far you can resize the columns for some reason...
         self.bgc_cols = [TableColumn(field='bgc_pk', title='ID', width=15), 
@@ -64,20 +206,23 @@ class TableData(object):
 
         self.gcf_cols = [TableColumn(field='gcf_pk', title='ID', width=15), 
                          TableColumn(field='gcf_id', title='GCF ID', width=75), 
-                         TableColumn(field='product_type', title='Product type', width=75)]
+                         TableColumn(field='product_type', title='Product type', width=75),
+                         TableColumn(field='nbgcs', title='#bgcs', width=75), 
+                         TableColumn(field='metcalf_score', title='Metcalf score', width=75)]
 
         self.spec_cols = [TableColumn(field='spec_pk', title='ID', width=15), 
-                          TableColumn(field='spectrum_id', title='Spectrum ID', width=76), 
-                          TableColumn(field='family', title='Family ID', width=75)]
+                          TableColumn(field='spectrum_id', title='Spectrum ID', width=75), 
+                          TableColumn(field='family', title='Family ID', width=75),
+                          TableColumn(field='metcalf_score', title='Metcalf score', width=75)]
 
         self.molfam_cols = [TableColumn(field='molfam_pk', title='ID', width=15), 
                             TableColumn(field='family_id', title='MolFam ID', width=75), 
                             TableColumn(field='nspectra', title='#spectra', width=75)]
 
-        self.bgc_ds = ColumnDataSource(self.bgc_df)
-        self.gcf_ds = ColumnDataSource(self.gcf_df)
-        self.spec_ds = ColumnDataSource(self.spec_df)
-        self.molfam_ds = ColumnDataSource(self.molfam_df)
+        self.bgc_ds = ColumnDataSource(self.data.bgc_df)
+        self.gcf_ds = ColumnDataSource(self.data.gcf_df)
+        self.spec_ds = ColumnDataSource(self.data.spec_df)
+        self.molfam_ds = ColumnDataSource(self.data.molfam_df)
 
         self.bgc_dt = DataTable(source=self.bgc_ds, columns=self.bgc_cols, name='table_bgcs', sizing_mode='scale_width', width=300, fit_columns=False, index_width=15)
         self.gcf_dt = DataTable(source=self.gcf_ds, columns=self.gcf_cols, name='table_gcfs', sizing_mode='scale_width', width=300, fit_columns=False, index_width=15)
@@ -98,6 +243,7 @@ class TableData(object):
             'bgc_table': self.bgc_ds,
             'gcf_table': self.gcf_ds
         }
+        self.data_sources = data_sources
 
         self.data_tables = {
             'molfam_table': self.molfam_dt, 
@@ -106,201 +252,159 @@ class TableData(object):
             'gcf_table': self.gcf_dt
         }
 
-        # custom JS callback to call the linker when a data table is clicked
-        # (note only triggered for the table that's actually clicked, updates
-        # to the others don't trigger this)
-        code = """
-            // get linker object
-            const linker = window.shared['linker'];
-            if (!linker) {
-                alert('Please click Load Data first!');
-                cb_obj.indices = [];
-                return;
-            }
+        # https://stackoverflow.com/questions/31824124/is-there-a-way-to-save-bokeh-data-table-content
+        download_button_code = """
+            function table_to_csv(source) {
+                const columns = Object.keys(source.data)
+                const nrows = source.get_length()
+                const lines = [columns.join(',')]
 
-            console.log("js_on_change for %o", table_name);
-
-            // this is a hacky way to show that the tables on the opposite side
-            // from the clicked table are now "disabled", by setting the opacity
-            // to 50% via CSS (but only if something was actually selected)
-            if(cb_obj.indices.length > 0) {
-                if(table_name == "molfam_table" || table_name == "spec_table") {
-                    var tables = $(".gen-table");
-                    for(var i=0;i<tables.length;i++) {
-                        $('#' + tables[i].id).css('opacity', '50%');
+                for (let i = 0; i < nrows; i++) {
+                    let row = [];
+                    for (let j = 0; j < columns.length; j++) {
+                        const column = columns[j]
+                        row.push(source.data[column][i].toString())
                     }
-                } else {
-                    var tables = $(".met-table");
-                    for(var i=0;i<tables.length;i++) {
-                        $('#' + tables[i].id).css('opacity', '50%');
-                    }
+                    lines.push(row.join(','))
                 }
-            }
-            
-            // propagate selections to the linker
-            const selected_indices = cb_obj.indices;
-            linker.removeConstraints(table_name);
-            for(let i = 0; i < selected_indices.length; i++) {
-                const idx = selected_indices[i];
-                linker.addConstraint(table_name, idx, data_sources[table_name]);
+                return lines.join('\\n').concat('\\n')
             }
 
-            // query the linker and update data sources with the query result
-            linker.query();
-            linker.updateDataSources(data_sources);
+            const filename = name + '_data.csv'
+            filetext = table_to_csv(source)
+            const blob = new Blob([filetext], { type: 'text/csv;charset=utf-8;' })
+
+            //addresses IE
+            if (navigator.msSaveBlob) {
+                navigator.msSaveBlob(blob, filename)
+            } else {
+                const link = document.createElement('a')
+                link.href = URL.createObjectURL(blob)
+                link.download = filename
+                link.target = '_blank'
+                link.style.visibility = 'hidden'
+                link.dispatchEvent(new MouseEvent('click'))
+            }
         """
 
-        # make the genomics tables non-selectable when a metabolomics table is clicked
-        def met_tables_clicked(attr, old, new):
-            self.gcf_dt.selectable = False
-            self.bgc_dt.selectable = False
+        self.molfam_dl_button = Button(label='MolFams to CSV')
+        self.spec_dl_button = Button(label='Spectra to CSV')
+        self.bgc_dl_button = Button(label='BGCs to CSV')
+        self.gcf_dl_button = Button(label='GCFs to CSV')
 
-        # make the metabolomics tables non-selectable when a genomics table is clicked
-        def gen_tables_clicked(attr, old, new):
-            self.molfam_dt.selectable = False
-            self.spec_dt.selectable = False
+        self.widgets.append(wrap_popover(self.molfam_dl_button, create_popover(*TOOLTIP_DOWNLOAD_CSV_MOLFAM), 'molfam_dl_button'))
+        self.widgets.append(wrap_popover(self.spec_dl_button, create_popover(*TOOLTIP_DOWNLOAD_CSV_SPECTRA), 'spec_dl_button'))
+        self.widgets.append(wrap_popover(self.bgc_dl_button, create_popover(*TOOLTIP_DOWNLOAD_CSV_BGC), 'bgc_dl_button'))
+        self.widgets.append(wrap_popover(self.gcf_dl_button, create_popover(*TOOLTIP_DOWNLOAD_CSV_GCF), 'gcf_dl_button'))
 
-        # NOTE: passing in DataTable widgets here in the same way as data_sources causes bokeh JS to throw weird exceptions... 
-        self.molfam_ds.selected.js_on_change('indices', CustomJS(args={'table_name': 'molfam_table', 'data_sources': data_sources}, code=code))
-        self.spec_ds.selected.js_on_change('indices', CustomJS(args={'table_name': 'spec_table', 'data_sources': data_sources}, code=code))
-        self.bgc_ds.selected.js_on_change('indices', CustomJS(args={'table_name': 'bgc_table', 'data_sources': data_sources}, code=code))
-        self.gcf_ds.selected.js_on_change('indices', CustomJS(args={'table_name': 'gcf_table', 'data_sources': data_sources}, code=code))
+        self.molfam_dl_button.callback = CustomJS(args=dict(name='molfam', source=self.molfam_ds), code=download_button_code)
+        self.spec_dl_button.callback = CustomJS(args=dict(name='spectrum', source=self.spec_ds), code=download_button_code)
+        self.bgc_dl_button.callback = CustomJS(args=dict(name='bgc', source=self.bgc_ds), code=download_button_code)
+        self.gcf_dl_button.callback = CustomJS(args=dict(name='gcf', source=self.gcf_ds), code=download_button_code)
 
-        self.molfam_ds.selected.on_change('indices', met_tables_clicked)
-        self.spec_ds.selected.on_change('indices', met_tables_clicked)
-        self.bgc_ds.selected.on_change('indices', gen_tables_clicked)
-        self.gcf_ds.selected.on_change('indices', gen_tables_clicked)
+        self.resetting = False
 
-        # pickle the links structs as they don't change for a given dataset and can take
-        # some time to generate when the webapp is instantiated
-        # TODO proper location for the pickled data file
-        pickled_links = 'table_links_{}.pckl'.format(self.nh.nplinker.dataset_id)
-        if not os.path.exists(pickled_links):
-            # 1. links between GCF and BGC objects
-            # note the +1s are because the tables code uses 0 for NA
-            bgc_to_gcf_indices = []
-            for gcf in self.nh.nplinker.gcfs:
-                for bgc in gcf.bgcs:
-                    bgc_to_gcf_indices.append((bgc.id + 1, gcf.id + 1))
-            self.bgc_gcf = create_links(self.bgc_df, self.gcf_df, 'bgc_pk', 'gcf_pk', bgc_to_gcf_indices)
+        def table_callback(name):
+            cb_obj = self.data_sources[name]
+            selected_indices = cb_obj.selected.indices
+            print('table {}, selected = {}'.format(name, selected_indices))
+            if self.resetting:
+                print('skipping remainder of callback, resetting is True')
+                return
 
-            # 2. links between Spectrum and MolFam objects
-            # note the +1s are because the tables code uses 0 for NA
-            molfam_to_spec_indices = []
-            for molfam in self.nh.nplinker.molfams:
-                for spec in molfam.spectra:
-                    molfam_to_spec_indices.append((molfam.id + 1, spec.id + 1))
-            self.mf_spectra = create_links(self.molfam_df, self.spec_df, 'molfam_pk', 'spec_pk', molfam_to_spec_indices)
+            self.linker.removeConstraints(name)
 
-            # 3. links between GCF<==>Spectrum objects based on metcalf scores, via BGCs
-            spec_to_bgc_indices = []
-            for spectrum in self.spec_links:
-                # lookup the GCF that this spectrum has a link to 
-                linked_gcfs = self.nh.nplinker.links_for_obj(spectrum, self.nh.nplinker.scoring.metcalf)
-                for gcf, score in linked_gcfs:
-                    #print('spec {} <==> gcf {}'.format(spectrum.id, gcf.id))
-                    for bgc in gcf.bgcs:
-                        spec_to_bgc_indices.append((spectrum.id + 1, bgc.id + 1))
-            self.spectra_bgc = create_links(self.spec_df, self.bgc_df, 'spec_pk', 'bgc_pk', spec_to_bgc_indices)
+            if name in ['bgc_table', 'gcf_table']:
+                self.molfam_dt.selectable = len(selected_indices) == 0
+                self.spec_dt.selectable = len(selected_indices) == 0
+                self.bgc_dt.selectable = True
+                self.spec_dt.selectable = True
+            else:
+                self.molfam_dt.selectable = True
+                self.spec_dt.selectable = True
+                self.gcf_dt.selectable = len(selected_indices) == 0
+                self.bgc_dt.selectable = len(selected_indices) == 0
 
-            pickle.dump((self.bgc_gcf, self.mf_spectra, self.spectra_bgc), open(pickled_links, 'wb'))
-        else:
-            self.bgc_gcf, self.mf_spectra, self.spectra_bgc = pickle.load(open(pickled_links, 'rb'))
+            for idx in selected_indices:
+                self.linker.addConstraint(name, idx, self.data_sources[name])
 
-        # add the buttons to trigger scoring
-        self.tables_score_met = Button(label='Show scores for selected spectra', name='tables_score_met')
-        self.tables_score_gen = Button(label='Show scores for selected BGCs', name='tables_score_gen')
-        self.widgets.append(self.tables_score_met)
-        self.widgets.append(self.tables_score_gen)
+            print('table_callback: query')
+            self.linker.query()
+            print('table_callback: updating data sources')
+            self.linker.updateDataSources(self.data_sources)
+            print('table_callback {} done'.format(name))
+
+        def reset_tables_callback(unused):
+            print('reset callback')
+            # this is used to prevent the table_callback being triggered during
+            # this callback, which doesn't break anything but does repeat some
+            # operations and waste time
+            self.resetting = True
+
+            for table_name, table_ds in self.data_sources.items():
+                table_ds.selected.indices = []
+                self.linker.removeConstraints(table_name)
+
+            self.linker.query()
+            self.linker.updateDataSources(self.data_sources)
+            print('reset callback done')
+
+            self.molfam_dt.selectable = True
+            self.spec_dt.selectable = True
+            self.gcf_dt.selectable = True
+            self.bgc_dt.selectable = True
+            self.tables_score_met.disabled = True
+            self.tables_score_gen.disabled = True
+
+            self.resetting = False
+
+        self.molfam_ds.selected.on_change('indices', lambda a, b, c: table_callback('molfam_table'))
+        self.spec_ds.selected.on_change('indices', lambda a, b, c: table_callback('spec_table'))
+        self.bgc_ds.selected.on_change('indices', lambda a, b, c: table_callback('bgc_table'))
+        self.gcf_ds.selected.on_change('indices', lambda a, b, c: table_callback('gcf_table'))
+
+        # the buttons to trigger scoring
+        self.tables_score_met = Button(label='Show scores for selected spectra', button_type='success', disabled=True)
+        self.tables_score_gen = Button(label='Show scores for selected BGCs', button_type='success', disabled=True)
+        self.widgets.append(wrap_popover(self.tables_score_met, create_popover(*TOOLTIP_SPECTRA_SCORING), 'tables_score_met'))
+        self.widgets.append(wrap_popover(self.tables_score_gen, create_popover(*TOOLTIP_BGC_SCORING), 'tables_score_gen'))
+
+        selection_change_callback_code = """
+            var value = '50%';
+            if(source.selected.indices.length == 0)
+                value = '';
+
+            if (name === 'bgc_table' || name === 'gcf_table') {
+                $('#spec_table').css('opacity', value);
+                $('#molfam_table').css('opacity', value);
+                btn_met.disabled = true;
+                btn_gen.disabled = false;
+            } else {
+                $('#bgc_table').css('opacity', value);
+                $('#gcf_table').css('opacity', value);
+                btn_met.disabled = false;
+                btn_gen.disabled = true;
+            }
+        """
+        self.molfam_ds.selected.js_on_change('indices', CustomJS(code=selection_change_callback_code, args=dict(name='molfam_table', btn_met=self.tables_score_met, btn_gen=self.tables_score_gen, source=self.molfam_ds)))
+        self.spec_ds.selected.js_on_change('indices', CustomJS(code=selection_change_callback_code, args=dict(name='spec_table', btn_met=self.tables_score_met, btn_gen=self.tables_score_gen, source=self.spec_ds)))
+        self.bgc_ds.selected.js_on_change('indices', CustomJS(code=selection_change_callback_code, args=dict(name='bgc_table', btn_met=self.tables_score_met, btn_gen=self.tables_score_gen, source=self.bgc_ds)))
+        self.gcf_ds.selected.js_on_change('indices', CustomJS(code=selection_change_callback_code, args=dict(name='gcf_table', btn_met=self.tables_score_met, btn_gen=self.tables_score_gen, source=self.gcf_ds)))
 
         # CustomJS callback code for resetting the selection (and opacity) states
         # of all the tables 
         reset_selection_code = """    
-            // get linker object    
-            const linker = window.shared['linker'];
-            if (!linker) {
-                alert('Please click Load Data first!');
-                cb_obj.indices = [];
-                return;
-            }
-
-            
             // remove selections from all tables
             var tablenames = ['molfam_table', 'spec_table', 'bgc_table', 'gcf_table'];
             for(let t=0;t<tablenames.length;t++) {
                 const table = tablenames[t];
-                // TODO is this the best way to do this??
-                //linker.removeConstraints(table);
-                data_sources[table].selected.indices = [];
-                
                 // restore opacity
                 $('#' + table).css('opacity', '');
             }
-            linker.query();
-            linker.updateDataSources(data_sources);
-
         """
-        self.tables_reset = Button(label='Clear selections', name='tables_reset')
-        self.tables_reset.js_on_click(CustomJS(args={'data_sources': data_sources, 'data_tables': self.data_tables}, code=reset_selection_code))
-        self.widgets.append(self.tables_reset)
+        self.tables_reset_button = Button(label='Clear selections', button_type='danger')
+        self.tables_reset_button.js_on_click(CustomJS(args=dict(), code=reset_selection_code))
+        self.tables_reset_button.on_click(reset_tables_callback)
+        self.widgets.append(wrap_popover(self.tables_reset_button, create_popover(*TOOLTIP_CLEAR_SELECTIONS), 'tables_reset'))
 
-        # combine the data and link informations into a list of dicts in the format the
-        # linker expects. this object is passed in to the linker by a callback after 
-        # the webapp loads (see below & main.py)
-        self.table_info = get_table_info(self.molfam_df, self.mf_spectra, self.spec_df, self.spectra_bgc, self.bgc_df, self.bgc_gcf, self.gcf_df)
-
-        # hack alert: bokeh doesn't provide any obvious way to trigger a JavaScript callback
-        # from Python code other than attaching a CustomJS object to a property of some 
-        # object, and then changing that property. This has limitations, such as not 
-        # working during the loading process. That's very annoying, because it makes it
-        # difficult to load the data into the tables (i.e. transferring data from 
-        # Python -> JS) without the original solution of asking the user to click a button
-        # to trigger the CustomJS callback necessary. 
-        #
-        # I finally found a very ugly but usable workaround thanks to this issue:
-        #    https://github.com/bokeh/bokeh/issues/8728
-        # which can be summed up as:
-        # 1. create an empty/hidden div on the page
-        # 2. attach the callback to be executed to its 'text' property
-        # 3. add a callback on the document object 
-        # 4. use *that* callback to modify the div text...
-        # 5. ... which then triggers the CustomJS callback... 
-        # 6. ... and finally remove the document callback 
-        # 
-        # Not very nice but it does work
-
-        # this is the empty div
-        self.dummydiv = Div(text='', name='dummydiv')
-        self.widgets.append(self.dummydiv)
-
-        # this callback is used to initialise the code behind the data tables, which 
-        # is all Javascript. It must be passed the set of tables constructed above,
-        # so that they can be used to populate the database that is ultimately used
-        # to do the filtering. The check for the loading already having been completed
-        # is required due to the really nasty workaround used to compensate for bokeh
-        # not having a nice way to trigger a CustomJS callback programatically from
-        # Python code (at least not on/as the page is loading).  
-        self.load_tables_callback = CustomJS(args=dict(dummyDiv=self.dummydiv, tableInfo=self.table_info), code="""
-            if (window.shared.hasOwnProperty('linker'))
-            {
-                console.log("Linker init already done!");
-                return;
-            }
-
-            // create linker object and store in window.shared
-            const linker = new Linker(tableInfo);
-            window.shared['linker'] = linker;
-
-            // update div to indicate loading completed (this is used to
-            // cancel the periodic callbacks begun by the code in main.py)
-            // yes it's a mess
-            dummyDiv.text = 'LOADED';
-
-            // hide the CSS 'loading...' overlay
-            document.getElementById("overlay").style.display = "none";
-        """)
-
-        # finally attach the callback to the text property of the empty div
-        # so that it will be triggered when the main.py callback updates 
-        # that property
-        self.dummydiv.js_on_change('text', self.load_tables_callback)
+        self.linker = Linker(self.data.table_info, self.data.nh.nplinker.dataset_id, os.path.join(self.data.local_cache, 'linker.sqlite3'))

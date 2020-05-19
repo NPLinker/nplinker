@@ -1,1 +1,14 @@
 prototype/nplinker/scoring/iokr/data
+prototype/nplinker/scoring/iokr/iokr_venv
+arch_venv
+.git
+.vscode
+prototype/carnegie-notebooks
+prototype/.ipynb_checkpoints
+__pycache__
+*.toml
+TODO*
+*.ipynb
+*.sh
+*.pckl
+*.sqlite3

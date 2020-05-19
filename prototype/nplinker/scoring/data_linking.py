@@ -23,16 +23,16 @@ try:
 except ImportError:
     print('Warning: plotting functionality will not be available (missing matplotlib and/or seaborn)')
 
-from .genomics import GCF
-from .metabolomics import Spectrum
-from .metabolomics import MolecularFamily
+from ..genomics import GCF
+from ..metabolomics import Spectrum
+from ..metabolomics import MolecularFamily
 
 from .data_linking_functions import calc_correlation_matrix, calc_likelihood_matrix
 from .data_linking_functions import pair_prob, pair_prob_hg, link_prob, pair_prob_approx
 
 SCORING_METHODS = ['metcalf', 'likescore', 'hg']
 
-from .logconfig import LogConfig
+from ..logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
 class DataLinks(object):

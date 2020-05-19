@@ -20,6 +20,7 @@ from .runbigscape import run_bigscape
 class Downloader(object):
 
     PAIREDOMICS_PROJECT_DATA_ENDPOINT = 'http://pairedomicsdata.bioinformatics.nl/api/projects'
+    PAIREDOMICS_PROJECT_URL = 'https://pairedomicsdata.bioinformatics.nl/api/projects/{}'
     GNPS_DATA_DOWNLOAD_URL = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_clustered_spectra'
     ANTISMASH_DB_PAGE_URL = 'https://antismash-db.secondarymetabolites.org/output/{}'
     ANTISMASH_DB_DOWNLOAD_URL = 'https://antismash-db.secondarymetabolites.org/output/{}/{}'
@@ -36,8 +37,10 @@ class Downloader(object):
         self.local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data', 'pairedomics')
         self.local_download_cache = os.path.join(self.local_cache, 'downloads')
         self.local_file_cache = os.path.join(self.local_cache, 'extracted')
-        self.local_project_json_file = os.path.join(self.local_cache, 'pairedomics_project_data.json')
-        self.local_project_json_data = None
+        self.all_project_json_file = os.path.join(self.local_cache, 'all_projects.json')
+        self.all_project_json = None
+        self.project_json_file = os.path.join(self.local_cache, '{}.json'.format(self.gnps_massive_id))
+        self.project_json = None
         os.makedirs(self.local_cache, exist_ok=True)
 
         self.json_data = None
@@ -46,30 +49,40 @@ class Downloader(object):
         
         logger.info('Downloader for {}, caching to {}'.format(platform_id, self.local_cache))
 
-        if not os.path.exists(self.local_project_json_file) or force_download:
+        if not os.path.exists(self.project_json_file) or force_download:
             logger.info('Downloading new copy of platform project data...')
-            self._download_platform_project_data(self.local_project_json_file)
+            self.all_project_json = self._download_platform_json_to_file(Downloader.PAIREDOMICS_PROJECT_DATA_ENDPOINT, self.all_project_json_file)
         else:
             logger.info('Using existing copy of platform project data')
-            with open(self.local_project_json_file, 'r') as f:
-                self.local_project_json_data = json.load(f)
+            with open(self.all_project_json_file, 'r') as f:
+                self.all_project_json = json.load(f)
 
-        # find the specified project
-        for project in self.local_project_json_data['data']:
+        # query the pairedomics webservice with the project ID to retrieve the data. unfortunately
+        # this is not the MSV... ID, but an internal GUID string. To get that, first need to get the
+        # list of all projects, find the one with a 'metabolite_id' value matching the MSV... ID, and
+        # then extract its '_id' value to get the GUID
+
+        # find the specified project and store its ID
+        for project in self.all_project_json['data']:
             pairedomics_id = project['_id']
-            gnps_massive_id = project['project']['metabolomics']['project']['GNPSMassIVE_ID']
+            gnps_massive_id = project['metabolite_id']
 
             if gnps_massive_id == platform_id:
                 self.pairedomics_id = pairedomics_id
-                if 'molecular_network' not in project['project']['metabolomics']['project']:
-                    raise Exception('Dataset has no GNPS data URL!')
-
-                self.gnps_task_id = project['project']['metabolomics']['project']['molecular_network']
-                logger.info('Found project with internal ID {}'.format(self.pairedomics_id))
-                self.project_json = project
+                logger.debug('platform_id {} matched to pairedomics_id {}'.format(self.gnps_massive_id, self.pairedomics_id))
+                break
 
         if self.pairedomics_id is None:
-            raise Exception('Failed to find pairedomics project with ID {}'.format(self.gnps_massive_id))
+            raise Exception('Failed to find a pairedomics project with ID {}'.format(self.gnps_massive_id))
+
+        # now get the project JSON data
+        logger.info('Found project, retrieving JSON data...')
+        self.project_json = self._download_platform_json_to_file(Downloader.PAIREDOMICS_PROJECT_URL.format(self.pairedomics_id), self.project_json_file)
+        
+        if 'molecular_network' not in self.project_json['metabolomics']['project']:
+            raise Exception('Dataset has no GNPS data URL!')
+
+        self.gnps_task_id = self.project_json['metabolomics']['project']['molecular_network']
 
         # create local cache folders for this dataset
         self.project_download_cache = os.path.join(self.local_download_cache, self.gnps_massive_id)
@@ -87,27 +100,30 @@ class Downloader(object):
 
         self.strain_mappings_file = os.path.join(self.project_file_cache, 'strain_mappings.csv')
 
-    def get(self):
+    def get(self, do_bigscape, extra_bigscape_parameters):
         logger.info('Going to download the metabolomics data file')
 
         self._download_metabolomics_zipfile(self.gnps_task_id)
-        self._download_genomics_data(self.project_json['project']['genomes'])
-        self._parse_genome_labels(self.project_json['project']['genome_metabolome_links'], self.project_json['project']['genomes'])
+        self._download_genomics_data(self.project_json['genomes'])
+        self._parse_genome_labels(self.project_json['genome_metabolome_links'], self.project_json['genomes'])
         self._generate_strain_mappings()
         self._download_mibig_json() # TODO version
-        self._run_bigscape() # TODO optional flag?
+        self._run_bigscape(do_bigscape, extra_bigscape_parameters) 
 
     def _is_new_gnps_format(self, directory):
         # TODO this should test for existence of quantification table instead
         return os.path.exists(os.path.join(directory, 'qiime2_output'))
 
-    def _run_bigscape(self):
+    def _run_bigscape(self, do_bigscape, extra_bigscape_parameters):
         # TODO this currently assumes docker environment, allow customisation?
         # can check if in container with: https://stackoverflow.com/questions/20010199/how-to-determine-if-a-process-runs-inside-lxc-docker
-        # TODO also meed option to skip if you already have manual results
-        logger.info('Running BiG-SCAPE...')
+        if not do_bigscape:
+            logger.info('BiG-SCAPE disabled by configuration, not running it')
+            return
+
+        logger.info('Running BiG-SCAPE! extra_bigscape_parameters="{}"'.format(extra_bigscape_parameters))
         try:
-            run_bigscape('/app/BiG-SCAPE/bigscape.py', os.path.join(self.project_file_cache, 'antismash'), os.path.join(self.project_file_cache, 'bigscape'), '/app', cutoffs=[0.3])
+            run_bigscape('/app/BiG-SCAPE/bigscape.py', os.path.join(self.project_file_cache, 'antismash'), os.path.join(self.project_file_cache, 'bigscape'), '/app', cutoffs=[0.3], extra_params=extra_bigscape_parameters)
         except Exception as e:
             logger.warning('Failed to run BiG-SCAPE on antismash data, error was "{}"'.format(e))
 
@@ -451,25 +467,23 @@ class Downloader(object):
         else:
             logger.info('Found OLD GNPS structure')
 
-    def _download_platform_project_data(self, local_path):
-        resp = httpx.get(Downloader.PAIREDOMICS_PROJECT_DATA_ENDPOINT)
+    def _download_platform_json_to_file(self, url, local_path):
+        resp = httpx.get(url)
         if not resp.status_code == 200:
-            raise Exception('Failed to download pairedomics project JSON data! {}'.format(resp.status))
+            raise Exception('Failed to download {} (status code {})'.format(url, resp.status_code))
 
-        logger.debug('Downloaded {} bytes of project data'.format(len(resp.content)))
-        self.local_project_json_data = json.loads(resp.content)
-        logger.info('Number of projects found: {}'.format(len(self.local_project_json_data['data'])))
-
+        content = json.loads(resp.content)
         with open(local_path, 'w') as f:
-           json.dump(self.local_project_json_data, f) 
+            json.dump(content, f)
 
-        logger.info('Stored data in {}'.format(local_path))
-    
+        logger.debug('Downloaded {} to {}'.format(url, local_path))
+
+        return content
 
 if __name__ == "__main__":
     # salinispora dataset (only one that actually works)
-    # d = Downloader('MSV000079284')
-    d = Downloader('MSV000084771')
+    d = Downloader('MSV000079284')
+    # d = Downloader('MSV000084771')
     d.get()
 
     # all_ids = ['MSV000078995',
