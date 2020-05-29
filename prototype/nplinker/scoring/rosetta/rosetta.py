@@ -64,6 +64,14 @@ class Rosetta(object):
         self._spec_hits = {}
         self._bgc_hits = {}
 
+    @property
+    def bgc_hits(self):
+        return self._bgc_hits
+
+    @property
+    def spec_hits(self):
+        return self._spec_hits
+
     def _load_csv(self, csv_path):
         logger.info('constructing rosetta dicts')
 
@@ -146,10 +154,6 @@ class Rosetta(object):
         logger.info('Found {} rosetta hits!'.format(len(self._rosetta_hits)))
 
     def generate_bgc_summary_scores(self):
-        # TODO
-        # this method is currently broken due to missing 'all_mibig_genes'
-        # in knownclusterblast parser output...
-
         # process the hit to compress it into more useful info
         # computes the total identity score for each mibig entry
         # and divides by the number of mibig genes
