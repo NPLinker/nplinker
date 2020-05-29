@@ -1,14 +1,6 @@
+loglevel = "DEBUG"
+logfile = ""
+repro_file = ""
 [dataset]
-root = "/mnt/archive/nplinker_data/current/carnegie_mibig_27112019"
-[dataset.overrides]
-[scoring]
-[scoring.metcalf]
-enabled = true
-standardised = true
-cutoff = 1.0
-[scoring.hg]
-prob = 0.99
-enabled = false
-[scoring.likescore]
-cutoff = 0.8
-enabled = false
+root = "/path/to/carnegie_nomibig_27112019"
+platform_id = ""
