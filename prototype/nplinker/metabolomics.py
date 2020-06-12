@@ -48,7 +48,6 @@ class Spectrum(object):
         self.dataset_strains = None
         self.family_id = -1
         self.family = None
-        self.random_spectrum = None
         # a dict indexed by filename, or "gnps" 
         self.annotations = {}
         self._losses = None
@@ -114,9 +113,6 @@ class Spectrum(object):
         peakdata = '\\n'.join('{}, {}'.format(*p) for p in self.peaks)
         self._jcamp = JCAMP.format(str(self), self.n_peaks, peakdata)
         return self._jcamp
-
-    def add_random(self, strain_prob_dict):
-        self.random_spectrum = RandomSpectrum(self, strain_prob_dict)
 
     def __str__(self):
         return "Spectrum(id={}, spectrum_id={}, strains={})".format(self.id, self.spectrum_id, len(self.strains))
@@ -208,37 +204,12 @@ class Spectrum(object):
 
         return matched_losses
 
-
-class RandomSpectrum(object):
-
-    def __init__(self, real_spectrum, strain_prob_dict):
-        self.real_spectrum = real_spectrum
-        n_strains = 0
-        for strain in strain_prob_dict:
-            if self.real_spectrum.has_strain(strain):
-                n_strains += 1
-
-        self.metadata = set(np.random.choice(list(strain_prob_dict.keys()), n_strains, replace=True, p=list(strain_prob_dict.values())))
-
-    @property
-    def strain_list(self):
-        return list(self.metadata)
-
-    @property
-    def strain_set(self):
-        return self.metadata
-
-    def has_strain(self, strain):
-        return strain in self.strain_set
-
-
 class MolecularFamily(object):
     def __init__(self, family_id):
         self.id = -1 
         self.family_id = family_id
         self.spectra = []
         self.family = None
-        self.random_molecular_family = RandomMolecularFamily(self)
 
     def has_strain(self, strain):
         for spectrum in self.spectra:
@@ -259,20 +230,6 @@ class MolecularFamily(object):
 
     def __str__(self):
         return 'MolFam(family_id={}, spectra={})'.format(self.family_id, len(self.spectra))
-
-class RandomMolecularFamily(object):
-    def __init__(self, molecular_family):
-        self.molecular_family = molecular_family
-
-    def has_strain(self, strain):
-        for spectrum in self.molecular_family.spectra:
-            if hasattr(spectrum, 'random_spectrum'):
-                if spectrum.random_spectrum.has_strain(strain):
-                    return True
-            else:
-                print("Spectrum objects need random spectra attached for this functionality")
-
-        return False
 
 class SingletonFamily(MolecularFamily):
     def __init__(self):

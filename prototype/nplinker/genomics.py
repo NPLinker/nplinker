@@ -69,7 +69,6 @@ class GCF(object):
         self.product_type = product_type
         self.bgcs = set()
         self.classes = set()
-        self.random_gcf = None
 
         self._aa_predictions = None
         self.strains = StrainCollection()
@@ -102,9 +101,6 @@ class GCF(object):
     def has_mibig(self):
         return self.num_mibig_bgcs > 0
 
-    def add_random(self, bgc_list):
-        self.random_gcf = RandomGCF(self, bgc_list)
-
     @property
     def non_mibig_bgcs(self):
         return list(filter(lambda bgc: not isinstance(bgc, MiBIGBGC), self.bgcs))
@@ -134,19 +130,6 @@ class GCF(object):
             self._aa_predictions = bgc_aa_prob
 
         return self._aa_predictions
-
-class RandomGCF(object):
-
-    def __init__(self, real_gcf, bgc_list):
-        self.real_gcf = real_gcf
-        self.strains = StrainCollection()
-        n_bgc = self.real_gcf.num_non_mibig_bgcs
-        # select n_bgc bgcs from the bgc_list
-        for bgc in list(np.random.choice(bgc_list, n_bgc, replace=False)):
-            self.strains.add(bgc.strain)
-
-    def has_strain(self, strain):
-        return strain in self.strains
 
 class MiBIGBGC(BGC):
 
