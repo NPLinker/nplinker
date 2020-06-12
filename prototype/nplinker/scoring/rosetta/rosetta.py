@@ -48,6 +48,7 @@ class Rosetta(object):
             os.makedirs(self._pickle_dir, exist_ok=True)
         self._speclib_pickle_path = os.path.join(self._pickle_dir, dataset_id + '_SpecLib.pckl')
         self._bgchits_pickle_path = os.path.join(self._pickle_dir, dataset_id + '_bgc_hits.pckl')
+        self._rhits_pickle_path = os.path.join(self._pickle_dir, dataset_id + '_RosettaHits.pckl')
 
         if not os.path.exists(self._mgf_path):
             logger.warning('Failed to load Rosetta data ({}), matching disabled'.format(self._mgf_path))
@@ -182,6 +183,17 @@ class Rosetta(object):
         return processed
 
     def run(self, spectra, bgcs, ms1_tol=100, score_thresh=0.5):
+        # TODO improve this (pickle, per dataset etc)
+        if len(self._rosetta_hits) > 0:
+            return self._rosetta_hits
+
+        if os.path.exists(self._rhits_pickle_path):
+            logger.info('Loading cached Rosetta hits for dataset {} at {}'.format(self._dataset_id, self._rhits_pickle_path))
+            with open(self._rhits_pickle_path, 'rb') as f:
+                self._rosetta_hits = pickle.load(f)
+
+            return self._rosetta_hits
+
         # check if we have a pickled SpecLib object first...
         if os.path.exists(self._speclib_pickle_path):
             logger.info('Found pickled SpecLib for dataset {} at {}!'.format(self._dataset_id, self._speclib_pickle_path))
@@ -209,4 +221,5 @@ class Rosetta(object):
         # finally construct the list of rosetta hits
         self._collect_rosetta_hits()
 
+        pickle.dump(self._rosetta_hits, open(self._rhits_pickle_path, 'wb'), protocol=4)
         return self._rosetta_hits
