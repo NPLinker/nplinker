@@ -53,5 +53,5 @@ _popover_text = """
 def create_popover(title, text):
     return _popover_text.format(title, text)
 
-def wrap_popover(host, pop_div, name):
-    return row(children=[host, Div(text=pop_div)], name=name)
+def wrap_popover(host, pop_div, name, sizing_mode='scale_width'):
+    return row(children=[host, Div(text=pop_div)], name=name, sizing_mode=sizing_mode)
