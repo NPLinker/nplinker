@@ -12,7 +12,8 @@ from .genomics import GCF, BGC
 from .config import Config, Args
 from .loader import DatasetLoader
 
-from .scoring.methods import MetcalfScoring, TestScoring, LinkCollection
+from .scoring.methods import MetcalfScoring, RosettaScoring, TestScoring
+from .scoring.methods import LinkCollection
 
 from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
@@ -24,7 +25,8 @@ class NPLinker(object):
     # default set of enabled scoring methods
     SCORING_METHODS =  {
         MetcalfScoring.NAME: MetcalfScoring,
-        TestScoring.NAME: TestScoring
+        TestScoring.NAME: TestScoring,
+        RosettaScoring.NAME: RosettaScoring, 
                        }
 
     def __init__(self, userconfig=None, platform_id=None):
@@ -341,15 +343,17 @@ class NPLinker(object):
         logger.debug('Calculating shared strain information...')
         # TODO more efficient version?
         for source, link_data in link_collection.links.items():
+            if isinstance(source, BGC):
+                logger.debug('Cannot determine shared strains for BGC input!')
+                break
+
             targets = list(link_data.keys())
 
             shared_strains = self._datalinks.common_strains([source], targets, True)
             for objpair in shared_strains.keys():
                 shared_strains[objpair] = [self._strains.lookup_index(x) for x in shared_strains[objpair]]
 
-            if isinstance(source, BGC):
-                raise Exception('Not supported - TODO')
-            elif isinstance(source, GCF):
+            if isinstance(source, GCF):
                 for target, link in link_data.items():
                     if (target, source) in shared_strains:
                         link.shared_strains = shared_strains[(target, source)]

@@ -7,6 +7,7 @@ import numpy as np
 from .data_linking import DataLinks, LinkFinder
 from ..genomics import BGC, GCF
 from ..metabolomics import Spectrum, MolecularFamily
+from ..scoring.rosetta.rosetta import Rosetta
 
 from ..logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
@@ -255,6 +256,63 @@ class TestScoring(ScoringMethod):
         # nothing
         return objects
 
+class RosettaScoring(ScoringMethod):
+
+    NAME = 'rosetta'
+    ROSETTA_OBJ = None
+
+    def __init__(self, npl):
+        super(RosettaScoring, self).__init__(npl)
+
+    @staticmethod
+    def setup(npl):
+        logger.info('RosettaScoring setup')
+        RosettaScoring.ROSETTA_OBJ = Rosetta(npl.data_dir, npl.root_dir, npl.dataset_id, ignore_genomic_cache=False)
+        RosettaScoring.ROSETTA_OBJ.run(npl.spectra, npl.bgcs)
+        logger.info('RosettaScoring setup completed')
+
+    def get_links(self, objects, link_collection):
+        # enforce constraint that the list must contain a set of identically typed objects
+        if not all(isinstance(x, type(objects[0])) for x in objects):
+            raise Exception('RosettaScoring: uniformly-typed list of objects is required')
+
+        # must be BGC or Spectrum 
+        if isinstance(objects[0], MolecularFamily) or isinstance(objects[0], GCF):
+            raise Exception('RosettaScoring requires input type Spectrum or BGC')
+
+        # list of RosettaHit objects
+        ro_hits = RosettaScoring.ROSETTA_OBJ._rosetta_hits
+
+        # TODO this might need to be faster
+        results = {}
+        if isinstance(objects[0], BGC):
+            for bgc in objects:
+                for hit in ro_hits:
+                    if bgc.id == hit.bgc.id:
+                        if bgc not in results:
+                            results[bgc] = {}
+                        results[bgc][hit.spec] = ObjectLink(bgc, hit.spec, self, data=hit)
+        else: # Spectrum
+            for spec in objects:
+                for hit in ro_hits:
+                    if spec.id == hit.spec.id:
+                        if spec not in results:
+                            results[spec] = {}
+                        results[spec][hit.bgc] = ObjectLink(spec, hit.bgc, self, data=hit)
+
+
+        logger.debug('RosettaScoring found {} results'.format(len(results)))
+        link_collection._add_links_from_method(self, results)
+        return link_collection
+
+    def format_data(self, data):
+        # TODO
+        return None
+
+    def sort(self, objects, reverse=True):
+        # TODO
+        return objects
+
 class MetcalfScoring(ScoringMethod):
 
     DATALINKS = None
@@ -401,7 +459,7 @@ class MetcalfScoring(ScoringMethod):
                     # save the scores
                     if gcf not in metcalf_results:
                         metcalf_results[gcf] = {obj: []}
-                    metcalf_results[gcf][obj] = ObjectLink(gcf, obj,self, res[self.R_SCORE, j])
+                    metcalf_results[gcf][obj] = ObjectLink(gcf, obj, self, res[self.R_SCORE, j])
 
         else:
             logger.debug('MetcalfScoring: input_type=Spec/MolFam, result_type=GCF, inputs={}, results={}'.format(len(objects), results[0].shape))
