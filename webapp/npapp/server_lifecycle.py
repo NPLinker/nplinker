@@ -269,6 +269,16 @@ class NPLinkerHelper(object):
 
         self.load_tables()
 
+        self.load_rosetta()
+
+    def load_rosetta(self):
+        # trigger rosetta scoring setup during initial load as the first run 
+        # can take a significant amount of time. the results are cached and
+        # pickled for subsequent use.
+        print('Preprocessing for rosetta scoring...')
+        rs_obj = self.nplinker.scoring_method('rosetta')
+        print('Finished preprocessing for rosetta scoring')
+
     def load_nplinker(self):
         # initialise nplinker and load the dataset, using a config file in the webapp dir
         datapath = os.getenv('NPLINKER_CONFIG', os.path.join(os.path.join(os.path.dirname(__file__), 'nplinker_webapp.toml')))
