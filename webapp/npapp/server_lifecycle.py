@@ -2,7 +2,6 @@ import sys
 import os
 import csv
 import time
-import pickle
 
 import bokeh.palettes as bkp
 from bokeh.models import ColumnDataSource

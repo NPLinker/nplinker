@@ -1,6 +1,5 @@
 import sys
 import logging
-import pickle
 
 import numpy as np
 
@@ -17,6 +16,8 @@ from .scoring.methods import LinkCollection
 
 from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
+
+from .pickler import save_pickled_data
 
 class NPLinker(object):
 
@@ -165,7 +166,7 @@ class NPLinker(object):
         self._collect_repro_data()
         with open(filename, 'wb') as repro_file:
             # TODO is pickle the best format to use?
-            pickle.dump(self._repro_data, repro_file, protocol=4)
+            save_pickled_data(self._repro_data, repro_file)
             logger.info('Saving reproducibility data to {}'.format(filename))
 
     @property

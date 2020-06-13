@@ -1,9 +1,10 @@
 import pickle
 import numpy as np
 import pylab as plt
+
 # Method to perform the projection from the input object that
 # Grimur provided
-def bgc_projection(input_pickle,bgc_list,weights = [0,1,0]):
+def bgc_projection(input_pickle, bgc_list, weights=[0,1,0]):
 
     # javcard, sequence, adjacency
     with open(input_pickle,'rb') as f:
@@ -30,8 +31,6 @@ def bgc_projection(input_pickle,bgc_list,weights = [0,1,0]):
     
 
     return bgc_dict,family_dict
-
-
 
 def plot_and_highlight(bgc_dict,strains):
     if not isinstance(strains,list):

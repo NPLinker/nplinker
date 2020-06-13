@@ -1,5 +1,4 @@
 import os
-import pickle
 
 import pandas as pd
 
@@ -12,6 +11,8 @@ from tables_functions import create_links, get_table_info, NA_ID, NA_TEXT
 from tooltips import create_popover, wrap_popover
 from tooltips import TOOLTIP_CLEAR_SELECTIONS, TOOLTIP_BGC_SCORING, TOOLTIP_SPECTRA_SCORING
 from tooltips import TOOLTIP_DOWNLOAD_CSV_BGC, TOOLTIP_DOWNLOAD_CSV_GCF, TOOLTIP_DOWNLOAD_CSV_SPECTRA, TOOLTIP_DOWNLOAD_CSV_MOLFAM
+
+from nplinker.pickler import load_pickled_data, save_pickled_data
 
 class TableData(object):
 
@@ -36,28 +37,25 @@ class TableData(object):
         # in the config file between runs here, so the last used value is stored
         # and compared against the current one. if it changes, have to regenerate
         # all the data structs below
-        last_cutoff_val = None
         current_cutoff_val = self.nh.nplinker._loader.webapp_scoring_cutoff()
-        if os.path.exists(last_cutoff_path):
-            last_cutoff_val = pickle.load(open(last_cutoff_path, 'rb'))
+        # this will be None if the file doesn't exist or can't be loaded
+        last_cutoff_val = load_pickled_data(last_cutoff_path)
 
         if last_cutoff_val != current_cutoff_val:
             print('*** Metcalf cutoff for tables has been changed (old={}, new={}), will regenerate data structs'.format(last_cutoff_val, current_cutoff_val))
             for path in [pickled_scores_path, pickled_links_path, database_path]:
                 if os.path.exists(path):
                     os.unlink(path)
-        pickle.dump(current_cutoff_val, open(last_cutoff_path, 'wb'), protocol=4)
+        save_pickled_data(current_cutoff_val, last_cutoff_path)
 
-        if not os.path.exists(pickled_scores_path):
+        spec_links = load_pickled_data(pickled_scores_path)
+        if spec_links is None:
             # get the metcalf scoring links between spectra:gcf and gcf:spectra pairs
             metcalf_scoring = self.nh.nplinker.scoring_method('metcalf')
             metcalf_scoring.cutoff = self.nh.nplinker._loader.webapp_scoring_cutoff()
             print('Metcalf tables cutoff is {}'.format(metcalf_scoring.cutoff))
             spec_links = self.nh.nplinker.get_links(self.nh.nplinker.spectra, metcalf_scoring)
-            pickle.dump(spec_links, open(pickled_scores_path, 'wb'), protocol=4)
-        else:
-            spec_links = pickle.load(open(pickled_scores_path, 'rb'))
-
+            save_pickled_data(spec_links, pickled_scores_path)
 
         spectra = list(spec_links.links.keys())
         gcfs = spec_links.get_all_targets()
@@ -124,7 +122,8 @@ class TableData(object):
 
         # create links between GCF and BGC objects (or load pickled version)
         # note the +1s are because the tables code uses 0 for NA
-        if not os.path.exists(pickled_links_path):
+        pickled_links_data = load_pickled_data(pickled_links_path)
+        if pickled_links_data is None:
             index_mappings_1, index_mappings_2 = {}, {}
 
             print('Constructing link data structures')
@@ -180,9 +179,9 @@ class TableData(object):
             print(' + spectra_bgc')
 
             # pickle the data structs to avoid doing the above again
-            pickle.dump((self.bgc_gcf, self.mf_spectra, self.spectra_bgc), open(pickled_links_path, 'wb'), protocol=4)
+            save_pickled_data((self.bgc_gcf, self.mf_spectra, self.spectra_bgc), pickled_links_path)
         else:
-            self.bgc_gcf, self.mf_spectra, self.spectra_bgc = pickle.load(open(pickled_links_path, 'rb'))
+            self.bgc_gcf, self.mf_spectra, self.spectra_bgc = pickled_links_data
 
         # combine the data and link informations into a list of dicts in the format the
         # linker class requires 
