@@ -347,20 +347,20 @@ class NPLinker(object):
                 logger.debug('Cannot determine shared strains for BGC input!')
                 break
 
-            targets = list(link_data.keys())
+            targets = list(filter(lambda x: not isinstance(x, BGC), link_data.keys()))
+            if len(targets) > 0:
+                shared_strains = self._datalinks.common_strains([source], targets, True)
+                for objpair in shared_strains.keys():
+                    shared_strains[objpair] = [self._strains.lookup_index(x) for x in shared_strains[objpair]]
 
-            shared_strains = self._datalinks.common_strains([source], targets, True)
-            for objpair in shared_strains.keys():
-                shared_strains[objpair] = [self._strains.lookup_index(x) for x in shared_strains[objpair]]
-
-            if isinstance(source, GCF):
-                for target, link in link_data.items():
-                    if (target, source) in shared_strains:
-                        link.shared_strains = shared_strains[(target, source)]
-            else:
-                for target, link in link_data.items():
-                    if (source, target) in shared_strains:
-                        link.shared_strains = shared_strains[(source, target)]
+                if isinstance(source, GCF):
+                    for target, link in link_data.items():
+                        if (target, source) in shared_strains:
+                            link.shared_strains = shared_strains[(target, source)]
+                else:
+                    for target, link in link_data.items():
+                        if (source, target) in shared_strains:
+                            link.shared_strains = shared_strains[(source, target)]
 
         logger.debug('Finished calculating shared strain information')
         return link_collection
