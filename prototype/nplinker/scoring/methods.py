@@ -118,9 +118,26 @@ class LinkCollection(object):
         for source in to_remove:
             del self._link_data[source]
 
-    def get_sorted_links(self, method, source, reverse=True):
-        links = [link for link in self._link_data[source].values() if method in link.methods]
-        return method.sort(links, reverse)
+    def get_sorted_links(self, method, source, reverse=True, strict=False):
+        # This method allows for the sorting of a set of links according to the 
+        # sorting implemented by a specific method. However because there may be
+        # links from multiple methods present in the collection, it isn't as simple
+        # as running <method>.sort(links) and returning the result, because that 
+        # will only work on links which have the expected method data. To get around
+        # this, the "strict" parameter is used. If set to True, it simply returns
+        # the sorted links *for the specific method only*, which may be a subset
+        # of the total collection if multiple methods were used to generate it. If 
+        # set to False, it will return a list consisting of the sorted links for
+        # the given method, with any remaining links appended in arbitrary order.
+
+        # run <method>.sort on the links foudn by that method
+        sorted_links_for_method = method.sort([link for link in self._link_data[source].values() if method in link.methods], reverse)
+
+        if not strict:
+            # append any remaining links 
+            sorted_links_for_method.extend([link for link in self._link_data[source].values() if method not in link.methods])
+
+        return sorted_links_for_method
 
     def get_all_targets(self):
         return list(set(itertools.chain.from_iterable(self._link_data[x].keys() for x in self._link_data.keys())))
@@ -263,6 +280,7 @@ class RosettaScoring(ScoringMethod):
 
     def __init__(self, npl):
         super(RosettaScoring, self).__init__(npl)
+        self.bgc_to_gcf = True
 
     @staticmethod
     def setup(npl):
@@ -291,14 +309,18 @@ class RosettaScoring(ScoringMethod):
                     if bgc.id == hit.bgc.id:
                         if bgc not in results:
                             results[bgc] = {}
-                        results[bgc][hit.spec] = ObjectLink(bgc, hit.spec, self, data=hit)
+
+                        src = bgc if not self.bgc_to_gcf else bgc.parent
+                        results[src][hit.spec] = ObjectLink(src, hit.spec, self, data=hit)
         else: # Spectrum
             for spec in objects:
                 for hit in ro_hits:
                     if spec.id == hit.spec.id:
                         if spec not in results:
                             results[spec] = {}
-                        results[spec][hit.bgc] = ObjectLink(spec, hit.bgc, self, data=hit)
+
+                        target = hit.bgc if not self.bgc_to_gcf else hit.bgc.parent
+                        results[spec][target] = ObjectLink(spec, target, self, data=hit)
 
 
         logger.debug('RosettaScoring found {} results'.format(len(results)))
