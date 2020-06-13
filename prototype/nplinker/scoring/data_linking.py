@@ -251,6 +251,9 @@ class DataLinks(object):
         the values are lists of strain indices which appear in both objects, which
         can then be looked up in NPLinker.strains.
         """
+
+        # TODO make this work for BGCs too?
+
         is_list_a = isinstance(objects_a, list)
         is_list_b = isinstance(objects_b, list)
 
