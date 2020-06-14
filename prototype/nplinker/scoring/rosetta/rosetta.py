@@ -221,4 +221,18 @@ class Rosetta(object):
         self._collect_rosetta_hits()
 
         save_pickled_data(self._rosetta_hits, self._rhits_pickle_path)
+
+        # automatically export CSV file containing hit data to <dataset>/rosetta
+        # along with the pickled data
+        self.export_to_csv(os.path.join(self._pickle_dir, 'rosetta_hits.csv'))
+
         return self._rosetta_hits
+
+    def export_to_csv(self, filename):
+        # convenience method for exporting a full set of rosetta hits to a CSV file
+        with open(filename, 'w', newline='') as csvfile:
+            csvwriter = csv.writer(csvfile, delimiter=',')
+
+            csvwriter.writerow(['nplinker spectrum ID', 'spectrum ID', 'GNPS ID', 'spectral score', 'nplinker BGC ID', 'BGC ID', 'MiBIG BGC ID', 'BGC score'])
+            for hit in self._rosetta_hits:
+                csvwriter.writerow([hit.spec.id, hit.spec.spectrum_id, hit.gnps_id, hit.spec_match_score, hit.bgc.id, hit.bgc.name, hit.mibig_id, hit.bgc_match_score])
