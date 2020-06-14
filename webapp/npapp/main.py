@@ -1091,8 +1091,12 @@ class NPLinkerBokeh(object):
         self.scoring_objects['metcalf'].cutoff = new
         self.get_links()
 
-    def testscore_value_callback(self, attr, old, new):
-        self.scoring_objects['testscore'].value = new
+    def rosetta_bgc_cutoff_callback(self, attr, old, new):
+        self.scoring_objects['rosetta'].bgc_score_cutoff = new
+        self.get_links()
+
+    def rosetta_spec_cutoff_callback(self, attr, old, new):
+        self.scoring_objects['rosetta'].spec_score_cutoff = new
         self.get_links()
         
     def scoring_method_callback(self, attr, old, new):
@@ -1536,25 +1540,39 @@ class NPLinkerBokeh(object):
         current_methods = self.current_scoring_methods()
         
         # call get_links, which returns the subset of input objects which have links
-        results = self.nh.nplinker.get_links(selected_spectra, current_methods)
+        results = self.nh.nplinker.get_links(selected_spectra, current_methods, and_mode=False)
 
         # TODO quick attempt to display scores in the tables (for metcalf only for now)
+        # TODO does it make sense to do this with other methods? might not have a single score...
         metcalf_obj = self.scoring_objects['metcalf']
+        table_metcalf_scores = ['-' for gcf_id in self.table_session_data.gcf_ds.data['gcf_id']]
         # check if metcalf scoring is enabled at the moment
         if metcalf_obj in current_methods:
             # create a dict mapping GCFs in the results to their scores
+            # NOTE: rosetta scoring currently outputs BGCs not GCFs, which breaks
+            # this assumption that GCFs are present. currently working around by 
+            # setting bgc_to_gcf=True on the scoring object...
             gcf_scores = {}
             for spec, result in results.links.items():
                 for gcf, link_data in result.items():
-                    metcalf_score = link_data.data(metcalf_obj)
-                    gcf_scores[gcf] = metcalf_score
+                    if metcalf_obj in link_data.methods:
+                        metcalf_score = link_data.data(metcalf_obj)
+                        gcf_scores[gcf] = metcalf_score
 
             # get a list of the GCFs currently visible in the table (note that
             # these are the actual GCF IDs, not the internal nplinker IDs)
-            visible_gcfs = map(int, self.table_session_data.gcf_ds.data['gcf_id'])
+            visible_gcfs = list(map(int, self.table_session_data.gcf_ds.data['gcf_id']))
 
             # update the data source with the scores
-            self.table_session_data.gcf_ds.data['metcalf_score'] = [gcf_scores[self.nh.nplinker.lookup_gcf(gcf_id)] for gcf_id in visible_gcfs]
+            table_metcalf_scores = []
+            for gcf_id in visible_gcfs:
+                gcf_obj = self.nh.nplinker.lookup_gcf(gcf_id)
+                if gcf_obj not in gcf_scores:
+                    table_metcalf_scores.append('-')
+                else:
+                    table_metcalf_scores.append(gcf_scores[gcf_obj])
+
+        self.table_session_data.gcf_ds.data['metcalf_score'] = table_metcalf_scores
 
         # next, need to display the results using the same code as for generating the 
         # results from plot selections, but without actually triggering any unintended
@@ -1652,22 +1670,36 @@ class NPLinkerBokeh(object):
         results = self.nh.nplinker.get_links(selected_gcfs, current_methods)
 
         # TODO quick attempt to display scores in the tables (for metcalf only for now)
+        # TODO does it make sense to do this with other methods? might not have a single score...
         metcalf_obj = self.scoring_objects['metcalf']
+        table_metcalf_scores = ['-' for spec_id in self.table_session_data.spec_ds.data['metcalf_score']]
         # check if metcalf scoring is enabled at the moment
         if metcalf_obj in current_methods:
             # create a dict mapping spectra in the results to their scores
+            # NOTE: rosetta scoring currently outputs BGCs not GCFs, which breaks
+            # this assumption that GCFs are present. currently working around by 
+            # setting bgc_to_gcf=True on the scoring object...
             spec_scores = {}
             for gcf, result in results.links.items():
                 for spec, link_data in result.items():
-                    metcalf_score = link_data.data(metcalf_obj)
-                    spec_scores[spec] = metcalf_score
+                    if metcalf_obj in link_data.methods:
+                        metcalf_score = link_data.data(metcalf_obj)
+                        spec_scores[spec] = metcalf_score
 
             # get a list of the spectra currently visible in the table (note that
             # these are the actual Spectrum IDs, not the internal nplinker IDs)
-            visible_spectra = map(int, self.table_session_data.spec_ds.data['spectrum_id'])
+            visible_spectra = list(map(int, self.table_session_data.spec_ds.data['spectrum_id']))
 
             # update the data source with the scores
-            self.table_session_data.spec_ds.data['metcalf_score'] = [spec_scores[self.nh.nplinker.lookup_spectrum(spec_id)] for spec_id in visible_spectra]
+            table_metcalf_scores = []
+            for spec_id in visible_spectra:
+                spec_obj = self.nh.nplinker.lookup_spectrum(spec_id)
+                if spec_obj not in spec_scores:
+                    table_metcalf_scores.append('-')
+                else:
+                    table_metcalf_scores.append(spec_scores[spec_obj])
+
+        self.table_session_data.spec_ds.data['metcalf_score'] = table_metcalf_scores
 
         # next, need to display the results using the same code as for generating the 
         # results from plot selections, but without actually triggering any unintended
@@ -1744,7 +1776,7 @@ class NPLinkerBokeh(object):
 
         # scoring objects and related stuff
         # TODO this should be drawn from nplinker config, not hardcoded here? or config file
-        self.scoring_methods = ['metcalf', 'testscore']
+        self.scoring_methods = ['metcalf', 'rosetta']
         self.scoring_objects = {m: self.nh.nplinker.scoring_method(m) for m in self.scoring_methods}
 
         # checkbox list of scoring methods to enable/disable them
@@ -1755,26 +1787,29 @@ class NPLinkerBokeh(object):
         # buttons to show the modal dialogs for configuring each scoring method
         self.scoring_method_buttons = {}
         self.scoring_method_buttons['metcalf'] = Button(label='Configure Metcalf scoring', name='metcalf_scoring_button', button_type='primary')
-        self.scoring_method_buttons['testscore'] = Button(label='Configure testscore scoring', name='testscore_scoring_button', button_type='primary', visible=False)
+        self.scoring_method_buttons['rosetta'] = Button(label='Configure rosetta scoring', name='rosetta_scoring_button', button_type='primary', visible=False)
         widgets.extend(x for x in self.scoring_method_buttons.values())
 
         # basic JS callbacks to show the modals that allow you to configure the enabled scoring methods
         show_modal_callback = """ $('#' + modal_name).modal(); """
         self.scoring_method_buttons['metcalf'].js_on_click(CustomJS(args=dict(modal_name='metcalfModal'), code=show_modal_callback))
-        self.scoring_method_buttons['testscore'].js_on_click(CustomJS(args=dict(modal_name='testscoreModal'), code=show_modal_callback))
+        self.scoring_method_buttons['rosetta'].js_on_click(CustomJS(args=dict(modal_name='rosettaModal'), code=show_modal_callback))
 
         # metcalf config objects
         self.metcalf_standardised = RadioGroup(labels=['Basic Metcalf scoring', 'Standardised Metcalf scoring'], name='metcalf_standardised', active=1 if self.scoring_objects['metcalf'].standardised else 0, sizing_mode='scale_width')
         self.metcalf_standardised.on_change('active', self.metcalf_standardised_callback)
         widgets.append(self.metcalf_standardised)
-        self.metcalf_cutoff = Slider(start=0, end=10, value=int(self.scoring_objects['metcalf'].cutoff), step=1, title='[metcalf] cutoff = ', name='metcalf_cutoff')
+        self.metcalf_cutoff = Slider(start=0, end=10, value=int(self.scoring_objects['metcalf'].cutoff), step=1, title='cutoff value', name='metcalf_cutoff')
         self.metcalf_cutoff.on_change('value', self.metcalf_cutoff_callback)
         widgets.append(self.metcalf_cutoff)
 
-        # same for testscore
-        self.testscore_value = Slider(start=0, end=1, step=.01, value=self.scoring_objects['testscore'].value, title='Value parameter', name='testscore_value')
-        self.testscore_value.on_change('value', self.testscore_value_callback)
-        widgets.append(self.testscore_value)
+        # same for rosetta
+        self.rosetta_spec_cutoff = Slider(start=0, end=1, step=0.1, value=self.scoring_objects['rosetta'].bgc_score_cutoff, name='rosetta_spec_cutoff', title='spectral score cutoff value')
+        self.rosetta_spec_cutoff.on_change('value', self.rosetta_spec_cutoff_callback)
+        self.rosetta_bgc_cutoff = Slider(start=0, end=1, step=0.1, value=self.scoring_objects['rosetta'].bgc_score_cutoff, name='rosetta_bgc_cutoff', title='BGC score cutoff value')
+        self.rosetta_bgc_cutoff.on_change('value', self.rosetta_bgc_cutoff_callback)
+        widgets.append(self.rosetta_spec_cutoff)
+        widgets.append(self.rosetta_bgc_cutoff)
 
         metcalf_info_div = Div(name='metcalf_info', sizing_mode='scale_width', text='Tables contain objects with Metcalf score > {:.1f}'.format(self.nh.nplinker._loader.webapp_scoring_cutoff()))
         self.metcalf_info = wrap_popover(metcalf_info_div, create_popover(*TOOLTIP_TABLES_FILTERING), 'metcalf_info')
