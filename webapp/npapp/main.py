@@ -3,7 +3,7 @@ import os
 from threading import Thread
 
 from bokeh.models.widgets import RadioGroup, Slider, Div, Select, CheckboxGroup
-from bokeh.models.widgets import Toggle, Button, TextInput, PreText
+from bokeh.models.widgets import Toggle, Button, TextInput, PreText, RadioButtonGroup
 from bokeh.layouts import row
 from bokeh.models import CustomJS
 from bokeh.plotting import figure, curdoc
@@ -201,6 +201,7 @@ class ScoringHelper(object):
     METABOLOMICS_LOOKUP = [SCO_MODE_SPEC_GCF, SCO_MODE_MOLFAM_GCF]
 
     def __init__(self, nh):
+        self.method_and_mode = True
         self.genomics_mode = GENOMICS_MODE_BGC
         self.metabolomics_mode = METABOLOMICS_MODE_SPEC
         self.mode = SCO_MODE_BGC_SPEC
@@ -1099,6 +1100,11 @@ class NPLinkerBokeh(object):
         self.scoring_objects['rosetta'].spec_score_cutoff = new
         self.get_links()
         
+    def scoring_mode_toggle_callback(self, attr, old, new):
+        # 0 = AND, 1 = OR
+        self.score_helper.method_and_mode = (new == 0)
+        print('AND mode? {}'.format(self.score_helper.method_and_mode))
+
     def scoring_method_callback(self, attr, old, new):
         # update visibility of buttons
         for i in range(len(self.scoring_methods)):
@@ -1540,7 +1546,7 @@ class NPLinkerBokeh(object):
         current_methods = self.current_scoring_methods()
         
         # call get_links, which returns the subset of input objects which have links
-        results = self.nh.nplinker.get_links(selected_spectra, current_methods, and_mode=False)
+        results = self.nh.nplinker.get_links(selected_spectra, current_methods, and_mode=self.score_helper.method_and_mode)
 
         # TODO quick attempt to display scores in the tables (for metcalf only for now)
         # TODO does it make sense to do this with other methods? might not have a single score...
@@ -1667,7 +1673,7 @@ class NPLinkerBokeh(object):
         current_methods = self.current_scoring_methods()
         
         # call get_links, which returns the subset of input objects which have links
-        results = self.nh.nplinker.get_links(selected_gcfs, current_methods)
+        results = self.nh.nplinker.get_links(selected_gcfs, current_methods, and_mode=self.score_helper.method_and_mode)
 
         # TODO quick attempt to display scores in the tables (for metcalf only for now)
         # TODO does it make sense to do this with other methods? might not have a single score...
@@ -1810,6 +1816,11 @@ class NPLinkerBokeh(object):
         self.rosetta_bgc_cutoff.on_change('value', self.rosetta_bgc_cutoff_callback)
         widgets.append(self.rosetta_spec_cutoff)
         widgets.append(self.rosetta_bgc_cutoff)
+
+        # and/or mode selection
+        self.scoring_mode_toggle = RadioButtonGroup(labels=['Show results from all methods (AND mode)', 'Show results from any method (OR mode)'], active=0, name='scoring_mode_toggle', sizing_mode='scale_width')
+        self.scoring_mode_toggle.on_change('active', self.scoring_mode_toggle_callback)
+        widgets.append(self.scoring_mode_toggle)
 
         metcalf_info_div = Div(name='metcalf_info', sizing_mode='scale_width', text='Tables contain objects with Metcalf score > {:.1f}'.format(self.nh.nplinker._loader.webapp_scoring_cutoff()))
         self.metcalf_info = wrap_popover(metcalf_info_div, create_popover(*TOOLTIP_TABLES_FILTERING), 'metcalf_info')
