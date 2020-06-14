@@ -130,7 +130,7 @@ class LinkCollection(object):
         # set to False, it will return a list consisting of the sorted links for
         # the given method, with any remaining links appended in arbitrary order.
 
-        # run <method>.sort on the links foudn by that method
+        # run <method>.sort on the links found by that method
         sorted_links_for_method = method.sort([link for link in self._link_data[source].values() if method in link.methods], reverse)
 
         if not strict:
@@ -281,6 +281,9 @@ class RosettaScoring(ScoringMethod):
     def __init__(self, npl):
         super(RosettaScoring, self).__init__(npl)
         self.bgc_to_gcf = True
+        
+        self.spec_score_cutoff = 0.0
+        self.bgc_score_cutoff = 0.0
 
     @staticmethod
     def setup(npl):
@@ -288,6 +291,12 @@ class RosettaScoring(ScoringMethod):
         RosettaScoring.ROSETTA_OBJ = Rosetta(npl.data_dir, npl.root_dir, npl.dataset_id, ignore_genomic_cache=False)
         RosettaScoring.ROSETTA_OBJ.run(npl.spectra, npl.bgcs)
         logger.info('RosettaScoring setup completed')
+
+    def _include_hit(self, hit):
+        if hit.spec_match_score < self.spec_score_cutoff or hit.bgc_match_score < self.bgc_score_cutoff:
+            return False
+
+        return True
 
     def get_links(self, objects, link_collection):
         # enforce constraint that the list must contain a set of identically typed objects
@@ -298,8 +307,8 @@ class RosettaScoring(ScoringMethod):
         if isinstance(objects[0], MolecularFamily) or isinstance(objects[0], GCF):
             raise Exception('RosettaScoring requires input type Spectrum or BGC')
 
-        # list of RosettaHit objects
-        ro_hits = RosettaScoring.ROSETTA_OBJ._rosetta_hits
+        # list of RosettaHit objects which satisfy the current cutoffs
+        ro_hits = list(filter(lambda hit: self._include_hit(hit), RosettaScoring.ROSETTA_OBJ._rosetta_hits))
 
         # TODO this might need to be faster
         results = {}
