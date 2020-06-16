@@ -110,11 +110,7 @@ class LinkCollection(object):
         to_remove = []
         sources_list = self._link_data.keys() if sources is None else sources
         for source in sources_list:
-            print('before {} => {}'.format(source, self._link_data[source]))
-            for k in self._link_data[source].keys():
-                print(k, ' ====> ', callable_obj(k), id(k))
             self._link_data[source] = {k: v for k, v in self._link_data[source].items() if callable_obj(k)}
-            print('after {} => {}'.format(source, self._link_data[source]))
             # if there are now no links for this source, remove it completely
             if len(self._link_data[source]) == 0:
                 to_remove.append(source)
