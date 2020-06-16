@@ -32,8 +32,14 @@ class BGC(object):
         return str(self)
 
     def __str__(self):
-        return self.__class__.__name__ + "(name=" + self.name + ", strain=" + str(self.strain) + ")"
-    
+        return '{}(id={}, name={}, strain={})'.format(self.__class__.__name__, self.id, self.name, self.strain)
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __hash__(self):
+        return self.id
+
     @property
     def is_mibig(self):
         return self.name.startswith('BGC')
@@ -62,6 +68,18 @@ class BGC(object):
                     self._aa_predictions[p[0]] = p[1]
         return [self._aa_predictions]
 
+class MiBIGBGC(BGC):
+
+    def __init__(self, id, strain, name, product_prediction):
+        super(MiBIGBGC, self).__init__(id, strain, name, None, product_prediction)
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __hash__(self):
+        return self.id
+
+
 class GCF(object):
     def __init__(self, id, gcf_id, product_type):
         self.id = id
@@ -80,6 +98,12 @@ class GCF(object):
 
     def __repr__(self):
         return str(self)
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __hash__(self):
+        return self.id
 
     def add_bgc(self, bgc):
         self.bgcs.add(bgc)
@@ -130,11 +154,6 @@ class GCF(object):
             self._aa_predictions = bgc_aa_prob
 
         return self._aa_predictions
-
-class MiBIGBGC(BGC):
-
-    def __init__(self, id, strain, name, product_prediction):
-        super(MiBIGBGC, self).__init__(id, strain, name, None, product_prediction)
 
 def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, network_file_dict, mibig_bgc_dict, antismash_dir, antismash_filenames, antismash_format='default'):
     gcf_dict = {}
@@ -304,6 +323,7 @@ def filter_mibig_bgcs(bgcs, gcfs, strains):
             for bgc in gcf.bgcs:
                 to_remove_bgcs.add(bgc)
                 strains.remove(bgc.strain)
+                bgc.parent = None
 
     for bgc in bgcs:
         if bgc.parent is None:
@@ -317,7 +337,6 @@ def filter_mibig_bgcs(bgcs, gcfs, strains):
     new_bgc_list = [bgc for bgc in bgcs if bgc not in to_remove_bgcs and bgc.parent is not None]
 
     # keep internal IDs consecutive 
-    # TODO does this actually break anything if not done?
     for i in range(len(new_bgc_list)):
         new_bgc_list[i].id = i
         if new_bgc_list[i].parent is None:

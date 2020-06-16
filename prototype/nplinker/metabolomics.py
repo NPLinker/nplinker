@@ -120,6 +120,12 @@ class Spectrum(object):
     def __repr__(self):
         return str(self)
 
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __hash__(self):
+        return self.id
+
     def __cmp__(self, other):
         if self.parent_mz >= other.parent_mz:
             return 1
@@ -230,6 +236,12 @@ class MolecularFamily(object):
 
     def __str__(self):
         return 'MolFam(family_id={}, spectra={})'.format(self.family_id, len(self.spectra))
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __hash__(self):
+        return self.id
 
 class SingletonFamily(MolecularFamily):
     def __init__(self):
