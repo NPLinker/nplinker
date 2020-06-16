@@ -51,6 +51,13 @@
             var hidenotmatching = $(table_id + " tr:not(:contains('" + search_term + "'))").hide(); 
         }
 
+        function onChangeRosettaTable(table_id, search_text) {
+            var search_term = $(search_text).val();
+            var table = $(table_id);
+            var showall = $(table_id + " tr").show();
+            var hidenotmatching = $(table_id + " tr:not(:contains('" + search_term + "'))").hide(); 
+        }
+
         // this is a hacky workaround from https://stackoverflow.com/questions/42794556/how-to-check-if-my-bokeh-server-application-is-completely-loaded-and-rendered
         // doesn't seem to be anything better provided by bokeh yet...
         old_log = console.log;
@@ -102,6 +109,7 @@
             <div class="modal-body">
                 {{ embed(roots.rosetta_spec_cutoff) }}
                 {{ embed(roots.rosetta_bgc_cutoff) }}
+                {{ embed(roots.rosetta_dl_button) }}
             </div>
             <div class="modal-footer">
             </div>
