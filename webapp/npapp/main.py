@@ -788,9 +788,8 @@ class NPLinkerBokeh(object):
 
             all_gcfs.update(link_data.keys())
 
-
-            body = 'Spectrum information'
-            body += self.generate_spec_info(spec, link=link_data)
+            body = ''
+            body += self.generate_spec_info(spec)
             
             # set up the chemdoodle plot so it appears when the entry is expanded 
             btn_id = 'spec_btn_{}'.format(pgindex)
@@ -1885,6 +1884,28 @@ class NPLinkerBokeh(object):
         self.rosetta_bgc_cutoff.on_change('value', self.rosetta_bgc_cutoff_callback)
         widgets.append(self.rosetta_spec_cutoff)
         widgets.append(self.rosetta_bgc_cutoff)
+
+        self.rosetta_dl_button = Button(label='Download all Rosetta hits for this dataset as a CSV file', name='rosetta_dl_button')
+        rosetta_download_code = """
+            const blob = new Blob([filetext], { type: 'text/csv;charset=utf-8;' })
+            const filename = 'rosetta_hits.csv';
+
+            //addresses IE
+            if (navigator.msSaveBlob) {
+                navigator.msSaveBlob(blob, filename)
+            } else {
+                const link = document.createElement('a')
+                link.href = URL.createObjectURL(blob)
+                link.download = filename
+                link.target = '_blank'
+                link.style.visibility = 'hidden'
+                link.dispatchEvent(new MouseEvent('click'))
+            }
+        """
+        with open(os.path.join(self.nh.nplinker.root_dir, 'rosetta', 'rosetta_hits.csv'), 'r') as f:
+            rosetta_csv_text = f.read()
+        self.rosetta_dl_button.callback = CustomJS(args=dict(filetext=rosetta_csv_text), code=rosetta_download_code)
+        widgets.append(self.rosetta_dl_button)
 
         # and/or mode selection
         self.scoring_mode_toggle = RadioButtonGroup(labels=['Show results from all methods (AND mode)', 'Show results from any method (OR mode)'], active=0, name='scoring_mode_toggle', sizing_mode='scale_width')
