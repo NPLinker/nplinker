@@ -325,9 +325,14 @@ class RosettaScoring(ScoringMethod):
         if not all(isinstance(x, type(objects[0])) for x in objects):
             raise Exception('RosettaScoring: uniformly-typed list of objects is required')
 
-        # must be BGC or Spectrum 
-        if isinstance(objects[0], MolecularFamily) or isinstance(objects[0], GCF):
-            raise Exception('RosettaScoring requires input type Spectrum or BGC')
+        if isinstance(objects[0], MolecularFamily):
+            raise Exception('RosettaScoring requires input type Spectrum (found MolecularFamily)')
+
+        if isinstance(objects[0], GCF):
+            # assume user wants to use all BGCs from these GCFs
+            bgcs = list(set(itertools.chain.from_iterable(x.bgcs for x in objects)))
+            logger.info('RosettaScoring got {} GCFs input, converted to {} BGCs'.format(len(objects), len(bgcs)))
+            objects = bgcs
 
         # list of RosettaHit objects which satisfy the current cutoffs
         ro_hits = list(filter(lambda hit: self._include_hit(hit), RosettaScoring.ROSETTA_OBJ._rosetta_hits))
