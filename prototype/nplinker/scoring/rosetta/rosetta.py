@@ -35,21 +35,22 @@ class RosettaHit(object):
 
 class Rosetta(object):
 
-    def __init__(self, data_path, root_path, dataset_id, ignore_genomic_cache = False):
+    def __init__(self, nplinker, ignore_genomic_cache = False):
+        self._nplinker = nplinker
         self._mgf_data = {}
         self._csv_data = {}
-        self._mgf_path = os.path.join(data_path, 'matched_mibig_gnps_update.mgf')
-        self._csv_path = os.path.join(data_path, 'matched_mibig_gnps_update.csv')
-        self._data_path = data_path
-        self._root_path = root_path
-        self._dataset_id = dataset_id
+        self._mgf_path = os.path.join(nplinker.data_dir, 'matched_mibig_gnps_update.mgf')
+        self._csv_path = os.path.join(nplinker.data_dir, 'matched_mibig_gnps_update.csv')
+        self._data_path = nplinker.data_dir
+        self._root_path = nplinker.root_dir
+        self._dataset_id = nplinker.dataset_id
         self._ignore_genomic_cache = ignore_genomic_cache
-        self._pickle_dir = os.path.join(root_path, 'rosetta')
+        self._pickle_dir = os.path.join(nplinker.root_dir, 'rosetta')
         if not os.path.exists(self._pickle_dir):
             os.makedirs(self._pickle_dir, exist_ok=True)
-        self._speclib_pickle_path = os.path.join(self._pickle_dir, dataset_id + '_SpecLib.pckl')
-        self._bgchits_pickle_path = os.path.join(self._pickle_dir, dataset_id + '_bgc_hits.pckl')
-        self._rhits_pickle_path = os.path.join(self._pickle_dir, dataset_id + '_RosettaHits.pckl')
+        self._speclib_pickle_path = os.path.join(self._pickle_dir, 'SpecLib.pckl')
+        self._bgchits_pickle_path = os.path.join(self._pickle_dir, 'bgc_hits.pckl')
+        self._rhits_pickle_path = os.path.join(self._pickle_dir, 'RosettaHits.pckl')
 
         if not os.path.exists(self._mgf_path):
             logger.warning('Failed to load Rosetta data ({}), matching disabled'.format(self._mgf_path))
@@ -186,7 +187,7 @@ class Rosetta(object):
         if len(self._rosetta_hits) > 0:
             return self._rosetta_hits
 
-        cached_rosetta_hits = load_pickled_data(self._rhits_pickle_path)
+        cached_rosetta_hits = load_pickled_data(self._nplinker, self._rhits_pickle_path)
         if cached_rosetta_hits is not None:
             logger.info('Loaded cached Rosetta hits for dataset {} at {}'.format(self._dataset_id, self._rhits_pickle_path))
             self._rosetta_hits = cached_rosetta_hits
@@ -194,7 +195,7 @@ class Rosetta(object):
             return self._rosetta_hits
 
         # check if we have a pickled SpecLib object first...
-        cached_speclib = load_pickled_data(self._speclib_pickle_path)
+        cached_speclib = load_pickled_data(self._nplinker, self._speclib_pickle_path)
         if cached_speclib is not None:
             logger.info('Found pickled SpecLib for dataset {} at {}!'.format(self._dataset_id, self._speclib_pickle_path))
             self.speclib = cached_speclib
@@ -210,7 +211,7 @@ class Rosetta(object):
             self._load_csv(self._csv_path)
 
         # collect bgc hits
-        cached_bgc_hits = load_pickled_data(self._bgchits_pickle_path)
+        cached_bgc_hits = load_pickled_data(self._nplinker, self._bgchits_pickle_path)
         if cached_bgc_hits is not None and not self._ignore_genomic_cache:
             logger.info('Found pickled bgc_hits for dataset {}!'.format(self._dataset_id))
             self._bgc_hits, self._mibig2bgc = cached_bgc_hits
