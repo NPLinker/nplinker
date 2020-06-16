@@ -1,4 +1,5 @@
 import os
+import itertools
 
 import pandas as pd
 
@@ -39,7 +40,7 @@ class TableData(object):
         # all the data structs below
         current_cutoff_val = self.nh.nplinker._loader.webapp_scoring_cutoff()
         # this will be None if the file doesn't exist or can't be loaded
-        last_cutoff_val = load_pickled_data(last_cutoff_path)
+        last_cutoff_val = load_pickled_data(self.nh.nplinker, last_cutoff_path)
 
         if last_cutoff_val != current_cutoff_val:
             print('*** Metcalf cutoff for tables has been changed (old={}, new={}), will regenerate data structs'.format(last_cutoff_val, current_cutoff_val))
@@ -48,21 +49,22 @@ class TableData(object):
                     os.unlink(path)
         save_pickled_data(current_cutoff_val, last_cutoff_path)
 
-        spec_links = load_pickled_data(pickled_scores_path)
-        if spec_links is None:
+        spec_links_data = load_pickled_data(self.nh.nplinker, pickled_scores_path)
+        if spec_links_data is None:
             # get the metcalf scoring links between spectra:gcf and gcf:spectra pairs
             metcalf_scoring = self.nh.nplinker.scoring_method('metcalf')
             metcalf_scoring.cutoff = self.nh.nplinker._loader.webapp_scoring_cutoff()
             print('Metcalf tables cutoff is {}'.format(metcalf_scoring.cutoff))
             spec_links = self.nh.nplinker.get_links(self.nh.nplinker.spectra, metcalf_scoring)
-            save_pickled_data(spec_links, pickled_scores_path)
+            spec_links_data = spec_links.links
+            save_pickled_data(spec_links_data, pickled_scores_path)
 
-        spectra = list(spec_links.links.keys())
-        gcfs = spec_links.get_all_targets()
+        spectra = list(spec_links_data.keys())
+        gcfs = list(set(itertools.chain.from_iterable(spec_links_data[x].keys() for x in spec_links_data.keys())))
         bgcs = []
         molfams = []
 
-        print('len(spec_links) = {}, gcfs={}'.format(len(spec_links), len(gcfs)))
+        print('len(spec_links_data_ = {}, gcfs={}'.format(len(spec_links_data), len(gcfs)))
 
         _spec_indices, _gcf_indices, _bgc_indices, _molfam_indices = {NA_ID: 0}, {NA_ID: 0}, {NA_ID: 0}, {NA_ID: 0}
 
@@ -122,7 +124,7 @@ class TableData(object):
 
         # create links between GCF and BGC objects (or load pickled version)
         # note the +1s are because the tables code uses 0 for NA
-        pickled_links_data = load_pickled_data(pickled_links_path)
+        pickled_links_data = load_pickled_data(self.nh.nplinker, pickled_links_path)
         if pickled_links_data is None:
             index_mappings_1, index_mappings_2 = {}, {}
 
@@ -163,7 +165,7 @@ class TableData(object):
             spec_to_bgc_indices = []
             tmp = set()
             tmpbgcs = {}
-            for spec, result in spec_links.links.items():
+            for spec, result in spec_links_data.items():
                 for gcf, data in result.items():
                     #print('spec {} <==> gcf {}'.format(spectrum.id, gcf.id))
                     for bgc in gcf.bgcs:
