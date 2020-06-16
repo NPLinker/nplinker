@@ -11,13 +11,14 @@ from .genomics import GCF, BGC
 from .config import Config, Args
 from .loader import DatasetLoader
 
+from .pickler import save_pickled_data
+
 from .scoring.methods import MetcalfScoring, RosettaScoring, TestScoring
 from .scoring.methods import LinkCollection
 
 from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
-from .pickler import save_pickled_data
 
 class NPLinker(object):
 
@@ -340,6 +341,9 @@ class NPLinker(object):
             self._datalinks = self.scoring_method(MetcalfScoring.NAME).datalinks
             logger.debug('Created internal datalinks object')
 
+        if len(link_collection) == 0:
+            logger.debug('No links found or remaining after merging all method results!')
+
         # populate shared strain info
         logger.debug('Calculating shared strain information...')
         # TODO more efficient version?
@@ -364,6 +368,8 @@ class NPLinker(object):
                             link.shared_strains = shared_strains[(source, target)]
 
         logger.debug('Finished calculating shared strain information')
+
+        logger.debug('Final size of link collection is {}'.format(len(link_collection)))
         return link_collection
 
     def get_common_strains(self, objects_a, objects_b, filter_no_shared=True):
