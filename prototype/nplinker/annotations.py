@@ -17,7 +17,7 @@ def headers_match_gnps(headers):
 
 # url_type: spectrum, png, svg, json
 def gnps_url(id, url_type='spectrum'):
-    return GNPS_URL_FORMAT.format('png', id)
+    return GNPS_URL_FORMAT.format(url_type, id)
 
 def create_gnps_annotation(spec, gnps_anno):
     # also insert useful URLs
