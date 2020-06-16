@@ -672,7 +672,7 @@ class NPLinkerBokeh(object):
             if spec.has_annotations():
                 spec_title += ', # annotations={}'.format(len(spec.annotations))
 
-            spec_body = self.generate_spec_info(spec, link.shared_strains)
+            spec_body = self.generate_spec_info(spec, link)
 
             # set up the chemdoodle plot so it appears when the entry is expanded 
             spec_btn_id = 'spec_btn_{}_{}'.format(pgindex, j)
@@ -716,7 +716,7 @@ class NPLinkerBokeh(object):
             gcf_hdr_id = 'gcf_result_header_{}_{}'.format(pgindex, j)
             gcf_body_id = 'gcf_body_{}_{}'.format(pgindex, j)
             gcf_title = 'GCF(id={}), scores <strong>{}</strong>, shared strains=<strong>{}</strong>'.format(gcf.gcf_id, score, len(link.shared_strains))
-            gcf_body = self.generate_gcf_info(gcf, link.shared_strains)
+            gcf_body = self.generate_gcf_info(gcf, link=link)
             span_badges = '&nbsp|&nbsp;'.join(['<span class="badge badge-info">{}</span>'.format(m.name) for m in link.methods])
             body += TMPL.format(hdr_id=gcf_hdr_id, hdr_color='ffe0b5', btn_target=gcf_body_id, btn_text=gcf_title, span_badges=span_badges,
                                 body_id=gcf_body_id, body_parent='accordion_spec_{}'.format(pgindex), body_body=gcf_body)
@@ -790,7 +790,7 @@ class NPLinkerBokeh(object):
 
 
             body = 'Spectrum information'
-            body += self.generate_spec_info(spec)
+            body += self.generate_spec_info(spec, link=link_data)
             
             # set up the chemdoodle plot so it appears when the entry is expanded 
             btn_id = 'spec_btn_{}'.format(pgindex)
@@ -1238,10 +1238,20 @@ class NPLinkerBokeh(object):
         bgc_body += '</ul>'
         return bgc_body
 
-    def generate_gcf_info(self, gcf, shared_strains=None):
+    def generate_gcf_info(self, gcf, link=None):
+        shared_strains = []
+        rosetta_obj = None
+        if link is not None:
+            shared_strains = link.shared_strains
+            tmp = list(filter(lambda m: m.name == 'rosetta', link.methods))
+            if len(tmp) > 0:
+                rosetta_obj = tmp[0]
+
         gcf_body = '<ul class="nav nav-tabs" id="gcf_{}_tabs" role="tablist">'.format(gcf.id)
         gcf_body += '<li class="nav-item"><a class="nav-link active" id="gcf_{}_main_tab" data-toggle="tab" href="#gcf_{}_main" role="tab">Main</a></li>'.format(gcf.id, gcf.id)
         gcf_body += '<li class="nav-item"><a class="nav-link" id="gcf_{}_bgcs_tab" data-toggle="tab" href="#gcf_{}_bgcs" role="tab">BGCs</a></li>'.format(gcf.id, gcf.id)
+        if rosetta_obj is not None:
+            gcf_body += '<li class="nav-item"><a class="nav-link" id="gcf_{}_rosetta_tab" data-toggle="tab" href="#gcf_{}_rosetta" role="tab">Rosetta hits</a></li>'.format(gcf.id, gcf.id)
         gcf_body += '</ul><div class="tab-content" id="gcf_{}_tab_content">'.format(gcf.id)
 
         # start of main tab content
@@ -1273,7 +1283,7 @@ class NPLinkerBokeh(object):
         gcf_body += '</ul>'
         gcf_body += '</div>'
 
-        # second tab content
+        # BGC tab content
         fields = ['name', 'strain', 'description', 'bigscape_class', 'product_prediction']
         gcf_body += '<div class="tab-pane" id="gcf_{}_bgcs" role="tabpanel">'.format(gcf.id)
         gcf_body += 'Type to filter: <input type="text" onkeyup="onChangeBGCTable(\'#gcf_{}_bgc_table\', \'#gcf_{}_bgc_search\')" id="gcf_{}_bgc_search">'.format(gcf.id, gcf.id, gcf.id)
@@ -1283,12 +1293,48 @@ class NPLinkerBokeh(object):
         for bgc in gcf.bgcs:
             gcf_body += '<tr><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td></tr>'.format(*list(getattr(bgc, x) for x in fields))
         gcf_body += '</tbody></table>'
-        gcf_body += '</div></div>'
+        gcf_body += '</div>'
+
+        # rosetta tab content, if available
+        if rosetta_obj is not None:
+            rosetta_fields = ['BGC name', 'BGC strain', 'MiBIG ID', 'BGC score', 'Spectrum ID', 'GNPS ID', 'Spectrum score']
+            gcf_body += '<div class="tab-pane" id="gcf_{}_rosetta" role="tabpanel">'.format(gcf.id)
+            gcf_body += 'Type to filter: <input type="text" onkeyup="onChangeRosettaTable(\'#gcf_{}_rosetta_table\', \'#gcf_{}_rosetta_search\')" id="gcf_{}_rosetta_search">'.format(gcf.id, gcf.id, gcf.id)
+            gcf_body += '<table class="table table-responsive table-striped" id="gcf_{}_rosetta_table"><thead><tr>'.format(gcf.id)
+            gcf_body += ''.join('<th scope="col">{}</th>'.format(x) for x in rosetta_fields)
+            gcf_body += '</thead><tbody>'
+            for hit in link.data(rosetta_obj):
+                bgc_url = '<a href="https://mibig.secondarymetabolites.org/repository/{}">{}</a>'.format(hit.mibig_id, hit.mibig_id)
+                gcf_body += '<tr><td>{}</td><td>{}</td><td>{}</td><td>{:.3f}</td>'.format(hit.bgc.name, hit.bgc.strain, bgc_url, hit.bgc_match_score)
+                spec_url = '<a href="{}">{}</a>'.format(gnps_url(hit.gnps_id, 'spectrum'), hit.gnps_id)
+                gcf_body += '<td>{}</td><td>{}</td><td>{:.3f}</td></tr>'.format(hit.spec.spectrum_id, spec_url, hit.spec_match_score)
+            gcf_body += '</tbody></table>'
+            gcf_body += '</div>'
+
+        gcf_body += '</div>'
 
         return gcf_body
 
-    def generate_spec_info(self, spec, shared_strains=None):
-        spec_body = '<ul>'
+    def generate_spec_info(self, spec, link=None):
+        shared_strains = []
+        rosetta_obj = None
+        if link is not None:
+            shared_strains = link.shared_strains
+            tmp = list(filter(lambda m: m.name == 'rosetta', link.methods))
+            if len(tmp) > 0:
+                rosetta_obj = tmp[0]
+
+        spec_body = '<ul class="nav nav-tabs" id="spec_{}_tabs" role="tablist">'.format(spec.id)
+        spec_body += '<li class="nav-item"><a class="nav-link active" id="spec_{}_main_tab" data-toggle="tab" href="#spec_{}_main" role="tab">Main</a></li>'.format(spec.id, spec.id)
+        if len(spec.annotations) > 0:
+            spec_body += '<li class="nav-item"><a class="nav-link" id="spec_{}_anno_tab" data-toggle="tab" href="#spec_{}_anno" role="tab">Annotations</a></li>'.format(spec.id, spec.id)
+        if rosetta_obj is not None:
+            spec_body += '<li class="nav-item"><a class="nav-link" id="spec_{}_rosetta_tab" data-toggle="tab" href="#spec_{}_rosetta" role="tab">Rosetta hits</a></li>'.format(spec.id, spec.id)
+        spec_body += '</ul><div class="tab-content" id="spec_{}_tab_content">'.format(spec.id)
+
+        # main tab content
+        spec_body += '<div class="tab-pane show active" id="spec_{}_main" role="tabpanel">'.format(spec.id)
+        spec_body += '<ul>'
         for attr in ['id', 'spectrum_id', 'family', 'rt', 'total_ms2_intensity', 'max_ms2_intensity', 'n_peaks', 'precursor_mz', 'parent_mz']:
             spec_body += '<li><strong>{}</strong>: {}</li>'.format(attr, getattr(spec, attr))
 
@@ -1297,12 +1343,12 @@ class NPLinkerBokeh(object):
             spec_body += '<li><strong>SampleType</strong>: {}</li>'.format(', '.join(spec.metadata['ATTRIBUTE_SampleType']))
 
         # add strain information (possibly empty)
-        if shared_strains is not None and len(shared_strains) > 0:
-            spec_body += '<li><strong>strains (total={}, shared={})</strong>: '.format(len(spec.strain_list), len(shared_strains))
+        if link is not None and len(link.shared_strains) > 0:
+            spec_body += '<li><strong>strains (total={}, shared={})</strong>: '.format(len(spec.strain_list), len(link.shared_strains))
 
-            non_shared = [s for s in spec.strain_list if s not in shared_strains]
+            non_shared = [s for s in spec.strain_list if s not in link.shared_strains]
 
-            for s in shared_strains:
+            for s in link.shared_strains:
                 spec_body += '<span style="background-color: #AAFFAA">{} ({})</span>, '.format(s.id, spec.get_growth_medium(s))
             for s in non_shared:
                 spec_body += '<span style="background-color: #DDDDDD">{} ({})</span>, '.format(s.id, spec.get_growth_medium(s))
@@ -1315,12 +1361,14 @@ class NPLinkerBokeh(object):
                 spec_body += '<span>{} ({})</span>, '.format(s.id, spec.get_growth_medium(s))
 
             spec_body += '</li>'
-        spec_body += '</ul>'
+        spec_body += '</ul></div>'
 
+        # annotations tab
         if len(spec.annotations) > 0:
+            spec_body += '<div class="tab-pane" id="spec_{}_anno" role="tabpanel">'.format(spec.id)
+
             # keys of spec.annotations indicate the source file: "gnps" or an actual filename
             for anno_src, anno_list in spec.annotations.items():
-                spec_body += '<hr width="80%"/>'
                 spec_body += '<strong>{} annotations:</strong><ul>'.format(anno_src)
                 for item in anno_list:
                     spec_body += '<ul>'
@@ -1334,6 +1382,27 @@ class NPLinkerBokeh(object):
                     spec_body += '<li>' + ', '.join(content) + '</li>'
                     spec_body += '</ul>'
                 spec_body += '</ul>'
+                spec_body += '<hr width="80%"/>'
+
+            spec_body += '</div>'
+
+        # rosetta tab content, if available
+        if rosetta_obj is not None:
+            rosetta_fields = ['BGC name', 'BGC strain', 'MiBIG ID', 'BGC score', 'Spectrum ID', 'GNPS ID', 'Spectrum score']
+            spec_body += '<div class="tab-pane" id="spec_{}_rosetta" role="tabpanel">'.format(spec.id)
+            spec_body += 'Type to filter: <input type="text" onkeyup="onChangeRosettaTable(\'#spec_{}_rosetta_table\', \'#spec_{}_rosetta_search\')" id="spec_{}_rosetta_search">'.format(spec.id, spec.id, spec.id)
+            spec_body += '<table class="table table-responsive table-striped" id="spec_{}_rosetta_table"><thead><tr>'.format(spec.id)
+            spec_body += ''.join('<th scope="col">{}</th>'.format(x) for x in rosetta_fields)
+            spec_body += '</thead><tbody>'
+            for hit in link.data(rosetta_obj):
+                bgc_url = '<a href="https://mibig.secondarymetabolites.org/repository/{}">{}</a>'.format(hit.mibig_id, hit.mibig_id)
+                spec_body += '<tr><td>{}</td><td>{}</td><td>{}</td><td>{:.3f}</td>'.format(hit.bgc.name, hit.bgc.strain, bgc_url, hit.bgc_match_score)
+                spec_url = '<a href="{}">{}</a>'.format(gnps_url(hit.gnps_id, 'spectrum'), hit.gnps_id)
+                spec_body += '<td>{}</td><td>{}</td><td>{:.3f}</td></tr>'.format(hit.spec.spectrum_id, spec_url, hit.spec_match_score)
+            spec_body += '</tbody></table>'
+            spec_body += '</div>'
+
+        spec_body += '</div>'
         return spec_body
 
     def generate_molfam_info(self, molfam, shared_strains=[]):
