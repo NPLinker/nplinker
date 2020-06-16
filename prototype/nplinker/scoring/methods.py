@@ -12,6 +12,8 @@ from ..scoring.rosetta.rosetta import Rosetta
 from ..logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
+# TODO update/expand comments in this file!
+
 class LinkCollection(object):
     """
     Class which stores the results of running one or more scoring methods. 
@@ -30,7 +32,6 @@ class LinkCollection(object):
         self._and_mode = and_mode
 
     def _add_links_from_method(self, method, object_links):
-        # object_links is a dict of <source: [ObjectLinks]>
         if method in self._methods:
             # this is probably an error...
             raise Exception('Duplicate method found in LinkCollection: {}'.format(method.name))
@@ -45,8 +46,10 @@ class LinkCollection(object):
             # only results that appear in both sets
             
             if not self._and_mode:
+                logger.debug('Merging {} results from method {} in OR mode'.format(len(object_links), method.name))
                 self._merge_or_mode(object_links)
             else:
+                logger.debug('Merging {} results from method {} in AND mode'.format(len(object_links), method.name))
                 self._merge_and_mode(object_links)
 
         self._methods.add(method)
@@ -58,27 +61,36 @@ class LinkCollection(object):
         # iterate over the existing set of link info, remove entries for objects
         # that aren't common to both that and the new set of info, and merge in
         # any common links
-        to_remove = []
+        to_remove = set()
         for source, existing_links in self._link_data.items():
             if source not in intersect1:
-                to_remove.append(source)
+                to_remove.add(source)
                 continue
 
             links_to_merge = object_links[source]
             intersect2 = existing_links.keys() & links_to_merge.keys()
+
             self._link_data[source] = {k: v for k, v in existing_links.items() if k in intersect2}
 
             for target, object_link in object_links[source].items():
-                self._link_data[source][target]._merge(object_link)
+                if target in self._link_data[source]:
+                    self._link_data[source][target]._merge(object_link)
+
+            if len(self._link_data[source]) == 0:
+                to_remove.add(source)
 
         for source in to_remove:
             del self._link_data[source]
 
     def _merge_or_mode(self, object_links):
+        # source = GCF/Spectrum, links = {Spectrum/GCF: ObjectLink} dict
         for source, links in object_links.items():
 
             # update the existing dict with the new entries that don't appear in it already
-            self._link_data[source].update({k: v for k, v in links.items() if k not in self._link_data[source]})
+            if source not in self._link_data:
+                self._link_data[source] = links
+            else:
+                self._link_data[source].update({k: v for k, v in links.items() if k not in self._link_data[source]})
 
             # now merge the remainder (common to both)
             for target, object_link in links.items():
@@ -98,7 +110,11 @@ class LinkCollection(object):
         to_remove = []
         sources_list = self._link_data.keys() if sources is None else sources
         for source in sources_list:
+            print('before {} => {}'.format(source, self._link_data[source]))
+            for k in self._link_data[source].keys():
+                print(k, ' ====> ', callable_obj(k), id(k))
             self._link_data[source] = {k: v for k, v in self._link_data[source].items() if callable_obj(k)}
+            print('after {} => {}'.format(source, self._link_data[source]))
             # if there are now no links for this source, remove it completely
             if len(self._link_data[source]) == 0:
                 to_remove.append(source)
@@ -170,10 +186,17 @@ class ObjectLink(object):
     """
     Class which stores information about a single link between two objects.
 
+    There will be at most one instance of an ObjectLink for a given pair of 
+    objects (source, target) after running 1 or more scoring methods. Some 
+    methods, e.g. Metcalf, will always produce a single output per link. 
+    However other methods like Rosetta may find multiple "hits" for a given
+    pair. In either case the data for a given method is associated with the 
+    ObjectLink so it can be retrieved afterwards.
+
     The information stored is basically:
-     - the "source" of the link (the original object provided as part of the input)
-     - the "target" of the link (the linked object)
-     - a possibly empty list of Strain objects shared between source and target
+     - the "source" of the link (original object provided as part of the input)
+     - the "target" of the link (linked object, as determined by the method(s) used)
+     - a (possibly empty) list of Strain objects shared between source and target
      - the output of the scoring method(s) used for this link (e.g. a metcalf score)
     """
     def __init__(self, source, target, method, data=None, shared_strains=[]):
@@ -186,13 +209,16 @@ class ObjectLink(object):
         self._method_data.update(other_link._method_data)
         return self
 
+    def set_data(self, method, newdata):
+        self._method_data[method] = newdata
+
     @property
     def method_count(self):
         return len(self._method_data)
 
     @property
     def methods(self):
-        return self._method_data.keys()
+        return list(self._method_data.keys())
 
     def data(self, method):
         return self._method_data[method]
@@ -288,7 +314,7 @@ class RosettaScoring(ScoringMethod):
     @staticmethod
     def setup(npl):
         logger.info('RosettaScoring setup')
-        RosettaScoring.ROSETTA_OBJ = Rosetta(npl.data_dir, npl.root_dir, npl.dataset_id, ignore_genomic_cache=False)
+        RosettaScoring.ROSETTA_OBJ = Rosetta(npl, ignore_genomic_cache=False)
         RosettaScoring.ROSETTA_OBJ.run(npl.spectra, npl.bgcs)
         logger.info('RosettaScoring setup completed')
 
@@ -316,29 +342,42 @@ class RosettaScoring(ScoringMethod):
             for bgc in objects:
                 for hit in ro_hits:
                     if bgc.id == hit.bgc.id:
-                        if bgc not in results:
-                            results[bgc] = {}
-
                         src = bgc if not self.bgc_to_gcf else bgc.parent
-                        results[src][hit.spec] = ObjectLink(src, hit.spec, self, data=hit)
+                        if src not in results:
+                            results[src] = {}
+
+                        # Rosetta can produce multiple "hits" per link, need to 
+                        # ensure the ObjectLink contains all the RosettaHit objects
+                        # in these cases
+                        if hit.spec in results[src]:
+                            original_data = results[src][hit.spec].data(self)
+                            results[src][hit.spec].set_data(self, original_data + [hit])
+                        else:
+                            results[src][hit.spec] = ObjectLink(src, hit.spec, self, data=[hit])
         else: # Spectrum
             for spec in objects:
                 for hit in ro_hits:
                     if spec.id == hit.spec.id:
+                        target = hit.bgc if not self.bgc_to_gcf else hit.bgc.parent
                         if spec not in results:
                             results[spec] = {}
+                        # Rosetta can produce multiple "hits" per link, need to 
+                        # ensure the ObjectLink contains all the RosettaHit objects
+                        # in these cases
+                        if target in results[spec]:
+                            original_data = results[spec][target].data(self)
+                            results[spec][target].set_data(self, original_data + [hit])
+                        else:
+                            results[spec][target] = ObjectLink(spec, target, self, data=[hit])
 
-                        target = hit.bgc if not self.bgc_to_gcf else hit.bgc.parent
-                        results[spec][target] = ObjectLink(spec, target, self, data=hit)
 
-
-        logger.debug('RosettaScoring found {} results'.format(len(results)))
         link_collection._add_links_from_method(self, results)
+        logger.debug('RosettaScoring found {} results'.format(len(results)))
         return link_collection
 
     def format_data(self, data):
         # TODO
-        return None
+        return '{} hits'.format(len(data))
 
     def sort(self, objects, reverse=True):
         # TODO
@@ -363,7 +402,7 @@ class MetcalfScoring(ScoringMethod):
 
     @staticmethod
     def setup(npl):
-        logger.info('MetcalfScoring.setup')
+        logger.info('MetcalfScoring.setup (bgcs={}, gcfs={}, spectra={}, molfams={}, strains={}'.format(len(npl.bgcs), len(npl.gcfs), len(npl.spectra), len(npl.molfams), len(npl.strains)))
         MetcalfScoring.DATALINKS = DataLinks()
         MetcalfScoring.DATALINKS.load_data(npl._spectra, npl._gcfs, npl._strains)
         MetcalfScoring.DATALINKS.find_correlations()
@@ -489,7 +528,7 @@ class MetcalfScoring(ScoringMethod):
 
                     # save the scores
                     if gcf not in metcalf_results:
-                        metcalf_results[gcf] = {obj: []}
+                        metcalf_results[gcf] = {}
                     metcalf_results[gcf][obj] = ObjectLink(gcf, obj, self, res[self.R_SCORE, j])
 
         else:
@@ -499,6 +538,9 @@ class MetcalfScoring(ScoringMethod):
             results = results[0]
             if results.shape[1] == 0:
                 logger.debug('Found no links for {} input objects'.format(len(objects)))
+                link_collection._add_links_from_method(self, metcalf_results)
+                # can just bail out here in this case
+                logger.debug('MetcalfScoring: completed')
                 return link_collection
 
             # for each entry in the results (each GCF)
@@ -516,7 +558,7 @@ class MetcalfScoring(ScoringMethod):
 
                 # save the scores
                 if obj not in metcalf_results:
-                    metcalf_results[obj] = {gcf: []}
+                    metcalf_results[obj] = {}
                 metcalf_results[obj][gcf] = ObjectLink(obj, gcf, self, results[self.R_SCORE, j])
 
         logger.debug('MetcalfScoring found {} results'.format(len(metcalf_results)))
