@@ -7,8 +7,7 @@ import bokeh.palettes as bkp
 from bokeh.models import ColumnDataSource
 
 # add path to nplinker/prototype (for local dev)
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../prototype'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../../nplinker/prototype'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../prototype'))
 
 from nplinker.nplinker import NPLinker
 from nplinker.genomics import load_mibig_map, MiBIGBGC
