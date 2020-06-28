@@ -1303,9 +1303,9 @@ class NPLinkerBokeh(object):
             gcf_body += ''.join('<th scope="col">{}</th>'.format(x) for x in rosetta_fields)
             gcf_body += '</thead><tbody>'
             for hit in link.data(rosetta_obj):
-                bgc_url = '<a href="https://mibig.secondarymetabolites.org/repository/{}">{}</a>'.format(hit.mibig_id, hit.mibig_id)
+                bgc_url = '<a href="https://mibig.secondarymetabolites.org/repository/{}" target="_blank">{}</a>'.format(hit.mibig_id, hit.mibig_id)
                 gcf_body += '<tr><td>{}</td><td>{}</td><td>{}</td><td>{:.3f}</td>'.format(hit.bgc.name, hit.bgc.strain, bgc_url, hit.bgc_match_score)
-                spec_url = '<a href="{}">{}</a>'.format(gnps_url(hit.gnps_id, 'spectrum'), hit.gnps_id)
+                spec_url = '<a href="{}" target="_blank">{}</a>'.format(gnps_url(hit.gnps_id, 'spectrum'), hit.gnps_id)
                 gcf_body += '<td>{}</td><td>{}</td><td>{:.3f}</td></tr>'.format(hit.spec.spectrum_id, spec_url, hit.spec_match_score)
             gcf_body += '</tbody></table>'
             gcf_body += '</div>'
@@ -1394,9 +1394,9 @@ class NPLinkerBokeh(object):
             spec_body += ''.join('<th scope="col">{}</th>'.format(x) for x in rosetta_fields)
             spec_body += '</thead><tbody>'
             for hit in link.data(rosetta_obj):
-                bgc_url = '<a href="https://mibig.secondarymetabolites.org/repository/{}">{}</a>'.format(hit.mibig_id, hit.mibig_id)
+                bgc_url = '<a href="https://mibig.secondarymetabolites.org/repository/{}" target="_blank">{}</a>'.format(hit.mibig_id, hit.mibig_id)
                 spec_body += '<tr><td>{}</td><td>{}</td><td>{}</td><td>{:.3f}</td>'.format(hit.bgc.name, hit.bgc.strain, bgc_url, hit.bgc_match_score)
-                spec_url = '<a href="{}">{}</a>'.format(gnps_url(hit.gnps_id, 'spectrum'), hit.gnps_id)
+                spec_url = '<a href="{}" target="_blank">{}</a>'.format(gnps_url(hit.gnps_id, 'spectrum'), hit.gnps_id)
                 spec_body += '<td>{}</td><td>{}</td><td>{:.3f}</td></tr>'.format(hit.spec.spectrum_id, spec_url, hit.spec_match_score)
             spec_body += '</tbody></table>'
             spec_body += '</div>'
