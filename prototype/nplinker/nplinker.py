@@ -1,5 +1,6 @@
 import sys
 import logging
+import copy
 
 import numpy as np
 
@@ -169,6 +170,11 @@ class NPLinker(object):
             # TODO is pickle the best format to use?
             save_pickled_data(self._repro_data, repro_file)
             logger.info('Saving reproducibility data to {}'.format(filename))
+
+    @property
+    def config(self):
+        """Returns a copy of the data parsed from the configuration file as a dict"""
+        return copy.deepcopy(self._config.config)
 
     @property
     def root_dir(self):
