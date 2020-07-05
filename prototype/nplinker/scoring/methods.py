@@ -311,7 +311,21 @@ class RosettaScoring(ScoringMethod):
     def setup(npl):
         logger.info('RosettaScoring setup')
         RosettaScoring.ROSETTA_OBJ = Rosetta(npl, ignore_genomic_cache=False)
-        RosettaScoring.ROSETTA_OBJ.run(npl.spectra, npl.bgcs)
+        ms1_tol = Rosetta.DEF_MS1_TOL
+        ms2_tol = Rosetta.DEF_MS2_TOL
+        score_thresh = Rosetta.DEF_SCORE_THRESH
+        min_match_peaks = Rosetta.DEF_MIN_MATCH_PEAKS
+
+        # allow overridding params via config file
+        config = npl.config
+        if 'scoring' in config and 'rosetta' in config['scoring']:
+            rc = config['scoring']['rosetta']
+            ms1_tol = rc.get('ms1_tol', Rosetta.DEF_MS1_TOL)
+            ms2_tol = rc.get('ms2_tol', Rosetta.DEF_MS2_TOL)
+            score_thresh = rc.get('score_thresh', Rosetta.DEF_SCORE_THRESH)
+            min_match_peaks = rc.get('min_match_peaks', Rosetta.DEF_MIN_MATCH_PEAKS)
+
+        RosettaScoring.ROSETTA_OBJ.run(npl.spectra, npl.bgcs, ms1_tol, ms2_tol, score_thresh, min_match_peaks)
         logger.info('RosettaScoring setup completed')
 
     def _include_hit(self, hit):
