@@ -16,6 +16,7 @@ class Args(object):
         def bool_checker(x):
             return str(x).lower() == 'true'
 
+        # TODO need to finalise these
         self.parser = argparse.ArgumentParser(description='nplinker arguments', epilog='Note: command-line arguments will override '
                                               'arguments from configuration files')
         self.parser.add_argument('-c', '--config', help='Path to a .toml configuration file', metavar='path')
