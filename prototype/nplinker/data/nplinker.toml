@@ -145,8 +145,25 @@ extra_bigscape_parameters = ""
 # The default value is 2.0
 tables_metcalf_threshold = 2.0
 
-# can also override any combination of individual file paths as required (empty
-# paths are ignored)
+# a section for general scoring parameters (currently unused)
+[scoring]
+
+# the "Rosetta" scoring method involves some preprocessing steps that can take
+# significant time. nplinker will automatically run these steps as it loads the
+# dataset and cache the results. if you would like to adjust the parameters used 
+# by the Rosetta method you can do by setting them below (note that changing
+# these values will invalidate any cached data and force the preprocessing steps
+# to be run again)
+# 
+# TODO document what these do
+[scoring.rosetta]
+# ms1_tol = 100
+# ms2_tol = 0.2
+# score_thresh = 0.5
+# min_match_peaks = 1
+
+# when loading, you can also override any combination of individual file paths
+# as required (empty paths are ignored)
 [dataset.overrides]
 # strain ID mapping filename, default is <root>/strain_mapping.csv
 #strain_mappings_file = ""
