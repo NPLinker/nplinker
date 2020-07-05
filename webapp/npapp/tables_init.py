@@ -64,8 +64,6 @@ class TableData(object):
         bgcs = []
         molfams = []
 
-        print('len(spec_links_data_ = {}, gcfs={}'.format(len(spec_links_data), len(gcfs)))
-
         _spec_indices, _gcf_indices, _bgc_indices, _molfam_indices = {NA_ID: 0}, {NA_ID: 0}, {NA_ID: 0}, {NA_ID: 0}
 
         # construct pandas dataframes and bokeh datatables for each object class
