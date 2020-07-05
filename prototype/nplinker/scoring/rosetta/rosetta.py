@@ -35,7 +35,12 @@ class RosettaHit(object):
 
 class Rosetta(object):
 
-    def __init__(self, nplinker, ignore_genomic_cache = False):
+    DEF_MS1_TOL         = 100
+    DEF_MS2_TOL         = 0.2
+    DEF_SCORE_THRESH    = 0.5
+    DEF_MIN_MATCH_PEAKS = 1
+
+    def __init__(self, nplinker, ignore_genomic_cache=False):
         self._nplinker = nplinker
         self._mgf_data = {}
         self._csv_data = {}
@@ -51,6 +56,7 @@ class Rosetta(object):
         self._speclib_pickle_path = os.path.join(self._pickle_dir, 'SpecLib.pckl')
         self._bgchits_pickle_path = os.path.join(self._pickle_dir, 'bgc_hits.pckl')
         self._rhits_pickle_path = os.path.join(self._pickle_dir, 'RosettaHits.pckl')
+        self._params_pickle_path = os.path.join(self._pickle_dir, 'RosettaParams.pckl')
 
         if not os.path.exists(self._mgf_path):
             logger.warning('Failed to load Rosetta data ({}), matching disabled'.format(self._mgf_path))
@@ -63,6 +69,7 @@ class Rosetta(object):
         self._mibig2gnps = None
         self._mibig2bgc = {}
 
+        self.speclib = None
         self._rosetta_hits = []
         self._spec_hits = {}
         self._bgc_hits = {}
@@ -96,10 +103,10 @@ class Rosetta(object):
                 else:
                     self._mibig2gnps[mibig] = [gnps]
 
-    def _generate_spec_hits(self, spectra, ms1_tol, score_thresh):
+    def _generate_spec_hits(self, spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
         spec_hits = {}
         for i, sp in enumerate(spectra):
-            hits = self.speclib.spectral_match(sp, ms1_tol=ms1_tol, score_thresh=score_thresh)
+            hits = self.speclib.spectral_match(sp, ms2_tol=ms2_tol, min_match_peaks=min_match_peaks, ms1_tol=ms1_tol, score_thresh=score_thresh)
             if len(hits) > 0:
                 spec_hits[sp] = hits
             if i % 100 == 0:
@@ -107,7 +114,7 @@ class Rosetta(object):
 
         return spec_hits
 
-    def _load_speclib(self, spectra):
+    def _load_speclib(self, spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
         logger.warning('No pickle SpecLib found, generating (this will take some time!)...')
         self.speclib = SpecLib(self._mgf_path)
         self.speclib._load_mgf()
@@ -115,7 +122,7 @@ class Rosetta(object):
 
         logger.info('Finished generating SpecLib')
     
-        save_pickled_data(self.speclib, self._speclib_pickle_path)
+        save_pickled_data((self.speclib, ms1_tol, ms2_tol, score_thresh, min_match_peaks), self._speclib_pickle_path)
 
     def _generate_bgc_hits(self, bgcs):
         self._bgc_hits = {}
@@ -139,7 +146,7 @@ class Rosetta(object):
                 self._mibig2bgc[mibig_bgc_id].add(bgc)
 
         logger.info('Completed, {} BGC hits found'.format(len(self._bgc_hits)))
-        save_pickled_data(self._bgc_hits, self._bgchits_pickle_path)
+        save_pickled_data((self._bgc_hits, self._mibig2bgc), self._bgchits_pickle_path)
 
     def _collect_rosetta_hits(self):
         self._rosetta_hits = []
@@ -181,9 +188,25 @@ class Rosetta(object):
                 scores[mibig_id] = score
             processed[bgc] = scores
         return processed
+    
+    def run(self, spectra, bgcs, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
+        # check if cached parameters exist, and if so check they match the 
+        # supplied ones. if not, need to regenerate any pickled data files
+        params = load_pickled_data(self._nplinker, self._params_pickle_path)
+        if params is not None:
+            _ms1_tol, _ms2_tol, _score_thresh, _min_match_peaks = params
 
-    def run(self, spectra, bgcs, ms1_tol=100, score_thresh=0.5):
-        # TODO improve this (pickle, per dataset etc)
+            if ms1_tol != _ms1_tol or ms2_tol != _ms2_tol or score_thresh != _score_thresh or min_match_peaks != _min_match_peaks:
+                logger.info('SpecLib parameters have been changed, regenerating cached data files!')
+                logger.debug('ms1_tol={:.3f}, ms2_tol={:.3f}, score_thresh={:.3f}, min_match_peaks={:d}'.format(ms1_tol, ms2_tol, score_thresh, min_match_peaks))
+                for path in [self._bgchits_pickle_path, self._rhits_pickle_path, self._params_pickle_path, self._speclib_pickle_path, os.path.join(self._pickle_dir, 'rosetta_hits.csv')]:
+                    if os.path.exists(path):
+                        os.unlink(path)
+
+
+                self.speclib = None
+                self._rosetta_hits = []
+            
         if len(self._rosetta_hits) > 0:
             return self._rosetta_hits
 
@@ -194,15 +217,17 @@ class Rosetta(object):
 
             return self._rosetta_hits
 
-        # check if we have a pickled SpecLib object first...
-        cached_speclib = load_pickled_data(self._nplinker, self._speclib_pickle_path)
-        if cached_speclib is not None:
+        # check if we have a pickled SpecLib object...
+        speclib = load_pickled_data(self._nplinker, self._speclib_pickle_path)
+        if speclib is not None:
             logger.info('Found pickled SpecLib for dataset {} at {}!'.format(self._dataset_id, self._speclib_pickle_path))
-            self.speclib = cached_speclib
-        else:
-            self._load_speclib(spectra)
+            self.speclib = speclib
+        
+        if self.speclib is None:
+            # no cached speclib available
+            self._load_speclib(spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks)
 
-        self._spec_hits = self._generate_spec_hits(spectra, ms1_tol, score_thresh)
+        self._spec_hits = self._generate_spec_hits(spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks)
 
         logger.info('SpecLib has {} spectra, {} hits'.format(self.speclib.get_n_spec(), len(self._spec_hits)))
 
@@ -222,6 +247,8 @@ class Rosetta(object):
         self._collect_rosetta_hits()
 
         save_pickled_data(self._rosetta_hits, self._rhits_pickle_path)
+
+        save_pickled_data((ms1_tol, ms2_tol, score_thresh, min_match_peaks), self._params_pickle_path)
 
         # automatically export CSV file containing hit data to <dataset>/rosetta
         # along with the pickled data
