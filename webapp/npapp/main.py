@@ -1904,7 +1904,7 @@ class NPLinkerBokeh(object):
         """
         with open(os.path.join(self.nh.nplinker.root_dir, 'rosetta', 'rosetta_hits.csv'), 'r') as f:
             rosetta_csv_text = f.read()
-        self.rosetta_dl_button.callback = CustomJS(args=dict(filetext=rosetta_csv_text), code=rosetta_download_code)
+        self.rosetta_dl_button.js_on_click(CustomJS(args=dict(filetext=rosetta_csv_text), code=rosetta_download_code))
         widgets.append(self.rosetta_dl_button)
 
         # and/or mode selection
