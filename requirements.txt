@@ -13,3 +13,4 @@ sortedcontainers
 httpx
 progress
 beautifulsoup4
+natsort
