@@ -17,4 +17,4 @@ pipenv shell
 ```
 See the example Jupyter notebook provided (TODO link) for a guided introduction to the NPLinker API which shows how to load and examine a dataset. 
 
-
+API documentation is still being updated but the latest version is available at [readthedocs](https://nplinker.readthedocs.io/en/latest/).
