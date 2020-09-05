@@ -3,14 +3,23 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to nplinker's documentation!
+nplinker documentation (WIP)
 ====================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+NPLinker module
+***************
 
+.. autoclass:: nplinker.nplinker.NPLinker
+   :members:
+
+Scoring methods
+***************
+.. automodule:: nplinker.scoring.methods
+   :members:
 
 Indices and tables
 ==================
