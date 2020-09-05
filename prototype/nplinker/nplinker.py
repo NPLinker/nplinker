@@ -2,8 +2,6 @@ import sys
 import logging
 import copy
 
-import numpy as np
-
 from .metabolomics import Spectrum
 from .metabolomics import MolecularFamily
 
@@ -20,12 +18,12 @@ from .scoring.methods import LinkCollection
 from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
-
 class NPLinker(object):
 
     # allowable types for objects to be passed to scoring methods
     OBJ_CLASSES = [Spectrum, MolecularFamily, GCF, BGC]
     # default set of enabled scoring methods
+    # TODO: ideally these shouldn't be hardcoded like this
     SCORING_METHODS =  {
         MetcalfScoring.NAME: MetcalfScoring,
         TestScoring.NAME: TestScoring,
@@ -33,17 +31,17 @@ class NPLinker(object):
                        }
 
     def __init__(self, userconfig=None, platform_id=None):
-        # TODO update docstring
-        """Initialise an NPLinker instance, automatically loading a dataset and generating scores.
+        """Initialise an NPLinker instance.
 
         NPLinker instances can be configured in multiple ways, in ascending order of priority:
             1. A global user-level default configuration file in TOML format, found in the directory:
                     $XDG_CONFIG_HOME/nplinker/nplinker.toml
             2. A local TOML configuration file
-            3. Command-line arguments / supplying a manually constructed dict instance
+            3. Command-line arguments / supplying a manually constructed parameter dictionary
 
-        The user-level configuration file will be created when you first create an NPLinker instance. 
-        It contains sensible default values for each setting and is intended to be copied and edited to
+        The global user-level configuration file will be created automatically the first time 
+        an NPLinker instance is initialised if it doesn't already exist. The default file contains 
+        sensible default values for each setting and is intended to be copied and edited to
         produce dataset-specific configuration files, which will then override any parameters shared
         with the user-level file. To load such a file, simply set the "userconfig" parameter to a 
         string containing the filename. 
@@ -53,45 +51,43 @@ class NPLinker(object):
         a dict with a structure corresponding to the configuration file format to this method.
 
         Some examples may make the various possible combinations a bit clearer:
-            # load the default/user-level configuration file and nothing else
-            npl = NPLinker()
+            # simplest option: load a local configuration file
+            $ npl = NPLinker('myconfig.toml')
 
-            # override the default file with a different one
-            npl = NPLinker('myconfig.toml')
-
-            # the same thing but running NPLinker as a script
-            > python nplinker.py --config "myconfig.toml"
+            # the same thing but running as a script 
+            $ python -m nplinker.nplinker --config "myconfig.toml"
 
             # use the defaults from the user-level config while modifying the root path
             # to load the dataset from (this is the minimum you would need to change in the
             # default config file)
-            npl = NPLinker({'dataset': {'root': '/path/to/dataset'}})
+            $ npl = NPLinker({'dataset': {'root': '/path/to/dataset'}})
 
             # the same thing running NPLinker as a script
-            > python nplinker.py --dataset.root /path/to/dataset
+            $ python nplinker.py --dataset.root /path/to/dataset
     
         Args:
             userconfig: supplies user-defined configuration data. May take one of 3 types:
-                - None: just load the user-level default configuration file
                 - str: treat as filename of a local configuration file to load 
                         (overriding the defaults)
                 - dict: contents will be used to override values in the dict generated 
                         from loading the configuration file(s)
+            platform_id: if loading a project from the Paired Omics platform, the project
+                        ID can either be supplied in the configuration file, or passed in
+                        as a string using this parameter
         """
 
-        # if userconfig is None => create Config() from empty dict
         # if userconfig is a string => create a dict with 'config' key and string as filename
         # if userconfig is a dict => pass it to Config() directly
-        if userconfig is None:
-            userconfig = {}
-        elif isinstance(userconfig, str):
+        if isinstance(userconfig, str):
             userconfig = {'config': userconfig}
         elif not isinstance(userconfig, dict):
             raise Exception('Invalid type for userconfig (should be None/str/dict, found "{}")'.format(type(userconfig)))
 
+        # if a specific platform project ID was supplied, insert it into the dict
+        # overriding any existing value
         if platform_id is not None:
             logger.debug('Setting project ID to {}'.format(platform_id))
-            userconfig['dataset'] = {'platform_id': platform_id }
+            userconfig['dataset'] = {'platform_id': platform_id}
 
         self._config = Config(userconfig)
 
@@ -107,10 +103,10 @@ class NPLinker(object):
                 # otherwise overwrite the default stdout destination
                 LogConfig.setLogDestination(logfile_dest)
 
-        # this object takes care of figuring out the locations of all the relevant files/folders
+        # the DatasetLoader takes care of figuring out the locations of all the relevant files/folders
         # and will show error/warning if any missing (depends if optional or not)
         self._loader = DatasetLoader(self._config.config)
-    
+        
         self._spectra = []
         self._bgcs = []
         self._gcfs = []
@@ -136,14 +132,14 @@ class NPLinker(object):
         self._repro_data = {}
         repro_file = self._config.config['repro_file']
         if len(repro_file) > 0:
-            self._save_repro_data(repro_file)
+            self.save_repro_data(repro_file)
 
     def _collect_repro_data(self):
         """Creates a dict containing data to aid reproducible runs of nplinker.
 
         This method creates a dict containing various bits of information about
         the current execution of nplinker. This data will typically be saved to
-        a file in order to aid reproducibility using :func:`_save_repro_data`. 
+        a file in order to aid reproducibility using :func:`save_repro_data`. 
 
         TODO describe contents
 
@@ -164,7 +160,7 @@ class NPLinker(object):
 
         return self._repro_data
 
-    def _save_repro_data(self, filename):
+    def save_repro_data(self, filename):
         self._collect_repro_data()
         with open(filename, 'wb') as repro_file:
             # TODO is pickle the best format to use?
@@ -173,19 +169,35 @@ class NPLinker(object):
 
     @property
     def config(self):
-        """Returns a copy of the data parsed from the configuration file as a dict"""
+        """Returns a copy of the data parsed from the configuration file as a dict
+        
+        Returns:
+                dict: configuration file parameters as a nested dict
+        """
         return copy.deepcopy(self._config.config)
 
     @property
     def root_dir(self):
-        """Returns path to nplinker external dataset directory (user-configured)"""
+        """Returns path to the current dataset root directory
+    
+        Returns:
+                str: the path to the dataset root directory currently in use
+        """
         return self._loader._root
 
     @property
     def dataset_id(self):
-        """Returns dataset "ID". For local datasets this will just be the last component
-        of the directory path, but for platform datasets it will be the platform 
-        project ID"""
+        """Returns dataset "ID". 
+
+        For local datasets this will just be the last component of the directory path, 
+        e.g. /path/to/my_dataset would produce an ID of "my_dataset". 
+
+        For datasets loaded from the Paired Omics platform the ID will be the platform
+        project ID, e.g. "MSV000079284"
+
+        Returns:
+            str: the dataset ID
+        """
         return self._loader.dataset_id
 
     @property
@@ -195,12 +207,23 @@ class NPLinker(object):
 
     @property
     def gnps_params(self):
-        """Returns a dict containing data from GNPS params.xml (if available)"""
+        """Returns a dict containing data from GNPS params.xml (if available).
+
+        Returns:
+            dict: GNPS parameters, or an empty dict if none exist in the dataset
+        """
         return self._loader.gnps_params
 
     @property
     def dataset_description(self):
-        """Returns a string containing the content of any supplied description.txt file"""
+        """Returns dataset description.
+
+        If nplinker finds a 'description.txt' file in the root directory of the
+        dataset, the content will be parsed and made available through this property.
+
+        Returns:
+            str: the content of description.txt or '<no description>'
+        """
         return self._loader.description_text
 
     @property
@@ -217,7 +240,7 @@ class NPLinker(object):
         using the corresponding properties of the NPLinker class.
 
         Returns:
-            True if successful, False otherwise
+            bool: True if successful, False otherwise
         """
         # typical case where load_data is being called with no params
         if new_bigscape_cutoff is None:
@@ -272,29 +295,33 @@ class NPLinker(object):
     def get_links(self, input_objects, scoring_methods, and_mode=True):
         """Find links for a set of input objects (BGCs/GCFs/Spectra/MolFams)
         
-        Given a set of input objects and 1 or more NPLinker scoring methods,
-        this method will return a dict mapping input objects with links to
-        the result(s) of the scoring method(s) selected. 
-
-        The input objects can be any mix of the following types:
+        The input objects can be any mix of the following NPLinker types:
             - BGC
             - GCF
             - Spectrum
             - MolecularFamily
 
-        # TODO update once finished below
-        
+        TODO longer description here
+
+        Args:
+            input_objects: objects to be passed to the scoring method(s).
+                This may be either a flat list of a uniform type (one of the 4
+                types above), or a list of such lists
+            scoring_methods: a list of one or more scoring methods to use
+            and_mode (bool): determines how results from multiple methods are combined.
+                This is ignored if a single method is supplied. If multiple methods
+                are used and ``and_mode`` is True, the results will only contain
+                links found by ALL methods. If False, results will contain links
+                found by ANY method. 
+
         Returns:
-            A dict keyed by objects from the input_objects list, but only containing
-            those objects that had links returned. The values of the dict will be
-            a set of the results from each of the enabled scoring methods for the
-            given object. The content of these results depends on the scoring method. 
+            An instance of ``nplinker.scoring.methods.LinkCollection``
         """
 
         if isinstance(input_objects, list) and len(input_objects) == 0:
             raise Exception('input_objects length must be > 0')
 
-        elif isinstance(scoring_methods, list) and  len(scoring_methods) == 0:
+        elif isinstance(scoring_methods, list) and len(scoring_methods) == 0:
             raise Exception('scoring_methods length must be > 0')
 
         # check if input_objects is a list of lists. if so there should be one
@@ -327,7 +354,6 @@ class NPLinker(object):
                     input_objects.append(input_objects[0])
                     logger.debug('Duplicating input object set')
 
-        object_counts = {}
         link_collection = LinkCollection(and_mode)
 
         for i, method in enumerate(scoring_methods):
@@ -379,20 +405,24 @@ class NPLinker(object):
         return link_collection
 
     def get_common_strains(self, objects_a, objects_b, filter_no_shared=True):
-        """
-        Allows for retrieval of shared strains for arbitrary pairs of objects.
+        """Retrive strains shared by arbitrary pairs of objects.
 
-        Takes two lists of objects as input. Typically one list will be MolecularFamily
-        or Spectrum objects and the other GCF (which list is which doesn't matter). The
-        return value is a dict mapping pairs of objects to lists of Strain objects 
-        shared by that pair. This list may be empty if filter_no_shared is False. If
-        filter_no_shared is True, every entry in the dict with no shared strains will
-        be removed before it is returned. 
+        Two lists of objects are required as input. Typically one list will be 
+        MolecularFamily or Spectrum objects and the other GCF (which list is which
+        doesn't matter). 
+
+        The return value is a dict mapping pairs of objects to lists of Strain objects 
+        shared by that pair. This list may be empty if ``filter_no_shared`` is False, 
+        indicating no shared strains were found. 
+
+        If ``filter_no_shared`` is True, every entry in the dict with no shared strains 
+        will be removed before it is returned, so the only entries will be those for
+        which shared strains exist. 
 
         Args:
-            objects_a: a list of Spectrum/MolecularFamily/GCF objects
-            objects_b: a list of Spectrum/MolecularFamily/GCF objects 
-            filter_no_shared: remove result entries if no shared strains exist
+            objects_a (list): a list of Spectrum/MolecularFamily/GCF objects
+            objects_b (list): a list of Spectrum/MolecularFamily/GCF objects 
+            filter_no_shared (bool): if True, remove result entries for which no shared strains exist
 
         Returns:
             A dict mapping pairs of objects (obj1, obj2) to lists of Strain objects.
@@ -418,21 +448,25 @@ class NPLinker(object):
         return common_strains
 
     def has_bgc(self, name):
+        """Returns True if BGC ``name`` exists in the dataset"""
         return name in self._bgc_lookup
 
     def lookup_bgc(self, name):
+        """If BGC ``name`` exists, return it. Otherwise return None"""
         if name not in self._bgc_lookup:
             return None
 
         return self._bgcs[self._bgc_lookup[name]]
 
     def lookup_gcf(self, gcf_id):
+        """If GCF ``gcf_id`` exists, return it. Otherwise return None"""
         if gcf_id not in self._gcf_lookup:
             return None
 
         return self._gcfs[self._gcf_lookup[gcf_id]]
 
     def lookup_spectrum(self, name):
+        """If Spectrum ``name`` exists, return it. Otherwise return None"""
         if name not in self._spec_lookup:
             return None
 
@@ -440,22 +474,27 @@ class NPLinker(object):
 
     @property
     def strains(self):
+        """Returns a list of all the strains in the dataset"""
         return self._strains
 
     @property
     def bgcs(self):
+        """Returns a list of all the BGCs in the dataset"""
         return self._bgcs
 
     @property
     def gcfs(self):
+        """Returns a list of all the GCFs in the dataset"""
         return self._gcfs
 
     @property
     def spectra(self):
+        """Returns a list of all the Spectra in the dataset"""
         return self._spectra
 
     @property
     def molfams(self):
+        """Returns a list of all the MolecularFamilies in the dataset"""
         return self._molfams
 
     @property
@@ -468,28 +507,27 @@ class NPLinker(object):
 
     @property
     def product_types(self):
-        """
-        Returns a list of the available BiGSCAPE product types in current dataset
-        """
+        """Returns a list of the available BiGSCAPE product types in current dataset"""
         return self._product_types
 
     @property
     def repro_data(self):
-        """
-        Returns the dict of reproducibility data
-        """
+        """Returns the dict containing reproducibility data"""
         return self._repro_data
 
     @property
     def scoring_methods(self):
-        """
-        Returns the set of available scoring method names
-        """
+        """Returns a list of available scoring method names"""
         return list(self._scoring_methods.keys())
 
     def scoring_method(self, name):
-        """
-        Return an instance of the given scoring method
+        """Return an instance of a scoring method.
+
+        Args:
+            name (str): the name of the method (see :func:`scoring_methods`)
+
+        Returns:
+            An instance of the named scoring method class, or None if the name is invalid
         """
         if not self._scoring_methods_setup_complete[name]:
             self._scoring_methods[name].setup(self)
