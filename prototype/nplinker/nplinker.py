@@ -34,10 +34,10 @@ class NPLinker(object):
         """Initialise an NPLinker instance.
 
         NPLinker instances can be configured in multiple ways, in ascending order of priority:
-            1. A global user-level default configuration file in TOML format, found in the directory:
-                    $XDG_CONFIG_HOME/nplinker/nplinker.toml
-            2. A local TOML configuration file
-            3. Command-line arguments / supplying a manually constructed parameter dictionary
+        
+        1. A global user-level default configuration file in TOML format, found in the directory XDG_CONFIG_HOME/nplinker/nplinker.toml
+        2. A local TOML configuration file
+        3. Command-line arguments / supplying a manually constructed parameter dictionary
 
         The global user-level configuration file will be created automatically the first time 
         an NPLinker instance is initialised if it doesn't already exist. The default file contains 
@@ -50,20 +50,21 @@ class NPLinker(object):
         supplying command-line arguments (if running nplinker.py as a script), or by passing
         a dict with a structure corresponding to the configuration file format to this method.
 
-        Some examples may make the various possible combinations a bit clearer:
+        Some examples may make the various possible combinations a bit clearer::
+
             # simplest option: load a local configuration file
-            $ npl = NPLinker('myconfig.toml')
+            > npl = NPLinker('myconfig.toml')
 
             # the same thing but running as a script 
-            $ python -m nplinker.nplinker --config "myconfig.toml"
+            > python -m nplinker.nplinker --config "myconfig.toml"
 
             # use the defaults from the user-level config while modifying the root path
             # to load the dataset from (this is the minimum you would need to change in the
             # default config file)
-            $ npl = NPLinker({'dataset': {'root': '/path/to/dataset'}})
+            > npl = NPLinker({'dataset': {'root': '/path/to/dataset'}})
 
             # the same thing running NPLinker as a script
-            $ python nplinker.py --dataset.root /path/to/dataset
+            > python nplinker.py --dataset.root /path/to/dataset
     
         Args:
             userconfig: supplies user-defined configuration data. May take one of 3 types:
@@ -317,7 +318,6 @@ class NPLinker(object):
         Returns:
             An instance of ``nplinker.scoring.methods.LinkCollection``
         """
-
         if isinstance(input_objects, list) and len(input_objects) == 0:
             raise Exception('input_objects length must be > 0')
 
