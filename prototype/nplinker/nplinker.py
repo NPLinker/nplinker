@@ -54,7 +54,7 @@ class NPLinker(object):
 
             # simplest option: load a local configuration file
             > npl = NPLinker('myconfig.toml')
-
+           
             # the same thing but running as a script 
             > python -m nplinker.nplinker --config "myconfig.toml"
 
@@ -65,13 +65,15 @@ class NPLinker(object):
 
             # the same thing running NPLinker as a script
             > python nplinker.py --dataset.root /path/to/dataset
-    
+            
         Args:
             userconfig: supplies user-defined configuration data. May take one of 3 types:
+
                 - str: treat as filename of a local configuration file to load 
                         (overriding the defaults)
                 - dict: contents will be used to override values in the dict generated 
                         from loading the configuration file(s)
+
             platform_id: if loading a project from the Paired Omics platform, the project
                         ID can either be supplied in the configuration file, or passed in
                         as a string using this parameter
@@ -297,6 +299,7 @@ class NPLinker(object):
         """Find links for a set of input objects (BGCs/GCFs/Spectra/MolFams)
         
         The input objects can be any mix of the following NPLinker types:
+
             - BGC
             - GCF
             - Spectrum
