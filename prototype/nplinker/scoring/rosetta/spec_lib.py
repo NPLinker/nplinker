@@ -44,7 +44,7 @@ class SpecLib(object):
         candidates = self._candidates(self.sorted_spectra, query.precursor_mz, ms1_tol)
         hits = []
         for c in candidates:
-            sc,_ = scoring_function(query, c, ms2_tol, min_match_peaks)
+            sc, _ = scoring_function(query, c, ms2_tol, min_match_peaks)
             if sc >= score_thresh:
                 hits.append((c.gnps_id, sc))
         return hits
