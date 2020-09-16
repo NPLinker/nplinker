@@ -2,8 +2,7 @@ loglevel = "DEBUG"
 logfile = ""
 repro_file = ""
 [dataset]
-root = "H:\\nplinker_data\\current\\carnegie_mibig_27112019"
-# root = 'platform:MSV000079284'
+root = "carnegie_mibig_27112019"
 
 [scoring.rosetta]
 
