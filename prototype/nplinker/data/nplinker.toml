@@ -13,11 +13,11 @@ repro_file = ""
 
 # scoring_methods to be enabled. currently available:
 #   - metcalf
-#   - testscore
+#   - rosetta
+#   - testscore (only for debug use)
 #
-# TODO more
 # The default is to enable all available methods.
-scoring_methods = ["metcalf", "testscore"]
+scoring_methods = ["metcalf", "rosetta", "testscore"]
 
 # Dataset configuration
 # ---------------------
@@ -77,18 +77,18 @@ scoring_methods = ["metcalf", "testscore"]
 # you can additionally set the "bigscape_dir" parameter to the appropriate 
 # location to skip this step. 
 #
-# All files are download and extracted to ~/nplinker_data 
-# 
-# TODO more detail
-[dataset]
-# if the dataset has the expected directory structure, this is all that's required
-# NOTE: only set one of root and platform_id!
-root = "<root directory of dataset>"
+# All files are downloaded and extracted to locations inside ~/nplinker_data. 
 
-# if you want to load data from the paired omics platform, give the project ID 
-# here (e.g. "MSV000079284")
-# NOTE: only set one of root and platform_id!
-platform_id = ""
+# Dataset configuration settings
+[dataset]
+# If the dataset has the expected directory structure, this value is all that's required.
+# It should be set to the path of the local directory containing the various data files
+# described above.
+# 
+# If you want to load a dataset from the paired platform, the value should be a string
+# of the form: "platform:datasetID". For example, "platform:MSV000079284" would 
+# load the dataset with ID MSV000079284. 
+root = "<root directory of dataset>"
 
 # antismash file structure. Should be either 'default' or 'flat'. 
 # default = the standard structure with nested subdirectories
