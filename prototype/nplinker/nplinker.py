@@ -30,7 +30,7 @@ class NPLinker(object):
         RosettaScoring.NAME: RosettaScoring, 
                        }
 
-    def __init__(self, userconfig=None, platform_id=None):
+    def __init__(self, userconfig=None):
         """Initialise an NPLinker instance.
 
         NPLinker instances can be configured in multiple ways, in ascending order of priority:
@@ -73,10 +73,6 @@ class NPLinker(object):
                         (overriding the defaults)
                 - dict: contents will be used to override values in the dict generated 
                         from loading the configuration file(s)
-
-            platform_id: if loading a project from the Paired Omics platform, the project
-                        ID can either be supplied in the configuration file, or passed in
-                        as a string using this parameter
         """
 
         # if userconfig is a string => create a dict with 'config' key and string as filename
@@ -85,12 +81,6 @@ class NPLinker(object):
             userconfig = {'config': userconfig}
         elif not isinstance(userconfig, dict):
             raise Exception('Invalid type for userconfig (should be None/str/dict, found "{}")'.format(type(userconfig)))
-
-        # if a specific platform project ID was supplied, insert it into the dict
-        # overriding any existing value
-        if platform_id is not None:
-            logger.debug('Setting project ID to {}'.format(platform_id))
-            userconfig['dataset'] = {'platform_id': platform_id}
 
         self._config = Config(userconfig)
 
