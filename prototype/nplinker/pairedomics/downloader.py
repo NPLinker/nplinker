@@ -22,7 +22,7 @@ class Downloader(object):
     PAIREDOMICS_PROJECT_DATA_ENDPOINT = 'http://pairedomicsdata.bioinformatics.nl/api/projects'
     PAIREDOMICS_PROJECT_URL = 'https://pairedomicsdata.bioinformatics.nl/api/projects/{}'
     GNPS_DATA_DOWNLOAD_URL = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_clustered_spectra'
-    ANTISMASH_DB_PAGE_URL = 'https://antismash-db.secondarymetabolites.org/output/{}'
+    ANTISMASH_DB_PAGE_URL = 'https://antismash-db.secondarymetabolites.org/output/{}/'
     ANTISMASH_DB_DOWNLOAD_URL = 'https://antismash-db.secondarymetabolites.org/output/{}/{}'
 
     NCBI_GENBANK_LOOKUP_URL = 'https://www.ncbi.nlm.nih.gov/nuccore/{}?report=docsum'
@@ -166,7 +166,7 @@ class Downloader(object):
             if 'RefSeq_accession' in gr['genome_ID']:
                 accession = gr['genome_ID']['RefSeq_accession']
                 # TODO does original value need preserved
-                accession = accession[:accession.rindex('.')]
+                # accession = accession[:accession.rindex('.')]
                 if accession in missing_files:
                     logger.warning('Not attempting to download data for accession={}'.format(accession))
                     continue
@@ -310,12 +310,13 @@ class Downloader(object):
             logger.info('antismash DB lookup for {} => {}'.format(accession_id, url))
             resp = httpx.get(url)
             soup = BeautifulSoup(resp.content, 'html.parser')
-            dl_list = soup.find('ul', {'id': 'downloadoptions'})
-            if dl_list is None:
+            # retrieve .zip file download link
+            link = soup.find('a', {'href': lambda url: url.endswith('.zip')})
+            if link is None:
                 logger.warning('Failed to download antismash-db results for {}'.format(accession_id))
                 return False
 
-            filename = dl_list.li.a['href']
+            filename = link['href']
             zipfile_url = Downloader.ANTISMASH_DB_DOWNLOAD_URL.format(accession_id, filename)
             with open(local_path, 'wb') as f:
                 total_bytes, last_total = 0, 0
