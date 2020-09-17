@@ -140,7 +140,6 @@ class Downloader(object):
                     strain_name = os.path.split(root)[1]
                     strain_alias = os.path.splitext(f)[0]
                     strain_alias = strain_alias[:strain_alias.index('.')]
-                    # print('mapping {} => {}'.format(strain_alias, self.strains.lookup(strain_name)))
                     if self.strains.lookup(strain_name) is not None:
                         self.strains.lookup(strain_name).add_alias(strain_alias)
                     else:
@@ -332,20 +331,25 @@ class Downloader(object):
         
         logger.debug('Extracting antismash data')
 
-        output_path = os.path.join(self.project_file_cache, 'antismash', os.path.splitext(os.path.split(local_path)[1])[0])
+        output_path = os.path.join(self.project_file_cache, 'antismash', accession_id)
+        # create a subfolder for each set of genome data (the zip files used to be
+        # constructed with path info but that seems to have changed recently)
+        if not os.path.exists(output_path):
+            os.makedirs(output_path, exist_ok=True)
+
         if os.path.exists(os.path.join(output_path, 'completed')):
             logger.debug('antismash data already extracted!')
             return True
 
         antismash_zip = zipfile.ZipFile(local_path)
-        kc_prefix = '{}/knownclusterblast'.format(accession_id)
-        antismash_path = os.path.join(self.project_file_cache, 'antismash')
+        kc_prefix1 = '{}/knownclusterblast'.format(accession_id)
+        kc_prefix2 = 'knownclusterblast'.format(accession_id)
         for zip_member in antismash_zip.namelist():
             # TODO other files here?
             if zip_member.endswith('.gbk'):
-                antismash_zip.extract(zip_member, path=antismash_path)
-            elif zip_member.startswith(kc_prefix):
-                antismash_zip.extract(zip_member, path=antismash_path)
+                antismash_zip.extract(zip_member, path=output_path)
+            elif zip_member.startswith(kc_prefix1) or zip_member.startswith(kc_prefix2):
+                antismash_zip.extract(zip_member, path=output_path)
 
         open(os.path.join(output_path, 'completed'), 'w').close()
 
@@ -394,7 +398,7 @@ class Downloader(object):
                 continue
 
             accession = rec['genome_ID']['RefSeq_accession']
-            accession = accession[:accession.rindex('.')]
+            # accession = accession[:accession.rindex('.')]
             if label in temp:
                 temp[label].append(accession)
             else:
