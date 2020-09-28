@@ -4,7 +4,7 @@ import numpy as np
 from nplinker.genomics import GCF, BGC
 from nplinker.metabolomics import Spectrum, MolecularFamily, make_families
 from nplinker.scoring.misc import metcalf_scoring, hg_scoring
-from nplinker.data_linking import DataLinks, LinkFinder
+from nplinker.scoring.data_linking import DataLinks, LinkFinder
 from nplinker.strains import Strain
 
 np.random.seed(50)
