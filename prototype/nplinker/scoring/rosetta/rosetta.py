@@ -122,7 +122,8 @@ class Rosetta(object):
 
         logger.info('Finished generating SpecLib')
     
-        save_pickled_data((self.speclib, ms1_tol, ms2_tol, score_thresh, min_match_peaks), self._speclib_pickle_path)
+        # save_pickled_data((self.speclib, ms1_tol, ms2_tol, score_thresh, min_match_peaks), self._speclib_pickle_path)
+        save_pickled_data(self.speclib, self._speclib_pickle_path)
 
     def _generate_bgc_hits(self, bgcs):
         self._bgc_hits = {}
@@ -130,9 +131,12 @@ class Rosetta(object):
             bgc_file = bgc.antismash_file
             kcb_name = KCBParser.get_kcb_filename_from_bgc(bgc)
             if kcb_name is not None:
-                parser = KCBParser(kcb_name)
-                if len(parser.hits) > 0:
-                    self._bgc_hits[bgc] = parser.hits
+                try:
+                    parser = KCBParser(kcb_name)
+                    if len(parser.hits) > 0:
+                        self._bgc_hits[bgc] = parser.hits
+                except:
+                    logger.warning('Failed to find knownclusterblast file: "{}", Rosetta scoring results will be incomplete'.format(kcb_name))
 
             if i % 100 == 0:
                 logger.info('Searching for BGC hits {}/{}'.format(i, len(bgcs)))
