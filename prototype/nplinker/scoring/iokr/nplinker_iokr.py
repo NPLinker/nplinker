@@ -9,7 +9,82 @@ from . import spectrum
 from . import spectrum_filters
 
 from nplinker.logconfig import LogConfig
+from nplinker.genomics import GCF
+from nplinker.metabolomics import MolecularFamily
+
 logger = LogConfig.getLogger(__file__)
+
+
+class NPLinkerIOKR(object):
+    """
+    Rank the potential links in a NPLinker object using IOKR, and wrap the results
+    """
+    def __init__(self, npl):
+        self.npl = npl
+
+        # Build BGC<->SMILES lookup
+        bgc_smiles_lookup = {}
+        for bgc_idx, bgc in enumerate(npl.bgcs):
+            bgc_smiles_lookup[bgc] = []
+            if bgc.smiles is not None:
+                try:
+                    fp = fingerprint.fingerprint_from_smiles(bgc.smiles)
+                    bgc_smiles_lookup[bgc].append(bgc.smiles)
+                except ValueError:
+                    print('Filtered out smiles {}'.format(bgc.smiles))
+                    pass
+        self.bgc_smiles_lookup = bgc_smiles_lookup
+
+        smiles_bgc_lookup = {}
+        for bgc, smiles in bgc_smiles_lookup.items():
+            if smiles is None:
+                continue
+            for smiles_string in smiles:
+                if smiles_string in smiles_bgc_lookup:
+                    smiles_bgc_lookup[smiles_string].add(bgc)
+                else:
+                    smiles_bgc_lookup[smiles_string] = set([bgc])
+
+        self.smiles_list = list(smiles_bgc_lookup.keys())
+
+        # Map NPLinker spectra to format understood by IOKR
+        self.spectra_list = [spectrum.MSSpectrum(spec=x) for x in npl.spectra]
+
+        # Initialise IOKR server
+        self.iokr_server = get_iokr_server()
+
+    def calculate_scores(self):
+        self.iokr_scores = self.iokr_server.score_smiles(self.spectra_list, self.smiles_list)
+
+    def get_score(self, mf_like, gcf_like):
+        if isinstance(mf_like, MolecularFamily):
+            mf = mf_like
+        else:
+            mf = MolecularFamily(-1)
+            mf.spectra = [mf_like]
+
+        if isinstance(gcf_like, GCF):
+            gcf = gcf_like
+        else:
+            gcf = GCF(-1, -1, -1)
+            gcf.bgcs = [gcf_like]
+
+        potential_scores = []
+        for spec in mf.spectra:
+            spectrum_idx = self.spectra_list.index(spec)
+            for bgc in gcf.bgcs:
+                bgc_smiles_list = self.bgc_smiles_lookup[bgc]
+                for smiles in bgc_smiles_list:
+                    smiles_idx = self.smiles_list.index(smiles)
+                    spectrum_smiles_score = self.iokr_scores[spectrum_idx, smiles_idx]
+                    potential_scores.append(spectrum_smiles_score)
+
+        if len(potential_scores) == 0:
+            logger.info('No scores found for {}'.format(gcf_like))
+            return 0
+        else:
+            return max(potential_scores)
+
 
 class IOKRWrapper(object):
     """
