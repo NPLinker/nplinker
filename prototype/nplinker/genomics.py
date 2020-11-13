@@ -258,7 +258,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                     new_bgc.description = description
 
                 if family_id not in gcf_dict:
-                    new_gcf = GCF(internal_gcf_id, family_id, product_type)
+                    new_gcf = GCF(internal_gcf_id, family_id, bigscape_class)
                     gcf_dict[family_id] = new_gcf
                     gcf_list.append(new_gcf)
                     internal_gcf_id += 1
