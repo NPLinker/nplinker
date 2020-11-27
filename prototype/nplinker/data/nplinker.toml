@@ -53,6 +53,7 @@ scoring_methods = ["metcalf", "rosetta", "testscore"]
 #   |- clusterinfo_summary/<UID>.tsv (spectrum metadata)
 #   |- metadata_table/metadata_table-00000.txt (TODO)
 #   |- networkedges_selfloop/<UID>.selfloop (the "edges" file for spectra network)
+#   |- spectra/*.mgf (mass spec data)
 #   |- quantification_table_reformatted/<UID>.csv ("extra" spectrum metadata - TODO proper name for this?)
 #   |- DB_result/*.tsv (GNPS and other spectral annotation files, optional)
 #   |- DB_result/annotations.tsv (annotation data to extract from each file, see docs for details)
