@@ -4,7 +4,7 @@ NPLinker is a tool that aims to address the significant bottleneck that exists i
 
 ## Getting Started - Web application
 
-The simplest option for most users will be to run NPLinker as a Dockerised web application, removing the need to install Python and other dependencies as well as providing a graphical interface. The web application can also be used without Docker if required, but it's much simpler to rely on the Docker version. Assuming you have Docker installed already, see the [wiki page](https://github.com/sdrogers/nplinker/wiki/Webapp) for detailed installation and usage instructions. 
+The simplest option for most users will be to run NPLinker as a Dockerised web application, removing the need to install Python and other dependencies as well as providing a graphical interface. The web application can also be used without Docker if required, but it's much simpler to rely on the Docker version. Assuming you have Docker installed already, see the [wiki page](https://github.com/sdrogers/nplinker/wiki/WebappInstallation) for detailed installation and usage instructions. 
 
 ## Getting Started - Python
 
