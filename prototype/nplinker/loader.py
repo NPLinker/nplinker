@@ -148,8 +148,10 @@ class DatasetLoader(object):
         # NOTE: only optional for Crusemann or Crusemann-like dataset format!
         self.extra_nodes_file = self._overrides.get(self.OR_EXTRA_NODES) or find_via_glob(os.path.join(self._root, 'quantification_table_reformatted', '*.csv'), self.OR_EXTRA_NODES, optional=True)
 
-        # 5. MET: <root>/spectra/specs_ms.mgf / mgf_file=<override>
-        self.mgf_file = self._overrides.get(self.OR_MGF) or find_via_glob(os.path.join(self._root, 'spectra', '*.mgf'), self.OR_MGF)
+        # 5. MET: <root>/spectra/*.mgf (or <root>/*.mgf)/ mgf_file=<override>
+        self.mgf_file = self._overrides.get(self.OR_MGF) or find_via_glob_alts([os.path.join(self._root, 'spectra', '*.mgf'),
+                                                                                os.path.join(self._root, '*.mgf')],
+                                                                                self.OR_MGF)
 
         # 6. MET: <root>/metadata_table/metadata_table-<number>.txt / metadata_table_file=<override>
         self.metadata_table_file = self._overrides.get(self.OR_METADATA) or find_via_glob(os.path.join(self._root, 'metadata_table', 'metadata_table*.txt'), self.OR_METADATA, optional=True)
