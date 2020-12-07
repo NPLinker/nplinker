@@ -155,7 +155,7 @@ class GCF(object):
 
         return self._aa_predictions
 
-def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, network_file_dict, mibig_bgc_dict, antismash_dir, antismash_filenames, antismash_format='default'):
+def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, network_file_dict, mibig_bgc_dict, antismash_dir, antismash_filenames, antismash_format, antismash_delimiters):
     gcf_dict = {}
     gcf_list = []
     metadata = {}
@@ -185,6 +185,10 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
 
     bgc_list = [v for v in mibig_bgc_dict.values()]
 
+    unknown_strains = {}
+
+    logger.info('Using antiSMASH filename delimiters {}'.format(antismash_delimiters))
+
     # "cluster files" are the various <class>_clustering_c0.xx.tsv files
     # - BGC name
     # - cluster ID
@@ -196,7 +200,6 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
             next(reader) # skip headers
             for line in reader:
                 name = line[0]
-                #family = os.path.split(filename)[-1] + ":" + line[1]
                 family_id = int(line[1])
                 if name.startswith('BGC'):
                     # removing the .<digit> suffix
@@ -205,17 +208,28 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                     if strain is None:
                         raise Exception('Unknown MiBIG BGC: original={} / parsed={}'.format(name, nname))
                 else:
-                    nname = name[:name.index('.')]
-                    strain = strains.lookup(nname)
-                    if strain is None:
-                        # TODO hack to get crusemann working
-                        for i in range(1, 3, 1):
-                            tmp = '{}.{}'.format(nname, i)
-                            strain = strains.lookup(tmp)
-                            if strain is not None:
+                    parsednames = [name[:name.index(d)] for d in antismash_delimiters if name.find(d) != -1]
+                    found = False
+                    for parsedname in parsednames:
+                        strain = strains.lookup(parsedname)
+                        if strain is not None:
+                            found = True
+                            break
+                        else:
+                            # TODO hack to get crusemann working, should really update strain mappings?
+                            for i in range(1, 3, 1):
+                                tmp = '{}.{}'.format(parsedname, i)
+                                strain = strains.lookup(tmp)
+                                if strain is not None:
+                                    found = True
+                                    break
+                            if found:
                                 break
-                        if strain is None:
-                            raise Exception('Unknown strain ID: original={} / parsed={} (from file {})'.format(name, nname, filename))
+
+                    if not found:
+                        logger.warning('Unknown strain ID: {} (from file {})'.format(name, filename))
+                        unknown_strains[name] = filename
+                        continue
 
                 metadata_line = metadata[name]
                 description = metadata_line[2]
@@ -242,6 +256,8 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                             new_bgc.antismash_file = antismash_filename
                         else:
                             new_bgc.antismash_file = antismash_filenames.get(new_bgc.name, None)
+                            # TODO should this actually search for all possible names based on strain
+                            # aliases instead of just this name? 
                             if new_bgc.antismash_file is None:
                                 logger.warning('Failed to find an antiSMASH file for {}'.format(new_bgc.name))
                                 num_missing_antismash += 1
@@ -303,7 +319,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                 bgc_dst = bgc_lookup[line[1]]
                 bgc_src.edges.add(bgc_dst.id)
 
-    return gcf_list, bgc_list, strains
+    return gcf_list, bgc_list, strains, unknown_strains
 
 def filter_mibig_bgcs(bgcs, gcfs, strains):
     # remove the following MiBIG BGCs:
