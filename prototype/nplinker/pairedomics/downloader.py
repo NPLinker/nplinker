@@ -17,18 +17,86 @@ logger = LogConfig.getLogger(__file__)
 
 from .runbigscape import run_bigscape
 
+PAIREDOMICS_PROJECT_DATA_ENDPOINT = 'http://pairedomicsdata.bioinformatics.nl/api/projects'
+PAIREDOMICS_PROJECT_URL = 'https://pairedomicsdata.bioinformatics.nl/api/projects/{}'
+GNPS_DATA_DOWNLOAD_URL = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_clustered_spectra'
+ANTISMASH_DB_PAGE_URL = 'https://antismash-db.secondarymetabolites.org/output/{}/'
+ANTISMASH_DB_DOWNLOAD_URL = 'https://antismash-db.secondarymetabolites.org/output/{}/{}'
+
+NCBI_GENBANK_LOOKUP_URL = 'https://www.ncbi.nlm.nih.gov/nuccore/{}?report=docsum'
+NCBI_ASSEMBLY_LOOKUP_URL = 'https://www.ncbi.nlm.nih.gov/assembly?LinkName=nuccore_assembly&from_uid={}'
+
+MIBIG_JSON_URL = 'https://dl.secondarymetabolites.org/mibig/mibig_json_{}.tar.gz'
+
+def download_and_extract_mibig_json(download_path, output_path, version='1.4'):
+    archive_path = os.path.join(download_path, 'mibig_json_{}.tar.gz'.format(version))
+    logger.debug('Checking for existing MiBIG archive at {}'.format(archive_path))
+    cached = False
+    if os.path.exists(archive_path):
+        logger.info('Found cached file at {}'.format(archive_path))
+        try:
+            _ = tarfile.open(archive_path)
+            cached = True
+        except:
+            logger.info('Invalid MiBIG archive found, will download again')
+            os.unlink(archive_path)
+
+    if not cached:
+        url = MIBIG_JSON_URL.format(version)
+        with open(archive_path, 'wb') as f:
+            total_bytes, last_total = 0, 0
+            with httpx.stream('GET', url) as r:
+                filesize = int(r.headers['content-length'])
+                bar = Bar(url, max=filesize, suffix='%(percent)d%%')
+                for data in r.iter_bytes():
+                    f.write(data)
+                    total_bytes += len(data)
+                    bar.next(len(data))
+                bar.finish()
+    
+    logger.debug('Extracting MiBIG JSON data')
+
+    if os.path.exists(os.path.join(output_path, 'completed')):
+        return True
+
+    mibig_gz = tarfile.open(archive_path, 'r:gz')
+    # extract and rename to "mibig_json"
+    # TODO annoyingly the 2.0 version has been archived with a subdirectory, while
+    # 1.4 just dumps all the files into the current directory, so if/when 2.0 support
+    # is required this will need to handle both cases
+    mibig_gz.extractall(path=os.path.join(output_path))
+    # os.rename(os.path.join(self.project_file_cache, 'mibig_json_{}'.format(version)), os.path.join(self.project_file_cache, 'mibig_json'))
+
+    open(os.path.join(output_path, 'completed'), 'w').close()
+
+    return True
+
+def generate_strain_mappings(strains, strain_mappings_file, antismash_dir):
+    # first time downloading, this file will not exist, should only need done once
+    if not os.path.exists(strain_mappings_file):
+        logger.info('Generating strain mappings file')
+        for root, dirs, files in os.walk(antismash_dir):
+            for f in files: 
+                if not f.endswith('.gbk'):
+                    continue
+
+                # TODO is this correct/sensible???
+                strain_name = os.path.split(root)[1]
+                strain_alias = os.path.splitext(f)[0]
+                if strain_alias.find('.') != -1:
+                    strain_alias = strain_alias[:strain_alias.index('.')]
+                if strains.lookup(strain_name) is not None:
+                    strains.lookup(strain_name).add_alias(strain_alias)
+                else:
+                    logger.warning('Failed to lookup strain name: {}'.format(strain_name))
+        logger.info('Saving strains to {}'.format(strain_mappings_file))
+        strains.save_to_file(strain_mappings_file)
+    else:
+        logger.info('Strain mappings already generated')
+
+    return strains
+
 class Downloader(object):
-
-    PAIREDOMICS_PROJECT_DATA_ENDPOINT = 'http://pairedomicsdata.bioinformatics.nl/api/projects'
-    PAIREDOMICS_PROJECT_URL = 'https://pairedomicsdata.bioinformatics.nl/api/projects/{}'
-    GNPS_DATA_DOWNLOAD_URL = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_clustered_spectra'
-    ANTISMASH_DB_PAGE_URL = 'https://antismash-db.secondarymetabolites.org/output/{}/'
-    ANTISMASH_DB_DOWNLOAD_URL = 'https://antismash-db.secondarymetabolites.org/output/{}/{}'
-
-    NCBI_GENBANK_LOOKUP_URL = 'https://www.ncbi.nlm.nih.gov/nuccore/{}?report=docsum'
-    NCBI_ASSEMBLY_LOOKUP_URL = 'https://www.ncbi.nlm.nih.gov/assembly?LinkName=nuccore_assembly&from_uid={}'
-
-    MIBIG_JSON_URL = 'https://dl.secondarymetabolites.org/mibig/mibig_json_{}.tar.gz'
 
     def __init__(self, platform_id, force_download=False):
         self.gnps_massive_id = platform_id
@@ -51,7 +119,7 @@ class Downloader(object):
 
         if not os.path.exists(self.project_json_file) or force_download:
             logger.info('Downloading new copy of platform project data...')
-            self.all_project_json = self._download_platform_json_to_file(Downloader.PAIREDOMICS_PROJECT_DATA_ENDPOINT, self.all_project_json_file)
+            self.all_project_json = self._download_platform_json_to_file(PAIREDOMICS_PROJECT_DATA_ENDPOINT, self.all_project_json_file)
         else:
             logger.info('Using existing copy of platform project data')
             with open(self.all_project_json_file, 'r') as f:
@@ -77,7 +145,7 @@ class Downloader(object):
 
         # now get the project JSON data
         logger.info('Found project, retrieving JSON data...')
-        self.project_json = self._download_platform_json_to_file(Downloader.PAIREDOMICS_PROJECT_URL.format(self.pairedomics_id), self.project_json_file)
+        self.project_json = self._download_platform_json_to_file(PAIREDOMICS_PROJECT_URL.format(self.pairedomics_id), self.project_json_file)
         
         if 'molecular_network' not in self.project_json['metabolomics']['project']:
             raise Exception('Dataset has no GNPS data URL!')
@@ -128,25 +196,7 @@ class Downloader(object):
             logger.warning('Failed to run BiG-SCAPE on antismash data, error was "{}"'.format(e))
 
     def _generate_strain_mappings(self):
-        # first time downloading, this file will not exist, should only need done once
-        if not os.path.exists(self.strain_mappings_file):
-            logger.info('Generating strain mappings file')
-            for root, dirs, files in os.walk(os.path.join(self.project_file_cache, 'antismash')):
-                for f in files: 
-                    if not f.endswith('.gbk'):
-                        continue
-
-                    # TODO is this correct/sensible???
-                    strain_name = os.path.split(root)[1]
-                    strain_alias = os.path.splitext(f)[0]
-                    strain_alias = strain_alias[:strain_alias.index('.')]
-                    if self.strains.lookup(strain_name) is not None:
-                        self.strains.lookup(strain_name).add_alias(strain_alias)
-                    else:
-                        logger.warning('Failed to lookup strain name: {}'.format(strain_name))
-            self.strains.save_to_file(self.strain_mappings_file)
-        else:
-            logger.info('Strain mappings already generated')
+        gen_strains = generate_strain_mappings(self.strains, self.strain_mappings_file, os.path.join(self.project_file_cache, 'antismash'))
 
     def _download_genomics_data(self, genome_records):
         found = 0
@@ -228,7 +278,7 @@ class Downloader(object):
                 genbank_id = genbank_id.lower() 
 
         # Look up genbank ID
-        url = Downloader.NCBI_GENBANK_LOOKUP_URL.format(genbank_id)
+        url = NCBI_GENBANK_LOOKUP_URL.format(genbank_id)
         resp = httpx.get(url)
         soup = BeautifulSoup(resp.content, 'html.parser')
         ids = soup.find('dl', {'class': 'rprtid'})
@@ -238,7 +288,7 @@ class Downloader(object):
                 break
 
         # Look up assembly
-        url = Downloader.NCBI_ASSEMBLY_LOOKUP_URL.format(seq_id)
+        url = NCBI_ASSEMBLY_LOOKUP_URL.format(seq_id)
         resp = httpx.get(url)
         soup = BeautifulSoup(resp.content, 'html.parser')
         title_href = soup.find('p', {'class': 'title'}).a['href']
@@ -247,44 +297,9 @@ class Downloader(object):
         return refseq_id
 
     def _download_mibig_json(self, version='1.4'):
-        local_path = os.path.join(self.project_download_cache, 'mibig_json_{}.tar.gz'.format(version))
-        logger.debug('Checking for existing MiBIG archive at {}'.format(local_path))
-        cached = False
-        if os.path.exists(local_path):
-            logger.info('Found cached file at {}'.format(local_path))
-            try:
-                agz = tarfile.open(local_path)
-                cached = True
-            except:
-                logger.info('Invalid MiBIG archive found, will download again')
-                os.unlink(local_path)
-
-        if not cached:
-            url = Downloader.MIBIG_JSON_URL.format(version)
-            with open(local_path, 'wb') as f:
-                total_bytes, last_total = 0, 0
-                with httpx.stream('GET', url) as r:
-                    filesize = int(r.headers['content-length'])
-                    bar = Bar(url, max=filesize, suffix='%(percent)d%%')
-                    for data in r.iter_bytes():
-                        f.write(data)
-                        total_bytes += len(data)
-                        bar.next(len(data))
-                    bar.finish()
-        
-        logger.debug('Extracting MiBIG JSON data')
-
         output_path = os.path.join(self.project_file_cache, 'mibig_json')
-        if os.path.exists(os.path.join(output_path, 'completed')):
-            return True
 
-        mibig_gz = tarfile.open(local_path, 'r:gz')
-        # extract and rename to "mibig_json"
-        # TODO annoyingly the 2.0 version has been archived with a subdirectory, while
-        # 1.4 just dumps all the files into the current directory, so if/when 2.0 support
-        # is required this will need to handle both cases
-        mibig_gz.extractall(path=os.path.join(self.project_file_cache, 'mibig_json'))
-        # os.rename(os.path.join(self.project_file_cache, 'mibig_json_{}'.format(version)), os.path.join(self.project_file_cache, 'mibig_json'))
+        download_and_extract_mibig_json(self.project_download_cache, output_path, version)
 
         open(os.path.join(output_path, 'completed'), 'w').close()
 
@@ -305,7 +320,7 @@ class Downloader(object):
                 os.unlink(local_path)
 
         if not cached:
-            url = Downloader.ANTISMASH_DB_PAGE_URL.format(accession_id)
+            url = ANTISMASH_DB_PAGE_URL.format(accession_id)
             logger.info('antismash DB lookup for {} => {}'.format(accession_id, url))
             resp = httpx.get(url)
             soup = BeautifulSoup(resp.content, 'html.parser')
@@ -316,7 +331,7 @@ class Downloader(object):
                 return False
 
             filename = link['href']
-            zipfile_url = Downloader.ANTISMASH_DB_DOWNLOAD_URL.format(accession_id, filename)
+            zipfile_url = ANTISMASH_DB_DOWNLOAD_URL.format(accession_id, filename)
             with open(local_path, 'wb') as f:
                 total_bytes, last_total = 0, 0
                 with httpx.stream('GET', zipfile_url) as r:
@@ -413,7 +428,7 @@ class Downloader(object):
             self.strains.add(strain)
 
     def _download_metabolomics_zipfile(self, gnps_task_id):
-        url = Downloader.GNPS_DATA_DOWNLOAD_URL.format(gnps_task_id)
+        url = GNPS_DATA_DOWNLOAD_URL.format(gnps_task_id)
 
         self.metabolomics_zip = os.path.join(self.project_download_cache, 'metabolomics_data.zip')
 
