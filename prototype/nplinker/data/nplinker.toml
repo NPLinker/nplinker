@@ -17,7 +17,7 @@ repro_file = ""
 #   - testscore (only for debug use)
 #
 # The default is to enable all available methods.
-scoring_methods = ["metcalf", "rosetta", "testscore"]
+# scoring_methods = ["metcalf", "rosetta"]
 
 # Dataset configuration
 # ---------------------
@@ -31,18 +31,27 @@ scoring_methods = ["metcalf", "rosetta", "testscore"]
 # defaults to looking for all the necessary files in a single directory, given
 # by the "root" parameter. 
 #
-# Alternatively, to load metabolomics data from the paired platform, leave the 
-# "root" parameter empty and set the "platform_id" parameter to that of the 
-# project ID on the platform (a value beginning with "MSV"). 
+# Alternatively, to load metabolomics data from the paired platform, set the "root"
+# parameter to "platform:<projectID>", where "<projectID>" is taken from the platform 
+# project list. For example, "platform:MSV000079284" would select the dataset with
+# the ID MSV000079284.
 #
 # For more details see below. 
 #
 # 1. Loading local datasets
 # -------------------------
 # Generally speaking the dataset layout the application expects matches the structure
-# of the output from a GNPS job with TODO TODO TODO settings, plus a few extra
-# files from other sources. If you have a dataset in the required structure, 
-# typically all you will need to do is tell nplinker where the root directory
+# of the output from a GNPS job. Workflows that are known to work so far are:
+# 
+#  - METABOLOMICS-SNETS (version 1.2.3) 
+#  - METABOLOMICS-SNETS-V2 (version release_14) 
+#  - FEATURE-BASED-MOLECULAR-NETWORKING (version 1.2.3)
+#
+# The simplest starting point is to download the "Clustered Spectra as MGF" zip 
+# file from GNPS and extract that into a folder to serve as the root directory for the dataset.
+# antiSMASH and BiG-SCAPE output are then added as additional subfolders. 
+#
+# Typically all you will need to do is tell nplinker where the root directory
 # is located. Otherwise you can customise the locations of the individual elements
 # using the various override settings below. 
 #
@@ -50,12 +59,13 @@ scoring_methods = ["metcalf", "rosetta", "testscore"]
 # <root>
 #   |- strain_mapping.csv (strain ID mappings)
 #   |   (METABOLOMICS DATA)
-#   |- clusterinfo_summary/<UID>.tsv (spectrum metadata)
-#   |- metadata_table/metadata_table-00000.txt (TODO)
+#   |- clusterinfo_summary*/<UID>.tsv (spectrum metadata, NOTE: NPLinker will search any folder beginning with "clusterinfo_summary")
+#   |- metadata_table/metadata_table-00000.txt (only present in FBMN GNPS jobs?)
 #   |- networkedges_selfloop/<UID>.selfloop (the "edges" file for spectra network)
 #   |- spectra/*.mgf (mass spec data)
-#   |- quantification_table_reformatted/<UID>.csv ("extra" spectrum metadata - TODO proper name for this?)
+#   |- quantification_table_reformatted/<UID>.csv ("extra" spectrum metadata, only present in FBMN jobs? TODO proper name for this?)
 #   |- DB_result/*.tsv (GNPS and other spectral annotation files, optional)
+#   |- result_specnets_DB/*.tsv (GNPS and other spectral annotation files, optional)
 #   |- DB_result/annotations.tsv (annotation data to extract from each file, see docs for details)
 #   |- params.xml (optional, params.xml from GNPS job output)
 #       (GENOMICS DATA)
@@ -66,9 +76,9 @@ scoring_methods = ["metcalf", "rosetta", "testscore"]
 #
 # 2. Loading platform datasets
 # ----------------------------
-# Given a platform ID, nplinker will retrieve the metabolomics data using the 
+# Given a platform ID, nplinker will retrieve the associated metabolomics data using the 
 # GNPS task ID. By default, it will also attempt to retrieve any available 
-# genomics data from the antismash database using the RefSeq accession labels 
+# genomics data from the antiSMASH database using the RefSeq accession labels 
 # in the platform project data. 
 # 
 # However, if you have local antismash results instead, you should also set the
@@ -76,9 +86,10 @@ scoring_methods = ["metcalf", "rosetta", "testscore"]
 # [dataset.overrides] section. nplinker can optionally also run bigscape on 
 # these results during the loading process. If you already have bigscape results
 # you can additionally set the "bigscape_dir" parameter to the appropriate 
-# location to skip this step. 
+# location to skip this step (or simply place them inside the <root>/bigscape folder)
 #
-# All files are downloaded and extracted to locations inside ~/nplinker_data. 
+# All files are downloaded and extracted to locations inside ~/nplinker_data. On Windows
+# this corresponds to C:\Users\<username>\nplinker_data.
 
 # Dataset configuration settings
 [dataset]
@@ -91,18 +102,30 @@ scoring_methods = ["metcalf", "rosetta", "testscore"]
 # load the dataset with ID MSV000079284. 
 root = "<root directory of dataset>"
 
+# you can optionally set the BIGSCAPE clustering cutoff value here. the default value
+# is 30, but any of the valid BIGSCAPE clustering thresholds can be used assuming the
+# corresponding files exist in the dataset. Also note that it's possible to change this
+# value after the dataset has initially been loaded, which will cause only the affected
+# data to be reloaded. Possibly only useful for the webapp
+#bigscape_cutoff = 30
+
+[antismash]
 # antismash file structure. Should be either 'default' or 'flat'. 
 # default = the standard structure with nested subdirectories
 # flat = all .gbk files placed in a single flat directory
 # TODO: is "flat" required any more? 
 antismash_format = "default"
 
-# you can optionally set the BIGSCAPE clustering cutoff value here. the default value
-# is 30, but any of the valid BIGSCAPE clustering thresholds can be used assuming the
-# corresponding files exist in the dataset. Also note that it's possible to change this
-# value after the dataset has initially been loaded, which will cause only the affected
-# data to be reloaded.
-#bigscape_cutoff = 30
+# NPLinker needs to know how to parse antiSMASH filenames from BiG-SCAPE output
+# to identify strain labels as part of the process of loading a dataset. 
+# Since the format of the filenames can vary from dataset to dataset, there isn't
+# a single rule that can be applied here. In most cases, the required action is
+# "take all text up to the first occurrence of <character>", e.g. the first 
+# underscore or period character. By default NPLinker will try the set of characters
+# defined below in sequence until a match is found. If you need to override this
+# then define a new list of at least one character to search for (note that it 
+# doesn't need to be a single character, e.g. ".abc" would also work)
+# antismash_delimiters = [".", "_", "-"]
 
 [docker]
 # this optional section contains various settings that only apply to the dockerised 
