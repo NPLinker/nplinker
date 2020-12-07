@@ -51,9 +51,8 @@ def run_bigscape(bigscape_py_path, antismash_path, output_path, pfam_path, cutof
     # disable extra clustering (TODO OK?)
     args.append('--clans-off')
 
-    logger.info('bigscape command: {}'.format(args) )
+    logger.info('bigscape command: {}'.format(args))
     result = subprocess.run(args, stdout=sys.stdout, stderr=sys.stderr)
-
     logger.info('bigscape completed!')
 
     # use presence of this file as a quick way to check if a previous run
