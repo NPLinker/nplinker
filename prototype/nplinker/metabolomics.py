@@ -1,5 +1,6 @@
 import os
 import csv
+import re
 
 import numpy as np
 
@@ -23,6 +24,9 @@ JCAMP = '##TITLE={}\\n' +\
         '##PEAK TABLE=(XY..XY)\\n' +\
         '{}\\n' +\
         '##END=\\n'
+
+# compile a regex for matching .mzXML and .mzML strings 
+RE_MZML_MZXML = re.compile('.mzXML|.mzML')
 
 class Spectrum(object):
     
@@ -359,7 +363,8 @@ def messy_strain_naming_lookup(mzxml, strains):
         # life is simple!
         return strains.lookup(mzxml)
 
-    # 1. knock off the .mzXML and try again
+    # 1. knock off the .mzXML and try again (using splitext should also handle
+    # other extensions like .mzML here)
     mzxml_no_ext = os.path.splitext(mzxml)[0]
     if mzxml_no_ext in strains:
         return strains.lookup(mzxml_no_ext)
@@ -397,11 +402,11 @@ def md_convert(val):
 
 def parse_mzxml_header(hdr, strains, md_table):
     # ignore any non-"Peak area" columns
-    # TODO can this be ".mzML" too??
-    if hdr.find('.mzXML Peak area') == -1:
-        return (None, None)
+    if hdr.find(' Peak area') == -1:
+        return (None, None, False)
 
-    # these columns should be named "<strain>_<growth media>.mzXML Peak area"
+    # in the datasets seen so far, these columns should be named 
+    #   "<strain>_<growth media>.mzXML Peak area"
     #   e.g. KRD178_ISP3.mzXML Peak area
     #   (OR  KRD_178_ISP3.mzXML Peak area)
     # want to extract both strain ID (assumed to be everything up to final underscore)
@@ -409,31 +414,37 @@ def parse_mzxml_header(hdr, strains, md_table):
     identifier = hdr[:hdr.index('.')]
     strain_name = None
     growth_medium = '<default>' # TODO what happens if not parsed?
+
+    # split the string around underscores
     tokens = identifier.split('_')
     
-    # treat the text as a strain ID and carry on)
+    # if we only have a single token, treat the text as a strain ID and carry on
     if len(tokens) == 1:
         strain_name = identifier
     elif len(tokens) == 2:
-        # this might be <strain>_<growthmedia> OR <strain>_<strain_pt2> 
-        # (e.g. KR7_178 instead of KRD178)
+        # if there are two tokens, it might indicate either 
+        #   <strain>_<growthmedia> OR <strain>_<strain_pt2> 
+        #   (e.g. KRD_178 instead of KRD178)
+        # so check if the first token appears in the strain list, which would indicate
+        # the second one is likely the growth medium
         if tokens[0] in strains:
             strain_name = tokens[0]
             growth_medium = tokens[1]
         else:
-            # check if the original strain is known
-            if strain_name not in strains:
-                # try removing the underscore
+            # if that fails, check if the original label is known 
+            if identifier not in strains:
+                # if it isn't, remove the underscores and try again...
                 if ''.join(tokens) in strains:
                     strain_name = ''.join(tokens)
                 else:
                     raise Exception('Failed to parse header: {}'.format(hdr))
     elif len(tokens) == 3:
-        # this should always(?) be <strain>_<strainpt2>_<growthmedia>
+        # if there are 3 tokens, this should always(??) be <strain>_<strainpt2>_<growthmedia>
+        # so just join the first two tokens and keep going
         strain_name = ''.join(tokens[:2])
         growth_medium = tokens[2]
     else:
-        raise Exception('Unknown mzXML header format: {}'.format(hdr))
+        raise Exception('Unknown mzXML/mzML header format: {}'.format(hdr))
 
     # found at least one case where these were different cases (m1 vs M1)
     if growth_medium is not None:
@@ -449,19 +460,21 @@ def parse_mzxml_header(hdr, strains, md_table):
         # appear in it, this indicates it's not a strain, so we should ignore it
         if md_table is not None and identifier not in md_table:
             # ignore this completely
-            return (None, None)
+            return (None, None, False)
 
         # throw an exception in case of unknown strain
-        raise Exception('Unknown strain identifier: {} (parsed from {})'.format(strain_name, hdr))
+        # raise Exception('Unknown strain identifier: {} (parsed from {})'.format(strain_name, hdr))
+        logger.warning('Unknown strain identifier: {} (parsed from {})'.format(strain_name, hdr))
 
-    return (strain_name, growth_medium)
+    return (strain_name, growth_medium, strain_name not in strains)
 
 def load_clusterinfo_old(gnps_format, strains, filename, spec_dict):
     # each line of this file represents a metabolite. 
     # columns representing strain IDs are *ignored* here in favour of parsing
-    # .mzXML filenames from either the AllFiles or UniqueFileSources column.
-    # both of these list the .mzXML files the molecule was found in (plus the scan 
+    # .mz(X)ML filenames from either the AllFiles or UniqueFileSources column.
+    # both of these list the .mz(X)ML files the molecule was found in (plus the scan 
     # number in the file in the AllFiles case)
+    unknown_strains = {}
     with open(filename, 'r') as f:
         reader = csv.reader(f, delimiter='\t')
         headers = next(reader)
@@ -473,7 +486,6 @@ def load_clusterinfo_old(gnps_format, strains, filename, spec_dict):
         else:
             raise Exception('Unexpected GNPS format {}'.format(gnps_format))
 
-        unknown_strains = {}
         for line in reader:
             # get the values of the important columns
             clu_index = int(line[clu_index_index]) 
@@ -519,6 +531,8 @@ def load_clusterinfo_old(gnps_format, strains, filename, spec_dict):
     if len(unknown_strains) > 0:
         logger.warning('{} unknown strains were detected a total of {} times'.format(len(unknown_strains), sum(unknown_strains.values())))
 
+    return unknown_strains
+
 # TODO just required to get growth media?
 def parse_metadata_table(filename):
     """Parses the metadata table file from GNPS"""
@@ -533,7 +547,9 @@ def parse_metadata_table(filename):
         for line in reader:
             # only non-BLANK entries
             if line[1] != 'BLANK':
-                table[line[0].replace('.mzXML', '')] = line[1]
+                # table[line[0].replace('.mzXML', '')] = line[1]
+                # want to strip out the .mz(X)ML extension here 
+                table[RE_MZML_MZXML.sub('', line[0])] = line[1]
 
     return table
 
@@ -571,6 +587,8 @@ def load_clusterinfo_fbmn(strains, nodes_file, extra_nodes_file, md_table_file, 
 
     logger.info('Merged nodes data (new-style), total lines = {}'.format(len(spec_info)))
 
+    unknown_strains = {}
+
     # for each spectrum 
     for spec_id, spec_data in spec_info.items():
         spectrum = spec_dict[spec_id]
@@ -589,9 +607,12 @@ def load_clusterinfo_fbmn(strains, nodes_file, extra_nodes_file, md_table_file, 
 
             # TODO this will probably need updating for platform data (should already
             # have a set of strain names...)
-            (strain_name, growth_medium) = parse_mzxml_header(k, strains, md_table)
+            (strain_name, growth_medium, is_unknown) = parse_mzxml_header(k, strains, md_table)
             if strain_name is None:
                 continue 
+            if is_unknown:
+                unknown_strains[k] = spec_id
+
             # add a strain object if the value is a float > 0
             v = md_convert(v)
             if strain_name in strains and isinstance(v, float) and v > 0:
@@ -600,7 +621,8 @@ def load_clusterinfo_fbmn(strains, nodes_file, extra_nodes_file, md_table_file, 
                 spectrum.add_strain(strain, growth_medium, v)
 
             spectrum.metadata[k] = v
-    return spec_info
+
+    return spec_info, unknown_strains
 
 def load_dataset(strains, mgf_file, edges_file, nodes_file, quant_table_file=None, metadata_table_file=None):
     # common steps to all formats of GNPS data:
@@ -619,7 +641,7 @@ def load_dataset(strains, mgf_file, edges_file, nodes_file, quant_table_file=Non
     load_edges(edges_file, spec_dict)
 
     gnps_format = identify_gnps_format(nodes_file, quant_table_file is not None)
-    print(nodes_file, quant_table_file is None)
+    logger.debug('Nodes_file: {}, quant_table_exists?: {}'.format(nodes_file, quant_table_file is None))
     if gnps_format == GNPS_FORMAT_UNKNOWN:
         raise Exception('Unknown/unsupported GNPS data format')
 
@@ -627,13 +649,13 @@ def load_dataset(strains, mgf_file, edges_file, nodes_file, quant_table_file=Non
     # if we don't have a quantification table, must be older-style dataset (or unknown format)
     if gnps_format != GNPS_FORMAT_NEW_FBMN and quant_table_file is None:
         logger.info('Found older-style GNPS dataset, no quantification table')
-        load_clusterinfo_old(gnps_format, strains, nodes_file, spec_dict)
+        unknown_strains = load_clusterinfo_old(gnps_format, strains, nodes_file, spec_dict)
     else:
         logger.info('quantification table exists, new-style GNPS dataset')
-        load_clusterinfo_fbmn(strains, nodes_file, quant_table_file, metadata_table_file, spec_dict)
+        _, unknown_strains = load_clusterinfo_fbmn(strains, nodes_file, quant_table_file, metadata_table_file, spec_dict)
 
     molfams = make_families(spectra)
-    return spec_dict, spectra, molfams
+    return spec_dict, spectra, molfams, unknown_strains
 
 def make_families(spectra):
     families = []
