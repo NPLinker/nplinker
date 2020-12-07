@@ -25,7 +25,6 @@ class Args(object):
         self.parser.add_argument('-f', '--logfile', help='Redirect logging from stdout to this file', metavar='logfile')
         self.parser.add_argument('-s', '--log_to_stdout', help='keep logging to stdout even if --logfile used', metavar='log_to_stdout')
 
-        self.parser.add_argument('--antismash-format', help='Antismash file format ("default" or "flat"!', metavar='format')
         self.parser.add_argument('--bigscape-cutoff', help='BIGSCAPE clustering cutoff threshold', metavar='cutoff')
         self.parser.add_argument('--repro-file', help='Filename to store reproducibility data in', metavar='filename')
 
