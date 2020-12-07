@@ -13,6 +13,8 @@ from .annotations import load_annotations
 from .strains import StrainCollection, Strain
 
 from .pairedomics.downloader import Downloader
+from .pairedomics.downloader import download_and_extract_mibig_json, generate_strain_mappings
+from .pairedomics.runbigscape import run_bigscape
 
 from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
@@ -59,46 +61,58 @@ def find_via_glob_alts(paths, file_type, optional=False):
 
     return filename
 
+def find_bigscape_dir(broot):
+    logger.info('Trying to discover correct bigscape directory under {}'.format(broot))
+    for root, dirs, files in os.walk(broot):
+        if 'Network_Annotations_Full.tsv' in files:
+            logger.info('Found network files directory: {}'.format(root))
+            return root
+
+    return None
+
 class DatasetLoader(object):
 
-    ANTISMASH_FMT_DEFAULT   = 'default'
-    ANTISMASH_FMT_FLAT      = 'flat'
-    ANTISMASH_FMTS          = [ANTISMASH_FMT_DEFAULT, ANTISMASH_FMT_FLAT]
+    ANTISMASH_FMT_DEFAULT         = 'default'
+    ANTISMASH_FMT_FLAT            = 'flat'
+    ANTISMASH_FMTS                = [ANTISMASH_FMT_DEFAULT, ANTISMASH_FMT_FLAT]
+    ANTISMASH_DELIMITERS_DEFAULT  = ['.', '_', '-']
 
-    TABLES_CUTOFF_DEFAULT   = 2.0
+    TABLES_CUTOFF_DEFAULT         = 2.0
 
-    BIGSCAPE_CUTOFF_DEFAULT = 30
+    BIGSCAPE_CUTOFF_DEFAULT       = 30
 
-    RUN_BIGSCAPE_DEFAULT = True
+    RUN_BIGSCAPE_DEFAULT          = True
     EXTRA_BIGSCAPE_PARAMS_DEFAULT = ""
 
     # keys for overriding metabolomics data elements
-    OR_NODES        = 'nodes_file'
-    OR_EDGES        = 'edges_file'
-    OR_EXTRA_NODES  = 'extra_nodes_file'
-    OR_MGF          = 'mgf_file'
-    OR_METADATA     = 'metadata_table_file'
-    OR_QUANT        = 'quantification_table_file'
-    OR_ANNO         = 'annotations_dir'
-    OR_ANNO_CONFIG  = 'annotations_config_file'
+    OR_NODES                      = 'nodes_file'
+    OR_EDGES                      = 'edges_file'
+    OR_EXTRA_NODES                = 'extra_nodes_file'
+    OR_MGF                        = 'mgf_file'
+    OR_METADATA                   = 'metadata_table_file'
+    OR_QUANT                      = 'quantification_table_file'
+    OR_ANNO                       = 'annotations_dir'
+    OR_ANNO_CONFIG                = 'annotations_config_file'
     # and the same for genomics data
-    OR_ANTISMASH    = 'antismash_dir'
-    OR_BIGSCAPE     = 'bigscape_dir'
-    OR_MIBIG_JSON   = 'mibig_json_dir'
-    OR_STRAINS      = 'strain_mappings_file'
+    OR_ANTISMASH                  = 'antismash_dir'
+    OR_BIGSCAPE                   = 'bigscape_dir'
+    OR_MIBIG_JSON                 = 'mibig_json_dir'
+    OR_STRAINS                    = 'strain_mappings_file'
     # misc files
-    OR_PARAMS       = 'gnps_params_file'
-    OR_DESCRIPTION  = 'description_file'
+    OR_PARAMS                     = 'gnps_params_file'
+    OR_DESCRIPTION                = 'description_file'
 
-    BIGSCAPE_PRODUCT_TYPES = ['NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs', 'Saccharides', 'Terpene']
+    BIGSCAPE_PRODUCT_TYPES        = ['NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs', 'Saccharides', 'Terpene']
 
     def __init__(self, config_data):
         self._config = config_data
         self._dataset = config_data['dataset']
         self._docker = config_data.get('docker', {})
         self._webapp = config_data.get('webapp', {})
+        self._antismash = config_data.get('antismash', {})
         self._overrides = self._dataset.get('overrides', {})
-        self._antismash_format = self._dataset.get('antismash_format', self.ANTISMASH_FMT_DEFAULT)
+        self._antismash_delimiters = self._antismash.get('antismash_delimiters', self.ANTISMASH_DELIMITERS_DEFAULT)
+        self._antismash_format = self._antismash.get('antismash_format', self.ANTISMASH_FMT_DEFAULT)
         self._bigscape_cutoff = self._dataset.get('bigscape_cutoff', self.BIGSCAPE_CUTOFF_DEFAULT)
         self._root = self._config['dataset']['root']
         self._platform_id = self._config['dataset']['platform_id']
@@ -135,7 +149,6 @@ class DatasetLoader(object):
         self.nodes_file = self._overrides.get(self.OR_NODES) or find_via_glob_alts([os.path.join(self._root, 'clusterinfo*', '*.tsv'),
                                                                                     os.path.join(self._root, 'clusterinfo*', '*.clustersummary')],
                                                                                    self.OR_NODES)
-        #find_via_glob(os.path.join(self._root, 'clusterinfo*', '*.tsv'), self.OR_NODES)
 
         # 3. MET: <root>/networkedges_selfloop/<some UID>.selfloop (new) or .pairsinfo (old) / edges_file=<override>
         self.edges_file = self._overrides.get(self.OR_EDGES) or find_via_glob_alts([os.path.join(self._root, 'networkedges_selfloop', '*.pairsinfo'),
@@ -174,12 +187,10 @@ class DatasetLoader(object):
         # what we really want here is the subdirectory containing the network/annotation fiies, 
         # but in case this is the path to the top level bigscape output, try to figure it out automatically
         if not os.path.exists(os.path.join(self.bigscape_dir, 'NRPS')):
-            logger.info('Trying to discover correct bigscape directory under {}'.format(self.bigscape_dir))
-            for root, dirs, files in os.walk(self.bigscape_dir):
-                if 'Network_Annotations_Full.tsv' in files:
-                    logger.info('Found network files directory: {}'.format(root))
-                    self.bigscape_dir = root
-                    break
+            new_bigscape_dir = find_bigscape_dir(self.bigscape_dir)
+            if new_bigscape_dir is not None:
+                logger.info('Updating bigscape_dir to discovered location {}'.format(new_bigscape_dir))
+                self.bigscape_dir = new_bigscape_dir
 
         # 11. GEN: <root>/mibig_json / mibig_json_dir=<override>
         self.mibig_json_dir = self._overrides.get(self.OR_MIBIG_JSON) or os.path.join(self._root, 'mibig_json')
@@ -214,6 +225,11 @@ class DatasetLoader(object):
         # Restrict strain list to only relevant strains
         if not met_only:
             self._filter_strains()
+
+        # if we don't have at least *some* strains here it probably means missing mappings
+        # or a complete failure to parse things, so bail out
+        if len(self.strains) == 0:
+            raise Exception('Failed to find *ANY* strains, missing strain_mappings.csv?')
 
         return True
 
@@ -254,7 +270,60 @@ class DatasetLoader(object):
             self.description_text = open(self.description_file, 'r').read()
             logger.debug('Parsed description text')
 
+    def _load_genomics_extra(self):
+        if not os.path.exists(self.mibig_json_dir):
+            logger.info('Attempting to download MiBIG JSON database...')
+            download_and_extract_mibig_json(self._root, self.mibig_json_dir)
+
+        if not os.path.exists(self.bigscape_dir):
+            should_run_bigscape = self._docker.get('run_bigscape', self.RUN_BIGSCAPE_DEFAULT)
+            extra_bigscape_parameters = self._docker.get('extra_bigscape_parameters', self.EXTRA_BIGSCAPE_PARAMS_DEFAULT)
+            if should_run_bigscape:
+                # TODO this should not be attempted if not in Docker env
+                logger.info('Running BiG-SCAPE! extra_bigscape_parameters="{}"'.format(extra_bigscape_parameters))
+                try:
+                    run_bigscape('/app/BiG-SCAPE/bigscape.py', os.path.join(self._root, 'antismash'), os.path.join(self._root, 'bigscape'), '/app', cutoffs=[0.3], extra_params=extra_bigscape_parameters)
+                except Exception as e:
+                    logger.warning('Failed to run BiG-SCAPE on antismash data, error was "{}"'.format(e))
+
+                self.bigscape_dir = find_bigscape_dir(self.bigscape_dir)
+
     def _load_genomics(self):
+        # TODO split this method up a bit
+
+        # hmmscan apparently can't cope with filenames that have spaces in them, and so if you try
+        # to run bigscape on a dataset like that it will just refuse. so, to try and avoid anyone
+        # having to manually fix this stupid problem, we will attempt to rename every .gbk file here
+        # TODO is this something nplinker should do, or dataset authors??
+        logger.debug('Collecting .gbk files (and possibly renaming)')
+        gbk_files = []
+        t = time.time()
+        renamed = 0
+        for root, dirs, files in os.walk(self.antismash_dir):
+            for f in files:
+                if f.lower().endswith('.gbk'):
+                    # this is a .gbk file, check it has a path without spaces 
+                    fullpath = os.path.join(root, f)
+                    if fullpath.find(' ') != -1:
+                        logger.debug('Spaces found in {}, renaming it'.format(fullpath))
+                        os.makedirs(root.replace(' ', '_'), exist_ok=True)
+                        newpath = fullpath.replace(' ', '_')
+                        os.rename(fullpath, newpath)
+                        fullpath = newpath
+                        renamed += 1
+
+                    gbk_files.append(fullpath)
+
+        logger.debug('.gbk collection took {:.3f}s'.format(time.time() - t))
+        logger.info('{}/{} .gbk files were renamed to remove spaces!'.format(renamed, len(gbk_files)))
+    
+        # both the bigscape and mibig_json dirs expected by nplinker may not exist at this point. in some
+        # cases this will cause an error later in the process, but this can also potentially be
+        # resolved automatically:
+        #   mibig_json => download and extract the JSON database
+        #   bigscape => run BiG-SCAPE before continuing (if using the Docker image)
+        self._load_genomics_extra()
+
         logger.debug('make_mibig_bgc_dict({})'.format(self.mibig_json_dir))
         self.mibig_bgc_dict = make_mibig_bgc_dict(self.strains, self.mibig_json_dir)
         logger.debug('mibig_bgc_dict has {} entries'.format(len(self.mibig_bgc_dict)))
@@ -314,23 +383,22 @@ class DatasetLoader(object):
             else:
                 self.product_types.append(prodtype)
 
+
         # generate a cache of antismash filenames to make matching them to BGC objects easier
         self.antismash_cache = {}
         logger.debug('Generating antiSMASH filename cache...')
         t = time.time()
-        for root, dirs, files in os.walk(self.antismash_dir):
-            for f in files:
-                if f.endswith('.gbk'):
-                    basename = os.path.splitext(f)[0]
-                    fullpath = os.path.join(root, f)
-                    self.antismash_cache[basename] = fullpath
-                    # also insert it with the folder name as matching on filename isn't always enough apparently
-                    parent = os.path.split(root)[-1]
-                    self.antismash_cache['{}_{}'.format(parent, basename)] = fullpath
+        for f in gbk_files:
+            basename = os.path.splitext(os.path.split(f)[1])[0]
+            fullpath = os.path.join(root, f)
+            self.antismash_cache[basename] = fullpath
+            # also insert it with the folder name as matching on filename isn't always enough apparently
+            parent = os.path.split(root)[-1]
+            self.antismash_cache['{}_{}'.format(parent, basename)] = fullpath
         logger.debug('Cache generation took {:.3f}s'.format(time.time() - t))
 
-        logger.debug('loadBGC_from_cluster_files(antismash_dir={})'.format(self.antismash_dir))
-        self.gcfs, self.bgcs, self.strains = loadBGC_from_cluster_files(
+        logger.debug('loadBGC_from_cluster_files(antismash_dir={}, delimiters={})'.format(self.antismash_dir, self._antismash_delimiters))
+        self.gcfs, self.bgcs, self.strains, unknown_strains = loadBGC_from_cluster_files(
                                                 self.strains,
                                                 cluster_files,
                                                 anno_files,
@@ -338,11 +406,29 @@ class DatasetLoader(object):
                                                 self.mibig_bgc_dict,
                                                 antismash_dir=self.antismash_dir,
                                                 antismash_filenames=self.antismash_cache,
-                                                antismash_format=self._antismash_format)
+                                                antismash_format=self._antismash_format,
+                                                antismash_delimiters=self._antismash_delimiters)
+
+        if len(unknown_strains) > 0:
+            us_path = os.path.join(self._root, 'unknown_strains_gen.csv')
+            logger.warning('Writing unknown strains from GENOMICS data to {}'.format(us_path))
+            with open(us_path, 'w') as us:
+                us.write('# unknown strain label, filename\n')
+                for strain, filename in unknown_strains.items():
+                    us.write('{}, {}\n'.format(strain, filename))
+
         return True
 
     def _load_metabolomics(self):
-        spec_dict, self.spectra, self.molfams = load_dataset(self.strains, self.mgf_file, self.edges_file, self.nodes_file, self.quantification_table_file, self.metadata_table_file)
+        spec_dict, self.spectra, self.molfams, unknown_strains = load_dataset(self.strains, self.mgf_file, self.edges_file, self.nodes_file, self.quantification_table_file, self.metadata_table_file)
+
+        if len(unknown_strains) > 0:
+            us_path = os.path.join(self._root, 'unknown_strains_met.csv')
+            logger.warning('Writing unknown strains from METABOLOMICS data to {}'.format(us_path))
+            with open(us_path, 'w') as us:
+                us.write('# unknown strain label\n')
+                for strain in unknown_strains.keys():
+                    us.write('{}\n'.format(strain))
 
         # load any available annotations from GNPS or user-provided files
         logger.info('Loading provided annotation files ({})'.format(self.annotations_dir))
@@ -358,13 +444,16 @@ class DatasetLoader(object):
         self.strains = StrainCollection()
 
         global_strain_id_file = os.path.join(self.datadir, 'strain_id_mapping.csv')
-        # self.strains.add_from_file(global_strain_id_file)
+        self.strains.add_from_file(global_strain_id_file)
         logger.info('Loaded global strain IDs ({} total)'.format(len(self.strains)))
 
         # now load the dataset mapping in the same way
         # TODO: what happens in case of clashes (differing primary IDs?)
         if not os.path.exists(self.strain_mappings_file):
-            raise Exception('Unable to load strain_mappings file: {}'.format(self.strain_mappings_file))
+            # create an empty placeholder file and show a warning
+            logger.warn('No strain_mappings.csv file found! Attempting to create one')
+            generate_strain_mappings(self.strains, self.strain_mappings_file, self.antismash_dir)
+            # raise Exception('Unable to load strain_mappings file: {}'.format(self.strain_mappings_file))
         else:
             self.strains.add_from_file(self.strain_mappings_file)
             logger.info('Loaded dataset strain IDs ({} total)'.format(len(self.strains)))
@@ -372,7 +461,8 @@ class DatasetLoader(object):
         return True
 
     def required_paths(self):
-        return [self.nodes_file, self.edges_file, self.mgf_file, self.antismash_dir, self.bigscape_dir, self.mibig_json_dir]
+        # these are files/paths that *must* exist for loading to begin
+        return [self.nodes_file, self.edges_file, self.mgf_file, self.antismash_dir]
 
     def optional_paths(self):
         return [self.annotations_dir]
