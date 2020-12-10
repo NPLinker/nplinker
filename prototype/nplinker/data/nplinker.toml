@@ -59,7 +59,7 @@ repro_file = ""
 # <root>
 #   |- strain_mapping.csv (strain ID mappings)
 #   |   (METABOLOMICS DATA)
-#   |- clusterinfo_summary*/<UID>.tsv (spectrum metadata, NOTE: NPLinker will search any folder beginning with "clusterinfo_summary")
+#   |- clusterinfo*/<UID>.tsv (spectrum metadata, NOTE: NPLinker will search any folder beginning with "clusterinfo")
 #   |- metadata_table/metadata_table-00000.txt (only present in FBMN GNPS jobs?)
 #   |- networkedges_selfloop/<UID>.selfloop (the "edges" file for spectra network)
 #   |- spectra/*.mgf (mass spec data)
