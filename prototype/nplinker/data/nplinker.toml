@@ -127,6 +127,15 @@ antismash_format = "default"
 # doesn't need to be a single character, e.g. ".abc" would also work)
 # antismash_delimiters = [".", "_", "-"]
 
+# if using the Docker version of NPLinker which contains BiG-SCAPE and can run it
+# automatically, you can choose to have the application automatically rename any
+# files under the <root>/antismash folder which contain spaces in their filenames
+# (both subfolders and .gbk files). This is to avoid BiG-SCAPE throwing up errors
+# because it can't handle filenames with spaces in them. If you already have 
+# BiG-SCAPE results or don't want NPLinker to rename anything automatically, set
+# this to true instead
+ignore_spaces = false
+
 [docker]
 # this optional section contains various settings that only apply to the dockerised 
 # version of nplinker. The Docker image contains BiG-SCAPE, and this tool can be run
