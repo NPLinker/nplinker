@@ -72,37 +72,38 @@ def find_bigscape_dir(broot):
 
 class DatasetLoader(object):
 
-    ANTISMASH_FMT_DEFAULT         = 'default'
-    ANTISMASH_FMT_FLAT            = 'flat'
-    ANTISMASH_FMTS                = [ANTISMASH_FMT_DEFAULT, ANTISMASH_FMT_FLAT]
-    ANTISMASH_DELIMITERS_DEFAULT  = ['.', '_', '-']
+    ANTISMASH_FMT_DEFAULT           = 'default'
+    ANTISMASH_FMT_FLAT              = 'flat'
+    ANTISMASH_FMTS                  = [ANTISMASH_FMT_DEFAULT, ANTISMASH_FMT_FLAT]
+    ANTISMASH_DELIMITERS_DEFAULT    = ['.', '_', '-']
+    ANTISMASH_IGNORE_SPACES_DEFAULT = False
 
-    TABLES_CUTOFF_DEFAULT         = 2.0
+    TABLES_CUTOFF_DEFAULT           = 2.0
 
-    BIGSCAPE_CUTOFF_DEFAULT       = 30
+    BIGSCAPE_CUTOFF_DEFAULT         = 30
 
-    RUN_BIGSCAPE_DEFAULT          = True
-    EXTRA_BIGSCAPE_PARAMS_DEFAULT = ""
+    RUN_BIGSCAPE_DEFAULT            = True
+    EXTRA_BIGSCAPE_PARAMS_DEFAULT   = ""
 
     # keys for overriding metabolomics data elements
-    OR_NODES                      = 'nodes_file'
-    OR_EDGES                      = 'edges_file'
-    OR_EXTRA_NODES                = 'extra_nodes_file'
-    OR_MGF                        = 'mgf_file'
-    OR_METADATA                   = 'metadata_table_file'
-    OR_QUANT                      = 'quantification_table_file'
-    OR_ANNO                       = 'annotations_dir'
-    OR_ANNO_CONFIG                = 'annotations_config_file'
+    OR_NODES                        = 'nodes_file'
+    OR_EDGES                        = 'edges_file'
+    OR_EXTRA_NODES                  = 'extra_nodes_file'
+    OR_MGF                          = 'mgf_file'
+    OR_METADATA                     = 'metadata_table_file'
+    OR_QUANT                        = 'quantification_table_file'
+    OR_ANNO                         = 'annotations_dir'
+    OR_ANNO_CONFIG                  = 'annotations_config_file'
     # and the same for genomics data
-    OR_ANTISMASH                  = 'antismash_dir'
-    OR_BIGSCAPE                   = 'bigscape_dir'
-    OR_MIBIG_JSON                 = 'mibig_json_dir'
-    OR_STRAINS                    = 'strain_mappings_file'
+    OR_ANTISMASH                    = 'antismash_dir'
+    OR_BIGSCAPE                     = 'bigscape_dir'
+    OR_MIBIG_JSON                   = 'mibig_json_dir'
+    OR_STRAINS                      = 'strain_mappings_file'
     # misc files
-    OR_PARAMS                     = 'gnps_params_file'
-    OR_DESCRIPTION                = 'description_file'
+    OR_PARAMS                       = 'gnps_params_file'
+    OR_DESCRIPTION                  = 'description_file'
 
-    BIGSCAPE_PRODUCT_TYPES        = ['NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs', 'Saccharides', 'Terpene']
+    BIGSCAPE_PRODUCT_TYPES          = ['NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs', 'Saccharides', 'Terpene']
 
     def __init__(self, config_data):
         self._config = config_data
@@ -113,6 +114,7 @@ class DatasetLoader(object):
         self._overrides = self._dataset.get('overrides', {})
         self._antismash_delimiters = self._antismash.get('antismash_delimiters', self.ANTISMASH_DELIMITERS_DEFAULT)
         self._antismash_format = self._antismash.get('antismash_format', self.ANTISMASH_FMT_DEFAULT)
+        self._antismash_ignore_spaces = self._antismash.get('ignore_spaces', self.ANTISMASH_IGNORE_SPACES_DEFAULT)
         self._bigscape_cutoff = self._dataset.get('bigscape_cutoff', self.BIGSCAPE_CUTOFF_DEFAULT)
         self._root = self._config['dataset']['root']
         self._platform_id = self._config['dataset']['platform_id']
@@ -299,14 +301,27 @@ class DatasetLoader(object):
         gbk_files = []
         t = time.time()
         renamed = 0
+
+        # if the option is enabled, check for spaces in the folder names under
+        # <dataset>/antismash and rename them, replacing spaces with underscores
+        ignore_spaces = self._antismash_ignore_spaces
+        if not ignore_spaces:
+            logger.debug('Checking for spaces in antiSMASH folder names...')
+            for root, dirs, files in os.walk(self.antismash_dir):
+                for d in dirs:
+                    if d.find(' ') != -1:
+                        os.rename(os.path.join(root, d), os.path.join(root, d.replace(' ', '_')))
+                        logger.warn('Renaming antiSMASH folder "{}" to "{}" to remove spaces! (suppress with ignore_spaces = true in config file)'.format(d, d.replace(' ', '_')))
+
+        # now want to gather a list of all .gbk files, and if necessary+enabled
+        # rename them to replace spaces with underscores
         for root, dirs, files in os.walk(self.antismash_dir):
             for f in files:
                 if f.lower().endswith('.gbk'):
-                    # this is a .gbk file, check it has a path without spaces 
                     fullpath = os.path.join(root, f)
-                    if fullpath.find(' ') != -1:
-                        logger.debug('Spaces found in {}, renaming it'.format(fullpath))
-                        os.makedirs(root.replace(' ', '_'), exist_ok=True)
+
+                    if not ignore_spaces and fullpath.find(' ') != -1:
+                        logger.debug('Spaces found in antiSMASH file "{}", renaming it'.format(fullpath))
                         newpath = fullpath.replace(' ', '_')
                         os.rename(fullpath, newpath)
                         fullpath = newpath
@@ -409,26 +424,24 @@ class DatasetLoader(object):
                                                 antismash_format=self._antismash_format,
                                                 antismash_delimiters=self._antismash_delimiters)
 
-        if len(unknown_strains) > 0:
-            us_path = os.path.join(self._root, 'unknown_strains_gen.csv')
-            logger.warning('Writing unknown strains from GENOMICS data to {}'.format(us_path))
-            with open(us_path, 'w') as us:
-                us.write('# unknown strain label, filename\n')
-                for strain, filename in unknown_strains.items():
-                    us.write('{}, {}\n'.format(strain, filename))
+        us_path = os.path.join(self._root, 'unknown_strains_gen.csv')
+        logger.warning('Writing unknown strains from GENOMICS data to {}'.format(us_path))
+        with open(us_path, 'w') as us:
+            us.write('# unknown strain label, filename\n')
+            for strain, filename in unknown_strains.items():
+                us.write('{}, {}\n'.format(strain, filename))
 
         return True
 
     def _load_metabolomics(self):
         spec_dict, self.spectra, self.molfams, unknown_strains = load_dataset(self.strains, self.mgf_file, self.edges_file, self.nodes_file, self.quantification_table_file, self.metadata_table_file)
 
-        if len(unknown_strains) > 0:
-            us_path = os.path.join(self._root, 'unknown_strains_met.csv')
-            logger.warning('Writing unknown strains from METABOLOMICS data to {}'.format(us_path))
-            with open(us_path, 'w') as us:
-                us.write('# unknown strain label\n')
-                for strain in unknown_strains.keys():
-                    us.write('{}\n'.format(strain))
+        us_path = os.path.join(self._root, 'unknown_strains_met.csv')
+        logger.warning('Writing unknown strains from METABOLOMICS data to {}'.format(us_path))
+        with open(us_path, 'w') as us:
+            us.write('# unknown strain label\n')
+            for strain in unknown_strains.keys():
+                us.write('{}\n'.format(strain))
 
         # load any available annotations from GNPS or user-provided files
         logger.info('Loading provided annotation files ({})'.format(self.annotations_dir))
