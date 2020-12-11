@@ -231,6 +231,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                         unknown_strains[name] = filename
                         continue
 
+                # logger.debug('"{}" matched to {}'.format(name, strain))
                 metadata_line = metadata[name]
                 description = metadata_line[2]
                 bigscape_class = metadata_line[4]
