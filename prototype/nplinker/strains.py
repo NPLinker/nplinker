@@ -14,6 +14,10 @@ class Strain(object):
         return alt_id in self.aliases
 
     def add_alias(self, alt_id):
+        if len(alt_id) == 0:
+            logger.warning('Refusing to add zero-length alias to strain {}'.format(self))
+            return
+
         self.aliases.add(alt_id)
 
     def __repr__(self):
@@ -90,6 +94,7 @@ class StrainCollection(object):
             logger.warning('strain mappings file not found: {}'.format(filename))
             return
 
+        line = 1
         with open(filename, 'r') as f:
             reader = csv.reader(f)
             for ids in reader:
@@ -97,8 +102,13 @@ class StrainCollection(object):
                     continue
                 strain = Strain(ids[0])
                 for id in ids[1:]:
-                    strain.add_alias(id)
+                    if len(id) == 0:
+                        logger.warning('Found zero-length strain label in {} on line {}'.format(filename, line))
+                    else:
+                        strain.add_alias(id)
                 self.add(strain)
+
+                line += 1
 
     def save_to_file(self, filename):
         with open(filename, 'w') as f:
