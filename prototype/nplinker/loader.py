@@ -244,6 +244,8 @@ class DatasetLoader(object):
         bgc_strains = set([x.strain for x in self.bgcs])
         spectrum_strains = set().union(*[x.strains for x in self.spectra])
         common_strains = bgc_strains.intersection(spectrum_strains)
+        logger.debug('Filtering strains: genomics count {}, metabolomics count: {}'.format(len(bgc_strains), len(spectrum_strains)))
+        logger.debug('Common strains found: {}'.format(len(common_strains)))
         self.strains.filter(common_strains)
         # this makes metcalf standardised scoring a bit more efficient
         for gcf in self.gcfs:
