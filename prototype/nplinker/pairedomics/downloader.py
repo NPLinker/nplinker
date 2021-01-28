@@ -501,32 +501,8 @@ class Downloader(object):
         return content
 
 if __name__ == "__main__":
-    # salinispora dataset (only one that actually works)
-    d = Downloader('MSV000079284')
-    # d = Downloader('MSV000084771')
-    d.get()
+    # salinispora dataset 
+    # d = Downloader('MSV000079284')
 
-    # all_ids = ['MSV000078995',
-    #         'MSV000082831',
-    #         'MSV000078847',
-    #         'MSV000078850',
-    #         'MSV000084723',
-    #         'MSV000084781',
-    #         'MSV000078836',
-    #         'MSV000078839',
-    #         'MSV000084278',
-    #         'MSV000079284',
-    #         'MSV000084771']
-    # failed = []
-    # for id in all_ids:
-    #     print('Attempting to get dataset {}'.format(id))
-    #     try:
-    #         d = Downloader(id)
-    #         d.get()
-    #     except Exception as e:
-    #         print('Failed: {}'.format(e))
-    #         failed.append(id)
-    #         continue
-
-    # print('Failed IDs')
-    # print(failed)
+    d = Downloader('MSV000078836').get(False, "")
+    # d = Downloader('MSV000079284').get(False, "")
