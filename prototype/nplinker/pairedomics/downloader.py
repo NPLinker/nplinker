@@ -106,7 +106,9 @@ def generate_strain_mappings(strains, strain_mappings_file, antismash_dir):
                 if not f.endswith('.gbk'):
                     continue
 
-                # TODO is this correct/sensible???
+                # use the containing folder of the .gbk file as the strain name,
+                # and then take everything but ".gbk" from the filename and use 
+                # that as an alias
                 strain_name = os.path.split(root)[1]
                 strain_alias = os.path.splitext(f)[0]
                 if strain_alias.find('.') != -1:
