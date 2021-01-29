@@ -370,8 +370,6 @@ class Downloader(object):
                 with open(genome_status_file, 'a+') as f:
                     f.write(genome_obj.to_csv()+'\n')
 
-
-        # TODO this is wrong, need to iterate over the list and check instead
         missing = len([x for x in genome_status.values() if len(x.filename) == 0])
         logger.info('Dataset has {} missing sets of antiSMASH data (from a total of {})'.format(missing, len(genome_records)))
 
