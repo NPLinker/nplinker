@@ -307,7 +307,6 @@ class Downloader(object):
         return None
 
     def _download_genomics_data(self, genome_records):
-        found_genomes = 0
         genome_status = {}
 
         # this file records genome IDs and local filenames to avoid having to repeat HTTP requests
@@ -363,7 +362,6 @@ class Downloader(object):
 
                 # if we got a refseq ID, now try to download the data from antismash
                 if self._download_antismash_zip(genome_obj):
-                    found_genomes += 1
                     logger.info('Genome data successfully downloaded for {}'.format(best_id))
                     genome_record['resolved_id'] = genome_obj.resolved_id
                 else:
@@ -379,9 +377,8 @@ class Downloader(object):
             for obj in genome_status.values():
                 f.write(obj.to_csv()+'\n')
 
-        if found_genomes == 0:
-            # raise Exception('Failed to download ANY genome data!')
-            logger.warning('Failed to download ANY genome data!')
+        if missing == len(genome_records):
+            logger.warning('Failed to successfully retrieve ANY genome data!')
 
     def _download_mibig_json(self, version='1.4'):
         output_path = os.path.join(self.project_file_cache, 'mibig_json')
