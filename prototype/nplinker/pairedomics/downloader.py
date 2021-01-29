@@ -2,7 +2,10 @@ import sys
 import os
 import zipfile
 import json
+import io
+import re
 import tarfile
+import csv
 
 import httpx
 from bs4 import BeautifulSoup
@@ -20,13 +23,36 @@ from .runbigscape import run_bigscape
 PAIREDOMICS_PROJECT_DATA_ENDPOINT = 'http://pairedomicsdata.bioinformatics.nl/api/projects'
 PAIREDOMICS_PROJECT_URL = 'https://pairedomicsdata.bioinformatics.nl/api/projects/{}'
 GNPS_DATA_DOWNLOAD_URL = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_clustered_spectra'
+
 ANTISMASH_DB_PAGE_URL = 'https://antismash-db.secondarymetabolites.org/output/{}/'
 ANTISMASH_DB_DOWNLOAD_URL = 'https://antismash-db.secondarymetabolites.org/output/{}/{}'
+
+ANTISMASH_DBV2_PAGE_URL = 'https://antismash-dbv2.secondarymetabolites.org/output/{}/'
+ANTISMASH_DBV2_DOWNLOAD_URL = 'https://antismash-dbv2.secondarymetabolites.org/output/{}/{}'
 
 NCBI_GENBANK_LOOKUP_URL = 'https://www.ncbi.nlm.nih.gov/nuccore/{}?report=docsum'
 NCBI_ASSEMBLY_LOOKUP_URL = 'https://www.ncbi.nlm.nih.gov/assembly?LinkName=nuccore_assembly&from_uid={}'
 
+JGI_GENOME_LOOKUP_URL = 'https://img.jgi.doe.gov/cgi-bin/m/main.cgi?section=TaxonDetail&page=taxonDetail&taxon_oid={}'
+
 MIBIG_JSON_URL = 'https://dl.secondarymetabolites.org/mibig/mibig_json_{}.tar.gz'
+
+USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'
+
+class GenomeStatus:
+
+    def __init__(self, original_id, resolved_id, attempted=False, filename=""):
+        self.original_id = original_id
+        self.resolved_id = None if resolved_id == 'None' else resolved_id
+        self.attempted = True if attempted == 'True' else False
+        self.filename = filename
+
+    @classmethod
+    def from_csv(cls, original_id, resolved_id, attempted, filename):
+        return cls(original_id, resolved_id, attempted, filename)
+
+    def to_csv(self):
+        return ','.join([self.original_id, str(self.resolved_id), str(self.attempted), self.filename])
 
 def download_and_extract_mibig_json(download_path, output_path, version='1.4'):
     archive_path = os.path.join(download_path, 'mibig_json_{}.tar.gz'.format(version))
@@ -163,7 +189,7 @@ class Downloader(object):
         for d in ['antismash', 'bigscape']:
             os.makedirs(os.path.join(self.project_file_cache, d), exist_ok=True)
 
-        with open(os.path.join(self.project_file_cache, 'platform_data.json'), 'w') as f:
+        with io.open(os.path.join(self.project_file_cache, 'platform_data.json'), 'w', encoding='utf-8') as f:
             f.write(str(self.project_json))
 
         self.strain_mappings_file = os.path.join(self.project_file_cache, 'strain_mappings.csv')
@@ -198,66 +224,8 @@ class Downloader(object):
     def _generate_strain_mappings(self):
         gen_strains = generate_strain_mappings(self.strains, self.strain_mappings_file, os.path.join(self.project_file_cache, 'antismash'))
 
-    def _download_genomics_data(self, genome_records):
-        found = 0
-        
-        missing_cache_file = os.path.join(self.project_download_cache, 'missing_antismash.txt')
-        missing_files = set()
-        if os.path.exists(missing_cache_file):
-            with open(missing_cache_file, 'r') as f:
-                for l in f.readlines():
-                    missing_files.add(l.strip())
 
-        logger.debug('Dataset has {} missing sets of antiSMASH data'.format(len(missing_files)))
-
-        for i, gr in enumerate(genome_records):
-            label = gr['genome_label']
-            if 'RefSeq_accession' in gr['genome_ID']:
-                accession = gr['genome_ID']['RefSeq_accession']
-                # TODO does original value need preserved
-                # accession = accession[:accession.rindex('.')]
-                if accession in missing_files:
-                    logger.warning('Not attempting to download data for accession={}'.format(accession))
-                    continue
-            
-                logger.info('Checking for antismash data {}/{}, accession={}'.format(i+1, len(genome_records), accession))
-                if self._download_antismash_zip(accession):
-                    found += 1
-                else:
-                    missing_files.add(accession)
-
-            elif 'GenBank_accession' in gr['genome_ID']:
-                accession = gr['genome_ID']['GenBank_accession']
-                try:
-                    refseq_accession = self._get_refseq_from_genbank(accession)
-                except:
-                    logger.warning('Failed resolving GenBank accession {}'.format(accession))
-                    continue
-
-                if refseq_accession in missing_files:
-                    logger.warning('Not attempting to download data for accession={}'.format(refseq_accession))
-                    continue
-
-                logger.info('Checking for antismash data {}/{}, accession={}'.format(i+1, len(genome_records), refseq_accession))
-                if self._download_antismash_zip(refseq_accession):
-                    found += 1
-                else:
-                    missing_files.add(refseq_accession)
-
-            else:
-                logger.warning('Missing RefSeq_accession label for {}'.format(label))
-                continue
-
-        with open(missing_cache_file, 'w') as f:
-            for mf in missing_files:
-                f.write('{}\n'.format(mf))
-
-        logger.info('Obtained {}/{} sets of genome data'.format(found, len(genome_records)))
-        if found == 0:
-            # raise Exception('Failed to download ANY genome data!')
-            logger.warning('Failed to download ANY genome data!')
-
-    def _get_refseq_from_genbank(self, genbank_id):
+    def _resolve_genbank_accession(self, genbank_id):
         """
         Super hacky way of trying to resolve the GenBank accession into RefSeq accession.
         """
@@ -278,23 +246,142 @@ class Downloader(object):
                 genbank_id = genbank_id.lower() 
 
         # Look up genbank ID
-        url = NCBI_GENBANK_LOOKUP_URL.format(genbank_id)
-        resp = httpx.get(url)
-        soup = BeautifulSoup(resp.content, 'html.parser')
-        ids = soup.find('dl', {'class': 'rprtid'})
-        for field_idx, field in enumerate(ids.findChildren()):
-            if field.getText().strip() == 'GI:':
-                seq_id = ids.findChildren()[field_idx + 1].getText().strip()
-                break
+        try:
+            url = NCBI_GENBANK_LOOKUP_URL.format(genbank_id)
+            resp = httpx.get(url)
+            soup = BeautifulSoup(resp.content, 'html.parser')
+            ids = soup.find('dl', {'class': 'rprtid'})
+            for field_idx, field in enumerate(ids.findChildren()):
+                if field.getText().strip() == 'GI:':
+                    seq_id = ids.findChildren()[field_idx + 1].getText().strip()
+                    break
 
-        # Look up assembly
-        url = NCBI_ASSEMBLY_LOOKUP_URL.format(seq_id)
-        resp = httpx.get(url)
-        soup = BeautifulSoup(resp.content, 'html.parser')
-        title_href = soup.find('p', {'class': 'title'}).a['href']
-        refseq_id = title_href.split('/')[-1].split('.')[0]
+            # Look up assembly
+            url = NCBI_ASSEMBLY_LOOKUP_URL.format(seq_id)
+            resp = httpx.get(url)
+            soup = BeautifulSoup(resp.content, 'html.parser')
+            title_href = soup.find('p', {'class': 'title'}).a['href']
+            refseq_id = title_href.split('/')[-1].split('.')[0]
+            return refseq_id
+        except Exception as e:
+            logger.warning('Failed resolving GenBank accession {}, error {}'.format(genbank_id, e))
 
-        return refseq_id
+        return None
+
+    def _resolve_jgi_accession(self, jgi_id):
+        url = JGI_GENOME_LOOKUP_URL.format(jgi_id)
+        # no User-Agent header produces a 403 Forbidden error on this site...
+        resp = httpx.get(url, headers={'User-Agent': USER_AGENT})
+        soup = BeautifulSoup(resp.content, 'html.parser')
+        # find the table entry giving the NCBI assembly accession ID
+        link = soup.find('a', href=re.compile('https://www.ncbi.nlm.nih.gov/nuccore/.*'))
+        if link is None:
+            return None
+        
+        return self._resolve_genbank_accession(link.text)
+
+    def _get_best_available_genome_id(self, genome_id_data):
+        if 'RefSeq_accession' in genome_id_data:
+            return genome_id_data['RefSeq_accession']
+        elif 'GenBank_accession' in genome_id_data:
+            return genome_id_data['GenBank_accession']
+        elif 'JGI_Genome_ID' in genome_id_data:
+            return genome_id_data['JGI_Genome_ID']
+
+        return None
+
+    def _resolve_genome_id_data(self, genome_id_data):
+        if 'RefSeq_accession' in genome_id_data:
+            # best case, can use this directly
+            return genome_id_data['RefSeq_accession']
+        elif 'GenBank_accession' in genome_id_data:
+            # resolve via NCBI
+            return self._resolve_genbank_accession(genome_id_data['GenBank_accession'])
+        elif 'JGI_Genome_ID' in genome_id_data:
+            # resolve via JGI => NCBI
+            return self._resolve_jgi_accession(genome_id_data['JGI_Genome_ID'])
+
+        logger.warning('Unable to resolve genome_ID: {}'.format(genome_id_data))
+        return None
+
+    def _download_genomics_data(self, genome_records):
+        found_genomes = 0
+        genome_status = {}
+
+        # this file records genome IDs and local filenames to avoid having to repeat HTTP requests
+        # each time the app is loaded (this can take a lot of time if there are dozens of genomes)
+        genome_status_file = os.path.join(self.project_download_cache, 'genome_status.txt')
+
+        # genome lookup status info
+        if os.path.exists(genome_status_file):
+            with open(genome_status_file, 'r') as f:
+                for line in csv.reader(f):
+                    asobj = GenomeStatus.from_csv(*line)
+                    genome_status[asobj.original_id] = asobj
+
+        for i, genome_record in enumerate(genome_records):
+            label = genome_record['genome_label']
+
+            # get the best available ID from the dict
+            best_id = self._get_best_available_genome_id(genome_record['genome_ID'])
+
+            # use this to check if the lookup has already been attempted and if
+            # so if the file is cached locally
+            if best_id not in genome_status:
+                genome_status[best_id] = GenomeStatus(best_id, None)
+
+            genome_obj = genome_status[best_id]
+                
+            logger.info('Checking for antismash data {}/{}, current genome ID={}'.format(i+1, len(genome_records), best_id))
+            # first check if file is cached locally
+            if os.path.exists(genome_obj.filename):
+                # file already downloaded
+                logger.info('Genome ID {} already downloaded to {}'.format(best_id, genome_obj.filename))
+                genome_record['resolved_id'] = genome_obj.resolved_id
+            elif genome_obj.attempted:
+                # lookup attempted previously but failed
+                logger.info('Genome ID {} skipped due to previous failure'.format(best_id))
+                genome_record['resolved_id'] = genome_obj.resolved_id
+            else:
+                # if no existing file and no lookup attempted, can start process of
+                # trying to retrieve the data
+
+                # lookup the ID
+                logger.info('Beginning lookup process for genome ID {}'.format(best_id))
+
+                genome_obj.resolved_id = self._resolve_genome_id_data(genome_record['genome_ID'])
+                genome_obj.attempted = True
+
+                if genome_obj.resolved_id is None:
+                    # give up on this one
+                    logger.warning('Failed lookup for genome ID {}'.format(best_id))
+                    with open(genome_status_file, 'a+') as f:
+                        f.write(genome_obj.to_csv()+'\n')
+                    continue
+
+                # if we got a refseq ID, now try to download the data from antismash
+                if self._download_antismash_zip(genome_obj):
+                    found_genomes += 1
+                    logger.info('Genome data successfully downloaded for {}'.format(best_id))
+                    genome_record['resolved_id'] = genome_obj.resolved_id
+                else:
+                    logger.warning('Failed to download antiSMASH data for genome ID {} ({})'.format(genome_obj.resolved_id, genome_obj.original_id))
+
+                with open(genome_status_file, 'a+') as f:
+                    f.write(genome_obj.to_csv()+'\n')
+
+
+        # TODO this is wrong, need to iterate over the list and check instead
+        missing = len([x for x in genome_status.values() if len(x.filename) == 0])
+        logger.info('Dataset has {} missing sets of antiSMASH data (from a total of {})'.format(missing, len(genome_records)))
+
+        with open(genome_status_file, 'w') as f:
+            for obj in genome_status.values():
+                f.write(obj.to_csv()+'\n')
+
+        if found_genomes == 0:
+            # raise Exception('Failed to download ANY genome data!')
+            logger.warning('Failed to download ANY genome data!')
 
     def _download_mibig_json(self, version='1.4'):
         output_path = os.path.join(self.project_file_cache, 'mibig_json')
@@ -304,49 +391,89 @@ class Downloader(object):
         open(os.path.join(output_path, 'completed'), 'w').close()
 
         return True
+
+    def _get_antismash_db_page(self, genome_obj):
+        # want to try up to 4 different links here, v1 and v2 databases, each
+        # with and without the .1 suffix on the accesssion ID
+
+        accesssions = [genome_obj.resolved_id, genome_obj.resolved_id + '.1']
+        for base_url in [ANTISMASH_DB_PAGE_URL, ANTISMASH_DBV2_PAGE_URL]:
+            for accession in accesssions:
+                url = base_url.format(accession)
+                link = None
+
+                logger.info('antismash DB lookup for {} => {}'.format(accession, url))
+                try:
+                    resp = httpx.get(url)
+                    soup = BeautifulSoup(resp.content, 'html.parser')
+                    # retrieve .zip file download link
+                    link = soup.find('a', {'href': lambda url: url.endswith('.zip')})
+                except Exception as e:
+                    logger.debug('antiSMASH DB page load failed: {}'.format(e))
+
+                if link is not None:
+                    logger.info('antiSMASH lookup succeeded! Filename is {}'.format(link['href']))
+                    # save with the .1 suffix if that worked
+                    genome_obj.resolved_id = accession
+                    return link['href']
+
+        return None
+
+    def _get_antismash_zip_data(self, accession_id, filename, local_path):
+        for base_url in [ANTISMASH_DB_DOWNLOAD_URL, ANTISMASH_DBV2_DOWNLOAD_URL]:
+            zipfile_url = base_url.format(accession_id, filename)
+            with open(local_path, 'wb') as f:
+                total_bytes = 0
+                try: 
+                    with httpx.stream('GET', zipfile_url) as r:
+                        if r.status_code == 404:
+                            logger.debug('antiSMASH download URL was a 404')
+                            continue
+
+                        logger.info('Downloading from antiSMASH: {}'.format(zipfile_url))
+                        filesize = int(r.headers['content-length'])
+                        bar = Bar(filename, max=filesize, suffix='%(percent)d%%')
+                        for data in r.iter_bytes():
+                            f.write(data)
+                            total_bytes += len(data)
+                            bar.next(len(data))
+                        bar.finish()
+                except Exception as e:
+                    logger.warning('antiSMASH zip download failed: {}'.format(e))
+                    continue
+        
+            return True
+
+        return False
     
-    def _download_antismash_zip(self, accession_id):
-        # save files as <accession>.zip to avoid having to repeat above lookup every time
-        local_path = os.path.join(self.project_download_cache, '{}.zip'.format(accession_id))
+    def _download_antismash_zip(self, antismash_obj):
+        # save zip files to avoid having to repeat above lookup every time
+        local_path = os.path.join(self.project_download_cache, '{}.zip'.format(antismash_obj.resolved_id))
         logger.debug('Checking for existing antismash zip at {}'.format(local_path))
+
         cached = False
         if os.path.exists(local_path):
             logger.info('Found cached file at {}'.format(local_path))
             try:
-                azip = zipfile.ZipFile(local_path)
+                _ = zipfile.ZipFile(local_path)
                 cached = True
+                antismash_obj.filename = local_path
             except zipfile.BadZipFile as bzf:
-                logger.info('Invalid antismash zipfile found, will download again')
+                logger.info('Invalid antismash zipfile found ({}). Will download again'.format(bzf))
                 os.unlink(local_path)
+                antismash_obj.filename = ""
 
         if not cached:
-            url = ANTISMASH_DB_PAGE_URL.format(accession_id)
-            logger.info('antismash DB lookup for {} => {}'.format(accession_id, url))
-            resp = httpx.get(url)
-            soup = BeautifulSoup(resp.content, 'html.parser')
-            # retrieve .zip file download link
-            link = soup.find('a', {'href': lambda url: url.endswith('.zip')})
-            if link is None:
-                logger.warning('Failed to download antismash-db results for {}'.format(accession_id))
+            filename = self._get_antismash_db_page(antismash_obj)
+            if filename is None:
                 return False
 
-            filename = link['href']
-            zipfile_url = ANTISMASH_DB_DOWNLOAD_URL.format(accession_id, filename)
-            with open(local_path, 'wb') as f:
-                total_bytes, last_total = 0, 0
-                with httpx.stream('GET', zipfile_url) as r:
-                    logger.debug('zipfile URL is {}'.format(zipfile_url))
-                    filesize = int(r.headers['content-length'])
-                    bar = Bar(filename, max=filesize, suffix='%(percent)d%%')
-                    for data in r.iter_bytes():
-                        f.write(data)
-                        total_bytes += len(data)
-                        bar.next(len(data))
-                    bar.finish()
-        
+            self._get_antismash_zip_data(antismash_obj.resolved_id, filename, local_path)    
+            antismash_obj.filename = local_path
+
         logger.debug('Extracting antismash data')
 
-        output_path = os.path.join(self.project_file_cache, 'antismash', accession_id)
+        output_path = os.path.join(self.project_file_cache, 'antismash', antismash_obj.resolved_id)
         # create a subfolder for each set of genome data (the zip files used to be
         # constructed with path info but that seems to have changed recently)
         if not os.path.exists(output_path):
@@ -357,8 +484,8 @@ class Downloader(object):
             return True
 
         antismash_zip = zipfile.ZipFile(local_path)
-        kc_prefix1 = '{}/knownclusterblast'.format(accession_id)
-        kc_prefix2 = 'knownclusterblast'.format(accession_id)
+        kc_prefix1 = '{}/knownclusterblast'.format(antismash_obj.resolved_id)
+        kc_prefix2 = 'knownclusterblast'
         for zip_member in antismash_zip.namelist():
             # TODO other files here?
             if zip_member.endswith('.gbk'):
@@ -406,14 +533,12 @@ class Downloader(object):
 
         for rec in gen_records:
             label = rec['genome_label']
-            # TODO other accessions?
-            # what happen if this is missing?
-            if not 'RefSeq_accession' in rec['genome_ID']:
-                logger.warning('Failed to extract genome label')
+            accession = rec.get('resolved_id', None)
+            if accession is None:
+                # this will happen for genomes where we couldn't retrieve data or resolve the ID
+                logger.warning('Failed to extract accession from genome with label {}'.format(label))
                 continue
 
-            accession = rec['genome_ID']['RefSeq_accession']
-            # accession = accession[:accession.rindex('.')]
             if label in temp:
                 temp[label].append(accession)
             else:
