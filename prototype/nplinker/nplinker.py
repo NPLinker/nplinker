@@ -543,7 +543,7 @@ if __name__ == "__main__":
     # create a metcalf scoring object
     mc = npl.scoring_method('metcalf')
     # set a scoring cutoff threshold
-    mc.cutoff = 3.0
+    mc.cutoff = 0.5
 
     # pick some GCFs to get links for
     test_gcfs = npl.gcfs[:10]
