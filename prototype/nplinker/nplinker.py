@@ -522,6 +522,9 @@ class NPLinker(object):
         Returns:
             An instance of the named scoring method class, or None if the name is invalid
         """
+        if name not in self._scoring_methods_setup_complete:
+            return None
+
         if not self._scoring_methods_setup_complete[name]:
             self._scoring_methods[name].setup(self)
             self._scoring_methods_setup_complete[name] = True
@@ -542,30 +545,35 @@ if __name__ == "__main__":
 
     # create a metcalf scoring object
     mc = npl.scoring_method('metcalf')
-    # set a scoring cutoff threshold
-    mc.cutoff = 0.5
+    if mc is not None:
+        # set a scoring cutoff threshold
+        mc.cutoff = 0.5
 
-    # pick some GCFs to get links for
-    test_gcfs = npl.gcfs[:10]
+        # pick some GCFs to get links for
+        test_gcfs = npl.gcfs[:10]
 
-    # tell nplinker to find links for this set of GCFs using metcalf scoring
-    results = npl.get_links(test_gcfs, mc)
+        # tell nplinker to find links for this set of GCFs using metcalf scoring
+        results = npl.get_links(test_gcfs, mc)
 
-    # check if any links were found
-    if len(results) == 0:
-        print('No links found!')
-        sys.exit(0)
+        # check if any links were found
+        if len(results) == 0:
+            print('No links found!')
+            sys.exit(0)
 
-    # the "result" object will be a LinkCollection, holding all the information
-    # returned by the scoring method(s) used
-    print('{} total links found'.format(len(results)))
+        # the "result" object will be a LinkCollection, holding all the information
+        # returned by the scoring method(s) used
+        print('{} total links found'.format(len(results)))
 
-    # display some information about each object and its links
-    for obj, result in results.links.items():
-        print('Results for object: {}, {} total links, {} methods used'.format(obj, len(result), results.method_count))
+        # display some information about each object and its links
+        for obj, result in results.links.items():
+            print('Results for object: {}, {} total links, {} methods used'.format(obj, len(result), results.method_count))
 
-        # get links for this object, sorted by metcalf score
-        sorted_links = results.get_sorted_links(mc, obj)
-        for link_data in sorted_links:
-            print('  --> [{}] {} | {} | # shared_strains = {}'.format(','.join(method.name for method in link_data.methods), link_data.target, link_data[mc], len(link_data.shared_strains)))
+            # get links for this object, sorted by metcalf score
+            sorted_links = results.get_sorted_links(mc, obj)
+            for link_data in sorted_links:
+                print('  --> [{}] {} | {} | # shared_strains = {}'.format(','.join(method.name for method in link_data.methods), link_data.target, link_data[mc], len(link_data.shared_strains)))
 
+
+    rs = npl.scoring_method('rosetta')
+    if rs is not None:
+        print('OK')
