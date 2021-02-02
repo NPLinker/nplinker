@@ -211,10 +211,6 @@ class Rosetta(object):
             processed[bgc] = scores
         return processed
 
-    def _gather_kcb_filenames(self, antismash_path):
-        pass
-
-    
     def run(self, spectra, bgcs, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
         # check if cached parameters exist, and if so check they match the 
         # supplied ones. if not, need to regenerate any pickled data files
