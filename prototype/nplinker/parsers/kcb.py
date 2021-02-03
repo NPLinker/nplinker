@@ -21,6 +21,27 @@ class KCBParser(object):
         self.mibig_bgcs = []
         self.hits = {}
 
+        # Structure outline for quick reference:
+        # <top of file>
+        # Clusterblast scores for <ID>
+        #
+        # Table of genes, locations, strands and annotations of query cluster:
+        # <multiple lines in table> (this is top_block below)
+        # 
+        # Significant hits: 
+        # <multiple hits> (this is second_block below)
+        #
+        # Details:
+        # 
+        # >> 
+        # <multiple lines of details for hit 1>
+        # 
+        # >> 
+        # <multiple lines of details for hit 2>
+        # 
+        # (continues up to hit n)
+        # EOF
+
         with open(filename, 'r') as f:
             line = next(f)
             while not line.startswith('Table of genes'):
@@ -81,31 +102,49 @@ class KCBParser(object):
             # do some processing on the blocks
             # firstly, extract the genes from the BGC -- stored in the first block
             # these are the gene names in the BGC
+            # e.g. given a line "STROP_RS12480	2788559	2789786	-	cytochrome P450	"
+            # this would add "STROP_RS12480" to self.bgc_genes
             for line in top_block:
                 tokens = line.split()
                 self.bgc_genes.add(tokens[0])
 
             # secondly, extract the MiBIG BGCs that are mentioned here
+            # e.g. given a line "1. BGC0000279_c1	Xantholipin_biosynthetic_gene_cluster"
+            # this would take "BGC0000279_c1" as the bgc_id and "Xantholipin_biosynthetic_gene_cluster" 
+            # as the bgc_product_name
             for line in second_block:
                 tokens = line.split()
                 bgc_id = tokens[1]
                 bgc_product_name = tokens[2]
                 self.mibig_bgcs.append((bgc_id, bgc_product_name))
 
+            # details is a list of lists, where each sublist contains the set of lines
+            # for one ">>" delimited section giving the detailed information on a 
+            # particular hit
             for i, detail in enumerate(details):
+                # the first line is of the form "1. BGC0000279_c1"
                 current_bgc_id = detail[0].split()[1] # this is the MiBIG ID, e.g. BGC0001666
+
                 self.hits[current_bgc_id] = {}
                 self.hits[current_bgc_id]['all_bgc_genes'] = self.bgc_genes
 
-                assert current_bgc_id == self.mibig_bgcs[i][0] # they should be in the same order
+                # if the detail sections don't appear in the same order as the "Significant hits"
+                # section then something is wrong and can't continue parsing this
+                if current_bgc_id != self.mibig_bgcs[i][0]:
+                    raise Exception('Mismatched ordering found in knownclusterblast file {}'.format(filename))
+
+                # get the line numbers where these two tables start
                 table_pos = detail.index('Table of genes, locations, strands and annotations of subject cluster:')
                 pos = detail.index('Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):')
 
-                # get the list of all of the genes within the MiBIG BGC
+                # get the list of all of the genes within the MiBIG BGC by iterating over
+                # the lines in the "Table of genes ..." table
                 all_mibig_genes = []
                 for line in detail[table_pos+1:pos]:
                     all_mibig_genes.append(line.split()[0])
 
+                if len(all_mibig_genes) == 0:
+                    logger.debug('KCBParser failed to extract any MiBIG genes from file {}, BGC ID {}'.format(filename, current_bgc_id))
                 self.hits[current_bgc_id]['all_mibig_genes'] = all_mibig_genes
                 self.hits[current_bgc_id]['individual_hits'] = []
 
