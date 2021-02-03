@@ -2,12 +2,10 @@ import os
 import csv
 
 from ...logconfig import LogConfig
-from ...parsers import mgf
 from ...parsers.kcb import KCBParser
 
 from ...pickler import load_pickled_data, save_pickled_data
 
-from .rosetta_functions import fast_cosine
 from .spec_lib import SpecLib
 
 from ...genomics import MiBIGBGC
