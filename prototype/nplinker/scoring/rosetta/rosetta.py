@@ -123,7 +123,7 @@ class Rosetta(object):
         self.speclib.filter()
 
         logger.info('Finished generating SpecLib')
-    
+
         # save_pickled_data((self.speclib, ms1_tol, ms2_tol, score_thresh, min_match_peaks), self._speclib_pickle_path)
         save_pickled_data(self.speclib, self._speclib_pickle_path)
 
@@ -198,8 +198,11 @@ class Rosetta(object):
             mibig_bgcs = list(hit.keys())
             scores = {}
             for mibig_id in mibig_bgcs:
-                n_source_genes = len(hit[mibig_id]['all_bgc_genes'])
                 n_mibig_genes = len(hit[mibig_id]['all_mibig_genes'])
+                if n_mibig_genes == 0:
+                    logger.warning('Found a BGC entry with zero genes, this should never happen! (BGC={})'.format(bgc))
+                    continue
+                # n_source_genes = len(hit[mibig_id]['all_bgc_genes'])
                 total_hit_identity = 0
                 for hit_gene in hit[mibig_id]['individual_hits']:
                     identity_percent = hit_gene['identity_percent']

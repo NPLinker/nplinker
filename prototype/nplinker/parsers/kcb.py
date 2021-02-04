@@ -144,7 +144,11 @@ class KCBParser(object):
                     all_mibig_genes.append(line.split()[0])
 
                 if len(all_mibig_genes) == 0:
-                    logger.debug('KCBParser failed to extract any MiBIG genes from file {}, BGC ID {}'.format(filename, current_bgc_id))
+                    logger.warning('KCBParser failed to extract any MiBIG genes from file {}, BGC ID {}'.format(filename, current_bgc_id))
+                    # just continue to the next section here because this currently makes the rest of the processing invalid
+                    del self.hits[current_bgc_id]
+                    continue
+
                 self.hits[current_bgc_id]['all_mibig_genes'] = all_mibig_genes
                 self.hits[current_bgc_id]['individual_hits'] = []
 
