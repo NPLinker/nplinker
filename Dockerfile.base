@@ -13,8 +13,8 @@ WORKDIR /app
 # copy over some installer/archive files
 COPY dockerfiles/Miniconda3-latest-Linux-x86_64.sh \
     dockerfiles/Pfam-A.hmm.gz \
-    dockerfiles/bokeh-1.3.5.dev3+5.ge5c1c99e1.dirty-py3-none-any.whl \
     /app/
+#dockerfiles/bokeh-1.3.5.dev3+5.ge5c1c99e1.dirty-py3-none-any.whl \
 
 # use mirrors for apt, much faster than the default
 #RUN sed -i -e 's/http:\/\/archive.ubuntu.com\/ubuntu/mirror:\/\/mirrors.ubuntu.com\/mirrors.txt/' /etc/apt/sources.list && \
@@ -39,11 +39,12 @@ RUN apt-get update -y && \
         gunzip Pfam-A.hmm.gz && \
         hmmpress Pfam-A.hmm && \
         conda install pip tornado toml networkx progress beautifulsoup4 pandas && \
-        pip install httpx xdg natsort sortedcontainers cython && \
-        pip install -v /app/bokeh-1.3.5.dev3+5.ge5c1c99e1.dirty-py3-none-any.whl && \
+        pip install httpx xdg natsort sortedcontainers cython bokeh && \
         # try to keep the image size down a bit by removing installers...
         rm -f /app/Miniconda3-latest-Linux-x86_64.sh *.whl && \
         # and packages downloaded by conda 
         rm -fr /app/conda/pkgs && \
         # and the bigscape .git folder
         rm -fr /app/BiG-SCAPE/.git 
+        
+#pip install -v /app/bokeh-1.3.5.dev3+5.ge5c1c99e1.dirty-py3-none-any.whl && \
