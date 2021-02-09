@@ -1,6 +1,6 @@
-import csv, glob, os, json
+import csv, glob, os, json, re
 
-import numpy as np
+from Bio import SeqIO
 
 from .aa_pred import predict_aa
 from .genomics_utilities import get_smiles
@@ -9,6 +9,8 @@ from .strains import Strain, StrainCollection
 
 from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
+
+CLUSTER_REGION_REGEX = re.compile('(.+?)\\.(cluster|region)(\\d+).gbk$')
 
 class BGC(object):
     def __init__(self, id, strain, name, bigscape_class, product_prediction, description=None):
@@ -19,6 +21,12 @@ class BGC(object):
         self.product_prediction = product_prediction
         self.parent = None
         self.description = description
+        # these will get parsed from the .gbk file
+        self.antismash_id = None
+        self.antismash_accession = None
+
+        self.region = -1
+        self.cluster = -1
 
         self.antismash_file = None
         self._aa_predictions = None
@@ -27,6 +35,20 @@ class BGC(object):
         self._smiles_parsed = False
 
         self.edges = set()
+
+    def set_filename(self, filename):
+        self.antismash_file = filename
+        if filename is None:
+            return
+
+        # try to extract the region or cluster number if provided
+        regex_obj = CLUSTER_REGION_REGEX.search(filename)
+        if regex_obj is not None:
+            c_or_r = regex_obj.group(2)
+            if c_or_r == 'region':
+                self.region = int(regex_obj.group(3))
+            elif c_or_r == 'cluster':
+                self.cluster = int(regex_obj.group(3))
 
     def __repr__(self):
         return str(self)
@@ -155,6 +177,12 @@ class GCF(object):
 
         return self._aa_predictions
 
+def parse_gbk_header(bgc):
+    records = list(SeqIO.parse(bgc.antismash_file, format='gb'))
+    if len(records) > 0:
+        bgc.antismash_accession = records[0].name
+        bgc.antismash_id = records[0].id
+
 def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, network_file_dict, mibig_bgc_dict, antismash_dir, antismash_filenames, antismash_format, antismash_delimiters):
     gcf_dict = {}
     gcf_list = []
@@ -254,14 +282,17 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                                 logger.warn('!!! Missing antismash file: {}'.format(antismash_filename))
                                 num_missing_antismash += 1
                                 # return None, None, None
-                            new_bgc.antismash_file = antismash_filename
+                            new_bgc.set_filename(antismash_filename)
+                            parse_gbk_header(new_bgc)
                         else:
-                            new_bgc.antismash_file = antismash_filenames.get(new_bgc.name, None)
+                            new_bgc.set_filename(antismash_filenames.get(new_bgc.name, None))
                             # TODO should this actually search for all possible names based on strain
                             # aliases instead of just this name? 
                             if new_bgc.antismash_file is None:
                                 logger.warning('Failed to find an antiSMASH file for {}'.format(new_bgc.name))
                                 num_missing_antismash += 1
+                            else:
+                                parse_gbk_header(new_bgc)
                 else:
                     num_mibig += 1
                     # TODO any reason not to supply the metadata fields that aren't set by
