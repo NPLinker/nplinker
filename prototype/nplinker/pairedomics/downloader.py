@@ -370,6 +370,8 @@ class Downloader(object):
                 with open(genome_status_file, 'a+') as f:
                     f.write(genome_obj.to_csv()+'\n')
 
+            self._extract_antismash_zip(genome_obj)
+
         missing = len([x for x in genome_status.values() if len(x.filename) == 0])
         logger.info('Dataset has {} missing sets of antiSMASH data (from a total of {})'.format(missing, len(genome_records)))
 
@@ -449,13 +451,16 @@ class Downloader(object):
         logger.debug('Checking for existing antismash zip at {}'.format(local_path))
 
         cached = False
+        # if the file exists locally
         if os.path.exists(local_path):
             logger.info('Found cached file at {}'.format(local_path))
             try:
+                # check if it's a valid zip file, if so treat it as cached
                 _ = zipfile.ZipFile(local_path)
                 cached = True
                 antismash_obj.filename = local_path
             except zipfile.BadZipFile as bzf:
+                # otherwise delete and redownload
                 logger.info('Invalid antismash zipfile found ({}). Will download again'.format(bzf))
                 os.unlink(local_path)
                 antismash_obj.filename = ""
@@ -468,24 +473,30 @@ class Downloader(object):
             self._get_antismash_zip_data(antismash_obj.resolved_id, filename, local_path)    
             antismash_obj.filename = local_path
 
-        logger.debug('Extracting antismash data')
+        return True
+
+    def _extract_antismash_zip(self, antismash_obj):
+        if antismash_obj.filename is None or len(antismash_obj.filename) == 0:
+            return False
 
         output_path = os.path.join(self.project_file_cache, 'antismash', antismash_obj.resolved_id)
+        exists_already = os.path.exists(output_path) and os.path.exists(os.path.join(output_path, 'completed'))
+
+        logger.debug('Extracting antismash data to {}, exists_already = {}'.format(output_path, exists_already))
+        if exists_already:
+            return True
+
         # create a subfolder for each set of genome data (the zip files used to be
         # constructed with path info but that seems to have changed recently)
         if not os.path.exists(output_path):
             os.makedirs(output_path, exist_ok=True)
 
-        if os.path.exists(os.path.join(output_path, 'completed')):
-            logger.debug('antismash data already extracted!')
-            return True
-
-        antismash_zip = zipfile.ZipFile(local_path)
+        antismash_zip = zipfile.ZipFile(antismash_obj.filename)
         kc_prefix1 = '{}/knownclusterblast'.format(antismash_obj.resolved_id)
         kc_prefix2 = 'knownclusterblast'
         for zip_member in antismash_zip.namelist():
             # TODO other files here?
-            if zip_member.endswith('.gbk'):
+            if zip_member.endswith('.gbk') or zip_member.endswith('.json'):
                 antismash_zip.extract(zip_member, path=output_path)
             elif zip_member.startswith(kc_prefix1) or zip_member.startswith(kc_prefix2):
                 antismash_zip.extract(zip_member, path=output_path)
