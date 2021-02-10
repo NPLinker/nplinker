@@ -499,7 +499,8 @@ class Downloader(object):
             if zip_member.endswith('.gbk') or zip_member.endswith('.json'):
                 antismash_zip.extract(zip_member, path=output_path)
             elif zip_member.startswith(kc_prefix1) or zip_member.startswith(kc_prefix2):
-                antismash_zip.extract(zip_member, path=output_path)
+                if zip_member.endswith('.txt'):
+                    antismash_zip.extract(zip_member, path=output_path)
 
         open(os.path.join(output_path, 'completed'), 'w').close()
 
