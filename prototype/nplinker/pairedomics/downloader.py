@@ -367,7 +367,7 @@ class Downloader(object):
                 else:
                     logger.warning('Failed to download antiSMASH data for genome ID {} ({})'.format(genome_obj.resolved_id, genome_obj.original_id))
 
-                with open(genome_status_file, 'a+') as f:
+                with open(genome_status_file, 'a+', newline='\n') as f:
                     f.write(genome_obj.to_csv()+'\n')
 
             self._extract_antismash_zip(genome_obj)
@@ -375,7 +375,7 @@ class Downloader(object):
         missing = len([x for x in genome_status.values() if len(x.filename) == 0])
         logger.info('Dataset has {} missing sets of antiSMASH data (from a total of {})'.format(missing, len(genome_records)))
 
-        with open(genome_status_file, 'w') as f:
+        with open(genome_status_file, 'w', newline='\n') as f:
             for obj in genome_status.values():
                 f.write(obj.to_csv()+'\n')
 
@@ -499,7 +499,7 @@ class Downloader(object):
             if zip_member.endswith('.gbk') or zip_member.endswith('.json'):
                 antismash_zip.extract(zip_member, path=output_path)
             elif zip_member.startswith(kc_prefix1) or zip_member.startswith(kc_prefix2):
-                if zip_member.endswith('.txt'):
+                if zip_member.endswith('.txt') and 'mibig_hits' not in zip_member:
                     antismash_zip.extract(zip_member, path=output_path)
 
         open(os.path.join(output_path, 'completed'), 'w').close()
