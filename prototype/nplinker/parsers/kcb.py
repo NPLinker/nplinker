@@ -164,22 +164,30 @@ class KCBJSONParser(object):
                 continue
 
             # step 3: extract BGC IDs (=parsing of "... subject cluster" tables in text file)
+            # (this is a list of lists)
             all_mibig_genes = [entry[0]['proteins'] for entry in result['ranking']]
             
             region_number = int(result['region_number'])
             # should never have two identical region numbers for the same ID
             assert(region_number not in record_hits)
 
-            # construct the same data structure as the original parser
+            # want to construct the same data structure as the original parser
             # should contain:
             #   - all_bgc_genes => gene_ids
             #   - all_mibig_genes => all_mibig_genes
             #   - invididual_hits => list populated based on blast_hits
             hit = {}
             assert(len(all_mibig_genes) == len(result['ranking']))
+
+
+            # step 4: extract the blast hit information from the 'rankings' and
+            # 'pairings' lists (=parsing of "Table of Blast hits" in text file)
+
+            # each "hit" shares these
+            hit = {'all_bgc_genes': gene_ids}
+            individual_hits = []
             for j, ranking in enumerate(result['ranking']):
-                hit = {'all_bgc_genes': gene_ids, 'all_mibig_genes': all_mibig_genes[j]}
-                individual_hits = []
+                hit['all_mibig_genes'] = all_mibig_genes[j]
                 for pairing in ranking[1]['pairings']:
                     tc1 = pairing[0].split('|')[4]
                     individual_hits.append({'source_bgc_gene': tc1, 
@@ -187,9 +195,9 @@ class KCBJSONParser(object):
                                             'identity_percent': int(pairing[2]['perc_ident']),
                                             'blast_score': int(pairing[2]['blastscore'])})
                     
-                hit['individual_hits'] = individual_hits
-                record_hits[region_number] = hit
-                # logger.debug('\tSig hit {}/{} for {}: found {} individual hits'.format(j+1, len(sig_hits), sig_hits[j][0], len(individual_hits)))
+            hit['individual_hits'] = individual_hits
+            record_hits[region_number] = hit
+            # logger.debug('\tSig hit {}/{} for {}: found {} individual hits'.format(j+1, len(sig_hits), sig_hits[j][0], len(individual_hits)))
 
         # don't create entries with no results
         if len(record_hits) == 0:
