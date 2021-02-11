@@ -2,7 +2,7 @@ import os
 import csv
 
 from ...logconfig import LogConfig
-from ...parsers.kcb import KCBParser
+from ...parsers.kcb import KCBTextParser, KCBJSONParser
 
 from ...pickler import load_pickled_data, save_pickled_data
 
@@ -133,26 +133,129 @@ class Rosetta(object):
         mibigs = 0
         errors = 0
 
-        for i, bgc in enumerate(bgcs):
-            # MiBIGBGC objects aren't created from local GenBank files, so don't
-            # bother trying to lookup knownclusterblast results for them
-            if isinstance(bgc, MiBIGBGC):
-                mibigs += 1
-                continue
+        # this method is a bit messy because it tries to handle a couple of different
+        # routes to extracting knownclusterblast results:
+        #
+        #   - newer antiSMASH runs should produce a single .JSON file in each directory
+        #       of .gbk files. this one file can be parsed to extract all the info that the
+        #       rosetta code requires for all of the .gbks (uses KCBJSONParser)
+        #   - older datasets will only include the now-deprecated text format results, which
+        #       should be located in a subdirectory of each of the .gbk directories called
+        #       "knownclusterblast". in these instances there will be a single .txt file 
+        #       for each .gbk
+        #   - some datasets may have no knownclusterblast results available
+        #
+        # it's also possible for all 3 of these to turn up within the same dataset. for example
+        # when downloading from the paired omics platform, the antiSMASH data is downloaded 
+        # separately for each genome from the antiSMASH DB and this means the format may not
+        # be consistent. 
 
-            kcb_name = KCBParser.get_kcb_filename_from_bgc(bgc)
-            if kcb_name is not None:
-                try:
-                    parser = KCBParser(kcb_name)
-                    if len(parser.hits) > 0:
-                        self._bgc_hits[bgc] = parser.hits
-                    kcb_found += 1
-                except Exception as e:
-                    logger.warning(e)
-                    errors += 1
+        logger.debug('Collecting BGC hit information...')
+        # go through the list of all available BGCs (ignoring MiBIGBGC instances) and
+        # group them by the directory they appear in
+        bgc_groups = {}
+        skipped, errors = 0, 0
 
-            if i % 100 == 0:
-                logger.info('Searching for BGC hits {}/{}'.format(i, len(bgcs)))
+        for bgc in bgcs:
+            if bgc.antismash_file is None or isinstance(bgc, MiBIGBGC):
+                skipped += 1
+                continue 
+
+            prefix = os.path.dirname(bgc.antismash_file)
+            if prefix not in bgc_groups:
+                bgc_groups[prefix] = [bgc]
+            else:
+                bgc_groups[prefix].append(bgc)
+        
+        logger.debug('{} BGC groups based on filenames'.format(len(bgc_groups)))
+
+        for prefix, prefix_bgcs in bgc_groups.items():
+            logger.debug('Attempting to parse JSON data for prefix {} with {} BGCs'.format(prefix, len(prefix_bgcs)))
+            # preferred option is to parse the results for the whole group using the 
+            # JSON file, but this may not be available...
+            json_hits = KCBJSONParser(prefix_bgcs).parse_hits()
+            matched_bgcs = {}
+            
+            if json_hits is not None:
+                # number of hits can often be less than number of BGCs (e.g. if no significant hits found)
+                sum_hits = sum(len(json_hits[x]) for x in json_hits)
+                logger.debug('JSON parsing was successful! Returned {} hits from {} BGCs'.format(sum_hits, len(prefix_bgcs)))
+
+                # unlike the KCBTextParser where each set of results is easy to link
+                # back to the appropriate BGC object, here we need to do some extra work 
+                # to ensure we have everything matched up correctly. 
+                # 
+                # seems like the best way to do this is to rely on the BGC attributes
+                # parsed from the .gbks during the loading process (including region
+                # numbers) as these should match up directly with the JSON data. 
+
+                for pbgc in prefix_bgcs:
+                    # the "normal" case appears to be that you'll have a directory
+                    # containing multiple gbks with the same accession and different
+                    # region numbers, e.g. ABC123.region001, ABC123.region002, ...
+                    # and should be able to expect that every "hit" comes from a 
+                    # .gbk that exists in the directory. 
+                    # 
+                    # in ideal circumstances, the json_hits structure will end up
+                    # containing a single top level accession (ABC123) and then
+                    # at the next level down one region number for each of the 
+                    # BGCs with signficant hits. this makes matching BGC objects
+                    # quite simple.
+                    # 
+                    # however in other cases there appear to be a mix of accession
+                    # IDs in the same antiSMASH directory. so you can have collections
+                    # where the filenames are e.g. ABC123.region001, DEF456.region001,
+                    # GHI789.region001, ... (including multiple regions for the same
+                    # accession). this is more difficult to handle because the JSON
+                    # data isn't a direct match with that parsed from the .gbks 
+                    # themselves. for example, the gbk might report a region number of
+                    # 7 while the corresponding JSON result has a region number of 1.
+                    # possible workaround is to take the gbk region number and check
+                    # if it appears in the filename of the gbk???
+
+                    if pbgc.antismash_id in json_hits:
+                        # simplest case where there's a direct match on region number 
+                        if pbgc.region in json_hits[pbgc.antismash_id]:
+                            logger.debug('Matched {} using {} + region{:03d}!'.format(pbgc.antismash_file, pbgc.antismash_id, pbgc.region))
+                            matched_bgcs[pbgc] = json_hits[pbgc.antismash_id][pbgc.region]
+                            continue
+                        else:
+                            # if the above case doesn't apply, check through every
+                            # region number available for the antismash ID we have,
+                            # and check if the original filename contains that region
+                            # number. if so assume it is the correct match. 
+                            for region in json_hits[pbgc.antismash_id]:
+                                if pbgc.antismash_file.endswith('region{:03d}.gbk'.format(pbgc.region)):
+                                    logger.debug('Matched {} using fallback {} + region{:03d} (orig={})'.format(pbgc.antismash_file, pbgc.antismash_id, region, pbgc.region))
+                                    matched_bgcs[pbgc] = json_hits[pbgc.antismash_id][region]
+                                    break
+                    else:
+                        # this could simply mean no significant hits found
+                        logger.info('Found no matching hits for BGC ID={}, region={}, file={}'.format(pbgc.antismash_id, pbgc.region, pbgc.antismash_file))
+                
+            else:
+                # ... if JSON parsing failed, fall back to the original text parser. this 
+                # must be called on each BGC individually
+                logger.debug('JSON parsing failed, falling back to text instead')
+                for i, bgc in enumerate(prefix_bgcs):
+                    kcb_name = KCBTextParser.get_kcb_filename_from_bgc(bgc)
+                    if kcb_name is not None:
+                        try:
+                            parser = KCBTextParser(kcb_name)
+                            if len(parser.hits) > 0:
+                                matched_bgcs[bgc] = parser.hits
+                        except Exception as e:
+                            logger.warning(e)
+                            errors += 1
+
+            print('Found matches for {}/{} bgcs'.format(len(matched_bgcs), len(prefix_bgcs)))
+            if len(matched_bgcs) != len(prefix_bgcs):
+                # not necessarily fatal but probably not good either
+                logger.warning('Failed to match {} BGCs to hits in directory {}!'.format(len(prefix_bgcs) - len(matched_bgcs), prefix))
+
+            # now insert the matched hits into the _bgc_hits structure so the original code
+            # below can parse them in the same way as the text parser results
+            self._bgc_hits.update(matched_bgcs)
 
         # make reverse dict
         self._mibig2bgc = {}
@@ -163,7 +266,6 @@ class Rosetta(object):
                 self._mibig2bgc[mibig_bgc_id].add(bgc)
 
         logger.info('Completed, {} BGC hits found'.format(len(self._bgc_hits)))
-        logger.info('GenBank files matched with knownclusterblast results: {}/{}'.format(kcb_found, len(bgcs) - mibigs))
         if errors > 0:
             logger.warning('Some knownclusterblast files could not be loaded, results may be incomplete')
         save_pickled_data((self._bgc_hits, self._mibig2bgc), self._bgchits_pickle_path)
