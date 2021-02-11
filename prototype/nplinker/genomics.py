@@ -54,7 +54,7 @@ class BGC(object):
         return str(self)
 
     def __str__(self):
-        return '{}(id={}, name={}, strain={})'.format(self.__class__.__name__, self.id, self.name, self.strain)
+        return '{}(id={}, name={}, strain={}, asid={}, region={})'.format(self.__class__.__name__, self.id, self.name, self.strain, self.antismash_id, self.region)
 
     def __eq__(self, other):
         return self.id == other.id
@@ -276,6 +276,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                         bgc_list.append(new_bgc)
 
                     if antismash_dir:
+                        # TODO remove this at some point
                         if antismash_format == 'flat':
                             antismash_filename = os.path.join(antismash_dir, new_bgc.name + '.gbk')
                             if not os.path.exists(antismash_filename):
@@ -286,13 +287,23 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                             parse_gbk_header(new_bgc)
                         else:
                             new_bgc.set_filename(antismash_filenames.get(new_bgc.name, None))
-                            # TODO should this actually search for all possible names based on strain
-                            # aliases instead of just this name? 
                             if new_bgc.antismash_file is None:
-                                logger.warning('Failed to find an antiSMASH file for {}'.format(new_bgc.name))
+                                # TODO in some instances (e.g. with MSV000078836/Crusemann dataset),
+                                # BiG-SCAPE output files appear to switch "cluster" with "region" in
+                                # the lists of IDs. this leads to .gbk files not being matched up with
+                                # BGCs even though they exist. Is this a sensible workaround???
+                                if 'cluster' in new_bgc.name:
+                                    new_bgc.set_filename(antismash_filenames.get(new_bgc.name.replace('cluster', 'region'), None))
+                                elif 'region' in new_bgc.name:
+                                    new_bgc.set_filename(antismash_filenames.get(new_bgc.name.replace('region', 'cluster'), None))
+
+                            if new_bgc.antismash_file is None:
+                                logger.warning('Failed to find an antiSMASH file for {} {}'.format(new_bgc.name, new_bgc))
                                 num_missing_antismash += 1
                             else:
                                 parse_gbk_header(new_bgc)
+
+
                 else:
                     num_mibig += 1
                     # TODO any reason not to supply the metadata fields that aren't set by
@@ -327,7 +338,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
     # update lookup table as well
     bgc_lookup = {bgc.name: bgc for bgc in bgc_list}
 
-    logger.info('# after filtering, total bgcs = {}, GCFs = {}, strains={}'.format(len(bgc_list), len(gcf_list), len(strains)))
+    logger.info('# after filtering, total bgcs = {}, GCFs = {}, strains={}, unknown_strains={}'.format(len(bgc_list), len(gcf_list), len(strains), len(unknown_strains)))
 
     # load edge info - note that this should be done AFTER the filtering step above
     # so that it won't leave us with edges for BGCs that are no longer present
