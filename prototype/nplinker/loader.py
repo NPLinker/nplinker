@@ -332,7 +332,8 @@ class DatasetLoader(object):
                     gbk_files.append(fullpath)
 
         logger.debug('.gbk collection took {:.3f}s'.format(time.time() - t))
-        logger.info('{}/{} .gbk files were renamed to remove spaces!'.format(renamed, len(gbk_files)))
+        if renamed > 0:
+            logger.info('{}/{} .gbk files were renamed to remove spaces!'.format(renamed, len(gbk_files)))
     
         # both the bigscape and mibig_json dirs expected by nplinker may not exist at this point. in some
         # cases this will cause an error later in the process, but this can also potentially be
