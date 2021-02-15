@@ -319,7 +319,7 @@ def mols_to_spectra(ms2, metadata):
         # note: LoadMGF seems to lowercase (some) metadata keys?
         if 'spectrumid' in new_spectrum.metadata:
             # add an annotation for consistency, if not already there
-            if not GNPS_KEY in new_spectrum.annotations:
+            if GNPS_KEY not in new_spectrum.annotations:
                 gnps_anno = {k: None for k in GNPS_DATA_COLUMNS}
                 gnps_anno['SpectrumID'] = new_spectrum.metadata['spectrumid']
                 create_gnps_annotation(new_spectrum, gnps_anno)
