@@ -56,6 +56,7 @@ class Rosetta(object):
         if not os.path.exists(self._pickle_dir):
             os.makedirs(self._pickle_dir, exist_ok=True)
         self._speclib_pickle_path = os.path.join(self._pickle_dir, 'SpecLib.pckl')
+        self._spechits_pickle_path = os.path.join(self._pickle_dir, 'spec_hits.pckl')
         self._bgchits_pickle_path = os.path.join(self._pickle_dir, 'bgc_hits.pckl')
         self._rhits_pickle_path = os.path.join(self._pickle_dir, 'RosettaHits.pckl')
         self._params_pickle_path = os.path.join(self._pickle_dir, 'RosettaParams.pckl')
@@ -73,8 +74,8 @@ class Rosetta(object):
 
         self.speclib = None
         self._rosetta_hits = []
-        self._spec_hits = {}
-        self._bgc_hits = {}
+        self._spec_hits =  None
+        self._bgc_hits = None
 
     @property
     def bgc_hits(self):
@@ -114,6 +115,7 @@ class Rosetta(object):
             if i % 100 == 0:
                 logger.info('Searching for spectral hits {}/{}'.format(i, len(spectra)))
 
+        save_pickled_data(spec_hits, self._spechits_pickle_path)
         return spec_hits
 
     def _load_speclib(self, spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
@@ -124,7 +126,6 @@ class Rosetta(object):
 
         logger.info('Finished generating SpecLib')
 
-        # save_pickled_data((self.speclib, ms1_tol, ms2_tol, score_thresh, min_match_peaks), self._speclib_pickle_path)
         save_pickled_data(self.speclib, self._speclib_pickle_path)
 
     def _generate_bgc_hits(self, bgcs):
@@ -217,7 +218,11 @@ class Rosetta(object):
                         # simplest case where there's a direct match on region number 
                         if pbgc.region in json_hits[pbgc.antismash_id]:
                             logger.debug('Matched {} using {} + region{:03d}!'.format(pbgc.antismash_file, pbgc.antismash_id, pbgc.region))
-                            matched_bgcs[pbgc] = json_hits[pbgc.antismash_id][pbgc.region]
+                            if pbgc not in matched_bgcs:
+                                matched_bgcs[pbgc] = {}
+
+                            hit = json_hits[pbgc.antismash_id][pbgc.region]
+                            matched_bgcs[pbgc][hit['mibig_id']] = hit
                             continue
                         else:
                             # if the above case doesn't apply, check through every
@@ -227,7 +232,11 @@ class Rosetta(object):
                             for region in json_hits[pbgc.antismash_id]:
                                 if pbgc.antismash_file.endswith('region{:03d}.gbk'.format(pbgc.region)):
                                     logger.debug('Matched {} using fallback {} + region{:03d} (orig={})'.format(pbgc.antismash_file, pbgc.antismash_id, region, pbgc.region))
-                                    matched_bgcs[pbgc] = json_hits[pbgc.antismash_id][region]
+                                    if pbgc not in matched_bgcs:
+                                        matched_bgcs[pbgc] = {}
+
+                                    hit = json_hits[pbgc.antismash_id][region]
+                                    matched_bgcs[pbgc][hit['mibig_id']] = hit
                                     break
                     else:
                         # this could simply mean no significant hits found
@@ -336,12 +345,15 @@ class Rosetta(object):
 
         # if any parameters have been changed or version mismatch found, delete all cached files
         if not params_ok:
-            logger.info('SpecLib parameters have been changed, regenerating cached data files!')
+            logger.info('SpecLib parameters have been changed or do not exist, regenerating cached data files!')
             logger.debug('ms1_tol={:.3f}, ms2_tol={:.3f}, score_thresh={:.3f}, min_match_peaks={:d}'.format(ms1_tol, ms2_tol, score_thresh, min_match_peaks))
-            for path in [self._bgchits_pickle_path, self._rhits_pickle_path, self._params_pickle_path, self._speclib_pickle_path, os.path.join(self._pickle_dir, 'rosetta_hits.csv')]:
+            for path in [self._bgchits_pickle_path, self._spechits_pickle_path, self._rhits_pickle_path, self._params_pickle_path, self._speclib_pickle_path, os.path.join(self._pickle_dir, 'rosetta_hits.csv')]:
                 if os.path.exists(path):
                     os.unlink(path)
+    
             self.speclib = None
+            self._spec_hits = None
+            self._bgc_hits = None
             self._rosetta_hits = []
             
         # next, try to load the cached rosetta_hits list. if parameters were invalidated above,
@@ -371,25 +383,33 @@ class Rosetta(object):
             logger.info('Generating BGC hits')
             self._generate_bgc_hits(bgcs)
 
-
         # if we didn't find any BGC hits, no point in continuing
         if len(self._bgc_hits) == 0:
             logger.warning('Aborting Rosetta scoring data generation, no BGC hits were found!')
             return self._rosetta_hits
 
-        # next is the metabolomic part. check if we have a pickled SpecLib object...
         logger.info('No cached Rosetta hits data found')
+
+        # next is the metabolomic part. check if we have a pickled SpecLib object...
         speclib = load_pickled_data(self._nplinker, self._speclib_pickle_path)
         if speclib is not None:
             logger.info('Found pickled SpecLib for dataset {} at {}!'.format(self._dataset_id, self._speclib_pickle_path))
             self.speclib = speclib
         
         if self.speclib is None:
-            # no cached speclib available
+            # no cached speclib available, generate (and cache)
+            logger.info('Generating SpecLib')
             self._load_speclib(spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks)
 
-        logger.info('Generating spectral hits')
-        self._spec_hits = self._generate_spec_hits(spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks)
+        spec_hits = load_pickled_data(self._nplinker, self._spechits_pickle_path)
+        if spec_hits is not None:
+            logger.info('Found pickled spectral hits for dataset {} at {}'.format(self._dataset_id, self._spechits_pickle_path))
+            self._spec_hits = spec_hits
+
+        if self._spec_hits is None:
+            # no cached spectral hits available, generate (and cache)
+            logger.info('Generating spectral hits')
+            self._spec_hits = self._generate_spec_hits(spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks)
 
         logger.info('SpecLib has {} spectra, {} hits'.format(self.speclib.get_n_spec(), len(self._spec_hits)))
 

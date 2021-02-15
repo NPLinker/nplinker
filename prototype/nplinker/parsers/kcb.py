@@ -166,7 +166,7 @@ class KCBJSONParser(object):
             # step 3: extract BGC IDs (=parsing of "... subject cluster" tables in text file)
             # (this is a list of lists)
             all_mibig_genes = [entry[0]['proteins'] for entry in result['ranking']]
-            
+
             region_number = int(result['region_number'])
             # should never have two identical region numbers for the same ID
             assert(region_number not in record_hits)
@@ -188,6 +188,7 @@ class KCBJSONParser(object):
             individual_hits = []
             for j, ranking in enumerate(result['ranking']):
                 hit['all_mibig_genes'] = all_mibig_genes[j]
+                hit['mibig_id'] = sig_hits[j][0]
                 for pairing in ranking[1]['pairings']:
                     tc1 = pairing[0].split('|')[4]
                     individual_hits.append({'source_bgc_gene': tc1, 
