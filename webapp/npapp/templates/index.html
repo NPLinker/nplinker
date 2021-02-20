@@ -122,35 +122,8 @@
         <div class="col-md-3">
             {{ embed(roots.header_text) }}
         </div>
-        <div class="col-md-3" style="display: none">
-            <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#optionsModal" aria-expanded="false" aria-controls="optionsModal" style="margin-top: 10px">
-                Options
-            </button>
-            <div class="modal" id="optionsModal" tabindex="-1" role="dialog">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Plot options</h5>
-                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                             </button>
-                        </div>
-                        <div class="modal-body">
-                            {{ embed(roots.plot_toggles) }}
-                            {{ embed(roots.tsne_id_select) }}
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="col-md-4">
             {{ embed(roots.alert_div) }}
-        </div>
-        <div class="col-md-2">
-            {{ embed(roots.reset_button) }}
         </div>
     </div>
     <div class="row" style="margin-top: 15px; margin-bottom: 15px;">
@@ -220,39 +193,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="tab-pane" id="modes_tab_plots">
-            <div class="row">
-                <div class="col-md-1">{{ embed(roots.legend_spec) }}</div>
-                <div class="col-md-5">
-                    {{ embed(roots.fig_spec) }}
-                </div>
-                <div class="col-md-5">
-                    {{ embed(roots.fig_bgc) }}
-                </div>
-                <div class="col-md-1">{{ embed(roots.legend_bgc) }}</div>
-            </div>
-            <div class="row">
-                <div class="col-md-1"></div>
-                <div class="col-lg-5">
-                    <div id="spec_hover_info"></div>
-                </div>
-                <div class="col-lg-5">
-                    <div id="bgc_hover_info"></div>
-                </div>
-                <div class="col-md-1"></div>
-            </div>
-            <div class="row">
-                <div class="col-md-1"></div>
-                <div class="col-lg-5">
-                    <div id="spec_hover_info_ext"></div>
-                </div>
-                <div class="col-lg-5">
-                    <div id="bgc_hover_info_ext"></div>
-                </div>
-                <div class="col-md-1"></div>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -280,31 +220,6 @@
             <div class="tab-content" id="mainTabContent">
                 <!-- scoring tab content -->
                 <div class="tab-pane  show active" id="scoring_div" role="tabpanel" aria-labelledby="scoringTab">
-                    <div class="row" style="display: none">
-                        <div class="col-md-1"></div>
-                        <div class="col-lg-4" style="text-align: right">
-                            <h6 style="">Metabolomics scoring mode:</h6>
-                        </div>
-                        <div class="col-lg-2">
-                        </div>
-                        <div class="col-lg-4">
-                            <h6>Genomics scoring mode:</h6>
-                        </div>
-                        <div class="col-md-1"></div>
-                    </div>
-                    <div class="row" style="display: none">
-                        <div class="col-md-1"></div>
-                        <div class="col-lg-4" id="mb_mode">
-                            {{ embed(roots.mb_mode_group) }}
-                        </div>
-                        <div class="col-lg-2">
-                            {{ embed(roots.plot_select) }}
-                        </div>
-                        <div class="col-lg-4">
-                            {{ embed(roots.ge_mode_group) }}
-                        </div>
-                        <div class="col-md-1"></div>
-                    </div>
                     <div class="row">
                         <div class="col-md-1"></div>
                         <div class="col-lg-10">
