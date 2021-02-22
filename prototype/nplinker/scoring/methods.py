@@ -1,6 +1,6 @@
 import itertools
 import random
-from types import SimpleNamespace
+import os
 
 import numpy as np
 
@@ -8,6 +8,7 @@ from .data_linking import DataLinks, LinkFinder
 from ..genomics import BGC, GCF
 from ..metabolomics import Spectrum, MolecularFamily
 from ..scoring.rosetta.rosetta import Rosetta
+from ..pickler import load_pickled_data, save_pickled_data
 
 from ..logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
@@ -418,12 +419,44 @@ class MetcalfScoring(ScoringMethod):
     @staticmethod
     def setup(npl):
         logger.info('MetcalfScoring.setup (bgcs={}, gcfs={}, spectra={}, molfams={}, strains={}'.format(len(npl.bgcs), len(npl.gcfs), len(npl.spectra), len(npl.molfams), len(npl.strains)))
-        MetcalfScoring.DATALINKS = DataLinks()
-        MetcalfScoring.DATALINKS.load_data(npl._spectra, npl._gcfs, npl._strains)
-        MetcalfScoring.DATALINKS.find_correlations()
-        MetcalfScoring.LINKFINDER = LinkFinder()
-        MetcalfScoring.LINKFINDER.metcalf_scoring(MetcalfScoring.DATALINKS, type='spec-gcf')
-        MetcalfScoring.LINKFINDER.metcalf_scoring(MetcalfScoring.DATALINKS, type='fam-gcf')
+
+        cache_dir = os.path.join(npl.root_dir, 'metcalf')
+        cache_file = os.path.join(cache_dir, 'metcalf_scores.pckl')
+        os.makedirs(cache_dir, exist_ok=True)
+
+        # the metcalf preprocessing can take a long time for large datasets, so it's 
+        # better to cache as the data won't change unless the number of objects does
+
+        dataset_counts = [len(npl.bgcs), len(npl.gcfs), len(npl.spectra), len(npl.molfams), len(npl.strains)]
+        datalinks, linkfinder = None, None
+        if os.path.exists(cache_file):
+            logger.debug('MetcalfScoring.setup loading cached data')
+            cache_data = load_pickled_data(npl, cache_file)
+            cache_ok = True
+            if cache_data is not None:
+                (counts, datalinks, linkfinder) = cache_data
+                # need to invalidate this if dataset appears to have changed
+                for i in range(len(counts)):
+                    if counts[i] != dataset_counts[i]:
+                        logger.info('MetcalfScoring.setup invalidating cached data!')
+                        cache_ok = False
+                        break
+
+            if cache_ok:
+                MetcalfScoring.DATALINKS = datalinks
+                MetcalfScoring.LINKFINDER = linkfinder
+
+        if MetcalfScoring.DATALINKS is None:
+            logger.info('MetcalfScoring.setup preprocessing dataset (this may take some time)')
+            MetcalfScoring.DATALINKS = DataLinks()
+            MetcalfScoring.DATALINKS.load_data(npl._spectra, npl._gcfs, npl._strains)
+            MetcalfScoring.DATALINKS.find_correlations()
+            MetcalfScoring.LINKFINDER = LinkFinder()
+            MetcalfScoring.LINKFINDER.metcalf_scoring(MetcalfScoring.DATALINKS, type='spec-gcf')
+            MetcalfScoring.LINKFINDER.metcalf_scoring(MetcalfScoring.DATALINKS, type='fam-gcf')
+            logger.debug('MetcalfScoring.setup caching results')
+            save_pickled_data((dataset_counts, MetcalfScoring.DATALINKS, MetcalfScoring.LINKFINDER), cache_file)
+
         logger.info('MetcalfScoring.setup completed')
 
     @property
