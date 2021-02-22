@@ -57,7 +57,7 @@ repro_file = ""
 #
 # The layout is as follows (see the documentation for more details):
 # <root>
-#   |- strain_mapping.csv (strain ID mappings)
+#   |- strain_mappings.csv (strain ID mappings)
 #   |   (METABOLOMICS DATA)
 #   |- clusterinfo*/<UID>.tsv (spectrum metadata, NOTE: NPLinker will search any folder beginning with "clusterinfo")
 #   |- metadata_table/metadata_table-00000.txt (only present in FBMN GNPS jobs?)
@@ -73,6 +73,7 @@ repro_file = ""
 #   |- bigscape/<classes subfolders> (BiG-SCAPE clustering/annotation files in their subfolders)
 #       (MISC DATA)
 #   |- description.txt (a freeform optional text file containing information about a dataset)
+#   |- include_strains.csv (optional list of strain IDs to explicitly include when loading, others excluded)
 #
 # 2. Loading platform datasets
 # ----------------------------
@@ -239,3 +240,7 @@ tables_metcalf_threshold = 2.0
 # (if needed, download the appropriate version of the archive in JSON format
 # from https://mibig.secondarymetabolites.org/download and extract the contents)
 #mibig_json_dir = ""
+
+# list of strains to include when loading the dataset. this is optional but can be used
+# to e.g. filter out most of a large dataset to focus on some specific objects
+#include_strains_file = ""
