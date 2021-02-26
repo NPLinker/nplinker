@@ -257,7 +257,7 @@ class Rosetta(object):
                             logger.warning(e)
                             errors += 1
 
-            print('Found matches for {}/{} bgcs'.format(len(matched_bgcs), len(prefix_bgcs)))
+            logger.debug('Found matches for {}/{} bgcs'.format(len(matched_bgcs), len(prefix_bgcs)))
             if len(matched_bgcs) != len(prefix_bgcs):
                 # not necessarily fatal but probably not good either
                 logger.warning('Failed to match {} BGCs to hits in directory {}!'.format(len(prefix_bgcs) - len(matched_bgcs), prefix))
