@@ -243,4 +243,5 @@ tables_metcalf_threshold = 2.0
 
 # list of strains to include when loading the dataset. this is optional but can be used
 # to e.g. filter out most of a large dataset to focus on some specific objects
+# default is <root>/include_strains.csv
 #include_strains_file = ""
