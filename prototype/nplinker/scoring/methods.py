@@ -418,7 +418,7 @@ class MetcalfScoring(ScoringMethod):
 
     @staticmethod
     def setup(npl):
-        logger.info('MetcalfScoring.setup (bgcs={}, gcfs={}, spectra={}, molfams={}, strains={}'.format(len(npl.bgcs), len(npl.gcfs), len(npl.spectra), len(npl.molfams), len(npl.strains)))
+        logger.info('MetcalfScoring.setup (bgcs={}, gcfs={}, spectra={}, molfams={}, strains={})'.format(len(npl.bgcs), len(npl.gcfs), len(npl.spectra), len(npl.molfams), len(npl.strains)))
 
         cache_dir = os.path.join(npl.root_dir, 'metcalf')
         cache_file = os.path.join(cache_dir, 'metcalf_scores.pckl')
@@ -515,10 +515,10 @@ class MetcalfScoring(ScoringMethod):
 
             # iterating over spectra
             for i, type1_obj in enumerate(type1_objects):
-                met_strains = len(type1_obj.dataset_strains)
+                met_strains = len(type1_obj.strains) # number of strains left after filtering
                 # iterating over GCFs
-                for j, other_obj in enumerate(other_objs):
-                    gen_strains = len(other_obj.dataset_strains) 
+                for j, other_obj in enumerate(other_objs): 
+                    gen_strains = len(other_obj.strains) # number of strains left after filtering
 
                     # lookup expected + variance values based on strain counts 
                     expected = linkfinder.metcalf_expected[met_strains][gen_strains]

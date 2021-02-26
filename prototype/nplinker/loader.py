@@ -10,7 +10,7 @@ from .genomics import make_mibig_bgc_dict
 
 from .annotations import load_annotations
 
-from .strains import StrainCollection, Strain
+from .strains import StrainCollection
 
 from .pairedomics.downloader import Downloader
 from .pairedomics.downloader import download_and_extract_mibig_json, generate_strain_mappings
@@ -102,6 +102,7 @@ class DatasetLoader(object):
     # misc files
     OR_PARAMS                       = 'gnps_params_file'
     OR_DESCRIPTION                  = 'description_file'
+    OR_INCLUDE_STRAINS              = 'include_strains_file'
 
     BIGSCAPE_PRODUCT_TYPES          = ['NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs', 'Saccharides', 'Terpene']
 
@@ -200,8 +201,11 @@ class DatasetLoader(object):
         # 12. MISC: <root>/params.xml
         self.params_file = os.path.join(self._root, 'params.xml')
 
-        # 12. MISC: <root>/description.txt
+        # 13. MISC: <root>/description.txt
         self.description_file = os.path.join(self._root, 'description.txt')
+
+        # 14. MISC: <root>/include_strains.csv / include_strains_file=<override>
+        self.include_strains_file = self._overrides.get(self.OR_INCLUDE_STRAINS) or os.path.join(self._root, 'include_strains.csv')
 
         for f in self.required_paths():
             if not os.path.exists(f):
@@ -224,9 +228,15 @@ class DatasetLoader(object):
 
         self._load_optional()
 
-        # Restrict strain list to only relevant strains
+        # Restrict strain list to only relevant strains (those that are present
+        # in both genomic and 
         if not met_only:
-            self._filter_strains()
+            # TODO add a config file option for this?
+            self._filter_only_common_strains()
+
+            # if the user specified a set of strains to be explicitly included, filter
+            # out everything except those strains
+            self._filter_user_strains()
 
         # if we don't have at least *some* strains here it probably means missing mappings
         # or a complete failure to parse things, so bail out
@@ -235,24 +245,88 @@ class DatasetLoader(object):
 
         return True
 
-    def _filter_strains(self):
+    def _filter_user_strains(self):
+        """
+        If the user has supplied a list of strains to be explicitly included, go through the
+        existing sets of objects we have and remove any that only include other strains. This
+        involves an initial round of removing BGC and Spectrum objects, then a further round
+        of removing now-empty GCF and MolFam objects. 
+        """
+        if len(self.include_only_strains) == 0:
+            logger.info('No further strain filtering to apply')
+            return
+
+        logger.info('Found a list of {} strains to retain, filtering objects'.format(len(self.include_only_strains)))
+
+        # filter the main list of strains
+        self.strains.filter(self.include_only_strains)
+
+        if len(self.strains) == 0:
+            logger.error('Strain list has been filtered down until it is empty! ')
+            logger.error('This probably indicates that you tried to specifically include a set of strains that had no overlap with the set common to metabolomics and genomics data (see the common_strains.csv in the dataset folder for a list of these')
+            raise Exception('No strains left after filtering, cannot continue!')
+    
+        # get the list of BGCs which have a strain found in the set we were given
+        bgcs_to_retain = [bgc for bgc in self.bgcs if bgc.strain in self.include_only_strains]
+        # get the list of spectra which have at least one strain in the set
+        spectra_to_retain = [spec for spec in self.spectra for sstrain in spec.strains if sstrain in self.include_only_strains]
+
+        logger.info('Current / filtered BGC counts: {} / {}'.format(len(self.bgcs), len(bgcs_to_retain)))
+        logger.info('Current / filtered spectra counts: {} / {}'.format(len(self.spectra), len(spectra_to_retain)))
+        
+        self.bgcs = bgcs_to_retain
+        for i, bgc in enumerate(self.bgcs):
+            bgc.id = i
+
+        self.spectra = spectra_to_retain
+        # also need to filter the set of strains attached to each spectrum
+        for i, spec in enumerate(self.spectra):
+            spec.strains.filter(self.include_only_strains)
+            spec.id = i
+
+        # now filter GCFs and MolFams based on the filtered BGCs and Spectra
+        gcfs = set([bgc.parent for bgc in self.bgcs])
+        logger.info('Current / filtered GCF counts: {} / {}'.format(len(self.gcfs), len(gcfs)))
+        self.gcfs = list(gcfs)
+        # filter each GCF's strain list
+        for i, gcf in enumerate(self.gcfs):
+            gcf.strains.filter(self.include_only_strains)
+            gcf.id = i
+
+        molfams = set([spec.family for spec in self.spectra])
+        logger.info('Current / filtered MolFam counts: {} / {}'.format(len(self.molfams), len(molfams)))
+        self.molfams = molfams
+        for i, molfam in enumerate(self.molfams):
+            molfam.id = i
+
+    def _filter_only_common_strains(self):
         """
         Filter strain population to only strains present in both genomic and molecular data
-        TODO: Maybe there should be an option to specify which strains are used, both so we can
-            selectively exclude strains, and include strains that are missing from either side.
         """
+        # TODO: Maybe there should be an option to specify which strains are used, both so we can
+        #    selectively exclude strains, and include strains that are missing from either side.
         bgc_strains = set([x.strain for x in self.bgcs])
         spectrum_strains = set().union(*[x.strains for x in self.spectra])
         common_strains = bgc_strains.intersection(spectrum_strains)
         logger.debug('Filtering strains: genomics count {}, metabolomics count: {}'.format(len(bgc_strains), len(spectrum_strains)))
         logger.debug('Common strains found: {}'.format(len(common_strains)))
         self.strains.filter(common_strains)
-        # this makes metcalf standardised scoring a bit more efficient
+
         for gcf in self.gcfs:
-            gcf.dataset_strains = set(gcf.strains).intersection(self.strains)
+            gcf.strains.filter(common_strains)
         for spec in self.spectra:
-            spec.dataset_strains = set(spec.strains.keys()).intersection(self.strains)
+            spec.strains.filter(common_strains)
         logger.info('Strains filtered down to total of {}'.format(len(self.strains)))
+
+        # write out a list of the common strains to the dataset folder (might be useful for
+        # anyone wanting to do additional filtering)
+        cs_path = os.path.join(self._root, 'common_strains.csv')
+        logger.warning('Writing unknown strains from GENOMICS data to {}'.format(cs_path))
+        with open(cs_path, 'w') as cs:
+            cs.write('# strain label\n')
+            for strain in self.strains:
+                cs.write('{}\n'.format(strain.id))
+
 
     def _load_optional(self):
         self.gnps_params = {}
@@ -273,6 +347,20 @@ class DatasetLoader(object):
         if os.path.exists(self.description_file):
             self.description_text = open(self.description_file, 'r').read()
             logger.debug('Parsed description text')
+
+        self.include_only_strains = set()
+        if os.path.exists(self.include_strains_file):
+            logger.debug('Loading include_strains from {}'.format(self.include_strains_file))
+            strain_list = open(self.include_strains_file, 'r').readlines()
+            self.include_only_strains = StrainCollection()
+            for line_num, sid in enumerate(strain_list):
+                sid = sid.strip() # get rid of newline
+                strain_obj = self.strains.lookup(sid)
+                if strain_obj is None:
+                    logger.warning('Line {} of {}: invalid/unknown strain ID "{}"'.format(line_num + 1, self.include_strains_file, sid))
+                    continue
+                self.include_only_strains.add(strain_obj)
+            logger.debug('Found {} strain IDs in include_strains'.format(len(self.include_only_strains)))
 
     def _load_genomics_extra(self):
         if not os.path.exists(self.mibig_json_dir):

@@ -46,10 +46,10 @@ class Spectrum(object):
         # TODO should add intensity here too
         self.metadata = {}
         self.edges = []
+        self.strains = StrainCollection()
         # this is a dict indexed by Strain objects (the strains found in this Spectrum), with 
         # the values being dicts of the form {growth_medium: peak intensity} for the parent strain
-        self.strains = {}
-        self.dataset_strains = None
+        self.growth_media = {}
         self.family_id = -1
         self.family = None
         # a dict indexed by filename, or "gnps" 
@@ -58,18 +58,21 @@ class Spectrum(object):
         self._jcamp = None
 
     def add_strain(self, strain, growth_medium, peak_intensity):
-        if strain not in self.strains:
-            self.strains[strain] = {}
+        # adds the strain to the StrainCollection if not already there
+        self.strains.add(strain)
+
+        if strain not in self.growth_media:
+            self.growth_media[strain] = {}
 
         # TODO temp workaround for crusemann issues
         if growth_medium is None:
-            self.strains[strain].update({'unknown_medium_{}'.format(len(self.strains[strain])): peak_intensity})
+            self.growth_media[strain].update({'unknown_medium_{}'.format(len(self.growth_media[strain])): peak_intensity})
             return
 
-        if strain in self.strains and growth_medium in self.strains[strain]:
-            raise Exception('Clash: {} / {} {}'.format(self, strain, growth_medium))
+        if strain in self.growth_media and growth_medium in self.growth_media[strain]:
+            raise Exception('Growth medium clash: {} / {} {}'.format(self, strain, growth_medium))
         
-        self.strains[strain].update({growth_medium: peak_intensity})
+        self.growth_media[strain].update({growth_medium: peak_intensity})
         
     @property
     def is_library(self):
@@ -92,14 +95,6 @@ class Spectrum(object):
         val = self.metadata.get(key, None)
         return val
 
-    @property
-    def strain_list(self):
-        return self.strains.keys()
-
-    @property
-    def strain_set(self):
-        return set(self.strains.keys())
-
     def has_strain(self, strain):
         return strain in self.strains
 
@@ -107,7 +102,7 @@ class Spectrum(object):
         if strain not in self.strains:
             return None
 
-        gms = self.strains[strain]
+        gms = self.growth_media[strain]
         return list(gms.keys())[0]
 
     def to_jcamp_str(self, force_refresh=False):
