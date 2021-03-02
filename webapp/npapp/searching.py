@@ -82,7 +82,7 @@ class Searcher(object):
         elif mode == SEARCH_OPT_GCF_ID:
             results = [gcf for gcf in self.npl.gcfs if self.textmatch(needle, str(gcf.gcf_id), use_re)]
         elif mode == SEARCH_OPT_SPEC_STRAINS:
-            results = [spec for spec in self.npl.spectra if self.textmatch_list(needle, spec.strain_list, use_re)]
+            results = [spec for spec in self.npl.spectra if self.textmatch_list(needle, [s.id for s in spec.strains], use_re)]
         elif mode == SEARCH_OPT_SPEC_FAMILY:
             # if not in regex mode here, probably want to use exact matching
             results = [spec for spec in self.npl.spectra if self.textmatch(needle, spec.family, use_re, not use_re)]
