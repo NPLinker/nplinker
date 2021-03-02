@@ -610,9 +610,9 @@ class NPLinkerBokeh(object):
 
         # add strain information (possibly empty)
         if link is not None and len(link.shared_strains) > 0:
-            spec_body += '<li><strong>strains (total={}, shared={})</strong>: '.format(len(spec.strain_list), len(link.shared_strains))
+            spec_body += '<li><strong>strains (total={}, shared={})</strong>: '.format(len(spec.strains), len(link.shared_strains))
 
-            non_shared = [s for s in spec.strain_list if s not in link.shared_strains]
+            non_shared = [s for s in spec.strains if s not in link.shared_strains]
 
             for s in link.shared_strains:
                 spec_body += '<span style="background-color: #AAFFAA">{} ({})</span>, '.format(s.id, spec.get_growth_medium(s))
@@ -621,9 +621,9 @@ class NPLinkerBokeh(object):
 
             spec_body += '</li>'
         else:
-            spec_body += '<li><strong>strains (total={}, shared=0)</strong>: '.format(len(spec.strain_list))
+            spec_body += '<li><strong>strains (total={}, shared=0)</strong>: '.format(len(spec.strains))
 
-            for s in spec.strain_list:
+            for s in spec.strains:
                 spec_body += '<span>{} ({})</span>, '.format(s.id, spec.get_growth_medium(s))
 
             spec_body += '</li>'
@@ -705,7 +705,7 @@ class NPLinkerBokeh(object):
         for i, spec in enumerate(spectra):
             spec_hdr_id = 'spec_search_header_{}'.format(i)
             spec_body_id = 'spec_search_body_{}'.format(i)
-            spec_title = 'Spectrum(parent_mass={:.4f}, id={}, strains={})'.format(spec.parent_mz, spec.spectrum_id, len(spec.strain_list))
+            spec_title = 'Spectrum(parent_mass={:.4f}, id={}, strains={})'.format(spec.parent_mz, spec.spectrum_id, len(spec.strains))
 
             spec_body = self.generate_spec_info(spec)
 
