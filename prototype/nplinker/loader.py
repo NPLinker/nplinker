@@ -466,12 +466,12 @@ class DatasetLoader(object):
         if len(anno_files) == 0:
             raise Exception('Failed to find *any* BiGSCAPE Network_Annotations tsv files under "{}" (incorrect cutoff value? currently set to {})'.format(self.bigscape_dir, self._bigscape_cutoff))
 
-        def _list_missing_files(t, l):
+        def _list_missing_files(m, l):
             if len(l) == 0:
                 return
-            logger.warning(t)
-            for i, f in enumerate(l):
-                logger.warning('  {}/{}: '.format(i+1, len(l)) + f)
+            logger.warning(m)
+            for i, fn in enumerate(l):
+                logger.warning('  {}/{}: '.format(i+1, len(l)) + fn)
 
         _list_missing_files('{} missing annotation tsv files:'.format(len(missing_anno_files)), missing_anno_files)
         _list_missing_files('{} missing clustering tsv files:'.format(len(missing_cluster_files)), missing_cluster_files)
