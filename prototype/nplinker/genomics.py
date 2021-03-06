@@ -1,4 +1,8 @@
-import csv, glob, os, json, re
+import csv
+import glob
+import os
+import json
+import re
 
 from Bio import SeqIO
 
