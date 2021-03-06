@@ -187,7 +187,7 @@ class DatasetLoader(object):
 
         # 10. GEN: <root>/bigscape / bigscape_dir=<override>
         self.bigscape_dir = self._overrides.get(self.OR_BIGSCAPE) or os.path.join(self._root, 'bigscape')
-        # what we really want here is the subdirectory containing the network/annotation fiies, 
+        # what we really want here is the subdirectory containing the network/annotation files,
         # but in case this is the path to the top level bigscape output, try to figure it out automatically
         if not os.path.exists(os.path.join(self.bigscape_dir, 'NRPS')):
             new_bigscape_dir = find_bigscape_dir(self.bigscape_dir)
