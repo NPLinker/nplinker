@@ -495,12 +495,13 @@ class DatasetLoader(object):
         logger.debug('Generating antiSMASH filename cache...')
         t = time.time()
         for f in gbk_files:
-            basename = os.path.splitext(os.path.split(f)[1])[0]
-            fullpath = os.path.join(root, f)
-            self.antismash_cache[basename] = fullpath
+            path, filename = os.path.split(f)
+            # cache with key set to bare filename with no extension
+            basename = os.path.splitext(filename)[0]
+            self.antismash_cache[basename] = f
             # also insert it with the folder name as matching on filename isn't always enough apparently
-            parent = os.path.split(root)[-1]
-            self.antismash_cache['{}_{}'.format(parent, basename)] = fullpath
+            parent = os.path.split(path)[-1]
+            self.antismash_cache['{}_{}'.format(parent, basename)] = f
         logger.debug('Cache generation took {:.3f}s'.format(time.time() - t))
 
         logger.debug('loadBGC_from_cluster_files(antismash_dir={}, delimiters={})'.format(self.antismash_dir, self._antismash_delimiters))
