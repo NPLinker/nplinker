@@ -2,8 +2,6 @@ import os
 import csv
 import re
 
-import numpy as np
-
 from .parsers.mgf import LoadMGF
 from .strains import StrainCollection
 from .utils import sqrt_normalise
