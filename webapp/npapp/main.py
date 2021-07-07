@@ -1092,8 +1092,12 @@ class NPLinkerBokeh(object):
                 link.dispatchEvent(new MouseEvent('click'))
             }
         """
-        with open(os.path.join(self.nh.nplinker.root_dir, 'rosetta', 'rosetta_hits.csv'), 'r') as f:
-            rosetta_csv_text = f.read()
+
+        # load rosetta hits (if available)
+        rosetta_path = os.path.join(self.nh.nplinker.root_dir, 'rosetta', 'rosetta_hits.csv')
+        if os.path.exists(rosetta_path):
+            with open(rosetta_path, 'r') as f:
+                rosetta_csv_text = f.read()
         self.rosetta_dl_button.js_on_click(CustomJS(args=dict(filetext=rosetta_csv_text), code=rosetta_download_code))
         widgets.append(self.rosetta_dl_button)
 
@@ -1192,7 +1196,7 @@ class NPLinkerBokeh(object):
         if defval is not None:
             deftext = '<strong>{}</strong> = {}'.format(defval, self.nh.nplinker.gnps_params[defval])
         else:
-            deftext = None
+            deftext = ''
         self.gnps_params_value = Div(text=deftext, sizing_mode='scale_height', name='gnps_params_value')
         widgets.append(self.gnps_params_value)
 
