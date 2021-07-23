@@ -386,6 +386,8 @@ class Rosetta(object):
         # if we didn't find any BGC hits, no point in continuing
         if len(self._bgc_hits) == 0:
             logger.warning('Aborting Rosetta scoring data generation, no BGC hits were found!')
+            # create an empty rosetta_hits.csv file
+            self.export_to_csv(os.path.join(self._pickle_dir, 'rosetta_hits.csv'))
             return self._rosetta_hits
 
         logger.info('No cached Rosetta hits data found')
