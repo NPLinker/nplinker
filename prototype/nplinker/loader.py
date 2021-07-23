@@ -321,7 +321,7 @@ class DatasetLoader(object):
         # write out a list of the common strains to the dataset folder (might be useful for
         # anyone wanting to do additional filtering)
         cs_path = os.path.join(self._root, 'common_strains.csv')
-        logger.warning('Writing unknown strains from GENOMICS data to {}'.format(cs_path))
+        logger.info('Writing common strain labels to {}'.format(cs_path))
         with open(cs_path, 'w') as cs:
             cs.write('# strain label\n')
             for strain in self.strains:
