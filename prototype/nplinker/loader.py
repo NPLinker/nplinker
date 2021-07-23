@@ -310,13 +310,6 @@ class DatasetLoader(object):
         common_strains = bgc_strains.intersection(spectrum_strains)
         logger.debug('Filtering strains: genomics count {}, metabolomics count: {}'.format(len(bgc_strains), len(spectrum_strains)))
         logger.debug('Common strains found: {}'.format(len(common_strains)))
-        self.strains.filter(common_strains)
-
-        for gcf in self.gcfs:
-            gcf.strains.filter(common_strains)
-        for spec in self.spectra:
-            spec.strains.filter(common_strains)
-        logger.info('Strains filtered down to total of {}'.format(len(self.strains)))
 
         # write out a list of the common strains to the dataset folder (might be useful for
         # anyone wanting to do additional filtering)
@@ -327,6 +320,14 @@ class DatasetLoader(object):
             for strain in self.strains:
                 cs.write('{}\n'.format(strain.id))
 
+        # filter the master list of strains down to include only the common set
+        self.strains.filter(common_strains)
+
+        for gcf in self.gcfs:
+            gcf.strains.filter(common_strains)
+        for spec in self.spectra:
+            spec.strains.filter(common_strains)
+        logger.info('Strains filtered down to total of {}'.format(len(self.strains)))
 
     def _load_optional(self):
         self.gnps_params = {}
