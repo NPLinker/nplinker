@@ -300,7 +300,7 @@ class DatasetLoader(object):
             spec.id = i
 
         # now filter GCFs and MolFams based on the filtered BGCs and Spectra
-        gcfs = set([bgc.parent for bgc in self.bgcs])
+        gcfs = set([parent for bgc in self.bgcs for parent in bgc.parents])
         logger.info('Current / filtered GCF counts: {} / {}'.format(len(self.gcfs), len(gcfs)))
         self.gcfs = list(gcfs)
         # filter each GCF's strain list

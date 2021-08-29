@@ -32,13 +32,13 @@ logger = LogConfig.getLogger(__file__)
 CLUSTER_REGION_REGEX = re.compile('(.+?)\\.(cluster|region)(\\d+).gbk$')
 
 class BGC(object):
-    def __init__(self, id, strain, name, bigscape_class, product_prediction, description=None):
+    def __init__(self, id, strain, name, product_prediction, description=None):
         self.id = id
         self.strain = strain
         self.name = name
-        self.bigscape_class = bigscape_class
         self.product_prediction = product_prediction
-        self.parent = None
+        # allow for multiple parents in the case of hybrid BGCs
+        self.parents = set()
         self.description = description
         # these will get parsed from the .gbk file
         self.antismash_id = None
@@ -69,6 +69,9 @@ class BGC(object):
             elif c_or_r == 'cluster':
                 self.cluster = int(regex_obj.group(3))
 
+    def add_parent(self, gcf):
+        self.parents.add(gcf)
+
     def __repr__(self):
         return str(self)
 
@@ -80,6 +83,14 @@ class BGC(object):
 
     def __hash__(self):
         return self.id
+
+    @property
+    def bigscape_classes(self):
+        return set([p.bigscape_class for p in self.parents])
+
+    @property
+    def is_hybrid(self):
+        return len(self.parents) > 1
 
     @property
     def is_mibig(self):
@@ -112,7 +123,7 @@ class BGC(object):
 class MiBIGBGC(BGC):
 
     def __init__(self, id, strain, name, product_prediction):
-        super(MiBIGBGC, self).__init__(id, strain, name, None, product_prediction)
+        super(MiBIGBGC, self).__init__(id, strain, name, product_prediction)
 
     def __eq__(self, other):
         return self.id == other.id
@@ -122,16 +133,18 @@ class MiBIGBGC(BGC):
 
 
 class GCF(object):
-    def __init__(self, id, gcf_id, product_type):
+    def __init__(self, id, gcf_id, bigscape_class):
         self.id = id
         self.gcf_id = gcf_id
-        self.product_type = product_type
+        self.bigscape_class = bigscape_class
         self.bgcs = set()
-        self.classes = set()
 
         self._aa_predictions = None
         self.strains = StrainCollection()
         self.strains_lookup = {}
+
+        # will be set to False if the GCF ends up containing any "hybrid" BGCs
+        self._is_pure = True
 
     def __str__(self):
         return 'GCF(id={}, class={}, gcf_id={}, strains={})'.format(self.id, self.product_type, self.gcf_id, len(self.strains))
@@ -147,11 +160,11 @@ class GCF(object):
 
     def add_bgc(self, bgc):
         self.bgcs.add(bgc)
-        self.classes.add(bgc.bigscape_class)
-        # TODO possible to have multiple parents??
-        bgc.parent = self
+        bgc.add_parent(self)
         self.strains.add(bgc.strain)
         self.strains_lookup[bgc.strain] = bgc
+        if bgc.is_hybrid:
+            self._is_pure = False
 
     def has_strain(self, strain):
         return strain in self.strains
@@ -164,6 +177,10 @@ class GCF(object):
 
     def has_mibig(self):
         return self.num_mibig_bgcs > 0
+
+    @property
+    def is_pure(self):
+        return self._is_pure
 
     @property
     def non_mibig_bgcs(self):
@@ -289,7 +306,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                         new_bgc = bgc_lookup.get(name)
                     else:
                         # create a new BGC, increment internal ID and add to the list
-                        new_bgc = BGC(internal_bgc_id, strain, name, bigscape_class, product_prediction, description)
+                        new_bgc = BGC(internal_bgc_id, strain, name, product_prediction, description)
                         internal_bgc_id += 1
                         bgc_list.append(new_bgc)
 
@@ -331,7 +348,6 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                     except KeyError:
                         raise Exception('Unknown MiBIG: {}'.format(strain.id))
 
-                    new_bgc.bigscape_class = bigscape_class
                     new_bgc.description = description
 
                 if family_id not in gcf_dict:
@@ -384,7 +400,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
 
 def filter_mibig_bgcs(bgcs, gcfs, strains):
     # remove the following MiBIG BGCs:
-    # - parent attr is None (indicating never added to a GCF)
+    # - parent set is empty (indicating never added to a GCF)
     # - any instances in a GCF with no other non-MiBIG BGCs
     to_remove_gcfs = set()
     to_remove_bgcs = set()
@@ -400,10 +416,10 @@ def filter_mibig_bgcs(bgcs, gcfs, strains):
             for bgc in gcf.bgcs:
                 to_remove_bgcs.add(bgc)
                 strains.remove(bgc.strain)
-                bgc.parent = None
+                bgc.parents.remove(gcf)
 
     for bgc in bgcs:
-        if bgc.parent is None:
+        if len(bgc.parents) == 0:
             strains.remove(bgc.strain)
 
     logger.info('Filtering MiBIG BGCs: removing {} GCFs and {} BGCs'.format(len(to_remove_gcfs), len(to_remove_bgcs)))
@@ -411,12 +427,12 @@ def filter_mibig_bgcs(bgcs, gcfs, strains):
     # for GCFs just remove those that appear in to_remove_gcfs
     new_gcf_list = [gcf for gcf in gcfs if gcf not in to_remove_gcfs]
     # for BGCs do similar but also get rid of the objects never added to a GCF in the first place
-    new_bgc_list = [bgc for bgc in bgcs if bgc not in to_remove_bgcs and bgc.parent is not None]
+    new_bgc_list = [bgc for bgc in bgcs if bgc not in to_remove_bgcs and len(bgc.parents) != 0]
 
     # keep internal IDs consecutive 
     for i in range(len(new_bgc_list)):
         new_bgc_list[i].id = i
-        if new_bgc_list[i].parent is None:
+        if len(new_bgc_list[i].parents) == 0:
             raise Exception(new_bgc_list[i])
 
     for i in range(len(new_gcf_list)):
