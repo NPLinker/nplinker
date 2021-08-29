@@ -139,14 +139,26 @@ class DataLinks(object):
         """
         
         # TODO: not only collect bigclass types but also product predictions
-        
         bigscape_bestguess = []
         for i, gcf in enumerate(gcf_list):
+            #bigscape_class = []
+            #for i, bgc in enumerate(gcf_list[i].bgcs):
+            #    # bigscape_class.append(gcf_list[i].bgc_list[m].bigscape_class)
+            #    bigscape_class.append(bgc.bigscape_class)
+            #    class_counter = Counter(bigscape_class)
+
+            # TODO: this might need properly rewritten due to changes in the way GCF/BGC
+            # objects store bigscape class information and handle hybrid BGCs (see genomics.py). the
+            # original version i've left above iterates over every BGC in the current GCF
+            # and extracts its .bigscape_class attribute, but now each BGC can have multiple
+            # classes if it happens to be a hybrid and i'm not sure the version below
+            # still makes sense.
+            # 
+            # doesn't seem to be very important for calculating the metcalf scores though so not urgent for now. 
             bigscape_class = []
-            for i, bgc in enumerate(gcf_list[i].bgcs):
-                # bigscape_class.append(gcf_list[i].bgc_list[m].bigscape_class)
-                bigscape_class.append(bgc.bigscape_class)
-                class_counter = Counter(bigscape_class)
+            for bgc in gcf.bgcs:
+                bigscape_class.extend(bgc.bigscape_classes)
+            class_counter = Counter(bigscape_class)
                 
             # try not to select "Others":   
             if class_counter.most_common(1)[0][0] is None:
