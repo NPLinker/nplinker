@@ -214,7 +214,7 @@ class DataLinks(object):
         
         if num_of_singletons > 0:  # if singletons exist + included
             M_fam_strain[(num_unique_fams-num_of_singletons):,
-                         :] = self.M_spec_strain[np.where(self.mapping_spec["fam-id"][:,0] == -1)[0],:]
+                         :] = self.M_spec_strain[np.where(self.mapping_spec["fam-id"][:, 0] == -1)[0], :]
 
         # go through families (except singletons) and collect member strain occurences  
         self.family_members = []
