@@ -147,7 +147,7 @@ class GCF(object):
         self._is_pure = True
 
     def __str__(self):
-        return 'GCF(id={}, class={}, gcf_id={}, strains={})'.format(self.id, self.product_type, self.gcf_id, len(self.strains))
+        return 'GCF(id={}, class={}, gcf_id={}, strains={})'.format(self.id, self.bigscape_class, self.gcf_id, len(self.strains))
 
     def __repr__(self):
         return str(self)
