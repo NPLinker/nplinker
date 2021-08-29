@@ -201,12 +201,29 @@ class Linker:
 
 class SqlManager:
 
+    # this value gets stored in the SQLite "user_version" value stored in the database
+    # header. it should be updated here any time the database schema is modified, which
+    # will then cause the contents to be wiped and regenerated using the latest code. 
+    # this should allow for schema changes without requiring any action by users. 
+    NPLINKER_USER_VERSION = 2
+
     def __init__(self, tablesInfo, path='linker.sqlite3', do_init=False):
         self.db = sqlite3.connect(path)
         self.db.row_factory = sqlite3.Row
 
         # useful for debugging
         # self.db.set_trace_callback(print)
+
+        # check the user_version value (0 is the default set by SQLite)
+        user_version = self.db.execute('PRAGMA user_version').fetchone()[0]
+        if user_version > 0 and SqlManager.NPLINKER_USER_VERSION != user_version:
+            print('*** DB user_version mismatch ({} vs {}), regenerating content'.format(user_version, SqlManager.NPLINKER_USER_VERSION))
+            do_init = True
+
+            self.db.close()
+            os.unlink(path)
+            self.db = sqlite3.connect(path)
+            self.db.row_factory = sqlite3.Row
 
         # use this to get consistent ordering of columns, can't rely on dicts
         self.tableColumns = {t['tableName']: [x for x in t['tableData'][0].keys()] for t in tablesInfo}
@@ -227,7 +244,7 @@ class SqlManager:
             tableName = t['tableName']
             # the tables which contain links can have INTEGER columns, leave the rest as TEXT
             # (INTEGER might be faster?)
-            if tableName == 'bgc_gcf' or tableName == 'mf_spectra'or tableName == 'spectra_bgc':
+            if tableName == 'bgc_gcf' or tableName == 'mf_spectra' or tableName == 'spectra_bgc':
                 columns = ', '.join(['{} INTEGER'.format(c) for c in t['tableData'][0].keys()])
             else:
                 columns = ', '.join(['{} TEXT'.format(c) for c in t['tableData'][0].keys()])
@@ -248,6 +265,9 @@ class SqlManager:
                 colnames = list(t['tableData'][0].keys())
                 sql = 'CREATE UNIQUE INDEX IF NOT EXISTS {}_index on {} ({}, {})'.format(t['tableName'], t['tableName'], colnames[0], colnames[1])
                 self.db.execute(sql)
+
+        # ensure we set the user_version value here
+        self.db.execute('PRAGMA user_version = {}'.format(SqlManager.NPLINKER_USER_VERSION))
 
         # only add data if needed
         cur = self.db.execute('SELECT COUNT({}) FROM {}'.format(tablesInfo[0]['options']['pk'], tablesInfo[0]['tableName']))
