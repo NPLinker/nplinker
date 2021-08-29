@@ -83,12 +83,12 @@ class DataLinks(object):
         self.M_notfam_gcf = []
 
 
-    def get_spec_pos(self,spec_id):
+    def get_spec_pos(self, spec_id):
         # get the position in the arrays of a spectrum
         row = self.mapping_spec.loc[self.mapping_spec['original spec-id'] == float(spec_id)]
         return int(row.iloc[0]['spec-id'])
 
-    def get_gcf_pos(self,gcf_id):
+    def get_gcf_pos(self, gcf_id):
         # TODO: fix this so the original ID is present in case of re-ordering
         pass
 
@@ -112,24 +112,24 @@ class DataLinks(object):
 
     def collect_mappings_spec(self, spectra):
         # Collect most import mapping tables from input data
-        mapping_spec = np.zeros((len(spectra),3))
-        mapping_spec[:,0] = np.arange(0,len(spectra))
+        mapping_spec = np.zeros((len(spectra), 3))
+        mapping_spec[:, 0] = np.arange(0, len(spectra))
 
         if isinstance(spectra[0].family, int):
             for i, spectrum in enumerate(spectra):
-                mapping_spec[i,1] = spectrum.id
-                mapping_spec[i,2] = spectrum.family
+                mapping_spec[i, 1] = spectrum.id
+                mapping_spec[i, 2] = spectrum.family
         elif isinstance(spectra[0].family.family_id, int): # assume make_families was run
             for i, spectrum in enumerate(spectra):
-                mapping_spec[i,1] = spectrum.id
-                mapping_spec[i,2] = spectrum.family.family_id
+                mapping_spec[i, 1] = spectrum.id
+                mapping_spec[i, 2] = spectrum.family.family_id
         else:
             raise Exception("No proper family-id found in spectra.")
             
         # extend mapping tables:
-        self.mapping_spec["spec-id"] = mapping_spec[:,0]
-        self.mapping_spec["original spec-id"] = mapping_spec[:,1]
-        self.mapping_spec["fam-id"] = mapping_spec[:,2]
+        self.mapping_spec["spec-id"] = mapping_spec[:, 0]
+        self.mapping_spec["original spec-id"] = mapping_spec[:, 1]
+        self.mapping_spec["fam-id"] = mapping_spec[:, 2]
     
     def collect_mappings_gcf(self, gcf_list):
         """
@@ -138,31 +138,27 @@ class DataLinks(object):
         additional score shows fraction of chosen class among all given ones
         """
         
-        # TODO: not only collect bigclass types but also product preditions
+        # TODO: not only collect bigclass types but also product predictions
         
         bigscape_bestguess = []
         for i, gcf in enumerate(gcf_list):
             bigscape_class = []
-            # for m in range(0, len(gcf_list[i].bgc_list)):
             for i, bgc in enumerate(gcf_list[i].bgcs):
                 # bigscape_class.append(gcf_list[i].bgc_list[m].bigscape_class)
                 bigscape_class.append(bgc.bigscape_class)
                 class_counter = Counter(bigscape_class)
                 
             # try not to select "Others":   
-            if class_counter.most_common(1)[0][0] == None:
+            if class_counter.most_common(1)[0][0] is None:
                 bigscape_bestguess.append(["Others", 0])
             elif class_counter.most_common(1)[0][0] == "Others" and class_counter.most_common(1)[0][1] < len(bigscape_class): 
-                if class_counter.most_common(2)[1][0] == None:
+                if class_counter.most_common(2)[1][0] is None:
                     bigscape_bestguess.append([class_counter.most_common(1)[0][0], class_counter.most_common(1)[0][1]/len(bigscape_class)])
                 else:
                     bigscape_bestguess.append([class_counter.most_common(2)[1][0], class_counter.most_common(2)[1][1]/len(bigscape_class)])
             else:
                 bigscape_bestguess.append([class_counter.most_common(1)[0][0], class_counter.most_common(1)[0][1]/len(bigscape_class)])
                 
-#            if bigscape_bestguess[-1] == None :
-#                bigscape_bestguess[-1] = ["Others", 0]
-
         # extend mapping tables:
         self.mapping_gcf["gcf-id"] = np.arange(0, len(bigscape_bestguess))
         bigscape_guess, bigscape_guessscore = zip(*bigscape_bestguess)
@@ -174,10 +170,10 @@ class DataLinks(object):
         # Collect co-ocurences in M_spec_strain matrix
         M_gcf_strain = np.zeros((len(gcf_list), len(strain_list)))
 
-        for i, strain  in enumerate(strain_list):
+        for i, strain in enumerate(strain_list):
             for m, gcf in enumerate(gcf_list):
                 if gcf.has_strain(strain):
-                    M_gcf_strain[m,i] = 1
+                    M_gcf_strain[m, i] = 1
 
         self.M_gcf_strain = M_gcf_strain
         # extend mapping tables:
@@ -191,7 +187,7 @@ class DataLinks(object):
         for i, spectrum in enumerate(spectra):
             for j, s in enumerate(strain_list):
                 if spectrum.has_strain(s):
-                    M_spec_strain[i,j] = 1
+                    M_spec_strain[i, j] = 1
         self.M_spec_strain = M_spec_strain
 
         # extend mapping tables:
@@ -225,7 +221,7 @@ class DataLinks(object):
         for i, fam_id in enumerate(family_ids[np.where(family_ids != -1)].astype(int)):
             family_members = np.where(np.array(self.mapping_spec["fam-id"]) == fam_id)
             self.family_members.append(family_members)
-            M_fam_strain[i,:] = np.sum(self.M_spec_strain[family_members,:], axis=1)
+            M_fam_strain[i, :] = np.sum(self.M_spec_strain[family_members, :], axis=1)
             strain_fam_labels.append(fam_id)
             strain_fam_index.append(i)
 
@@ -239,7 +235,7 @@ class DataLinks(object):
             strain_fam_index.append(i+1)
         
         # only looking for co-occurence, hence only 1 or 0
-        M_fam_strain[M_fam_strain>1] = 1
+        M_fam_strain[M_fam_strain > 1] = 1
 
         self.M_fam_strain = M_fam_strain
         # extend mapping table:
@@ -503,7 +499,7 @@ class LinkFinder(object):
         
         # Compute the expected values for all possible values of spec and gcf strains
         # we need the total number of strains
-        _ ,n_strains = data_links.M_gcf_strain.shape
+        _, n_strains = data_links.M_gcf_strain.shape
         if self.metcalf_expected is None:
             sz = (n_strains + 1, n_strains + 1)
             self.metcalf_expected = np.zeros(sz)
@@ -731,34 +727,34 @@ class LinkFinder(object):
         
         # Calculate the hypergeometric probability (as before)
         for i in range(link_candidates.shape[1]):
-             link_candidates[9, i] = pair_prob_hg(link_candidates[6,i],
+             link_candidates[9, i] = pair_prob_hg(link_candidates[6, i],
                                                             num_strains,
-                                                            Nx_list[link_candidates[1,i]],
-                                                            Ny_list[int(link_candidates[0,i])])
+                                                            Nx_list[link_candidates[1, i]],
+                                                            Ny_list[int(link_candidates[0, i])])
 
         # Calculate the GCF specific probability
         for i in range(link_candidates.shape[1]):
-            id_spec = int(link_candidates[0,i])
-            id_gcf = int(link_candidates[1,i])
+            id_spec = int(link_candidates[0, i])
+            id_gcf = int(link_candidates[1, i])
             
             # find set of strains which contain GCF with id link_candidates[1,i] 
             XG = np.where(data_links.M_gcf_strain[id_gcf , :] == 1)[0]
                                                            
-            link_candidates[10,i] = pair_prob_approx(P_str, XG,
+            link_candidates[10, i] = pair_prob_approx(P_str, XG,
                                                             int(Ny_list[id_spec]),
-                                                            int(link_candidates[6,i]))
+                                                            int(link_candidates[6, i]))
             # Calculate the link specific probability
             # Find strains where GCF and spectra/family co-occur
             if type == 'spec-gcf':
                 XGS = np.where((data_links.M_gcf_strain[id_gcf, :] == 1) & (data_links.M_spec_strain[id_spec, :] == 1))[0]
             elif type == 'fam-gcf':
                 XGS = np.where((data_links.M_gcf_strain[id_gcf, :] == 1) & (data_links.M_fam_strain[id_spec, :] == 1))[0]
-            link_candidates[11,i] = link_prob(P_str, XGS,
+            link_candidates[11, i] = link_prob(P_str, XGS,
                                                            int(Nx_list[id_gcf]),
                                                            int(Ny_list[id_spec]), num_strains)
             
         # Transform into pandas Dataframe (to avoid index confusions):
-        link_candidates_pd = pd.DataFrame(link_candidates.transpose(1,0), columns = index_names)
+        link_candidates_pd = pd.DataFrame(link_candidates.transpose(1, 0), columns=index_names)
         
         # add other potentially relevant knowdledge
         # If this will grow to more collected information -> create separate function/class
@@ -768,7 +764,7 @@ class LinkFinder(object):
         link_candidates_pd["BGC class"] = bgc_class
 
         # Change some columns to int
-        link_candidates_pd.iloc[:,[0,1,6,7]] = link_candidates_pd.iloc[:,[0,1,6,7]].astype(int)
+        link_candidates_pd.iloc[:, [0, 1, 6, 7]] = link_candidates_pd.iloc[:, [0, 1, 6, 7]].astype(int)
         
         # return results
         if type == 'spec-gcf':
@@ -1066,8 +1062,8 @@ class LinkFinder(object):
     
         # make pandas dataframe from numpy array
         M_links = pd.DataFrame(M_links, 
-                               index = mapping_fams.astype(int), 
-                               columns = mapping_gcfs.astype(int))
+                               index=mapping_fams.astype(int), 
+                               columns=mapping_gcfs.astype(int))
         if type == 'spec-gcf': 
             M_links.index.name = 'spectrum number'
         elif type == 'fam-gcf':
@@ -1077,7 +1073,7 @@ class LinkFinder(object):
         # add color label representing gene cluster class
         for bgc_class in link_candidates["BGC class"]:
             if bgc_class is None:
-                col_colors.append((0,0,0))
+                col_colors.append((0, 0, 0))
             else:
                 col_colors.append(bigscape_classes_dict[bgc_class])
     
