@@ -16,7 +16,7 @@ from searching import SEARCH_OPTIONS, Searcher
 from tables_functions import NA_ID
 
 from tooltips import create_popover, wrap_popover
-from tooltips import TOOLTIP_TABLES_FILTERING
+from tooltips import TOOLTIP_TABLES_FILTERING, TOOLTIP_HYBRID_SCORING
 
 GENOMICS_SCORING_MODES = ['manual', 'GCF']
 METABOLOMICS_SCORING_MODES = ['manual', 'MolFam']
@@ -934,6 +934,7 @@ class NPLinkerBokeh(object):
 
         print('Currently selected bgcs: {}'.format(len(self.table_session_data.bgc_ds.data['bgc_pk'])))
         print('Actual selections: {}'.format(len(self.table_session_data.bgc_ds.selected.indices)))
+        ignore_hybrid_bgcs = len(self.hybrid_scoring_control_checkbox.active) == 1 
 
         if len(self.table_session_data.bgc_ds.selected.indices) == 0 and len(self.table_session_data.gcf_ds.selected.indices) == 0:
             self.hidden_alert_thing.text = 'Error: no BGCs have been selected!\n\n' +\
@@ -958,20 +959,42 @@ class NPLinkerBokeh(object):
 
         if len(self.table_session_data.bgc_ds.selected.indices) > 0:
             # assume there's been an explicit selection and use those objects
+            # (i.e. the user has selected BGCs directly instead of filtering by 
+            # picking a GCF first)
             for index in self.table_session_data.bgc_ds.selected.indices:
                 bgcid = self.table_session_data.bgc_ds.data['bgc_pk'][index] # internal nplinker ID
                 if bgcid == NA_ID:
                     continue
                 bgc = self.nh.nplinker.bgcs[int(bgcid)]
                 selected_bgcs.append(bgc)
+                # TODO should probably add a UI widget to allow for control over
+                # hybrid BGCs. e.g. if you select a BGC that has 3 GCF parents
+                # with different BiG-SCAPE classes, it should be possible to say
+                # "only include the NRPS one"... 
                 gcfs.update(bgc.parents)
         else:
+            print(self.table_session_data.gcf_ds.selected.indices)
+            # get the selected GCFs
+            tmp_gcfs = []
+            for index in self.table_session_data.gcf_ds.selected.indices:
+                gcfid = self.table_session_data.gcf_ds.data['gcf_pk'][index] # internal nplinker ID
+                tmp_gcfs.append(self.nh.nplinker.gcfs[gcfid])
+
             for bgcid in self.table_session_data.bgc_ds.data['bgc_pk']: # internal nplinker IDs
                 if bgcid == NA_ID:
                     continue
                 bgc = self.nh.nplinker.bgcs[int(bgcid)]
                 selected_bgcs.append(bgc)
-                gcfs.update(bgc.parents)
+                if ignore_hybrid_bgcs and bgc.is_hybrid:
+                    # if ignoring hybrid BGCs, only want to include parent GCFs with 
+                    # matching BiG-SCAPE classes, so only add those that appear in 
+                    # the set above (that we know were explicitly selected by the user)
+                    for parent in bgc.parents:
+                        if parent in tmp_gcfs:
+                            gcfs.add(parent)
+                else:
+                    # just add all parents
+                    gcfs.update(bgc.parents)
 
         selected_gcfs = list(gcfs)
 
@@ -1222,6 +1245,12 @@ class NPLinkerBokeh(object):
         self.hidden_alert_thing = PreText(text='', name='hidden_alert', visible=False)
         self.hidden_alert_thing.js_on_change('text', CustomJS(code='if(cb_obj.text.length > 0) alert(cb_obj.text);', args={}))
         widgets.append(self.hidden_alert_thing)
+
+        # hybrid scoring control
+        self.hybrid_scoring_control_checkbox = CheckboxGroup(sizing_mode='scale_width', labels=['Treat hybrid BGCs as non-hybrid during scoring'], active=[0], name='hybrid_scoring_control_checkbox')
+        self.hybrid_scoring_control_checkbox_wrapper = wrap_popover(self.hybrid_scoring_control_checkbox, create_popover(*TOOLTIP_HYBRID_SCORING), 'hybrid_scoring_control_checkbox', sizing_mode='scale_width')
+        widgets.append(self.hybrid_scoring_control_checkbox_wrapper)
+
         print('layout done, adding widget roots')
 
         for w in widgets:
