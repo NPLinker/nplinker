@@ -70,21 +70,21 @@ class Spectrum(object):
         self._losses = None
         self._jcamp = None
 
-    def add_strain(self, strain, alias_or_name, growth_medium, peak_intensity):
+    def add_strain(self, strain, growth_medium, peak_intensity):
         # adds the strain to the StrainCollection if not already there
         self.strains.add(strain)
 
-        if alias_or_name not in self.growth_media:
-            self.growth_media[alias_or_name] = {}
+        if strain not in self.growth_media:
+            self.growth_media[strain] = {}
 
         if growth_medium is None:
-            self.growth_media[alias_or_name].update({'unknown_medium_{}'.format(len(self.growth_media[alias_or_name])): peak_intensity})
+            self.growth_media[strain].update({'unknown_medium_{}'.format(len(self.growth_media[strain])): peak_intensity})
             return
 
-        if alias_or_name in self.growth_media and growth_medium in self.growth_media[alias_or_name]:
+        if strain in self.growth_media and growth_medium in self.growth_media[strain]:
             raise Exception('Growth medium clash: {} / {} {}'.format(self, strain, growth_medium))
         
-        self.growth_media[alias_or_name].update({growth_medium: peak_intensity})
+        self.growth_media[strain].update({growth_medium: peak_intensity})
         
     @property
     def is_library(self):
@@ -522,7 +522,7 @@ def load_clusterinfo_old(gnps_format, strains, filename, spec_dict):
 
                 if strain is not None:
                     # TODO this need fixed somehow (missing growth medium info)
-                    spec_dict[clu_index].add_strain(strain, None, None, 1)
+                    spec_dict[clu_index].add_strain(strain, None, 1)
                 
                 # update metadata on Spectrum object
                 spec_dict[clu_index].metadata.update(metadata)
@@ -682,7 +682,7 @@ def load_clusterinfo_fbmn(strains, nodes_file, extra_nodes_file, md_table_file, 
                 # growth medium will only be set if extended_metadata_table_parsing is
                 # enabled in the config file and the metadata table file contains that info
                 strain = strains.lookup(strain_name)
-                spectrum.add_strain(strain, strain_name, growth_medium, v)
+                spectrum.add_strain(strain, growth_medium, v)
 
             # record this as an entry in the metadata dict as well
             spectrum.metadata[k] = v
