@@ -68,8 +68,8 @@ class TableData(object):
 
         # construct pandas dataframes and bokeh datatables for each object class
         # (this is probably fast enough to not be worth pickling like the links)
-        self.bgc_data = dict(bgc_pk=[NA_ID], name=[NA_TEXT], product_type=[NA_TEXT])
-        self.gcf_data = dict(gcf_pk=[NA_ID], gcf_id=[NA_TEXT], product_type=[NA_TEXT], nbgcs=[NA_TEXT], metcalf_score=[NA_TEXT])
+        self.bgc_data = dict(bgc_pk=[NA_ID], name=[NA_TEXT], product_type=[NA_TEXT], is_hybrid=[NA_TEXT])
+        self.gcf_data = dict(gcf_pk=[NA_ID], gcf_id=[NA_TEXT], bigscape_class=[NA_TEXT], is_pure=[NA_TEXT], nbgcs=[NA_TEXT], metcalf_score=[NA_TEXT])
         self.spec_data = dict(spec_pk=[NA_ID], spectrum_id=[NA_TEXT], family=[NA_TEXT], metcalf_score=[NA_TEXT])
         self.molfam_data = dict(molfam_pk=[NA_ID], family_id=[NA_TEXT], nspectra=[NA_TEXT])
 
@@ -78,7 +78,8 @@ class TableData(object):
         for gcf in gcfs:
             self.gcf_data['gcf_pk'].append(gcf.id)
             self.gcf_data['gcf_id'].append(gcf.gcf_id)
-            self.gcf_data['product_type'].append(gcf.product_type)
+            self.gcf_data['bigscape_class'].append(gcf.bigscape_class)
+            self.gcf_data['is_pure'].append('yes' if gcf.is_pure else 'no')
             self.gcf_data['nbgcs'].append(len(gcf.bgcs))
             self.gcf_data['metcalf_score'].append(NA_TEXT)
             _gcf_indices[gcf] = len(_gcf_indices)
@@ -93,6 +94,7 @@ class TableData(object):
             self.bgc_data['bgc_pk'].append(bgc.id)
             self.bgc_data['name'].append(bgc.name)
             self.bgc_data['product_type'].append(bgc.product_prediction)
+            self.bgc_data['is_hybrid'].append('yes' if bgc.is_hybrid else 'no')
 
         molfams_seen = set()
         for spec in spectra:
@@ -201,13 +203,15 @@ class TableSessionData(object):
         # place limits on how far you can resize the columns for some reason...
         self.bgc_cols = [TableColumn(field='bgc_pk', title='ID', width=15), 
                          TableColumn(field='name', title='BGC name', width=220), 
-                         TableColumn(field='product_type', title='Product type', width=75)]
+                         TableColumn(field='product_type', title='Product pred.', width=75),
+                         TableColumn(field='is_hybrid', title='Hybrid?', width=40)]
 
         self.gcf_cols = [TableColumn(field='gcf_pk', title='ID', width=15), 
                          TableColumn(field='gcf_id', title='GCF ID', width=75), 
-                         TableColumn(field='product_type', title='Product type', width=75),
+                         TableColumn(field='bigscape_class', title='BiG-SCAPE class', width=75),
                          TableColumn(field='nbgcs', title='#bgcs', width=75), 
-                         TableColumn(field='metcalf_score', title='Metcalf score', width=75)]
+                         TableColumn(field='metcalf_score', title='Metcalf score', width=75),
+                         TableColumn(field='is_pure', title='Pure?', width=40)]
 
         self.spec_cols = [TableColumn(field='spec_pk', title='ID', width=15), 
                           TableColumn(field='spectrum_id', title='Spectrum ID', width=75), 

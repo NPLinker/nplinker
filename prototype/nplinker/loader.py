@@ -87,39 +87,40 @@ def find_bigscape_dir(broot):
 
 class DatasetLoader(object):
 
-    ANTISMASH_FMT_DEFAULT           = 'default'
-    ANTISMASH_FMT_FLAT              = 'flat'
-    ANTISMASH_FMTS                  = [ANTISMASH_FMT_DEFAULT, ANTISMASH_FMT_FLAT]
-    ANTISMASH_DELIMITERS_DEFAULT    = ['.', '_', '-']
-    ANTISMASH_IGNORE_SPACES_DEFAULT = False
+    ANTISMASH_FMT_DEFAULT                      = 'default'
+    ANTISMASH_FMT_FLAT                         = 'flat'
+    ANTISMASH_FMTS                             = [ANTISMASH_FMT_DEFAULT, ANTISMASH_FMT_FLAT]
+    ANTISMASH_DELIMITERS_DEFAULT               = ['.', '_', '-']
+    ANTISMASH_IGNORE_SPACES_DEFAULT            = False
 
-    TABLES_CUTOFF_DEFAULT           = 2.0
+    TABLES_CUTOFF_DEFAULT                      = 2.0
 
-    BIGSCAPE_CUTOFF_DEFAULT         = 30
+    BIGSCAPE_CUTOFF_DEFAULT                    = 30
+    EXTENDED_METADATA_TABLE_PARSING_DEFAULT    = False
 
-    RUN_BIGSCAPE_DEFAULT            = True
-    EXTRA_BIGSCAPE_PARAMS_DEFAULT   = ""
+    RUN_BIGSCAPE_DEFAULT                       = True
+    EXTRA_BIGSCAPE_PARAMS_DEFAULT              = ""
 
     # keys for overriding metabolomics data elements
-    OR_NODES                        = 'nodes_file'
-    OR_EDGES                        = 'edges_file'
-    OR_EXTRA_NODES                  = 'extra_nodes_file'
-    OR_MGF                          = 'mgf_file'
-    OR_METADATA                     = 'metadata_table_file'
-    OR_QUANT                        = 'quantification_table_file'
-    OR_ANNO                         = 'annotations_dir'
-    OR_ANNO_CONFIG                  = 'annotations_config_file'
+    OR_NODES                                   = 'nodes_file'
+    OR_EDGES                                   = 'edges_file'
+    OR_EXTRA_NODES                             = 'extra_nodes_file'
+    OR_MGF                                     = 'mgf_file'
+    OR_METADATA                                = 'metadata_table_file'
+    OR_QUANT                                   = 'quantification_table_file'
+    OR_ANNO                                    = 'annotations_dir'
+    OR_ANNO_CONFIG                             = 'annotations_config_file'
     # and the same for genomics data
-    OR_ANTISMASH                    = 'antismash_dir'
-    OR_BIGSCAPE                     = 'bigscape_dir'
-    OR_MIBIG_JSON                   = 'mibig_json_dir'
-    OR_STRAINS                      = 'strain_mappings_file'
+    OR_ANTISMASH                               = 'antismash_dir'
+    OR_BIGSCAPE                                = 'bigscape_dir'
+    OR_MIBIG_JSON                              = 'mibig_json_dir'
+    OR_STRAINS                                 = 'strain_mappings_file'
     # misc files
-    OR_PARAMS                       = 'gnps_params_file'
-    OR_DESCRIPTION                  = 'description_file'
-    OR_INCLUDE_STRAINS              = 'include_strains_file'
+    OR_PARAMS                                  = 'gnps_params_file'
+    OR_DESCRIPTION                             = 'description_file'
+    OR_INCLUDE_STRAINS                         = 'include_strains_file'
 
-    BIGSCAPE_PRODUCT_TYPES          = ['NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs', 'Saccharides', 'Terpene']
+    BIGSCAPE_PRODUCT_TYPES                     = ['NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs', 'Saccharides', 'Terpene']
 
     def __init__(self, config_data):
         self._config = config_data
@@ -132,6 +133,7 @@ class DatasetLoader(object):
         self._antismash_format = self._antismash.get('antismash_format', self.ANTISMASH_FMT_DEFAULT)
         self._antismash_ignore_spaces = self._antismash.get('ignore_spaces', self.ANTISMASH_IGNORE_SPACES_DEFAULT)
         self._bigscape_cutoff = self._dataset.get('bigscape_cutoff', self.BIGSCAPE_CUTOFF_DEFAULT)
+        self._extended_metadata_table_parsing = self._dataset.get('extended_metadata_table_parsing', self.EXTENDED_METADATA_TABLE_PARSING_DEFAULT)
         self._root = self._config['dataset']['root']
         self._platform_id = self._config['dataset']['platform_id']
         self._remote_loading = len(self._platform_id) > 0
@@ -300,7 +302,7 @@ class DatasetLoader(object):
             spec.id = i
 
         # now filter GCFs and MolFams based on the filtered BGCs and Spectra
-        gcfs = set([bgc.parent for bgc in self.bgcs])
+        gcfs = set([parent for bgc in self.bgcs for parent in bgc.parents])
         logger.info('Current / filtered GCF counts: {} / {}'.format(len(self.gcfs), len(gcfs)))
         self.gcfs = list(gcfs)
         # filter each GCF's strain list
@@ -542,7 +544,7 @@ class DatasetLoader(object):
         return True
 
     def _load_metabolomics(self):
-        spec_dict, self.spectra, self.molfams, unknown_strains = load_dataset(self.strains, self.mgf_file, self.edges_file, self.nodes_file, self.quantification_table_file, self.metadata_table_file)
+        spec_dict, self.spectra, self.molfams, unknown_strains = load_dataset(self.strains, self.mgf_file, self.edges_file, self.nodes_file, self.quantification_table_file, self.metadata_table_file, self._extended_metadata_table_parsing)
 
         us_path = os.path.join(self._root, 'unknown_strains_met.csv')
         logger.warning('Writing unknown strains from METABOLOMICS data to {}'.format(us_path))

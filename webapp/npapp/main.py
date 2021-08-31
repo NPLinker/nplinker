@@ -155,7 +155,7 @@ class ScoringHelper(object):
             # in either of these two modes, we simply want to select the set 
             # of "parent" GCFs for each of the selected BGCs, which is simple
             # (although have to filter out dups here!)
-            scoring_objs = set([bgc.parent for bgc in bgcs])
+            scoring_objs = set([parent for bgc in bgcs for parent in bgc.parents])
             self.gcfs = list(scoring_objs)
         elif self.mode == SCO_MODE_GCF_SPEC or self.mode == SCO_MODE_GCF_MOLFAM:
             # this pair of modes are more complex. first build a set of *all* 
@@ -525,7 +525,7 @@ class NPLinkerBokeh(object):
         # start of main tab content
         gcf_body += '<div class="tab-pane show active" id="gcf_{}_main" role="tabpanel">'.format(gcf.id)
         gcf_body += '<ul>'
-        for attr in ['id', 'gcf_id', 'product_type']:
+        for attr in ['id', 'gcf_id', 'bigscape_class']:
             gcf_body += '<li><strong>{}</strong>: {}</li>'.format(attr, getattr(gcf, attr))
 
         # add strain information
@@ -552,7 +552,7 @@ class NPLinkerBokeh(object):
         gcf_body += '</div>'
 
         # BGC tab content
-        fields = ['name', 'strain', 'description', 'bigscape_class', 'product_prediction']
+        fields = ['name', 'strain', 'description', 'bigscape_classes', 'product_prediction']
         gcf_body += '<div class="tab-pane" id="gcf_{}_bgcs" role="tabpanel">'.format(gcf.id)
         gcf_body += 'Type to filter: <input type="text" onkeyup="onChangeBGCTable(\'#gcf_{}_bgc_table\', \'#gcf_{}_bgc_search\')" id="gcf_{}_bgc_search">'.format(gcf.id, gcf.id, gcf.id)
         gcf_body += '<table class="table table-responsive table-striped" id="gcf_{}_bgc_table"><thead><tr>'.format(gcf.id)
@@ -964,14 +964,14 @@ class NPLinkerBokeh(object):
                     continue
                 bgc = self.nh.nplinker.bgcs[int(bgcid)]
                 selected_bgcs.append(bgc)
-                gcfs.add(bgc.parent)
+                gcfs.update(bgc.parents)
         else:
             for bgcid in self.table_session_data.bgc_ds.data['bgc_pk']: # internal nplinker IDs
                 if bgcid == NA_ID:
                     continue
                 bgc = self.nh.nplinker.bgcs[int(bgcid)]
                 selected_bgcs.append(bgc)
-                gcfs.add(bgc.parent)
+                gcfs.update(bgc.parents)
 
         selected_gcfs = list(gcfs)
 

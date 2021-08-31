@@ -110,6 +110,17 @@ root = "<root directory of dataset>"
 # data to be reloaded. Possibly only useful for the webapp
 #bigscape_cutoff = 30
 
+# For datasets using the GNPS FBMN workflow, NPLinker can optionally try to parse
+# more data out of the "metadata table" file included in the output. This can both
+# simplify the process of creating a strain mappings file and allow NPLinker to 
+# extract growth media labels for each strain, which are then displayed in the 
+# web application. This option defaults to being disabled to provide a consistent
+# experience with other types of dataset, but you can choose to enable it if you
+# have a compatible metadata table file. 
+#
+# For more information: https://github.com/sdrogers/nplinker/wiki/Strain-mappings
+#extended_metadata_table_parsing = false
+
 [antismash]
 # antismash file structure. Should be either 'default' or 'flat'. 
 # default = the standard structure with nested subdirectories
