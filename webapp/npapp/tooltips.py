@@ -47,6 +47,11 @@ TOOLTIP_RESULTS_AREA = (
     """Results from clicking either of the two scoring buttons above the tables will be displayed here"""
 )
 
+TOOLTIP_HYBRID_SCORING = (
+    'Hybrid BGC handling',
+    """When you run scoring with a selection of GCFs that include one or more hybrid BGCs with this option disabled, NPLinker will look for links among ALL parent GCFs of each hybrid BGC. This may mean you find GCFs in the results that you didn't originally select. For example, if GCF A contains a hybrid BGC with parents GCF A and GCF B, you may find GCF B in the results as it will be included in the search for links through the hybrid BGC. If you do NOT want this behaviour and instead want to limit NPLinker to searching for links only in the GCF(s) selected, enable this option. This will force NPLinker to ignore other parent GCFs associated with each hybrid BGC. If your input is a GCF with no hybrid BGCs, this option has no effect."""
+)
+
 _popover_text = """
     <a tabindex="0" class="btn btn-sm btn-secondary popover-dismiss" role="button" data-toggle="popover" data-trigger="focus" title="{}" data-content="{}">?</a>
 """
