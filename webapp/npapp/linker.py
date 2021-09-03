@@ -216,7 +216,8 @@ class SqlManager:
 
         # check the user_version value (0 is the default set by SQLite)
         user_version = self.db.execute('PRAGMA user_version').fetchone()[0]
-        if user_version > 0 and SqlManager.NPLINKER_USER_VERSION != user_version:
+        print('*** DB user_version is currently {}, expecting {}'.format(user_version, SqlManager.NPLINKER_USER_VERSION))
+        if SqlManager.NPLINKER_USER_VERSION != user_version:
             print('*** DB user_version mismatch ({} vs {}), regenerating content'.format(user_version, SqlManager.NPLINKER_USER_VERSION))
             do_init = True
 
