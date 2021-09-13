@@ -168,6 +168,7 @@ run_bigscape = true
 #   -o/--outputdir
 #   --pfam_dir
 #   --clans-off
+#   --mibig
 # 
 # In addition, the --cutoffs parameter will default to:
 #   --cutoffs=0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7
