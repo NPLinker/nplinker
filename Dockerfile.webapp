@@ -3,13 +3,10 @@ FROM nplinkerbase:latest
 
 SHELL ["/bin/bash", "-c"]
 
-COPY prototype /app/prototype
-COPY webapp /app/webapp
-
-# not needed
-RUN rm -rf /app/prototype/nplinker/scoring/iokr/data && rm -rf /app/prototype/nplinker/scoring/iokr/iokr_venv
-
 WORKDIR /app
+
+# clone latest master version
+RUN cd /app && git clone https://github.com/sdrogers/nplinker nplinker
 
 ENV LANG "en_GB.UTF-8"
 ENV LOCALE "C"
@@ -29,6 +26,6 @@ EXPOSE 5006/tcp
 
 # run the webapp
 # TODO need to have a way to run the downloader part here 
-CMD cd /app && source activate bigscape && bokeh serve webapp/npapp --dev 
+CMD cd /app/nplinker && source activate bigscape && bokeh serve webapp/npapp --dev 
 
 # append this if not using port 5006 externally: --allow-websocket-origin=localhost:5010 
