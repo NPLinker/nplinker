@@ -312,7 +312,7 @@ class DatasetLoader(object):
 
         molfams = set([spec.family for spec in self.spectra])
         logger.info('Current / filtered MolFam counts: {} / {}'.format(len(self.molfams), len(molfams)))
-        self.molfams = molfams
+        self.molfams = list(molfams)
         for i, molfam in enumerate(self.molfams):
             molfam.id = i
 
