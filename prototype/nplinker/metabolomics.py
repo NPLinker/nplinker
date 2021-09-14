@@ -259,7 +259,7 @@ class SingletonFamily(MolecularFamily):
         super(SingletonFamily, self).__init__(-1)
 
     def __str__(self):
-        return "Singleton molecular family"
+        return "Singleton molecular family (id={})".format(self.id)
 
 #
 # methods for parsing metabolomics data files
