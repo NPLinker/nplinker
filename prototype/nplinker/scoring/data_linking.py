@@ -299,14 +299,8 @@ class DataLinks(object):
 
         # retrieve object IDs
         ids_b = [gcf.id for gcf in objects_b]
-        ids_a = []
-        if type_a == Spectrum:
-            ids_a = [spec.id for spec in objects_a]
-        else:
-            # TODO similar treatment to Spectrum/GCF?
-            mapping_fam_id = self.mapping_fam["original family id"]
-            for fam in objects_a:
-                ids_a.append(np.where(mapping_fam_id == int(fam.family_id))[0][0])
+        # these might be MolFams or Spectra, either way they'll have a .id attribute
+        ids_a = [obj.id for obj in objects_a]
 
         data_a = self.M_spec_strain if type_a == Spectrum else self.M_fam_strain
         data_b = self.M_gcf_strain
@@ -855,11 +849,12 @@ class LinkFinder(object):
             
             # Get necessary ids
             # TODO: include Singletons, maybe optinal
-            input_ids = np.zeros(query_size)
-            mapping_fam_id = data_links.mapping_fam["original family id"]
-            for i, family in enumerate(input_object):
-                input_ids[i] = np.where(mapping_fam_id == int(family.family_id))[0]
-            input_ids =  input_ids.astype(int)
+            #input_ids = np.zeros(query_size)
+            #mapping_fam_id = data_links.mapping_fam["original family id"]
+            #for i, family in enumerate(input_object):
+            #    input_ids[i] = np.where(mapping_fam_id == int(family.family_id))[0]
+            #input_ids =  input_ids.astype(int)
+            input_ids = np.array([mf.id for mf in input_object], dtype=np.int32)
             
             input_type = "fam"
             link_levels = [1]
