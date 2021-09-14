@@ -465,7 +465,7 @@ class MetcalfScoring(ScoringMethod):
             logger.info('MetcalfScoring.setup preprocessing dataset (this may take some time)')
             MetcalfScoring.DATALINKS = DataLinks()
             MetcalfScoring.DATALINKS.load_data(npl._spectra, npl._gcfs, npl._strains)
-            MetcalfScoring.DATALINKS.find_correlations()
+            MetcalfScoring.DATALINKS.find_correlations(include_singletons=True)
             MetcalfScoring.LINKFINDER = LinkFinder()
             MetcalfScoring.LINKFINDER.metcalf_scoring(MetcalfScoring.DATALINKS, type='spec-gcf')
             MetcalfScoring.LINKFINDER.metcalf_scoring(MetcalfScoring.DATALINKS, type='fam-gcf')
@@ -495,7 +495,7 @@ class MetcalfScoring(ScoringMethod):
         if not self.standardised:
             results = linkfinder.get_links(datalinks, objects, self.name, self.cutoff)
         else:
-             # get the basic Metcalf scores BUT ignore the cutoff value here as it should only be applied to 
+            # get the basic Metcalf scores BUT ignore the cutoff value here as it should only be applied to 
             # the final scores, not the original ones
             results = linkfinder.get_links(datalinks, objects, self.name, None)
 
