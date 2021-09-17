@@ -478,6 +478,87 @@ class MetcalfScoring(ScoringMethod):
     def datalinks(self):
         return MetcalfScoring.DATALINKS
 
+    def _metcalf_postprocess_met(self, linkfinder, results, input_type):
+        logger.debug('Postprocessing results for standardised Metcalf scores (met input)')
+        # results will be links from EITHER Spectrum OR MolFam => GCF here
+
+        # need to know if the metabolomic objects given as input are Spectrum/MolFam 
+        met_objs = self.npl.spectra if input_type == Spectrum else self.npl.molfams
+        new_src, new_dst, new_sco = [], [], []
+
+        # go through each pair of input objects and calculate their standardised scores
+        for i in range(len(results[0][self.R_SRC_ID])):
+            met_obj = met_objs[int(results[0][self.R_SRC_ID][i])]
+            # met_obj will now be either a Spectrum or a MolecularFamily, but 
+            # doesn't matter which (in this implementation at least) because they
+            # both have a .strains attribute which is the only thing we need. For
+            # Spectra it's the number of strains, for a MolFam it's the total
+            # number of *unique* strains across all Spectra in that family.
+            met_strains = len(met_obj.strains)
+            gcf = self.npl.gcfs[int(results[0][self.R_DST_ID][i])]
+            gen_strains = len(gcf.strains)
+
+            # lookup expected + variance values based on strain counts 
+            expected = linkfinder.metcalf_expected[met_strains][gen_strains]
+            variance_sqrt = linkfinder.metcalf_variance_sqrt[met_strains][gen_strains]
+
+            # calculate the final score based on the basic Metcalf score for these two
+            # particular objects
+            final_score = (results[0][self.R_SCORE][i] - expected) / variance_sqrt
+
+            # finally apply the scoring cutoff and store the result
+            if self.cutoff is None or (final_score >= self.cutoff):
+                new_src.append(int(results[0][self.R_SRC_ID][i]))
+                new_dst.append(int(results[0][self.R_DST_ID][i]))
+                new_sco.append(final_score)
+
+        # overwrite original "results" with equivalent new data structure
+        return [np.array([new_src, new_dst, new_sco])]
+
+    def _metcalf_postprocess_gen(self, linkfinder, results, input_type):
+        logger.debug('Postprocessing results for standardised Metcalf scores (gen input)')
+        # results will be links from GCF to BOTH Spectrum and MolFams here (first
+        # element Spectra, second MolFams)
+
+        new_results = []
+        met_objs_list = [self.npl.spectra, self.npl.molfams]
+
+        # iterate over the Spectrum results and then the MolFam results
+        for m, met_objs in enumerate(met_objs_list):
+            new_src, new_dst, new_sco = [], [], []
+
+            # go through each pair of input objects and calculate their standardised scores
+            for i in range(len(results[m][self.R_SRC_ID])):
+                gcf = self.npl.gcfs[int(results[m][self.R_SRC_ID][i])]
+                gen_strains = len(gcf.strains)
+
+                # met_obj will now be either a Spectrum or a MolecularFamily, but 
+                # doesn't matter which (in this implementation at least) because they
+                # both have a .strains attribute which is the only thing we need. For
+                # Spectra it's the number of strains, for a MolFam it's the total
+                # number of *unique* strains across all Spectra in that family.
+                met_obj = met_objs[int(results[m][self.R_DST_ID][i])]
+                met_strains = len(met_obj.strains)
+
+                # lookup expected + variance values based on strain counts 
+                expected = linkfinder.metcalf_expected[met_strains][gen_strains]
+                variance_sqrt = linkfinder.metcalf_variance_sqrt[met_strains][gen_strains]
+
+                # calculate the final score based on the basic Metcalf score for these two
+                # particular objects
+                final_score = (results[m][self.R_SCORE][i] - expected) / variance_sqrt
+
+                # finally apply the scoring cutoff and store the result
+                if self.cutoff is None or (final_score >= self.cutoff):
+                    new_src.append(int(results[m][self.R_SRC_ID][i]))
+                    new_dst.append(int(results[m][self.R_DST_ID][i]))
+                    new_sco.append(final_score)
+
+            # overwrite original "results" with equivalent new data structure
+            new_results.append(np.array([new_src, new_dst, new_sco]))
+
+        return new_results
+
     def get_links(self, objects, link_collection):
         # enforce constraint that the list must contain a set of identically typed objects
         if not all(isinstance(x, type(objects[0])) for x in objects):
@@ -495,71 +576,27 @@ class MetcalfScoring(ScoringMethod):
         if not self.standardised:
             results = linkfinder.get_links(datalinks, objects, self.name, self.cutoff)
         else:
-            # get the basic Metcalf scores BUT ignore the cutoff value here as it should only be applied to 
-            # the final scores, not the original ones
+            # get the basic Metcalf scores BUT ignore the cutoff value here by setting
+            # it to None. The actual user-supplied cutoff value is applied further down
+            # once the standardised scores for these results have been calculated.
             results = linkfinder.get_links(datalinks, objects, self.name, None)
 
-            # TODO molfam support still missing here (as in data_linking.py)
+            # The "results" object varies slightly depending on the input provided
+            # to the LinkFinder class:
+            #  - given Spectra/MolFam input, it will be a single element list containing 
+            #   a (3, x) array, where the first row contains source (input) object 
+            #   IDs, the second contains destination (linked) object IDs, and the 
+            #   third contains regular Metcalf scores for those pairs of objects. 
+            #  - however for GCF input, "results" is instead a 2-element list where
+            #   each entry has the same structure as described above, with the first
+            #   entry describing GCF-Spectrum links and the second GCF-MolFam links.
 
-            # results is a (3, x) array for spec/molfam input, where (1, :) gives src obj ID, (2, :) gives
-            # dst obj ID, and (3, :) gives scores
-            # for GCFs you get [spec, molfam] with above substructure
+            gcf_input = (input_type == GCF)
 
-            # NOTE: need to use sets here because if the "else" cases are executed 
-            # can get lots of duplicate object IDs which messes everything up
-
-            spectra_input = (input_type == Spectrum)
-
-            # make type1_objects always == spectra. if input is spectra, just use "objects",
-            # otherwise build a list using the object IDs in the results array
-            type1_objects = objects if spectra_input else {self.npl.spectra[int(index)] for index in results[0][self.R_DST_ID]}
-
-            # other objs should be "objects" if input is GCF, otherwise create 
-            # from the results array as above
-            other_objs = objects if not spectra_input else {self.npl._gcfs[int(index)] for index in results[0][self.R_DST_ID]}
-
-            # build a lookup table for pairs of object IDs and their index in the results array
-            if spectra_input:
-                pairs_lookup = {(results[0][self.R_SRC_ID][i], results[0][self.R_DST_ID][i]): i for i in range(len(results[0][self.R_SRC_ID]))}
+            if not gcf_input:
+                results = self._metcalf_postprocess_met(linkfinder, results, input_type)
             else:
-                pairs_lookup = {(results[0][self.R_DST_ID][i], results[0][self.R_SRC_ID][i]): i for i in range(len(results[0][self.R_SRC_ID]))}
-
-            # apply score update to each spec:gcf pairing and update the corresponding entry in results
-            # (the metcalf_expected and metcalf_variance matrices should have been calculated already)
-            new_src, new_dst, new_res = [], [], []
-
-            # iterating over spectra
-            for i, type1_obj in enumerate(type1_objects):
-                met_strains = len(type1_obj.strains) # number of strains left after filtering
-                # iterating over GCFs
-                for j, other_obj in enumerate(other_objs): 
-                    gen_strains = len(other_obj.strains) # number of strains left after filtering
-
-                    # lookup expected + variance values based on strain counts 
-                    expected = linkfinder.metcalf_expected[met_strains][gen_strains]
-                    variance_sqrt = linkfinder.metcalf_variance_sqrt[met_strains][gen_strains]
-
-                    # now need to extract the original score for this particular pair of objects. 
-                    # this requires figuring out the correct index into the results array for the pair,
-                    # using the lookup table constructed above
-                    k = pairs_lookup[(type1_obj.id, other_obj.id)]
-
-                    # calculate the final score based on the basic Metcalf score for these two
-                    # particular objects
-                    final_score = (results[0][self.R_SCORE][k] - expected) / variance_sqrt
-
-                    # finally apply the scoring cutoff and store the result
-                    if self.cutoff is None or (final_score >= self.cutoff):
-                        new_src.append(results[0][self.R_SRC_ID][k])
-                        new_dst.append(results[0][self.R_DST_ID][k])
-                        new_res.append(final_score)
-                
-            # overwrite original "results" with equivalent new data structure
-            results = [np.array([new_src, new_dst, new_res])]
-
-            if input_type == GCF:
-                # TODO molfam...
-                results.append(np.zeros((3, 0)))
+                results = self._metcalf_postprocess_gen(linkfinder, results, input_type)
 
         scores_found = set()
         metcalf_results = {}
