@@ -205,7 +205,37 @@ class SqlManager:
     # header. it should be updated here any time the database schema is modified, which
     # will then cause the contents to be wiped and regenerated using the latest code. 
     # this should allow for schema changes without requiring any action by users. 
-    NPLINKER_USER_VERSION = 2
+    NPLINKER_USER_VERSION = 3
+
+    # mapping from column name to column datatype for each of the 4 tables that 
+    # correspond to the visible widgets in the webapp
+    TABLE_COLUMN_SPECS = {
+        'bgc_table': {
+            'bgc_pk'       : 'INTEGER PRIMARY KEY',
+            'name'         : 'TEXT',
+            'product_type' : 'TEXT',
+            'is_hybrid'    : 'TEXT',
+        },
+        'gcf_table': {
+            'gcf_pk'         : 'INTEGER PRIMARY KEY',
+            'gcf_id'         : 'INTEGER',
+            'bigscape_class' : 'TEXT',
+            'is_pure'        : 'TEXT',
+            'nbgcs'          : 'INTEGER',
+            'metcalf_score'  : 'REAL',
+        },
+        'spec_table': {
+            'spec_pk'           : 'INTEGER PRIMARY KEY',
+            'spectrum_id'       : 'INTEGER',
+            'family'            : 'INTEGER',
+            'metcalf_score'     : 'REAL',
+        },
+        'molfam_table': {
+            'molfam_pk' : 'INTEGER PRIMARY_KEY',
+            'family_id' : 'INTEGER',
+            'nspectra'  : 'INTEGER',
+        }
+    }
 
     def __init__(self, tablesInfo, path='linker.sqlite3', do_init=False):
         self.db = sqlite3.connect(path)
@@ -216,7 +246,8 @@ class SqlManager:
 
         # check the user_version value (0 is the default set by SQLite)
         user_version = self.db.execute('PRAGMA user_version').fetchone()[0]
-        if user_version > 0 and SqlManager.NPLINKER_USER_VERSION != user_version:
+        print('*** DB user_version is currently {}, expecting {}'.format(user_version, SqlManager.NPLINKER_USER_VERSION))
+        if SqlManager.NPLINKER_USER_VERSION != user_version:
             print('*** DB user_version mismatch ({} vs {}), regenerating content'.format(user_version, SqlManager.NPLINKER_USER_VERSION))
             do_init = True
 
@@ -242,19 +273,13 @@ class SqlManager:
     def initialiseTables(self, tablesInfo):
         for t in tablesInfo:
             tableName = t['tableName']
-            # the tables which contain links can have INTEGER columns, leave the rest as TEXT
-            # (INTEGER might be faster?)
+            # these 3 linking tables are simple because they only contain INTEGER columns
             if tableName == 'bgc_gcf' or tableName == 'mf_spectra' or tableName == 'spectra_bgc':
                 columns = ', '.join(['{} INTEGER'.format(c) for c in t['tableData'][0].keys()])
             else:
-                columns = ', '.join(['{} TEXT'.format(c) for c in t['tableData'][0].keys()])
-                columns = []
-                for c in t['tableData'][0].keys():
-                    if c.endswith('_pk'):
-                        columns.append('{} INTEGER PRIMARY KEY'.format(c))
-                    else:
-                        columns.append('{} TEXT'.format(c))
-                columns = ', '.join(columns)
+                # use the manually-defined column spec for the rest
+                column_spec = SqlManager.TABLE_COLUMN_SPECS[tableName]
+                columns = ', '.join(['{} {}'.format(c, column_spec[c]) for c in t['tableData'][0].keys()])
 
             sql = 'CREATE TABLE IF NOT EXISTS {} ({})'.format(t['tableName'], columns)
             self.db.execute(sql)

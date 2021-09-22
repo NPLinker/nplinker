@@ -23,7 +23,7 @@ logger = LogConfig.getLogger(__file__)
 # NOTE: for simplicity this is currently written with assumption it will only be
 # called in context of nplinker Docker image, where bigscape should be available
 
-def run_bigscape(bigscape_py_path, antismash_path, output_path, pfam_path, cutoffs=[0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7], mibig_14=False, mibig_13=False, extra_params=None):
+def run_bigscape(bigscape_py_path, antismash_path, output_path, pfam_path, cutoffs=[0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7], mibig=True, mibig_14=False, mibig_13=False, extra_params=None):
     logger.info('run_bigscape: input="{}", output="{}", cutoffs={}"'.format(antismash_path, output_path, cutoffs))
 
     if os.path.exists(os.path.join(output_path, 'completed')):
@@ -57,11 +57,12 @@ def run_bigscape(bigscape_py_path, antismash_path, output_path, pfam_path, cutof
     if extra_params is not None and len(extra_params) > 0:
         args.append(extra_params)
 
-    # TODO mibig 2.0???
     if mibig_13:
         args.append('--mibig13')
     elif mibig_14:
-        args.append('--mibig')
+        args.append('--mibig14')
+    elif mibig:
+        args.append('--mibig') # default
 
     # disable extra clustering (TODO OK?)
     args.append('--clans-off')

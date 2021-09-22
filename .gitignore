@@ -106,3 +106,4 @@ venv.bak/
 tags
 webapp/npapp/static/css/bokeh*.css
 webapp/npapp/static/js/bokeh*.js
+prototype/nplinker/scoring/iokr/data/SPEC/

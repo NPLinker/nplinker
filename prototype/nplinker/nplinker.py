@@ -329,8 +329,12 @@ class NPLinker(object):
         if isinstance(input_objects, list) and len(input_objects) == 0:
             raise Exception('input_objects length must be > 0')
 
-        elif isinstance(scoring_methods, list) and len(scoring_methods) == 0:
+        if isinstance(scoring_methods, list) and len(scoring_methods) == 0:
             raise Exception('scoring_methods length must be > 0')
+
+        # for convenience convert a single scoring object into a single entry list
+        if not isinstance(scoring_methods, list):
+            scoring_methods = [scoring_methods]
 
         # check if input_objects is a list of lists. if so there should be one
         # entry for each supplied method for it to be a valid parameter
@@ -343,8 +347,6 @@ class NPLinker(object):
         # want everything to be in lists of lists
         if not isinstance(input_objects, list) or (isinstance(input_objects, list) and not isinstance(input_objects[0], list)):
             input_objects = [input_objects]
-        if not isinstance(scoring_methods, list):
-            scoring_methods = [scoring_methods]
 
         logger.debug('get_links: {} object sets, {} methods'.format(len(input_objects), len(scoring_methods)))
 

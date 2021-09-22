@@ -115,16 +115,9 @@ class DataLinks(object):
         mapping_spec = np.zeros((len(spectra), 3))
         mapping_spec[:, 0] = np.arange(0, len(spectra))
 
-        if isinstance(spectra[0].family, int):
-            for i, spectrum in enumerate(spectra):
-                mapping_spec[i, 1] = spectrum.id
-                mapping_spec[i, 2] = spectrum.family
-        elif isinstance(spectra[0].family.family_id, int): # assume make_families was run
-            for i, spectrum in enumerate(spectra):
-                mapping_spec[i, 1] = spectrum.id
-                mapping_spec[i, 2] = spectrum.family.family_id
-        else:
-            raise Exception("No proper family-id found in spectra.")
+        for i, spectrum in enumerate(spectra):
+            mapping_spec[i, 1] = spectrum.id
+            mapping_spec[i, 2] = spectrum.family.family_id
             
         # extend mapping tables:
         self.mapping_spec["spec-id"] = mapping_spec[:, 0]
@@ -213,10 +206,17 @@ class DataLinks(object):
 
         family_ids = np.unique(self.mapping_spec["fam-id"]) # get unique family ids
 
+        # if singletons are included, check if there are a non-zero number of them (singleton
+        # families all have -1 as a family ID number)
         if include_singletons and np.where(self.mapping_spec["fam-id"] == -1)[0].shape[0] > 0:
+            # in this case the number of unique families is the number of singletons
+            # plus the number of normal families. the "-1" is (I think) to account for 
+            # the single "-1" entry that will be present in "family_ids". 
             num_of_singletons = np.where(self.mapping_spec["fam-id"] == -1)[0].shape[0]
             num_unique_fams = num_of_singletons + len(family_ids) - 1
         else:
+            # if no singletons included or present in the dataset, just take the number
+            # of regular molfams instead
             num_of_singletons = 0
             num_unique_fams = len(family_ids)
 
@@ -299,14 +299,8 @@ class DataLinks(object):
 
         # retrieve object IDs
         ids_b = [gcf.id for gcf in objects_b]
-        ids_a = []
-        if type_a == Spectrum:
-            ids_a = [spec.id for spec in objects_a]
-        else:
-            # TODO similar treatment to Spectrum/GCF?
-            mapping_fam_id = self.mapping_fam["original family id"]
-            for fam in objects_a:
-                ids_a.append(np.where(mapping_fam_id == int(fam.family_id))[0][0])
+        # these might be MolFams or Spectra, either way they'll have a .id attribute
+        ids_a = [obj.id for obj in objects_a]
 
         data_a = self.M_spec_strain if type_a == Spectrum else self.M_fam_strain
         data_b = self.M_gcf_strain
@@ -855,11 +849,12 @@ class LinkFinder(object):
             
             # Get necessary ids
             # TODO: include Singletons, maybe optinal
-            input_ids = np.zeros(query_size)
-            mapping_fam_id = data_links.mapping_fam["original family id"]
-            for i, family in enumerate(input_object):
-                input_ids[i] = np.where(mapping_fam_id == int(family.family_id))[0]
-            input_ids =  input_ids.astype(int)
+            #input_ids = np.zeros(query_size)
+            #mapping_fam_id = data_links.mapping_fam["original family id"]
+            #for i, family in enumerate(input_object):
+            #    input_ids[i] = np.where(mapping_fam_id == int(family.family_id))[0]
+            #input_ids =  input_ids.astype(int)
+            input_ids = np.array([mf.id for mf in input_object], dtype=np.int32)
             
             input_type = "fam"
             link_levels = [1]

@@ -1,0 +1,12 @@
+# Default behaviour
+* text=auto
+
+# Explicitly text files
+*.py text
+*.txt text
+*.ipynb text
+*.md text
+*.rst text
+*.sh text
+*.bat text
+*.toml text

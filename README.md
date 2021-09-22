@@ -18,3 +18,7 @@ pipenv shell
 See the example Jupyter notebook (notebooks/nplinker_demo1.ipynb) for a guided introduction to the NPLinker API which shows how to load and examine a dataset. 
 
 API documentation is still being updated but the latest version is available at [readthedocs](https://nplinker.readthedocs.io/en/latest/).
+
+## Versioning
+
+A list of NPLinker releases and a description of the changes in each can be found in the [CHANGELOG file](https://github.com/sdrogers/nplinker/blob/master/CHANGELOG.md).
