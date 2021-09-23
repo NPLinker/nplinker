@@ -27,7 +27,7 @@ repro_file = ""
 #   2. Some/all files retrieved from the paired omics platform (http://pairedomicsdata.bioinformatics.nl/)
 #
 # The method you want to use determines the values that should be populated in 
-# the [dataset] section below. If working with a purely local dataset, nplinker
+# the [dataset] section below. If working with a purely local dataset, NPLinker
 # defaults to looking for all the necessary files in a single directory, given
 # by the "root" parameter. 
 #
@@ -51,7 +51,7 @@ repro_file = ""
 # file from GNPS and extract that into a folder to serve as the root directory for the dataset.
 # antiSMASH and BiG-SCAPE output are then added as additional subfolders. 
 #
-# Typically all you will need to do is tell nplinker where the root directory
+# Typically all you will need to do is tell NPLinker where the root directory
 # is located. Otherwise you can customise the locations of the individual elements
 # using the various override settings below. 
 #
@@ -77,14 +77,14 @@ repro_file = ""
 #
 # 2. Loading platform datasets
 # ----------------------------
-# Given a platform ID, nplinker will retrieve the associated metabolomics data using the 
+# Given a platform ID, NPLinker will retrieve the associated metabolomics data using the 
 # GNPS task ID. By default, it will also attempt to retrieve any available 
 # genomics data from the antiSMASH database using the RefSeq accession labels 
 # in the platform project data. 
 # 
 # However, if you have local antismash results instead, you should also set the
 # location of those files using the "antismash_dir" parameter in the 
-# [dataset.overrides] section. nplinker can optionally also run bigscape on 
+# [dataset.overrides] section. NPLinker can optionally also run bigscape on 
 # these results during the loading process. If you already have bigscape results
 # you can additionally set the "bigscape_dir" parameter to the appropriate 
 # location to skip this step (or simply place them inside the <root>/bigscape folder)
@@ -150,37 +150,57 @@ ignore_spaces = false
 
 [docker]
 # this optional section contains various settings that only apply to the dockerised 
-# version of nplinker. The Docker image contains BiG-SCAPE, and this tool can be run
+# version of NPLinker. The Docker image contains BiG-SCAPE, and this tool can be run
 # as part of the dataset loading process. If you want to enable/disable this, and 
 # configure the parameters used, this can be done by modifying the settings below. 
 
-# enable or disable running BiG-SCAPE on a dataset being used with the nplinker Docker
+# enable or disable running BiG-SCAPE on a dataset being used with the NPLinker Docker
 # image. If false, you must have existing BiG-SCAPE results for your dataset in the 
-# format nplinker expects (described above). If true, the copy of BiG-SCAPE installed
+# format NPLinker expects (described above). If true, the copy of BiG-SCAPE installed
 # in the Docker image will be run on the directory containing the antiSMASH data for
 # the selected dataset, using the parameters configured below. 
 # The default value is true
 run_bigscape = true
 
-# when BiG-SCAPE is executed by nplinker, it will automatically configure the following
-# parameters:
+# The extra_bigscape_parameters setting allows you to configure the parameters passed
+# to the BiG-SCAPE application when it's executed inside an NPLinker Docker image. In
+# most cases you won't need to adjust this, but if you want extra control over 
+# the BiG-SCAPE run you can edit the default value to add/remove/change the supplied
+# parameters. 
+#
+# The available parameters are listed on the BiG-SCAPE wiki at:
+#    https://git.wageningenur.nl/medema-group/BiG-SCAPE/-/wikis/parameters
+#
+# NPLinker will automatically configure the following parameter values so you 
+# never need to include them:
 #   -i/--inputdir
 #   -o/--outputdir
 #   --pfam_dir
-#   --clans-off
-#   --mibig
+#
+# NOTE: by default NPLinker will pass the "--mibig" parameter to BiG-SCAPE, 
+# including MiBIG BGCs in the analysis. If you do NOT want to include this, you
+# will need to edit the default value and remove the "--mibig" section.
 # 
-# In addition, the --cutoffs parameter will default to:
-#   --cutoffs=0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7
+# Similarly, the "--clans-off" parameter is also passed by default. This disables
+# the BiG-SCAPE feature which performs a second level of clustering on GCFs.
+#
+# For example, to use a different set of cutoffs and enable verbose mode while 
+# retaining the other defaults:
+#   extra_bigscape_parameters = "--mibig --clans-off --cutoffs 0.3 0.4 0.5 -v"
+#
+# Or to do the same with MiBIG disabled:
+#   extra_bigscape_parameters = "--clans-off --cutoffs 0.3 0.4 0.5 -v"
+#
+# Or to limit the number of cores used:
+#   extra_bigscape_parameters = "--mibig --clans-off --cores 4"
 # 
-# If you wish to change the set of cutoffs, or set any of the other parameters
-# not listed above, you can do so by editing the value of this string. For example,
-# to use a smaller set of cutoffs and enable verbose mode:
-#   extra_bigscape_parameters = "--cutoffs 0.5,0.6 -v"
-extra_bigscape_parameters = ""
+# The default simply enables MiBIG (2.0), disables the extra GCF clustering step.
+# Note that BiG-SCAPE defaults to using 0.3 as a clustering cutoff if "--cutoffs"
+# is not set.
+#extra_bigscape_parameters = "--mibig --clans-off"
 
 # this optional section contains various settings that only affect the webapp interface
-# for nplinker. If you're not using it, you can leave this out of your configuration. 
+# for NPLinker. If you're not using it, you can leave this out of your configuration. 
 [webapp]
 # A fundamental part of the webapp is a set of tables which display objects in the dataset
 # that have been found to have links, based on the output of the Metcalf scoring method. 
@@ -195,7 +215,7 @@ tables_metcalf_threshold = 2.0
 [scoring]
 
 # the "Rosetta" scoring method involves some preprocessing steps that can take
-# significant time. nplinker will automatically run these steps as it loads the
+# significant time. NPLinker will automatically run these steps as it loads the
 # dataset and cache the results. if you would like to adjust the parameters used 
 # by the Rosetta method you can do by setting them below (note that changing
 # these values will invalidate any cached data and force the preprocessing steps
