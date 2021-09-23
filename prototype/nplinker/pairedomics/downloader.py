@@ -234,7 +234,7 @@ class Downloader(object):
 
         logger.info('Running BiG-SCAPE! extra_bigscape_parameters="{}"'.format(extra_bigscape_parameters))
         try:
-            run_bigscape('/app/BiG-SCAPE/bigscape.py', os.path.join(self.project_file_cache, 'antismash'), os.path.join(self.project_file_cache, 'bigscape'), '/app', cutoffs=[0.3], extra_params=extra_bigscape_parameters)
+            run_bigscape('/app/BiG-SCAPE/bigscape.py', os.path.join(self.project_file_cache, 'antismash'), os.path.join(self.project_file_cache, 'bigscape'), '/app', extra_bigscape_parameters)
         except Exception as e:
             logger.warning('Failed to run BiG-SCAPE on antismash data, error was "{}"'.format(e))
 
