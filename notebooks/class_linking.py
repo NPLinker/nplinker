@@ -9,6 +9,7 @@ import pandas as pd
 from collections import defaultdict, Counter
 
 sys.path.append('../prototype')
+from nplinker.nplinker import BGC, GCF, Spectrum
 from nplinker.nplinker import NPLinker
 
 
@@ -331,12 +332,12 @@ class NPLinker_classes(NPLinker):
         if is_spectrum:
             # list of list of tuples/None - todo: add to spectrum object
             spec_like_classes = self.canopus.spectra_classes.get(str(spec_like.spectrum_id))
-            spec_like_classes_names = self.class_links.spectra_classes_names
-            spec_like_classes_names_inds = self.class_links.spectra_classes_names_inds
+            spec_like_classes_names = self.canopus.spectra_classes_names
+            spec_like_classes_names_inds = self.canopus.spectra_classes_names_inds
         else:  # molfam
             spec_like_classes = self.canopus.molfam_classes.get(str(spec_like.spectrum_id))
-            spec_like_classes_names = self.class_links.molfam_classes_names
-            spec_like_classes_names_inds = self.class_links.molfam_classes_names_inds
+            spec_like_classes_names = self.canopus.molfam_classes_names
+            spec_like_classes_names_inds = self.canopus.molfam_classes_names_inds
 
         scores = []
         # todo: calculate scores coming from spectrum side
@@ -355,17 +356,17 @@ class NPLinker_classes(NPLinker):
                         # does info exist for this spectra class level
                         spec_class_i = spec_like_classes_names_inds.get(chem_class_name)
                         if spec_class_i:
-                            spec_class_options = spec_classes[spec_class_i][0]  # get class - for now only use first
+                            spec_class_options = spec_like_classes[spec_class_i][0]  # get class - for now only use first
                             if spec_class_options:  # if there is a class at this lvl
                                 spec_class = spec_class_options[0]  # is a tuple of (name, score) so take [0]
-                                score = class_link_obj.class_links[bgc_class_name][chem_class_name]\
+                                score = self.class_links.class_links[bgc_class_name][chem_class_name]\
                                     .get(bgc_class,{}).get(spec_class)
                                 if score:
                                     result_tuple = (score, bgc_class_name, chem_class_name, bgc_class, spec_class)
                                     scores.append(result_tuple)
         return sorted(scores, reverse=True)
     
-    def get_gcf_as_classes(gcf, cutoff = 0.5):
+    def get_gcf_as_classes(self, gcf, cutoff = 0.5):
         """Get antismash classes for a gcf if antismash class occurs in more than <cutoff> of gcf
         
         Args:
