@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 Starting from v1.1, each release listed here will also have a corresponding tagged [Docker image version](https://hub.docker.com/r/andrewramsay/nplinker/tags?page=1&ordering=last_updated). If you want to use the latest version of NPLinker, use `docker pull andrewramsay/nplinker:latest`. If you want a specific version, you can instead use `docker pull andrewramsay/nplinker:v1.1` etc. 
 
+## [[v1.1.3]](https://github.com/sdrogers/nplinker/compare/v1.1.2...v1.1.3) - 2021-11-26
+
+To use this release, run `docker pull andrewramsay:nplinker:v1.1.3`
+
+### Changed
+
+ - Reverted a change to inclusion of singleton MolFams in Metcalf scoring from v1.1.2 until [issue #57](https://github.com/sdrogers/nplinker/issues/57) can be resolved
+ - Updated RefSeq accession ID process via NCBI website when downloading datasets from the paired data platform (website updates had broken the previous version)
+ - Download process better handles genome records with no usable genome ID
+ - Added more logging for information/debugging
+
 ## [[v1.1.2]](https://github.com/sdrogers/nplinker/compare/v1.1.1...v1.1.2) - 2021-09-23
 
 To use this release, run `docker pull andrewramsay:nplinker:v1.1.2`
