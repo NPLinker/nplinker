@@ -287,8 +287,14 @@ class Downloader(object):
 
     def _resolve_jgi_accession(self, jgi_id):
         url = JGI_GENOME_LOOKUP_URL.format(jgi_id)
+        logger.info('Attempting to resolve JGI_Genome_ID to GenBank accession')
         # no User-Agent header produces a 403 Forbidden error on this site...
-        resp = httpx.get(url, headers={'User-Agent': USER_AGENT})
+        try:
+            resp = httpx.get(url, headers={'User-Agent': USER_AGENT}, timeout=10.0)
+        except httpx.ReadTimeout:
+            logger.warning('Timed out waiting for result of JGI_Genome_ID lookup')
+            return None
+
         soup = BeautifulSoup(resp.content, 'html.parser')
         # find the table entry giving the NCBI assembly accession ID
         link = soup.find('a', href=re.compile('https://www.ncbi.nlm.nih.gov/nuccore/.*'))
