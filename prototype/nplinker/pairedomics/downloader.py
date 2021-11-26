@@ -67,7 +67,7 @@ class GenomeStatus:
         return cls(original_id, resolved_id, attempted, filename)
 
     def to_csv(self):
-        return ','.join([self.original_id, str(self.resolved_id), str(self.attempted), self.filename])
+        return ','.join([str(self.original_id), str(self.resolved_id), str(self.attempted), self.filename])
 
 def download_and_extract_mibig_json(download_path, output_path, version='1.4'):
     archive_path = os.path.join(download_path, 'mibig_json_{}.tar.gz'.format(version))
