@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-import sys
+import time
 import os
 import zipfile
 import json
@@ -24,7 +24,6 @@ import csv
 
 import httpx
 from bs4 import BeautifulSoup
-from xdg import XDG_CONFIG_HOME
 from progress.bar import Bar
 from progress.spinner import Spinner
 
@@ -45,8 +44,7 @@ ANTISMASH_DB_DOWNLOAD_URL = 'https://antismash-db.secondarymetabolites.org/outpu
 ANTISMASH_DBV2_PAGE_URL = 'https://antismash-dbv2.secondarymetabolites.org/output/{}/'
 ANTISMASH_DBV2_DOWNLOAD_URL = 'https://antismash-dbv2.secondarymetabolites.org/output/{}/{}'
 
-NCBI_GENBANK_LOOKUP_URL = 'https://www.ncbi.nlm.nih.gov/nuccore/{}?report=docsum'
-NCBI_ASSEMBLY_LOOKUP_URL = 'https://www.ncbi.nlm.nih.gov/assembly?LinkName=nuccore_assembly&from_uid={}'
+NCBI_LOOKUP_URL_NEW = 'https://www.ncbi.nlm.nih.gov/assembly/?term={}'
 
 JGI_GENOME_LOOKUP_URL = 'https://img.jgi.doe.gov/cgi-bin/m/main.cgi?section=TaxonDetail&page=taxonDetail&taxon_oid={}'
 
@@ -67,7 +65,7 @@ class GenomeStatus:
         return cls(original_id, resolved_id, attempted, filename)
 
     def to_csv(self):
-        return ','.join([self.original_id, str(self.resolved_id), str(self.attempted), self.filename])
+        return ','.join([str(self.original_id), str(self.resolved_id), str(self.attempted), self.filename])
 
 def download_and_extract_mibig_json(download_path, output_path, version='1.4'):
     archive_path = os.path.join(download_path, 'mibig_json_{}.tar.gz'.format(version))
@@ -234,18 +232,34 @@ class Downloader(object):
 
         logger.info('Running BiG-SCAPE! extra_bigscape_parameters="{}"'.format(extra_bigscape_parameters))
         try:
-            run_bigscape('/app/BiG-SCAPE/bigscape.py', os.path.join(self.project_file_cache, 'antismash'), os.path.join(self.project_file_cache, 'bigscape'), '/app', cutoffs=[0.3], extra_params=extra_bigscape_parameters)
+            run_bigscape('/app/BiG-SCAPE/bigscape.py', os.path.join(self.project_file_cache, 'antismash'), os.path.join(self.project_file_cache, 'bigscape'), '/app', extra_bigscape_parameters)
         except Exception as e:
             logger.warning('Failed to run BiG-SCAPE on antismash data, error was "{}"'.format(e))
 
     def _generate_strain_mappings(self):
         gen_strains = generate_strain_mappings(self.strains, self.strain_mappings_file, os.path.join(self.project_file_cache, 'antismash'))
 
+    def _ncbi_genbank_search(self, genbank_id, retry=True, retry_time=3.0):
+        url = NCBI_LOOKUP_URL_NEW.format(genbank_id)
+        logger.debug('Looking up GenBank data at {}'.format(url))
+        resp = httpx.get(url)
+        if resp.status_code == httpx.codes.OK:
+            return resp.content
+
+        if retry:
+            logger.debug('Lookup failed due to HTTP error, trying again in {} seconds'.format(retry_time))
+            # wait a few seconds here and then try again, seems to occasionally
+            # fail even though it should produce a valid result so maybe some
+            # throttling going on?
+            time.sleep(retry_time)
+            resp = httpx.get(url)
+            if resp.status_code == httpx.codes.OK:
+                return resp.content
+
+        logger.warning('HTTP error {} resolving GenBank accession {} (URL was {})'.format(resp.status_code, genbank_id, url))
+        return None
 
     def _resolve_genbank_accession(self, genbank_id):
-        """
-        Super hacky way of trying to resolve the GenBank accession into RefSeq accession.
-        """
         logger.info('Attempting to resolve RefSeq accession from Genbank accession {}'.format(genbank_id))
         # genbank id => genbank seq => refseq
 
@@ -262,24 +276,39 @@ class Downloader(object):
             else:
                 genbank_id = genbank_id.lower() 
 
-        # Look up genbank ID
-        try:
-            url = NCBI_GENBANK_LOOKUP_URL.format(genbank_id)
-            resp = httpx.get(url)
-            soup = BeautifulSoup(resp.content, 'html.parser')
-            ids = soup.find('dl', {'class': 'rprtid'})
-            for field_idx, field in enumerate(ids.findChildren()):
-                if field.getText().strip() == 'GI:':
-                    seq_id = ids.findChildren()[field_idx + 1].getText().strip()
-                    break
+        # get rid of any extraneous whitespace
+        genbank_id = genbank_id.strip() 
 
-            # Look up assembly
-            url = NCBI_ASSEMBLY_LOOKUP_URL.format(seq_id)
-            resp = httpx.get(url)
-            soup = BeautifulSoup(resp.content, 'html.parser')
-            title_href = soup.find('p', {'class': 'title'}).a['href']
-            refseq_id = title_href.split('/')[-1].split('.')[0]
-            return refseq_id
+        # run a search using the GenBank accession ID
+        try:
+            content = self._ncbi_genbank_search(genbank_id)
+            if content is None:
+                raise Exception('HTTP connection error')
+
+            soup = BeautifulSoup(content, 'html.parser')
+            # find the <dl> element with class "assembly_summary_new"
+            dl_element = soup.find('dl', {'class': 'assembly_summary_new'})
+            if dl_element is None:
+                raise Exception('Unknown HTML format')
+
+            refseq_idx = -1
+            for field_idx, field in enumerate(dl_element.children):
+                # this is the element immediately preceding the one with
+                # the actual RefSeq ID we want
+                if field.getText().strip() == 'RefSeq assembly accession:':
+                    refseq_idx = field_idx + 1
+
+                # this should be True when we've reached the right element
+                if field_idx == refseq_idx:
+                    refseq_id = field.getText()
+                    # if it has any spaces, take everything up to first one (some have annotations afterwards)
+                    if refseq_id.find(' ') != -1:
+                        refseq_id = refseq_id[:refseq_id.find(' ')]
+                
+                    return refseq_id
+
+            if refseq_idx == -1:
+                raise Exception('Expected HTML elements not found')
         except Exception as e:
             logger.warning('Failed resolving GenBank accession {}, error {}'.format(genbank_id, e))
 
@@ -287,8 +316,14 @@ class Downloader(object):
 
     def _resolve_jgi_accession(self, jgi_id):
         url = JGI_GENOME_LOOKUP_URL.format(jgi_id)
+        logger.info('Attempting to resolve JGI_Genome_ID to GenBank accession')
         # no User-Agent header produces a 403 Forbidden error on this site...
-        resp = httpx.get(url, headers={'User-Agent': USER_AGENT})
+        try:
+            resp = httpx.get(url, headers={'User-Agent': USER_AGENT}, timeout=10.0)
+        except httpx.ReadTimeout:
+            logger.warning('Timed out waiting for result of JGI_Genome_ID lookup')
+            return None
+
         soup = BeautifulSoup(resp.content, 'html.parser')
         # find the table entry giving the NCBI assembly accession ID
         link = soup.find('a', href=re.compile('https://www.ncbi.nlm.nih.gov/nuccore/.*'))
@@ -305,6 +340,7 @@ class Downloader(object):
         elif 'JGI_Genome_ID' in genome_id_data:
             return genome_id_data['JGI_Genome_ID']
 
+        logger.warning('No known genome ID field in genome data: {}'.format(genome_id_data))
         return None
 
     def _resolve_genome_id_data(self, genome_id_data):
@@ -340,6 +376,9 @@ class Downloader(object):
 
             # get the best available ID from the dict
             best_id = self._get_best_available_genome_id(genome_record['genome_ID'])
+            if best_id is None:
+                logger.warning('Ignoring genome record "{}" due to missing genome ID field'.format(genome_record))
+                continue
 
             # use this to check if the lookup has already been attempted and if
             # so if the file is cached locally

@@ -99,7 +99,7 @@ class DatasetLoader(object):
     EXTENDED_METADATA_TABLE_PARSING_DEFAULT    = False
 
     RUN_BIGSCAPE_DEFAULT                       = True
-    EXTRA_BIGSCAPE_PARAMS_DEFAULT              = ""
+    EXTRA_BIGSCAPE_PARAMS_DEFAULT              = '--mibig --clans-off'
 
     # keys for overriding metabolomics data elements
     OR_NODES                                   = 'nodes_file'
@@ -392,7 +392,7 @@ class DatasetLoader(object):
                 # TODO this should not be attempted if not in Docker env
                 logger.info('Running BiG-SCAPE! extra_bigscape_parameters="{}"'.format(extra_bigscape_parameters))
                 try:
-                    run_bigscape('/app/BiG-SCAPE/bigscape.py', os.path.join(self._root, 'antismash'), os.path.join(self._root, 'bigscape'), '/app', cutoffs=[0.3], extra_params=extra_bigscape_parameters)
+                    run_bigscape('/app/BiG-SCAPE/bigscape.py', os.path.join(self._root, 'antismash'), os.path.join(self._root, 'bigscape'), '/app', extra_params=extra_bigscape_parameters)
                 except Exception as e:
                     logger.warning('Failed to run BiG-SCAPE on antismash data, error was "{}"'.format(e))
 
