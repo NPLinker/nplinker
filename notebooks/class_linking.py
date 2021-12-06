@@ -122,8 +122,8 @@ class Class_links:
                 counts_df = pd.DataFrame.from_dict(counts, dtype=int)
                 class_linking_tables[bgc_key][chem_key] = (counts_df/counts_df.sum(axis=0)).fillna(0)
                 class_linking_counts[bgc_key][chem_key] = counts_df.fillna(0)
-                class_linking_tables[chem_key][bgc_key] = (counts_df/counts_df.sum(axis=1)).fillna(0)
-                class_linking_counts[chem_key][bgc_key] = counts_df.fillna(0)
+                class_linking_tables[chem_key][bgc_key] = (counts_df.T/counts_df.sum(axis=1)).fillna(0)
+                class_linking_counts[chem_key][bgc_key] = counts_df.T.fillna(0)
         self._class_links = class_linking_tables
         self._class_links_counts = class_linking_counts
         return class_linking_tables
@@ -340,6 +340,7 @@ class NPLinker_classes(NPLinker):
             spec_like_classes_names_inds = self.canopus.molfam_classes_names_inds
 
         scores = []
+        std_score = 0  # if link not recorded in scores (mibig) return this score
         # todo: calculate scores coming from spectrum side
         # loop through classes that are possible to link (names in link object)
         for bgc_class_name in self.class_links.bgc_class_names:
@@ -360,7 +361,7 @@ class NPLinker_classes(NPLinker):
                             if spec_class_options:  # if there is a class at this lvl
                                 spec_class = spec_class_options[0]  # is a tuple of (name, score) so take [0]
                                 score = self.class_links.class_links[bgc_class_name][chem_class_name]\
-                                    .get(bgc_class,{}).get(spec_class)
+                                    .get(bgc_class,{}).get(spec_class, std_score)
                                 if score:
                                     result_tuple = (score, bgc_class_name, chem_class_name, bgc_class, spec_class)
                                     scores.append(result_tuple)
