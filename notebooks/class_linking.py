@@ -362,9 +362,8 @@ class NPLinker_classes(NPLinker):
                                 spec_class = spec_class_options[0]  # is a tuple of (name, score) so take [0]
                                 score = self.class_links.class_links[bgc_class_name][chem_class_name]\
                                     .get(bgc_class,{}).get(spec_class, std_score)
-                                if score:
-                                    result_tuple = (score, bgc_class_name, chem_class_name, bgc_class, spec_class)
-                                    scores.append(result_tuple)
+                                result_tuple = (score, bgc_class_name, chem_class_name, bgc_class, spec_class)
+                                scores.append(result_tuple)
         return sorted(scores, reverse=True)
     
     def get_gcf_as_classes(self, gcf, cutoff = 0.5):
