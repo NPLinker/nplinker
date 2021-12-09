@@ -26,7 +26,7 @@ class Class_links:
         self._bigscape_mibig_conversion = {
             'PKSI': 'Polyketide', 'PKSother': 'Polyketide',
             'NRPS': 'NRP', 'RiPPs': 'RiPP', 'Saccharides': 'Saccharide',
-            'Others': 'Other', 'Terpene': 'Terpene', 'PKS-NRP_hybrid': 'PKS-NRP_hybrids'}
+            'Others': 'Other', 'Terpene': 'Terpene', 'PKS-NRP_Hybrids': 'PKS-NRP_hybrids'}
 
     def _read_mibig_classes(self):
         # read mibig file to dict of list {chem_id: [bgc_classes, chem_classes]}
