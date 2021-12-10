@@ -26,7 +26,58 @@ class Class_links:
         self._bigscape_mibig_conversion = {
             'PKSI': 'Polyketide', 'PKSother': 'Polyketide',
             'NRPS': 'NRP', 'RiPPs': 'RiPP', 'Saccharides': 'Saccharide',
-            'Others': 'Other', 'Terpene': 'Terpene', 'PKS-NRP_Hybrids': 'PKS-NRP_hybrids'}
+            'Others': 'Other', 'Terpene': 'Terpene', 'PKS-NRP_Hybrids': 'PKS-NRP_Hybrids'}
+        
+        self._as_conversion = {
+            'NAGGN': 'other', 'NAPAA': 'other', 'RRE-containing': 'bacteriocin',
+            'RiPP-like': 'bacteriocin', 'cf_fatty_acid': "fatty_acid", 'cf_putative': 'other',
+            'cf_saccharide': 'saccharide', 'guanidinotides': 'fused', 'lanthipeptide-class-i': 'lanthipeptide',
+            'lanthipeptide-class-ii': 'lanthipeptide', 'lanthipeptide-class-iii': 'lanthipeptide',
+            'lanthipeptide-class-iv': 'lanthipeptide', 'lanthipeptide-class-v': 'lanthipeptide',
+            'lantipeptide': 'lanthipeptide', 'linaridin': 'lanthipeptide', 'lipolanthine': 'lanthipeptide',
+            'nrps': 'NRPS', 'otherks': 'hglE-KS', 'prodigiosin': 'other', 'pyrrolidine': 'other',
+            'ranthipeptide': 'bacteriocin', 'redox-cofactor': 'other', 't1pks': 'T1PKS', 't2pks': 'T2PKS',
+            't3pks': 'T3PKS', 'thioamide-NRP': 'other', 'thioamitides': 'bacteriocin',
+            'transatpks': 'transAT-PKS'}
+
+    def get_gcf_as_classes(self, gcf, cutoff = 0.5):
+        """Get antismash classes for a gcf if antismash class occurs in more than <cutoff> of gcf
+
+        Args:
+            - gcf: GCF NPLinker object
+            - cutoff: float - fraction of the GCF that needs to contain the class for it to be counted
+        Returns:
+            List of str, the antismash classes present in the gcf
+        """
+        # todo: move to GCF object?
+        gcf_size = len(gcf.bgcs)
+        unlist_all_products = [product for bgc in gcf.bgcs for product in bgc.product_prediction.split('.')]
+        sorted_as_classes = Counter(unlist_all_products).most_common()
+        # keep if in more than half of bgcs?
+        cutoff = 0.5
+        size_cutoff = gcf_size * cutoff
+        filtered_as_classes = []
+        for product in sorted_as_classes:
+            if product[1] >= size_cutoff:
+                filtered_as_classes.append(product[0])
+        return filtered_as_classes
+    
+    def convert_as_classes(self, init_as_classes: list):
+        """Convert AS classes to class names that are in scoring table
+
+        Args:
+            - init_as_classes: list of str, the initial antismash class names
+        Returns:
+            List of str: converted antismash classes with _as_conversion_table
+        """
+        as_classes = []
+        for as_class in init_as_classes:
+            as_conversion = self.as_conversion.get(as_class)
+            if as_conversion:
+                as_classes.append(as_conversion)
+            else:
+                as_classes.append(as_class)
+        return as_classes
 
     def _read_mibig_classes(self):
         # read mibig file to dict of list {chem_id: [bgc_classes, chem_classes]}
@@ -147,6 +198,10 @@ class Class_links:
     @property
     def bigscape_mibig_conversion(self):
         return self._bigscape_mibig_conversion
+    
+    @property
+    def as_conversion(self):
+        return self._as_conversion
 
 
 class Canopus_results:
@@ -290,13 +345,13 @@ class NPLinker_classes(NPLinker):
     
     def class_linking_score(self, obj, target):
         """Return sorted class link scores for scoring obj and target
-        
+
         The input objects can be any mix of the following NPLinker types:
             - BGC
             - GCF
             - Spectrum
             - MolecularFamily
-        
+
         Args:
             - obj: one of the possible input objects
             - target: one of the possible input objects
@@ -324,11 +379,14 @@ class NPLinker_classes(NPLinker):
         if is_bgc:
             # get parent gcf for bgc
             bgc_like_gcf = [gcf for gcf in self.gcfs if bgc_like.id in [b.id for b in gcf.bgcs]][0]
+            # gather AS classes and convert to names in scoring dict
+            as_classes = self.class_links.convert_as_classes(bgc_like.product_prediction.split("."))
             bgc_like_classes_dict = {"bigscape_class": bgc_like_gcf.bigscape_class,  # str - always one bigscape class right?
-                                     "as_classes": product_prediction}  # list(str)
+                                     "as_classes": as_classes}  # list(str)
         else:
+            as_classes = self.class_links.convert_as_classes(self.class_links.get_gcf_as_classes(bgc_like, 0.5))
             bgc_like_classes_dict = {"bigscape_class": bgc_like.bigscape_class,  # str - always one bigscape class right?
-                                     "as_classes": self.get_gcf_as_classes(bgc_like, 0.5)}  # list(str)
+                                     "as_classes": as_classes}  # list(str)
         if is_spectrum:
             # list of list of tuples/None - todo: add to spectrum object
             spec_like_classes = self.canopus.spectra_classes.get(str(spec_like.spectrum_id))
@@ -365,28 +423,6 @@ class NPLinker_classes(NPLinker):
                                 result_tuple = (score, bgc_class_name, chem_class_name, bgc_class, spec_class)
                                 scores.append(result_tuple)
         return sorted(scores, reverse=True)
-    
-    def get_gcf_as_classes(self, gcf, cutoff = 0.5):
-        """Get antismash classes for a gcf if antismash class occurs in more than <cutoff> of gcf
-        
-        Args:
-            - gcf: GCF NPLinker object
-            - cutoff: float - fraction of the GCF that needs to contain the class for it to be counted
-        Returns:
-            List of str, the antismash classes present in the gcf
-        """
-        # todo: move to GCF object?
-        gcf_size = len(gcf.bgcs)
-        unlist_all_products = [product for bgc in gcf.bgcs for product in bgc.product_prediction.split('.')]
-        sorted_as_classes = Counter(unlist_all_products).most_common()
-        # keep if in more than half of bgcs?
-        cutoff = 0.5
-        size_cutoff = gcf_size * cutoff
-        filtered_as_classes = []
-        for product in sorted_as_classes:
-            if product[1] >= size_cutoff:
-                filtered_as_classes.append(product[0])
-        return filtered_as_classes
 
     @property
     def class_links(self):
