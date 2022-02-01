@@ -393,7 +393,7 @@ class NPLinker_classes(NPLinker):
             spec_like_classes_names = self.canopus.spectra_classes_names
             spec_like_classes_names_inds = self.canopus.spectra_classes_names_inds
         else:  # molfam
-            spec_like_classes = self.canopus.molfam_classes.get(str(spec_like.spectrum_id))
+            spec_like_classes = self.canopus.molfam_classes.get(str(spec_like.family_id))
             spec_like_classes_names = self.canopus.molfam_classes_names
             spec_like_classes_names_inds = self.canopus.molfam_classes_names_inds
 
