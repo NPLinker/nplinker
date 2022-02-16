@@ -211,21 +211,27 @@ class Canopus_results:
         -cluster_index_classifications.txt
         -component_index_classifications.txt
     """
-    def __init__(self, input_dir):
-        """Read the class info"""
-        spectra_classes_names, spectra_classes = self._read_spectra_classes(input_dir)
+    def __init__(self, root_dir):
+        """Read the class info from root_dir/canopus
+        
+        Args:
+            root_dir: str, root_dir of nplinker project
+        """
+        spectra_classes_names, spectra_classes = self._read_spectra_classes(root_dir)
         self._spectra_classes = spectra_classes
         self._spectra_classes_names = spectra_classes_names
         self._spectra_classes_names_inds = {elem:i for i,elem in enumerate(spectra_classes_names)}
         
-        molfam_classes_names, molfam_classes = self._read_molfam_classes(input_dir)
+        molfam_classes_names, molfam_classes = self._read_molfam_classes(root_dir)
         self._molfam_classes = molfam_classes
         self._molfam_classes_names = molfam_classes_names
         self._molfam_classes_names_inds = {elem:i for i,elem in enumerate(molfam_classes_names)}
     
-    def _read_spectra_classes(self, input_dir):
+    def _read_spectra_classes(self, root_dir):
         """Read canopus classes for spectra, return classes_names, classes
         
+        Args:
+            root_dir: str, root_dir of nplinker project
         Returns:
             Tuple of:
             - ci_classes_names: list of str - the names of each different level
@@ -234,7 +240,7 @@ class Canopus_results:
                 class prediction for a level
         """
         input_file = os.path.join(
-            input_dir, 'cluster_index_classifications.txt')
+            root_dir, 'canopus', 'cluster_index_classifications.txt')
 
         ci_classes = {}  # make a dict {ci: [[(class,score)]]}
         ci_classes_header = None
@@ -263,9 +269,11 @@ class Canopus_results:
                    [f"npc_{elem}" for elem in ci_classes_header[-3:]]
         return ci_classes_names, ci_classes
     
-    def _read_molfam_classes(self, input_dir):
+    def _read_molfam_classes(self, root_dir):
         """Read canopus classes for molfams, return classes_names, classes
         
+        Args:
+            root_dir: str, root_dir of nplinker project
         Returns:
             Tuple of:
             - compi_classes_names: list of str - the names of each different level
@@ -274,7 +282,7 @@ class Canopus_results:
                 class prediction for a level
         """
         input_file = os.path.join(
-            input_dir, 'component_index_classifications.txt')
+            root_dir, 'canopus', 'component_index_classifications.txt')
 
         compi_classes = {}  # make a dict {compi: [[(class,score)]]}
         compi_classes_header = None
@@ -328,6 +336,93 @@ class Canopus_results:
         return self._molfam_classes_names_inds
 
 
+class MolNetEnhancer_results:
+    """Class for storing MolNetEnhancer results
+    
+    The input file for ClassyFire results is read from the molnetenhancer directory:
+        - ClassyFireResults_Network.txt
+    """
+    def __init__(self, root_dir):
+        """Read the class info from file in root_dir/molnetenhancer/
+        
+        Args:
+            root_dir: str, root_dir of nplinker project
+        """
+        cf_classes_names, molfam_classes, spectra2molfam = self._read_cf_classes(root_dir)
+        self._spectra2molfam = spectra2molfam
+        self._molfam_classes = molfam_classes
+        self._spectra_classes_names = cf_classes_names  # if NPC gets implemented, add here
+        self._spectra_classes_names_inds = {elem:i for i,elem in enumerate(cf_classes_names)}
+        
+    def _read_cf_classes(self, root_dir):
+        """Read ClassyFireResults_Network.txt in molnetenhancer dir
+        
+        Args:
+            root_dir: str, root_dir of nplinker project
+        Returns: 
+            tuple of:
+            -list of str - names of the classes in order
+            -dict of {str: [(str, float)]} - linking molfams to (classes, scores) in order of names,
+                singleton families are denoted with S[\d]+
+            -dict of {str:str} - linking spectra to molfams
+        """
+        columns = []
+        mne_component_dict = {}
+        mne_cluster2component = {}
+        input_file = os.path.join(root_dir, "molnetenhancer", "ClassyFireResults_Network.txt")
+        if not os.path.isfile(input_file):
+            print("no molnetenhancer input")  # todo: add to logger
+            return columns, mne_component_dict, mne_cluster2component
+        with open(input_file) as inf:
+            header = inf.readline().strip().split("\t")
+            columns = ['cf_direct_parent' if col == 'CF_Dparent' else col.lower()
+                       for i, col in enumerate(header[3:]) if i%2 == 0]
+            for line in inf:
+                line = line.strip('\n').split("\t")
+                cluster = line.pop(0)
+                component = line.pop(0)
+                nr_nodes = line.pop(0)
+                class_info = []
+                for i in range(0, len(line), 2):
+                    class_tup = (line[i], float(line[i+1]))
+                    class_info.append(class_tup)
+                if not component in mne_component_dict:
+                    mne_component_dict[component] = class_info
+                mne_cluster2component[cluster] = component
+
+        return columns, mne_component_dict, mne_cluster2component
+    
+    def spectra_classes(self, spectrum_id):
+        """Return classes by relating spectrum_id in the molfam_classes
+        
+        Args:
+            spectrum_id: int/str, spectrum_id - ints will be converted to str
+        """
+        classes = []
+        if isinstance(spectrum_id, int):
+            spectrum_id = str(spectrum_id)
+        molfam_id = self.spectra2molfam.get(spectrum_id)
+        if molfam_id:
+            classes = self.molfam_classes.get(molfam_id)
+        return classes
+    
+    @property
+    def spectra2molfam(self):
+        return self._spectra2molfam
+    
+    @property
+    def spectra_classes_names(self):
+        return self._spectra_classes_names
+    
+    @property
+    def spectra_classes_names_inds(self):
+        return self._spectra_classes_names_inds
+    
+    @property
+    def molfam_classes(self):
+        return self._molfam_classes
+
+
 # dummy class before integrating it into the NPLinker class
 class NPLinker_classes(NPLinker):
     def __init__(self, userconfig=None):
@@ -336,12 +431,23 @@ class NPLinker_classes(NPLinker):
     def read_class_info(self):
         """Should include this in load_data/loader()
         
-        Yields a Canopus object with info about classes, and the Class links object
+        returns a Canopus and MNE object with info about classes, and the Class links object
         """
         mibig_classes_file = glob.glob(os.path.join(self.root_dir, "MIBiG*_compounds_with_AS_BGC_CF_NPC_classes.txt"))[0]
         self._class_links = Class_links(mibig_classes_file)
         
+        class_predict_options = []
         self._canopus = Canopus_results(self.root_dir)
+        if self._canopus.spectra_classes:
+            print("CANOPUS classes loaded succesfully")
+            class_predict_options.append('canopus')
+        self._molnetenhancer = MolNetEnhancer_results(self.root_dir)
+        if self._molnetenhancer.spectra2molfam:
+            print("MolNetEnhancer classes loaded succesfully")
+            class_predict_options.append('molnetenhancer')
+        if class_predict_options:
+            class_predict_options = ['mix', 'main'] + class_predict_options
+        self._class_predict_options = class_predict_options
     
     def class_linking_score(self, obj, target):
         """Return sorted class link scores for scoring obj and target
@@ -423,6 +529,134 @@ class NPLinker_classes(NPLinker):
                                 result_tuple = (score, bgc_class_name, chem_class_name, bgc_class, spec_class)
                                 scores.append(result_tuple)
         return sorted(scores, reverse=True)
+    
+    def npclass_score(self, obj, target, method = 'main'):
+        """Return sorted class link scores for scoring obj and target
+
+        The input objects can be any mix of the following NPLinker types:
+            - BGC
+            - GCF
+            - Spectrum
+            - MolecularFamily
+
+        Args:
+            - obj: one of the possible input objects
+            - target: one of the possible input objects
+            - method: str, which classification method to use for spectra. default is 'main'
+                options:
+                    -'main': use the main method - currently canopus
+                    -'mix': use main method first, when no main classes present, use the others
+                    if present
+                    -'canopus': use only canopus class predictions
+                    -'molnetenhancer': use only molnetenhancer class predictions
+        Returns:
+            List of tuple of
+            (score, obj_class_lvl, target_class_lvl, obj_class, target_class)
+            (float, str, str, str, str)
+            List will be empty if either BGC or spectrum classes are missing
+        """
+        # assess what is obj and target
+        spec_like = obj
+        bgc_like = target
+        bgc_to_spec = False
+        if isinstance(obj, BGC) or isinstance(obj, GCF):
+            bgc_like = obj
+            spec_like = target
+            bgc_to_spec = True
+
+        # assess if bgc or gcf and if spectrum or molfam
+        is_spectrum = False
+        is_bgc = False
+        if isinstance(spec_like, Spectrum):
+            is_spectrum = True
+        if isinstance(bgc_like, BGC):
+            is_bgc = True
+
+        # assess method
+        # todo: read options from NPLinker object - add option if the canopus/mne results are read correctly
+        method_options = self.class_predict_options
+        assert method in method_options, (
+            f"NPClass method should be one of method options: {method_options}, if your method is not "+
+            "in the options check if the class predictions (canopus, etc.) are loaded correctly")
+
+        # gather correct classes based on input, dict for bgcs and list for spec
+        if is_bgc:
+            # get parent gcf for bgc
+            bgc_like_gcf = [gcf for gcf in self.gcfs if bgc_like.id in [b.id for b in gcf.bgcs]][0]
+            # gather AS classes and convert to names in scoring dict
+            as_classes = self.class_links.convert_as_classes(bgc_like.product_prediction.split("."))
+            bgc_like_classes_dict = {"bigscape_class": bgc_like_gcf.bigscape_class,  # str - always one bigscape class right?
+                                     "as_classes": as_classes}  # list(str)
+        else:
+            as_classes = self.class_links.convert_as_classes(self.class_links.get_gcf_as_classes(bgc_like, 0.5))
+            bgc_like_classes_dict = {"bigscape_class": bgc_like.bigscape_class,  # str - always one bigscape class right?
+                                     "as_classes": as_classes}  # list(str)
+
+        # gather classes for spectra, choose right method
+        # choose the main method here by including it as 'main' in the method parameter
+        use_canopus = 'main' in method or 'canopus' in method or 'mix' in method
+        use_mne = 'molnetenhancer' in method or 'mix' in method
+        spec_like_classes, spec_like_classes_names, spec_like_classes_names_inds = (None, None, None)
+        # the order in which the classes are read, determines the priority (now: first canopus, then mne)
+        if use_canopus and not spec_like_classes:
+            if is_spectrum:
+                # list of list of tuples/None - todo: add to spectrum object
+                # take only 'best' (first) classification per ontology level
+                all_classes = self.canopus.spectra_classes.get(str(spec_like.spectrum_id))
+                if all_classes:
+                    spec_like_classes = [cls_per_lvl for lvl in all_classes
+                                         for i, cls_per_lvl in enumerate(lvl) if i==0]
+                spec_like_classes_names = self.canopus.spectra_classes_names
+                spec_like_classes_names_inds = self.canopus.spectra_classes_names_inds
+            else:  # molfam
+                all_classes = self.canopus.molfam_classes.get(str(spec_like.family_id)) 
+                if all_classes:
+                    spec_like_classes = [cls_per_lvl for lvl in all_classes
+                                         for i, cls_per_lvl in enumerate(lvl) if i==0]
+                spec_like_classes_names = self.canopus.molfam_classes_names
+                spec_like_classes_names_inds = self.canopus.molfam_classes_names_inds
+        if use_mne and not spec_like_classes:  # if mne or when main/canopus does not get classes
+            if is_spectrum:
+                spec_like_classes = self.molnetenhancer.spectra_classes(spec_like.spectrum_id)
+            else: # molfam
+                spec_like_classes = self.molnetenhancer.molfam_classes.get(str(spec_like.family_id))
+            # classes are same for molfam and spectrum so names are irrespective of is_spectrum
+            spec_like_classes_names = self.molnetenhancer.spectra_classes_names
+            spec_like_classes_names_inds = self.molnetenhancer.spectra_classes_names_inds
+
+
+        scores = []  # this will be returned if one of the class sides is absent
+        std_score = 0  # if link not recorded in scores (mibig) return this score
+        # loop through classes that are possible to link (names in class_link object)
+        for bgc_class_name in self.class_links.bgc_class_names:
+            if bgc_class_name == "mibig_classes":
+                # treat specially as bigscape class needs to be translated to mibig class
+                bigscape_class = bgc_like_classes_dict["bigscape_class"]
+                # convert bigscape class to mibig class
+                bgc_like_classes = [self.class_links.bigscape_mibig_conversion.get(bigscape_class)]
+            else:
+                bgc_like_classes = bgc_like_classes_dict.get(bgc_class_name)
+            if bgc_like_classes and spec_like_classes:  # check for classes from both sides
+                for bgc_class in bgc_like_classes:
+                    for chem_class_name in self.class_links.chem_class_names:
+                        # does info exist for this spectrum class level, return index for class level
+                        spec_class_level_i = spec_like_classes_names_inds.get(chem_class_name)
+                        if spec_class_level_i:
+                            spec_class_tup = spec_like_classes[spec_class_level_i]
+                            if spec_class_tup:  # if there is a class at this lvl
+                                spec_class = spec_class_tup[0]  # is a tuple of (name, score) so take [0]
+
+                                # determine direction of scoring: BGC -> spectrum
+                                if bgc_to_spec:
+                                    score = self.class_links.class_links[bgc_class_name][chem_class_name]\
+                                        .get(bgc_class,{}).get(spec_class, std_score)
+                                    result_tuple = (score, bgc_class_name, chem_class_name, bgc_class, spec_class)
+                                else:  # spectrum -> BGC
+                                    score = self.class_links.class_links[chem_class_name][bgc_class_name]\
+                                        .get(spec_class, {}).get(bgc_class, std_score)
+                                    result_tuple = (score, chem_class_name, bgc_class_name, spec_class, bgc_class)
+                                scores.append(result_tuple)
+        return sorted(scores, reverse=True)
 
     @property
     def class_links(self):
@@ -431,3 +665,11 @@ class NPLinker_classes(NPLinker):
     @property
     def canopus(self):
         return self._canopus
+    
+    @property
+    def molnetenhancer(self):
+        return self._molnetenhancer
+    
+    @property
+    def class_predict_options(self):
+        return self._class_predict_options
