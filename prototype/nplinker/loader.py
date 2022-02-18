@@ -101,6 +101,9 @@ class DatasetLoader(object):
     RUN_BIGSCAPE_DEFAULT                       = True
     EXTRA_BIGSCAPE_PARAMS_DEFAULT              = '--mibig --clans-off'
 
+    RUN_CANOPUS_DEFAULT                        = False
+    EXTRA_CANOPUS_PARAMS_DEFAULT               = '--maxmz 850 formula zodiac structure canopus'
+
     # keys for overriding metabolomics data elements
     OR_NODES                                   = 'nodes_file'
     OR_EDGES                                   = 'edges_file'
@@ -119,6 +122,9 @@ class DatasetLoader(object):
     OR_PARAMS                                  = 'gnps_params_file'
     OR_DESCRIPTION                             = 'description_file'
     OR_INCLUDE_STRAINS                         = 'include_strains_file'
+    # class predictions
+    OR_CANOPUS                                 = 'canopus_dir'
+    OR_MOLNETENHANCER                          = 'molnetenhancer_dir'
 
     BIGSCAPE_PRODUCT_TYPES                     = ['NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs', 'Saccharides', 'Terpene']
 
@@ -223,6 +229,12 @@ class DatasetLoader(object):
 
         # 14. MISC: <root>/include_strains.csv / include_strains_file=<override>
         self.include_strains_file = self._overrides.get(self.OR_INCLUDE_STRAINS) or os.path.join(self._root, 'include_strains.csv')
+
+        # 15. CLASS: <root>/canopus / canopus_dir=<override>
+        self.canopus_dir = self._overrides.get(self.OR_CANOPUS) or os.path.join(self._root, 'canopus')
+
+        # 15. CLASS: <root>/canopus / canopus_dir=<override>
+        self.molnetenhancer_dir = self._overrides.get(self.OR_MOLNETENHANCER) or os.path.join(self._root, 'molnetenhancer')
 
         for f in self.required_paths():
             if not os.path.exists(f):
