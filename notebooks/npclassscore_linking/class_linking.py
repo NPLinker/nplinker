@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 '''
-Initial code for class linking
+Initial code for NPClassScore
 '''
 import sys
 import os
@@ -8,7 +8,7 @@ import glob
 import pandas as pd
 from collections import defaultdict, Counter
 
-sys.path.append('../prototype')
+sys.path.append('../../prototype')
 from nplinker.nplinker import BGC, GCF, Spectrum
 from nplinker.nplinker import NPLinker
 
