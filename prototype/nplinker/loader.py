@@ -570,6 +570,22 @@ class DatasetLoader(object):
         self.spectra = load_annotations(self.annotations_dir, self.annotations_config_file, self.spectra, spec_dict)
         return True
 
+    def _load_class_info(self):
+        """Load class match info (based on mibig) and chemical class predictions
+
+        Run CANOPUS if asked for
+
+        :return: True if everything completes
+        """
+        # load Class_matches with mibig info from data/MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt
+
+        # run canopus if canopus_dir does not exist
+
+        # load Chem_class_predictions (canopus, molnetenhancer are loaded)
+        # for canopus, check if results can be converted with canopus_treemap
+        # otherwise use the pre-existing output of canopus
+        # for molnetenhancer, do search for the ClassyFireResults_Network.txt file
+
     def _load_strain_mappings(self):
         # this file should be a csv file, one line per strain, containing a list
         # of possible alternative IDs (the first one being the preferred ID). 
