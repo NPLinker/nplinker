@@ -23,6 +23,8 @@ from .metabolomics import load_dataset
 from .genomics import loadBGC_from_cluster_files
 from .genomics import make_mibig_bgc_dict
 
+from .class_info.class_matches import ClassMatches
+
 from .annotations import load_annotations
 
 from .strains import StrainCollection
@@ -575,9 +577,12 @@ class DatasetLoader(object):
 
         Run CANOPUS if asked for
 
-        :return: True if everything completes
+        Return:
+            True if everything completes
         """
         # load Class_matches with mibig info from data/MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt
+        mibig_class_file = './data/MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt'
+        self.class_matches = ClassMatches(mibig_class_file)
 
         # run canopus if canopus_dir does not exist
         should_run_canopus = self._docker.get('run_canopus',
