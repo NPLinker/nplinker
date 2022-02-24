@@ -580,11 +580,19 @@ class DatasetLoader(object):
         # load Class_matches with mibig info from data/MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt
 
         # run canopus if canopus_dir does not exist
+        should_run_canopus = self._docker.get('run_canopus',
+                                               self.RUN_CANOPUS_DEFAULT)
+        extra_canopus_parameters = self._docker.get(
+            'extra_canopus_parameters', self.EXTRA_CANOPUS_PARAMS_DEFAULT)
+        if should_run_canopus:
+            pass  # run canopus here
 
         # load Chem_class_predictions (canopus, molnetenhancer are loaded)
         # for canopus, check if results can be converted with canopus_treemap
         # otherwise use the pre-existing output of canopus
         # for molnetenhancer, do search for the ClassyFireResults_Network.txt file
+
+        return True
 
     def _load_strain_mappings(self):
         # this file should be a csv file, one line per strain, containing a list
