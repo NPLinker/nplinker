@@ -122,6 +122,8 @@ class NPLinker(object):
         self._metadata = {}
         self._molfams = []
         self._mibig_bgc_dict = {}
+        self._chem_classes = None
+        self._class_matches = None
 
         self._bgc_lookup = {}
         self._spec_lookup = {}
@@ -276,6 +278,7 @@ class NPLinker(object):
         self._strains = self._loader.strains
         self._product_types = self._loader.product_types
         self._chem_classes = self._loader.chem_classes
+        self._class_matches = self._loader.class_matches
 
         logger.debug('Generating lookup tables: genomics')
         self._bgc_lookup = {}

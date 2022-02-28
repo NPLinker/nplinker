@@ -585,12 +585,11 @@ class DatasetLoader(object):
             True if everything completes
         """
         # load Class_matches with mibig info from data/MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt
-        mibig_class_file = './data/MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt'
+        mibig_class_file = os.path.join(self.datadir, 'MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt')
         self.class_matches = ClassMatches(mibig_class_file)
 
         # run canopus if canopus_dir does not exist
-        should_run_canopus = self._docker.get('run_canopus',
-                                               self.RUN_CANOPUS_DEFAULT)
+        should_run_canopus = self._docker.get('run_canopus', self.RUN_CANOPUS_DEFAULT)
         extra_canopus_parameters = self._docker.get(
             'extra_canopus_parameters', self.EXTRA_CANOPUS_PARAMS_DEFAULT)
         if should_run_canopus:
