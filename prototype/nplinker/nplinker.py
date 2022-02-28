@@ -275,6 +275,7 @@ class NPLinker(object):
         self._mibig_bgc_dict = self._loader.mibig_bgc_dict
         self._strains = self._loader.strains
         self._product_types = self._loader.product_types
+        self._chem_classes = self._loader.chem_classes
 
         logger.debug('Generating lookup tables: genomics')
         self._bgc_lookup = {}

@@ -24,6 +24,7 @@ from .genomics import loadBGC_from_cluster_files
 from .genomics import make_mibig_bgc_dict
 
 from .class_info.class_matches import ClassMatches
+from .class_info.chem_classes import ChemClassPredictions
 
 from .annotations import load_annotations
 
@@ -255,6 +256,9 @@ class DatasetLoader(object):
             return False
 
         if not met_only and not self._load_genomics():
+            return False
+
+        if not self._load_class_info():
             return False
 
         self._load_optional()
@@ -575,7 +579,7 @@ class DatasetLoader(object):
     def _load_class_info(self):
         """Load class match info (based on mibig) and chemical class predictions
 
-        Run CANOPUS if asked for
+        Run CANOPUS if asked for.
 
         Return:
             True if everything completes
@@ -590,13 +594,13 @@ class DatasetLoader(object):
         extra_canopus_parameters = self._docker.get(
             'extra_canopus_parameters', self.EXTRA_CANOPUS_PARAMS_DEFAULT)
         if should_run_canopus:
-            pass  # run canopus here
+            if not os.path.isdir(self.canopus_dir):
+                pass  # run canopus here
 
         # load Chem_class_predictions (canopus, molnetenhancer are loaded)
         # for canopus, check if results can be converted with canopus_treemap
         # otherwise use the pre-existing output of canopus
-        # for molnetenhancer, do search for the ClassyFireResults_Network.txt file
-
+        self.chem_classes = ChemClassPredictions(self.canopus_dir, self.molnetenhancer_dir)
         return True
 
     def _load_strain_mappings(self):

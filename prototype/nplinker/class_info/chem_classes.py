@@ -23,7 +23,45 @@ logger = LogConfig.getLogger(__file__)
 # load Chem_class_predictions (canopus, molnetenhancer are loaded)
 # for canopus, check if results can be converted with canopus_treemap
 # otherwise use the pre-existing output of canopus
-# for molnetenhancer, do search for the ClassyFireResults_Network.txt file
+class ChemClassPredictions:
+    """Class for storing results for chemical class predictions of spectra
+
+    Currently, CANOPUS and MolNetEnhancer results are loaded
+    """
+    def __init__(self, canopus_dir, mne_dir):
+        """Load classes with CanopusResults, MolNetEnhancerResults
+
+        Args:
+            canopus_dir: str, canopus_dir found in root_dir of nplinker project
+            mne_dir: str, mne_dir found in root_dir of nplinker project
+        """
+        # todo: use canopus_treemap to convert canopus result
+        self._canopus = CanopusResults(canopus_dir)
+        self._molnetenhancer = MolNetEnhancerResults(mne_dir)
+
+        class_predict_options = []
+        if self._canopus.spectra_classes:
+            class_predict_options.append('canopus')
+        if self._molnetenhancer.spectra2molfam:
+            class_predict_options.append('molnetenhancer')
+        if class_predict_options:
+            class_predict_options = ['mix', 'main'] + class_predict_options
+        self._class_predict_options = class_predict_options
+
+    @property
+    def canopus(self):
+        return self._canopus
+
+    @property
+    def molnetenhancer(self):
+        return self._molnetenhancer
+
+    @property
+    def class_predict_options(self):
+        """The available class predictions"""
+        return self._class_predict_options
+
+
 class CanopusResults:
     """Class for storing canopus results
 
