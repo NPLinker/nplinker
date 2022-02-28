@@ -604,7 +604,6 @@ class DatasetLoader(object):
                                 self.canopus_dir, extra_canopus_parameters)
                 except Exception as e:
                     logger.warning('Failed to run CANOPUS on mgf file with docker, error was "{}"'.format(e))
-                else:
                     logger.info('Trying to run CANOPUS again using SIRIUS from path')
                     try:
                         run_canopus('sirius', self.mgf_file,
