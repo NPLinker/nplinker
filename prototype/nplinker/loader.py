@@ -25,6 +25,7 @@ from .genomics import make_mibig_bgc_dict
 
 from .class_info.class_matches import ClassMatches
 from .class_info.chem_classes import ChemClassPredictions
+from .class_info.runcanopus import run_canopus
 
 from .annotations import load_annotations
 
@@ -579,12 +580,13 @@ class DatasetLoader(object):
     def _load_class_info(self):
         """Load class match info (based on mibig) and chemical class predictions
 
-        Run CANOPUS if asked for.
+        Run CANOPUS if asked for. First sirius is run through docker, if this
+        fails, it is run with a version present on the path.
 
         Return:
             True if everything completes
         """
-        # load Class_matches with mibig info from data/MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt
+        # load Class_matches with mibig info from data
         mibig_class_file = os.path.join(self.datadir, 'MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt')
         self.class_matches = ClassMatches(mibig_class_file)
 
@@ -593,8 +595,22 @@ class DatasetLoader(object):
         extra_canopus_parameters = self._docker.get(
             'extra_canopus_parameters', self.EXTRA_CANOPUS_PARAMS_DEFAULT)
         if should_run_canopus:
+            # don't run canopus when canopus dir exists already
             if not os.path.isdir(self.canopus_dir):
-                pass  # run canopus here
+                logger.info('Running CANOPUS! extra_canopus_parameters="{}"'.format(
+                        extra_canopus_parameters))
+                try:
+                    run_canopus('/app/sirius/bin/sirius', self.mgf_file,
+                                self.canopus_dir, extra_canopus_parameters)
+                except Exception as e:
+                    logger.warning('Failed to run CANOPUS on mgf file with docker, error was "{}"'.format(e))
+                else:
+                    logger.info('Trying to run CANOPUS again using SIRIUS from path')
+                    try:
+                        run_canopus('sirius', self.mgf_file,
+                                    self.canopus_dir, extra_canopus_parameters)
+                    except Exception as e:
+                        logger.warning('Again failed to run CANOPUS on mgf file using sirius from path, error was "{}"'.format(e))
 
         # load Chem_class_predictions (canopus, molnetenhancer are loaded)
         # for canopus, check if results can be converted with canopus_treemap
