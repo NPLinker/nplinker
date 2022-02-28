@@ -13,7 +13,7 @@ from nplinker.class_info.chem_classes import CanopusResults, \
 class TestCanopusResults(unittest.TestCase):
     def setUp(self):
         canopus_test_dir = "test_files"
-        can_res = CanopusResults(canopus_test_dir)
+        can_res = CanopusResults(canopus_test_dir, 'gnps_test_data')
         self._cr = can_res
 
     def test_running(self):
@@ -23,6 +23,10 @@ class TestCanopusResults(unittest.TestCase):
                 self._cr.molfam_classes_names,
                 self._cr.molfam_classes_names_inds]):
             self.assertTrue(len(elem) != 0, f"Element {i} failed to load")
+
+    def test_can_treemap(self):
+        # todo
+        pass
 
 
 class TestMolNetEnhancerResults(unittest.TestCase):

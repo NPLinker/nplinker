@@ -14,6 +14,7 @@
 
 import os
 import glob
+from canopus.classifications_to_gnps import analyse_canopus
 
 from ..logconfig import LogConfig
 
@@ -28,15 +29,16 @@ class ChemClassPredictions:
 
     Currently, CANOPUS and MolNetEnhancer results are loaded
     """
-    def __init__(self, canopus_dir, mne_dir):
+    def __init__(self, canopus_dir, mne_dir, gnps_dir):
         """Load classes with CanopusResults, MolNetEnhancerResults
 
         Args:
             canopus_dir: str, canopus_dir found in root_dir of nplinker project
             mne_dir: str, mne_dir found in root_dir of nplinker project
+            gnps_dir: str, root dir where all gnps info is found
         """
         # todo: use canopus_treemap to convert canopus result
-        self._canopus = CanopusResults(canopus_dir)
+        self._canopus = CanopusResults(canopus_dir, gnps_dir)
         self._molnetenhancer = MolNetEnhancerResults(mne_dir)
 
         class_predict_options = []
@@ -65,19 +67,40 @@ class ChemClassPredictions:
 class CanopusResults:
     """Class for storing canopus results
 
-    The two input files from input_dir are read for the spectra and molfams, respectively:
+    The results from the canopus dir are read and combined with the MN from GNPS
+    using canopus_treemap: github.com/louwenjjr/canopus_treemap/tree/master/canopus
+    This creates the two files that are read for the spectra and molfams:
         -cluster_index_classifications.txt
         -component_index_classifications.txt
+
+    If canopus_treemap somehow fails (like for too old gnps results), the canopus
+    output is read as is from canopus_summary.tsv
     """
 
-    def __init__(self, canopus_dir):
+    def __init__(self, canopus_dir, gnps_dir):
         """Read the class info from root_dir/canopus
 
         Args:
             canopus_dir: str, canopus_dir found in root_dir of nplinker project
+            gnps_dir: str, root dir where all gnps info is found
         """
+        ci_file = glob.glob(os.path.join(
+            canopus_dir, '*cluster_index_classifications.txt'))[0]
+
+        canopus_converted = False
+        if not os.path.isfile(ci_file):
+            logger.info('Converting canopus output using canopus_treemap')
+            try:
+                analyse_canopus(canopus_dir, gnps_dir, canopus_dir)
+            except Exception as e:
+                logger.warning(f'canopus_treemap failed with {e}')
+            else:
+                canopus_converted = True
+
+        # todo: directly use canopus output when canopus_treemap fails
+        # todo: if not canopus_converted:
         spectra_classes_names, spectra_classes = self._read_spectra_classes(
-            canopus_dir)
+            ci_file)
         self._spectra_classes = spectra_classes
         self._spectra_classes_names = spectra_classes_names
         self._spectra_classes_names_inds = {elem: i for i, elem in
@@ -90,11 +113,11 @@ class CanopusResults:
         self._molfam_classes_names_inds = {elem: i for i, elem in
                                            enumerate(molfam_classes_names)}
 
-    def _read_spectra_classes(self, canopus_dir):
+    def _read_spectra_classes(self, input_file):
         """Read canopus classes for spectra, return classes_names, classes
 
         Args:
-            root_dir: str, root_dir of nplinker project
+            input_file: str, cluster_index_classifications.txt
         Returns:
             Tuple of:
             - ci_classes_names: list of str - the names of each different level
@@ -102,15 +125,12 @@ class CanopusResults:
                 where each level is a list of (class_name, score) sorted on best choice so index 0 is the best
                 class prediction for a level
         """
-        input_file = glob.glob(os.path.join(
-            canopus_dir, '*cluster_index_classifications.txt'))[0]
-
         ci_classes = {}  # make a dict {ci: [[(class,score)]]}
         ci_classes_header = None
         ci_classes_names = []
 
         if os.path.isfile(input_file):
-            logger.info(f"reading canopus results from {canopus_dir}")
+            logger.info(f"reading canopus results for spectra from {input_file}")
             with open(input_file) as inf:
                 ci_classes_header = inf.readline().strip().split("\t")
                 for line in inf:
@@ -143,7 +163,7 @@ class CanopusResults:
         """Read canopus classes for molfams, return classes_names, classes
 
         Args:
-            root_dir: str, root_dir of nplinker project
+            canopus_dir: str, root_dir of nplinker project
         Returns:
             Tuple of:
             - compi_classes_names: list of str - the names of each different level

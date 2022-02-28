@@ -613,8 +613,9 @@ class DatasetLoader(object):
 
         # load Chem_class_predictions (canopus, molnetenhancer are loaded)
         # for canopus, check if results can be converted with canopus_treemap
-        # otherwise use the pre-existing output of canopus
-        self.chem_classes = ChemClassPredictions(self.canopus_dir, self.molnetenhancer_dir)
+        # todo: otherwise use the pre-existing output of canopus
+        self.chem_classes = ChemClassPredictions(
+            self.canopus_dir, self.molnetenhancer_dir, self._root)
         return True
 
     def _load_strain_mappings(self):
