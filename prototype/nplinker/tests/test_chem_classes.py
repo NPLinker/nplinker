@@ -24,10 +24,6 @@ class TestCanopusResults(unittest.TestCase):
                 self._cr.molfam_classes_names_inds]):
             self.assertTrue(len(elem) != 0, f"Element {i} failed to load")
 
-    def test_singleton_mf(self):
-        # todo: test if singleton MFs are loaded properly
-        print(self._cr.molfam_classes)
-
 
 class TestMolNetEnhancerResults(unittest.TestCase):
     def setUp(self):
@@ -44,10 +40,6 @@ class TestMolNetEnhancerResults(unittest.TestCase):
         test_spec_classes = self._mr.spectra_classes('130522')
         self.assertTrue(len(test_spec_classes) != 0,
                         f"func spectra_classes() not working")
-
-    def test_singleton_mf(self):
-        # todo: test if singleton MFs are loaded properly
-        print(self._mr.molfam_classes)
 
 
 if __name__ == '__main__':

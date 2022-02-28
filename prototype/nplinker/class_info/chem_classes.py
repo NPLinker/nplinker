@@ -16,6 +16,7 @@ import os
 import glob
 
 from ..logconfig import LogConfig
+
 logger = LogConfig.getLogger(__file__)
 
 
@@ -89,7 +90,8 @@ class CanopusResults:
                         classes_list.append(lvl_list)
                     ci_classes[line[1]] = classes_list
         else:
-            logger.warn('could not load cluster_index_classifications.txt; missing from canopus_dir')
+            logger.warn(
+                'could not load cluster_index_classifications.txt; missing from canopus_dir')
 
         if ci_classes_header:
             #  todo: rename the output from the canopus script directly
@@ -136,7 +138,8 @@ class CanopusResults:
                         classes_list.append(lvl_list)
                     compi_classes[line[0]] = classes_list
         else:
-            logger.warn('could not load component_index_classifications.txt; missing from canopus_dir')
+            logger.warn(
+                'could not load component_index_classifications.txt; missing from canopus_dir')
 
         if compi_classes_header:
             #  todo: rename the output from the canopus script directly
@@ -210,8 +213,8 @@ class MolNetEnhancerResults:
         # flexible finding of CF results
         input_file = 'not_found'
         wanted_file = "ClassyFireResults_Network.txt"
-        possible_files = glob.glob(os.path.join(mne_dir, "*")) +\
-            glob.glob(os.path.join(mne_dir, "*", "*"))
+        possible_files = glob.glob(os.path.join(mne_dir, "*")) + \
+                         glob.glob(os.path.join(mne_dir, "*", "*"))
         try:
             input_file = [pos_file for pos_file in possible_files
                           if pos_file.endswith(wanted_file)][0]
@@ -225,6 +228,7 @@ class MolNetEnhancerResults:
         with open(input_file) as inf:
             logger.info(f"reading molnetenhancer results from {mne_dir}")
             header = inf.readline().strip().split("\t")
+            # get the columns that are of interest to us
             columns = [
                 'cf_direct_parent' if col == 'CF_Dparent' else col.lower()
                 for i, col in enumerate(header[3:]) if i % 2 == 0]
@@ -233,11 +237,16 @@ class MolNetEnhancerResults:
                 cluster = line.pop(0)
                 component = line.pop(0)
                 nr_nodes = line.pop(0)
+                # todo: make it easier to query classes of singleton families
+                # if singleton family, format like '-1_spectrum-id' like canopus results
+                if nr_nodes == '1':
+                    component = f'-1_{cluster}'
                 class_info = []
+                # get class names and scores in (class, score)
                 for i in range(0, len(line), 2):
                     class_tup = (line[i], float(line[i + 1]))
                     class_info.append(class_tup)
-                if not component in mne_component_dict:
+                if component not in mne_component_dict:
                     mne_component_dict[component] = class_info
                 mne_cluster2component[cluster] = component
 
