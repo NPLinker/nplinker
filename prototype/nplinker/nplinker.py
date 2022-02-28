@@ -27,7 +27,7 @@ from .loader import DatasetLoader
 
 from .pickler import save_pickled_data
 
-from .scoring.methods import MetcalfScoring, RosettaScoring, TestScoring
+from .scoring.methods import MetcalfScoring, RosettaScoring, TestScoring, NPClassScoring
 from .scoring.methods import LinkCollection
 
 from .logconfig import LogConfig
@@ -42,7 +42,8 @@ class NPLinker(object):
     SCORING_METHODS =  {
         MetcalfScoring.NAME: MetcalfScoring,
         TestScoring.NAME: TestScoring,
-        RosettaScoring.NAME: RosettaScoring, 
+        RosettaScoring.NAME: RosettaScoring,
+        NPClassScoring.NAME: NPClassScoring
                        }
 
     def __init__(self, userconfig=None):
@@ -533,6 +534,17 @@ class NPLinker(object):
     def scoring_methods(self):
         """Returns a list of available scoring method names"""
         return list(self._scoring_methods.keys())
+
+    @property
+    def chem_classes(self):
+        """Returns loaded ChemClassPredictions with the class predictions"""
+        return self._chem_classes
+
+    @property
+    def class_matches(self):
+        """ClassMatches with the matched classes and scoring tables from MIBiG
+        """
+        return self._class_matches
 
     def scoring_method(self, name):
         """Return an instance of a scoring method.
