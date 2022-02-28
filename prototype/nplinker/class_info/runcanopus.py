@@ -17,6 +17,7 @@ import sys
 import subprocess
 import os
 
+
 from ..logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
@@ -40,12 +41,12 @@ def run_canopus(sirius_path, mgf_file, output_path,
         -o canopus --maxmz 850 formula zodiac structure canopus
     """
     logger.info('run_canopus: input="{}", output="{}", extra_params={}"'.format(mgf_file, output_path, extra_params))
-    if 'canopus' not in extra_params or ' C ' not in extra_params:
-        logger.warn('canopus not in sirius command, please check canopus parameters')
+    if 'canopus' not in extra_params and ' C ' not in extra_params:
+        logger.warning('canopus not in sirius command, please check canopus parameters')
 
-    if os.path.exists(os.path.join(output_path, 'canopus_summary.tsv')):
+    if os.path.exists(os.path.join(output_path, 'completed')):
         logger.info('CANOPUS appears to have been run already, skipping!')
-        logger.info('To force re-run, delete {}'.format(os.path.join(output_path, 'canopus_summary.tsv')))
+        logger.info('To force re-run, delete {}'.format(os.path.join(output_path, 'completed')))
         return True
 
     try:
@@ -73,7 +74,7 @@ def run_canopus(sirius_path, mgf_file, output_path,
 
     # use presence of this file as a quick way to check if a previous run
     # finished or not
-    open(os.path.join(output_path, 'canopus_summary.tsv'), 'w').close()
+    open(os.path.join(output_path, 'completed'), 'w').close()
 
     return True
 
