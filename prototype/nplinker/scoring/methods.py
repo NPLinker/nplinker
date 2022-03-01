@@ -808,11 +808,11 @@ class NPClassScoring(ScoringMethod):
 
                                 # determine direction of scoring: BGC -> spectrum
                                 if bgc_to_spec:
-                                    score = self.npl.class_matches.class_links[bgc_class_name][chem_class_name]\
-                                        .get(bgc_class,{}).get(spec_class, std_score)
+                                    score = self.npl.class_matches.class_matches[bgc_class_name][chem_class_name]\
+                                        .get(bgc_class, {}).get(spec_class, std_score)
                                     result_tuple = (score, bgc_class_name, chem_class_name, bgc_class, spec_class)
                                 else:  # spectrum -> BGC
-                                    score = self.npl.class_matches.class_links[chem_class_name][bgc_class_name]\
+                                    score = self.npl.class_matches.class_matches[chem_class_name][bgc_class_name]\
                                         .get(spec_class, {}).get(bgc_class, std_score)
                                     result_tuple = (score, chem_class_name, bgc_class_name, spec_class, bgc_class)
                                 scores.append(result_tuple)
