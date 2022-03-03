@@ -26,6 +26,11 @@ RUN apt-get update -y && \
         git clone https://git.wur.nl/medema-group/BiG-SCAPE.git && \
         chmod +x BiG-SCAPE/*.py && \
         chmod a+w BiG-SCAPE/domains_color_file.tsv && \
+        # install and set up latest version of SIRIUS
+        wget https://github.com/boecker-lab/sirius/releases/download/v4.9.12/sirius-4.9.12-linux64-headless.zip -O sirius_zipped.zip && \
+        unzip sirius_zipped.zip && \
+        rm sirius_zipped.zip && \
+        chmod +x sirius/bin/sirius && \
         # install Miniconda in batch mode to /app/conda
         chmod +x Miniconda3-latest-Linux-x86_64.sh && \
         ./Miniconda3-latest-Linux-x86_64.sh -b -p /app/conda && \
