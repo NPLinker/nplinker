@@ -865,11 +865,12 @@ class NPClassScoring(ScoringMethod):
         logger.info("Setting up NPClassScore scoring")
         met_options = npl.chem_classes.class_predict_options
         logger.info(f"Please choose one of the methods from {met_options}")
-        logger.info(f"Currently method {met_options[0]} is selected")
+        logger.info(f"Currently the method '{met_options[0]}' is selected")
         # todo: give info about parameters
 
     def get_links(self, objects, link_collection):
         """Given a set of objects, return link information"""
+        logger.info("Running NPClassScore...")
         begin = time.time()
         targets = self._get_targets(objects[0])
 
