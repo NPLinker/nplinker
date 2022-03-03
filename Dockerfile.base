@@ -45,6 +45,10 @@ RUN apt-get update -y && \
         hmmpress Pfam-A.hmm && \
         conda install pip tornado toml networkx progress beautifulsoup4 pandas && \
         pip install httpx xdg natsort sortedcontainers cython bokeh && \
+        # install canopus_treemap to convert canopus output
+        git clone https://github.com/louwenjjr/canopus_treemap.git && \
+        pip install -e canopus_treemap && \
+        rm -rf canopus_treemap && \
         # try to keep the image size down a bit by removing installers...
         rm -f /app/Miniconda3-latest-Linux-x86_64.sh *.whl && \
         # and packages downloaded by conda 
