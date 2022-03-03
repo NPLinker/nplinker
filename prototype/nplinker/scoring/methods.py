@@ -16,6 +16,7 @@
 import itertools
 import random
 import os
+import time
 
 import numpy as np
 
@@ -683,15 +684,18 @@ class NPClassScoring(ScoringMethod):
     def __init__(self, npl):
         super(NPClassScoring, self).__init__(npl)
         self.cutoff = 0.25
-        self.method = 'main'
         self.method_options = npl.chem_classes.class_predict_options
+        self.method = self.method_options[0]
         self.num_results = 1  # how many scores do you want for each link
         # take care what targets are as this method can link both bgc/gcf to
         # both spectrum/gcf
         self.equal_targets = False  # if obj GCF, target is spec not MF
         self.both_targets = False  # if obj GCF, target both spec and MF
+        # filter out spectra without a score due to missing spectrum classes
+        self.filter_missing_scores = False
+        self._target_no_scores = set()
 
-    def _npclass_score(self, obj, target, method='main'):
+    def _npclass_score(self, obj, target, method='mix'):
         """Return sorted class link scores for scoring obj and target
 
         The input objects can be any mix of the following NPLinker types:
@@ -818,33 +822,101 @@ class NPClassScoring(ScoringMethod):
                                 scores.append(result_tuple)
         return sorted(scores, reverse=True)
 
+    def _get_targets(self, test_id):
+        """
+        Get the targets based upon instance of test_id, returns list of targets
+
+        Args:
+            test_id: one of the NPLinker objects: BGC, GCF, Spectrum, Molfam
+        Returns:
+            List of one or more of one of the NPLinker objects
+        """
+        if isinstance(test_id, BGC) or isinstance(test_id, GCF):  # genome side
+            if self.both_targets:  # no matter BGC or GCF take both spec and MF
+                targets = self.npl.spectra + self.npl.molfams
+            elif isinstance(test_id, BGC):  # obj are BGC
+                if self.equal_targets:  # take
+                    targets = self.npl.spectra
+                else:
+                    targets = self.npl.molfams
+            else:  # obj are GCF
+                if self.equal_targets:
+                    targets = self.npl.molfams
+                else:
+                    targets = self.npl.spectra
+        else:  # metabolome side
+            if self.both_targets:
+                targets = self.npl.bgcs + self.npl.gcfs
+            elif isinstance(test_id, Spectrum):
+                if self.equal_targets:
+                    targets = self.npl.bgcs
+                else:
+                    targets = self.npl.gcfs
+            else:  # obj are molfam
+                if self.equal_targets:
+                    targets = self.npl.gcfs
+                else:
+                    targets = self.npl.bgcs
+        return targets
+
     @staticmethod
     def setup(npl):
         """Perform any one-off initialisation required (will only be called once)"""
         logger.info("Setting up NPClassScore scoring")
-        logger.info(f"Please choose one of the methods from {npl.chem_classes.class_predict_options}")
+        met_options = npl.chem_classes.class_predict_options
+        logger.info(f"Please choose one of the methods from {met_options}")
+        logger.info(f"Currently method {met_options[0]} is selected")
         # todo: give info about parameters
 
     def get_links(self, objects, link_collection):
         """Given a set of objects, return link information"""
-        # basically (coming from bgc):
-        # todo: figure out how to get what is obj and target and use self.equal_targets and self.both_targets
+        begin = time.time()
+        targets = self._get_targets(objects[0])
+
+        # todo: only get classes once for each instance, now every time again in the double loop
         results = {}
         for obj in objects:
             results[obj] = {}
-            targets = self.npl.spectra
+            # todo: get obj class here
             for target in targets:
-                result = self._npclass_score(obj, target)[:self.num_results]
-                if result[0][0] > self.cutoff:
-                    results[obj][target] = ObjectLink(obj, target, self, result)
+                # todo: have classes for target predetermined out of this loop
+                full_score = self._npclass_score(obj, target, self.method)[:self.num_results]
+                try:
+                    npclassscore = full_score[0][0]
+                except IndexError:
+                    # no score is found due to missing classes for spectra
+                    self._target_no_scores.add(target)  # keep track
+                    if not self.filter_missing_scores:
+                        results[obj][target] = ObjectLink(obj, target, self, full_score)
+                else:
+                    if npclassscore > self.cutoff:
+                        results[obj][target] = ObjectLink(obj, target, self, full_score)
 
+        # info about spectra/MFs with missing scoring
+        len_missing = len(self._target_no_scores)
+        if len_missing > 0:
+            filter_msg = 'kept'
+            if self.filter_missing_scores:
+                filter_msg = 'filtered out'
+            logger.warning(
+                f'{len_missing} targets have no NPClassScore '
+                f'prediction due to missing class predictions and are '
+                f'{filter_msg} by default. Adjust .filter_missing_scores '
+                f'to change.')
+
+        logger.info(f"NPClassScore completed in {time.time() - begin}s")
         link_collection._add_links_from_method(self, results)
         return link_collection
 
     def format_data(self, data):
         """Given whatever output data the method produces, return a readable string version"""
-        return ''
+        # data or full_score is a list of tuples, here return just NPClassScore
+        formatted_data = None  # default when there is no score (missing class)
+        if data:
+            # there is a score
+            formatted_data = '{:.3f}'.format(data[0][0])
+        return formatted_data
 
     def sort(self, objects, reverse=True):
         """Given a list of objects, return them sorted by link score"""
-        return objects
+        return sorted(objects, key=lambda objlink: objlink[self], reverse=reverse)
