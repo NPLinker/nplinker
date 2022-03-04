@@ -969,6 +969,14 @@ class NPClassScoring(ScoringMethod):
         else:
             targets_classes = [self._get_gen_classes(target) for target in
                                targets]
+
+        # get mapping of shared strains
+        if not self.npl._datalinks:
+            self.npl._datalinks = self.npl.scoring_method(MetcalfScoring.NAME).datalinks
+        # this is a dict with structure:
+        #   tup(Spectrum/MolecularFamily, GCF) => list of strain indices
+        common_strains = self.npl._datalinks.common_strains(objects, targets, True)
+
         results = {}
         for obj in objects:
             results[obj] = {}
@@ -979,22 +987,23 @@ class NPClassScoring(ScoringMethod):
                 obj_classes = self._get_met_classes(obj, self.method)
 
             for target, target_classes in zip(targets, targets_classes):
-                # todo: only consider targets that have shared strains?
-                full_score = self._npclass_score(
-                    obj, target, self.method, obj_classes,
-                    target_classes)[:self.num_results]
-                try:
-                    npclassscore = full_score[0][0]
-                except IndexError:
-                    # no score is found due to missing classes for spectra
-                    self._target_no_scores.add(target)  # keep track
-                    if not self.filter_missing_scores:
-                        results[obj][target] = ObjectLink(obj, target, self,
-                                                          full_score)
-                else:
-                    if npclassscore > self.cutoff:
-                        results[obj][target] = ObjectLink(obj, target, self,
-                                                          full_score)
+                # only consider targets that have shared strains?
+                if common_strains[(obj, target)]:
+                    full_score = self._npclass_score(
+                        obj, target, self.method, obj_classes,
+                        target_classes)[:self.num_results]
+                    try:
+                        npclassscore = full_score[0][0]
+                    except IndexError:
+                        # no score is found due to missing classes for spectra
+                        self._target_no_scores.add(target)  # keep track
+                        if not self.filter_missing_scores:
+                            results[obj][target] = ObjectLink(obj, target,
+                                                              self, full_score)
+                    else:
+                        if npclassscore > self.cutoff:
+                            results[obj][target] = ObjectLink(obj, target,
+                                                              self, full_score)
 
         # info about spectra/MFs with missing scoring
         len_missing = len(self._target_no_scores)
