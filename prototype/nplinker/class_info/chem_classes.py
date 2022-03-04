@@ -29,6 +29,7 @@ class ChemClassPredictions:
 
     Currently, CANOPUS and MolNetEnhancer results are loaded
     """
+
     def __init__(self, canopus_dir, mne_dir, gnps_dir):
         """Load classes with CanopusResults, MolNetEnhancerResults
 
@@ -83,9 +84,24 @@ class CanopusResults:
         Args:
             canopus_dir: str, canopus_dir found in root_dir of nplinker project
             gnps_dir: str, root dir where all gnps info is found
+
+        If possible, convert canopus output with canopus_treemap. Otherwise
+        canopus output is used directly. If converting fails, probably the MN
+        version is too old.
         """
-        ci_file = glob.glob(os.path.join(
-            canopus_dir, '*cluster_index_classifications.txt'))[0]
+        ci_file = False  # find cluster_index_classifications in canopus_dir
+        compi_file = False  # same for component_index_classifications
+        canopus_files = glob.glob(os.path.join(canopus_dir))
+        possible_ci_file = [canopus_file for canopus_file in canopus_files
+                            if canopus_file.endswith(
+                                'cluster_index_classifications.txt')]
+        possible_compi_file = [canopus_file for canopus_file in canopus_files
+                               if canopus_file.endswith(
+                                   'component_index_classifications.txt')]
+        if possible_ci_file:
+            ci_file = possible_ci_file[0]
+        if possible_compi_file:
+            compi_file = possible_compi_file[0]
 
         canopus_converted = False
         if not os.path.isfile(ci_file):
@@ -93,7 +109,8 @@ class CanopusResults:
             try:
                 analyse_canopus(canopus_dir, gnps_dir, canopus_dir)
             except Exception as e:
-                logger.warning(f'canopus_treemap failed with {e}')
+                logger.warning(f'canopus_treemap failed with: {e}.'
+                               f' Probably the MN version from GNPS is too old')
             else:
                 canopus_converted = True
 
@@ -107,7 +124,7 @@ class CanopusResults:
                                             enumerate(spectra_classes_names)}
 
         molfam_classes_names, molfam_classes = self._read_molfam_classes(
-            canopus_dir)
+            compi_file)
         self._molfam_classes = molfam_classes
         self._molfam_classes_names = molfam_classes_names
         self._molfam_classes_names_inds = {elem: i for i, elem in
@@ -130,7 +147,8 @@ class CanopusResults:
         ci_classes_names = []
 
         if os.path.isfile(input_file):
-            logger.info(f"reading canopus results for spectra from {input_file}")
+            logger.info(
+                f"reading canopus results for spectra from {input_file}")
             with open(input_file) as inf:
                 ci_classes_header = inf.readline().strip().split("\t")
                 for line in inf:
@@ -159,11 +177,11 @@ class CanopusResults:
                                 ci_classes_header[-3:]]
         return ci_classes_names, ci_classes
 
-    def _read_molfam_classes(self, canopus_dir):
+    def _read_molfam_classes(self, input_file):
         """Read canopus classes for molfams, return classes_names, classes
 
         Args:
-            canopus_dir: str, root_dir of nplinker project
+            input_file: str, component_index_classifications.txt
         Returns:
             Tuple of:
             - compi_classes_names: list of str - the names of each different level
@@ -171,9 +189,6 @@ class CanopusResults:
                 where each level is a list of (class_name, fraction) sorted on best choice so index 0 is the best
                 class prediction for a level
         """
-        input_file = glob.glob(os.path.join(
-            canopus_dir, '*component_index_classifications.txt'))[0]
-
         compi_classes = {}  # make a dict {compi: [[(class,score)]]}
         compi_classes_header = None
         compi_classes_names = []
