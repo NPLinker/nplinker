@@ -694,7 +694,8 @@ class NPClassScoring(ScoringMethod):
         self.filter_missing_scores = False
         self._target_no_scores = set()
 
-    def _npclass_score(self, obj, target, method='mix'):
+    def _npclass_score(self, obj, target, method='mix',
+                       obj_classes=None, target_classes=None):
         """Return sorted class link scores for scoring obj and target
 
         The input objects can be any mix of the following NPLinker types:
@@ -702,6 +703,17 @@ class NPClassScoring(ScoringMethod):
             - GCF
             - Spectrum
             - MolecularFamily
+
+        Classes will be retrieved from NPLinker object with _get_gen_classes
+        and _get_met_classes or the classes can be predetermined and given as
+        input with the function, this should correspond to obj and
+        target (if obj is BGC then  obj_classes should be classes for the BGC).
+        Can be:
+            - BGC/GCF classes: {'as_classes': list(str), 'bigscape_class': str}
+            - Spectrum/Molfam classes: tuple of (classes, class_names_indices),
+            where classes is a list of list of tuples/None, where each
+            tuple is a class and a score (str, float), and class_names_indices
+            is a list of ints that relate to the name of a class ontology lvl
 
         Args:
             obj: one of the possible input objects
@@ -713,6 +725,9 @@ class NPClassScoring(ScoringMethod):
                     if present
                     -'canopus': use only canopus class predictions
                     -'molnetenhancer': use only molnetenhancer class predictions
+            obj_classes: default - None, or classes for one of the input types
+            target_classes: default - None, or classes for one of the input types
+
         Returns:
             List of tuple of
             (score, obj_class_lvl, target_class_lvl, obj_class, target_class)
@@ -723,91 +738,32 @@ class NPClassScoring(ScoringMethod):
         # assess what is obj and target
         spec_like = obj
         bgc_like = target
+        spec_like_classes_tup = obj_classes
+        bgc_like_classes_dict = target_classes
         bgc_to_spec = False
         if isinstance(obj, BGC) or isinstance(obj, GCF):
             bgc_like = obj
             spec_like = target
+            bgc_like_classes_dict = obj_classes
+            spec_like_classes_tup = target_classes
             bgc_to_spec = True
-
-        # assess if bgc or gcf and if spectrum or molfam
-        is_spectrum = False
-        is_bgc = False
-        if isinstance(spec_like, Spectrum):
-            is_spectrum = True
-        if isinstance(bgc_like, BGC):
-            is_bgc = True
 
         # assess method - move to get_links?
         assert method in self.method_options, \
             (f"NPClass method should be one of method options: {self.method_options}, if your method is not " +
              "in the options check if the class predictions (canopus, etc.) are loaded correctly")
 
-        # gather correct classes based on input, dict for bgcs and list for spec
-        if is_bgc:
-            # get parent gcf for bgc
-            bgc_like_gcf = [gcf for gcf in self.npl.gcfs if
-                            bgc_like.id in [b.id for b in gcf.bgcs]][0]
-            # gather AS classes and convert to names in scoring dict
-            as_classes = self.npl.class_matches.convert_as_classes(
-                bgc_like.product_prediction.split("."))
-            bgc_like_classes_dict = {
-                "bigscape_class": bgc_like_gcf.bigscape_class,
-                # str - always one bigscape class right?
-                "as_classes": as_classes}  # list(str)
-        else:
-            as_classes = self.npl.class_matches.convert_as_classes(
-                self.npl.class_matches.get_gcf_as_classes(bgc_like, 0.5))
-            bgc_like_classes_dict = {"bigscape_class": bgc_like.bigscape_class,
-                                     # str - always one bigscape class right?
-                                     "as_classes": as_classes}  # list(str)
-
-        # gather classes for spectra, choose right method
-        # choose the main method here by including it as 'main' in the method parameter
-        use_canopus = 'main' in method or 'canopus' in method or 'mix' in method
-        use_mne = 'molnetenhancer' in method or 'mix' in method
-        spec_like_classes, spec_like_classes_names, \
-            spec_like_classes_names_inds = (None, None, None)
-        # the order in which the classes are read, determines the priority (now: first canopus, then mne)
-        if use_canopus and not spec_like_classes:
-            if is_spectrum:
-                # list of list of tuples/None - todo: add to spectrum object?
-                # take only 'best' (first) classification per ontology level
-                all_classes = self.npl.chem_classes.canopus.\
-                    spectra_classes.get(str(spec_like.spectrum_id))
-                if all_classes:
-                    spec_like_classes = [cls_per_lvl for lvl in all_classes
-                                         for i, cls_per_lvl in enumerate(lvl)
-                                         if i == 0]
-                spec_like_classes_names_inds = self.npl.chem_classes.canopus.\
-                    spectra_classes_names_inds
-            else:  # molfam
-                fam_id = str(spec_like.family_id)
-                if fam_id == '-1':  # account for singleton families
-                    fam_id += f'_{spec_like.spectra[0].spectrum_id}'
-                all_classes = self.npl.chem_classes.canopus.molfam_classes.get(
-                    fam_id)
-                if all_classes:
-                    spec_like_classes = [cls_per_lvl for lvl in all_classes
-                                         for i, cls_per_lvl in enumerate(lvl)
-                                         if i == 0]
-                spec_like_classes_names_inds = self.npl.chem_classes.canopus.\
-                    molfam_classes_names_inds
-        if use_mne and not spec_like_classes:  # if mne or when main/canopus does not get classes
-            if is_spectrum:
-                spec_like_classes = self.npl.chem_classes.molnetenhancer.\
-                    spectra_classes(spec_like.spectrum_id)
-            else:  # molfam
-                fam_id = str(spec_like.family_id)
-                if fam_id == '-1':  # account for singleton families
-                    fam_id += f'_{spec_like.spectra[0].spectrum_id}'
-                spec_like_classes = self.npl.chem_classes.molnetenhancer.\
-                    molfam_classes.get(fam_id)
-            # classes are same for molfam and spectrum so names are irrespective of is_spectrum
-            spec_like_classes_names_inds = self.npl.chem_classes.molnetenhancer.spectra_classes_names_inds
+        # gather correct classes if not provided, dict for bgcs, tup for spec
+        if not bgc_like_classes_dict:
+            bgc_like_classes_dict = self._get_gen_classes(bgc_like)
+        if not spec_like_classes_tup:
+            spec_like_classes_tup = self._get_met_classes(spec_like, method)
+        # unpack spec_like classes - both are lists
+        spec_like_classes, spec_like_classes_names_inds = spec_like_classes_tup
 
         scores = []  # this will be returned if one of the class sides is absent
         std_score = 0  # if link not recorded in scores (mibig) return this score
-        # loop through classes that are possible to link (names in class_link object)
+        # loop through classes that are possible to link (names in class_match object)
         for bgc_class_name in self.npl.class_matches.bgc_class_names:
             if bgc_class_name == "mibig_classes":
                 # treat specially as bigscape class needs to be translated to mibig class
@@ -887,6 +843,103 @@ class NPClassScoring(ScoringMethod):
                     targets = self.npl.bgcs
         return targets
 
+    def _get_gen_classes(self, bgc_like, gcf_as_cutoff=0.5):
+        """Get classes for genomics objects
+
+        Args:
+            bgc_like: BGC or GCF object from NPLinker input objects
+            gcf_as_cutoff: float - if GCF, get antismash classes with
+                class_matches.get_gcf_as_classes if the class occurs in more
+                than this fraction of the GCF, default = 0.5
+        Returns:
+            Genome-based classes as a dict with antismash and bigscpae classes
+            {'as_classes': list(str), 'bigscape_class': str}
+        """
+        # assess if bgc or gcf
+        is_bgc = isinstance(bgc_like, BGC)
+        if is_bgc:
+            # get parent gcf for bgc
+            bgc_like_gcf = [gcf for gcf in self.npl.gcfs if
+                            bgc_like.id in [b.id for b in gcf.bgcs]][0]
+            # gather AS classes and convert to names in scoring dict
+            as_classes = self.npl.class_matches.convert_as_classes(
+                bgc_like.product_prediction.split("."))
+            bgc_like_classes_dict = {
+                "bigscape_class": bgc_like_gcf.bigscape_class,
+                # str - always one bigscape class right?
+                "as_classes": as_classes}  # list(str)
+        else:
+            as_classes = self.npl.class_matches.convert_as_classes(
+                self.npl.class_matches.get_gcf_as_classes(bgc_like,
+                                                          gcf_as_cutoff))
+            bgc_like_classes_dict = {"bigscape_class": bgc_like.bigscape_class,
+                                     # str - always one bigscape class right?
+                                     "as_classes": as_classes}  # list(str)
+        return bgc_like_classes_dict
+
+    def _get_met_classes(self, spec_like, method='mix'):
+        """Get chemical classes for a Spectrum or MolFam based on method
+
+        Args:
+            spec_like: Spectrum or MolFam, one of the NPLinker input types
+            method: str, one of the appropriate methods for chemical class
+                predictions (mix, canopus...), default='mix'
+        Returns:
+            tuple of (classes, class_names_indices),
+            where classes is a list of list of tuples/None, where each
+            tuple is a class and a score (str, float), and class_names_indices
+            is a list of ints that relate to the name of a class ontology lvl
+        """
+        # assess if spectrum or molfam
+        is_spectrum = isinstance(spec_like, Spectrum)
+
+        # gather classes for spectra, using right method
+        # choose the main method here by including it as 'main' in the method parameter
+        use_canopus = 'main' in method or 'canopus' in method or 'mix' in method
+        use_mne = 'molnetenhancer' in method or 'mix' in method
+        spec_like_classes, spec_like_classes_names, \
+            spec_like_classes_names_inds = (None, None, None)
+        # the order in which the classes are read, determines the priority (now: first canopus, then mne)
+        if use_canopus and not spec_like_classes:
+            if is_spectrum:
+                # list of list of tuples/None - todo: add to spectrum object?
+                # take only 'best' (first) classification per ontology level
+                all_classes = self.npl.chem_classes.canopus. \
+                    spectra_classes.get(str(spec_like.spectrum_id))
+                if all_classes:
+                    spec_like_classes = [cls_per_lvl for lvl in all_classes
+                                         for i, cls_per_lvl in enumerate(lvl)
+                                         if i == 0]
+                spec_like_classes_names_inds = self.npl.chem_classes.canopus. \
+                    spectra_classes_names_inds
+            else:  # molfam
+                fam_id = str(spec_like.family_id)
+                if fam_id == '-1':  # account for singleton families
+                    fam_id += f'_{spec_like.spectra[0].spectrum_id}'
+                all_classes = self.npl.chem_classes.canopus.molfam_classes.get(
+                    fam_id)
+                if all_classes:
+                    spec_like_classes = [cls_per_lvl for lvl in all_classes
+                                         for i, cls_per_lvl in enumerate(lvl)
+                                         if i == 0]
+                spec_like_classes_names_inds = self.npl.chem_classes.canopus. \
+                    molfam_classes_names_inds
+        if use_mne and not spec_like_classes:
+            # if mne or when main/canopus does not get classes
+            if is_spectrum:
+                spec_like_classes = self.npl.chem_classes.molnetenhancer. \
+                    spectra_classes(spec_like.spectrum_id)
+            else:  # molfam
+                fam_id = str(spec_like.family_id)
+                if fam_id == '-1':  # account for singleton families
+                    fam_id += f'_{spec_like.spectra[0].spectrum_id}'
+                spec_like_classes = self.npl.chem_classes.molnetenhancer. \
+                    molfam_classes.get(fam_id)
+            # classes are same for molfam and spectrum so names are irrespective of is_spectrum
+            spec_like_classes_names_inds = self.npl.chem_classes.\
+                molnetenhancer.spectra_classes_names_inds
+        return spec_like_classes, spec_like_classes_names_inds
+
     @staticmethod
     def setup(npl):
         """Perform any one-off initialisation required (will only be called once)"""
@@ -905,17 +958,31 @@ class NPClassScoring(ScoringMethod):
         """Given a set of objects, return link information"""
         logger.info("Running NPClassScore...")
         begin = time.time()
-        targets = self._get_targets(objects[0])
+        first_obj = objects[0]
+        targets = self._get_targets(first_obj)
+        obj_is_gen = isinstance(first_obj, BGC) or isinstance(first_obj, GCF)
 
-        # todo: only get classes once for each instance, now every time again in the double loop
+        # only get target classes once for each target here
+        if obj_is_gen:  # obj is genome so get metabolome classes for target
+            targets_classes = [self._get_met_classes(target, self.method) for
+                               target in targets]
+        else:
+            targets_classes = [self._get_gen_classes(target) for target in
+                               targets]
         results = {}
         for obj in objects:
             results[obj] = {}
-            # todo: get obj class here
-            for target in targets:
-                # todo: have classes for target predetermined out of this loop
-                full_score = self._npclass_score(obj, target, self.method)[
-                             :self.num_results]
+            # get obj class
+            if obj_is_gen:
+                obj_classes = self._get_gen_classes(obj)
+            else:
+                obj_classes = self._get_met_classes(obj, self.method)
+
+            for target, target_classes in zip(targets, targets_classes):
+                # todo: only consider targets that have shared strains?
+                full_score = self._npclass_score(
+                    obj, target, self.method, obj_classes,
+                    target_classes)[:self.num_results]
                 try:
                     npclassscore = full_score[0][0]
                 except IndexError:
@@ -941,7 +1008,7 @@ class NPClassScoring(ScoringMethod):
                 f'{filter_msg} by default. Adjust .filter_missing_scores '
                 f'to change.')
 
-        logger.info(f"NPClassScore completed in {time.time() - begin}s")
+        logger.info(f"NPClassScore completed in {time.time() - begin:.1f}s")
         link_collection._add_links_from_method(self, results)
         return link_collection
 
