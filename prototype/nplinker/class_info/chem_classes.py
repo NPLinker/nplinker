@@ -91,7 +91,7 @@ class CanopusResults:
         """
         ci_file = False  # find cluster_index_classifications in canopus_dir
         compi_file = False  # same for component_index_classifications
-        canopus_files = glob.glob(os.path.join(canopus_dir))
+        canopus_files = glob.glob(os.path.join(canopus_dir, "*"))
         possible_ci_file = [canopus_file for canopus_file in canopus_files
                             if canopus_file.endswith(
                                 'cluster_index_classifications.txt')]
