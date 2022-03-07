@@ -103,32 +103,52 @@ class CanopusResults:
         if possible_compi_file:
             compi_file = possible_compi_file[0]
 
-        canopus_converted = False
         if not os.path.isfile(ci_file):
             logger.info('Converting canopus output using canopus_treemap')
             try:
                 analyse_canopus(canopus_dir, gnps_dir, canopus_dir)
             except Exception as e:
-                logger.warning(f'canopus_treemap failed with: {e}.'
-                               f' Probably the MN version from GNPS is too old')
+                logger.warning(f'canopus_treemap failed with: {e}. '
+                               f'Probably the MN version from GNPS is too old')
             else:
-                canopus_converted = True
+                # find processed canopus files again
+                canopus_files = glob.glob(os.path.join(canopus_dir, "*"))
+                possible_ci_file = [
+                    canopus_file for canopus_file in canopus_files if
+                    canopus_file.endswith('cluster_index_classifications.txt')]
+                possible_compi_file = [
+                    canopus_file for canopus_file in canopus_files if
+                    canopus_file.endswith(
+                        'component_index_classifications.txt')]
+                if possible_ci_file:
+                    ci_file = possible_ci_file[0]
+                if possible_compi_file:
+                    compi_file = possible_compi_file[0]
 
         # todo: directly use canopus output when canopus_treemap fails
-        # todo: if not canopus_converted:
-        spectra_classes_names, spectra_classes = self._read_spectra_classes(
-            ci_file)
+        if os.path.isfile(ci_file):
+            spectra_classes_names, spectra_classes = \
+                self._read_spectra_classes(ci_file)
+
+            molfam_classes_names, molfam_classes = self._read_molfam_classes(
+                compi_file)
+            self._molfam_classes = molfam_classes
+            self._molfam_classes_names = molfam_classes_names
+            self._molfam_classes_names_inds = {elem: i for i, elem in
+                                               enumerate(molfam_classes_names)}
+
+        else:
+            # use canopus output correctly (only for spectra)
+            logger.info("Attempting to read spectra classes directly from "
+                        "canopus_dir (canopus_summary.tsv)")
+            spectra_classes_names, spectra_classes = \
+                self._read_spectra_classes_directly(canopus_dir)
+            # todo: add function so that classes can be determined for molfams
+
         self._spectra_classes = spectra_classes
         self._spectra_classes_names = spectra_classes_names
         self._spectra_classes_names_inds = {elem: i for i, elem in
                                             enumerate(spectra_classes_names)}
-
-        molfam_classes_names, molfam_classes = self._read_molfam_classes(
-            compi_file)
-        self._molfam_classes = molfam_classes
-        self._molfam_classes_names = molfam_classes_names
-        self._molfam_classes_names_inds = {elem: i for i, elem in
-                                           enumerate(molfam_classes_names)}
 
     def _read_spectra_classes(self, input_file):
         """Read canopus classes for spectra, return classes_names, classes
@@ -176,6 +196,49 @@ class CanopusResults:
                                [f"npc_{elem}" for elem in
                                 ci_classes_header[-3:]]
         return ci_classes_names, ci_classes
+
+    def _read_spectra_classes_directly(self, canopus_dir):
+        """Read canopus classes directly from canopus output
+
+        Args:
+            canopus_dir: str, canopus dir
+        Returns:
+            Tuple of:
+            - can_classes_names: list of str - the names of each different level
+            - can_classes: dict of {str, lists of tuple(str, float)} - per spectrum (key) the classes for each level
+                where each level is a list of (class_name, score) sorted on best choice so index 0 is the best
+                class prediction for a level
+        """
+        can_classes = {}  # make a dict {can: [[(class,score)]]}
+        can_classes_header = None
+        can_classes_names = []
+
+        input_file = os.path.join(canopus_dir, 'canopus_summary.tsv')
+        if os.path.isfile(input_file):
+            logger.info(f"reading canopus results for spectra directly from "
+                        f"{input_file}")
+            with open(input_file) as inf:
+                can_classes_header = inf.readline().strip().split("\t")
+                # get [4:8] - level 5 subclass        class   superclass
+                starti = 4
+                stopi = 8
+                for line in inf:
+                    line = line.strip('\n').split("\t")
+                    # make tuples with scores as None
+                    classes_list = [(cls, None) for cls in line[starti:stopi]]
+                    # assuming that all MGFs have ScanNumber headers..
+                    spec_index = line[0].split('ScanNumber')[-1]
+                    classes_list.reverse()  # reverse so superclass is first
+                    can_classes[spec_index] = classes_list
+        else:
+            logger.warn(f'could not load canopus results for spectra; '
+                        f'{input_file} missing from canopus_dir')
+
+        if can_classes_header:
+            can_classes_names = [f"cf_{elem}" for elem in
+                                 can_classes_header[starti:stopi]]
+            can_classes_names.reverse()  # reverse so superclass is first
+        return can_classes_names, can_classes
 
     def _read_molfam_classes(self, input_file):
         """Read canopus classes for molfams, return classes_names, classes
