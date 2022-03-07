@@ -956,6 +956,7 @@ class NPClassScoring(ScoringMethod):
 
     def get_links(self, objects, link_collection):
         """Given a set of objects, return link information"""
+        # todo: pickle results
         logger.info("Running NPClassScore...")
         begin = time.time()
         first_obj = objects[0]
@@ -970,12 +971,17 @@ class NPClassScoring(ScoringMethod):
             targets_classes = [self._get_gen_classes(target) for target in
                                targets]
 
+        logger.info("Using Metcalf scoring to get shared strains")
         # get mapping of shared strains
         if not self.npl._datalinks:
             self.npl._datalinks = self.npl.scoring_method(MetcalfScoring.NAME).datalinks
         # this is a dict with structure:
-        #   tup(Spectrum/MolecularFamily, GCF) => list of strain indices
+        #   tup(Spectrum/MolecularFamily, GCF) => array of strain indices
         common_strains = self.npl._datalinks.common_strains(objects, targets, True)
+        logger.info(f"Calculating NPClassScore for {len(objects)} objects to "
+                    f"{len(targets)} targets ({len(common_strains)} pairwise "
+                    f"interactions that share at least 1 strain). This might "
+                    f"take a while.")
 
         results = {}
         for obj in objects:
@@ -987,8 +993,12 @@ class NPClassScoring(ScoringMethod):
                 obj_classes = self._get_met_classes(obj, self.method)
 
             for target, target_classes in zip(targets, targets_classes):
-                # only consider targets that have shared strains?
-                if common_strains[(obj, target)]:
+                # only consider targets that have shared strains
+                common_tup = (obj, target)
+                if obj_is_gen:
+                    common_tup = (target, obj)
+                shared_strains = common_strains.get(common_tup)
+                if shared_strains is not None:  # todo: fix for bgcs
                     full_score = self._npclass_score(
                         obj, target, self.method, obj_classes,
                         target_classes)[:self.num_results]
