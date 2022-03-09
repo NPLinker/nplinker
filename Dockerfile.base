@@ -20,7 +20,7 @@ COPY dockerfiles/Miniconda3-latest-Linux-x86_64.sh \
 #RUN sed -i -e 's/http:\/\/archive.ubuntu.com\/ubuntu/mirror:\/\/mirrors.ubuntu.com\/mirrors.txt/' /etc/apt/sources.list && \
         # install a few things with apt to get started
 RUN apt-get update -y && \
-        apt-get install -yq wget curl git && \
+        apt-get install -yq wget curl git unzip && \
         apt-get clean && \
         # clone and set up BiG-SCAPE
         git clone https://git.wur.nl/medema-group/BiG-SCAPE.git && \
@@ -48,7 +48,6 @@ RUN apt-get update -y && \
         # install canopus_treemap to convert canopus output
         git clone https://github.com/louwenjjr/canopus_treemap.git && \
         pip install -e canopus_treemap && \
-        rm -rf canopus_treemap && \
         # try to keep the image size down a bit by removing installers...
         rm -f /app/Miniconda3-latest-Linux-x86_64.sh *.whl && \
         # and packages downloaded by conda 
