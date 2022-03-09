@@ -106,7 +106,7 @@ class DatasetLoader(object):
     EXTRA_BIGSCAPE_PARAMS_DEFAULT              = '--mibig --clans-off'
 
     RUN_CANOPUS_DEFAULT                        = False
-    EXTRA_CANOPUS_PARAMS_DEFAULT               = '--maxmz 850 formula zodiac structure canopus'
+    EXTRA_CANOPUS_PARAMS_DEFAULT               = '--maxmz 600 formula zodiac structure canopus'
 
     # keys for overriding metabolomics data elements
     OR_NODES                                   = 'nodes_file'
@@ -610,6 +610,8 @@ class DatasetLoader(object):
                                     self.canopus_dir, extra_canopus_parameters)
                     except Exception as e:
                         logger.warning('Again failed to run CANOPUS on mgf file using sirius from path, error was "{}"'.format(e))
+            else:
+                logger.info('Found CANOPUS dir, CANOPUS not run again!')
 
         # load Chem_class_predictions (canopus, molnetenhancer are loaded)
         # for canopus, check if results can be converted with canopus_treemap

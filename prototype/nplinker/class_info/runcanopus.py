@@ -23,7 +23,7 @@ logger = LogConfig.getLogger(__file__)
 
 
 def run_canopus(sirius_path, mgf_file, output_path,
-                extra_params='--maxmz 850 formula zodiac structure canopus'):
+                extra_params='--maxmz 600 formula zodiac structure canopus'):
     """Runs canopus from the sirius workflow
 
     Args:
@@ -32,13 +32,15 @@ def run_canopus(sirius_path, mgf_file, output_path,
         output_path: str, path to canopus_dir for results
         extra_params: str, the extra parameters for running canopus. this
             should always end with canopus, default:
-            --maxmz 850 formula zodiac structure canopus
+            --maxmz 600 formula zodiac structure canopus
     Returns:
         True if everything runs okay
 
     Within NPLinker a normal (default) will look like:
     sirius -i METABOLOMICS-SNETS-V2-<id>-download_clustered_spectra-main.mgf
-        -o canopus --maxmz 850 formula zodiac structure canopus
+        -o canopus --maxmz 600 formula zodiac structure canopus
+
+    Note that SIRIUS might take a long time when setting a high --maxmz cutoff
     """
     logger.info('run_canopus: input="{}", output="{}", extra_params={}"'.format(mgf_file, output_path, extra_params))
     if 'canopus' not in extra_params and ' C ' not in extra_params:
