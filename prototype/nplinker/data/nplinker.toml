@@ -151,40 +151,40 @@ ignore_spaces = false
 [docker]
 # this optional section contains various settings that only apply to the dockerised 
 # version of NPLinker. The Docker image contains BiG-SCAPE, and this tool can be run
-# as part of the dataset loading process. If you want to enable/disable this, and 
-# configure the parameters used, this can be done by modifying the settings below. 
+# as part of the dataset loading process. If you want to enable/disable this, and
+# configure the parameters used, this can be done by modifying the settings below.
 
 # enable or disable running BiG-SCAPE on a dataset being used with the NPLinker Docker
-# image. If false, you must have existing BiG-SCAPE results for your dataset in the 
+# image. If false, you must have existing BiG-SCAPE results for your dataset in the
 # format NPLinker expects (described above). If true, the copy of BiG-SCAPE installed
 # in the Docker image will be run on the directory containing the antiSMASH data for
-# the selected dataset, using the parameters configured below. 
+# the selected dataset, using the parameters configured below.
 # The default value is true
 run_bigscape = true
 
 # The extra_bigscape_parameters setting allows you to configure the parameters passed
 # to the BiG-SCAPE application when it's executed inside an NPLinker Docker image. In
-# most cases you won't need to adjust this, but if you want extra control over 
+# most cases you won't need to adjust this, but if you want extra control over
 # the BiG-SCAPE run you can edit the default value to add/remove/change the supplied
-# parameters. 
+# parameters.
 #
 # The available parameters are listed on the BiG-SCAPE wiki at:
 #    https://git.wageningenur.nl/medema-group/BiG-SCAPE/-/wikis/parameters
 #
-# NPLinker will automatically configure the following parameter values so you 
+# NPLinker will automatically configure the following parameter values so you
 # never need to include them:
 #   -i/--inputdir
 #   -o/--outputdir
 #   --pfam_dir
 #
-# NOTE: by default NPLinker will pass the "--mibig" parameter to BiG-SCAPE, 
+# NOTE: by default NPLinker will pass the "--mibig" parameter to BiG-SCAPE,
 # including MiBIG BGCs in the analysis. If you do NOT want to include this, you
 # will need to edit the default value and remove the "--mibig" section.
-# 
+#
 # Similarly, the "--clans-off" parameter is also passed by default. This disables
 # the BiG-SCAPE feature which performs a second level of clustering on GCFs.
 #
-# For example, to use a different set of cutoffs and enable verbose mode while 
+# For example, to use a different set of cutoffs and enable verbose mode while
 # retaining the other defaults:
 #   extra_bigscape_parameters = "--mibig --clans-off --cutoffs 0.3 0.4 0.5 -v"
 #
@@ -193,11 +193,61 @@ run_bigscape = true
 #
 # Or to limit the number of cores used:
 #   extra_bigscape_parameters = "--mibig --clans-off --cores 4"
-# 
+#
 # The default simply enables MiBIG (2.0), disables the extra GCF clustering step.
 # Note that BiG-SCAPE defaults to using 0.3 as a clustering cutoff if "--cutoffs"
 # is not set.
 #extra_bigscape_parameters = "--mibig --clans-off"
+
+# The Docker image also contains SIRIUS to run CANOPUS, and this tool can be run
+# as part of the dataset loading process. If you want to enable/disable this, and
+# configure the parameters used, this can be done by modifying the settings below.
+
+# enable or disable running CANOPUS on a dataset being used with the NPLinker Docker
+# image. If false, you should have CANOPUS results already present in the canopus
+# directory if you want to use chemical class predictions from CANOPUS. If true,
+# the copy of SIRIUS installed
+# in the Docker image will be run on mgf file with the spectra data for
+# the selected dataset, using the parameters configured below.
+# The default value is false
+# NOTE: if run_canopus is true but NPLinker is not run from the docker image,
+# NPLinker also tries to look for SIRIUS in path.
+run_canopus = false
+
+# The extra_canopus_parameters setting allows you to configure the parameters passed
+# to the SIRIUS when run within NPLinker. In most cases you won't need to adjust
+# this, but if you want extra control over the SIRIUS/CANOPUS run you can edit
+# the default value to add/remove/change the supplied parameters.
+#
+# The available parameters are listed on the SIRIUS documentation at:
+#    https://boecker-lab.github.io/docs.sirius.github.io/cli/
+#
+# NPLinker will automatically configure the following parameter values so you
+# never need to include them:
+#   -i/--inputdir
+#   -o/--outputdir
+#
+# NOTE: the "canopus" parameter should always be passed to SIRIUS, as this is
+# responsible for running CANOPUS.
+# NOTE: The --maxmz is an important parameter as it only runs for spectra below
+# this mass cutoff. The default is 600 which will probably take at most a few hours
+# for moderate datasets. If you want CANOPUS to finish within 24 hours, we
+# recommend not setting this cutoff above 850 Da.
+#
+# The "formula zodiac structure" parameters are also passed by default.
+# This runs the other normal features of SIIRUS to get the best CANOPUS predictions.
+#
+# For example, to use a different maxmz cutoff while using a different loggin level
+# retaining the other defaults:
+#   extra_canopus_parameters = "--maxmz 850 --log FINER formula zodiac structure canopus"
+#
+# Or to do the same with ZODIAC disabled:
+#   extra_canopus_parameters = "--maxmz 850 --log FINER formula structure canopus"
+#
+# The default uses a --maxmz 600 cutoff, and uses formula zodiac structure canopus.
+# Note that SIRIUS defaults to using infinity as a maxmz cutoff if "--maxmz"
+# is not set.
+extra_canopus_parameters = "--maxmz 600 formula zodiac structure canopus"
 
 # this optional section contains various settings that only affect the webapp interface
 # for NPLinker. If you're not using it, you can leave this out of your configuration. 
