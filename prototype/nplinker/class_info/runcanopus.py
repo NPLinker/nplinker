@@ -61,6 +61,8 @@ def run_canopus(sirius_path, mgf_file, output_path,
 
     # configure the IO-related parameters
     args = [sirius_path, '-i', mgf_file, '-o', output_path]
+    if '--log' not in args:
+        args.extend(['--log', 'INFO'])
 
     # append the user supplied params, if any
     if len(extra_params) > 0:
