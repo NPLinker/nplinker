@@ -147,11 +147,17 @@ class TableData(object):
             index_mappings_1, index_mappings_2 = {}, {}
             molfam_to_spec_indices = []
             tmp = set(spectra)
+            tmp2 = set()
             for molfam in molfams:
                 for spec in molfam.spectra:
                     if spec not in tmp:
                         continue
-                    molfam_to_spec_indices.append((_molfam_indices[molfam], _spec_indices[spec]))
+                    pair = (_molfam_indices[molfam], _spec_indices[spec])
+                    # avoid dup entries
+                    if pair in tmp2:
+                        continue
+                    molfam_to_spec_indices.append(pair)
+                    tmp2.add(pair)
                     index_mappings_1[_molfam_indices[molfam]] = molfam.id
                     index_mappings_2[_spec_indices[spec]] = spec.id
             self.mf_spectra = create_links(self.molfam_df, self.spec_df, 'molfam_pk', 'spec_pk', molfam_to_spec_indices, index_mappings_1, index_mappings_2)
@@ -164,11 +170,12 @@ class TableData(object):
             for spec, result in spec_links_data.items():
                 for gcf, data in result.items():
                     for bgc in gcf.bgcs:
+                        pair = (_spec_indices[spec], _bgc_indices[bgc])
                         # avoid dup entries
-                        if (_spec_indices[spec], _bgc_indices[bgc]) in tmp:
+                        if pair in tmp:
                             continue
-                        spec_to_bgc_indices.append((_spec_indices[spec], _bgc_indices[bgc]))
-                        tmp.add((_spec_indices[spec], _bgc_indices[bgc]))
+                        spec_to_bgc_indices.append(pair)
+                        tmp.add(pair)
                         index_mappings_1[_spec_indices[spec]] = spec.id
                         index_mappings_2[_bgc_indices[bgc]] = bgc.id
             self.spectra_bgc = create_links(self.spec_df, self.bgc_df, 'spec_pk', 'bgc_pk', spec_to_bgc_indices, index_mappings_1, index_mappings_2)
