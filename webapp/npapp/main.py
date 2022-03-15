@@ -1081,7 +1081,7 @@ class NPLinkerBokeh(object):
         self.metcalf_standardised = RadioGroup(labels=['Basic Metcalf scoring', 'Standardised Metcalf scoring'], name='metcalf_standardised', active=1 if self.scoring_objects['metcalf'].standardised else 0, sizing_mode='scale_width')
         self.metcalf_standardised.on_change('active', self.metcalf_standardised_callback)
         widgets.append(self.metcalf_standardised)
-        self.metcalf_cutoff = Slider(start=0, end=10, value=int(self.scoring_objects['metcalf'].cutoff), step=1, title='cutoff value', name='metcalf_cutoff')
+        self.metcalf_cutoff = Slider(start=0, end=50, value=int(self.scoring_objects['metcalf'].cutoff), step=1, title='cutoff value', name='metcalf_cutoff')
         self.metcalf_cutoff.on_change('value', self.metcalf_cutoff_callback)
         widgets.append(self.metcalf_cutoff)
 
