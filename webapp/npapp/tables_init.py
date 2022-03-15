@@ -111,7 +111,6 @@ class TableData(object):
                 _molfam_indices[spec.family] = len(molfams)
                 molfams.append(spec.family)
 
-
         self.bgc_df = pd.DataFrame(self.bgc_data)
         self.gcf_df = pd.DataFrame(self.gcf_data)
         self.spec_df = pd.DataFrame(self.spec_data)
@@ -136,9 +135,9 @@ class TableData(object):
                     if bgc not in bgcs_seen:
                         continue
                     # bgc_to_gcf_indices.append((bgc.id + 1, gcf.id + 1))
-                    bgc_to_gcf_indices.append((_bgc_indices[bgc] + 0, _gcf_indices[gcf] + 0))
-                    index_mappings_1[_bgc_indices[bgc] + 0] = bgc.id
-                    index_mappings_2[_gcf_indices[gcf] + 0] = gcf.id
+                    bgc_to_gcf_indices.append((_bgc_indices[bgc], _gcf_indices[gcf]))
+                    index_mappings_1[_bgc_indices[bgc]] = bgc.id
+                    index_mappings_2[_gcf_indices[gcf]] = gcf.id
 
             self.bgc_gcf = create_links(self.bgc_df, self.gcf_df, 'bgc_pk', 'gcf_pk', bgc_to_gcf_indices, index_mappings_1, index_mappings_2)
             print(' + bgc_gcf')
@@ -148,15 +147,13 @@ class TableData(object):
             index_mappings_1, index_mappings_2 = {}, {}
             molfam_to_spec_indices = []
             tmp = set(spectra)
-            # for molfam in self.nh.nplinker.molfams:
             for molfam in molfams:
                 for spec in molfam.spectra:
-                    # molfam_to_spec_indices.append((molfam.id + 0, spec.id + 0))
                     if spec not in tmp:
                         continue
-                    molfam_to_spec_indices.append((_molfam_indices[molfam] + 0, _spec_indices[spec] + 0))
-                    index_mappings_1[_molfam_indices[molfam] + 0] = molfam.id
-                    index_mappings_2[_spec_indices[spec] + 0] = spec.id
+                    molfam_to_spec_indices.append((_molfam_indices[molfam], _spec_indices[spec]))
+                    index_mappings_1[_molfam_indices[molfam]] = molfam.id
+                    index_mappings_2[_spec_indices[spec]] = spec.id
             self.mf_spectra = create_links(self.molfam_df, self.spec_df, 'molfam_pk', 'spec_pk', molfam_to_spec_indices, index_mappings_1, index_mappings_2)
             print(' + mf_spectra')
 
@@ -164,19 +161,16 @@ class TableData(object):
             index_mappings_1, index_mappings_2 = {}, {}
             spec_to_bgc_indices = []
             tmp = set()
-            tmpbgcs = {}
             for spec, result in spec_links_data.items():
                 for gcf, data in result.items():
-                    #print('spec {} <==> gcf {}'.format(spectrum.id, gcf.id))
                     for bgc in gcf.bgcs:
-                        # spec_to_bgc_indices.append((spec.id + 0, bgc.id + 0))
                         # avoid dup entries
-                        if (_spec_indices[spec] + 0, _bgc_indices[bgc] + 0) in tmp:
+                        if (_spec_indices[spec], _bgc_indices[bgc]) in tmp:
                             continue
-                        spec_to_bgc_indices.append((_spec_indices[spec] + 0, _bgc_indices[bgc] + 0))
-                        tmp.add((_spec_indices[spec] + 0, _bgc_indices[bgc] + 0))
-                        index_mappings_1[_spec_indices[spec] + 0] = spec.id
-                        index_mappings_2[_bgc_indices[bgc] + 0] = bgc.id
+                        spec_to_bgc_indices.append((_spec_indices[spec], _bgc_indices[bgc]))
+                        tmp.add((_spec_indices[spec], _bgc_indices[bgc]))
+                        index_mappings_1[_spec_indices[spec]] = spec.id
+                        index_mappings_2[_bgc_indices[bgc]] = bgc.id
             self.spectra_bgc = create_links(self.spec_df, self.bgc_df, 'spec_pk', 'bgc_pk', spec_to_bgc_indices, index_mappings_1, index_mappings_2)
             print(' + spectra_bgc')
 
