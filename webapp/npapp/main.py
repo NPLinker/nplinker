@@ -452,19 +452,15 @@ class NPLinkerBokeh(object):
         if obj.standardised == new:
             return
         obj.standardised = (new == 1)
-        self.get_links()
 
     def metcalf_cutoff_callback(self, attr, old, new):
         self.scoring_objects['metcalf'].cutoff = new
-        self.get_links()
 
     def rosetta_bgc_cutoff_callback(self, attr, old, new):
         self.scoring_objects['rosetta'].bgc_score_cutoff = new
-        self.get_links()
 
     def rosetta_spec_cutoff_callback(self, attr, old, new):
         self.scoring_objects['rosetta'].spec_score_cutoff = new
-        self.get_links()
         
     def scoring_mode_toggle_callback(self, attr, old, new):
         # 0 = AND, 1 = OR
@@ -475,7 +471,6 @@ class NPLinkerBokeh(object):
         # update visibility of buttons
         for i in range(len(self.scoring_methods)):
             self.scoring_method_buttons[self.scoring_methods[i]].visible = i in new
-        # self.get_links()
 
     def get_scoring_mode_text(self):
         return SCO_MODE_NAMES[self.score_helper.mode]
