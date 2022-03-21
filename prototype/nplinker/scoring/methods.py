@@ -351,6 +351,34 @@ class RosettaScoring(ScoringMethod):
 
         return True
 
+    def _insert_result_gen(self, results, src, hit):
+        if src not in results:
+            results[src] = {}
+        # Rosetta can produce multiple "hits" per link, need to 
+        # ensure the ObjectLink contains all the RosettaHit objects
+        # in these cases
+        if hit.spec in results[src]:
+            original_data = results[src][hit.spec].data(self)
+            results[src][hit.spec].set_data(self, original_data + [hit])
+        else:
+            results[src][hit.spec] = ObjectLink(src, hit.spec, self, data=[hit])
+
+        return results
+
+    def _insert_result_met(self, results, spec, target, hit):
+        if spec not in results:
+            results[spec] = {}
+        # Rosetta can produce multiple "hits" per link, need to 
+        # ensure the ObjectLink contains all the RosettaHit objects
+        # in these cases
+        if target in results[spec]:
+            original_data = results[spec][target].data(self)
+            results[spec][target].set_data(self, original_data + [hit])
+        else:
+            results[spec][target] = ObjectLink(spec, target, self, data=[hit])
+
+        return results
+
     def get_links(self, objects, link_collection):
         # enforce constraint that the list must contain a set of identically typed objects
         if not all(isinstance(x, type(objects[0])) for x in objects):
@@ -374,34 +402,28 @@ class RosettaScoring(ScoringMethod):
             for bgc in objects:
                 for hit in ro_hits:
                     if bgc.id == hit.bgc.id:
-                        src = bgc if not self.bgc_to_gcf else bgc.parent
-                        if src not in results:
-                            results[src] = {}
-
-                        # Rosetta can produce multiple "hits" per link, need to 
-                        # ensure the ObjectLink contains all the RosettaHit objects
-                        # in these cases
-                        if hit.spec in results[src]:
-                            original_data = results[src][hit.spec].data(self)
-                            results[src][hit.spec].set_data(self, original_data + [hit])
+                        if not self.bgc_to_gcf:
+                            # can use the BGC directly
+                            results = self._insert_result_gen(results, bgc, hit)
                         else:
-                            results[src][hit.spec] = ObjectLink(src, hit.spec, self, data=[hit])
+                            # if we want the results to contain GCFs instead, need
+                            # to iterate over the set of bgc.parents (most will only
+                            # have one, hybrid BGCs will have more)
+                            for gcf in bgc.parents:
+                                results = self._insert_result_gen(results, gcf, hit)
         else: # Spectrum
             for spec in objects:
                 for hit in ro_hits:
                     if spec.id == hit.spec.id:
-                        target = hit.bgc if not self.bgc_to_gcf else hit.bgc.parent
-                        if spec not in results:
-                            results[spec] = {}
-                        # Rosetta can produce multiple "hits" per link, need to 
-                        # ensure the ObjectLink contains all the RosettaHit objects
-                        # in these cases
-                        if target in results[spec]:
-                            original_data = results[spec][target].data(self)
-                            results[spec][target].set_data(self, original_data + [hit])
+                        if not self.bgc_to_gcf:
+                            # can use the BGC directly
+                            results = self._insert_result_met(results, spec, hit.bgc, hit)
                         else:
-                            results[spec][target] = ObjectLink(spec, target, self, data=[hit])
-
+                            # if we want the results to contain GCFs instead, need
+                            # to iterate over the set of bgc.parents (most will only
+                            # have one, hybrid BGCs will have more)
+                            for gcf in hit.bgc.parents:
+                                results = self._insert_result_met(results, spec, gcf, hit)
 
         link_collection._add_links_from_method(self, results)
         logger.debug('RosettaScoring found {} results'.format(len(results)))

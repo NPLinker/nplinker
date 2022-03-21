@@ -236,32 +236,41 @@ class NPLinkerBokeh(object):
             sorted_links = link_data.values()
 
         for link in sorted_links:
-            spec = link.target
+            # Metcalf scoring with GCF input can return a mix of GCF->Spectrum and GCF->MolFam links. for now
+            # deal with this by extracting every Spectrum from the MolFams and adding them to the other Spectra
             score = '[' + ', '.join('{}={}'.format(m.name, m.format_data(link[m])) for m in link.methods) + ']'
 
             spec_hdr_id = 'spec_result_header_{}_{}'.format(pgindex, j)
             spec_body_id = 'spec_body_{}_{}'.format(pgindex, j)
-            spec_title = 'Spectrum(parent_mass={:.4f}, id={}), scores <strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.parent_mz, spec.spectrum_id, score, len(link.shared_strains))
-            if spec.has_annotations():
-                spec_title += ', # annotations={}'.format(len(spec.annotations))
 
-            spec_body = self.generate_spec_info(spec, link)
+            specs = []
+            if isinstance(link.target, Spectrum):
+                specs.append(link.target)
+            else:
+                specs = link.target.spectra
 
-            # set up the chemdoodle plot so it appears when the entry is expanded 
-            spec_btn_id = 'spec_btn_{}_{}'.format(pgindex, j)
-            spec_plot_id = 'spec_plot_{}_{}'.format(pgindex, j)
-            spec_body += '<center><canvas id="{}"></canvas></center>'.format(spec_plot_id)
-            span_badges = '&nbsp|&nbsp;'.join(['<span class="badge badge-info">{}</span>'.format(m.name) for m in link.methods])
+            for spec in specs:
+                spec_title = 'Spectrum(parent_mass={:.4f}, id={}), scores <strong>{}</strong>, shared strains=<strong>{}</strong>'.format(spec.parent_mz, spec.spectrum_id, score, len(link.shared_strains))
+                if spec.has_annotations():
+                    spec_title += ', # annotations={}'.format(len(spec.annotations))
 
-            # note annoying escaping required here, TODO better way of doing this?
-            spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, spec.to_jcamp_str())
+                spec_body = self.generate_spec_info(spec, link)
 
-            hdr_color = 'ffe0b5'
-            if len(spec.annotations) > 0:
-                hdr_color = 'ffb5e0'
-            body += TMPL_ON_CLICK.format(hdr_id=spec_hdr_id, hdr_color=hdr_color, btn_target=spec_body_id, btn_onclick=spec_onclick, btn_id=spec_btn_id, 
-                                         btn_text=spec_title, span_badges=span_badges, body_id=spec_body_id, body_parent='accordion_gcf_{}'.format(pgindex), body_body=spec_body)
-            j += 1
+                # set up the chemdoodle plot so it appears when the entry is expanded 
+                spec_btn_id = 'spec_btn_{}_{}'.format(pgindex, j)
+                spec_plot_id = 'spec_plot_{}_{}'.format(pgindex, j)
+                spec_body += '<center><canvas id="{}"></canvas></center>'.format(spec_plot_id)
+                span_badges = '&nbsp|&nbsp;'.join(['<span class="badge badge-info">{}</span>'.format(m.name) for m in link.methods])
+
+                # note annoying escaping required here, TODO better way of doing this?
+                spec_onclick = 'setupPlot(\'{}\', \'{}\', \'{}\');'.format(spec_btn_id, spec_plot_id, spec.to_jcamp_str())
+
+                hdr_color = 'ffe0b5'
+                if len(spec.annotations) > 0:
+                    hdr_color = 'ffb5e0'
+                body += TMPL_ON_CLICK.format(hdr_id=spec_hdr_id, hdr_color=hdr_color, btn_target=spec_body_id, btn_onclick=spec_onclick, btn_id=spec_btn_id, 
+                                                btn_text=spec_title, span_badges=span_badges, body_id=spec_body_id, body_parent='accordion_gcf_{}'.format(pgindex), body_body=spec_body)
+                j += 1
 
         body += '</div>'
         return body
@@ -318,7 +327,15 @@ class NPLinkerBokeh(object):
             hdr_id = 'gcf_result_header_{}'.format(pgindex)
             body_id = 'gcf_result_body_{}'.format(pgindex)
 
-            title = '{} spectra linked to GCF(id={})'.format(len(link_data), gcf.gcf_id)
+            # counting linked objects has to account for some potentially being
+            # MolFams vs Spectra
+            link_count = 0
+            for target in link_data.keys():
+                if isinstance(target, Spectrum):
+                    link_count += 1
+                else:
+                    link_count += len(target.spectra)
+            title = '{} spectra linked to GCF(id={})'.format(link_count, gcf.gcf_id)
 
             # first part of the body content is basic info about the GCF itself
             body = self.generate_gcf_info(gcf)
@@ -330,13 +347,13 @@ class NPLinkerBokeh(object):
             # finally, store the complete generated HTML string in a list along with
             # the number of links this GCF has, so we can sort the eventual list
             # by number of links 
-            unsorted.append((len(link_data), TMPL.format(hdr_id=hdr_id, hdr_color='adeaad', 
+            unsorted.append((link_count, TMPL.format(hdr_id=hdr_id, hdr_color='adeaad', 
                                                            btn_target=body_id, btn_text=title, span_badges='',
                                                            body_id=body_id, body_parent='accordionResults', 
                                                            body_body=body)))
             pgindex += 1
 
-        content = '<h4>GCFs={}, linked spectra={}</h4>'.format(len(self.score_helper.scoring_results), len(link_data))
+        content = '<h4>GCFs={}, total # linked objects={}</h4>'.format(len(self.score_helper.scoring_results), sum(x[0] for x in unsorted))
 
         for _, text in sorted(unsorted, key=lambda x: -x[0]):
             content += text
@@ -380,7 +397,7 @@ class NPLinkerBokeh(object):
 
             pgindex += 1
         
-        content = '<h4>Spectra={}, linked GCFs={}</h4>'.format(len(self.score_helper.scoring_results), len(all_gcfs))
+        content = '<h4>Spectra={}, total # linked GCFs={}</h4>'.format(len(self.score_helper.scoring_results), len(all_gcfs))
 
         for _, text in sorted(unsorted, key=lambda x: -x[0]):
             content += text
@@ -452,19 +469,15 @@ class NPLinkerBokeh(object):
         if obj.standardised == new:
             return
         obj.standardised = (new == 1)
-        self.get_links()
 
     def metcalf_cutoff_callback(self, attr, old, new):
         self.scoring_objects['metcalf'].cutoff = new
-        self.get_links()
 
     def rosetta_bgc_cutoff_callback(self, attr, old, new):
         self.scoring_objects['rosetta'].bgc_score_cutoff = new
-        self.get_links()
 
     def rosetta_spec_cutoff_callback(self, attr, old, new):
         self.scoring_objects['rosetta'].spec_score_cutoff = new
-        self.get_links()
         
     def scoring_mode_toggle_callback(self, attr, old, new):
         # 0 = AND, 1 = OR
@@ -475,7 +488,6 @@ class NPLinkerBokeh(object):
         # update visibility of buttons
         for i in range(len(self.scoring_methods)):
             self.scoring_method_buttons[self.scoring_methods[i]].visible = i in new
-        # self.get_links()
 
     def get_scoring_mode_text(self):
         return SCO_MODE_NAMES[self.score_helper.mode]
@@ -1086,7 +1098,7 @@ class NPLinkerBokeh(object):
         self.metcalf_standardised = RadioGroup(labels=['Basic Metcalf scoring', 'Standardised Metcalf scoring'], name='metcalf_standardised', active=1 if self.scoring_objects['metcalf'].standardised else 0, sizing_mode='scale_width')
         self.metcalf_standardised.on_change('active', self.metcalf_standardised_callback)
         widgets.append(self.metcalf_standardised)
-        self.metcalf_cutoff = Slider(start=0, end=10, value=int(self.scoring_objects['metcalf'].cutoff), step=1, title='cutoff value', name='metcalf_cutoff')
+        self.metcalf_cutoff = Slider(start=0, end=50, value=int(self.scoring_objects['metcalf'].cutoff), step=1, title='cutoff value', name='metcalf_cutoff')
         self.metcalf_cutoff.on_change('value', self.metcalf_cutoff_callback)
         widgets.append(self.metcalf_cutoff)
 

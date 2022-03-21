@@ -303,18 +303,18 @@ class DatasetLoader(object):
             raise Exception('No strains left after filtering, cannot continue!')
     
         # get the list of BGCs which have a strain found in the set we were given
-        bgcs_to_retain = [bgc for bgc in self.bgcs if bgc.strain in self.include_only_strains]
+        bgcs_to_retain = set([bgc for bgc in self.bgcs if bgc.strain in self.include_only_strains])
         # get the list of spectra which have at least one strain in the set
-        spectra_to_retain = [spec for spec in self.spectra for sstrain in spec.strains if sstrain in self.include_only_strains]
+        spectra_to_retain = set([spec for spec in self.spectra for sstrain in spec.strains if sstrain in self.include_only_strains])
 
         logger.info('Current / filtered BGC counts: {} / {}'.format(len(self.bgcs), len(bgcs_to_retain)))
         logger.info('Current / filtered spectra counts: {} / {}'.format(len(self.spectra), len(spectra_to_retain)))
         
-        self.bgcs = bgcs_to_retain
+        self.bgcs = list(bgcs_to_retain)
         for i, bgc in enumerate(self.bgcs):
             bgc.id = i
 
-        self.spectra = spectra_to_retain
+        self.spectra = list(spectra_to_retain)
         # also need to filter the set of strains attached to each spectrum
         for i, spec in enumerate(self.spectra):
             spec.strains.filter(self.include_only_strains)
