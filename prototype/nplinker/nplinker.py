@@ -27,7 +27,7 @@ from .loader import DatasetLoader
 
 from .pickler import save_pickled_data
 
-from .scoring.methods import MetcalfScoring, RosettaScoring, TestScoring
+from .scoring.methods import MetcalfScoring, RosettaScoring, TestScoring, NPClassScoring
 from .scoring.methods import LinkCollection
 
 from .logconfig import LogConfig
@@ -42,7 +42,8 @@ class NPLinker(object):
     SCORING_METHODS =  {
         MetcalfScoring.NAME: MetcalfScoring,
         TestScoring.NAME: TestScoring,
-        RosettaScoring.NAME: RosettaScoring, 
+        RosettaScoring.NAME: RosettaScoring,
+        NPClassScoring.NAME: NPClassScoring
                        }
 
     def __init__(self, userconfig=None):
@@ -122,6 +123,8 @@ class NPLinker(object):
         self._metadata = {}
         self._molfams = []
         self._mibig_bgc_dict = {}
+        self._chem_classes = None
+        self._class_matches = None
 
         self._bgc_lookup = {}
         self._spec_lookup = {}
@@ -275,6 +278,8 @@ class NPLinker(object):
         self._mibig_bgc_dict = self._loader.mibig_bgc_dict
         self._strains = self._loader.strains
         self._product_types = self._loader.product_types
+        self._chem_classes = self._loader.chem_classes
+        self._class_matches = self._loader.class_matches
 
         logger.debug('Generating lookup tables: genomics')
         self._bgc_lookup = {}
@@ -529,6 +534,17 @@ class NPLinker(object):
     def scoring_methods(self):
         """Returns a list of available scoring method names"""
         return list(self._scoring_methods.keys())
+
+    @property
+    def chem_classes(self):
+        """Returns loaded ChemClassPredictions with the class predictions"""
+        return self._chem_classes
+
+    @property
+    def class_matches(self):
+        """ClassMatches with the matched classes and scoring tables from MIBiG
+        """
+        return self._class_matches
 
     def scoring_method(self, name):
         """Return an instance of a scoring method.

@@ -23,6 +23,10 @@ from .metabolomics import load_dataset
 from .genomics import loadBGC_from_cluster_files
 from .genomics import make_mibig_bgc_dict
 
+from .class_info.class_matches import ClassMatches
+from .class_info.chem_classes import ChemClassPredictions
+from .class_info.runcanopus import run_canopus
+
 from .annotations import load_annotations
 
 from .strains import StrainCollection
@@ -101,6 +105,9 @@ class DatasetLoader(object):
     RUN_BIGSCAPE_DEFAULT                       = True
     EXTRA_BIGSCAPE_PARAMS_DEFAULT              = '--mibig --clans-off'
 
+    RUN_CANOPUS_DEFAULT                        = False
+    EXTRA_CANOPUS_PARAMS_DEFAULT               = '--maxmz 600 formula zodiac structure canopus'
+
     # keys for overriding metabolomics data elements
     OR_NODES                                   = 'nodes_file'
     OR_EDGES                                   = 'edges_file'
@@ -119,6 +126,9 @@ class DatasetLoader(object):
     OR_PARAMS                                  = 'gnps_params_file'
     OR_DESCRIPTION                             = 'description_file'
     OR_INCLUDE_STRAINS                         = 'include_strains_file'
+    # class predictions
+    OR_CANOPUS                                 = 'canopus_dir'
+    OR_MOLNETENHANCER                          = 'molnetenhancer_dir'
 
     BIGSCAPE_PRODUCT_TYPES                     = ['NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs', 'Saccharides', 'Terpene']
 
@@ -224,6 +234,12 @@ class DatasetLoader(object):
         # 14. MISC: <root>/include_strains.csv / include_strains_file=<override>
         self.include_strains_file = self._overrides.get(self.OR_INCLUDE_STRAINS) or os.path.join(self._root, 'include_strains.csv')
 
+        # 15. CLASS: <root>/canopus / canopus_dir=<override>
+        self.canopus_dir = self._overrides.get(self.OR_CANOPUS) or os.path.join(self._root, 'canopus')
+
+        # 15. CLASS: <root>/canopus / canopus_dir=<override>
+        self.molnetenhancer_dir = self._overrides.get(self.OR_MOLNETENHANCER) or os.path.join(self._root, 'molnetenhancer')
+
         for f in self.required_paths():
             if not os.path.exists(f):
                 raise FileNotFoundError('File/directory "{}" does not exist or is not readable!'.format(f))
@@ -241,6 +257,9 @@ class DatasetLoader(object):
             return False
 
         if not met_only and not self._load_genomics():
+            return False
+
+        if not self._load_class_info():
             return False
 
         self._load_optional()
@@ -556,6 +575,49 @@ class DatasetLoader(object):
         # load any available annotations from GNPS or user-provided files
         logger.info('Loading provided annotation files ({})'.format(self.annotations_dir))
         self.spectra = load_annotations(self.annotations_dir, self.annotations_config_file, self.spectra, spec_dict)
+        return True
+
+    def _load_class_info(self):
+        """Load class match info (based on mibig) and chemical class predictions
+
+        Run CANOPUS if asked for. First sirius is run through docker, if this
+        fails, it is run with a version present on the path.
+
+        Return:
+            True if everything completes
+        """
+        # load Class_matches with mibig info from data
+        mibig_class_file = os.path.join(self.datadir, 'MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt')
+        self.class_matches = ClassMatches(mibig_class_file)
+
+        # run canopus if canopus_dir does not exist
+        should_run_canopus = self._docker.get('run_canopus', self.RUN_CANOPUS_DEFAULT)
+        extra_canopus_parameters = self._docker.get(
+            'extra_canopus_parameters', self.EXTRA_CANOPUS_PARAMS_DEFAULT)
+        if should_run_canopus:
+            # don't run canopus when canopus dir exists already
+            if not os.path.isdir(self.canopus_dir):
+                logger.info('Running CANOPUS! extra_canopus_parameters="{}"'.format(
+                        extra_canopus_parameters))
+                try:
+                    run_canopus('/app/sirius/bin/sirius', self.mgf_file,
+                                self.canopus_dir, extra_canopus_parameters)
+                except Exception as e:
+                    logger.warning('Failed to run CANOPUS on mgf file with docker, error was "{}"'.format(e))
+                    logger.info('Trying to run CANOPUS again using SIRIUS from path')
+                    try:
+                        run_canopus('sirius', self.mgf_file,
+                                    self.canopus_dir, extra_canopus_parameters)
+                    except Exception as e:
+                        logger.warning('Again failed to run CANOPUS on mgf file using sirius from path, error was "{}"'.format(e))
+            else:
+                logger.info('Found CANOPUS dir, CANOPUS not run again!')
+
+        # load Chem_class_predictions (canopus, molnetenhancer are loaded)
+        # for canopus, check if results can be converted with canopus_treemap
+        # todo: otherwise use the pre-existing output of canopus
+        self.chem_classes = ChemClassPredictions(
+            self.canopus_dir, self.molnetenhancer_dir, self._root)
         return True
 
     def _load_strain_mappings(self):
