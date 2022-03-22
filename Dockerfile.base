@@ -5,7 +5,7 @@ FROM python:3.7-slim-buster
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 # add the paths where conda and bigscape will be installed to PATH
-ENV PATH="/app/conda/bin:/app/BiG-SCAPE:${PATH}"
+ENV PATH="/app/conda/bin:/app/BiG-SCAPE:/app/sirius/bin:${PATH}"
 
 SHELL ["/bin/bash", "-c"]
 WORKDIR /app
