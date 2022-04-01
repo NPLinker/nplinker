@@ -17,7 +17,7 @@ import argparse
 import os
 from types import SimpleNamespace
 from shutil import copyfile
-from collections import Mapping
+from collections.abc import Mapping
 
 import toml
 from xdg import XDG_CONFIG_HOME
