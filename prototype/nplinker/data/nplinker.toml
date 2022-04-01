@@ -121,6 +121,21 @@ root = "<root directory of dataset>"
 # For more information: https://github.com/sdrogers/nplinker/wiki/Strain-mappings
 #extended_metadata_table_parsing = false
 
+# NPLinker can automatically download a copy of the MiBIG database in the JSON
+# format it expects to find, and place it in the same folder as the current dataset.
+# This behaviour is enabled by default. If you wish to disable it for any reason
+# change the value of this setting to "false". 
+#use_mibig = true
+
+# When the "use_mibig" setting described above is set to "true", NPLinker will use
+# the value of this setting to determine which version of the MiBIG database should
+# be downloaded. The default is "1.4". If you need a newer version, define the 
+# value to be the appropriate version, e.g. "2.0". Currently tested versions are
+# "1.4" and "2.0". 
+#
+# NOTE: the value MUST be a string (i.e. enclosed by " characters: "2.0" not 2.0)
+#mibig_version = "1.4"
+
 [antismash]
 # antismash file structure. Should be either 'default' or 'flat'. 
 # default = the standard structure with nested subdirectories
@@ -194,7 +209,9 @@ run_bigscape = true
 # Or to limit the number of cores used:
 #   extra_bigscape_parameters = "--mibig --clans-off --cores 4"
 #
-# The default simply enables MiBIG (2.0), disables the extra GCF clustering step.
+# The default simply enables MiBIG, disables the extra GCF clustering step. If you
+# need to select a particular version of the MiBIG database, see the "mibig_version"
+# setting. 
 # Note that BiG-SCAPE defaults to using 0.3 as a clustering cutoff if "--cutoffs"
 # is not set.
 #extra_bigscape_parameters = "--mibig --clans-off"

@@ -101,6 +101,8 @@ class DatasetLoader(object):
 
     BIGSCAPE_CUTOFF_DEFAULT                    = 30
     EXTENDED_METADATA_TABLE_PARSING_DEFAULT    = False
+    USE_MIBIG_DEFAULT                          = True
+    MIBIG_VERSION_DEFAULT                      = "1.4"
 
     RUN_BIGSCAPE_DEFAULT                       = True
     EXTRA_BIGSCAPE_PARAMS_DEFAULT              = '--mibig --clans-off'
@@ -144,6 +146,8 @@ class DatasetLoader(object):
         self._antismash_ignore_spaces = self._antismash.get('ignore_spaces', self.ANTISMASH_IGNORE_SPACES_DEFAULT)
         self._bigscape_cutoff = self._dataset.get('bigscape_cutoff', self.BIGSCAPE_CUTOFF_DEFAULT)
         self._extended_metadata_table_parsing = self._dataset.get('extended_metadata_table_parsing', self.EXTENDED_METADATA_TABLE_PARSING_DEFAULT)
+        self._use_mibig = self._dataset.get('use_mibig', self.USE_MIBIG_DEFAULT)
+        self._mibig_version = self._dataset.get('mibig_version', self.MIBIG_VERSION_DEFAULT)
         self._root = self._config['dataset']['root']
         self._platform_id = self._config['dataset']['platform_id']
         self._remote_loading = len(self._platform_id) > 0
@@ -167,7 +171,7 @@ class DatasetLoader(object):
         if self._remote_loading:
             self._root = self._downloader.project_file_cache
             logger.debug('remote loading mode, configuring root={}'.format(self._root))
-            self._downloader.get(self._docker.get('run_bigscape', self.RUN_BIGSCAPE_DEFAULT), self._docker.get('extra_bigscape_parameters', self.EXTRA_BIGSCAPE_PARAMS_DEFAULT))
+            self._downloader.get(self._docker.get('run_bigscape', self.RUN_BIGSCAPE_DEFAULT), self._docker.get('extra_bigscape_parameters', self.EXTRA_BIGSCAPE_PARAMS_DEFAULT), self._use_mibig, self._mibig_version)
 
         # construct the paths and filenames required to load everything else and check 
         # they all seem to exist (but don't parse anything yet)
@@ -401,8 +405,11 @@ class DatasetLoader(object):
 
     def _load_genomics_extra(self):
         if not os.path.exists(self.mibig_json_dir):
-            logger.info('Attempting to download MiBIG JSON database...')
-            download_and_extract_mibig_json(self._root, self.mibig_json_dir)
+            if self._use_mibig:
+                logger.info('Attempting to download MiBIG JSON database (v{})...'.format(self._mibig_version))
+                download_and_extract_mibig_json(self._root, self.mibig_json_dir, self._mibig_version)
+            else:
+                logger.warning('Not downloading MiBIG database automatically, use_mibig = false')
 
         if not os.path.exists(self.bigscape_dir):
             should_run_bigscape = self._docker.get('run_bigscape', self.RUN_BIGSCAPE_DEFAULT)
@@ -468,7 +475,7 @@ class DatasetLoader(object):
         self._load_genomics_extra()
 
         logger.debug('make_mibig_bgc_dict({})'.format(self.mibig_json_dir))
-        self.mibig_bgc_dict = make_mibig_bgc_dict(self.strains, self.mibig_json_dir)
+        self.mibig_bgc_dict = make_mibig_bgc_dict(self.strains, self.mibig_json_dir, self._mibig_version)
         logger.debug('mibig_bgc_dict has {} entries'.format(len(self.mibig_bgc_dict)))
 
         missing_anno_files, missing_cluster_files, missing_network_files = [], [], []

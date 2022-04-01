@@ -67,7 +67,7 @@ class GenomeStatus:
     def to_csv(self):
         return ','.join([str(self.original_id), str(self.resolved_id), str(self.attempted), self.filename])
 
-def download_and_extract_mibig_json(download_path, output_path, version='1.4'):
+def download_and_extract_mibig_json(download_path, output_path, version):
     archive_path = os.path.join(download_path, 'mibig_json_{}.tar.gz'.format(version))
     logger.debug('Checking for existing MiBIG archive at {}'.format(archive_path))
     cached = False
@@ -82,6 +82,7 @@ def download_and_extract_mibig_json(download_path, output_path, version='1.4'):
 
     if not cached:
         url = MIBIG_JSON_URL.format(version)
+        logger.debug('Downloading MiBIG database from {}'.format(url))
         with open(archive_path, 'wb') as f:
             total_bytes, last_total = 0, 0
             with httpx.stream('GET', url) as r:
@@ -99,12 +100,23 @@ def download_and_extract_mibig_json(download_path, output_path, version='1.4'):
         return True
 
     mibig_gz = tarfile.open(archive_path, 'r:gz')
-    # extract and rename to "mibig_json"
-    # TODO annoyingly the 2.0 version has been archived with a subdirectory, while
-    # 1.4 just dumps all the files into the current directory, so if/when 2.0 support
-    # is required this will need to handle both cases
-    mibig_gz.extractall(path=os.path.join(output_path))
-    # os.rename(os.path.join(self.project_file_cache, 'mibig_json_{}'.format(version)), os.path.join(self.project_file_cache, 'mibig_json'))
+    # extract all the .json files and put them in the "output_path" folder.
+    # annoyingly the 2.0 version has been archived with a subdirectory, while
+    # 1.4 has no subdirectory. So have to handle these slightly differently and
+    # this might need updated for future versions
+    if version == "1.4":
+        mibig_gz.extractall(path=output_path)
+    else:
+        os.makedirs(output_path, exist_ok=True)
+        # assume they'll keep the same format for >2.0, which has a subdirectory
+        # called "mibig_json_2.0" containing the .json files
+        for info in mibig_gz.getmembers():
+            if info.isfile():
+                extracted_file = mibig_gz.extractfile(info)
+                # write the file with only the filename component (ignoring the
+                # subdirectory)
+                with open(os.path.join(output_path, os.path.split(info.path)[1]), 'wb') as f:
+                    f.write(extracted_file.read())
 
     open(os.path.join(output_path, 'completed'), 'w').close()
 
@@ -209,14 +221,15 @@ class Downloader(object):
 
         self.strain_mappings_file = os.path.join(self.project_file_cache, 'strain_mappings.csv')
 
-    def get(self, do_bigscape, extra_bigscape_parameters):
+    def get(self, do_bigscape, extra_bigscape_parameters, use_mibig, mibig_version):
         logger.info('Going to download the metabolomics data file')
 
         self._download_metabolomics_zipfile(self.gnps_task_id)
         self._download_genomics_data(self.project_json['genomes'])
         self._parse_genome_labels(self.project_json['genome_metabolome_links'], self.project_json['genomes'])
         self._generate_strain_mappings()
-        self._download_mibig_json() # TODO version
+        if use_mibig:
+            self._download_mibig_json(mibig_version)
         self._run_bigscape(do_bigscape, extra_bigscape_parameters) 
 
     def _is_new_gnps_format(self, directory):
@@ -436,7 +449,7 @@ class Downloader(object):
         if missing == len(genome_records):
             logger.warning('Failed to successfully retrieve ANY genome data!')
 
-    def _download_mibig_json(self, version='1.4'):
+    def _download_mibig_json(self, version):
         output_path = os.path.join(self.project_file_cache, 'mibig_json')
 
         download_and_extract_mibig_json(self.project_download_cache, output_path, version)

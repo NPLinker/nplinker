@@ -465,13 +465,18 @@ def load_mibig_library_json(mibig_json_directory):
             mibig[bgc_id] = json.load(f)
     return mibig
 
-def make_mibig_bgc_dict(strains, mibig_json_directory):
+def make_mibig_bgc_dict(strains, mibig_json_directory, version):
     mibig_dict = load_mibig_library_json(mibig_json_directory)
     mibig_bgc_dict = {}
     i = 0
     for name, data in list(mibig_dict.items()):
-        accession = data['general_params']['mibig_accession']
-        biosyn_class = data['general_params']['biosyn_class'][0]
+        if version == "1.4":
+            accession = data['general_params']['mibig_accession']
+            biosyn_class = data['general_params']['biosyn_class'][0]
+        else: # 2.0(+)
+            accession = data['cluster']['mibig_accession']
+            biosyn_class = data['cluster']['biosyn_class'][0]
+
         strain = Strain(accession)
         new_bgc = MiBIGBGC(i, strain, accession, biosyn_class)
         mibig_bgc_dict[accession] = new_bgc
