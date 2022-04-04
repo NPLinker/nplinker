@@ -49,6 +49,7 @@ NCBI_LOOKUP_URL_NEW = 'https://www.ncbi.nlm.nih.gov/assembly/?term={}'
 JGI_GENOME_LOOKUP_URL = 'https://img.jgi.doe.gov/cgi-bin/m/main.cgi?section=TaxonDetail&page=taxonDetail&taxon_oid={}'
 
 MIBIG_JSON_URL = 'https://dl.secondarymetabolites.org/mibig/mibig_json_{}.tar.gz'
+MIBIG_BGC_URL = 'https://mibig.secondarymetabolites.org/repository/{}/{}.json'
 
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'
 
@@ -66,6 +67,27 @@ class GenomeStatus:
 
     def to_csv(self):
         return ','.join([str(self.original_id), str(self.resolved_id), str(self.attempted), self.filename])
+
+def download_mibig_bgc_json(output_path, bgc_id):
+    # this method is only used if a dataset contains references to an MiBIG BGC
+    # that isn't included in the JSON database archive file for some reason. At
+    # present (4/4/2022) one example of this is BGC0001871 which is listed at
+    # https://mibig.secondarymetabolites.org/repository/BGC0001871/BGC0001871.json
+    # but doesn't appear in the MiBIG v2.0 database download. 
+    #
+    # as a workaround for this problem, NPLinker will call this method if it 
+    # finds a reference to a BGC that doesn't appear in the downloaded database.
+    # it simply attempts to download the individual BGC .json file and add it to
+    # the local database folder
+    logger.info('Attempting to retrieve missing MiBIG BGC JSON data for {}'.format(bgc_id))
+    resp = httpx.get(MIBIG_BGC_URL.format(bgc_id, bgc_id))
+    if resp.status_code == httpx.codes.OK:
+        with open(os.path.join(output_path, '{}.json'.format(bgc_id)), 'wb') as f:
+            f.write(resp.content)
+
+        return True
+
+    return False
 
 def download_and_extract_mibig_json(download_path, output_path, version):
     archive_path = os.path.join(download_path, 'mibig_json_{}.tar.gz'.format(version))

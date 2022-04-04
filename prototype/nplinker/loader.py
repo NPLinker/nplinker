@@ -555,6 +555,7 @@ class DatasetLoader(object):
                                                 anno_files,
                                                 network_files,
                                                 self.mibig_bgc_dict,
+                                                self.mibig_json_dir,
                                                 antismash_dir=self.antismash_dir,
                                                 antismash_filenames=self.antismash_cache,
                                                 antismash_format=self._antismash_format,

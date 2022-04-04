@@ -24,6 +24,8 @@ from Bio import SeqIO
 from .aa_pred import predict_aa
 from .genomics_utilities import get_smiles
 
+from .pairedomics import downloader
+
 from .strains import Strain, StrainCollection
 
 from .logconfig import LogConfig
@@ -218,7 +220,7 @@ def parse_gbk_header(bgc):
         bgc.antismash_accession = records[0].name
         bgc.antismash_id = records[0].id
 
-def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, network_file_dict, mibig_bgc_dict, antismash_dir, antismash_filenames, antismash_format, antismash_delimiters):
+def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, network_file_dict, mibig_bgc_dict, mibig_json_dir, antismash_dir, antismash_filenames, antismash_format, antismash_delimiters):
     gcf_dict = {}
     gcf_list = []
     metadata = {}
@@ -269,7 +271,29 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict, networ
                     nname = name[:name.index('.')]
                     strain = strains.lookup(nname)
                     if strain is None:
-                        raise Exception('Unknown MiBIG BGC: original={} / parsed={}'.format(name, nname))
+                        # if this happens, it probably means we have an MiBIG BGC which has been mistakenly
+                        # excluded from the JSON database archive that NPLinker downloads. For more info
+                        # see https://github.com/sdrogers/nplinker/issues/60#issuecomment-1086722952.
+                        #
+                        # To attempt to fix this issue without user intervention, try to download the 
+                        # missing BGC JSON data from the MiBIG website
+                        if not downloader.download_mibig_bgc_json(mibig_json_dir, nname):
+                            # download failed, bail out here
+                            raise Exception('Unknown MiBIG BGC: original={} / parsed={}'.format(name, nname))
+                        else:
+                            # retrieved the file successfully but now have to parse it and add
+                            # a new BGC to the existing set
+                            strains, mibig_bgc_dict = append_mibig_library_json(strains, mibig_bgc_dict, mibig_json_dir, nname, internal_bgc_id)
+                            logger.info('Appended MiBIG BGC {} to existing set'.format(nname))
+
+                            # now can try again to lookup the strain, which should succeed this time
+                            strain = strains.lookup(nname)
+                            if strain is None:
+                                # something is still wrong if this happens
+                                raise Exception('Unknown MiBIG BGC: original={} / parsed={}'.format(name, nname))
+
+                            logger.info('MiBIG missing BGC workaround was successful')
+
                 else:
                     parsednames = [name[:name.index(d)] for d in antismash_delimiters if name.find(d) != -1]
                     found = False
@@ -465,18 +489,31 @@ def load_mibig_library_json(mibig_json_directory):
             mibig[bgc_id] = json.load(f)
     return mibig
 
+def extract_mibig_json_data(data):
+    if 'general_params' in data:
+        accession = data['general_params']['mibig_accession']
+        biosyn_class = data['general_params']['biosyn_class'][0]
+    else: # 2.0(+)
+        accession = data['cluster']['mibig_accession']
+        biosyn_class = data['cluster']['biosyn_class'][0]
+
+    return accession, biosyn_class
+
+def append_mibig_library_json(strains, mibig_bgc_dict, mibig_json_directory, bgc_id, internal_id):
+    json_data = json.load(open(os.path.join(mibig_json_directory, '{}.json'.format(bgc_id)), 'rb'))
+    accession, biosyn_class = extract_mibig_json_data(json_data)
+    strain = Strain(accession)
+    new_bgc = MiBIGBGC(internal_id, strain, accession, biosyn_class)
+    mibig_bgc_dict[accession] = new_bgc
+    strains.add(strain)
+    return strains, mibig_bgc_dict
+
 def make_mibig_bgc_dict(strains, mibig_json_directory, version):
     mibig_dict = load_mibig_library_json(mibig_json_directory)
     mibig_bgc_dict = {}
     i = 0
     for name, data in list(mibig_dict.items()):
-        if version == "1.4":
-            accession = data['general_params']['mibig_accession']
-            biosyn_class = data['general_params']['biosyn_class'][0]
-        else: # 2.0(+)
-            accession = data['cluster']['mibig_accession']
-            biosyn_class = data['cluster']['biosyn_class'][0]
-
+        accession, biosyn_class = extract_mibig_json_data(data)
         strain = Strain(accession)
         new_bgc = MiBIGBGC(i, strain, accession, biosyn_class)
         mibig_bgc_dict[accession] = new_bgc
