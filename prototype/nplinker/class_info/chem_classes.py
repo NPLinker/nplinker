@@ -14,6 +14,8 @@
 
 import os
 import glob
+from collections import Counter
+
 from canopus.classifications_to_gnps import analyse_canopus
 from canopus import Canopus
 
@@ -146,7 +148,10 @@ class CanopusResults:
                         "canopus_dir (canopus_summary.tsv)")
             spectra_classes_names, spectra_classes = \
                 self._read_spectra_classes_directly()
-            # todo: add function so that classes can be determined for molfams
+            # molfams have to be added later with info about molfam <- spectra
+            # this happens with transfer_spec_classes_to_molfams() in loader.py
+            self._molfam_classes, self._molfam_classes_names, \
+                self._molfam_classes_names_inds = (None, None, None)
 
         self._spectra_classes = spectra_classes
         self._spectra_classes_names = spectra_classes_names
@@ -316,7 +321,7 @@ class CanopusResults:
                                    compi_classes_header[-3:]]
         return compi_classes_names, compi_classes
 
-    def transfer_spec_classes_to_molfams(self, molfams):
+    def transfer_spec_classes_to_molfams(self, molfams, fraction_cutoff=0.):
         """Set _molfam_classes(_names) from spectra_classes and return classes
 
         This can be used in the _loader to get molfam classes when the GNPS MN
@@ -324,12 +329,55 @@ class CanopusResults:
 
         Args:
             molfams: list of MolecularFamily from the NPLinker space
+            fraction_cutoff: float, cut-off for the fraction of class terms
+                needed to be included in the molfam
         Returns:
             dict of {str: lists of tuple(str, float)} - per molfam (key) the classes for each level
                 where each level is a list of (class_name, fraction) sorted on best choice so index 0 is the best
                 class prediction for a level. When no class is present, instead of Tuple it will be None for that level.
         """
-        pass
+        self._molfam_classes_names = self._spectra_classes_names
+        self._molfam_classes_names_inds = self._spectra_classes_names_inds
+        molfam_classes = {}
+
+        for mi, molfam in enumerate(molfams):
+            fid = str(molfam.family_id)  # the key
+            spectra = molfam.spectra
+            len_molfam = len(spectra)
+
+            classes_per_spectra = []
+            for spec in spectra:
+                spec_classes = self.spectra_classes.get(str(spec.spectrum_id))
+                if spec_classes:  # account for spectra without prediction
+                    classes_per_spectra.append(spec_classes)
+
+            if not classes_per_spectra:
+                continue  # no spectra with classes for this molfam
+
+            sorted_classes = []
+            for i, class_level in enumerate(self._molfam_classes_names):
+                # 1. aggregate classes from all spectra for this class level
+                classes_cur_level = [
+                    class_tup[0] for spec_classes in classes_per_spectra
+                    for class_tup in spec_classes[i] if class_tup]
+                # 2. count the instances of each class in the MF per class lvl
+                counts_cur_level = Counter(classes_cur_level)
+                # 3. calculate fraction and sort high to low, filter out Nones
+                fraction_tups = sorted([
+                    (cls, count/len_molfam) for cls, count in
+                    counts_cur_level.most_common()
+                    if count/len_molfam >= fraction_cutoff],
+                        key=lambda x: x[1], reverse=True)
+                if not fraction_tups:
+                    fraction_tups = [None]
+                if mi < 1000:
+                    print(mi, class_level, classes_cur_level, counts_cur_level.most_common())
+                    print(fraction_tups)
+                sorted_classes.append(fraction_tups)
+            molfam_classes[fid] = sorted_classes
+
+        self._molfam_classes = molfam_classes
+        return molfam_classes
 
     def show(self, objects):
         """Show a table of predicted chemical compound classes for spectrum/MF
