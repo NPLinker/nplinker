@@ -624,7 +624,8 @@ class DatasetLoader(object):
 
         # load Chem_class_predictions (canopus, molnetenhancer are loaded)
         chem_classes = ChemClassPredictions(
-            self.canopus_dir, self.molnetenhancer_dir, self._root)
+            self.canopus_dir, self.molnetenhancer_dir,
+            self._root, should_run_canopus)
         # if no molfam classes transfer them from spectra (due to old style MN)
         if not chem_classes.canopus.molfam_classes and \
                 chem_classes.canopus.spectra_classes:
