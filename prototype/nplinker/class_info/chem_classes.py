@@ -295,7 +295,7 @@ class CanopusResults:
                 header = ['componentindex', 'cluster index', 'formula'] +\
                     [name.partition('_')[-1] for name in can_classes_names]
                 outf.write('\t'.join(header)+'\n')
-                for spec, classes in can_classes:
+                for spec, classes in can_classes.items():
                     formatted_classes = []
                     for lvl in classes:
                         lvl_classes = []
