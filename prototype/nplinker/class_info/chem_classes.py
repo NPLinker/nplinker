@@ -514,9 +514,19 @@ class MolNetEnhancerResults:
                 class_info = []
                 # get class names and scores in (class, score)
                 for i in range(0, len(line), 2):
-                    class_tup = (line[i], float(line[i + 1]))
+                    cur_class = line[i]
+                    if not cur_class or cur_class == "no matches":
+                        # add None instead of tuple when no match at this lvl
+                        class_tup = None
+                        # catch when there is 'no matches' at superclass lvl ->
+                        # no prediction and dont add to dict (same as canopus)
+                        if columns[int(i/2)] == "cf_kingdom":
+                            break
+                    else:
+                        class_tup = (line[i], float(line[i + 1]))
+
                     class_info.append(class_tup)
-                if component not in mne_component_dict:
+                if component not in mne_component_dict and class_info:
                     mne_component_dict[component] = class_info
                 mne_cluster2component[cluster] = component
 

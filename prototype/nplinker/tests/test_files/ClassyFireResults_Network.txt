@@ -1,0 +1,4 @@
+cluster index	CF_componentindex	CF_NrNodes	CF_kingdom	CF_kingdom_score	CF_superclass	CF_superclass_score	CF_class	CF_class_score	CF_subclass	CF_subclass_score	CF_Dparent	CF_Dparent_score	CF_MFramework	CF_MFramework_score
+217875	S6515	1	Organic compounds	1.0	Organic acids and derivatives	1.0	Carboxylic acids and derivatives	1.0	Amino acids, peptides, and analogues	1.0	Isoleucine and derivatives	0.5	Aromatic heteropolycyclic compounds	1.0
+130522	519	33	Organic compounds	0.9393939393939394	no matches	0.4869528619528619		0.3212962962962963	Amino acids, peptides, and analogues	0.3212962962962963	Isoleucine and derivatives	0.19570707070707072	no matches	0.5458754208754207
+31	72	2	no matches	0.0	no matches	0.0	no matches	0.0	no matches	0.0	no matches	0.0	no matches	0.0
