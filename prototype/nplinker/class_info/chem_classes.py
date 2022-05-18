@@ -306,7 +306,7 @@ class CanopusResults:
                                 lvl_classes.append(f"{tup[0]}:{tup[1]:.3f}")
                         formatted_classes.append('; '.join(lvl_classes))
                     output_l = ['-', spec, '-'] + formatted_classes
-                outf.write('\t'.join(output_l)+'\n')
+                    outf.write('\t'.join(output_l)+'\n')
         return can_classes_names, can_classes
 
     def _read_molfam_classes(self, input_file):
