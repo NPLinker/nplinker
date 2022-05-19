@@ -286,6 +286,16 @@ class CanopusResults:
                 f"npc_{elem}" for elem in
                 npc_can_classes_header[npc_starti:npc_stopi:2]]
             can_classes_names.extend(npc_can_classes_names)
+
+            # make sure that non-existing NPC predictions are added as [None]
+            # to all spectra - some spectra where not included in npc_summary
+            len_classes_names = len(can_classes_names)
+            for spec_index, classes_list in can_classes.items():
+                diff = len_classes_names - len(classes_list)
+                if diff > 0:
+                    for _ in range(diff):
+                        classes_list.append([None])
+
             # save output, next time clusterindex_classifications.txt is read
             # save just the info that we need in the format that is parsed in
             # read_spectra_classes()
@@ -376,6 +386,10 @@ class CanopusResults:
         for molfam in molfams:
             fid = str(molfam.family_id)  # the key
             spectra = molfam.spectra
+            # if singleton family, format like '-1_spectrum-id'
+            if fid == '-1':
+                spec_id = spectra[0].spectrum_id
+                fid += f'_{spec_id}'
             len_molfam = len(spectra)
 
             classes_per_spectra = []
@@ -390,9 +404,18 @@ class CanopusResults:
             sorted_classes = []
             for i, class_level in enumerate(self._molfam_classes_names):
                 # 1. aggregate classes from all spectra for this class level
-                classes_cur_level = [
-                    class_tup[0] for spec_classes in classes_per_spectra
-                    for class_tup in spec_classes[i] if class_tup]
+                classes_cur_level = []
+                for spec_classes in classes_per_spectra:
+                    try:
+                        for class_tup in spec_classes[i]:
+                            if class_tup:
+                                classes_cur_level.append(class_tup[0])
+                    except IndexError:
+                        print(self._molfam_classes_names)
+                        print(i, class_level)
+                        print(classes_per_spectra)
+                        print(spec_classes)
+                        print(spectra)
                 # 2. count the instances of each class in the MF per class lvl
                 counts_cur_level = Counter(classes_cur_level)
                 # 3. calculate fraction and sort high to low, filter out Nones
