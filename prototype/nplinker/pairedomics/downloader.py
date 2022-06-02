@@ -80,7 +80,7 @@ def download_mibig_bgc_json(output_path, bgc_id):
     # it simply attempts to download the individual BGC .json file and add it to
     # the local database folder
     logger.info('Attempting to retrieve missing MiBIG BGC JSON data for {}'.format(bgc_id))
-    resp = httpx.get(MIBIG_BGC_URL.format(bgc_id, bgc_id))
+    resp = httpx.get(MIBIG_BGC_URL.format(bgc_id, bgc_id), follow_redirects=True)
     if resp.status_code == httpx.codes.OK:
         with open(os.path.join(output_path, '{}.json'.format(bgc_id)), 'wb') as f:
             f.write(resp.content)
@@ -274,28 +274,38 @@ class Downloader(object):
     def _generate_strain_mappings(self):
         gen_strains = generate_strain_mappings(self.strains, self.strain_mappings_file, os.path.join(self.project_file_cache, 'antismash'))
 
-    def _ncbi_genbank_search(self, genbank_id, retry=True, retry_time=3.0):
+    def _ncbi_genbank_search(self, genbank_id, retry_time=5.0):
         url = NCBI_LOOKUP_URL_NEW.format(genbank_id)
-        logger.debug('Looking up GenBank data at {}'.format(url))
-        resp = httpx.get(url)
+        logger.debug('Looking up GenBank data for {} at {}'.format(genbank_id, url))
+        resp = httpx.get(url, follow_redirects=True)
+
         if resp.status_code == httpx.codes.OK:
-            return resp.content
+            # the page should contain a <dl> element with class "assembly_summary_new". retrieving
+            # the page seems to fail occasionally in the middle of lengthy sequences of genome
+            # lookups, so there might be some throttling going on. this will automatically retry
+            # the lookup if the expected content isn't found the first time 
+            soup = BeautifulSoup(resp.content, 'html.parser')
+            # find the <dl> element with class "assembly_summary_new"
+            dl_element = soup.find('dl', {'class': 'assembly_summary_new'})
+            if dl_element is not None:
+                return dl_element
 
-        if retry:
-            logger.debug('Lookup failed due to HTTP error, trying again in {} seconds'.format(retry_time))
-            # wait a few seconds here and then try again, seems to occasionally
-            # fail even though it should produce a valid result so maybe some
-            # throttling going on?
-            time.sleep(retry_time)
-            resp = httpx.get(url)
-            if resp.status_code == httpx.codes.OK:
-                return resp.content
+        logger.debug('NCBI lookup failed, status code {}. Trying again in {} seconds'.format(resp.status_code, retry_time))
+        time.sleep(retry_time)
+        logger.debug('Looking up GenBank data for {} at {}'.format(genbank_id, url))
+        resp = httpx.get(url, follow_redirects=True)
+        if resp.status_code == httpx.codes.OK:
+            soup = BeautifulSoup(resp.content, 'html.parser')
+            # find the <dl> element with class "assembly_summary_new"
+            dl_element = soup.find('dl', {'class': 'assembly_summary_new'})
+            if dl_element is not None:
+                return dl_element
 
-        logger.warning('HTTP error {} resolving GenBank accession {} (URL was {})'.format(resp.status_code, genbank_id, url))
+        logger.warning('Failed to resolve NCBI genome ID {} at URL {} (after retrying)'.format(genbank_id, url))
         return None
 
     def _resolve_genbank_accession(self, genbank_id):
-        logger.info('Attempting to resolve RefSeq accession from Genbank accession {}'.format(genbank_id))
+        logger.info('Attempting to resolve Genbank accession {} to RefSeq accession'.format(genbank_id))
         # genbank id => genbank seq => refseq
 
         # The GenBank accession can have several formats:
@@ -313,16 +323,11 @@ class Downloader(object):
 
         # get rid of any extraneous whitespace
         genbank_id = genbank_id.strip() 
+        logger.debug('Parsed GenBank ID to "{}"'.format(genbank_id))
 
         # run a search using the GenBank accession ID
         try:
-            content = self._ncbi_genbank_search(genbank_id)
-            if content is None:
-                raise Exception('HTTP connection error')
-
-            soup = BeautifulSoup(content, 'html.parser')
-            # find the <dl> element with class "assembly_summary_new"
-            dl_element = soup.find('dl', {'class': 'assembly_summary_new'})
+            dl_element = self._ncbi_genbank_search(genbank_id)
             if dl_element is None:
                 raise Exception('Unknown HTML format')
 
@@ -351,10 +356,10 @@ class Downloader(object):
 
     def _resolve_jgi_accession(self, jgi_id):
         url = JGI_GENOME_LOOKUP_URL.format(jgi_id)
-        logger.info('Attempting to resolve JGI_Genome_ID to GenBank accession')
+        logger.info('Attempting to resolve JGI_Genome_ID {} to GenBank accession via {}'.format(jgi_id, url))
         # no User-Agent header produces a 403 Forbidden error on this site...
         try:
-            resp = httpx.get(url, headers={'User-Agent': USER_AGENT}, timeout=10.0)
+            resp = httpx.get(url, headers={'User-Agent': USER_AGENT}, timeout=10.0, follow_redirects=True)
         except httpx.ReadTimeout:
             logger.warning('Timed out waiting for result of JGI_Genome_ID lookup')
             return None
@@ -492,7 +497,7 @@ class Downloader(object):
 
                 logger.info('antismash DB lookup for {} => {}'.format(accession, url))
                 try:
-                    resp = httpx.get(url)
+                    resp = httpx.get(url, follow_redirects=True)
                     soup = BeautifulSoup(resp.content, 'html.parser')
                     # retrieve .zip file download link
                     link = soup.find('a', {'href': lambda url: url.endswith('.zip')})
@@ -711,7 +716,7 @@ class Downloader(object):
             logger.info('Found OLD GNPS structure')
 
     def _download_platform_json_to_file(self, url, local_path):
-        resp = httpx.get(url)
+        resp = httpx.get(url, follow_redirects=True)
         if not resp.status_code == 200:
             raise Exception('Failed to download {} (status code {})'.format(url, resp.status_code))
 
