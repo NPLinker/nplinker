@@ -16,6 +16,7 @@ To use this release, run `docker pull andrewramsay:nplinker:v1.2.0`
  - CANOPUS is included in the workflow if `run_canopus = true` is set in the toml file/config.
  - Chemical class predictions from CANOPUS and MolNetEnhancer are read from directories 'canopus' and 'molnetenhancer'.
  - To perform class-based linking in NPClassScore, [MIBiG classes](prototype/nplinker/data/MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt) are added from which [scoring tables](notebooks/npclassscore_linking/class_matching_tables.ipynb) are calculated depicting the matching class ontologies.
+ - Fix genome_status.txt when multiple GenBank accessions are listed, by reading them in as ';' separated. See [here](https://github.com/NPLinker/nplinker/pull/65/commits/7aa53370ffd277983d9d9608ae0b7f5ad6ea7fd3).
 
 ## [[v1.1.3]](https://github.com/sdrogers/nplinker/compare/v1.1.2...v1.1.3) - 2021-11-26
 
