@@ -20,7 +20,7 @@ cd nplinker
 pipenv sync
 pipenv shell
 ```
-See the example Jupyter notebook (notebooks/nplinker_demo1.ipynb) for a guided introduction to the NPLinker API which shows how to load and examine a dataset. Other notebooks are present showcasing other scoring methods (like notebooks/npclassscore_linking/NPClassScore_demo.ipynb).
+See the example [Jupyter notebook](notebooks/nplinker_demo1.ipynb) for a guided introduction to the NPLinker API which shows how to load and examine a dataset. Other notebooks are present showcasing other scoring methods, like for [NPClassScore](notebooks/npclassscore_linking/NPClassScore_demo.ipynb).
 
 API documentation is still being updated but the latest version is available at [readthedocs](https://nplinker.readthedocs.io/en/latest/).
 
