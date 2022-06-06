@@ -4,8 +4,7 @@ import itertools
 import pandas as pd
 
 from bokeh.models import Button, CustomJS, ColumnDataSource
-from bokeh.models.widgets import DataTable, TableColumn, Div
-from bokeh.layouts import row
+from bokeh.models.widgets import DataTable, TableColumn
 
 from linker import Linker
 from tables_functions import create_links, get_table_info, NA_ID, NA_TEXT
@@ -122,7 +121,6 @@ class TableData(object):
         print('DataFrames created')
 
         # create links between GCF and BGC objects (or load pickled version)
-        # note the +1s are because the tables code uses 0 for NA
         pickled_links_data = load_pickled_data(self.nh.nplinker, pickled_links_path)
         if pickled_links_data is None:
             index_mappings_1, index_mappings_2 = {}, {}
@@ -134,7 +132,6 @@ class TableData(object):
                 for bgc in gcf.bgcs:
                     if bgc not in bgcs_seen:
                         continue
-                    # bgc_to_gcf_indices.append((bgc.id + 1, gcf.id + 1))
                     bgc_to_gcf_indices.append((_bgc_indices[bgc], _gcf_indices[gcf]))
                     index_mappings_1[_bgc_indices[bgc]] = bgc.id
                     index_mappings_2[_gcf_indices[gcf]] = gcf.id
@@ -143,7 +140,6 @@ class TableData(object):
             print(' + bgc_gcf')
 
             # links between Spectrum and MolFam objects
-            # note the +1s are because the tables code uses 0 for NA
             index_mappings_1, index_mappings_2 = {}, {}
             molfam_to_spec_indices = []
             tmp = set(spectra)
