@@ -8,7 +8,7 @@ Starting from v1.1, each release listed here will also have a corresponding tagg
 
 ## [v1.2.0](https://github.com/sdrogers/nplinker/compare/v1.1.3...v1.2.0)
 
-To use this release, run `docker pull andrewramsay:nplinker:v1.2.0`
+To use this release, run `docker pull andrewramsay/nplinker:v1.2.0`
 
 ### Added
 
@@ -31,7 +31,7 @@ To use this release, run `docker pull andrewramsay:nplinker:v1.2.0`
 
 ## [v1.1.3](https://github.com/sdrogers/nplinker/compare/v1.1.2...v1.1.3) - 2021-11-26
 
-To use this release, run `docker pull andrewramsay:nplinker:v1.1.3`
+To use this release, run `docker pull andrewramsay/nplinker:v1.1.3`
 
 ### Changed
 
@@ -42,7 +42,7 @@ To use this release, run `docker pull andrewramsay:nplinker:v1.1.3`
 
 ## [v1.1.2](https://github.com/sdrogers/nplinker/compare/v1.1.1...v1.1.2) - 2021-09-23
 
-To use this release, run `docker pull andrewramsay:nplinker:v1.1.2`
+To use this release, run `docker pull andrewramsay/nplinker:v1.1.2`
 
 ### Changed
 
@@ -50,7 +50,7 @@ To use this release, run `docker pull andrewramsay:nplinker:v1.1.2`
  
 ## [v1.1.1](https://github.com/sdrogers/nplinker/compare/v1.1...v1.1.1) - 2021-09-13
 
-To use this release, run `docker pull andrewramsay:nplinker:v1.1.1`
+To use this release, run `docker pull andrewramsay/nplinker:v1.1.1`
 
 ### Changed
 
@@ -61,7 +61,7 @@ To use this release, run `docker pull andrewramsay:nplinker:v1.1.1`
 
 ## [v1.1](https://github.com/sdrogers/nplinker/compare/v1.0...v1.1) - 2021-09-04
 
-To use this release, run `docker pull andrewramsay:nplinker:v1.1`
+To use this release, run `docker pull andrewramsay/nplinker:v1.1`
 
 ### Added
 
