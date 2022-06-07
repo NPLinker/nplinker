@@ -6,17 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 Starting from v1.1, each release listed here will also have a corresponding tagged [Docker image version](https://hub.docker.com/r/andrewramsay/nplinker/tags?page=1&ordering=last_updated). If you want to use the latest version of NPLinker, use `docker pull andrewramsay/nplinker:latest`. If you want a specific version, you can instead use `docker pull andrewramsay/nplinker:v1.1` etc. 
 
-## [v1.2.0](https://github.com/sdrogers/nplinker/compare/v1.1.3...v1.2)
+## [v1.2.0](https://github.com/sdrogers/nplinker/compare/v1.1.3...v1.2.0)
 
 To use this release, run `docker pull andrewramsay:nplinker:v1.2.0`
 
-### Changed
+### Added
 
- - NPClassScore is added as a scoring method. Demo notebook can be found [here](notebooks/npclassscore_linking/NPClassScore_demo.ipynb).
+ - NPClassScore is added as a scoring method. Demo notebook can be found [here](notebooks/npclassscore_linking/NPClassScore_demo.ipynb). Original PR [is here](https://github.com/NPLinker/nplinker/pull/65)
  - CANOPUS is included in the workflow if `run_canopus = true` is set in the toml file/config.
  - Chemical class predictions from CANOPUS and MolNetEnhancer are read from directories 'canopus' and 'molnetenhancer'.
  - To perform class-based linking in NPClassScore, [MIBiG classes](prototype/nplinker/data/MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt) are added from which [scoring tables](notebooks/npclassscore_linking/class_matching_tables.ipynb) are calculated depicting the matching class ontologies.
+ - In some rare cases datasets may contain references to MiBIG BGCs that are not packaged in the database archive downloaded by NPLinker. If NPLinker detects this situation it will now make an automatic attempt to download the missing BGC data from https://mibig.secondarymetabolites.org. If this succeeds the loading process will continue as normal. See [this issue for details](https://github.com/NPLinker/nplinker/issues/60#issuecomment-1086722952)
+
+### Changed
  - Fix genome_status.txt when multiple GenBank accessions are listed, by reading them in as ';' separated. See [here](https://github.com/NPLinker/nplinker/pull/65/commits/7aa53370ffd277983d9d9608ae0b7f5ad6ea7fd3).
+ - The Metcalf scoring implementation can now return a mix of Spectrum and MolecularFamily objects. In the web application, this is now handled by extracting all the Spectra from the MolFams and listing those, rather than listing a mix of the two object types
+ - The Metcalf scoring slider in the web application now ranges between 0-50 instead of 0-10
+ - Bugfix for duplicate Spectrum/BGC objects potentially being generated when using the "include_strains.csv" file
+ - Connections to the Paired Omics Data Platform now use the HTTPS endpoint rather than HTTP
+ - Rosetta scoring updated to handle hybrid BGC objects
+ - MiBIG database versioning improved. You can now use the `mibig_version` setting [in the configuration file](https://github.com/NPLinker/nplinker/blob/35c9890584a593a47b021433ed2a9f9c9c14060a/prototype/nplinker/data/nplinker.toml#L137) to tell NPLinker to download either v1.4 or v2.0 of the database (default is v1.4)
+ - The downloader module has been updated to ensure it will follow HTTP redirects, and to try to workaround intermittent failures to retrieve pages from https://www.ncbi.nlm.nih.gov. This may be down to some throttling behaviour on the server, as a follow-up attempt usually succeeds. The downloader module will now make an automatic 2nd attempt to retrieve a page if the first attempt fails, with a 5 second delay between them
+ - Some Python dependency versions updated
 
 ## [[v1.1.3]](https://github.com/sdrogers/nplinker/compare/v1.1.2...v1.1.3) - 2021-11-26
 
