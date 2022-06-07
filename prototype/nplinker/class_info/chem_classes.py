@@ -33,16 +33,15 @@ class ChemClassPredictions:
     Currently, CANOPUS and MolNetEnhancer results are loaded
     """
 
-    def __init__(self, canopus_dir, mne_dir, gnps_dir, run_canopus=True):
+    def __init__(self, canopus_dir, mne_dir, gnps_dir):
         """Load classes with CanopusResults, MolNetEnhancerResults
 
         Args:
             canopus_dir: str, canopus_dir found in root_dir of nplinker project
             mne_dir: str, mne_dir found in root_dir of nplinker project
             gnps_dir: str, root dir where all gnps info is found
-            run_canopus: bool to indicate if canopus was run or not
         """
-        self._canopus = CanopusResults(canopus_dir, gnps_dir, run_canopus)
+        self._canopus = CanopusResults(canopus_dir, gnps_dir)
         self._molnetenhancer = MolNetEnhancerResults(mne_dir)
 
         class_predict_options = []
@@ -81,13 +80,12 @@ class CanopusResults:
     output is read as is from canopus_summary.tsv
     """
 
-    def __init__(self, canopus_dir, gnps_dir, run_canopus=True):
+    def __init__(self, canopus_dir, gnps_dir):
         """Read the class info from root_dir/canopus
 
         Args:
             canopus_dir: str, canopus_dir found in root_dir of nplinker project
             gnps_dir: str, root dir where all gnps info is found
-            run_canopus: bool to indicate if canopus was run or not
 
         If possible, convert canopus output with canopus_treemap. Otherwise
         canopus output is used directly. If converting fails, probably the MN
@@ -99,10 +97,11 @@ class CanopusResults:
             self._molfam_classes_names_inds = (None, None, None)
         self._spectra_classes, self._spectra_classes_names, \
             self._spectra_classes_names_inds = (None, None, None)
-        if run_canopus:
+        if os.path.isdir(self._canopus_dir):
             self._read_all_classes()
         else:
-            logger.info("No CANOPUS results present (run_canopus = false)")
+            logger.info(f"No CANOPUS results present at {self._canopus_dir}. "
+                        f"(set run_canopus=true in the .toml to run CANOPUS)")
 
     def _read_all_classes(self):
         """Wrapper to read all canopus output and store them in the object"""
@@ -125,9 +124,12 @@ class CanopusResults:
             try:
                 analyse_canopus(self._canopus_dir, self._gnps_dir,
                                 self._canopus_dir)
-            except Exception as e:
+            except FileNotFoundError as er1:
                 logger.warning(
-                    f'canopus_treemap failed with: {e}. Probably the MN '
+                    f'{er1}. CANOPUS output is missing in {self._canopus_dir}')
+            except Exception as er2:
+                logger.warning(
+                    f'canopus_treemap failed with: {er2}. Probably the MN '
                     f'version from GNPS is too old. Will attempt to read '
                     f'directly from canopus_dir')
             else:
@@ -515,7 +517,9 @@ class MolNetEnhancerResults:
             pass
 
         if not os.path.isfile(input_file):
-            logger.warn(f"no molnetenhancer input found in {mne_dir}")
+            logger.info(f"No MolNetEnhancer result present at {mne_dir}. "
+                        f"(run it on GNPS and download it here if you want to "
+                        f"use it)")
             return columns, mne_component_dict, mne_cluster2component
 
         with open(input_file) as inf:
