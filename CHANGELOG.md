@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 Starting from v1.1, each release listed here will also have a corresponding tagged [Docker image version](https://hub.docker.com/r/andrewramsay/nplinker/tags?page=1&ordering=last_updated). If you want to use the latest version of NPLinker, use `docker pull andrewramsay/nplinker:latest`. If you want a specific version, you can instead use `docker pull andrewramsay/nplinker:v1.1` etc. 
 
-## [v1.2.0](https://github.com/sdrogers/nplinker/compare/v1.1.3...v1.2.0)
+## [[v1.2.0]](https://github.com/sdrogers/nplinker/compare/v1.1.3...v1.2.0)
 
 To use this release, run `docker pull andrewramsay:nplinker:v1.2.0`
 
