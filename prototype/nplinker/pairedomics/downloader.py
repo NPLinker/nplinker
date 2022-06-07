@@ -56,7 +56,7 @@ USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 
 class GenomeStatus:
 
     def __init__(self, original_id, resolved_id, attempted=False, filename=""):
-        self.original_id = original_id
+        self.original_id = ';'.join(original_id.split(','))
         self.resolved_id = None if resolved_id == 'None' else resolved_id
         self.attempted = True if attempted == 'True' else False
         self.filename = filename

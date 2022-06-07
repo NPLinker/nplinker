@@ -595,7 +595,8 @@ class DatasetLoader(object):
             True if everything completes
         """
         # load Class_matches with mibig info from data
-        mibig_class_file = os.path.join(self.datadir, 'MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt')
+        mibig_class_file = os.path.join(
+            self.datadir, 'MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt')
         self.class_matches = ClassMatches(mibig_class_file)
 
         # run canopus if canopus_dir does not exist
@@ -622,10 +623,15 @@ class DatasetLoader(object):
                 logger.info('Found CANOPUS dir, CANOPUS not run again!')
 
         # load Chem_class_predictions (canopus, molnetenhancer are loaded)
-        # for canopus, check if results can be converted with canopus_treemap
-        # todo: otherwise use the pre-existing output of canopus
-        self.chem_classes = ChemClassPredictions(
+        chem_classes = ChemClassPredictions(
             self.canopus_dir, self.molnetenhancer_dir, self._root)
+        # if no molfam classes transfer them from spectra (due to old style MN)
+        if not chem_classes.canopus.molfam_classes and \
+                chem_classes.canopus.spectra_classes:
+            logger.debug("Added chemical compound classes for MFs")
+            chem_classes.canopus.transfer_spec_classes_to_molfams(self.molfams)
+        # include them in loader
+        self.chem_classes = chem_classes
         return True
 
     def _load_strain_mappings(self):

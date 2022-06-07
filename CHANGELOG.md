@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 Starting from v1.1, each release listed here will also have a corresponding tagged [Docker image version](https://hub.docker.com/r/andrewramsay/nplinker/tags?page=1&ordering=last_updated). If you want to use the latest version of NPLinker, use `docker pull andrewramsay/nplinker:latest`. If you want a specific version, you can instead use `docker pull andrewramsay/nplinker:v1.1` etc. 
 
+## [v1.2.0](https://github.com/sdrogers/nplinker/compare/v1.1.3...v1.2)
+
+To use this release, run `docker pull andrewramsay:nplinker:v1.2.0`
+
+### Changed
+
+ - NPClassScore is added as a scoring method. Demo notebook can be found [here](notebooks/npclassscore_linking/NPClassScore_demo.ipynb).
+ - CANOPUS is included in the workflow if `run_canopus = true` is set in the toml file/config.
+ - Chemical class predictions from CANOPUS and MolNetEnhancer are read from directories 'canopus' and 'molnetenhancer'.
+ - To perform class-based linking in NPClassScore, [MIBiG classes](prototype/nplinker/data/MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt) are added from which [scoring tables](notebooks/npclassscore_linking/class_matching_tables.ipynb) are calculated depicting the matching class ontologies.
+ - Fix genome_status.txt when multiple GenBank accessions are listed, by reading them in as ';' separated. See [here](https://github.com/NPLinker/nplinker/pull/65/commits/7aa53370ffd277983d9d9608ae0b7f5ad6ea7fd3).
+
 ## [[v1.1.3]](https://github.com/sdrogers/nplinker/compare/v1.1.2...v1.1.3) - 2021-11-26
 
 To use this release, run `docker pull andrewramsay:nplinker:v1.1.3`

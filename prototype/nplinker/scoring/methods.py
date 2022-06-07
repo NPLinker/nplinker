@@ -917,8 +917,10 @@ class NPClassScoring(ScoringMethod):
 
         # gather classes for spectra, using right method
         # choose the main method here by including it as 'main' in the method parameter
-        use_canopus = 'main' in method or 'canopus' in method or 'mix' in method
-        use_mne = 'molnetenhancer' in method or 'mix' in method
+        use_canopus = ('main' in method or 'canopus' in method or 'mix'
+                       in method) and 'canopus' in self.method_options
+        use_mne = ('molnetenhancer' in method or 'mix' in method) and \
+                  'molnetenhancer' in self.method_options
         spec_like_classes, spec_like_classes_names, \
             spec_like_classes_names_inds = (None, None, None)
         # the order in which the classes are read, determines the priority (now: first canopus, then mne)
