@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 Starting from v1.1, each release listed here will also have a corresponding tagged [Docker image version](https://hub.docker.com/r/andrewramsay/nplinker/tags?page=1&ordering=last_updated). If you want to use the latest version of NPLinker, use `docker pull andrewramsay/nplinker:latest`. If you want a specific version, you can instead use `docker pull andrewramsay/nplinker:v1.1` etc. 
 
-## [[v1.2.0]](https://github.com/sdrogers/nplinker/compare/v1.1.3...v1.2.0)
+## [v1.2.0](https://github.com/sdrogers/nplinker/compare/v1.1.3...v1.2.0)
 
 To use this release, run `docker pull andrewramsay:nplinker:v1.2.0`
 
@@ -29,7 +29,7 @@ To use this release, run `docker pull andrewramsay:nplinker:v1.2.0`
  - The downloader module has been updated to ensure it will follow HTTP redirects, and to try to workaround intermittent failures to retrieve pages from https://www.ncbi.nlm.nih.gov. This may be down to some throttling behaviour on the server, as a follow-up attempt usually succeeds. The downloader module will now make an automatic 2nd attempt to retrieve a page if the first attempt fails, with a 5 second delay between them
  - Some Python dependency versions updated
 
-## [[v1.1.3]](https://github.com/sdrogers/nplinker/compare/v1.1.2...v1.1.3) - 2021-11-26
+## [v1.1.3](https://github.com/sdrogers/nplinker/compare/v1.1.2...v1.1.3) - 2021-11-26
 
 To use this release, run `docker pull andrewramsay:nplinker:v1.1.3`
 
@@ -40,7 +40,7 @@ To use this release, run `docker pull andrewramsay:nplinker:v1.1.3`
  - Download process better handles genome records with no usable genome ID
  - Added more logging for information/debugging
 
-## [[v1.1.2]](https://github.com/sdrogers/nplinker/compare/v1.1.1...v1.1.2) - 2021-09-23
+## [v1.1.2](https://github.com/sdrogers/nplinker/compare/v1.1.1...v1.1.2) - 2021-09-23
 
 To use this release, run `docker pull andrewramsay:nplinker:v1.1.2`
 
@@ -48,7 +48,7 @@ To use this release, run `docker pull andrewramsay:nplinker:v1.1.2`
 
  - BiG-SCAPE parameter handling behaviour has been updated. See the [default configuration file](https://github.com/sdrogers/nplinker/blob/666669e32724139bcc27d6869a986f891c1dc0cf/prototype/nplinker/data/nplinker.toml#L200) for details. The default settings are the same as the last release
  
-## [[v1.1.1]](https://github.com/sdrogers/nplinker/compare/v1.1...v1.1.1) - 2021-09-13
+## [v1.1.1](https://github.com/sdrogers/nplinker/compare/v1.1...v1.1.1) - 2021-09-13
 
 To use this release, run `docker pull andrewramsay:nplinker:v1.1.1`
 
@@ -59,7 +59,7 @@ To use this release, run `docker pull andrewramsay:nplinker:v1.1.1`
  - bugfix for parameter handling in NPLinker.get_links method
  
 
-## [[v1.1]](https://github.com/sdrogers/nplinker/compare/v1.0...v1.1) - 2021-09-04
+## [v1.1](https://github.com/sdrogers/nplinker/compare/v1.0...v1.1) - 2021-09-04
 
 To use this release, run `docker pull andrewramsay:nplinker:v1.1`
 
@@ -82,7 +82,7 @@ To use this release, run `docker pull andrewramsay:nplinker:v1.1`
  - old `strain_id_mapping.csv` file is now removed to avoid name clashes with uesr-provided strain mappings (this was an early development feature anyway)
  - various unused/older files cluttering the repository
 
-## [[v1.0]](https://github.com/sdrogers/nplinker/compare/v.0.1...v1.0) - 2021-04-12
+## [v1.0](https://github.com/sdrogers/nplinker/compare/v.0.1...v1.0) - 2021-04-12
 
 ### Added
  
