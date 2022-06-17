@@ -3,9 +3,9 @@
 NPLinker is a tool that aims to address the significant bottleneck that exists in the realization of the potential of genome-led metabolite discovery, namely the slow manual matching of predicted biosynthetic gene clusters (BGCs) with metabolites produced during bacterial culture; linking phenotype to genotype. NPLinker implements a new data-centric approach to alleviate this linking problem by searching for patterns of strain presence and absence between groups of similar spectra (molecular families; MF) and groups of similar BGCs (gene cluster families; GCF). Searches can be performed using a number of available analysis methods employed in isolation or together. 
 
 Currently available analysis methods (scoring methods):
-- (Standardised) Metcalf, see [Hjörleifsson Eldjárn G, et al. (2021)](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1008920) and [Doroghazi JR, et al. (2014)](https://www.nature.com/articles/nchembio.1659).
+- (Standardised) Metcalf, see [Hjörleifsson Eldjárn G, et al. (2021)](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1008920), [Doroghazi JR, et al. (2014)](https://www.nature.com/articles/nchembio.1659), and the [demo](notebooks/nplinker_demo1.ipynb).
 - Rosetta, see [Hjörleifsson Eldjárn G, et al. (2021)](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1008920) and [Soldatou S, et al. (2021)](https://www.mdpi.com/1660-3397/19/2/103).
-- NPClassScore (currently only available in the python version), see the preprint [Louwen JJR, et al. (2022)](https://www.researchsquare.com/article/rs-1391827/new/v1).
+- NPClassScore (currently only available in the python version), see the preprint [Louwen JJR, et al. (2022)](https://www.researchsquare.com/article/rs-1391827/new/v1), and the [demo](notebooks/npclassscore_linking/NPClassScore_demo.ipynb).
 
 ## Getting Started - Web application
 
