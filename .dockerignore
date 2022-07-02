@@ -1,10 +1,10 @@
-prototype/nplinker/scoring/iokr/data
-prototype/nplinker/scoring/iokr/iokr_venv
+src/nplinker/scoring/iokr/data
+src/nplinker/scoring/iokr/iokr_venv
 arch_venv
 .git
 .vscode
-prototype/carnegie-notebooks
-prototype/.ipynb_checkpoints
+src/carnegie-notebooks
+src/.ipynb_checkpoints
 __pycache__
 *.toml
 TODO*

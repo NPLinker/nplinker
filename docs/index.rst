@@ -1,25 +1,14 @@
 .. nplinker documentation master file, created by
-   sphinx-quickstart on Sat Sep  5 19:06:19 2020.
+   sphinx-quickstart on Wed May  5 22:45:36 2021.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-nplinker documentation (WIP)
-====================================
+Welcome to nplinker's documentation!
+==========================================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-NPLinker module
-***************
-
-.. autoclass:: nplinker.nplinker.NPLinker
-   :members:
-
-Scoring methods
-***************
-.. automodule:: nplinker.scoring.methods
-   :members:
+  :maxdepth: 2
+  :caption: Contents:
 
 Indices and tables
 ==================

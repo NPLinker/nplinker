@@ -8,7 +8,7 @@ import glob
 import pandas as pd
 from collections import defaultdict, Counter
 
-sys.path.append('../../prototype')
+sys.path.append('../../src')
 from nplinker.nplinker import BGC, GCF, Spectrum
 from nplinker.nplinker import NPLinker
 
@@ -22,12 +22,12 @@ class Class_links:
         self._get_class_counts()
         self._get_scoring_tables()
         pd.options.display.float_format = "{:,.3f}".format  # adjust pd formatting
-        
+
         self._bigscape_mibig_conversion = {
             'PKSI': 'Polyketide', 'PKSother': 'Polyketide',
             'NRPS': 'NRP', 'RiPPs': 'RiPP', 'Saccharides': 'Saccharide',
             'Others': 'Other', 'Terpene': 'Terpene', 'PKS-NRP_Hybrids': 'PKS-NRP_Hybrids'}
-        
+
         self._as_conversion = {
             'NAGGN': 'other', 'NAPAA': 'other', 'RRE-containing': 'bacteriocin',
             'RiPP-like': 'bacteriocin', 'cf_fatty_acid': "fatty_acid", 'cf_putative': 'other',
@@ -61,7 +61,7 @@ class Class_links:
             if product[1] >= size_cutoff:
                 filtered_as_classes.append(product[0])
         return filtered_as_classes
-    
+
     def convert_as_classes(self, init_as_classes: list):
         """Convert AS classes to class names that are in scoring table
 
@@ -92,7 +92,7 @@ class Class_links:
                 sub_classes = [cls for cls in class_base if cls.split(":")[1]]
                 as_classes = elems.pop(0).split(',')
 
-                bgc_classes = [classes, sub_classes, as_classes]        
+                bgc_classes = [classes, sub_classes, as_classes]
                 chem_classes = [chem_cls.split('; ') for chem_cls in elems[2:]]
                 classes_dict[chem_id] = [bgc_classes, chem_classes]
         self._mibig_classes = classes_dict
@@ -103,14 +103,14 @@ class Class_links:
         self._chem_class_names = s_h[5:]
 
         return self._mibig_classes
-    
+
     def _get_class_counts(self):
         # aggregate pairwise class matrices for all compounds
-        
+
         def _rec_dd():
             """Initialises a recurring defaultdict"""
             return defaultdict(_rec_dd)
-        
+
         result = _rec_dd()
         # loop through each mibig compound
         for mibig_chem_id, (bgc_classes, chem_classes) in self._mibig_classes.items():
@@ -135,7 +135,7 @@ class Class_links:
                         for init_bgc_c in init_bgc_class:
                             if not any([test in init_bgc_c.lower() for test in ['nrp', 'pks', 'polyketide']]):
                                 bgc_class.append(init_bgc_c)
-                    
+
                     # replace Alkaloid with Other in bgc_class
                     bgc_class = ["Other" if bgc_c == "Alkaloid" else bgc_c for bgc_c in bgc_class]
 
@@ -152,7 +152,7 @@ class Class_links:
                                 result[bgc_cat][chem_cat][bgc_c][chem_c] = 1
         self._class_count_dict = result
         return result
-    
+
     def _get_scoring_tables(self):
         # makes dict of pd.DataFrames
         # read resulting tables column to row
@@ -178,27 +178,27 @@ class Class_links:
         self._class_links = class_linking_tables
         self._class_links_counts = class_linking_counts
         return class_linking_tables
-    
+
     @property
     def class_links(self):
         return self._class_links
-    
+
     @property
     def class_links_counts(self):
         return self._class_links_counts
-    
+
     @property
     def bgc_class_names(self):
         return self._bgc_class_names
-    
+
     @property
     def chem_class_names(self):
         return self._chem_class_names
-    
+
     @property
     def bigscape_mibig_conversion(self):
         return self._bigscape_mibig_conversion
-    
+
     @property
     def as_conversion(self):
         return self._as_conversion
@@ -206,14 +206,14 @@ class Class_links:
 
 class Canopus_results:
     """Class for storing canopus results
-    
+
     The two input files from input_dir are read for the spectra and molfams, respectively:
         -cluster_index_classifications.txt
         -component_index_classifications.txt
     """
     def __init__(self, root_dir):
         """Read the class info from root_dir/canopus
-        
+
         Args:
             root_dir: str, root_dir of nplinker project
         """
@@ -221,15 +221,15 @@ class Canopus_results:
         self._spectra_classes = spectra_classes
         self._spectra_classes_names = spectra_classes_names
         self._spectra_classes_names_inds = {elem:i for i,elem in enumerate(spectra_classes_names)}
-        
+
         molfam_classes_names, molfam_classes = self._read_molfam_classes(root_dir)
         self._molfam_classes = molfam_classes
         self._molfam_classes_names = molfam_classes_names
         self._molfam_classes_names_inds = {elem:i for i,elem in enumerate(molfam_classes_names)}
-    
+
     def _read_spectra_classes(self, root_dir):
         """Read canopus classes for spectra, return classes_names, classes
-        
+
         Args:
             root_dir: str, root_dir of nplinker project
         Returns:
@@ -245,7 +245,7 @@ class Canopus_results:
         ci_classes = {}  # make a dict {ci: [[(class,score)]]}
         ci_classes_header = None
         ci_classes_names = []
-        
+
         if os.path.isfile(input_file):
             with open(input_file) as inf:
                 ci_classes_header = inf.readline().strip().split("\t")
@@ -268,10 +268,10 @@ class Canopus_results:
             ci_classes_names = [f"cf_{elem}" for elem in ci_classes_header[3:-3]] +\
                    [f"npc_{elem}" for elem in ci_classes_header[-3:]]
         return ci_classes_names, ci_classes
-    
+
     def _read_molfam_classes(self, root_dir):
         """Read canopus classes for molfams, return classes_names, classes
-        
+
         Args:
             root_dir: str, root_dir of nplinker project
         Returns:
@@ -287,7 +287,7 @@ class Canopus_results:
         compi_classes = {}  # make a dict {compi: [[(class,score)]]}
         compi_classes_header = None
         compi_classes_names = []
-        
+
         if os.path.isfile(input_file):
             with open(input_file) as inf:
                 compi_classes_header = inf.readline().strip().split("\t")
@@ -310,27 +310,27 @@ class Canopus_results:
             compi_classes_names = [f"cf_{elem}" for elem in compi_classes_header[2:-3]] +\
                       [f"npc_{elem}" for elem in compi_classes_header[-3:]]
         return compi_classes_names, compi_classes
-    
+
     @property
     def spectra_classes(self):
         return self._spectra_classes
-    
+
     @property
     def spectra_classes_names(self):
         return self._spectra_classes_names
-    
+
     @property
     def spectra_classes_names_inds(self):
         return self._spectra_classes_names_inds
-    
+
     @property
     def molfam_classes(self):
         return self._molfam_classes
-    
+
     @property
     def molfam_classes_names(self):
         return self._molfam_classes_names
-    
+
     @property
     def molfam_classes_names_inds(self):
         return self._molfam_classes_names_inds
@@ -338,13 +338,13 @@ class Canopus_results:
 
 class MolNetEnhancer_results:
     """Class for storing MolNetEnhancer results
-    
+
     The input file for ClassyFire results is read from the molnetenhancer directory:
         - ClassyFireResults_Network.txt
     """
     def __init__(self, root_dir):
         """Read the class info from file in root_dir/molnetenhancer/
-        
+
         Args:
             root_dir: str, root_dir of nplinker project
         """
@@ -353,13 +353,13 @@ class MolNetEnhancer_results:
         self._molfam_classes = molfam_classes
         self._spectra_classes_names = cf_classes_names  # if NPC gets implemented, add here
         self._spectra_classes_names_inds = {elem:i for i,elem in enumerate(cf_classes_names)}
-        
+
     def _read_cf_classes(self, root_dir):
         """Read ClassyFireResults_Network.txt in molnetenhancer dir
-        
+
         Args:
             root_dir: str, root_dir of nplinker project
-        Returns: 
+        Returns:
             tuple of:
             -list of str - names of the classes in order
             -dict of {str: [(str, float)]} - linking molfams to (classes, scores) in order of names,
@@ -391,10 +391,10 @@ class MolNetEnhancer_results:
                 mne_cluster2component[cluster] = component
 
         return columns, mne_component_dict, mne_cluster2component
-    
+
     def spectra_classes(self, spectrum_id):
         """Return classes by relating spectrum_id in the molfam_classes
-        
+
         Args:
             spectrum_id: int/str, spectrum_id - ints will be converted to str
         """
@@ -405,19 +405,19 @@ class MolNetEnhancer_results:
         if molfam_id:
             classes = self.molfam_classes.get(molfam_id)
         return classes
-    
+
     @property
     def spectra2molfam(self):
         return self._spectra2molfam
-    
+
     @property
     def spectra_classes_names(self):
         return self._spectra_classes_names
-    
+
     @property
     def spectra_classes_names_inds(self):
         return self._spectra_classes_names_inds
-    
+
     @property
     def molfam_classes(self):
         return self._molfam_classes
@@ -427,15 +427,15 @@ class MolNetEnhancer_results:
 class NPLinker_classes(NPLinker):
     def __init__(self, userconfig=None):
         super().__init__(userconfig)
-        
+
     def read_class_info(self):
         """Should include this in load_data/loader()
-        
+
         returns a Canopus and MNE object with info about classes, and the Class links object
         """
         mibig_classes_file = glob.glob(os.path.join(self.root_dir, "MIBiG*_compounds_with_AS_BGC_CF_NPC_classes.txt"))[0]
         self._class_links = Class_links(mibig_classes_file)
-        
+
         class_predict_options = []
         self._canopus = Canopus_results(self.root_dir)
         if self._canopus.spectra_classes:
@@ -448,7 +448,7 @@ class NPLinker_classes(NPLinker):
         if class_predict_options:
             class_predict_options = ['mix', 'main'] + class_predict_options
         self._class_predict_options = class_predict_options
-    
+
     def class_linking_score(self, obj, target):
         """Return sorted class link scores for scoring obj and target
 
@@ -529,7 +529,7 @@ class NPLinker_classes(NPLinker):
                                 result_tuple = (score, bgc_class_name, chem_class_name, bgc_class, spec_class)
                                 scores.append(result_tuple)
         return sorted(scores, reverse=True)
-    
+
     def npclass_score(self, obj, target, method = 'main'):
         """Return sorted class link scores for scoring obj and target
 
@@ -609,7 +609,7 @@ class NPLinker_classes(NPLinker):
                 spec_like_classes_names = self.canopus.spectra_classes_names
                 spec_like_classes_names_inds = self.canopus.spectra_classes_names_inds
             else:  # molfam
-                all_classes = self.canopus.molfam_classes.get(str(spec_like.family_id)) 
+                all_classes = self.canopus.molfam_classes.get(str(spec_like.family_id))
                 if all_classes:
                     spec_like_classes = [cls_per_lvl for lvl in all_classes
                                          for i, cls_per_lvl in enumerate(lvl) if i==0]
@@ -661,15 +661,15 @@ class NPLinker_classes(NPLinker):
     @property
     def class_links(self):
         return self._class_links
-    
+
     @property
     def canopus(self):
         return self._canopus
-    
+
     @property
     def molnetenhancer(self):
         return self._molnetenhancer
-    
+
     @property
     def class_predict_options(self):
         return self._class_predict_options

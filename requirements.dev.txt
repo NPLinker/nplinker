@@ -1,0 +1,13 @@
+-r requirements.txt
+autoflake
+bump2version
+coverage[toml]
+isort
+prospector[with_pyroma]
+pytest
+pytest-cov
+sphinx
+sphinx_rtd_theme
+sphinx-autoapi
+myst_parser
+yapf

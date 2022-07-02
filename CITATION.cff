@@ -1,0 +1,56 @@
+# YAML 1.2
+---
+cff-version: "1.1.0"
+title: "NPLinker"
+authors:
+  -
+    given-names: Cunliang
+    family-names: Geng
+    affiliation: "Netherlands eScience Center"
+    orcid: "https://orcid.org/0000-0002-1409-8358"
+  -
+    given-names: Giulia
+    family-names: Crocioni
+    affiliation: "Netherlands eScience Center"
+  -
+    given-names:  Simon
+    family-names:  Rogers
+  -
+    given-names:  Andrew
+    family-names:  Ramsay
+  -
+    given-names:  Katherine
+    family-names:  Duncan
+  -
+    given-names:  Justin
+    family-names:  van
+  -
+    given-names:  Grímur
+    family-names:  Hjörleifsson
+  -
+    given-names:  Sylvia
+    family-names:  Soldatou
+  -
+    given-names:  Florian
+    family-names:  Huber
+  -
+    given-names:  Joe
+    family-names:  Wandy
+  -
+    given-names:  Ronan
+    family-names:  Daly
+  -
+    given-names:  Joris
+    family-names:  Louwen
+  -
+    given-names:  Marnix
+    family-names:  Medema
+version: "1.3.0"
+repository-code: "https://github.com/NPLinker/nplinker"
+keywords:
+  - Genome
+  - Metabolome
+  - Natural Products
+  - Data Mining
+message: "If you use this software, please cite it using these metadata."
+license: Apache-2.0

@@ -2,10 +2,7 @@ loglevel = "DEBUG"
 logfile = ""
 repro_file = ""
 [dataset]
-root = "carnegie_mibig_27112019"
+root = "platform:MSV000079284"
 
-[scoring.rosetta]
-
-ms1_tol = 100
-ms2_tol = 0.2
-score_thresh = 0.55
+[webapp]
+tables_metcalf_score = 3.0

@@ -4,7 +4,6 @@ Initial testing for NPClassScore integration into NPLinker
 '''
 
 from class_linking import NPLinker_classes
-import numpy as np
 
 
 if __name__ == "__main__":

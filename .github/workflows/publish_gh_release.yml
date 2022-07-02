@@ -1,0 +1,73 @@
+name: Draft or publish Github release
+# this action will automatically create a tag for the latest commit
+
+on:
+  workflow_dispatch:
+    inputs:
+      current_version:
+        description: 'Current version python package'
+        default: '0.0.1'
+        type: string
+        required: true
+      new_version:
+        description: 'New version to release, used for package version, tag name and release title'
+        default: '0.0.2'
+        type: string
+        required: true
+      mode:
+        description: 'Draft or publish Github release'
+        default: "Draft"
+        required: true
+        type: choice
+        options:
+          - draft
+          - publish
+
+env:
+  REPO_NAME: nplinker
+  CHANGELOG_FILE: CHANGELOG.md
+  RELEASE_NOTES_FILE: release_notes.md
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if:  ${{ inputs.current_version != inputs.new_version }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'
+    - name: Upgrade pip and install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install bump2version
+    - name: Update package version and change log
+      run: |
+        bumpversion --current-version ${{ inputs.current_version }}  --new-version ${{ inputs.new_version }} fake
+        docker run --rm -v "$(pwd)":/usr/local/src/your-app \
+          githubchangeloggenerator/github-changelog-generator \
+          -u ${{ github.repository_owner }} \
+          -p $REPO_NAME \
+          --future-release=v${{ inputs.new_version }} \
+          -o $CHANGELOG_FILE \
+          -t ${{ secrets.GITHUB_TOKEN }}
+    - name: Commit and push the changes
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Update version to ${{ inputs.new_version }}
+    - name: Generate release notes
+      run: |
+        awk '/^## \[v${{ inputs.new_version }}/{flag=1; next}/^##/{flag=0}flag' $CHANGELOG_FILE > $RELEASE_NOTES_FILE
+    - name: Draft a Github release
+      if: ${{ inputs.mode == 'draft' }}
+      run: |
+        gh release create v${{ inputs.new_version }} --draft --title v${{ inputs.new_version }} -F $RELEASE_NOTES_FILE
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_ACTION_TOKEN }}
+    - name: Publish a Github release
+      if: ${{ inputs.mode == 'publish' }}
+      run: |
+        gh release create v${{ inputs.new_version }} --title v${{ inputs.new_version }} -F $RELEASE_NOTES_FILE
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_ACTION_TOKEN }}

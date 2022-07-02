@@ -1,3 +1,29 @@
 {
-    "python.pythonPath": "/Users/simon/.virtualenvs/nplinker-CEvfx91u/bin/python"
+  "editor.rulers": [
+    72,
+    79
+  ],
+
+  // python
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python"
+  },
+  "python.analysis.completeFunctionParens": true,
+  "python.autoComplete.addBrackets": true,
+  "python.defaultInterpreterPath": "",
+  "python.languageServer": "Pylance",
+  // formatting and linting
+  "python.formatting.provider": "yapf",
+  "python.linting.enabled": true,
+  "python.linting.prospectorEnabled": true,
+  "python.linting.pylintEnabled": false,
+  // python docstring
+  "autoDocstring.docstringFormat": "google",
+  "autoDocstring.customTemplatePath": ".vscode/vscode_docstring_google_adapted.mustache",
+
+  // Jupyter
+  "jupyter.sendSelectionToInteractiveWindow": true,
+  "jupyter.askForKernelRestart": false,
+  "notebook.lineNumbers": "on",
+  "notebook.diff.ignoreMetadata": true
 }
