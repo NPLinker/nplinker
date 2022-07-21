@@ -16,9 +16,12 @@ keywords = ["Genome", "Metabolome", "Natural Products", "Data Mining"]
 license = { file="LICENSE" }
 classifiers = [
     "Development Status :: 4 - Beta",
+    "Intended Audience :: Education",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: Apache Software License",
     "Natural Language :: English",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
