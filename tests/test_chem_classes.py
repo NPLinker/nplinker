@@ -1,7 +1,6 @@
 import os
 import unittest
 from pathlib import Path
-from nplinker.class_info.chem_classes import CanopusResults
 from nplinker.class_info.chem_classes import MolNetEnhancerResults
 
 # TODO:  No such file or directory: 'canopus.tsv'
