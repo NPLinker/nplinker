@@ -20,7 +20,7 @@ from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
 
-class Strain(object):
+class Strain():
 
     def __init__(self, primary_strain_id):
         self.id = primary_strain_id
@@ -44,7 +44,7 @@ class Strain(object):
         return 'Strain({}) [{} aliases]'.format(self.id, len(self.aliases))
 
 
-class StrainCollection(object):
+class StrainCollection():
 
     def __init__(self):
         self._strains = []

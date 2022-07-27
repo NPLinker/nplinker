@@ -16,7 +16,7 @@ import logging
 import sys
 
 
-class LogConfig(object):
+class LogConfig():
 
     active_loggers = {}
     logfmt = '%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d, %(message)s'

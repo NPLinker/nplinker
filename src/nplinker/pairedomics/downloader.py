@@ -190,7 +190,7 @@ def generate_strain_mappings(strains, strain_mappings_file, antismash_dir):
     return strains
 
 
-class Downloader(object):
+class Downloader():
     # TODO: move to independent config file  ---C.Geng
     PFAM_PATH = os.path.join(sys.prefix, 'nplinker_lib')
 

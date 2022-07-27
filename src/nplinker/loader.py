@@ -102,7 +102,7 @@ def find_bigscape_dir(broot):
     return None
 
 
-class DatasetLoader(object):
+class DatasetLoader():
 
     ANTISMASH_FMT_DEFAULT = 'default'
     ANTISMASH_FMT_FLAT = 'flat'

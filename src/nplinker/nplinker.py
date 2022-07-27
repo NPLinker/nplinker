@@ -34,7 +34,7 @@ from .scoring.methods import TestScoring
 logger = LogConfig.getLogger(__file__)
 
 
-class NPLinker(object):
+class NPLinker():
 
     # allowable types for objects to be passed to scoring methods
     OBJ_CLASSES = [Spectrum, MolecularFamily, GCF, BGC]

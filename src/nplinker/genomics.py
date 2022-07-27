@@ -31,7 +31,7 @@ logger = LogConfig.getLogger(__file__)
 CLUSTER_REGION_REGEX = re.compile('(.+?)\\.(cluster|region)(\\d+).gbk$')
 
 
-class BGC(object):
+class BGC():
 
     def __init__(self, id, strain, name, product_prediction, description=None):
         self.id = id
@@ -136,7 +136,7 @@ class MiBIGBGC(BGC):
         return self.id
 
 
-class GCF(object):
+class GCF():
 
     def __init__(self, id, gcf_id, bigscape_class):
         self.id = id

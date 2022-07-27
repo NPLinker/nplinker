@@ -15,7 +15,7 @@
 import numpy
 
 
-class InputOutputKernelRegression(object):
+class InputOutputKernelRegression():
 
     def __init__(self, data):
         self.data = data

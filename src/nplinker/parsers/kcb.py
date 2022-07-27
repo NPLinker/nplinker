@@ -29,12 +29,12 @@ CLUSTER_REGION_REGEX = re.compile('(.+?)\\.(cluster|region)(\\d+).gbk$')
 # format with one text file per gbk.
 
 
-class KCBJSONParser(object):
+class KCBJSONParser():
     """
     Parser for the large .json files antiSMASH generates as part of its output
 
     This is supposed to do the same job as the KCBTextParser class without relying
-    on parsing the legacy-format text files. 
+    on parsing the legacy-format text files.
 
     Args:
         bgcs: a list of NPLinker BGC objects created from the same antiSMASH output folder
@@ -239,7 +239,7 @@ class KCBJSONParser(object):
         return {record_id: record_hits}
 
 
-class KCBTextParser(object):
+class KCBTextParser():
     """
     Parser for antismash knownclusterblast text output files
     """
@@ -410,20 +410,20 @@ class KCBTextParser(object):
     def get_kcb_filename_from_bgc(bgc):
         """Given a BGC object, return the filename of the corresponding knownclusterblast .txt file (if any).
 
-            
-        This method attempts to derive the name of the knownclusterblast output file for the 
-        supplied BGC object, using the original path + filename of the .gbk that the BGC was 
-        sourced from during the loading process. 
+
+        This method attempts to derive the name of the knownclusterblast output file for the
+        supplied BGC object, using the original path + filename of the .gbk that the BGC was
+        sourced from during the loading process.
 
         Assumptions made:
             - the .gbk files are grouped in subdirectories with <dataset>/antismash/
             - each of these subdirectories contains a "knownclusterblast" subdirectory
-            - within that, there is a single .txt file for each .gbk 
-        
+            - within that, there is a single .txt file for each .gbk
+
         For some reason there doesn't appear to be a simple way of matching up the .gbk/.txt
-        files using their contents, only the filenames. And there are various different 
+        files using their contents, only the filenames. And there are various different
         possibilities for the naming schemes, so this method tries to account for the
-        known variants discovered so far. 
+        known variants discovered so far.
 
         Args:
             bgc: a BGC object

@@ -16,7 +16,7 @@ import numpy
 from numba import jit
 
 
-class MSSpectrum(object):
+class MSSpectrum():
 
     def __init__(self, mgf_dict=None, spec=None):
         self.compound = None

@@ -15,7 +15,7 @@
 import re
 
 
-class Formula(object):
+class Formula():
 
     def __init__(self, formula):
         self.atom_names = [

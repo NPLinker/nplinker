@@ -124,7 +124,7 @@ def rank_candidate_kernel_opt(index, candidate_kernels, latent,
         numpy.array(candidate_distances))[::-1], fingerprint_kernel_vectors
 
 
-class InputOutputKernelRegression(object):
+class InputOutputKernelRegression():
 
     def __init__(self, data):
         self.data = data

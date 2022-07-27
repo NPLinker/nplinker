@@ -26,7 +26,7 @@ from .spec_lib import SpecLib
 logger = LogConfig.getLogger(__file__)
 
 
-class RosettaHit(object):
+class RosettaHit():
 
     def __init__(self, spec, gnps_id, mibig_id, bgc, spec_match_score,
                  bgc_match_score):
@@ -46,7 +46,7 @@ class RosettaHit(object):
         return str(self)
 
 
-class Rosetta(object):
+class Rosetta():
 
     DEF_MS1_TOL = 100
     DEF_MS2_TOL = 0.2

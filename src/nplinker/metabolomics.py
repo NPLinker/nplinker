@@ -43,7 +43,7 @@ JCAMP = '##TITLE={}\\n' +\
 RE_MZML_MZXML = re.compile('.mzXML|.mzML')
 
 
-class Spectrum(object):
+class Spectrum():
 
     def __init__(self,
                  id,
@@ -243,7 +243,7 @@ class Spectrum(object):
         return matched_losses
 
 
-class MolecularFamily(object):
+class MolecularFamily():
 
     def __init__(self, family_id):
         self.id = -1

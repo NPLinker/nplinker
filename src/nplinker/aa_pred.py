@@ -25,7 +25,7 @@ for c in AA_CODES:
 AA_CODES_ISO['b-ala'] = 'ala'
 
 
-class AntiSmashFile(object):
+class AntiSmashFile():
 
     def __init__(self, filename):
         self.raw_data = []
@@ -62,7 +62,7 @@ class AntiSmashFile(object):
         return [x.get_prob(aa) for x in self.raw_data]
 
 
-class AntiSmash5Record(object):
+class AntiSmash5Record():
 
     def __init__(self, seq_record):
         self.raw_data = seq_record
@@ -119,7 +119,7 @@ class AntiSmash5Record(object):
                 yield AA_CODES_ISO[aa]
 
 
-class AntiSmashRecord(object):
+class AntiSmashRecord():
 
     def __init__(self, seq_record):
         self.raw_data = seq_record

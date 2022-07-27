@@ -28,7 +28,7 @@ from . import spectrum_filters
 logger = LogConfig.getLogger(__file__)
 
 
-class NPLinkerIOKR(object):
+class NPLinkerIOKR():
     """
     Rank the potential links in a NPLinker object using IOKR, and wrap the results
     """
@@ -101,7 +101,7 @@ class NPLinkerIOKR(object):
             return max(potential_scores)
 
 
-class IOKRWrapper(object):
+class IOKRWrapper():
     """
     Wrapper around the IOKR server.
     Takes care of format conversion, fingerprint calculations, etc.

@@ -20,7 +20,7 @@ import os
 PROTON_MASS = 1.00727645199076
 
 
-class MS1(object):
+class MS1():
 
     def __init__(self,
                  id,
@@ -49,7 +49,7 @@ class MS1(object):
 
 # Abstract loader class
 # *load_spectra* functions are too long, refactor and split when having time
-class Loader(object):
+class Loader():
 
     def __init__(self,
                  min_ms1_intensity=0.0,
@@ -108,7 +108,7 @@ class Loader(object):
 
     def _ion_masses(self, precursormass, int_charge):
         """
-        Compute the parent masses. Single charge version is used for 
+        Compute the parent masses. Single charge version is used for
         loss computation.
         """
         mul = abs(int_charge)
@@ -156,7 +156,7 @@ class Loader(object):
 
     def _load_peak_list(self):
         """
-        Modify peaklist function. Try to detect "featureid", store it in ms1_peaks 
+        Modify peaklist function. Try to detect "featureid", store it in ms1_peaks
         used for mgf ms1 analysis.
         ms1_peaks: [featid, mz, rt, intensity], featid will be None if "FeatureId"
             does not exist.

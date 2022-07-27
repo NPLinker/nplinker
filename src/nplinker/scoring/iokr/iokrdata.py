@@ -49,7 +49,7 @@ def load_kernels(kernel_files, normalise=True):
 
 
 # Hold the GNPS records
-class GNPS(object):
+class GNPS():
 
     def __init__(self, filename):
         logger.debug('GNPS {}'.format(sys._getframe().f_code.co_name))
@@ -196,7 +196,7 @@ def load_spectra(filename):
 # - Also handle output kernel values (queriable in the same way?)
 # - more flexible way of loading (input) kernels
 # - Calclulate novel input kernels
-class IOKRDataServer(object):
+class IOKRDataServer():
 
     def __init__(self, path, kernel=None):
         logger.debug('IOKRDataServer {}'.format(

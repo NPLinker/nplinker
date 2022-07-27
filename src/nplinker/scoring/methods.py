@@ -34,15 +34,15 @@ logger = LogConfig.getLogger(__file__)
 # TODO update/expand comments in this file!
 
 
-class LinkCollection(object):
+class LinkCollection():
     """
-    Class which stores the results of running one or more scoring methods. 
+    Class which stores the results of running one or more scoring methods.
 
     It provides access to the set of objects which were found to have links,
     the set of objects linked to each of those objects, and the information
-    produced by the scoring method(s) about each link. 
+    produced by the scoring method(s) about each link.
 
-    There are also some useful utility methods to filter the original results. 
+    There are also some useful utility methods to filter the original results.
     """
 
     def __init__(self, and_mode=True):
@@ -233,15 +233,15 @@ class LinkCollection(object):
         return len(self._link_data)
 
 
-class ObjectLink(object):
+class ObjectLink():
     """
     Class which stores information about a single link between two objects.
 
-    There will be at most one instance of an ObjectLink for a given pair of 
-    objects (source, target) after running 1 or more scoring methods. Some 
-    methods, e.g. Metcalf, will always produce a single output per link. 
+    There will be at most one instance of an ObjectLink for a given pair of
+    objects (source, target) after running 1 or more scoring methods. Some
+    methods, e.g. Metcalf, will always produce a single output per link.
     However other methods like Rosetta may find multiple "hits" for a given
-    pair. In either case the data for a given method is associated with the 
+    pair. In either case the data for a given method is associated with the
     ObjectLink so it can be retrieved afterwards.
 
     The information stored is basically:
@@ -293,7 +293,7 @@ class ObjectLink(object):
         return str(self)
 
 
-class ScoringMethod(object):
+class ScoringMethod():
 
     NAME = 'ScoringMethod'
 

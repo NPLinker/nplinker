@@ -58,8 +58,8 @@ from ..logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
 
-class DataLinks(object):
-    """ 
+class DataLinks():
+    """
     DataLinks collects and structures co-occurence data
     1) Co-occurences of spectra, families, and GCFs with respect to strains
     2) Mappings: Lookup-tables that link different ids and categories
@@ -399,7 +399,7 @@ class DataLinks(object):
     # TODO add output functions (e.g. to search for mappings of individual specs, gcfs etc.)
 
 
-class LinkLikelihood(object):
+class LinkLikelihood():
     """
     Class to:
     1) create ansd store likelihood matrices (from co-occurences)
@@ -428,7 +428,7 @@ class LinkLikelihood(object):
     def calculate_likelihoods(self, data_links, type='spec-gcf'):
         """
         Calulate likelihoods from empirically found co-occurences in data
-        
+
         IF type='spec-gcf':
         P(GCF_x | spec_y), P(spec_y | GCF_x),
         P(GCF_x | not spec_y), P(spec_y | not GCF_x)
@@ -478,13 +478,13 @@ class LinkLikelihood(object):
             raise Exception("No correct likelihood matrices were created.")
 
 
-class LinkFinder(object):
+class LinkFinder():
     """
     Class to:
     1) Score potential links based on collected information from:
         DataLinks, LinkLikelihood (and potentially other resources)
     Different scores can be used for this!
-    
+
     2) Rank and output selected candidates
     3) Create output plots and tables
     """
@@ -655,7 +655,7 @@ class LinkFinder(object):
                            type='spec-gcf'):
         """
         Calculate likelihood scores from DataLinks() co-occurence matrices.
-        
+
         Idea:
             Score reflect the directionality BGC-->compound-->spectrum, which
             suggests that the most relevant likelihoods are:
@@ -663,10 +663,10 @@ class LinkFinder(object):
                             this value should be high (close or equal to 1)
             P(type1|not gcf) - Following the same logic, this value should be very
                                 small or 0 ("no gene cluster, no compound")
-                                
+
         Score:
             Score = P(gcf|type1) * (1 - P(type1|not gcf) * weighing function
-            
+
             weighing function is here a function of the number of strains they co-occur.
             weighing function = (1 - exp(-alpha_weighing * num_of_co-occurrences)
         """
@@ -700,7 +700,7 @@ class LinkFinder(object):
         Look for potential best candidate for links between
         IF type='spec-gcf': GCFs and spectra
         IF type='fam-gcf': GCFs and mol.families
-        
+
         Parameters
         ----------
         data_links: DataLinks() object
@@ -861,7 +861,7 @@ class LinkFinder(object):
                   score_cutoff=0.5):
         """
         Output likely links for 'input_object'
-        
+
         Parameters
         ----------
         input_objects: object()
@@ -1032,7 +1032,7 @@ class LinkFinder(object):
             mass spec side --> bipartite = 0
             gene cluster side --> bipartite = 1
         Output format is a graphml file.
-        
+
         Parameters
         ----------
         data_links: DataLinks() object

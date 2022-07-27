@@ -29,7 +29,7 @@ except ImportError:
 logger = LogConfig.getLogger(__file__)
 
 
-class Args(object):
+class Args():
 
     def __init__(self):
 
@@ -102,7 +102,7 @@ class Args(object):
         return args
 
 
-class Config(object):
+class Config():
     """Wrapper for all NPLinker configuration options"""
 
     DEFAULT_CONFIG = 'nplinker.toml'
