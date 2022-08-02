@@ -122,12 +122,12 @@ class Config():
         # and if present use it to override the defaults
         logger.debug('Parsing default config file: {}'.format(
             self.default_config_path))
-        config = toml.load(open(self.default_config_path, 'r'))
+        config = toml.load(open(self.default_config_path))
         if 'config' in config_dict:
             logger.debug('Loading user config {}'.format(
                 config_dict['config']))
             if config_dict['config'] is not None:
-                user_config = toml.load(open(config_dict['config'], 'r'))
+                user_config = toml.load(open(config_dict['config']))
                 config.update(user_config)
                 del config_dict['config']
 
@@ -161,6 +161,6 @@ class Config():
                 raise Exception(
                     'Dataset path "{}" not found or not accessible'.format(
                         root))
-            logger.info('Loading from local data in directory {}'.format(root))
+            logger.info(f'Loading from local data in directory {root}')
 
         self.config = config

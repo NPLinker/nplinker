@@ -102,7 +102,7 @@ def create_ppk_matrix():
             kernel_matrix_ppkr[j, i] = ij_peaks + ij_nloss
 
             if cnt % 100 == 0:
-                print('done %s/%s, %s' % (cnt,
+                print('done {}/{}, {}'.format(cnt,
                                           (ker_size**2) / 2, time.time() - t0))
                 t0 = time.time()
 
@@ -142,7 +142,7 @@ def create_ppk_matrix_stripe_serial(filter_func, shift, normalise,
             kernel_matrix_nloss[cnt, j_idx] = ij_nloss
 
         cnt += 1
-        print('done %s / %s, %s' % (cnt, candidate_set_size, time.time() - t0))
+        print(f'done {cnt} / {candidate_set_size}, {time.time() - t0}')
 
     numpy.save(output_name + '_test_peaks.npy', kernel_matrix_peaks)
     numpy.save(output_name + '_test_nloss.npy', kernel_matrix_nloss)

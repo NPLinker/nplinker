@@ -48,7 +48,7 @@ class KCBJSONParser():
                     'KCBJSONParser failed to find file "{}"'.format(
                         bgc.antismash_file))
 
-        logger.debug('KCBJSONParser({} BGCs)'.format(len(bgcs)))
+        logger.debug(f'KCBJSONParser({len(bgcs)} BGCs)')
 
         # find the JSON file: TODO is the assumption of there only being a single .json
         # file always going to work? otherwise have to try guessing the name based on
@@ -67,7 +67,7 @@ class KCBJSONParser():
             return
 
         self.json_filename = os.path.join(prefix, json_files[0])
-        logger.debug('Using JSON file {}'.format(self.json_filename))
+        logger.debug(f'Using JSON file {self.json_filename}')
 
     def parse_hits(self):
         if self.json_filename is None:
@@ -81,7 +81,7 @@ class KCBJSONParser():
         # TODO: catch exception and print message recommending 64-bit
         logger.info('Loading antiSMASH JSON data from {}'.format(
             self.json_filename))
-        data = json.load(open(self.json_filename, 'r'))
+        data = json.load(open(self.json_filename))
 
         # JSON data structure: depending on the gbks in the source folder, the
         # structure of the results may be different from one to the next. from
@@ -247,7 +247,7 @@ class KCBTextParser():
     def __init__(self, filename):
         if not os.path.exists(filename):
             raise Exception(
-                'KCBTextParser failed to find file "{}"'.format(filename))
+                f'KCBTextParser failed to find file "{filename}"')
 
         self.bgc_genes = set()
         self.mibig_bgcs = []
@@ -274,7 +274,7 @@ class KCBTextParser():
         # (continues up to hit n)
         # EOF
 
-        with open(filename, 'r') as f:
+        with open(filename) as f:
             line = next(f)
             while not line.startswith('Table of genes'):
                 line = next(f)
@@ -433,7 +433,7 @@ class KCBTextParser():
             supplied BGC, or None if an error occurred/file doesn't exist
         """
         if bgc.antismash_file is None:
-            logger.warning('BGC {} has no antismash_file set'.format(bgc))
+            logger.warning(f'BGC {bgc} has no antismash_file set')
             return None
 
         # expecting to find the .txt files inside a 'knownclusterblast' subdir in the
@@ -462,7 +462,7 @@ class KCBTextParser():
             # construct the expected filename using the prefix and number
             # (note no leading zeroes on the number)
             kcb_name = os.path.join(base_path,
-                                    '{}_c{}.txt'.format(prefix, number))
+                                    f'{prefix}_c{number}.txt')
         elif 'cluster' in genbank_file:
             # case 2: assume the genbank files have a <someID>.cluster<num>.gbk naming scheme.
             # this is the case with the Crusemann dataset on the paired platform among others.
@@ -473,7 +473,7 @@ class KCBTextParser():
 
             # construct the expected filename
             # (note no leading zeroes on the number)
-            kcb_name = os.path.join(base_path, 'cluster{}.txt'.format(number))
+            kcb_name = os.path.join(base_path, f'cluster{number}.txt')
         else:
             logger.warning(
                 'Unknown GenBank file naming scheme, failed to determine knownclusterblast filenames!'

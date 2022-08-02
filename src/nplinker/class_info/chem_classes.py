@@ -435,9 +435,9 @@ class CanopusResults:
                 counts_cur_level = Counter(classes_cur_level)
                 # 3. calculate fraction and sort high to low, filter out Nones
                 fraction_tups = sorted(
-                    [(cls, count / len_molfam)
+                    ((cls, count / len_molfam)
                      for cls, count in counts_cur_level.most_common()
-                     if count / len_molfam >= fraction_cutoff],
+                     if count / len_molfam >= fraction_cutoff),
                     key=lambda x: x[1],
                     reverse=True)
                 if not fraction_tups:
@@ -507,7 +507,7 @@ class MolNetEnhancerResults:
         }
 
     def _read_cf_classes(self, mne_dir):
-        """Read ClassyFireResults_Network.txt in molnetenhancer dir
+        r"""Read ClassyFireResults_Network.txt in molnetenhancer dir
 
         Args:
             mne_dir: str, mne_dir found in root_dir of nplinker project

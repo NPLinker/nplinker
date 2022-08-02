@@ -324,7 +324,7 @@ class TestScoring(ScoringMethod):
     NAME = 'testscore'
 
     def __init__(self, npl):
-        super(TestScoring, self).__init__(npl)
+        super().__init__(npl)
         self.value = 0.5
         self.mc = MetcalfScoring(npl)
 
@@ -346,7 +346,7 @@ class TestScoring(ScoringMethod):
                 link._method_data[self] = random.random()
                 del link._method_data[self.mc]
 
-        logger.debug('TestScoring found {} results'.format(len(results)))
+        logger.debug(f'TestScoring found {len(results)} results')
         link_collection._add_links_from_method(self, results)
         return link_collection
 
@@ -364,7 +364,7 @@ class RosettaScoring(ScoringMethod):
     ROSETTA_OBJ = None
 
     def __init__(self, npl):
-        super(RosettaScoring, self).__init__(npl)
+        super().__init__(npl)
         self.bgc_to_gcf = True
 
         self.spec_score_cutoff = 0.0
@@ -489,12 +489,12 @@ class RosettaScoring(ScoringMethod):
                                     results, spec, gcf, hit)
 
         link_collection._add_links_from_method(self, results)
-        logger.debug('RosettaScoring found {} results'.format(len(results)))
+        logger.debug(f'RosettaScoring found {len(results)} results')
         return link_collection
 
     def format_data(self, data):
         # TODO
-        return '{} hits'.format(len(data))
+        return f'{len(data)} hits'
 
     def sort(self, objects, reverse=True):
         # TODO
@@ -514,7 +514,7 @@ class MetcalfScoring(ScoringMethod):
     R_SRC_ID, R_DST_ID, R_SCORE = range(3)
 
     def __init__(self, npl):
-        super(MetcalfScoring, self).__init__(npl)
+        super().__init__(npl)
         self.cutoff = 1.0
         self.standardised = True
 
@@ -804,7 +804,7 @@ class MetcalfScoring(ScoringMethod):
 
     def format_data(self, data):
         # for metcalf the data will just be a floating point value (i.e. the score)
-        return '{:.4f}'.format(data)
+        return f'{data:.4f}'
 
     def sort(self, objects, reverse=True):
         # sort based on score
@@ -817,7 +817,7 @@ class NPClassScoring(ScoringMethod):
     NAME = 'npclassscore'
 
     def __init__(self, npl):
-        super(NPClassScoring, self).__init__(npl)
+        super().__init__(npl)
         self.cutoff = 0.25
         self.method_options = npl.chem_classes.class_predict_options
         self.method = self.method_options[0]
@@ -1193,7 +1193,7 @@ class NPClassScoring(ScoringMethod):
         formatted_data = None  # default when there is no score (missing class)
         if data:
             # there is a score
-            formatted_data = '{:.3f}'.format(data[0][0])
+            formatted_data = f'{data[0][0]:.3f}'
         return formatted_data
 
     def sort(self, objects, reverse=True):

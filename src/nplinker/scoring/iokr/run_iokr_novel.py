@@ -84,7 +84,7 @@ def run_iokr(data):
 
         # actual rankings
         correct_ranking = min(
-            [res_ranking.index(x) for x in res_correct_indices])
+            res_ranking.index(x) for x in res_correct_indices)
         collected_rankings.append((res_i, correct_ranking, len(res_ranking)))
 
         # correct_random_rankings = []
@@ -96,7 +96,7 @@ def run_iokr(data):
 
         random.shuffle(res_ranking)
         correct_random_ranking = min(
-            [res_ranking.index(x) for x in res_correct_indices])
+            res_ranking.index(x) for x in res_correct_indices)
         collected_baseline_rankings.append(
             (res_i, correct_random_ranking, len(res_ranking)))
 
@@ -111,7 +111,7 @@ def run_iokr(data):
 
     print('')
     print('IOKR test run done!')
-    print('#samples: {}'.format(len(collected_rankings)))
+    print(f'#samples: {len(collected_rankings)}')
     print('top-1 acc: {}'.format(
         float([x[1] for x in collected_rankings].count(0)) / total, total))
     print('top-1 base: {}'.format(
@@ -126,8 +126,8 @@ def get_test_set(fingerprint):
     from pyteomics import mgf
 
     mapping = []
-    with open('/home/grimur/iokr/data/mibig/matched_mibig_gnps_2.0.csv',
-              'r') as f:
+    # TODO: fix the path
+    with open('/home/grimur/iokr/data/mibig/matched_mibig_gnps_2.0.csv') as f:
         for line in csv.reader(f):
             if not line[0].startswith('#'):
                 mapping.append(line)

@@ -59,7 +59,7 @@ class LogConfig():
         constant from the logging module (e.g. "INFO", "DEBUG")
         """
         if not hasattr(logging, level):
-            raise Exception('Unknown/invalid loglevel "{}"'.format(level))
+            raise Exception(f'Unknown/invalid loglevel "{level}"')
 
         LogConfig.setLogLevel(getattr(logging, level))
 

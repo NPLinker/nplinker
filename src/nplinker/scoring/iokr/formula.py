@@ -53,12 +53,12 @@ class Formula():
 
     def get_atoms(self, atom_name):
         # Do some regex matching to find the numbers of the important atoms
-        ex = atom_name + '(?![a-z])' + '\d*'
+        ex = atom_name + '(?![a-z])' + r'\d*'
         m = re.search(ex, self.formula)
         if m == None:
             return 0
         else:
-            ex = atom_name + '(?![a-z])' + '(\d*)'
+            ex = atom_name + '(?![a-z])' + r'(\d*)'
             m2 = re.findall(ex, self.formula)
             total = 0
             for a in m2:

@@ -98,7 +98,7 @@ def create_ppk_matrix():
             kernel_matrix_ppkr[j, i] = ij_peaks + ij_nloss
 
             if cnt % 100 == 0:
-                print('done %s/%s, %s' % (cnt,
+                print('done {}/{}, {}'.format(cnt,
                                           (ker_size**2) / 2, time.time() - t0))
                 t0 = time.time()
 

@@ -93,10 +93,10 @@ def find_via_glob_alts(paths, file_type, optional=False):
 
 def find_bigscape_dir(broot):
     logger.info(
-        'Trying to discover correct bigscape directory under {}'.format(broot))
+        f'Trying to discover correct bigscape directory under {broot}')
     for root, dirs, files in os.walk(broot):
         if 'Network_Annotations_Full.tsv' in files:
-            logger.info('Found network files directory: {}'.format(root))
+            logger.info(f'Found network files directory: {root}')
             return root
 
     return None
@@ -388,14 +388,14 @@ class DatasetLoader():
                 'No strains left after filtering, cannot continue!')
 
         # get the list of BGCs which have a strain found in the set we were given
-        bgcs_to_retain = set([
+        bgcs_to_retain = {
             bgc for bgc in self.bgcs if bgc.strain in self.include_only_strains
-        ])
+        }
         # get the list of spectra which have at least one strain in the set
-        spectra_to_retain = set([
+        spectra_to_retain = {
             spec for spec in self.spectra for sstrain in spec.strains
             if sstrain in self.include_only_strains
-        ])
+        }
 
         logger.info('Current / filtered BGC counts: {} / {}'.format(
             len(self.bgcs), len(bgcs_to_retain)))
@@ -413,7 +413,7 @@ class DatasetLoader():
             spec.id = i
 
         # now filter GCFs and MolFams based on the filtered BGCs and Spectra
-        gcfs = set([parent for bgc in self.bgcs for parent in bgc.parents])
+        gcfs = {parent for bgc in self.bgcs for parent in bgc.parents}
         logger.info('Current / filtered GCF counts: {} / {}'.format(
             len(self.gcfs), len(gcfs)))
         self.gcfs = list(gcfs)
@@ -422,7 +422,7 @@ class DatasetLoader():
             gcf.strains.filter(self.include_only_strains)
             gcf.id = i
 
-        molfams = set([spec.family for spec in self.spectra])
+        molfams = {spec.family for spec in self.spectra}
         logger.info('Current / filtered MolFam counts: {} / {}'.format(
             len(self.molfams), len(molfams)))
         self.molfams = list(molfams)
@@ -435,22 +435,22 @@ class DatasetLoader():
         """
         # TODO: Maybe there should be an option to specify which strains are used, both so we can
         #    selectively exclude strains, and include strains that are missing from either side.
-        bgc_strains = set([x.strain for x in self.bgcs])
+        bgc_strains = {x.strain for x in self.bgcs}
         spectrum_strains = set().union(*[x.strains for x in self.spectra])
         common_strains = bgc_strains.intersection(spectrum_strains)
         logger.debug(
             'Filtering strains: genomics count {}, metabolomics count: {}'.
             format(len(bgc_strains), len(spectrum_strains)))
-        logger.debug('Common strains found: {}'.format(len(common_strains)))
+        logger.debug(f'Common strains found: {len(common_strains)}')
 
         # write out a list of the common strains to the dataset folder (might be useful for
         # anyone wanting to do additional filtering)
         cs_path = os.path.join(self._root, 'common_strains.csv')
-        logger.info('Writing common strain labels to {}'.format(cs_path))
+        logger.info(f'Writing common strain labels to {cs_path}')
         with open(cs_path, 'w') as cs:
             cs.write('# strain label\n')
             for strain in self.strains:
-                cs.write('{}\n'.format(strain.id))
+                cs.write(f'{strain.id}\n')
 
         # filter the master list of strains down to include only the common set
         self.strains.filter(common_strains)
@@ -475,18 +475,18 @@ class DatasetLoader():
             for param in root:
                 self.gnps_params[param.attrib['name']] = param.text
 
-            logger.debug('Parsed {} GNPS params'.format(len(self.gnps_params)))
+            logger.debug(f'Parsed {len(self.gnps_params)} GNPS params')
 
         self.description_text = '<no description>'
         if os.path.exists(self.description_file):
-            self.description_text = open(self.description_file, 'r').read()
+            self.description_text = open(self.description_file).read()
             logger.debug('Parsed description text')
 
         self.include_only_strains = set()
         if os.path.exists(self.include_strains_file):
             logger.debug('Loading include_strains from {}'.format(
                 self.include_strains_file))
-            strain_list = open(self.include_strains_file, 'r').readlines()
+            strain_list = open(self.include_strains_file).readlines()
             self.include_only_strains = StrainCollection()
             for line_num, sid in enumerate(strain_list):
                 sid = sid.strip()  # get rid of newline
@@ -582,7 +582,7 @@ class DatasetLoader():
 
                     gbk_files.append(fullpath)
 
-        logger.debug('.gbk collection took {:.3f}s'.format(time.time() - t))
+        logger.debug(f'.gbk collection took {time.time() - t:.3f}s')
         if renamed > 0:
             logger.info(
                 '{}/{} .gbk files were renamed to remove spaces!'.format(
@@ -595,7 +595,7 @@ class DatasetLoader():
         #   bigscape => run BiG-SCAPE before continuing (if using the Docker image)
         self._load_genomics_extra()
 
-        logger.debug('make_mibig_bgc_dict({})'.format(self.mibig_json_dir))
+        logger.debug(f'make_mibig_bgc_dict({self.mibig_json_dir})')
         self.mibig_bgc_dict = make_mibig_bgc_dict(self.strains,
                                                   self.mibig_json_dir,
                                                   self._mibig_version)
@@ -611,10 +611,10 @@ class DatasetLoader():
                 folder, self._bigscape_cutoff)
             cluster_filename = os.path.join(folder_path, cutoff_filename)
             annotation_filename = os.path.join(
-                folder_path, 'Network_Annotations_{}.tsv'.format(folder))
+                folder_path, f'Network_Annotations_{folder}.tsv')
             network_filename = os.path.join(
                 folder_path,
-                '{}_c0.{:02d}.network'.format(folder, self._bigscape_cutoff))
+                f'{folder}_c0.{self._bigscape_cutoff:02d}.network')
 
             # mandatory
             if not os.path.exists(annotation_filename):
@@ -645,16 +645,16 @@ class DatasetLoader():
                 return
             logger.warning(m)
             for i, fn in enumerate(l):
-                logger.warning('  {}/{}: '.format(i + 1, len(l)) + fn)
+                logger.warning(f'  {i + 1}/{len(l)}: ' + fn)
 
         _list_missing_files(
-            '{} missing annotation tsv files:'.format(len(missing_anno_files)),
+            f'{len(missing_anno_files)} missing annotation tsv files:',
             missing_anno_files)
         _list_missing_files(
             '{} missing clustering tsv files:'.format(
                 len(missing_cluster_files)), missing_cluster_files)
         _list_missing_files(
-            '{} missing network files:'.format(len(missing_network_files)),
+            f'{len(missing_network_files)} missing network files:',
             missing_network_files)
 
         # exclude any product types that don't have both annotation and cluster files
@@ -682,8 +682,8 @@ class DatasetLoader():
             self.antismash_cache[basename] = f
             # also insert it with the folder name as matching on filename isn't always enough apparently
             parent = os.path.split(path)[-1]
-            self.antismash_cache['{}_{}'.format(parent, basename)] = f
-        logger.debug('Cache generation took {:.3f}s'.format(time.time() - t))
+            self.antismash_cache[f'{parent}_{basename}'] = f
+        logger.debug(f'Cache generation took {time.time() - t:.3f}s')
 
         logger.debug(
             'loadBGC_from_cluster_files(antismash_dir={}, delimiters={})'.
@@ -702,11 +702,11 @@ class DatasetLoader():
 
         us_path = os.path.join(self._root, 'unknown_strains_gen.csv')
         logger.warning(
-            'Writing unknown strains from GENOMICS data to {}'.format(us_path))
+            f'Writing unknown strains from GENOMICS data to {us_path}')
         with open(us_path, 'w') as us:
             us.write('# unknown strain label, filename\n')
             for strain, filename in unknown_strains.items():
-                us.write('{}, {}\n'.format(strain, filename))
+                us.write(f'{strain}, {filename}\n')
 
         return True
 
@@ -723,7 +723,7 @@ class DatasetLoader():
         with open(us_path, 'w') as us:
             us.write('# unknown strain label\n')
             for strain in unknown_strains.keys():
-                us.write('{}\n'.format(strain))
+                us.write(f'{strain}\n')
 
         # load any available annotations from GNPS or user-provided files
         logger.info('Loading provided annotation files ({})'.format(

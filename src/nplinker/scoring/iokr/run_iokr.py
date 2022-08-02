@@ -92,7 +92,7 @@ def run_iokr(data):
 
             total_count = len(candidate_inchi)
 
-            print('iokr job idx %s, cand.set size %s' % (i, total_count))
+            print(f'iokr job idx {i}, cand.set size {total_count}')
             # ranking = iokr.rank_candidates_opt(i, candidate_fingerprints)
             # # print(ranking)
             # ranking = list(ranking)
@@ -139,7 +139,7 @@ def run_iokr(data):
 
     print('')
     print('IOKR test run done!')
-    print('#samples: {}'.format(len(collected_rankings)))
+    print(f'#samples: {len(collected_rankings)}')
     print('top-1 acc: {}'.format(
         float([x[1] for x in collected_rankings].count(0)) / total, total))
 

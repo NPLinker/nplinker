@@ -355,7 +355,7 @@ class MolNetEnhancer_results:
         self._spectra_classes_names_inds = {elem:i for i,elem in enumerate(cf_classes_names)}
 
     def _read_cf_classes(self, root_dir):
-        """Read ClassyFireResults_Network.txt in molnetenhancer dir
+        r"""Read ClassyFireResults_Network.txt in molnetenhancer dir
 
         Args:
             root_dir: str, root_dir of nplinker project

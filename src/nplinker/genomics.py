@@ -89,7 +89,7 @@ class BGC():
 
     @property
     def bigscape_classes(self):
-        return set([p.bigscape_class for p in self.parents])
+        return {p.bigscape_class for p in self.parents}
 
     @property
     def is_hybrid(self):
@@ -109,7 +109,7 @@ class BGC():
 
         self._smiles = get_smiles(self)
         self._smiles_parsed = True
-        logger.debug('SMILES for {} = {}'.format(self, self._smiles))
+        logger.debug(f'SMILES for {self} = {self._smiles}')
         return self._smiles
 
     @property
@@ -127,7 +127,7 @@ class BGC():
 class MiBIGBGC(BGC):
 
     def __init__(self, id, strain, name, product_prediction):
-        super(MiBIGBGC, self).__init__(id, strain, name, product_prediction)
+        super().__init__(id, strain, name, product_prediction)
 
     def __eq__(self, other):
         return self.id == other.id
@@ -246,7 +246,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict,
     # - Organism [5]
     # - Taxonomy [6]
     for a in ann_file_dict.values():
-        with open(a, 'r') as f:
+        with open(a) as f:
             reader = csv.reader(f, delimiter='\t')
             next(reader)  # skip headers
             for line in reader:
@@ -264,7 +264,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict,
     unknown_strains = {}
 
     logger.info(
-        'Using antiSMASH filename delimiters {}'.format(antismash_delimiters))
+        f'Using antiSMASH filename delimiters {antismash_delimiters}')
 
     # "cluster files" are the various <class>_clustering_c0.xx.tsv files
     # - BGC name
@@ -272,7 +272,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict,
     for product_type, filename in cluster_file_dict.items():
         product_type = os.path.split(filename)[-1]
         product_type = product_type[:product_type.index('_')]
-        with open(filename, 'r') as f:
+        with open(filename) as f:
             reader = csv.reader(f, delimiter='\t')
             next(reader)  # skip headers
             for line in reader:
@@ -330,7 +330,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict,
                         else:
                             # TODO hack to get crusemann working, should really update strain mappings?
                             for i in range(1, 3, 1):
-                                tmp = '{}.{}'.format(parsedname, i)
+                                tmp = f'{parsedname}.{i}'
                                 strain = strains.lookup(tmp)
                                 if strain is not None:
                                     found = True
@@ -409,7 +409,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict,
                     try:
                         new_bgc = mibig_bgc_dict[strain.id]
                     except KeyError:
-                        raise Exception('Unknown MiBIG: {}'.format(strain.id))
+                        raise Exception(f'Unknown MiBIG: {strain.id}')
 
                     new_bgc.description = description
 
@@ -449,7 +449,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict,
     # so that it won't leave us with edges for BGCs that are no longer present
     logger.debug('Loading .network files')
     for filename in network_file_dict.values():
-        with open(filename, 'r') as f:
+        with open(filename) as f:
             reader = csv.reader(f, delimiter='\t')
             next(reader)  # skip headers
             # try to look up bgc IDs
@@ -519,7 +519,7 @@ def filter_mibig_bgcs(bgcs, gcfs, strains):
 
 def load_mibig_map(filename='mibig_gnps_links_q3_loose.csv'):
     mibig_map = {}
-    with open(filename, 'r') as f:
+    with open(filename) as f:
         reader = csv.reader(f)
         next(reader)  # skip headers
 
@@ -535,9 +535,9 @@ def load_mibig_map(filename='mibig_gnps_links_q3_loose.csv'):
 def load_mibig_library_json(mibig_json_directory):
     mibig = {}
     files = glob.glob(mibig_json_directory + os.sep + '*.json')
-    logger.info("Found {} MiBIG json files".format(len(files)))
+    logger.info(f"Found {len(files)} MiBIG json files")
     for file in files:
-        with open(file, 'r') as f:
+        with open(file) as f:
             bgc_id = file.split(os.sep)[-1].split('.')[0]
             mibig[bgc_id] = json.load(f)
     return mibig
@@ -557,7 +557,7 @@ def extract_mibig_json_data(data):
 def append_mibig_library_json(strains, mibig_bgc_dict, mibig_json_directory,
                               bgc_id, internal_id):
     json_data = json.load(
-        open(os.path.join(mibig_json_directory, '{}.json'.format(bgc_id)),
+        open(os.path.join(mibig_json_directory, f'{bgc_id}.json'),
              'rb'))
     accession, biosyn_class = extract_mibig_json_data(json_data)
     strain = Strain(accession)

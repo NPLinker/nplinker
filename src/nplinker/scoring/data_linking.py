@@ -375,7 +375,7 @@ class DataLinks():
             )
 
         logger.debug(
-            "Calculating correlation matrices of type: {}".format(type))
+            f"Calculating correlation matrices of type: {type}")
 
         # Calculate correlation matrix from co-occurence matrices
         M_type1_gcf, M_type1_notgcf, M_nottype1_gcf, M_nottype1_notgcf = calc_correlation_matrix(
@@ -456,7 +456,7 @@ class LinkLikelihood():
             )
 
         logger.debug(
-            "Calculating likelihood matrices of type: {}".format(type))
+            f"Calculating likelihood matrices of type: {type}")
         # Calculate likelihood matrices using calc_likelihood_matrix()
         P_type2_given_type1, P_type2_not_type1, P_type1_given_type2, \
             P_type1_not_type2 = calc_likelihood_matrix(M_type1_cond,
@@ -966,7 +966,7 @@ class LinkFinder():
                 else:
                     # should never happen
                     raise Exception(
-                        'Unknown scoring type! "{}"'.format(main_score))
+                        f'Unknown scoring type! "{main_score}"')
             else:
                 # TODO is this best way to get same output as above code?
                 # to keep the remainder of the method identical in the case of no cutoff

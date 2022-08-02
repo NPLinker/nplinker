@@ -57,9 +57,9 @@ class Spectrum():
         self.normalised_peaks = sqrt_normalise(self.peaks)  # useful later
         self.n_peaks = len(self.peaks)
         self.max_ms2_intensity = max(
-            [intensity for mz, intensity in self.peaks])
+            intensity for mz, intensity in self.peaks)
         self.total_ms2_intensity = sum(
-            [intensity for mz, intensity in self.peaks])
+            intensity for mz, intensity in self.peaks)
         assert (isinstance(spectrum_id, int))
         self.spectrum_id = spectrum_id
         self.rt = rt
@@ -89,7 +89,7 @@ class Spectrum():
 
         if growth_medium is None:
             self.growth_media[strain].update({
-                'unknown_medium_{}'.format(len(self.growth_media[strain])):
+                f'unknown_medium_{len(self.growth_media[strain])}':
                 peak_intensity
             })
             return
@@ -190,9 +190,9 @@ class Spectrum():
         if self.n_peaks > 0:
             self.normalised_peaks = sqrt_normalise(self.peaks)
             self.max_ms2_intensity = max(
-                [intensity for mz, intensity in self.peaks])
+                intensity for mz, intensity in self.peaks)
             self.total_ms2_intensity = sum(
-                [intensity for mz, intensity in self.peaks])
+                intensity for mz, intensity in self.peaks)
         else:
             self.normalised_peaks = []
             self.max_ms2_intensity = 0.0
@@ -260,7 +260,7 @@ class MolecularFamily():
 
     @property
     def strains(self):
-        strains = set([])
+        strains = set()
         for spectrum in self.spectra:
             strains = strains.union(spectrum.strains)
         return strains
@@ -282,10 +282,10 @@ class MolecularFamily():
 class SingletonFamily(MolecularFamily):
 
     def __init__(self):
-        super(SingletonFamily, self).__init__(-1)
+        super().__init__(-1)
 
     def __str__(self):
-        return "Singleton molecular family (id={})".format(self.id)
+        return f"Singleton molecular family (id={self.id})"
 
 
 #
@@ -300,7 +300,7 @@ GNPS_FORMAT_NEW_FBMN = 'fbmn'
 
 def get_headers(filename, delimiters=['\t', ',']):
     headers = None
-    with open(filename, 'r') as f:
+    with open(filename) as f:
         headers = f.readline()
         for dl in delimiters:
             if len(headers.split(dl)) < 2:
@@ -370,7 +370,7 @@ def mols_to_spectra(ms2, metadata):
 def load_edges(edges_file, spec_dict):
     logger.debug('loading edges file: {} [{} spectra from MGF]'.format(
         edges_file, len(spec_dict)))
-    with open(edges_file, 'r') as f:
+    with open(edges_file) as f:
         reader = csv.reader(f, delimiter='\t')
         headers = next(reader)
         try:
@@ -520,7 +520,7 @@ def load_clusterinfo_old(gnps_format, strains, filename, spec_dict):
     # both of these list the .mz(X)ML files the molecule was found in (plus the scan
     # number in the file in the AllFiles case)
     unknown_strains = {}
-    with open(filename, 'r') as f:
+    with open(filename) as f:
         reader = csv.reader(f, delimiter='\t')
         headers = next(reader)
         clu_index_index = headers.index('cluster index')
@@ -529,7 +529,7 @@ def load_clusterinfo_old(gnps_format, strains, filename, spec_dict):
         elif gnps_format == GNPS_FORMAT_OLD_UNIQUEFILES:
             mzxml_index = headers.index('UniqueFileSources')
         else:
-            raise Exception('Unexpected GNPS format {}'.format(gnps_format))
+            raise Exception(f'Unexpected GNPS format {gnps_format}')
 
         for line in reader:
             # get the values of the important columns
@@ -590,7 +590,7 @@ def parse_metadata_table(filename):
         return None
 
     table = {}
-    with open(filename, 'r') as f:
+    with open(filename) as f:
         reader = csv.reader(f, delimiter='\t')
         headers = next(reader)
 
@@ -657,7 +657,7 @@ def load_clusterinfo_fbmn(strains, nodes_file, extra_nodes_file, md_table_file,
     # combine the information in the nodes_file (clusterinfo_summary folder) and
     # the extra_nodes_file (quantification_table folder), indexed by the "cluster index"
     # and "row ID" fields respectively to link the rows
-    with open(nodes_file, 'r') as f:
+    with open(nodes_file) as f:
         reader = csv.reader(f, delimiter='\t')
         headers = next(reader)
         ci_index = headers.index('cluster index')
@@ -670,7 +670,7 @@ def load_clusterinfo_fbmn(strains, nodes_file, extra_nodes_file, md_table_file,
                 tmp[headers[i]] = v
             spec_info[int(line[ci_index])] = tmp
 
-    with open(extra_nodes_file, 'r') as f:
+    with open(extra_nodes_file) as f:
         reader = csv.reader(f, delimiter=',')
         headers = next(reader)
         ri_index = headers.index('row ID')
@@ -768,7 +768,7 @@ def load_dataset(strains,
 
     # build a set of Spectrum objects by parsing the MGF file
     ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([mgf_file])
-    logger.info('{} molecules parsed from MGF file'.format(len(ms1)))
+    logger.info(f'{len(ms1)} molecules parsed from MGF file')
     spectra = mols_to_spectra(ms2, metadata)
     # above returns a list, create a dict indexed by spectrum_id to make
     # the rest of the parsing a bit simpler

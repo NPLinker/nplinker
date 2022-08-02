@@ -76,10 +76,10 @@ class MSSpectrum():
         self.output_spectrum = None
         self.filename = filename
         spectrum = []
-        with open(filename, 'r') as f:
+        with open(filename) as f:
             for line in f.readlines():
                 line = line.strip()
-                if len(line) is 0:
+                if len(line) == 0:
                     pass
                 elif line.startswith('>compound'):
                     self.compound = strip_leading(line)
@@ -128,7 +128,7 @@ class MSSpectrum():
         else:
             if self.output_spectrum is None:
                 filtered_spectrum = self.filter(self)
-                if len(filtered_spectrum) is not 0:
+                if len(filtered_spectrum) != 0:
                     self.output_spectrum = self.filter(self)
                 else:
                     self.output_spectrum = self.shifted_spectrum

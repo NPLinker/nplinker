@@ -40,7 +40,7 @@ def gnps_url(id, url_type='spectrum'):
 def create_gnps_annotation(spec, gnps_anno):
     # also insert useful URLs
     for t in ['png', 'json', 'svg', 'spectrum']:
-        gnps_anno['{}_url'.format(t)] = GNPS_URL_FORMAT.format(
+        gnps_anno[f'{t}_url'] = GNPS_URL_FORMAT.format(
             t, gnps_anno['SpectrumID'])
 
     if GNPS_KEY in spec.annotations:
@@ -55,13 +55,13 @@ def create_gnps_annotation(spec, gnps_anno):
 
 def load_annotations(root, config, spectra, spec_dict):
     if not os.path.exists(root):
-        logger.debug('Annotation directory not found ({})'.format(root))
+        logger.debug(f'Annotation directory not found ({root})')
         return spectra
 
     ac = {}
     if os.path.exists(config):
         # parse annotations config file if it exists
-        with open(config, 'r') as f:
+        with open(config) as f:
             rdr = csv.reader(f, delimiter='\t')
             for row in rdr:
                 # expecting 3 columns: filename, index col name, data col name(s)
@@ -79,7 +79,7 @@ def load_annotations(root, config, spectra, spec_dict):
                     continue
                 ac[row[0]] = (row[1], data_cols)
 
-    logger.debug('Parsed {} annotations configuration entries'.format(len(ac)))
+    logger.debug(f'Parsed {len(ac)} annotations configuration entries')
 
     annotation_files = []
     for f in os.listdir(root):
@@ -90,14 +90,14 @@ def load_annotations(root, config, spectra, spec_dict):
     logger.debug('Found {} annotations .tsv files in {}'.format(
         len(annotation_files), root))
     for af in annotation_files:
-        with open(af, 'r') as f:
+        with open(af) as f:
             rdr = csv.reader(f, delimiter='\t')
             headers = next(rdr)
             filename = os.path.split(af)[1]
 
             if headers_match_gnps(headers):
                 # assume this is our main annotations file
-                logger.debug('Parsing GNPS annotations from {}'.format(af))
+                logger.debug(f'Parsing GNPS annotations from {af}')
 
                 scans_index = headers.index(GNPS_INDEX_COLUMN)
 
@@ -121,13 +121,13 @@ def load_annotations(root, config, spectra, spec_dict):
                     for dc in data_cols:
                         if dc not in headers:
                             logger.warning(
-                                'Column lookup failed for "{}"'.format(dc))
+                                f'Column lookup failed for "{dc}"')
                             continue
                         data[dc] = line[headers.index(dc)]
 
                     create_gnps_annotation(spec, data)
             else:
-                logger.debug('Parsing general annotations from {}'.format(af))
+                logger.debug(f'Parsing general annotations from {af}')
                 # this is a general annotations file, so rely purely on the user-provided columns
                 if filename not in ac:
                     logger.warning(
@@ -161,7 +161,7 @@ def load_annotations(root, config, spectra, spec_dict):
                     for dc in data_cols:
                         if dc not in headers:
                             logger.warning(
-                                'Column lookup failed for "{}"'.format(dc))
+                                f'Column lookup failed for "{dc}"')
                             continue
                         data[dc] = line[headers.index(dc)]
                     spec_annotations[spec].append(data)

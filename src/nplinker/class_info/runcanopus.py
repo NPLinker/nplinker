@@ -56,14 +56,13 @@ def run_canopus(mgf_file,
 
     try:
         subprocess.run(['sirius', '-h'],
-                       stdout=subprocess.PIPE,
-                       stderr=subprocess.PIPE)
+                       capture_output=True)
     except Exception as e:
         raise Exception(
-            'Failed to find/run SIRIUS (CANOPUS) (err={})'.format(e))
+            f'Failed to find/run SIRIUS (CANOPUS) (err={e})')
 
     if not os.path.exists(mgf_file):
-        raise Exception('mgf input file "{}" does not exist!'.format(mgf_file))
+        raise Exception(f'mgf input file "{mgf_file}" does not exist!')
 
     # configure the IO-related parameters
     args = ['sirius', '-i', mgf_file, '-o', output_path]
@@ -74,7 +73,7 @@ def run_canopus(mgf_file,
     if len(extra_params) > 0:
         args.extend(extra_params.split(' '))
 
-    logger.info('CANOPUS command: {}'.format(args))
+    logger.info(f'CANOPUS command: {args}')
     result = subprocess.run(args, stdout=sys.stdout, stderr=sys.stderr)
     logger.info('CANOPUS completed with return code {}'.format(
         result.returncode))

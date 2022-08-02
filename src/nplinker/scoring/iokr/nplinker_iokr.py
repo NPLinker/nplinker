@@ -45,7 +45,7 @@ class NPLinkerIOKR():
                     fp = fingerprint.fingerprint_from_smiles(bgc.smiles)
                     bgc_smiles_lookup[bgc].append(bgc.smiles)
                 except ValueError:
-                    print('Filtered out smiles {}'.format(bgc.smiles))
+                    print(f'Filtered out smiles {bgc.smiles}')
         self.bgc_smiles_lookup = bgc_smiles_lookup
 
         smiles_bgc_lookup = {}
@@ -56,7 +56,7 @@ class NPLinkerIOKR():
                 if smiles_string in smiles_bgc_lookup:
                     smiles_bgc_lookup[smiles_string].add(bgc)
                 else:
-                    smiles_bgc_lookup[smiles_string] = set([bgc])
+                    smiles_bgc_lookup[smiles_string] = {bgc}
 
         self.smiles_list = list(smiles_bgc_lookup.keys())
 
@@ -95,7 +95,7 @@ class NPLinkerIOKR():
                     potential_scores.append(spectrum_smiles_score)
 
         if len(potential_scores) == 0:
-            logger.info('No scores found for {}'.format(gcf_like))
+            logger.info(f'No scores found for {gcf_like}')
             return 0
         else:
             return max(potential_scores)
@@ -133,7 +133,7 @@ class IOKRWrapper():
         # TODO: Cache this
         candidate_fps = []
         for i, c in enumerate(candidate_smiles):
-            logger.debug('done {}/{}'.format(i, len(candidate_smiles)))
+            logger.debug(f'done {i}/{len(candidate_smiles)}')
             candidate_fps.append(self._fingerprint(c))
         candidate_fps = numpy.array(candidate_fps)
         logger.debug('Extract latent basis')
@@ -157,13 +157,13 @@ class IOKRWrapper():
             ms_kernel_vector = numpy.array(
                 self.iokr_server.get_kernel_vector_for_sample(ms))
             t1 = time.time()
-            logger.debug('done ({})'.format(t1 - t0))
+            logger.debug(f'done ({t1 - t0})')
             logger.debug('project')
             # projections, _ = iokr_opt.project_candidates_opt(0, candidate_fps, latent, ms_kernel_vector, latent_basis, gamma)
             projections, _ = iokr_opt.project_candidates_preprocessed(
                 candidates, ms_kernel_vector)
             t2 = time.time()
-            logger.debug('done ({})'.format(t2 - t1))
+            logger.debug(f'done ({t2 - t1})')
 
             logger.debug('save distances')
             projection_matrix[ms_index, :] = projections
@@ -182,23 +182,23 @@ class IOKRWrapper():
         logger.debug('rank_smiles - Calculate candidate FPs')
         candidate_fps = numpy.array(
             [self._fingerprint(x) for x in candidate_smiles])
-        logger.debug('> {:.2f}s '.format(time.time() - t))
+        logger.debug(f'> {time.time() - t:.2f}s ')
         t = time.time()
         logger.debug('rank_smiles - Extract latent basis')
         latent, latent_basis, gamma = self.iokr_server.get_data_for_novel_candidate_ranking(
         )
-        logger.debug('> {:.2f}s '.format(time.time() - t))
+        logger.debug(f'> {time.time() - t:.2f}s ')
         t = time.time()
         logger.debug('rank_smiles - Get kernel vector for input sample')
         ms_kernel_vector = numpy.array(
             self.iokr_server.get_kernel_vector_for_sample(ms))
-        logger.debug('> {:.2f}s '.format(time.time() - t))
+        logger.debug(f'> {time.time() - t:.2f}s ')
         t = time.time()
         logger.debug('rank_smiles - Rank candidate set')
         ranking, _ = iokr_opt.rank_candidates_opt(0, candidate_fps, latent,
                                                   ms_kernel_vector,
                                                   latent_basis, gamma)
-        logger.debug('> {:.2f}s '.format(time.time() - t))
+        logger.debug(f'> {time.time() - t:.2f}s ')
         t = time.time()
 
         return ranking
@@ -212,7 +212,7 @@ def get_iokr_server():
     datapath = get_datapath()
     kernel_files = [
         os.path.join(datapath,
-                     'ppk_dag_all_normalised_shifted_{}.npy'.format(x))
+                     f'ppk_dag_all_normalised_shifted_{x}.npy')
         for x in ['nloss', 'peaks']
     ]
 
@@ -301,7 +301,7 @@ def test():
 
     # Candidate set
     SMILES = [
-        "C\C=C\C=C\C(=O)C1=C(O)C(C)=C(O)C(C)=C1",
+        r"C\C=C\C=C\C(=O)C1=C(O)C(C)=C(O)C(C)=C1",
         "CC1=CC2=C(C(O)=C1)C(=O)C3=C(C=C(O)C=C3O)C2=O",
         "CC1=CC2=C(C(O)=C1)C(=O)C3=C(C=C(O)C=C3O)C2=O",
         "CC1=C2C(OC(=O)C3=C2C=C(O)C=C3O)=CC(O)=C1",

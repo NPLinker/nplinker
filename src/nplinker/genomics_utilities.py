@@ -25,10 +25,10 @@ def get_smiles(bgc):
         return None
 
     if not os.path.exists(bgc.antismash_file):
-        logger.warn('Missing antismash_file: {}'.format(bgc.antismash_file))
+        logger.warn(f'Missing antismash_file: {bgc.antismash_file}')
         return None
 
-    with open(bgc.antismash_file, 'r') as f:
+    with open(bgc.antismash_file) as f:
         for rec in SeqIO.parse(f, 'gb'):
             # rec is a Bio.SeqRecord object, search its .features list
             # for "cand_cluster" and then extract SMILES string from there

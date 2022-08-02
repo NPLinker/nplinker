@@ -69,7 +69,7 @@ def fingerprint_from_smiles(smiles, fingerprint_type=None):
         fingerprinter = c.cdk.fingerprint.KlekotaRothFingerprinter()
     else:
         raise SystemExit(
-            'Unknown fingerprint type: {}'.format(fingerprint_type))
+            f'Unknown fingerprint type: {fingerprint_type}')
 
     fp = fingerprinter.getBitFingerprint(c.mol_container)
     fp_size = fp.size()
@@ -97,7 +97,7 @@ def fingerprint_from_inchi(inchi, fingerprint_type=None):
         fingerprinter = c.cdk.fingerprint.KlekotaRothFingerprinter()
     else:
         raise SystemExit(
-            'Unknown fingerprint type: {}'.format(fingerprint_type))
+            f'Unknown fingerprint type: {fingerprint_type}')
 
     fp = fingerprinter.getBitFingerprint(c.mol_container)
     fp_size = fp.size()

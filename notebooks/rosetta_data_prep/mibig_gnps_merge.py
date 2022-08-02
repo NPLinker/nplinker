@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 
 # In[ ]:
 
@@ -75,12 +74,12 @@ import csv
 mibig_inchi_keys = {}
 failing_smiles = []
 cnt = 0
-with open('compunds_structures_2.0.csv', 'r') as f:
+with open('compunds_structures_2.0.csv') as f:
     for l in csv.reader(f):
-        if cnt is 0:
+        if cnt == 0:
             cnt += 1
             continue
-        if len(l) is 0:
+        if len(l) == 0:
             continue
         mibig_id, compound_name, smiles, pubchem_id = l
         if smiles == '':
@@ -118,7 +117,7 @@ for gnps_spectrum in mgf.read('/home/grimur/iokr/data/mibig/gnps-mibig/gnps_with
         print(gnps_smiles)
         failing_smiles.append((gnps_count, gnps_spectrum['params']['filename'], gnps_smiles))
     gnps_count += 1
-    print('processing {}'.format(gnps_inchi_key))
+    print(f'processing {gnps_inchi_key}')
     gnps_inchi_first_block = gnps_inchi_key.split('-')[0]
     gnps_inchi_keys.add(gnps_inchi_first_block)
     mibig_id = mibig_inchi_keys.get(gnps_inchi_first_block, None)
@@ -129,12 +128,12 @@ for gnps_spectrum in mgf.read('/home/grimur/iokr/data/mibig/gnps-mibig/gnps_with
 # In[7]:
 
 
-print('matches: {}'.format(len(matches)))
-print('matched mibig ids: {}'.format(len(set([x[1][0][0] for x in matches]))))
-print('gnps spectra: {}'.format(gnps_count))
-print('gnps keys: {}'.format(len(gnps_inchi_keys)))
-print('total mibig ids: {}'.format(len(set().union(*mibig_inchi_keys.values()))))
-print('mibig keys: {}'.format(len(mibig_inchi_keys.keys())))
+print(f'matches: {len(matches)}')
+print(f'matched mibig ids: {len({x[1][0][0] for x in matches})}')
+print(f'gnps spectra: {gnps_count}')
+print(f'gnps keys: {len(gnps_inchi_keys)}')
+print(f'total mibig ids: {len(set().union(*mibig_inchi_keys.values()))}')
+print(f'mibig keys: {len(mibig_inchi_keys.keys())}')
 
 
 # In[51]:

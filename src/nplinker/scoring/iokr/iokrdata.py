@@ -52,7 +52,7 @@ def load_kernels(kernel_files, normalise=True):
 class GNPS():
 
     def __init__(self, filename):
-        logger.debug('GNPS {}'.format(sys._getframe().f_code.co_name))
+        logger.debug(f'GNPS {sys._getframe().f_code.co_name}')
         self.data_gnps = scipy.io.loadmat(filename)
         self.data_fp_array = numpy.array(self.data_gnps['fp'].todense())
 
@@ -65,11 +65,11 @@ class GNPS():
         return inchi, formula, fingerprint
 
     def get_fingerprints(self, indices):
-        logger.debug('GNPS {}'.format(sys._getframe().f_code.co_name))
+        logger.debug(f'GNPS {sys._getframe().f_code.co_name}')
         return self.data_fp_array[:, indices].T
 
     def set_fingerprint(self, fingerprint):
-        logger.debug('GNPS {}'.format(sys._getframe().f_code.co_name))
+        logger.debug(f'GNPS {sys._getframe().f_code.co_name}')
         fp_list = []
         num_fps = len(self.data_gnps['inchi'])
         count = 0
@@ -79,11 +79,11 @@ class GNPS():
             fp = calc_fp(inchi, fingerprint)
             fp_list.append(fp)
             if count % 100 == 0:
-                logger.debug('Done {} / {}'.format(count, num_fps))
+                logger.debug(f'Done {count} / {num_fps}')
         self.data_fp_array = numpy.array(fp_list).T
 
     def set_fingerprint_from_file(self, filename):
-        logger.debug('GNPS {}'.format(sys._getframe().f_code.co_name))
+        logger.debug(f'GNPS {sys._getframe().f_code.co_name}')
         self.data_fp_array = numpy.load(filename)
 
     def save_fingerprint_to_file(self, filename):
@@ -91,14 +91,14 @@ class GNPS():
 
 
 def load_folds(filename):
-    with open(filename, 'r') as f:
+    with open(filename) as f:
         fold_ids = f.readlines()
     fold_ids = [x.strip() for x in fold_ids]
     return fold_ids
 
 
 def load_kernel(filename):
-    with open(filename, 'r') as f:
+    with open(filename) as f:
         raw = f.read().strip().split()
 
     data = numpy.array([float(x.strip()) for x in raw])
@@ -181,7 +181,7 @@ def extract_candidate_name(filename):
 
 def load_spectra(filename):
     spectra = []
-    with open(filename, 'r') as f:
+    with open(filename) as f:
         for l in f.readlines():
             if l.startswith('SPECTRUM_ID'):
                 continue
@@ -233,7 +233,7 @@ class IOKRDataServer():
             try:
                 self.ms = numpy.load(open(os.path.join(path, 'ms.npy'), 'rb'),
                                      allow_pickle=True)
-                logger.debug('Done in {:2f}s'.format(time.time() - t))
+                logger.debug(f'Done in {time.time() - t:2f}s')
                 return
             except Exception as e:
                 logger.debug(
@@ -249,7 +249,7 @@ class IOKRDataServer():
             ms.filter = spectrum_filters.filter_by_frozen_dag
             ms.load(os.path.join(path, 'SPEC', spectrum_id + '.ms'))
             self.ms.append(ms)
-        logger.debug('Loading took {:2f}s'.format(time.time() - t))
+        logger.debug(f'Loading took {time.time() - t:2f}s')
         logger.debug('Caching MS data')
         numpy.save(open(os.path.join(path, 'ms.npy'), 'wb'), self.ms)
 
@@ -257,15 +257,13 @@ class IOKRDataServer():
         logger.debug('IOKRDataServer {}'.format(
             sys._getframe().f_code.co_name))
         if self.fingerprint is None:
-            for candidate_inchi, candidate_fp in load_candidate_file(
-                    self.candidate_path % formula):
-                yield candidate_inchi, candidate_fp
+            yield from load_candidate_file(
+                    self.candidate_path % formula)
         else:
             candidate_path = self.candidate_path % formula
             fp_path = self.fp_path + os.sep + 'fp_%s.bin' % formula
-            for candidate_inchi, candidate_fp in load_candidate_file_fp(
-                    candidate_path, fp_path, self.fingerprint):
-                yield candidate_inchi, candidate_fp
+            yield from load_candidate_file_fp(
+                    candidate_path, fp_path, self.fingerprint)
 
     def get_sample(self, idx, skip_candidates=False):
         gnps_inchi, formula, fingerprint = self.gnps.get(idx)
@@ -343,11 +341,11 @@ class IOKRDataServer():
 
         fppath = self.path
         fpfile = os.path.join(self.path,
-                              'fp_{}_gnps.bin.npy'.format(fingerprint))
+                              f'fp_{fingerprint}_gnps.bin.npy')
         # fppath = self.path + os.sep + 'fp_' + fingerprint + os.sep
         # fpfile = fppath + os.sep + 'fp_gnps.bin'
         self.fp_path = fppath
-        logger.debug('fpfile is "{}"'.format(fpfile))
+        logger.debug(f'fpfile is "{fpfile}"')
         if os.path.exists(fpfile):
             logger.debug('Loading GNPS fingerprints from file')
             self.gnps.set_fingerprint_from_file(fpfile)

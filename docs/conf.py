@@ -17,9 +17,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = u"nplinker"
-copyright = u"2022, Netherlands eScience Center"
-author = u"Cunliang Geng"
+project = "nplinker"
+copyright = "2022, Netherlands eScience Center"
+author = "Cunliang Geng"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

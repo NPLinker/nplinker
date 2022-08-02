@@ -14,13 +14,13 @@ np.random.seed(50)
 
 
 def create_strains(n=10):
-    return [Strain('strain_{:02d}'.format(x)) for x in range(n)]
+    return [Strain(f'strain_{x:02d}') for x in range(n)]
 
 
 def create_gcfs(strains, n=3):
     gcfs = []
     for i in range(n):
-        gcf = GCF(i, 'fake_gcf_{}'.format(i), 'NRPS')
+        gcf = GCF(i, f'fake_gcf_{i}', 'NRPS')
         num_strains = np.random.randint(1, len(strains))
         randoms = list(range(len(strains)))
         np.random.shuffle(randoms)

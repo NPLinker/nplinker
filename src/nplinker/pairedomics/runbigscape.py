@@ -38,8 +38,7 @@ def run_bigscape(bigscape_py_path, antismash_path, output_path, pfam_path,
 
     try:
         subprocess.run([bigscape_py_path, '-h'],
-                       stdout=subprocess.PIPE,
-                       stderr=subprocess.PIPE)
+                       capture_output=True)
     except Exception as e:
         raise Exception(
             'Failed to find/run bigscape.py (path={}, err={})'.format(
@@ -47,7 +46,7 @@ def run_bigscape(bigscape_py_path, antismash_path, output_path, pfam_path,
 
     if not os.path.exists(antismash_path):
         raise Exception(
-            'antismash_path "{}" does not exist!'.format(antismash_path))
+            f'antismash_path "{antismash_path}" does not exist!')
 
     # configure the IO-related parameters, including pfam_dir
     args = [
@@ -59,7 +58,7 @@ def run_bigscape(bigscape_py_path, antismash_path, output_path, pfam_path,
     if len(extra_params) > 0:
         args.extend(extra_params.split(' '))
 
-    logger.info('BiG-SCAPE command: {}'.format(args))
+    logger.info(f'BiG-SCAPE command: {args}')
     result = subprocess.run(args, stdout=sys.stdout, stderr=sys.stderr)
     logger.info('BiG-SCAPE completed with return code {}'.format(
         result.returncode))
