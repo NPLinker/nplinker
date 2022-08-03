@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # User should create virutal env to install nplinker and dependencies
-# do not use pip install --user nplinker
-#
+# Do not use pip install --user nplinker
+
+# Set script to exit immediately if any command fails
+set -e
 
 #------------------------------------------------------------------------------
 # Creat installation path
@@ -21,13 +23,13 @@ fi
 # check the path of this script
 if [[ $(command -v install-nplinker-deps) != $PY_PATH/bin/install-nplinker-deps ]]; then
     echo "❌ Error: command `install-nplinker-deps` invoked from bad path;"
-    echo "Please install nplinker with `pip install nplinker` and re-run the command."
+    echo "Please install nplinker with `pip install nplinker` and then re-run this command."
     exit
 fi
 
 # create dependecy install path
 cd $PY_PATH
-mkdir nplinker_lib
+[[ -d nplinker_lib ]] || mkdir nplinker_lib
 LIB_PATH=$PY_PATH/nplinker_lib
 cd $LIB_PATH
 echo -e "✅ NPLinker dependecies and databases will be installed in: $LIB_PATH\n"
@@ -51,12 +53,10 @@ if [[ "$OSTYPE" == "linux"* ]]; then
         echo "Package manager command 'apt' or 'dnf' or 'yum' NOT found."
         exit
     fi
-
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     # install package manager brew for MacOS if not exist
     ! command -v brew &> /dev/null && /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     do_install="brew install"
-
 else
     echo "Error: NPLinker is not supported on $OSTYPE system, use linux or MacOS system please."
     exit 0
@@ -86,10 +86,15 @@ done
 # install gcc compiler (required by FastTree)
 if command -v gcc &> /dev/null; then
     gcc="gcc"
-elif ! command -v gcc-10 &> /dev/null; then
+elif command -v gcc-10 &> /dev/null; then
+    gcc="gcc-10"
+else
     brew install gcc@10
     gcc="gcc-10"
 fi
+
+# upgrade pip and setuptools
+pip install -q -U pip setuptools
 
 #------------------------------------------------------------------------------
 # Install NPLinker dependencies
@@ -98,12 +103,18 @@ fi
 #--- Install BigScape
 ## Note: DO NOT pip install bigscape until its modular version
 echo "🔥 Start installing BigScape ..."
-    git clone https://github.com/medema-group/BiG-SCAPE.git
-    pip install -r BiG-SCAPE/requirements.txt
-    chmod 754 BiG-SCAPE/bigscape.py
-    chmod 664 BiG-SCAPE/domains_color_file.tsv
-    chmod 775 BiG-SCAPE/Annotated_MIBiG_reference
-    ln -s $LIB_PATH/BiG-SCAPE/bigscape.py $PY_PATH/bin
+    [[ -d BiG-SCAPE ]] || git clone https://github.com/medema-group/BiG-SCAPE.git
+    cd BiG-SCAPE
+    git config --add advice.detachedHead false  # disable advice
+    git checkout master
+    git pull
+    git checkout a3ea8c5a4ef0abdb3b6b043a0f2657d3d778ca20  # tag v1.1.4
+    pip install -q -U -r requirements.txt
+    chmod 754 bigscape.py
+    chmod 664 domains_color_file.tsv
+    chmod 775 Annotated_MIBiG_reference
+    ln -sf $LIB_PATH/BiG-SCAPE/bigscape.py $PY_PATH/bin
+    cd ..
 echo -e "✅ BigScape installed successfully\n"
 
 #--- Install FastTree (not support Windows, required by BigScape)
@@ -112,40 +123,43 @@ echo "🔥 Start installing FastTree ..."
     if [[ "$OSTYPE" == "linux"* ]]; then
         $do_install fasttree
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        wget http://www.microbesonline.org/fasttree/FastTree.c
+        wget -q --show-progress http://www.microbesonline.org/fasttree/FastTree.c
         $gcc -DNO_SSE -O3 -finline-functions -funroll-loops -Wall -o $PY_PATH/bin/fasttree FastTree.c -lm
         rm FastTree.c
     fi
 echo -e "✅ FastTree installed successfully\n"
 
-#--- Install Hmmer (not support Windows, required by BigScape)
-install_it hmmer
+#--- Install Hmmer (not support Windows and ARM64, required by BigScape)
+# brew hmmer not available ARM64 platform (e.g. Apple silicon)
+if ! command -v hmmpress &> /dev/null; then
+    install_it hmmer
+fi
 
 #--- Prepare Pfam database (required by BigScape)
 echo "🔥 Start installing Pfam database ..."
-    wget ftp://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam34.0/Pfam-A.hmm.gz
-    gunzip Pfam-A.hmm.gz
-    hmmpress Pfam-A.hmm
+    [[ -e Pfam-A.hmm.gz ]] || wget -q --show-progress ftp://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam34.0/Pfam-A.hmm.gz
+    gunzip -f Pfam-A.hmm.gz
+    hmmpress -f Pfam-A.hmm
 echo -e "✅ Pfam database installed successfully\n"
 
 
 #--- Install canopus_treemap
 echo "🔥 Start installing Canopus"
-    pip install canopus@git+https://github.com/kaibioinfo/canopus_treemap.git
+    pip install -U -q canopus@git+https://github.com/kaibioinfo/canopus_treemap.git
 echo -e "✅ Canopus installed successfully\n"
 
 
 #--- Install SIRIUS
 echo "🔥 Start installing Sirius"
     if [[ "$OSTYPE" == "linux"* ]]; then
-        wget https://github.com/boecker-lab/sirius/releases/download/v5.5.5/sirius-5.5.5-linux64-headless.zip
-        unzip sirius-5.5.5-linux64-headless.zip
-        ln -s $LIB_PATH/sirius/bin/sirius $PY_PATH/bin
+        wget -q --show-progress https://github.com/boecker-lab/sirius/releases/download/v5.5.5/sirius-5.5.5-linux64-headless.zip
+        unzip -q -o sirius-5.5.5-linux64-headless.zip
+        ln -sf $LIB_PATH/sirius/bin/sirius $PY_PATH/bin
         rm sirius-5.5.5-linux64-headless.zip
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        wget https://github.com/boecker-lab/sirius/releases/download/v5.5.5/sirius-5.5.5-osx64-headless.zip
-        unzip sirius-5.5.5-osx64-headless.zip
-        ln -s $LIB_PATH/sirius.app/Contents/MacOS/sirius $PY_PATH/bin
+        wget -q --show-progress https://github.com/boecker-lab/sirius/releases/download/v5.5.5/sirius-5.5.5-osx64-headless.zip
+        unzip -q -o sirius-5.5.5-osx64-headless.zip
+        ln -sf $LIB_PATH/sirius.app/Contents/MacOS/sirius $PY_PATH/bin
         rm sirius-5.5.5-osx64-headless.zip
     fi
 echo -e "✅ Sirius installed successfully\n"
