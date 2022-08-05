@@ -43,7 +43,7 @@ jobs:
       - name: Install nplinker
         run: |
           pip install $(ls dist/nplinker*.whl)
-          install-nplinker-deps
+          install-nplinker-deps --run-on-github
       - name: Run unit tests
         run: pytest -v
 
@@ -70,13 +70,13 @@ jobs:
       - name: Upgrade pip and install dependencies
         run: |
           python3 -m pip install --upgrade pip setuptools
-          pip install build pytest
+          pip install build pytest wheel
       - name: Build the package
         run: 	python -m build
       - name: Install nplinker
         run: |
           pip install $(ls dist/nplinker*.whl)
-          install-nplinker-deps
+          install-nplinker-deps --run-on-github
       - name: Run unit tests
         run: pytest -v
 
@@ -99,11 +99,11 @@ jobs:
           python3 --version
       - name: Upgrade pip and setuptools
         run: |
-          python3 -m pip install --upgrade pip setuptools
+          python3 -m pip install --upgrade pip setuptools wheel
       - name: Install nplinker and its dependencies
         run: |
           python3 -m pip install .[dev]
-          install-nplinker-deps
+          install-nplinker-deps --run-on-github
       - name: Check style against standards using prospector
         run: prospector --zero-exit --output-format grouped --output-format pylint:pylint-report.txt
       - name: Run unit tests with coverage
