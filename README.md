@@ -46,6 +46,12 @@ pip install nplinker
 install-nplinker-deps
 ```
 
+Due to hardware requirements of some non-pypi dependecies:
+- NPLinker can only be installed on `Linux` and `MacOS (Intel chip)`
+- `MacOS(Apple Silicon, M1/M2 chip)` user should execute the install commands in a [Rosseta-enabled terminal](https://support.apple.com/en-us/HT211861).
+- For `Windows` users, please use our [docker image](https://hub.docker.com/r/nlesc/nplinker).
+
+
 See the example in [Jupyter notebook](notebooks/nplinker_demo1.ipynb) for a guided introduction to the NPLinker API which shows how to load and examine a dataset. Other notebooks are present showcasing other scoring methods, like for [NPClassScore](notebooks/npclassscore_linking/NPClassScore_demo.ipynb).
 
 If you want to visualize and manipulate NPLinker predictions, check [NPLinker Webapp](https://github.com/NPLinker/nplinker-webapp) for more info.
