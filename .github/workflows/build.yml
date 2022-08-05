@@ -37,7 +37,7 @@ jobs:
       - name: Upgrade pip and install dependencies
         run: |
           python3 -m pip install --upgrade pip setuptools
-          pip install build pytest
+          pip install build pytest wheel
       - name: Build the package
         run: 	python -m build
       - name: Install nplinker
