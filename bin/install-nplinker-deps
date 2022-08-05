@@ -43,15 +43,20 @@ echo -e "✅ NPLinker dependecies and databases will be installed in: $LIB_PATH\
 if [[ "$OSTYPE" == "linux"* ]]; then
     # detect package manager for Linux
     if command -v apt &> /dev/null; then
-        apt update &> /dev/null
-        do_install="apt install -y"
         echo -e "✅ Package manager is 'apt'\n"
+        if [[ -e $GITHUB_ACTIONS ]]; then
+            sudo apt update &> /dev/null
+            do_install="sudo apt install -y"
+        else
+            apt update &> /dev/null
+            do_install="apt install -y"
+        fi
     elif command -v dnf &> /dev/null; then
-        do_install="dnf install -y"
         echo -e "✅ Package manager is 'dnf'\n"
+        do_install="dnf install -y"
     elif command -v yum &> /dev/null; then
-        do_install="yum install -y"
         echo -e "✅ Package manager is 'yum'\n"
+        do_install="yum install -y"
     else
         echo "Package manager command 'apt' or 'dnf' or 'yum' NOT found."
         exit
