@@ -32,9 +32,9 @@ datapath = ''
 
 
 def load_formula_dag(filename):
-    formula = set([])
+    formula = set()
 
-    with open(filename, 'r') as f:
+    with open(filename) as f:
         for line in f.readlines():
             if not line.startswith('v'):
                 continue
@@ -94,7 +94,7 @@ def filter_by_tree(self):
     except:
         formula = load_formula_dag(treepath + os.path.sep + self.id + '.dot')
     formula_objects = [Formula(x) for x in formula]
-    formula_masses = sorted([x.compute_exact_mass() for x in formula_objects])
+    formula_masses = sorted(x.compute_exact_mass() for x in formula_objects)
 
     return filter_by_mass(self.shifted_spectrum, formula_masses, tol)
 
@@ -117,7 +117,7 @@ def filter_by_dag(self):
 
     formula = load_formula_dag(treepath + os.sep + self.id + '.dot')
     formula_objects = [Formula(x) for x in formula]
-    formula_masses = sorted([x.compute_exact_mass() for x in formula_objects])
+    formula_masses = sorted(x.compute_exact_mass() for x in formula_objects)
 
     return filter_by_mass(self.shifted_spectrum, formula_masses, tol)
 

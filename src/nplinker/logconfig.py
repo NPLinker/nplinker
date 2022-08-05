@@ -16,7 +16,7 @@ import logging
 import sys
 
 
-class LogConfig(object):
+class LogConfig():
 
     active_loggers = {}
     logfmt = '%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d, %(message)s'
@@ -59,7 +59,7 @@ class LogConfig(object):
         constant from the logging module (e.g. "INFO", "DEBUG")
         """
         if not hasattr(logging, level):
-            raise Exception('Unknown/invalid loglevel "{}"'.format(level))
+            raise Exception(f'Unknown/invalid loglevel "{level}"')
 
         LogConfig.setLogLevel(getattr(logging, level))
 

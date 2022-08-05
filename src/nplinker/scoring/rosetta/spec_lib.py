@@ -22,7 +22,7 @@ from .rosetta_functions import fast_cosine
 logger = LogConfig.getLogger(__file__)
 
 
-class SpecLib(object):
+class SpecLib():
 
     def __init__(self, mgf_file):
         self.mgf_file = mgf_file

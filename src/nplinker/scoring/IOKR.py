@@ -21,7 +21,7 @@ logger = LogConfig.getLogger(__file__)
 
 
 def run_iokr_ranking(spec, bgc_list):
-    logger.debug('IOKR datapath: {}'.format(nplinker_iokr.get_datapath()))
+    logger.debug(f'IOKR datapath: {nplinker_iokr.get_datapath()}')
 
     # extract SMILES strings for each supplied BGC (caching them in the object)
     smiles = [bgc.smiles for bgc in bgc_list]
@@ -38,7 +38,7 @@ def run_iokr_ranking(spec, bgc_list):
 
 
 def run_iokr_scoring(spec_list, bgc_list):
-    logger.debug('IOKR datapath: {}'.format(nplinker_iokr.get_datapath()))
+    logger.debug(f'IOKR datapath: {nplinker_iokr.get_datapath()}')
     smiles = [bgc.smiles for bgc in bgc_list]
     if None in smiles:
         logger.error(

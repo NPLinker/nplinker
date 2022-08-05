@@ -16,7 +16,7 @@ import numpy
 from numba import jit
 
 
-class MSSpectrum(object):
+class MSSpectrum():
 
     def __init__(self, mgf_dict=None, spec=None):
         self.compound = None
@@ -76,10 +76,10 @@ class MSSpectrum(object):
         self.output_spectrum = None
         self.filename = filename
         spectrum = []
-        with open(filename, 'r') as f:
+        with open(filename) as f:
             for line in f.readlines():
                 line = line.strip()
-                if len(line) is 0:
+                if len(line) == 0:
                     pass
                 elif line.startswith('>compound'):
                     self.compound = strip_leading(line)
@@ -128,7 +128,7 @@ class MSSpectrum(object):
         else:
             if self.output_spectrum is None:
                 filtered_spectrum = self.filter(self)
-                if len(filtered_spectrum) is not 0:
+                if len(filtered_spectrum) != 0:
                     self.output_spectrum = self.filter(self)
                 else:
                     self.output_spectrum = self.shifted_spectrum

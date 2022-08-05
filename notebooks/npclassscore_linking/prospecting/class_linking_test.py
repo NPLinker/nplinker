@@ -53,5 +53,5 @@ if __name__ == "__main__":
     mc.standardised = True
 
     results = npl.get_links(npl.gcfs, mc, and_mode=True)
-    print('Number of results: {}'.format(len(results)))
+    print(f'Number of results: {len(results)}')
     print(results.methods)

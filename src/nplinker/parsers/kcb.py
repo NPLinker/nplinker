@@ -29,12 +29,12 @@ CLUSTER_REGION_REGEX = re.compile('(.+?)\\.(cluster|region)(\\d+).gbk$')
 # format with one text file per gbk.
 
 
-class KCBJSONParser(object):
+class KCBJSONParser():
     """
     Parser for the large .json files antiSMASH generates as part of its output
 
     This is supposed to do the same job as the KCBTextParser class without relying
-    on parsing the legacy-format text files. 
+    on parsing the legacy-format text files.
 
     Args:
         bgcs: a list of NPLinker BGC objects created from the same antiSMASH output folder
@@ -48,7 +48,7 @@ class KCBJSONParser(object):
                     'KCBJSONParser failed to find file "{}"'.format(
                         bgc.antismash_file))
 
-        logger.debug('KCBJSONParser({} BGCs)'.format(len(bgcs)))
+        logger.debug(f'KCBJSONParser({len(bgcs)} BGCs)')
 
         # find the JSON file: TODO is the assumption of there only being a single .json
         # file always going to work? otherwise have to try guessing the name based on
@@ -67,7 +67,7 @@ class KCBJSONParser(object):
             return
 
         self.json_filename = os.path.join(prefix, json_files[0])
-        logger.debug('Using JSON file {}'.format(self.json_filename))
+        logger.debug(f'Using JSON file {self.json_filename}')
 
     def parse_hits(self):
         if self.json_filename is None:
@@ -81,7 +81,7 @@ class KCBJSONParser(object):
         # TODO: catch exception and print message recommending 64-bit
         logger.info('Loading antiSMASH JSON data from {}'.format(
             self.json_filename))
-        data = json.load(open(self.json_filename, 'r'))
+        data = json.load(open(self.json_filename))
 
         # JSON data structure: depending on the gbks in the source folder, the
         # structure of the results may be different from one to the next. from
@@ -239,7 +239,7 @@ class KCBJSONParser(object):
         return {record_id: record_hits}
 
 
-class KCBTextParser(object):
+class KCBTextParser():
     """
     Parser for antismash knownclusterblast text output files
     """
@@ -247,7 +247,7 @@ class KCBTextParser(object):
     def __init__(self, filename):
         if not os.path.exists(filename):
             raise Exception(
-                'KCBTextParser failed to find file "{}"'.format(filename))
+                f'KCBTextParser failed to find file "{filename}"')
 
         self.bgc_genes = set()
         self.mibig_bgcs = []
@@ -274,7 +274,7 @@ class KCBTextParser(object):
         # (continues up to hit n)
         # EOF
 
-        with open(filename, 'r') as f:
+        with open(filename) as f:
             line = next(f)
             while not line.startswith('Table of genes'):
                 line = next(f)
@@ -410,20 +410,20 @@ class KCBTextParser(object):
     def get_kcb_filename_from_bgc(bgc):
         """Given a BGC object, return the filename of the corresponding knownclusterblast .txt file (if any).
 
-            
-        This method attempts to derive the name of the knownclusterblast output file for the 
-        supplied BGC object, using the original path + filename of the .gbk that the BGC was 
-        sourced from during the loading process. 
+
+        This method attempts to derive the name of the knownclusterblast output file for the
+        supplied BGC object, using the original path + filename of the .gbk that the BGC was
+        sourced from during the loading process.
 
         Assumptions made:
             - the .gbk files are grouped in subdirectories with <dataset>/antismash/
             - each of these subdirectories contains a "knownclusterblast" subdirectory
-            - within that, there is a single .txt file for each .gbk 
-        
+            - within that, there is a single .txt file for each .gbk
+
         For some reason there doesn't appear to be a simple way of matching up the .gbk/.txt
-        files using their contents, only the filenames. And there are various different 
+        files using their contents, only the filenames. And there are various different
         possibilities for the naming schemes, so this method tries to account for the
-        known variants discovered so far. 
+        known variants discovered so far.
 
         Args:
             bgc: a BGC object
@@ -433,7 +433,7 @@ class KCBTextParser(object):
             supplied BGC, or None if an error occurred/file doesn't exist
         """
         if bgc.antismash_file is None:
-            logger.warning('BGC {} has no antismash_file set'.format(bgc))
+            logger.warning(f'BGC {bgc} has no antismash_file set')
             return None
 
         # expecting to find the .txt files inside a 'knownclusterblast' subdir in the
@@ -462,7 +462,7 @@ class KCBTextParser(object):
             # construct the expected filename using the prefix and number
             # (note no leading zeroes on the number)
             kcb_name = os.path.join(base_path,
-                                    '{}_c{}.txt'.format(prefix, number))
+                                    f'{prefix}_c{number}.txt')
         elif 'cluster' in genbank_file:
             # case 2: assume the genbank files have a <someID>.cluster<num>.gbk naming scheme.
             # this is the case with the Crusemann dataset on the paired platform among others.
@@ -473,7 +473,7 @@ class KCBTextParser(object):
 
             # construct the expected filename
             # (note no leading zeroes on the number)
-            kcb_name = os.path.join(base_path, 'cluster{}.txt'.format(number))
+            kcb_name = os.path.join(base_path, f'cluster{number}.txt')
         else:
             logger.warning(
                 'Unknown GenBank file naming scheme, failed to determine knownclusterblast filenames!'

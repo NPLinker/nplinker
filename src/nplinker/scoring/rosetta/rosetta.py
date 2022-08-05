@@ -26,7 +26,7 @@ from .spec_lib import SpecLib
 logger = LogConfig.getLogger(__file__)
 
 
-class RosettaHit(object):
+class RosettaHit():
 
     def __init__(self, spec, gnps_id, mibig_id, bgc, spec_match_score,
                  bgc_match_score):
@@ -46,7 +46,7 @@ class RosettaHit(object):
         return str(self)
 
 
-class Rosetta(object):
+class Rosetta():
 
     DEF_MS1_TOL = 100
     DEF_MS2_TOL = 0.2
@@ -115,7 +115,7 @@ class Rosetta(object):
         self._gnps2mibig = {}
         self._mibig2gnps = {}
 
-        with open(csv_path, 'r') as f:
+        with open(csv_path) as f:
             rdr = csv.reader(f, delimiter=',')
             headers = next(rdr)
             for line in rdr:
@@ -328,7 +328,7 @@ class Rosetta(object):
                     self._mibig2bgc[mibig_bgc_id] = set()
                 self._mibig2bgc[mibig_bgc_id].add(bgc)
 
-        logger.info('Completed, {} BGC hits found'.format(len(self._bgc_hits)))
+        logger.info(f'Completed, {len(self._bgc_hits)} BGC hits found')
         if errors > 0:
             logger.warning(
                 'Some knownclusterblast files could not be loaded, results may be incomplete'
@@ -349,7 +349,7 @@ class Rosetta(object):
                             self._rosetta_hits.append(
                                 RosettaHit(spec, gnps_id, mibig_id, bgc, score,
                                            bgc_score))
-        logger.info('Found {} rosetta hits!'.format(len(self._rosetta_hits)))
+        logger.info(f'Found {len(self._rosetta_hits)} rosetta hits!')
 
     def generate_bgc_summary_scores(self):
         # process the hit to compress it into more useful info
@@ -406,7 +406,7 @@ class Rosetta(object):
 
             except Exception as e:
                 logger.warning(
-                    'Failed to parse pickled Rosetta parameters: {}'.format(e))
+                    f'Failed to parse pickled Rosetta parameters: {e}')
 
         # if any parameters have been changed or version mismatch found, delete all cached files
         if not params_ok:

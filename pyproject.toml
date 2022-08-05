@@ -13,7 +13,7 @@ description = "Natural Products Linker"
 readme = "README.md"
 requires-python = ">=3.7"
 keywords = ["Genome", "Metabolome", "Natural Products", "Data Mining"]
-license = { file="LICENSE" }
+license = {text = "Apache-2.0 license"}
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Education",
@@ -47,7 +47,6 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "autoflake",
     "bump2version",
     "coverage[toml]",
     "isort",
@@ -58,6 +57,7 @@ dev = [
     "sphinx_rtd_theme",
     "sphinx-autoapi",
     "myst_parser",
+    "unimport",
     "yapf"
 ]
 publishing = [
@@ -89,15 +89,3 @@ no_lines_before = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"
 known_first_party = ["nplinker"]
 src_paths = ["src", "tests"]
 line_length = 80
-
-# TODO: to config tox
-[tool.tox]
-legacy_tox_ini = """
-[tox]
-envlist = py37,py38,py39,py310
-skip_missing_interpreters = true
-[testenv]
-platform = linux2|darwin
-commands = pytest
-extras = dev
-"""

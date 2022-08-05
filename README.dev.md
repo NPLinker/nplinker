@@ -70,7 +70,7 @@ coverage report
 ## Linting and formatting
 
 
-We use [prospector](https://pypi.org/project/prospector/) for linting, [isort](https://pycqa.github.io/isort/) to sort imports, [autoflake](https://github.com/PyCQA/autoflake) to remove unused imports, and [yapf](https://github.com/google/yapf) for formatting, i.e. fixing readability of your code style.
+We use [prospector](https://pypi.org/project/prospector/) for linting, [isort](https://pycqa.github.io/isort/) to sort imports, [unimport](https://github.com/hakancelikdev/unimport) to remove unused imports, and [yapf](https://github.com/google/yapf) for formatting, i.e. fixing readability of your code style.
 
 Running the linters and formatters requires an activated virtual environment with the development tools installed.
 
@@ -88,8 +88,7 @@ isort --check --diff .
 isort .
 
 # remove unused imports for the project
-# WARNING: python keyword `pass` will also be removed automatically
-autoflake --in-place --remove-all-unused-imports  -r .
+unimport --requirements --ignore-init --include-star-import --gitignore --remove
 
 # format python style for the project
 yapf -r -i .

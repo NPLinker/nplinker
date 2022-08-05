@@ -92,7 +92,7 @@ def download_mibig_bgc_json(output_path, bgc_id):
     resp = httpx.get(MIBIG_BGC_URL.format(bgc_id, bgc_id),
                      follow_redirects=True)
     if resp.status_code == httpx.codes.OK:
-        with open(os.path.join(output_path, '{}.json'.format(bgc_id)),
+        with open(os.path.join(output_path, f'{bgc_id}.json'),
                   'wb') as f:
             f.write(resp.content)
 
@@ -103,12 +103,12 @@ def download_mibig_bgc_json(output_path, bgc_id):
 
 def download_and_extract_mibig_json(download_path, output_path, version):
     archive_path = os.path.join(download_path,
-                                'mibig_json_{}.tar.gz'.format(version))
+                                f'mibig_json_{version}.tar.gz')
     logger.debug(
-        'Checking for existing MiBIG archive at {}'.format(archive_path))
+        f'Checking for existing MiBIG archive at {archive_path}')
     cached = False
     if os.path.exists(archive_path):
-        logger.info('Found cached file at {}'.format(archive_path))
+        logger.info(f'Found cached file at {archive_path}')
         try:
             _ = tarfile.open(archive_path)
             cached = True
@@ -118,7 +118,7 @@ def download_and_extract_mibig_json(download_path, output_path, version):
 
     if not cached:
         url = MIBIG_JSON_URL.format(version)
-        logger.debug('Downloading MiBIG database from {}'.format(url))
+        logger.debug(f'Downloading MiBIG database from {url}')
         with open(archive_path, 'wb') as f:
             total_bytes, last_total = 0, 0
             with httpx.stream('GET', url) as r:
@@ -181,8 +181,8 @@ def generate_strain_mappings(strains, strain_mappings_file, antismash_dir):
                     strains.lookup(strain_name).add_alias(strain_alias)
                 else:
                     logger.warning(
-                        'Failed to lookup strain name: {}'.format(strain_name))
-        logger.info('Saving strains to {}'.format(strain_mappings_file))
+                        f'Failed to lookup strain name: {strain_name}')
+        logger.info(f'Saving strains to {strain_mappings_file}')
         strains.save_to_file(strain_mappings_file)
     else:
         logger.info('Strain mappings already generated')
@@ -190,7 +190,7 @@ def generate_strain_mappings(strains, strain_mappings_file, antismash_dir):
     return strains
 
 
-class Downloader(object):
+class Downloader():
     # TODO: move to independent config file  ---C.Geng
     PFAM_PATH = os.path.join(sys.prefix, 'nplinker_lib')
 
@@ -206,7 +206,7 @@ class Downloader(object):
                                                   'all_projects.json')
         self.all_project_json = None
         self.project_json_file = os.path.join(
-            self.local_cache, '{}.json'.format(self.gnps_massive_id))
+            self.local_cache, f'{self.gnps_massive_id}.json')
         self.project_json = None
         os.makedirs(self.local_cache, exist_ok=True)
 
@@ -223,7 +223,7 @@ class Downloader(object):
                 PAIREDOMICS_PROJECT_DATA_ENDPOINT, self.all_project_json_file)
         else:
             logger.info('Using existing copy of platform project data')
-            with open(self.all_project_json_file, 'r') as f:
+            with open(self.all_project_json_file) as f:
                 self.all_project_json = json.load(f)
 
         # query the pairedomics webservice with the project ID to retrieve the data. unfortunately
@@ -275,7 +275,7 @@ class Downloader(object):
             os.makedirs(os.path.join(self.project_file_cache, d),
                         exist_ok=True)
 
-        with io.open(os.path.join(self.project_file_cache,
+        with open(os.path.join(self.project_file_cache,
                                   'platform_data.json'),
                      'w',
                      encoding='utf-8') as f:
@@ -382,7 +382,7 @@ class Downloader(object):
 
         # get rid of any extraneous whitespace
         genbank_id = genbank_id.strip()
-        logger.debug('Parsed GenBank ID to "{}"'.format(genbank_id))
+        logger.debug(f'Parsed GenBank ID to "{genbank_id}"')
 
         # run a search using the GenBank accession ID
         try:
@@ -465,7 +465,7 @@ class Downloader(object):
             return self._resolve_jgi_accession(genome_id_data['JGI_Genome_ID'])
 
         logger.warning(
-            'Unable to resolve genome_ID: {}'.format(genome_id_data))
+            f'Unable to resolve genome_ID: {genome_id_data}')
         return None
 
     def _download_genomics_data(self, genome_records):
@@ -478,7 +478,7 @@ class Downloader(object):
 
         # genome lookup status info
         if os.path.exists(genome_status_file):
-            with open(genome_status_file, 'r') as f:
+            with open(genome_status_file) as f:
                 for line in csv.reader(f):
                     asobj = GenomeStatus.from_csv(*line)
                     genome_status[asobj.original_id] = asobj
@@ -532,7 +532,7 @@ class Downloader(object):
                 if genome_obj.resolved_id is None:
                     # give up on this one
                     logger.warning(
-                        'Failed lookup for genome ID {}'.format(best_id))
+                        f'Failed lookup for genome ID {best_id}')
                     with open(genome_status_file, 'a+') as f:
                         f.write(genome_obj.to_csv() + '\n')
                     continue
@@ -596,7 +596,7 @@ class Downloader(object):
                     link = soup.find(
                         'a', {'href': lambda url: url.endswith('.zip')})
                 except Exception as e:
-                    logger.debug('antiSMASH DB page load failed: {}'.format(e))
+                    logger.debug(f'antiSMASH DB page load failed: {e}')
 
                 if link is not None:
                     logger.info(
@@ -634,7 +634,7 @@ class Downloader(object):
                         bar.finish()
                 except Exception as e:
                     logger.warning(
-                        'antiSMASH zip download failed: {}'.format(e))
+                        f'antiSMASH zip download failed: {e}')
                     continue
 
             return True
@@ -644,14 +644,14 @@ class Downloader(object):
     def _download_antismash_zip(self, antismash_obj):
         # save zip files to avoid having to repeat above lookup every time
         local_path = os.path.join(self.project_download_cache,
-                                  '{}.zip'.format(antismash_obj.resolved_id))
+                                  f'{antismash_obj.resolved_id}.zip')
         logger.debug(
-            'Checking for existing antismash zip at {}'.format(local_path))
+            f'Checking for existing antismash zip at {local_path}')
 
         cached = False
         # if the file exists locally
         if os.path.exists(local_path):
-            logger.info('Found cached file at {}'.format(local_path))
+            logger.info(f'Found cached file at {local_path}')
             try:
                 # check if it's a valid zip file, if so treat it as cached
                 _ = zipfile.ZipFile(local_path)
@@ -697,7 +697,7 @@ class Downloader(object):
             os.makedirs(output_path, exist_ok=True)
 
         antismash_zip = zipfile.ZipFile(antismash_obj.filename)
-        kc_prefix1 = '{}/knownclusterblast'.format(antismash_obj.resolved_id)
+        kc_prefix1 = f'{antismash_obj.resolved_id}/knownclusterblast'
         kc_prefix2 = 'knownclusterblast'
         for zip_member in antismash_zip.namelist():
             # TODO other files here?
@@ -745,8 +745,8 @@ class Downloader(object):
             if label in self.growth_media:
                 self.growth_media[label].add(rec['sample_preparation_label'])
             else:
-                self.growth_media[label] = set(
-                    [rec['sample_preparation_label']])
+                self.growth_media[label] = {
+                    rec['sample_preparation_label']}
 
         for rec in gen_records:
             label = rec['genome_label']
@@ -791,7 +791,7 @@ class Downloader(object):
                 os.unlink(self.metabolomics_zip)
 
         if not cached:
-            logger.info('Downloading metabolomics data from {}'.format(url))
+            logger.info(f'Downloading metabolomics data from {url}')
             with open(self.metabolomics_zip, 'wb') as f:
                 # note that this requires a POST, not a GET
                 total_bytes, last_total = 0, 0
@@ -808,7 +808,7 @@ class Downloader(object):
         # this should throw an exception if zip is malformed etc
         mbzip = zipfile.ZipFile(self.metabolomics_zip)
 
-        logger.info('Extracting files to {}'.format(self.project_file_cache))
+        logger.info(f'Extracting files to {self.project_file_cache}')
         # extract the contents to the file cache folder. only want some of the files
         # so pick them out and only extract those:
         # - root/spectra/*.mgf
@@ -848,7 +848,7 @@ class Downloader(object):
         with open(local_path, 'w') as f:
             json.dump(content, f)
 
-        logger.debug('Downloaded {} to {}'.format(url, local_path))
+        logger.debug(f'Downloaded {url} to {local_path}')
 
         return content
 

@@ -83,7 +83,7 @@ class NPLinkerUnpickler(pickle.Unpickler):
             return self.nplinker.scoring_method(obj_id)
 
         raise pickle.UnpicklingError(
-            'Unsupported persistent object: {}'.format(pid))
+            f'Unsupported persistent object: {pid}')
 
 
 # basic wrapper for loading pickled data files. this is done in various places

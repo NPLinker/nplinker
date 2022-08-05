@@ -25,13 +25,13 @@ for c in AA_CODES:
 AA_CODES_ISO['b-ala'] = 'ala'
 
 
-class AntiSmashFile(object):
+class AntiSmashFile():
 
     def __init__(self, filename):
         self.raw_data = []
         self.filename = filename
 
-        with open(filename, 'r') as f:
+        with open(filename) as f:
             # antiSMASH 5 vs. 4 output is vastly different
             for record in SeqIO.parse(f, 'gb'):
                 if 'structured_comment' in record.annotations:
@@ -42,14 +42,13 @@ class AntiSmashFile(object):
                         self.raw_data.append(AntiSmash5Record(record))
                     else:
                         raise ValueError(
-                            'Invalid antiSMASH version: {}'.format(as_version))
+                            f'Invalid antiSMASH version: {as_version}')
                 else:
                     self.raw_data.append(AntiSmashRecord(record))
 
     def get_spec(self):
         for r in self.raw_data:
-            for s in r.get_spec():
-                yield s
+            yield from r.get_spec()
 
     @property
     def products(self):
@@ -62,7 +61,7 @@ class AntiSmashFile(object):
         return [x.get_prob(aa) for x in self.raw_data]
 
 
-class AntiSmash5Record(object):
+class AntiSmash5Record():
 
     def __init__(self, seq_record):
         self.raw_data = seq_record
@@ -119,7 +118,7 @@ class AntiSmash5Record(object):
                 yield AA_CODES_ISO[aa]
 
 
-class AntiSmashRecord(object):
+class AntiSmashRecord():
 
     def __init__(self, seq_record):
         self.raw_data = seq_record
@@ -284,8 +283,7 @@ def to_set(nested):
         if type(item) is str:
             yield item
         else:
-            for x in to_set(item):
-                yield x
+            yield from to_set(item)
 
 
 def predict_aa(filename):
@@ -302,7 +300,7 @@ def read_aa_losses(filename):
     Read AA losses from data file. (assume fixed structure...)
     """
     aa_losses = {}
-    with open(filename, 'r') as f:
+    with open(filename) as f:
         reader = csv.reader(f, delimiter=',')
         next(reader)  # skip headers
         for line in reader:
@@ -322,4 +320,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     for aa, res in predict_aa(args.file):
-        print('%s,%s' % (aa, res))
+        print(f'{aa},{res}')

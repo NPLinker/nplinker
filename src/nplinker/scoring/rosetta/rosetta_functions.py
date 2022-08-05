@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
 
 
 def fast_cosine_shift(spectrum1, spectrum2, tol, min_match):
@@ -114,4 +113,4 @@ def comp_scores(spectra, file_scan, similarity_function, similarity_tolerance,
             spec2 = specs[j]
             sc, _ = similarity_function(spec, spec2, similarity_tolerance,
                                         min_match)
-            print("{},{} <-> {},{} = {}".format(f, s, f2, s2, sc))
+            print(f"{f},{s} <-> {f2},{s2} = {sc}")

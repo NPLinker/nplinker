@@ -20,7 +20,7 @@ from .logconfig import LogConfig
 logger = LogConfig.getLogger(__file__)
 
 
-class Strain(object):
+class Strain():
 
     def __init__(self, primary_strain_id):
         self.id = primary_strain_id
@@ -32,7 +32,7 @@ class Strain(object):
     def add_alias(self, alt_id):
         if len(alt_id) == 0:
             logger.warning(
-                'Refusing to add zero-length alias to strain {}'.format(self))
+                f'Refusing to add zero-length alias to strain {self}')
             return
 
         self.aliases.add(alt_id)
@@ -41,10 +41,10 @@ class Strain(object):
         return str(self)
 
     def __str__(self):
-        return 'Strain({}) [{} aliases]'.format(self.id, len(self.aliases))
+        return f'Strain({self.id}) [{len(self.aliases)} aliases]'
 
 
-class StrainCollection(object):
+class StrainCollection():
 
     def __init__(self):
         self._strains = []
@@ -110,11 +110,11 @@ class StrainCollection(object):
     def add_from_file(self, filename):
         if not os.path.exists(filename):
             logger.warning(
-                'strain mappings file not found: {}'.format(filename))
+                f'strain mappings file not found: {filename}')
             return
 
         line = 1
-        with open(filename, 'r') as f:
+        with open(filename) as f:
             reader = csv.reader(f)
             for ids in reader:
                 if len(ids) == 0:
@@ -145,7 +145,7 @@ class StrainCollection(object):
 
     def __str__(self):
         if len(self) > 20:
-            return 'StrainCollection(n={})'.format(len(self))
+            return f'StrainCollection(n={len(self)})'
 
-        return 'StrainCollection(n={}) ['.format(len(self)) + ','.join(
+        return f'StrainCollection(n={len(self)}) [' + ','.join(
             s.id for s in self._strains) + ']'

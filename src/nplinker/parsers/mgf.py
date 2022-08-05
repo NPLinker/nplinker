@@ -20,7 +20,7 @@ import os
 PROTON_MASS = 1.00727645199076
 
 
-class MS1(object):
+class MS1():
 
     def __init__(self,
                  id,
@@ -40,7 +40,7 @@ class MS1(object):
             self.single_charge_precursor_mass = single_charge_precursor_mass
         else:
             self.single_charge_precursor_mass = self.mz
-        self.name = "{}_{}".format(self.mz, self.rt)
+        self.name = f"{self.mz}_{self.rt}"
 
     def __str__(self):
         return 'MS1(name={}, mz={}, id={}, rt={})'.format(
@@ -49,7 +49,7 @@ class MS1(object):
 
 # Abstract loader class
 # *load_spectra* functions are too long, refactor and split when having time
-class Loader(object):
+class Loader():
 
     def __init__(self,
                  min_ms1_intensity=0.0,
@@ -108,7 +108,7 @@ class Loader(object):
 
     def _ion_masses(self, precursormass, int_charge):
         """
-        Compute the parent masses. Single charge version is used for 
+        Compute the parent masses. Single charge version is used for
         loss computation.
         """
         mul = abs(int_charge)
@@ -156,14 +156,14 @@ class Loader(object):
 
     def _load_peak_list(self):
         """
-        Modify peaklist function. Try to detect "featureid", store it in ms1_peaks 
+        Modify peaklist function. Try to detect "featureid", store it in ms1_peaks
         used for mgf ms1 analysis.
         ms1_peaks: [featid, mz, rt, intensity], featid will be None if "FeatureId"
             does not exist.
         """
         self.ms1_peaks = []
         self.user_cols_names = []
-        with open(self.peaklist, 'r') as f:
+        with open(self.peaklist) as f:
             heads = f.readline()
 
             # add this in case peaklist file is separated by ';'
@@ -360,7 +360,7 @@ class Loader(object):
         ms1 = new_ms1_list
         ms2 = new_ms2_list
         metadata = new_metadata
-        print("Peaklist filtering results in {} documents".format(len(ms1)))
+        print(f"Peaklist filtering results in {len(ms1)} documents")
         return ms1, ms2, metadata
 
     def filter_ms1_intensity(self, ms1, ms2, min_ms1_intensity=1e6):
@@ -370,15 +370,15 @@ class Loader(object):
         ms1 = filter(
             lambda x: False
             if x.intensity and x.intensity < min_ms1_intensity else True, ms1)
-        print("{} MS1 remaining".format(len(ms1)))
+        print(f"{len(ms1)} MS1 remaining")
         ms2 = filter(lambda x: x[3] in set(ms1), ms2)
-        print("{} MS2 remaining".format(len(ms2)))
+        print(f"{len(ms2)} MS2 remaining")
         return ms1, ms2
 
     def filter_ms2_intensity(self, ms2, min_ms2_intensity=1e6):
         print("Filtering MS2 on intensity")
         ms2 = filter(lambda x: x[2] >= min_ms2_intensity, ms2)
-        print("{} MS2 remaining".format(len(ms2)))
+        print(f"{len(ms2)} MS2 remaining")
         return ms2
 
     def filter_ms1(self, ms1, ms2, mz_tol=0.5, rt_tol=16):
@@ -414,12 +414,12 @@ class Loader(object):
                 pos = ms1_by_intensity.index(hit)
                 del ms1_by_intensity[pos]
 
-        print("{} MS1 remaining".format(len(final_ms1_list)))
+        print(f"{len(final_ms1_list)} MS1 remaining")
         for m in ms2:
             if m[3] in final_ms1_list:
                 final_ms2_list.append(m)
 
-        print("{} MS2 remaining".format(len(final_ms2_list)))
+        print(f"{len(final_ms2_list)} MS2 remaining")
         return final_ms1_list, final_ms2_list
 
     def process_metadata(self, ms1, metadata):
@@ -444,7 +444,7 @@ class LoadMGF(Loader):
         for input_file in input_set:
             # Use built-in method to get file_name
             file_name = os.path.basename(input_file)
-            with open(input_file, 'r') as f:
+            with open(input_file) as f:
                 temp_metadata = {}
                 in_doc = False
                 parentmass = None
@@ -544,7 +544,7 @@ class LoadMGF(Loader):
                                     if 'name' in temp_metadata:
                                         doc_name = temp_metadata['name']
                                     else:
-                                        doc_name = 'document_{}'.format(ms1_id)
+                                        doc_name = f'document_{ms1_id}'
                                 metadata[doc_name] = temp_metadata.copy()
                                 # TODO this overrides the original format of MS1.name attribute?
                                 new_ms1.name = doc_name

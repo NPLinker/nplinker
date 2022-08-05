@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 
 # In[1]:
 
@@ -70,7 +69,7 @@ print('Molecular Families:', len(npl.molfams)) # contains MolecularFamily object
 # get a list of the names of the available scoring methods:
 print('Available scoring methods:')
 for m in npl.scoring_methods:
-    print(' - {}'.format(m))
+    print(f' - {m}')
 
 # The first step in running a scoring operation is to get an instance of the
 # method(s) you want to use by calling scoring_method():
@@ -109,7 +108,7 @@ results = npl.get_links(npl.gcfs[:10], mc, and_mode=True)
 # around the results of the scoring operation and has various useful properties/methods:
 #
 # - len(results) or .source_count will tell you how many of the input_objects were found to have links
-print('Number of results: {}'.format(len(results)))
+print(f'Number of results: {len(results)}')
 # - .sources is a list of those objects
 objects_with_links = results.sources
 # - .links is a dict with structure {input_object: {linked_object: ObjectLink}}
@@ -146,7 +145,7 @@ methods = results.methods
 # the information stored in the ObjectLink)
 for obj, result in results.links.items():
     # display the object, the number of links it has, and the number of methods that were used to get them
-    print('Results for object: {}, {} total links, {} methods used'.format(obj, len(result), results.method_count))
+    print(f'Results for object: {obj}, {len(result)} total links, {results.method_count} methods used')
 
     # sorting is method-dependent since they might have very different "scores", so you should
     # use the original object to do this. For Metcalf scoring, this will return the ObjectLinks sorted

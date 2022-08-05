@@ -304,7 +304,6 @@ def permutation_unique_helper(listunique, result_list, d):
             if i.occurrences > 0:
                 result_list[d] = i.value
                 i.occurrences -= 1
-                for g in permutation_unique_helper(listunique, result_list,
-                                                   d - 1):
-                    yield g
+                yield from permutation_unique_helper(listunique, result_list,
+                                                   d - 1)
                 i.occurrences += 1

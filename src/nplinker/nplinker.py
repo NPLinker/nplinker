@@ -34,7 +34,7 @@ from .scoring.methods import TestScoring
 logger = LogConfig.getLogger(__file__)
 
 
-class NPLinker(object):
+class NPLinker():
 
     # allowable types for objects to be passed to scoring methods
     OBJ_CLASSES = [Spectrum, MolecularFamily, GCF, BGC]
@@ -139,7 +139,7 @@ class NPLinker(object):
         for name, method in NPLinker.SCORING_METHODS.items():
             if len(config_methods) == 0 or name in config_methods:
                 self._scoring_methods[name] = method
-                logger.debug('Enabled scoring method: {}'.format(name))
+                logger.debug(f'Enabled scoring method: {name}')
 
         self._scoring_methods_setup_complete = {
             name: False
@@ -185,7 +185,7 @@ class NPLinker(object):
         with open(filename, 'wb') as repro_file:
             # TODO is pickle the best format to use?
             save_pickled_data(self._repro_data, repro_file)
-            logger.info('Saving reproducibility data to {}'.format(filename))
+            logger.info(f'Saving reproducibility data to {filename}')
 
     @property
     def config(self):
@@ -273,7 +273,7 @@ class NPLinker(object):
                 return False
         else:
             logger.debug(
-                'load_data with new cutoff = {}'.format(new_bigscape_cutoff))
+                f'load_data with new cutoff = {new_bigscape_cutoff}')
             # 1. change the cutoff (which by itself doesn't do anything)
             self._loader._bigscape_cutoff = new_bigscape_cutoff
             # 2. reload the strain mappings (MiBIG filtering may have removed strains
@@ -398,7 +398,7 @@ class NPLinker(object):
         for i, method in enumerate(scoring_methods):
             # do any one-off initialisation required by this method
             if not self._scoring_methods_setup_complete[method.name]:
-                logger.debug('Doing one-time setup for {}'.format(method.name))
+                logger.debug(f'Doing one-time setup for {method.name}')
                 self._scoring_methods[method.name].setup(self)
                 self._scoring_methods_setup_complete[method.name] = True
 
@@ -639,7 +639,7 @@ if __name__ == "__main__":
 
         # the "result" object will be a LinkCollection, holding all the information
         # returned by the scoring method(s) used
-        print('{} total links found'.format(len(results)))
+        print(f'{len(results)} total links found')
 
         # display some information about each object and its links
         for obj, result in results.links.items():
