@@ -1,5 +1,18 @@
 # Changelog
 
+## [v1.3.1](https://github.com/NPLinker/nplinker/tree/v1.3.1) (2022-08-05)
+
+[Full Changelog](https://github.com/NPLinker/nplinker/compare/v1.3.0...v1.3.1)
+
+**Closed issues:**
+
+- Important: Stop committing until restructuring is done  [\#73](https://github.com/NPLinker/nplinker/issues/73)
+- Explore tutorials/modules are relevant to develop the dashboard [\#68](https://github.com/NPLinker/nplinker/issues/68)
+
+**Merged pull requests:**
+
+- Refine install script and upgrade python syntax [\#75](https://github.com/NPLinker/nplinker/pull/75) ([CunliangGeng](https://github.com/CunliangGeng))
+
 ## [v1.3.0](https://github.com/NPLinker/nplinker/tree/v1.3.0) (2022-07-21)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v1.2.0...v1.3.0)
