@@ -1,22 +1,21 @@
 ## Badges
 
-| fair-software.eu recommendations | |
+| [fair-software.eu](https://fair-software.eu/) recommendations | |
 | :-- | :--  |
-| (1/5) code repository              | [![github repo badge](https://img.shields.io/badge/github-repo-000.svg?logo=github&labelColor=gray&color=blue)](https://github.com/NPLinker/nplinker) |
+| (1/5) code repository              | [![github repo badge](https://img.shields.io/badge/github-nplinker-000.svg?color=blue)](https://github.com/NPLinker/nplinker) |
 | (2/5) license                      | [![github license badge](https://img.shields.io/github/license/NPLinker/nplinker)](https://github.com/NPLinker/nplinker) |
-| (3/5) community registry           | [![RSD](https://img.shields.io/badge/rsd-nplinker-00a3e3.svg)](https://www.research-software.nl/software/nplinker) [![workflow pypi badge](https://img.shields.io/pypi/v/nplinker.svg?colorB=blue)](https://pypi.python.org/project/nplinker/) |
-| (4/5) citation                     | [![DOI](https://zenodo.org/badge/DOI/<replace-with-created-DOI>.svg)](https://doi.org/<replace-with-created-DOI>) |
-| (5/5) checklist                    | [![workflow cii badge](https://bestpractices.coreinfrastructure.org/projects/<replace-with-created-project-identifier>/badge)](https://bestpractices.coreinfrastructure.org/projects/<replace-with-created-project-identifier>) |
-| howfairis                          | [![fair-software badge](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu) |
-| **Other best practices**           | &nbsp; |
+| (3/5) community registry           | [![pypi badge](https://img.shields.io/pypi/v/nplinker.svg?color=blue)](https://pypi.python.org/project/nplinker/) ![Docker Image Version (latest by date)](https://img.shields.io/docker/v/nlesc/nplinker?arch=amd64&label=docker&sort=date)|
+| (4/5) citation                     | [![Zenodo](https://zenodo.org/badge/DOI/10.5281/zenodo.4680218.svg)](https://doi.org/10.5281/zenodo.4680218)
+ |
+| (5/5) checklist                    | Coming soon |
+| how FAIR is                          | [![fair-software badge](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu) |
+| **Other best practices**           |  |
+| Documentation                      | [![Documentation Status](https://readthedocs.org/projects/nplinker/badge/?version=latest)](https://nplinker.readthedocs.io/en/latest/?badge=latest) |
+| Build & Test                       | [![build](https://github.com/NPLinker/nplinker/actions/workflows/build.yml/badge.svg)](https://github.com/NPLinker/nplinker/actions/workflows/build.yml) |
 | Static analysis                    | [![workflow scq badge](https://sonarcloud.io/api/project_badges/measure?project=NPLinker_nplinker&metric=alert_status)](https://sonarcloud.io/dashboard?id=NPLinker_nplinker) |
 | Coverage                           | [![workflow scc badge](https://sonarcloud.io/api/project_badges/measure?project=NPLinker_nplinker&metric=coverage)](https://sonarcloud.io/dashboard?id=NPLinker_nplinker) |
-| Documentation                      | [![Documentation Status](https://readthedocs.org/projects/nplinker/badge/?version=latest)](https://nplinker.readthedocs.io/en/latest/?badge=latest) |
-| **GitHub Actions**                 | &nbsp; |
-| Build                              | [![build](https://github.com/NPLinker/nplinker/actions/workflows/build.yml/badge.svg)](https://github.com/NPLinker/nplinker/actions/workflows/build.yml) |
-| Citation data consistency               | [![cffconvert](https://github.com/NPLinker/nplinker/actions/workflows/cffconvert.yml/badge.svg)](https://github.com/NPLinker/nplinker/actions/workflows/cffconvert.yml) |
-| SonarCloud                         | [![sonarcloud](https://github.com/NPLinker/nplinker/actions/workflows/sonarcloud.yml/badge.svg)](https://github.com/NPLinker/nplinker/actions/workflows/sonarcloud.yml) |
-| MarkDown link checker              | [![markdown-link-check](https://github.com/NPLinker/nplinker/actions/workflows/markdown-link-check.yml/badge.svg)](https://github.com/NPLinker/nplinker/actions/workflows/markdown-link-check.yml) |
+| Citation data consistency          | [![cffconvert](https://github.com/NPLinker/nplinker/actions/workflows/cffconvert.yml/badge.svg)](https://github.com/NPLinker/nplinker/actions/workflows/cffconvert.yml) |
+| **Downloads** | ![Docker Pulls](https://img.shields.io/docker/pulls/nlesc/nplinker?color=green&label=docker%20pulls) |
 
 
 # Natural Products Linker (NPLinker)
