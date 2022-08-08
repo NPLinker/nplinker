@@ -8,7 +8,7 @@ on:
       - src/**
       - tests/**
       - setup.py
-      - workflows/build.yml
+      - .github/workflows/build.yml
   pull_request:
     branches:
       - main
@@ -16,7 +16,7 @@ on:
       - src/**
       - tests/**
       - setup.py
-      - workflows/build.yml
+      - .github/workflows/build.yml
 
 jobs:
 
