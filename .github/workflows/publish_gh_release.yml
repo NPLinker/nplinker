@@ -53,6 +53,7 @@ jobs:
           -o $CHANGELOG_FILE \
           -t ${{ secrets.GITHUB_TOKEN }}
     - name: Commit and push the changes
+      if: ${{ inputs.mode == 'publish' }}
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: Update version to ${{ inputs.new_version }}
