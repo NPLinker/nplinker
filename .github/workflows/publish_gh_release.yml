@@ -64,10 +64,10 @@ jobs:
       run: |
         gh release create v${{ inputs.new_version }} --draft --title v${{ inputs.new_version }} -F $RELEASE_NOTES_FILE
       env:
-        GITHUB_TOKEN: ${{ secrets.GH_ACTION_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
     - name: Publish a Github release
       if: ${{ inputs.mode == 'publish' }}
       run: |
         gh release create v${{ inputs.new_version }} --title v${{ inputs.new_version }} -F $RELEASE_NOTES_FILE
       env:
-        GITHUB_TOKEN: ${{ secrets.GH_ACTION_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
