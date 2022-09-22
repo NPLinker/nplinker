@@ -18,11 +18,11 @@ from nplinker.annotations import GNPS_KEY
 from nplinker.annotations import create_gnps_annotation
 from nplinker.logconfig import LogConfig
 from nplinker.parsers.mgf import LoadMGF
-
-from .Spectrum import Spectrum
+from .load_gnps import load_gnps
 from .MolecularFamily import MolecularFamily
 from .SingletonFamily import SingletonFamily
-from .load_gnps import load_gnps
+from .Spectrum import Spectrum
+
 
 logger = LogConfig.getLogger(__file__)
 
@@ -101,6 +101,17 @@ def load_dataset(strains,
     #   - parse the edges file and update the spectra with that data
 
     # build a set of Spectrum objects by parsing the MGF file
+    spec_dict = load_spectra(mgf_file, edges_file)
+
+    unknown_strains = load_gnps(strains, nodes_file, quant_table_file,
+                                metadata_table_file, ext_metadata_parsing,
+                                spec_dict)
+
+    molfams = _make_families(spec_dict.values())
+    return spec_dict, spec_dict.values(), molfams, unknown_strains
+
+
+def load_spectra(mgf_file, edges_file):
     ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([mgf_file])
     logger.info(f'{len(ms1)} molecules parsed from MGF file')
     spectra = mols_to_spectra(ms2, metadata)
@@ -110,13 +121,7 @@ def load_dataset(strains,
 
     # add edges info to the spectra
     load_edges(edges_file, spec_dict)
-
-    unknown_strains = load_gnps(strains, nodes_file, quant_table_file,
-                                metadata_table_file, ext_metadata_parsing,
-                                spec_dict)
-
-    molfams = _make_families(spectra)
-    return spec_dict, spectra, molfams, unknown_strains
+    return spec_dict
 
 
 def _make_families(spectra):

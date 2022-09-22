@@ -3,6 +3,7 @@ import os
 import re
 from nplinker.logconfig import LogConfig
 
+
 logger = LogConfig.getLogger(__file__)
 
 # compile a regex for matching .mzXML and .mzML strings
