@@ -29,7 +29,7 @@ from .pairedomics.downloader import Downloader
 from .pairedomics.downloader import download_and_extract_mibig_json
 from .pairedomics.downloader import generate_strain_mappings
 from .pairedomics.runbigscape import run_bigscape
-from .strains import StrainCollection
+from .straincollection import StrainCollection
 
 
 try:
