@@ -27,7 +27,6 @@ from .logconfig import LogConfig
 from .metabolomics import load_dataset
 from .pairedomics.downloader import Downloader
 from .pairedomics.downloader import download_and_extract_mibig_json
-from .pairedomics.downloader import generate_strain_mappings
 from .pairedomics.runbigscape import run_bigscape
 from .straincollection import StrainCollection
 
@@ -796,12 +795,7 @@ class DatasetLoader():
         #
         # this is a per-dataset mapping, and is then merged with the global mapping file
         # packaged with nplinker itself
-        self.strains = StrainCollection()
-
-        global_strain_id_file = self.datadir.joinpath('strain_id_mapping.csv')
-        self.strains.add_from_file(global_strain_id_file)
-        logger.info('Loaded global strain IDs ({} total)'.format(
-            len(self.strains)))
+        self._init_global_strain_id_mapping()
 
         # now load the dataset mapping in the same way
         # TODO: what happens in case of clashes (differing primary IDs?)
@@ -809,7 +803,7 @@ class DatasetLoader():
             # create an empty placeholder file and show a warning
             logger.warn(
                 'No strain_mappings.csv file found! Attempting to create one')
-            generate_strain_mappings(self.strains, self.strain_mappings_file,
+            self.strains.generate_strain_mappings(self.strain_mappings_file,
                                      self.antismash_dir)
             # raise Exception('Unable to load strain_mappings file: {}'.format(self.strain_mappings_file))
         else:
@@ -818,6 +812,13 @@ class DatasetLoader():
                 len(self.strains)))
 
         return True
+
+    def _init_global_strain_id_mapping(self):
+        self.strains = StrainCollection()
+        global_strain_id_file = self.datadir.joinpath('strain_id_mapping.csv')
+        self.strains.add_from_file(global_strain_id_file)
+        logger.info('Loaded global strain IDs ({} total)'.format(
+            len(self.strains)))
 
     def required_paths(self):
         # these are files/paths that *must* exist for loading to begin

@@ -99,6 +99,34 @@ class StrainCollection():
             for strain in self._strains:
                 ids = [strain.id] + list(strain.aliases)
                 f.write(','.join(ids) + '\n')
+    
+    def generate_strain_mappings(self, strain_mappings_file, antismash_dir):
+        # first time downloading, this file will not exist, should only need done once
+        if not os.path.exists(strain_mappings_file):
+            logger.info('Generating strain mappings file')
+            for root, dirs, files in os.walk(antismash_dir):
+                for f in files:
+                    if not f.endswith('.gbk'):
+                        continue
+                    
+                    # use the containing folder of the .gbk file as the strain name,
+                    # and then take everything but ".gbk" from the filename and use
+                    # that as an alias
+                    strain_name = os.path.split(root)[1]
+                    strain_alias = os.path.splitext(f)[0]
+                    if strain_alias.find('.') != -1:
+                        strain_alias = strain_alias[:strain_alias.index('.')]
+                    if self.lookup(strain_name) is not None:
+                        self.lookup(strain_name).add_alias(strain_alias)
+                    else:
+                        logger.warning(
+                            f'Failed to lookup strain name: {strain_name}')
+            logger.info(f'Saving strains to {strain_mappings_file}')
+            self.save_to_file(strain_mappings_file)
+        else:
+            logger.info('Strain mappings already generated')
+    
+        return self
 
     def __len__(self):
         return len(self._strains)
