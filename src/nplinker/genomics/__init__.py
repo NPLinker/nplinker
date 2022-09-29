@@ -3,9 +3,6 @@ import logging
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-__author__ = "Helge Hecht"
-__email__ = "h.hecht@esciencecenter.nl"
-__version__ = "1.3.2"
 
 from .BGC import BGC
 from .GCF import GCF
