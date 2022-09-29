@@ -1,4 +1,4 @@
-from nplinker.strains import StrainCollection
+from nplinker.straincollection import StrainCollection
 from .MiBIGBGC import MiBIGBGC
 
 

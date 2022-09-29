@@ -1,6 +1,6 @@
 
 from nplinker.annotations import GNPS_KEY
-from nplinker.strains import StrainCollection
+from nplinker.straincollection import StrainCollection
 from nplinker.utils import sqrt_normalise
 
 JCAMP = '##TITLE={}\\n' +\
