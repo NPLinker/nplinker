@@ -17,18 +17,18 @@ import os
 import sys
 import time
 import xml.etree.ElementTree as ET
-from .annotations import load_annotations
-from .class_info.chem_classes import ChemClassPredictions
-from .class_info.class_matches import ClassMatches
-from .class_info.runcanopus import run_canopus
-from .genomics import loadBGC_from_cluster_files
-from .genomics import make_mibig_bgc_dict
-from .logconfig import LogConfig
-from .metabolomics import load_dataset
-from .pairedomics.downloader import Downloader
-from .pairedomics.downloader import download_and_extract_mibig_json
-from .pairedomics.runbigscape import run_bigscape
-from .straincollection import StrainCollection
+from nplinker.annotations import load_annotations
+from nplinker.class_info.chem_classes import ChemClassPredictions
+from nplinker.class_info.class_matches import ClassMatches
+from nplinker.class_info.runcanopus import run_canopus
+from nplinker.genomics import loadBGC_from_cluster_files
+from nplinker.genomics import make_mibig_bgc_dict
+from nplinker.logconfig import LogConfig
+from nplinker.metabolomics import load_dataset
+from nplinker.pairedomics.downloader import Downloader
+from nplinker.pairedomics.downloader import download_and_extract_mibig_json
+from nplinker.pairedomics.runbigscape import run_bigscape
+from nplinker.straincollection import StrainCollection
 
 
 try:
