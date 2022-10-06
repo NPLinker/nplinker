@@ -1,0 +1,11 @@
+name: nplinker-dev
+channels:
+  - defaults
+  - bioconda
+dependencies:
+  - python=3.9.13
+  - pip
+  - hmmer
+  - jupyter
+  - pip:
+    - -r ../requirements.dev.txt
