@@ -1,5 +1,5 @@
 from nplinker.straincollection import StrainCollection
-from .MiBIGBGC import MiBIGBGC
+from .mibigbgc import MiBIGBGC
 
 
 class GCF():

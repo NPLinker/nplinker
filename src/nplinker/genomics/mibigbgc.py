@@ -1,4 +1,4 @@
-from .BGC import BGC
+from .bgc import BGC
 
 
 class MiBIGBGC(BGC):

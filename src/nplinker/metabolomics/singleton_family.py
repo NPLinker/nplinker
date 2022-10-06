@@ -1,4 +1,4 @@
-from .MolecularFamily import MolecularFamily
+from .molecular_family import MolecularFamily
 
 class SingletonFamily(MolecularFamily):
 

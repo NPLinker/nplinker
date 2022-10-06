@@ -19,9 +19,9 @@ from nplinker.annotations import create_gnps_annotation
 from nplinker.logconfig import LogConfig
 from nplinker.parsers.mgf import LoadMGF
 from .load_gnps import load_gnps
-from .MolecularFamily import MolecularFamily
-from .SingletonFamily import SingletonFamily
-from .Spectrum import Spectrum
+from .molecular_family import MolecularFamily
+from .singleton_family import SingletonFamily
+from .spectrum import Spectrum
 
 
 logger = LogConfig.getLogger(__file__)

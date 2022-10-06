@@ -22,9 +22,9 @@ from nplinker.logconfig import LogConfig
 from nplinker.pairedomics import downloader
 from nplinker.strains import Strain
 
-from .BGC import BGC
-from .GCF import GCF
-from .MiBIGBGC import MiBIGBGC
+from .bgc import BGC
+from .gcf import GCF
+from .mibigbgc import MiBIGBGC
 
 
 logger = LogConfig.getLogger(__file__)
