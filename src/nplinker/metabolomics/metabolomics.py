@@ -108,7 +108,7 @@ def load_dataset(strains,
                                 spec_dict)
 
     molfams = _make_families(spec_dict.values())
-    return spec_dict, spec_dict.values(), molfams, unknown_strains
+    return spec_dict, list(spec_dict.values()), molfams, unknown_strains
 
 
 def load_spectra(mgf_file, edges_file):
