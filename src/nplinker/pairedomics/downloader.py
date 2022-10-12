@@ -27,7 +27,7 @@ from progress.bar import Bar
 from progress.spinner import Spinner
 from nplinker.logconfig import LogConfig
 from nplinker.strains import Strain
-from nplinker.straincollection import StrainCollection
+from nplinker.strain_collection import StrainCollection
 
 
 logger = LogConfig.getLogger(__file__)

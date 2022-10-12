@@ -28,7 +28,7 @@ from nplinker.metabolomics import load_dataset
 from nplinker.pairedomics.downloader import Downloader
 from nplinker.pairedomics.downloader import download_and_extract_mibig_json
 from nplinker.pairedomics.runbigscape import run_bigscape
-from nplinker.straincollection import StrainCollection
+from nplinker.strain_collection import StrainCollection
 
 
 try:
