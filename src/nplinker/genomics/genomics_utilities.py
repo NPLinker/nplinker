@@ -14,7 +14,7 @@
 
 import os
 from Bio import SeqIO
-from .logconfig import LogConfig
+from nplinker.logconfig import LogConfig
 
 
 logger = LogConfig.getLogger(__file__)

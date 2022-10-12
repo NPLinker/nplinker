@@ -17,14 +17,14 @@ import os
 import random
 import time
 import numpy as np
-from ..genomics import BGC
-from ..genomics import GCF
-from ..logconfig import LogConfig
-from ..metabolomics import MolecularFamily
-from ..metabolomics import Spectrum
-from ..pickler import load_pickled_data
-from ..pickler import save_pickled_data
-from ..scoring.rosetta.rosetta import Rosetta
+from nplinker.genomics import BGC
+from nplinker.genomics import GCF
+from nplinker.logconfig import LogConfig
+from nplinker.metabolomics import MolecularFamily
+from nplinker.metabolomics import Spectrum
+from nplinker.pickler import load_pickled_data
+from nplinker.pickler import save_pickled_data
+from nplinker.scoring.rosetta.rosetta import Rosetta
 from .data_linking import DataLinks
 from .data_linking import LinkFinder
 

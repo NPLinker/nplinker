@@ -25,9 +25,9 @@ import httpx
 from bs4 import BeautifulSoup
 from progress.bar import Bar
 from progress.spinner import Spinner
-from ..logconfig import LogConfig
-from ..strains import Strain
-from ..strains import StrainCollection
+from nplinker.logconfig import LogConfig
+from nplinker.strains import Strain
+from nplinker.strain_collection import StrainCollection
 
 
 logger = LogConfig.getLogger(__file__)
@@ -160,36 +160,6 @@ def download_and_extract_mibig_json(download_path, output_path, version):
 
     return True
 
-
-def generate_strain_mappings(strains, strain_mappings_file, antismash_dir):
-    # first time downloading, this file will not exist, should only need done once
-    if not os.path.exists(strain_mappings_file):
-        logger.info('Generating strain mappings file')
-        for root, dirs, files in os.walk(antismash_dir):
-            for f in files:
-                if not f.endswith('.gbk'):
-                    continue
-
-                # use the containing folder of the .gbk file as the strain name,
-                # and then take everything but ".gbk" from the filename and use
-                # that as an alias
-                strain_name = os.path.split(root)[1]
-                strain_alias = os.path.splitext(f)[0]
-                if strain_alias.find('.') != -1:
-                    strain_alias = strain_alias[:strain_alias.index('.')]
-                if strains.lookup(strain_name) is not None:
-                    strains.lookup(strain_name).add_alias(strain_alias)
-                else:
-                    logger.warning(
-                        f'Failed to lookup strain name: {strain_name}')
-        logger.info(f'Saving strains to {strain_mappings_file}')
-        strains.save_to_file(strain_mappings_file)
-    else:
-        logger.info('Strain mappings already generated')
-
-    return strains
-
-
 class Downloader():
     # TODO: move to independent config file  ---C.Geng
     PFAM_PATH = os.path.join(sys.prefix, 'nplinker_lib')
@@ -321,8 +291,7 @@ class Downloader():
                 format(e))
 
     def _generate_strain_mappings(self):
-        gen_strains = generate_strain_mappings(
-            self.strains, self.strain_mappings_file,
+        gen_strains = self.strains.generate_strain_mappings(self.strain_mappings_file,
             os.path.join(self.project_file_cache, 'antismash'))
 
     def _ncbi_genbank_search(self, genbank_id, retry_time=5.0):
