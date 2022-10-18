@@ -1,15 +1,16 @@
-
-
 import os
-from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN, GNPS_FORMAT_OLD_ALLFILES, _identify_gnps_format, _load_clusterinfo_old, load_gnps
+from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN
+from nplinker.metabolomics.load_gnps import GNPS_FORMAT_OLD_ALLFILES
+from nplinker.metabolomics.load_gnps import _identify_gnps_format
+from nplinker.metabolomics.load_gnps import _load_clusterinfo_old
+from nplinker.metabolomics.load_gnps import load_gnps
 from nplinker.strain_collection import StrainCollection
-
 from .test_metabolomics import spec_dict
 
-testdata_dir = os.path.join(os.getcwd(),"tests", "data")
+
+testdata_dir = os.path.join(os.getcwd(), "tests", "data")
 nodes_file = os.path.join(testdata_dir, "nodes.tsv")
 strains = StrainCollection()
-
 
 
 def test_load_gnps(spec_dict):
