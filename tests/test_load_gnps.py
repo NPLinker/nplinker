@@ -1,6 +1,5 @@
-from copy import copy
-from curses import meta
 import os
+from itertools import chain
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_OLD_ALLFILES
 from nplinker.metabolomics.load_gnps import _identify_gnps_format
@@ -8,9 +7,6 @@ from nplinker.metabolomics.load_gnps import _load_clusterinfo_old
 from nplinker.metabolomics.load_gnps import load_gnps
 from nplinker.strain_collection import StrainCollection
 from .test_metabolomics import spec_dict
-
-from itertools import chain
-
 
 
 testdata_dir = os.path.join(os.getcwd(), "tests", "data")
