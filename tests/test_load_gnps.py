@@ -1,4 +1,5 @@
 from copy import copy
+from curses import meta
 import os
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_OLD_ALLFILES
@@ -51,10 +52,10 @@ def test_load_clusterinfo_old(spec_dict):
         spec_dict
     )
 
-    metadata_after = [x.metadata for x in spec_dict.values()]
-
     
     assert len(sut) > 0
-    for metadata in metadata_after:
+    for spectrum_id, spec in spec_dict.items():
+        metadata = spec.metadata
         assert len(metadata.get('files')) > 1
         assert isinstance(metadata.get('cluster_index'), int)
+        assert spectrum_id == metadata.get('cluster_index')
