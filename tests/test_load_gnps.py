@@ -1,3 +1,4 @@
+from copy import copy
 import os
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_OLD_ALLFILES
@@ -6,6 +7,9 @@ from nplinker.metabolomics.load_gnps import _load_clusterinfo_old
 from nplinker.metabolomics.load_gnps import load_gnps
 from nplinker.strain_collection import StrainCollection
 from .test_metabolomics import spec_dict
+
+from itertools import chain
+
 
 
 testdata_dir = os.path.join(os.getcwd(), "tests", "data")
@@ -23,7 +27,7 @@ def test_load_gnps(spec_dict):
         spec_dict
     )
 
-    assert len(unknown_strains) is not None
+    assert len(unknown_strains) > 0
 
 
 def test_identify_gnps_format():
@@ -34,11 +38,23 @@ def test_identify_gnps_format():
 
 
 def test_load_clusterinfo_old(spec_dict):
+    metadata_keys_before = set(chain(*[x.metadata.copy().keys() for x in spec_dict.values()]))
+
+    assert 'files' not in metadata_keys_before
+    assert 'cluster_index' not in metadata_keys_before
+
+
     sut = _load_clusterinfo_old(
         GNPS_FORMAT_OLD_ALLFILES,
         strains,
         nodes_file,
         spec_dict
     )
+
+    metadata_after = [x.metadata for x in spec_dict.values()]
+
     
-    assert len(sut) is not None
+    assert len(sut) > 0
+    for metadata in metadata_after:
+        assert len(metadata.get('files')) > 1
+        assert isinstance(metadata.get('cluster_index'), int)
