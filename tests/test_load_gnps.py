@@ -52,8 +52,12 @@ def test_load_clusterinfo_old(spec_dict):
         spec_dict
     )
 
-    
+    metadata_keys_after = set(chain(*[x.metadata.keys() for x in spec_dict.values()]))
+
+    assert len(metadata_keys_after) == len(metadata_keys_before) + 2
+  
     assert len(sut) > 0
+
     for spectrum_id, spec in spec_dict.items():
         metadata = spec.metadata
         assert len(metadata.get('files')) > 1
