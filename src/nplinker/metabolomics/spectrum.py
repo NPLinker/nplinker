@@ -34,7 +34,7 @@ class Spectrum():
         self.total_ms2_intensity = sum(
             intensity for mz, intensity in self.peaks)
         assert (isinstance(spectrum_id, int))
-        self.spectrum_id = spectrum_id
+        self.spectrum_id = spectrum_id # == metadata.get('cluster_index')
         self.rt = rt
         self.precursor_mz = precursor_mz
         self.parent_mz = parent_mz
