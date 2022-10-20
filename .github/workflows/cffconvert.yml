@@ -4,11 +4,13 @@ on:
   push:
     branches:
       - main
+      - dev
     paths:
       - CITATION.cff
   pull_request:
     branches:
       - main
+      - dev
     paths:
       - CITATION.cff
 
