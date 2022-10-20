@@ -25,8 +25,8 @@ from nplinker.metabolomics import Spectrum
 from nplinker.pickler import load_pickled_data
 from nplinker.pickler import save_pickled_data
 from nplinker.scoring.rosetta.rosetta import Rosetta
-from .data_linking import DataLinks
-from .data_linking import LinkFinder
+from .linking.data_linking import DataLinks
+from .linking.data_linking import LinkFinder
 
 
 logger = LogConfig.getLogger(__file__)
