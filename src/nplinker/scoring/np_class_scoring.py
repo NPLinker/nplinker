@@ -157,31 +157,38 @@ class NPClassScoring(ScoringMethod):
             List of one or more of one of the NPLinker objects
         """
         if isinstance(test_id, BGC) or isinstance(test_id, GCF):  # genome side
-            if self.both_targets:  # no matter BGC or GCF take both spec and MF
-                targets = self.npl.spectra + self.npl.molfams
-            elif isinstance(test_id, BGC):  # obj are BGC
-                if self.equal_targets:  # take
-                    targets = self.npl.spectra
-                else:
-                    targets = self.npl.molfams
-            else:  # obj are GCF
-                if self.equal_targets:
-                    targets = self.npl.molfams
-                else:
-                    targets = self.npl.spectra
+            return self._get_targets_genomics(test_id)
         else:  # metabolome side
-            if self.both_targets:
-                targets = self.npl.bgcs + self.npl.gcfs
-            elif isinstance(test_id, Spectrum):
-                if self.equal_targets:
-                    targets = self.npl.bgcs
-                else:
-                    targets = self.npl.gcfs
-            else:  # obj are molfam
-                if self.equal_targets:
-                    targets = self.npl.gcfs
-                else:
-                    targets = self.npl.bgcs
+            return self._get_targets_metabolomics(test_id)
+
+    def _get_targets_metabolomics(self, test_id):
+        if self.both_targets:
+            targets = self.npl.bgcs + self.npl.gcfs
+        elif isinstance(test_id, Spectrum):
+            if self.equal_targets:
+                targets = self.npl.bgcs
+            else:
+                targets = self.npl.gcfs
+        else:  # obj are molfam
+            if self.equal_targets:
+                targets = self.npl.gcfs
+            else:
+                targets = self.npl.bgcs
+        return targets
+
+    def _get_targets_genomics(self, test_id):
+        if self.both_targets:  # no matter BGC or GCF take both spec and MF
+            targets = self.npl.spectra + self.npl.molfams
+        elif isinstance(test_id, BGC):  # obj are BGC
+            if self.equal_targets:  # take
+                targets = self.npl.spectra
+            else:
+                targets = self.npl.molfams
+        else:  # obj are GCF
+            if self.equal_targets:
+                targets = self.npl.molfams
+            else:
+                targets = self.npl.spectra
         return targets
 
     def _get_gen_classes(self, bgc_like, gcf_as_cutoff=0.5):
@@ -348,27 +355,7 @@ class NPClassScoring(ScoringMethod):
                 obj_classes = self._get_met_classes(obj, self.method)
 
             for target, target_classes in zip(targets, targets_classes):
-                # only consider targets that have shared strains
-                common_tup = (obj, target)
-                if obj_is_gen:
-                    common_tup = (target, obj)
-                shared_strains = common_strains.get(common_tup)
-                if shared_strains is not None:  # todo: fix for bgcs
-                    full_score = self._npclass_score(
-                        obj, target, self.method, obj_classes,
-                        target_classes)[:self.num_results]
-                    try:
-                        npclassscore = full_score[0][0]
-                    except IndexError:
-                        # no score is found due to missing classes for spectra
-                        self._target_no_scores.add(target)  # keep track
-                        if not self.filter_missing_scores:
-                            results[obj][target] = ObjectLink(
-                                obj, target, self, full_score)
-                    else:
-                        if npclassscore > self.cutoff:
-                            results[obj][target] = ObjectLink(
-                                obj, target, self, full_score)
+                self._create_object_link(obj_is_gen, common_strains, results, obj, obj_classes, target, target_classes)
 
         # info about spectra/MFs with missing scoring
         len_missing = len(self._target_no_scores)
@@ -385,6 +372,29 @@ class NPClassScoring(ScoringMethod):
         logger.info(f"NPClassScore completed in {time.time() - begin:.1f}s")
         link_collection._add_links_from_method(self, results)
         return link_collection
+
+    def _create_object_link(self, obj_is_gen, common_strains, results, obj, obj_classes, target, target_classes):
+        # only consider targets that have shared strains
+        common_tup = (obj, target)
+        if obj_is_gen:
+            common_tup = (target, obj)
+        shared_strains = common_strains.get(common_tup)
+        if shared_strains is not None:  # todo: fix for bgcs
+            full_score = self._npclass_score(
+                        obj, target, self.method, obj_classes,
+                        target_classes)[:self.num_results]
+            try:
+                npclassscore = full_score[0][0]
+            except IndexError:
+                        # no score is found due to missing classes for spectra
+                self._target_no_scores.add(target)  # keep track
+                if not self.filter_missing_scores:
+                    results[obj][target] = ObjectLink(
+                                obj, target, self, full_score)
+            else:
+                if npclassscore > self.cutoff:
+                    results[obj][target] = ObjectLink(
+                                obj, target, self, full_score)
 
     def format_data(self, data):
         """Given whatever output data the method produces, return a readable string version"""
