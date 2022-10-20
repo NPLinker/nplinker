@@ -1,7 +1,9 @@
-import os
 import unittest
 from pathlib import Path
 from nplinker.class_info.chem_classes import MolNetEnhancerResults
+
+from . import DATA_DIR
+
 
 # TODO:  No such file or directory: 'canopus.tsv'
 # class TestCanopusResults(unittest.TestCase):
@@ -26,8 +28,8 @@ from nplinker.class_info.chem_classes import MolNetEnhancerResults
 class TestMolNetEnhancerResults(unittest.TestCase):
 
     def setUp(self):
-        mne_test_dir = os.path.join(Path(__file__).parent, "data")
-        mne_res = MolNetEnhancerResults(mne_test_dir)
+        # ./data/ClassyFireResults_Network.txt is required
+        mne_res = MolNetEnhancerResults(DATA_DIR)
         self._mr = mne_res
 
     def test_running(self):

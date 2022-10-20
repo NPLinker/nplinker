@@ -1,4 +1,3 @@
-import os
 from itertools import chain
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_OLD_ALLFILES
@@ -8,9 +7,10 @@ from nplinker.metabolomics.load_gnps import load_gnps
 from nplinker.strain_collection import StrainCollection
 from .test_metabolomics import spec_dict
 
+from . import DATA_DIR
 
-testdata_dir = os.path.join(os.getcwd(), "tests", "data")
-nodes_file = os.path.join(testdata_dir, "nodes.tsv")
+
+nodes_file = DATA_DIR / "nodes.tsv"
 strains = StrainCollection()
 
 
@@ -51,7 +51,7 @@ def test_load_clusterinfo_old(spec_dict):
     metadata_keys_after = set(chain(*[x.metadata.keys() for x in spec_dict.values()]))
 
     assert len(metadata_keys_after) == len(metadata_keys_before) + 2
-  
+
     assert len(sut) > 0
 
     for spectrum_id, spec in spec_dict.items():
