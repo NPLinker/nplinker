@@ -130,8 +130,7 @@ class Rosetta():
         save_pickled_data(spec_hits, self._spechits_pickle_path)
         return spec_hits
 
-    def _generate_speclib(self, spectra, ms1_tol, ms2_tol, score_thresh,
-                      min_match_peaks):
+    def _generate_speclib(self):
         logger.warning(
             'No pickle SpecLib found, generating (this will take some time!)...'
         )
@@ -368,6 +367,8 @@ class Rosetta():
 
     def run(self, spectra, bgcs, ms1_tol, ms2_tol, score_thresh,
             min_match_peaks):
+        """ Function which actually computes the rosetta score somehow
+        """
 
         params_ok = self._load_cached_params(ms1_tol, ms2_tol, score_thresh, min_match_peaks)
 
@@ -481,8 +482,7 @@ class Rosetta():
         if self.speclib is None:
             # no cached speclib available, generate (and cache)
             logger.info('Generating SpecLib')
-            self._generate_speclib(spectra, ms1_tol, ms2_tol, score_thresh,
-                               min_match_peaks)
+            self._generate_speclib(spectra)
 
 
     def _load_cached_params(self, ms1_tol, ms2_tol, score_thresh, min_match_peaks):

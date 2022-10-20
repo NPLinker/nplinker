@@ -32,8 +32,16 @@ class RosettaScoring(ScoringMethod):
         score_thresh = Rosetta.DEF_SCORE_THRESH
         min_match_peaks = Rosetta.DEF_MIN_MATCH_PEAKS
 
-        # allow overridding params via config file
-        config = npl.config
+        ms1_tol, ms2_tol, score_thresh, min_match_peaks = RosettaScoring._init_from_config(npl.config)
+
+        RosettaScoring.ROSETTA_OBJ.run(npl.spectra, npl.bgcs, ms1_tol, ms2_tol,
+                                       score_thresh, min_match_peaks)
+        logger.info('RosettaScoring setup completed')
+
+    @staticmethod
+    def _init_from_config(config):
+        """ allow overridding params via config file
+        """
         if 'scoring' in config and 'rosetta' in config['scoring']:
             rc = config['scoring']['rosetta']
             ms1_tol = rc.get('ms1_tol', Rosetta.DEF_MS1_TOL)
@@ -41,10 +49,8 @@ class RosettaScoring(ScoringMethod):
             score_thresh = rc.get('score_thresh', Rosetta.DEF_SCORE_THRESH)
             min_match_peaks = rc.get('min_match_peaks',
                                      Rosetta.DEF_MIN_MATCH_PEAKS)
-
-        RosettaScoring.ROSETTA_OBJ.run(npl.spectra, npl.bgcs, ms1_tol, ms2_tol,
-                                       score_thresh, min_match_peaks)
-        logger.info('RosettaScoring setup completed')
+                                     
+        return ms1_tol,ms2_tol,score_thresh,min_match_peaks
 
     def _include_hit(self, hit):
         if hit.spec_match_score < self.spec_score_cutoff or hit.bgc_match_score < self.bgc_score_cutoff:
@@ -84,15 +90,7 @@ class RosettaScoring(ScoringMethod):
         return results
 
     def get_links(self, objects, link_collection):
-        # enforce constraint that the list must contain a set of identically typed objects
-        if not all(isinstance(x, type(objects[0])) for x in objects):
-            raise Exception(
-                'RosettaScoring: uniformly-typed list of objects is required')
-
-        if isinstance(objects[0], MolecularFamily):
-            raise Exception(
-                'RosettaScoring requires input type Spectrum (found MolecularFamily)'
-            )
+        self._validate_inputs(objects)
 
         if isinstance(objects[0], GCF):
             # assume user wants to use all BGCs from these GCFs
@@ -111,39 +109,59 @@ class RosettaScoring(ScoringMethod):
         # TODO this might need to be faster
         results = {}
         if isinstance(objects[0], BGC):
-            for bgc in objects:
-                for hit in ro_hits:
-                    if bgc.id == hit.bgc.id:
-                        if not self.bgc_to_gcf:
-                            # can use the BGC directly
-                            results = self._insert_result_gen(
-                                results, bgc, hit)
-                        else:
-                            # if we want the results to contain GCFs instead, need
-                            # to iterate over the set of bgc.parents (most will only
-                            # have one, hybrid BGCs will have more)
-                            for gcf in bgc.parents:
-                                results = self._insert_result_gen(
-                                    results, gcf, hit)
+            results = self._collect_results_bgc(objects, ro_hits, results)
         else:  # Spectrum
-            for spec in objects:
-                for hit in ro_hits:
-                    if spec.id == hit.spec.id:
-                        if not self.bgc_to_gcf:
-                            # can use the BGC directly
-                            results = self._insert_result_met(
-                                results, spec, hit.bgc, hit)
-                        else:
-                            # if we want the results to contain GCFs instead, need
-                            # to iterate over the set of bgc.parents (most will only
-                            # have one, hybrid BGCs will have more)
-                            for gcf in hit.bgc.parents:
-                                results = self._insert_result_met(
-                                    results, spec, gcf, hit)
+            results = self._collect_results_spectra(objects, ro_hits, results)
 
         link_collection._add_links_from_method(self, results)
         logger.debug(f'RosettaScoring found {len(results)} results')
         return link_collection
+
+    def _collect_results_spectra(self, objects, ro_hits, results):
+        for spec in objects:
+            for hit in ro_hits:
+                if spec.id == hit.spec.id:
+                    if not self.bgc_to_gcf:
+                            # can use the BGC directly
+                        results = self._insert_result_met(
+                                results, spec, hit.bgc, hit)
+                    else:
+                            # if we want the results to contain GCFs instead, need
+                            # to iterate over the set of bgc.parents (most will only
+                            # have one, hybrid BGCs will have more)
+                        for gcf in hit.bgc.parents:
+                            results = self._insert_result_met(
+                                    results, spec, gcf, hit)                                
+        return results
+
+    def _collect_results_bgc(self, objects, ro_hits, results):
+        for bgc in objects:
+            for hit in ro_hits:
+                if bgc.id == hit.bgc.id:
+                    if not self.bgc_to_gcf:
+                            # can use the BGC directly
+                        results = self._insert_result_gen(
+                                results, bgc, hit)
+                    else:
+                            # if we want the results to contain GCFs instead, need
+                            # to iterate over the set of bgc.parents (most will only
+                            # have one, hybrid BGCs will have more)
+                        for gcf in bgc.parents:
+                            results = self._insert_result_gen(
+                                    results, gcf, hit)
+        return results
+
+    def _validate_inputs(self, objects):
+        """ enforce constraint that the list must contain a set of identically typed objects
+        """
+        if not all(isinstance(x, type(objects[0])) for x in objects):
+            raise Exception(
+                'RosettaScoring: uniformly-typed list of objects is required')
+
+        if isinstance(objects[0], MolecularFamily):
+            raise Exception(
+                'RosettaScoring requires input type Spectrum (found MolecularFamily)'
+            )
 
     def format_data(self, data):
         # TODO
