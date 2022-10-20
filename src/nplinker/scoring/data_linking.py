@@ -43,11 +43,11 @@ except ImportError:
 from ..genomics import GCF
 from ..metabolomics import MolecularFamily
 from ..metabolomics import Spectrum
-from .data_linking_functions import calc_correlation_matrix
-from .data_linking_functions import calc_likelihood_matrix
-from .data_linking_functions import link_prob
-from .data_linking_functions import pair_prob_approx
-from .data_linking_functions import pair_prob_hg
+from .linking.data_linking_functions import calc_correlation_matrix
+from .linking.data_linking_functions import calc_likelihood_matrix
+from .linking.data_linking_functions import link_prob
+from .linking.data_linking_functions import pair_prob_approx
+from .linking.data_linking_functions import pair_prob_hg
 
 
 SCORING_METHODS = ['metcalf', 'likescore', 'hg']
