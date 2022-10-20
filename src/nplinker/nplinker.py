@@ -26,7 +26,7 @@ from .metabolomics import Spectrum
 from .pickler import save_pickled_data
 from .scoring.link_collection import LinkCollection
 from .scoring.methods import MetcalfScoring
-from .scoring.methods import NPClassScoring
+from .scoring.np_class_scoring import NPClassScoring
 from .scoring.methods import RosettaScoring
 from .scoring.methods import TestScoring
 
