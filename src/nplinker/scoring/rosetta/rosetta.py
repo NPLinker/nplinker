@@ -14,6 +14,8 @@
 
 import csv
 import os
+
+from nplinker.scoring.rosetta.rosetta_hit import RosettaHit
 from ...genomics import MiBIGBGC
 from ...logconfig import LogConfig
 from ...parsers.kcb import KCBJSONParser
@@ -24,26 +26,6 @@ from .spec_lib import SpecLib
 
 
 logger = LogConfig.getLogger(__file__)
-
-
-class RosettaHit():
-
-    def __init__(self, spec, gnps_id, mibig_id, bgc, spec_match_score,
-                 bgc_match_score):
-        self.spec = spec
-        self.gnps_id = gnps_id
-        self.mibig_id = mibig_id
-        self.bgc = bgc
-        self.spec_match_score = spec_match_score
-        self.bgc_match_score = bgc_match_score
-
-    def __str__(self):
-        return 'RosettaHit: {}<-->{} via ({} ({:.3f}), {} ({:.3f}))'.format(
-            self.spec.spectrum_id, self.bgc.name, self.gnps_id,
-            self.spec_match_score, self.mibig_id, self.bgc_match_score)
-
-    def __repr__(self):
-        return str(self)
 
 
 class Rosetta():
@@ -148,7 +130,7 @@ class Rosetta():
         save_pickled_data(spec_hits, self._spechits_pickle_path)
         return spec_hits
 
-    def _load_speclib(self, spectra, ms1_tol, ms2_tol, score_thresh,
+    def _generate_speclib(self, spectra, ms1_tol, ms2_tol, score_thresh,
                       min_match_peaks):
         logger.warning(
             'No pickle SpecLib found, generating (this will take some time!)...'
@@ -386,44 +368,12 @@ class Rosetta():
 
     def run(self, spectra, bgcs, ms1_tol, ms2_tol, score_thresh,
             min_match_peaks):
-        # check if cached parameters exist, and if so check they match the
-        # supplied ones. if not, need to regenerate any pickled data files
-        params = load_pickled_data(self._nplinker, self._params_pickle_path)
-        params_ok = False
 
-        if params is not None:
-            try:
-                if params[0] != Rosetta.PARAM_VERSION:
-                    logger.warning(
-                        'Rosetta: pickled data version mismatch (old {}, new {})'
-                        .format(params[0], Rosetta.PARAM_VERSION))
-                else:
-                    _version, _ms1_tol, _ms2_tol, _score_thresh, _min_match_peaks = params
-
-                    if ms1_tol == _ms1_tol and ms2_tol == _ms2_tol and score_thresh == _score_thresh and min_match_peaks == _min_match_peaks:
-                        # params only valid if all of these match up
-                        params_ok = True
-
-            except Exception as e:
-                logger.warning(
-                    f'Failed to parse pickled Rosetta parameters: {e}')
+        params_ok = self._load_cached_params(ms1_tol, ms2_tol, score_thresh, min_match_peaks)
 
         # if any parameters have been changed or version mismatch found, delete all cached files
         if not params_ok:
-            logger.info(
-                'SpecLib parameters have been changed or do not exist, regenerating cached data files!'
-            )
-            logger.debug(
-                'ms1_tol={:.3f}, ms2_tol={:.3f}, score_thresh={:.3f}, min_match_peaks={:d}'
-                .format(ms1_tol, ms2_tol, score_thresh, min_match_peaks))
-            for path in [
-                    self._bgchits_pickle_path, self._spechits_pickle_path,
-                    self._rhits_pickle_path, self._params_pickle_path,
-                    self._speclib_pickle_path,
-                    os.path.join(self._pickle_dir, 'rosetta_hits.csv')
-            ]:
-                if os.path.exists(path):
-                    os.unlink(path)
+            self._clear_cache(ms1_tol, ms2_tol, score_thresh, min_match_peaks)
 
             self.speclib = None
             self._spec_hits = None
@@ -449,18 +399,7 @@ class Rosetta():
             logger.info('Constructing GNPS/MiBIG dicts')
             self._load_csv(self._csv_path)
 
-        # collect BGC hits. this is done first because the SpecLib generation below can take
-        # several minutes and is a waste of time if the knownclusterblast files required for
-        # the genomics data aren't available in the current dataset
-        cached_bgc_hits = load_pickled_data(self._nplinker,
-                                            self._bgchits_pickle_path)
-        if cached_bgc_hits is not None and not self._ignore_genomic_cache:
-            logger.info('Found pickled bgc_hits for dataset {}!'.format(
-                self._dataset_id))
-            self._bgc_hits, self._mibig2bgc = cached_bgc_hits
-        else:
-            logger.info('Generating BGC hits')
-            self._generate_bgc_hits(bgcs)
+        self._init_bgc_hits(bgcs)
 
         # if we didn't find any BGC hits, no point in continuing
         if len(self._bgc_hits) == 0:
@@ -474,19 +413,44 @@ class Rosetta():
 
         logger.info('No cached Rosetta hits data found')
 
-        # next is the metabolomic part. check if we have a pickled SpecLib object...
-        speclib = load_pickled_data(self._nplinker, self._speclib_pickle_path)
-        if speclib is not None:
-            logger.info('Found pickled SpecLib for dataset {} at {}!'.format(
-                self._dataset_id, self._speclib_pickle_path))
-            self.speclib = speclib
+        self._init_speclib(spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks)
 
-        if self.speclib is None:
-            # no cached speclib available, generate (and cache)
-            logger.info('Generating SpecLib')
-            self._load_speclib(spectra, ms1_tol, ms2_tol, score_thresh,
-                               min_match_peaks)
+        self._init_spec_hits(spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks)
 
+        # finally construct the list of rosetta hits
+        self._collect_rosetta_hits()
+
+        # export cached data for future runs
+        save_pickled_data(self._rosetta_hits, self._rhits_pickle_path)
+        save_pickled_data((Rosetta.PARAM_VERSION, ms1_tol, ms2_tol,
+                           score_thresh, min_match_peaks),
+                          self._params_pickle_path)
+
+        # automatically export CSV file containing hit data to <dataset>/rosetta
+        # along with the pickled data
+        self.export_to_csv(os.path.join(self._pickle_dir, 'rosetta_hits.csv'))
+
+        return self._rosetta_hits
+
+    def _init_bgc_hits(self, bgcs):
+        """
+        collect BGC hits. this is done first because the SpecLib generation below can take
+        several minutes and is a waste of time if the knownclusterblast files required for
+        the genomics data aren't available in the current dataset
+        """
+
+        cached_bgc_hits = load_pickled_data(self._nplinker,
+                                            self._bgchits_pickle_path)
+        if cached_bgc_hits is not None and not self._ignore_genomic_cache:
+            logger.info('Found pickled bgc_hits for dataset {}!'.format(
+                self._dataset_id))
+            self._bgc_hits, self._mibig2bgc = cached_bgc_hits
+        else:
+            logger.info('Generating BGC hits')
+            self._generate_bgc_hits(bgcs)
+    
+
+    def _init_spec_hits(self, spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
         spec_hits = load_pickled_data(self._nplinker,
                                       self._spechits_pickle_path)
         if spec_hits is not None:
@@ -505,20 +469,65 @@ class Rosetta():
         logger.info('SpecLib has {} spectra, {} hits'.format(
             self.speclib.get_n_spec(), len(self._spec_hits)))
 
-        # finally construct the list of rosetta hits
-        self._collect_rosetta_hits()
+    def _init_speclib(self, spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
+        """ next is the metabolomic part. check if we have a pickled SpecLib object...
+        """
+        speclib = load_pickled_data(self._nplinker, self._speclib_pickle_path)
+        if speclib is not None:
+            logger.info('Found pickled SpecLib for dataset {} at {}!'.format(
+                self._dataset_id, self._speclib_pickle_path))
+            self.speclib = speclib
 
-        # export cached data for future runs
-        save_pickled_data(self._rosetta_hits, self._rhits_pickle_path)
-        save_pickled_data((Rosetta.PARAM_VERSION, ms1_tol, ms2_tol,
-                           score_thresh, min_match_peaks),
-                          self._params_pickle_path)
+        if self.speclib is None:
+            # no cached speclib available, generate (and cache)
+            logger.info('Generating SpecLib')
+            self._generate_speclib(spectra, ms1_tol, ms2_tol, score_thresh,
+                               min_match_peaks)
 
-        # automatically export CSV file containing hit data to <dataset>/rosetta
-        # along with the pickled data
-        self.export_to_csv(os.path.join(self._pickle_dir, 'rosetta_hits.csv'))
 
-        return self._rosetta_hits
+    def _load_cached_params(self, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
+        """
+        check if cached parameters exist, and if so check they match the
+        supplied ones. if not, need to regenerate any pickled data files
+        """
+
+        params = load_pickled_data(self._nplinker, self._params_pickle_path)
+        params_ok = False
+
+        if params is not None:
+            try:
+                if params[0] != Rosetta.PARAM_VERSION:
+                    logger.warning(
+                        'Rosetta: pickled data version mismatch (old {}, new {})'
+                        .format(params[0], Rosetta.PARAM_VERSION))
+                else:
+                    _version, _ms1_tol, _ms2_tol, _score_thresh, _min_match_peaks = params
+
+                    if ms1_tol == _ms1_tol and ms2_tol == _ms2_tol and score_thresh == _score_thresh and min_match_peaks == _min_match_peaks:
+                        # params only valid if all of these match up
+                        params_ok = True
+
+            except Exception as e:
+                logger.warning(
+                    f'Failed to parse pickled Rosetta parameters: {e}')
+                    
+        return params_ok
+
+    def _clear_cache(self, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
+        logger.info(
+                'SpecLib parameters have been changed or do not exist, regenerating cached data files!'
+            )
+        logger.debug(
+                'ms1_tol={:.3f}, ms2_tol={:.3f}, score_thresh={:.3f}, min_match_peaks={:d}'
+                .format(ms1_tol, ms2_tol, score_thresh, min_match_peaks))
+        for path in [
+                    self._bgchits_pickle_path, self._spechits_pickle_path,
+                    self._rhits_pickle_path, self._params_pickle_path,
+                    self._speclib_pickle_path,
+                    os.path.join(self._pickle_dir, 'rosetta_hits.csv')
+            ]:
+            if os.path.exists(path):
+                os.unlink(path)
 
     def export_to_csv(self, filename):
         # convenience method for exporting a full set of rosetta hits to a CSV file
