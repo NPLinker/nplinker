@@ -12,10 +12,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# CG: AA translation could be done by biopython. Need to check and replace re-invented wheels
+
+
 import argparse
 from Bio import SeqIO
-from .aalist import AA_LIST as AA_CODES
 
+
+AA_CODES = [
+    'ala',
+    'cys',
+    'asp',
+    'glu',
+    'phe',
+    'gly',
+    'his',
+    'ile',
+    'lys',
+    'leu',
+    'met',
+    'asn',
+    'pyl',
+    'pro',
+    'gln',
+    'arg',
+    'ser',
+    'thr',
+    'sec',
+    'val',
+    'trp',
+    'tyr',
+]
 
 # AA_CODES_ISO contains codes that should map to
 # an entry in the AA_CODES list - i.e. isomers, etc.
@@ -24,7 +51,10 @@ for c in AA_CODES:
     AA_CODES_ISO['d-%s' % c] = c
 AA_CODES_ISO['b-ala'] = 'ala'
 
-
+# CG: create one class for handling antismash output files and records
+## since antismash output formats change along with version
+## we should delegate all processes in other classes/functions to the methods of this class
+## so that one type of data, one class covering all methodes needed
 class AntiSmashFile():
 
     def __init__(self, filename):
@@ -119,6 +149,7 @@ class AntiSmash5Record():
 
 
 class AntiSmashRecord():
+    # CG: this is for antiSMASH version 4.0 results, it can be removed.
 
     def __init__(self, seq_record):
         self.raw_data = seq_record
