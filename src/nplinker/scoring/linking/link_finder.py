@@ -1,17 +1,13 @@
 
 import numpy as np
 import pandas as pd
-
 from scipy.stats import hypergeom
 from nplinker.genomics.gcf import GCF
 from nplinker.metabolomics.spectrum import Spectrum
-
 from nplinker.scoring.linking.data_linking import SCORING_METHODS
-
-from .data_linking_functions import calc_likelihood_matrix
-from .data_linking_functions import link_prob
 from .data_linking_functions import pair_prob_approx
 from .data_linking_functions import pair_prob_hg
+
 
 # import packages for plotting
 # TODO move plotting to separate module?
@@ -23,10 +19,9 @@ except ImportError:
         'Warning: plotting functionality will not be available (missing matplotlib and/or seaborn)'
     )
 
+from ...logconfig import LogConfig
 from ...metabolomics import MolecularFamily
 
-
-from ...logconfig import LogConfig
 
 logger = LogConfig.getLogger(__file__)
 

@@ -1,5 +1,6 @@
 from nplinker.logconfig import LogConfig
-from nplinker.scoring.linking.data_linking_functions import calc_likelihood_matrix
+from nplinker.scoring.linking.data_linking_functions import \
+    calc_likelihood_matrix
 
 
 logger = LogConfig.getLogger(__file__)

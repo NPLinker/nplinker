@@ -5,7 +5,8 @@ from nplinker.genomics import BGC
 from nplinker.genomics import GCF
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import Spectrum
-from nplinker.scoring.methods import MetcalfScoring, ScoringMethod
+from nplinker.scoring.methods import MetcalfScoring
+from nplinker.scoring.methods import ScoringMethod
 from nplinker.scoring.object_link import ObjectLink
 
 

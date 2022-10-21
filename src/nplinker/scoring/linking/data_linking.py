@@ -27,17 +27,15 @@ from collections import Counter
 # import packages
 import numpy as np
 import pandas as pd
-
-
 from ...genomics import GCF
 from ...metabolomics import Spectrum
 from .data_linking_functions import calc_correlation_matrix
 
 
-
 SCORING_METHODS = ['metcalf', 'likescore', 'hg']
 
 from ...logconfig import LogConfig
+
 
 logger = LogConfig.getLogger(__file__)
 
