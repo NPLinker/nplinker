@@ -3,8 +3,8 @@ import pandas as pd
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
 from nplinker.metabolomics import Spectrum
-from nplinker.scoring.data_linking import DataLinks
-from nplinker.scoring.data_linking import LinkFinder
+from nplinker.scoring.linking.data_linking import DataLinks
+from nplinker.scoring.linking.data_linking import LinkFinder
 from nplinker.scoring.misc import hg_scoring
 from nplinker.scoring.misc import metcalf_scoring
 from nplinker.strains import Strain
