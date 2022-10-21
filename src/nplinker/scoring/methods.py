@@ -25,7 +25,7 @@ from nplinker.pickler import load_pickled_data
 from nplinker.pickler import save_pickled_data
 from nplinker.scoring.object_link import ObjectLink
 from .linking.data_linking import DataLinks
-from .linking.data_linking import LinkFinder
+from .linking.link_finder import LinkFinder
 
 
 logger = LogConfig.getLogger(__file__)
