@@ -57,44 +57,6 @@ class ScoringMethod():
         """Given a list of objects, return them sorted by link score"""
         return objects
 
-class TestScoring(ScoringMethod):
-
-    NAME = 'testscore'
-
-    def __init__(self, npl):
-        super().__init__(npl)
-        self.value = 0.5
-        self.mc = MetcalfScoring(npl)
-
-    @staticmethod
-    def setup(npl):
-        logger.info('TestScoring setup')
-
-    def get_links(self, objects, link_collection):
-        mc_results = self.mc.get_links(objects, link_collection)
-        num_to_keep = int(len(mc_results) * self.value)
-        results = {
-            obj: data
-            for obj, data in list(mc_results.links.items())[:num_to_keep]
-        }
-        for links in results.values():
-            for link in links.values():
-                # this is just to make things work properly for the test
-                # method, shouldn't do stuff like this normally
-                link._method_data[self] = random.random()
-                del link._method_data[self.mc]
-
-        logger.debug(f'TestScoring found {len(results)} results')
-        link_collection._add_links_from_method(self, results)
-        return link_collection
-
-    def format_data(self, data):
-        return self.mc.format_data(data)
-
-    def sort(self, objects, reverse=True):
-        # nothing
-        return objects
-
 class MetcalfScoring(ScoringMethod):
 
     DATALINKS = None
