@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+# CG: these functions are not used by other, could be removed
+
 from nplinker.logconfig import LogConfig
-from .iokr import nplinker_iokr
-from .iokr.spectrum import MSSpectrum
+from . import nplinker_iokr
+from .spectrum import MSSpectrum
 
 
 logger = LogConfig.getLogger(__file__)

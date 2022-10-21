@@ -16,6 +16,10 @@ import numpy as np
 import scipy.stats
 
 
+# CG: this file has the scroing functions for correlation-based method.
+# These functions (metcalf, hg) are redundant with those in `data_linking.py`
+
+
 # weights for metcalf_scoring, in order:
 # - neither
 # - GCF only
@@ -199,6 +203,3 @@ def aa_scoring(spectrum, gcf_like, tol=0.01):
         probs.append(p)
 
     return np.mean(probs)
-
-
-
