@@ -1,19 +1,7 @@
-# Copyright 2021 The NPLinker Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-# CG: AA translation could be done by biopython. Need to check and replace re-invented wheels
-
+# CG: This module parse AntiSMASH files to get the predicted monomers of product.
+# And it only cares the case when the monomers are amino acids.
+# TODO This module is used in bgc.py, referenced in gcf.py and then in misc.py,
+# NPLinker core business does not use it at all.
 
 import argparse
 from Bio import SeqIO
@@ -44,12 +32,12 @@ AA_CODES = [
     'tyr',
 ]
 
-# AA_CODES_ISO contains codes that should map to
+# AA_CODES_ISOMER contains codes that should map to
 # an entry in the AA_CODES list - i.e. isomers, etc.
-AA_CODES_ISO = {}
+AA_CODES_ISOMER = {}
 for c in AA_CODES:
-    AA_CODES_ISO['d-%s' % c] = c
-AA_CODES_ISO['b-ala'] = 'ala'
+    AA_CODES_ISOMER['d-%s' % c] = c
+AA_CODES_ISOMER['b-ala'] = 'ala'
 
 # CG: create one class for handling antismash output files and records
 ## since antismash output formats change along with version
@@ -58,11 +46,23 @@ AA_CODES_ISO['b-ala'] = 'ala'
 class AntiSmashFile():
 
     def __init__(self, filename):
+        """Parse product and specificity (predicted monomer) from AntiSMASH file.
+
+        This class is a wrapper for AntiSmash4Record and AntiSmash5Record.
+
+        Deprecated:
+            AntiSMASH file always contains one sequence record, so users should
+            directly use AntiSmash5Record or AntiSmash4Record.
+
+        Args:
+            filename(str): AntiSMASH file path
+        """
         self.raw_data = []
         self.filename = filename
 
         with open(filename) as f:
             # antiSMASH 5 vs. 4 output is vastly different
+            # CG: TODO should use SeqIO.read since antismash file has only one sequence record
             for record in SeqIO.parse(f, 'gb'):
                 if 'structured_comment' in record.annotations:
                     as_version = record.annotations['structured_comment'][
@@ -74,14 +74,16 @@ class AntiSmashFile():
                         raise ValueError(
                             f'Invalid antiSMASH version: {as_version}')
                 else:
-                    self.raw_data.append(AntiSmashRecord(record))
+                    self.raw_data.append(AntiSmash4Record(record))
 
     def get_spec(self):
+        """Get specificity (predicted monomer)"""
         for r in self.raw_data:
             yield from r.get_spec()
 
     @property
     def products(self):
+        """Get list of products"""
         return [x.products for x in self.raw_data]
 
     def build_prob(self):
@@ -93,10 +95,18 @@ class AntiSmashFile():
 
 class AntiSmash5Record():
 
+    # CG: TODO input should also include antismash file
     def __init__(self, seq_record):
+        """Parse product and specificity (predicted monomer of product) from
+            AntiSMASH v5 data.
+
+        Args:
+            seq_record(Bio.SeqRecord): SeqRecord of AntiSMASH
+        """
         self.raw_data = seq_record
         self.description = self.raw_data.description
 
+        # parse "cand_cluster"
         clusters = [
             x for x in self.raw_data.features if x.type == 'cand_cluster'
         ]
@@ -107,10 +117,11 @@ class AntiSmash5Record():
                 products.append(prod)
 
         smiles = []
-        for smiles_list in [x.qualifiers['SMILES'] for x in clusters]:
+        for smiles_list in [x.qualifiers['SMILES'] for x in clusters if 'SMILES' in x.qualifiers]:
             for s in smiles_list:
                 smiles.append(s)
 
+        # parse "aSDomain"
         asdomains = [x for x in self.raw_data.features if x.type == 'aSDomain']
         asdomains_with_predictions = [
             x for x in asdomains if 'specificity' in x.qualifiers
@@ -124,6 +135,7 @@ class AntiSmash5Record():
         self.smiles = smiles
         self.asdomains_with_predictions_known = asdomains_with_predictions_known
 
+        # parse predicted monomer of product, i.e. "specificity"
         self.specificities = []
         specificities_listed = [
             x.qualifiers['specificity']
@@ -135,20 +147,30 @@ class AntiSmash5Record():
                     self.specificities.append(specificity.split()[1])
 
     def get_prob(self, aa):
+        """Get probability of predicted amino acid.
+
+        Args:
+            aa(str): amino acid
+
+        Returns:
+            float: prediction probability
+        """
         if aa in self.specificities:
             return 1.0
         else:
             return 0.0
 
     def get_spec(self):
+        """Get predicted specificities (animo acids).
+        """
         for aa in set(self.specificities):
             if aa in AA_CODES:
                 yield aa
-            elif aa in AA_CODES_ISO:
-                yield AA_CODES_ISO[aa]
+            elif aa in AA_CODES_ISOMER:
+                yield AA_CODES_ISOMER[aa]
 
 
-class AntiSmashRecord():
+class AntiSmash4Record():
     # CG: this is for antiSMASH version 4.0 results, it can be removed.
 
     def __init__(self, seq_record):
@@ -275,8 +297,8 @@ def predict_aa_string(prediction_string):
     for prediction in prediction_string.split('|'):
         if prediction in AA_CODES:
             parsed_predictions.append(prediction)
-        elif prediction in AA_CODES_ISO:
-            parsed_predictions.append(AA_CODES_ISO[prediction])
+        elif prediction in AA_CODES_ISOMER:
+            parsed_predictions.append(AA_CODES_ISOMER[prediction])
         else:
             parsed_predictions.append('none')
     return parsed_predictions
