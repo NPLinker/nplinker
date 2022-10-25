@@ -1,6 +1,6 @@
 import re
-from nplinker.aa_pred import predict_aa
 from nplinker.logconfig import LogConfig
+from .aa_pred import predict_aa
 from .genomics_utilities import get_smiles
 
 

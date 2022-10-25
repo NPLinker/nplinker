@@ -48,6 +48,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict,
     gcf_list = []
     metadata = {}
 
+    # CG: bigscape data
     # parse the annotation files (<dataset>/bigscape/<cluster_name>/Network_Annotations_<cluster_name>.tsv
     # these contain fields:
     # - BGC name/ID [0]
@@ -78,6 +79,7 @@ def loadBGC_from_cluster_files(strains, cluster_file_dict, ann_file_dict,
     logger.info(
         f'Using antiSMASH filename delimiters {antismash_delimiters}')
 
+    # CG: bigscape data
     # "cluster files" are the various <class>_clustering_c0.xx.tsv files
     # - BGC name
     # - cluster ID

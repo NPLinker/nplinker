@@ -537,6 +537,7 @@ class DatasetLoader():
 
                 self.bigscape_dir = find_bigscape_dir(self.bigscape_dir)
 
+    # CG: load gemonics data into memory
     def _load_genomics(self):
         # TODO split this method up a bit
 
@@ -603,6 +604,12 @@ class DatasetLoader():
 
         missing_anno_files, missing_cluster_files, missing_network_files = [], [], []
         cluster_files, anno_files, network_files = {}, {}, {}
+
+        # CG: bigscape data used in NPLinker
+        # Take chemical class PKSI as example:
+        #   Network_Annotations_PKSI.tsv
+        #   PKSI_c0.30.network.tsv
+        #   PKSI_clustering_c0.30.tsv
 
         for folder in self.BIGSCAPE_PRODUCT_TYPES:
             folder_path = os.path.join(self.bigscape_dir, folder)
