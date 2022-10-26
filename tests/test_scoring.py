@@ -5,7 +5,7 @@ from nplinker.genomics import GCF
 from nplinker.metabolomics import Spectrum
 from nplinker.scoring.linking.data_linking import DataLinks
 
-from nplinker.scoring.linking.data_linking import LinkFinder
+from nplinker.scoring.linking.link_finder import LinkFinder
 from nplinker.scoring.linking.misc_deprecated import hg_scoring
 from nplinker.scoring.linking.misc_deprecated import metcalf_scoring
 from nplinker.strains import Strain
