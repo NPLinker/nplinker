@@ -7,4 +7,5 @@ progress
 scipy
 sortedcontainers
 toml
+tqdm
 xdg
