@@ -1,5 +1,5 @@
 import csv
-from typing import Tuple, Iterable, List
+from typing import Tuple, List
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.IMolecularFamilyLoader import IMolecularFamilyLoader
 from nplinker.metabolomics.molecular_family import MolecularFamily
@@ -11,7 +11,7 @@ logger = LogConfig.getLogger(__file__)
 
 class GNPSMolecularFamilyLoader(IMolecularFamilyLoader):
     def __init__(self, filename: str):
-        self._families = List[MolecularFamily]()
+        self._families: List[MolecularFamily] = []
         
         for family_id, spectra_ids in _load_edges(filename).items():
             if family_id == -1:
@@ -21,7 +21,7 @@ class GNPSMolecularFamilyLoader(IMolecularFamilyLoader):
                 family.spectra_ids = spectra_ids
                 self._families.append(family)
     
-    def families(self) -> Iterable[MolecularFamily]:
+    def families(self) -> List[MolecularFamily]:
         return self._families
 
 
