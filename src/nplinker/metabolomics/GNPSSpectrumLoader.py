@@ -13,7 +13,7 @@ class GNPSSpectrumLoader(ISpectrumLoader):
 
     def __init__(self, filename):
         ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([filename])
-        logger.info(f'{len(ms1)} molecules parsed from MGF file')
+        logger.info('%d molecules parsed from MGF file', len(ms1))
         self._spectra = mols_to_spectra(ms2, metadata)
     
     def spectra(self):

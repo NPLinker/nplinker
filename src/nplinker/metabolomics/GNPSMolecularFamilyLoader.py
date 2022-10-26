@@ -13,7 +13,7 @@ class GNPSMolecularFamilyLoader(IMolecularFamilyLoader):
     def __init__(self, filename: str):
         self._families: List[MolecularFamily] = []
         
-        for family_id, spectra_ids in _load_edges(filename).items():
+        for family_id, spectra_ids in _load_molecular_families(filename).items():
             if family_id == -1:
                 self._families.append(SingletonFamily())
             else:
@@ -25,7 +25,15 @@ class GNPSMolecularFamilyLoader(IMolecularFamilyLoader):
         return self._families
 
 
-def _load_edges(filename: str) -> dict:
+def _load_molecular_families(filename: str) -> dict:
+    """Load ids of molecular families and corresponding spectra from GNPS output file.
+
+    Args:
+        filename(str): Path to GNPS .pairsinfo file.
+
+    Returns:
+        dict: Mapping from molecular family/cluster id to the spectra ids.
+    """
     logger.debug('loading edges file: %s', filename)
 
     families: dict = {}
@@ -49,6 +57,18 @@ def _load_edges(filename: str) -> dict:
     return families
 
 def _sniff_column_indices(filename: str, headers: str) -> Tuple[int, int, int]:
+    """Get indices of required columns from the file.
+
+    Args:
+        filename(string): Path to the edges file.
+        headers(string): Header line of the edges file.
+
+    Raises:
+        Exception: Raises exception if one of the required columns is not present.
+
+    Returns:
+        Tuple[int, int, int]: Tuple of indices for the required columns.
+    """
     try:
         cid1_index = headers.index('CLUSTERID1')
         cid2_index = headers.index('CLUSTERID2')
