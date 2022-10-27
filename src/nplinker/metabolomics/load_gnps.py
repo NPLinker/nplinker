@@ -31,7 +31,7 @@ def _get_headers(filename, delimiters=['\t', ',']):
     return headers
 
 
-def _identify_gnps_format(filename, has_quant_table):
+def identify_gnps_format(filename, has_quant_table):
     headers = _get_headers(filename)
 
     if headers is None:
@@ -416,7 +416,7 @@ def _load_clusterinfo_fbmn(strains, nodes_file, extra_nodes_file,
 
 def load_gnps(strains, nodes_file, quant_table_file, metadata_table_file,
               ext_metadata_parsing, spec_dict):
-    gnps_format = _identify_gnps_format(nodes_file, quant_table_file
+    gnps_format = identify_gnps_format(nodes_file, quant_table_file
                                         is not None)
     logger.debug('Nodes_file: {}, quant_table_exists?: {}'.format(
         nodes_file, quant_table_file is None))
