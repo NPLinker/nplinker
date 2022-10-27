@@ -24,9 +24,12 @@
 # fam   stands for molecular family
 
 from collections import Counter
+from typing import Iterable
 # import packages
 import numpy as np
 import pandas as pd
+
+from nplinker.metabolomics.molecular_family import MolecularFamily
 from ...genomics import GCF
 from ...metabolomics import Spectrum
 from .data_linking_functions import calc_correlation_matrix
@@ -85,10 +88,10 @@ class DataLinks():
         # TODO: fix this so the original ID is present in case of re-ordering
         pass
 
-    def load_data(self, spectra, gcf_list, strain_list):
+    def load_data(self, spectra, gcf_list, strain_list, molfams):
         # load data from spectra, GCFs, and strains
         logger.debug("Create mappings between spectra, gcfs, and strains.")
-        self.collect_mappings_spec(spectra)
+        self.collect_mappings_spec_v2(molfams)
         self.collect_mappings_gcf(gcf_list)
         logger.debug(
             "Create co-occurence matrices: spectra<->strains + and gcfs<->strains."
@@ -113,6 +116,25 @@ class DataLinks():
             mapping_spec[i, 1] = spectrum.id
             mapping_spec[i, 2] = spectrum.family.family_id
 
+        # extend mapping tables:
+        self.mapping_spec["spec-id"] = mapping_spec[:, 0]
+        self.mapping_spec["original spec-id"] = mapping_spec[:, 1]
+        self.mapping_spec["fam-id"] = mapping_spec[:, 2]
+    
+    def collect_mappings_spec_v2(self, molfams: Iterable[MolecularFamily]):
+        num_spectra = sum(len(x.spectra_ids) for x in molfams)
+        mapping_spec = np.zeros((num_spectra, 3))
+        mapping_spec[:, 0] = np.arange(0, num_spectra)
+
+        inverted_mappings = {}
+        for item in molfams:
+            for spectrum_id in item.spectra_ids:
+                inverted_mappings[spectrum_id] = item.family_id
+        
+        for i, key in enumerate(inverted_mappings):
+            mapping_spec[i, 1] = key
+            mapping_spec[i, 2] = inverted_mappings[key]
+        
         # extend mapping tables:
         self.mapping_spec["spec-id"] = mapping_spec[:, 0]
         self.mapping_spec["original spec-id"] = mapping_spec[:, 1]
