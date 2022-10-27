@@ -98,44 +98,6 @@ def loadBGC_from_cluster_files(strains, product_class_cluster_file_dict, network
                     nname = name[:name.index('.')]
                     strain = strains.lookup(nname)
                     if strain is None:
-                        # if this happens, it probably means we have an MiBIG BGC which has been mistakenly
-                        # excluded from the JSON database archive that NPLinker downloads. For more info
-                        # see https://github.com/sdrogers/nplinker/issues/60#issuecomment-1086722952.
-                        #
-                        # To attempt to fix this issue without user intervention, try to download the
-                        # missing BGC JSON data from the MiBIG website
-
-                        # CG: Some mibig bgc is missing due to update of mibig version
-                        # see https://mibig.secondarymetabolites.org/repository/BGC0001871/index.html#r1c1
-                        # should make it clear which version is using in nplinker.
-
-                        if not downloader.download_mibig_bgc_metadata(
-                                mibig_json_dir, nname):
-                            # download failed, bail out here
-                            raise Exception(
-                                'Unknown MiBIG BGC: original={} / parsed={}'.
-                                format(name, nname))
-                        else:
-                            # retrieved the file successfully but now have to parse it and add
-                            # a new BGC to the existing set
-                            strains, mibig_bgc_dict = append_mibig_library_json(
-                                strains, mibig_bgc_dict, mibig_json_dir, nname,
-                                internal_bgc_id)
-                            logger.info(
-                                'Appended MiBIG BGC {} to existing set'.format(
-                                    nname))
-
-                            # now can try again to lookup the strain, which should succeed this time
-                            strain = strains.lookup(nname)
-                            if strain is None:
-                                # something is still wrong if this happens
-                                raise Exception(
-                                    'Unknown MiBIG BGC: original={} / parsed={}'
-                                    .format(name, nname))
-
-                            logger.info(
-                                'MiBIG missing BGC workaround was successful')
-
                 else:
                     parsednames = [
                         name[:name.index(d)] for d in antismash_delimiters
@@ -396,18 +358,6 @@ def extract_mibig_metadata(metadata):
 
     return accession, biosyn_class
 
-
-def append_mibig_library_json(strains, mibig_bgc_dict, mibig_json_directory,
-                              bgc_id, internal_id):
-    json_data = json.load(
-        open(os.path.join(mibig_json_directory, f'{bgc_id}.json'),
-             'rb'))
-    accession, biosyn_class = extract_mibig_metadata(json_data)
-    strain = Strain(accession)
-    new_bgc = MiBIGBGC(internal_id, strain, accession, biosyn_class)
-    mibig_bgc_dict[accession] = new_bgc
-    strains.add(strain)
-    return strains, mibig_bgc_dict
 
 
 def make_mibig_bgc_dict(strains, mibig_metadata_database):
