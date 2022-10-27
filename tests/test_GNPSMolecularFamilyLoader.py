@@ -7,4 +7,5 @@ def test_has_molecular_families():
     filename = os.path.join(DATA_DIR, "edges.pairsinfo")
     sut = GNPSMolecularFamilyLoader(filename)
     actual = sut.families()
-    assert len(actual[0]) == 19
+    assert len(actual) == 25769
+    assert len(actual[0].spectra_ids) == 19
