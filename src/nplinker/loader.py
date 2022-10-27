@@ -597,8 +597,7 @@ class DatasetLoader():
 
         logger.debug(f'make_mibig_bgc_dict({self.mibig_json_dir})')
         self.mibig_bgc_dict = make_mibig_bgc_dict(self.strains,
-                                                  self.mibig_json_dir,
-                                                  self._mibig_version)
+                                                  self.mibig_json_dir)
         logger.debug('mibig_bgc_dict has {} entries'.format(
             len(self.mibig_bgc_dict)))
 
@@ -694,6 +693,7 @@ class DatasetLoader():
         logger.debug(
             'loadBGC_from_cluster_files(antismash_dir={}, delimiters={})'.
             format(self.antismash_dir, self._antismash_delimiters))
+
         self.gcfs, self.bgcs, self.strains, unknown_strains = loadBGC_from_cluster_files(
             self.strains,
             cluster_files,

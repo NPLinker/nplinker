@@ -49,8 +49,10 @@ NCBI_LOOKUP_URL_NEW = 'https://www.ncbi.nlm.nih.gov/assembly/?term={}'
 
 JGI_GENOME_LOOKUP_URL = 'https://img.jgi.doe.gov/cgi-bin/m/main.cgi?section=TaxonDetail&page=taxonDetail&taxon_oid={}'
 
-MIBIG_JSON_URL = 'https://dl.secondarymetabolites.org/mibig/mibig_json_{}.tar.gz'
-MIBIG_BGC_URL = 'https://mibig.secondarymetabolites.org/repository/{}/{}.json'
+MIBIG_METADATA_URL = 'https://dl.secondarymetabolites.org/mibig/mibig_json_{}.tar.gz'
+MIBIG_BGC_METADATA_URL = 'https://mibig.secondarymetabolites.org/repository/{}/annotations.json'
+# MIBIG_BGC_GENBANK_URL = 'https://mibig.secondarymetabolites.org/repository/{}/{}.gbk'
+# MIBIG_BGC_JSON_URL = 'https://mibig.secondarymetabolites.org/repository/{}/{}.json'
 
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'
 
@@ -75,7 +77,7 @@ class GenomeStatus:
         ])
 
 
-def download_mibig_bgc_json(output_path, bgc_id):
+def download_mibig_bgc_metadata(output_path, bgc_id):
     # this method is only used if a dataset contains references to an MiBIG BGC
     # that isn't included in the JSON database archive file for some reason. At
     # present (4/4/2022) one example of this is BGC0001871 which is listed at
@@ -89,7 +91,7 @@ def download_mibig_bgc_json(output_path, bgc_id):
     logger.info(
         'Attempting to retrieve missing MiBIG BGC JSON data for {}'.format(
             bgc_id))
-    resp = httpx.get(MIBIG_BGC_URL.format(bgc_id, bgc_id),
+    resp = httpx.get(MIBIG_BGC_METADATA_URL.format(bgc_id, bgc_id),
                      follow_redirects=True)
     if resp.status_code == httpx.codes.OK:
         with open(os.path.join(output_path, f'{bgc_id}.json'),
@@ -117,7 +119,7 @@ def download_and_extract_mibig_json(download_path, output_path, version):
             os.unlink(archive_path)
 
     if not cached:
-        url = MIBIG_JSON_URL.format(version)
+        url = MIBIG_METADATA_URL.format(version)
         logger.debug(f'Downloading MiBIG database from {url}')
         with open(archive_path, 'wb') as f:
             total_bytes, last_total = 0, 0
