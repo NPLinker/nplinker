@@ -15,6 +15,7 @@
 import csv
 
 from nplinker.logconfig import LogConfig
+from nplinker.metabolomics.GNPSMolecularFamilyLoader import GNPSMolecularFamilyLoader
 from nplinker.metabolomics.GNPSSpectrumLoader import GNPSSpectrumLoader
 from .load_gnps import load_gnps
 from .molecular_family import MolecularFamily
@@ -87,8 +88,14 @@ def load_dataset(strains,
     # build a set of Spectrum objects by parsing the MGF file
     spec_dict = load_spectra(mgf_file, edges_file)
 
+    # spectra = GNPSSpectrumLoader(mgf_file).spectra()
+    # above returns a list, create a dict indexed by spectrum_id to make
+    # the rest of the parsing a bit simpler
+    # spec_dict = {spec.spectrum_id: spec for spec in spectra}
+
     # add edges info to the spectra
     molfams = _make_families(spec_dict.values())
+    #molfams = GNPSMolecularFamilyLoader(edges_file).families()
 
     unknown_strains = load_gnps(strains, nodes_file, quant_table_file,
                                 metadata_table_file, ext_metadata_parsing,
