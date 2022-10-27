@@ -1,6 +1,7 @@
 import pytest
 from nplinker.metabolomics.metabolomics import load_dataset
 from nplinker.metabolomics.metabolomics import load_spectra
+from nplinker.metabolomics.metabolomics import _make_families
 from nplinker.strain_collection import StrainCollection
 
 from . import DATA_DIR
@@ -32,3 +33,8 @@ def test_load_dataset():
 
     assert isinstance(spec_dict, dict)
     assert len(spectra) > 1
+
+
+def test_make_families(spec_dict):
+    families = _make_families(spec_dict.values())
+    assert len(families) == 25769

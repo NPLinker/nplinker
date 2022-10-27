@@ -1,7 +1,7 @@
 from itertools import chain
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_OLD_ALLFILES
-from nplinker.metabolomics.load_gnps import _identify_gnps_format
+from nplinker.metabolomics.load_gnps import identify_gnps_format
 from nplinker.metabolomics.load_gnps import _load_clusterinfo_old
 from nplinker.metabolomics.load_gnps import load_gnps
 from nplinker.strain_collection import StrainCollection
@@ -28,7 +28,7 @@ def test_load_gnps(spec_dict):
 
 
 def test_identify_gnps_format():
-    actual = _identify_gnps_format(nodes_file, None)
+    actual = identify_gnps_format(nodes_file, None)
 
     assert actual is not GNPS_FORMAT_NEW_FBMN
     assert actual is GNPS_FORMAT_OLD_ALLFILES
