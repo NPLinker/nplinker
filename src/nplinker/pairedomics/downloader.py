@@ -28,6 +28,7 @@ from progress.spinner import Spinner
 from nplinker.logconfig import LogConfig
 from nplinker.strains import Strain
 from nplinker.strain_collection import StrainCollection
+from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 
 
 logger = LogConfig.getLogger(__file__)
@@ -76,67 +77,6 @@ class GenomeStatus:
             str(self.attempted), self.filename
         ])
 
-
-
-
-def download_and_extract_mibig_json(download_path, output_path, version):
-    archive_path = os.path.join(download_path,
-                                f'mibig_json_{version}.tar.gz')
-    logger.debug(
-        f'Checking for existing MiBIG archive at {archive_path}')
-    cached = False
-    if os.path.exists(archive_path):
-        logger.info(f'Found cached file at {archive_path}')
-        try:
-            _ = tarfile.open(archive_path)
-            cached = True
-        except:
-            logger.info('Invalid MiBIG archive found, will download again')
-            os.unlink(archive_path)
-
-    if not cached:
-        url = MIBIG_METADATA_URL.format(version)
-        logger.debug(f'Downloading MiBIG database from {url}')
-        with open(archive_path, 'wb') as f:
-            total_bytes, last_total = 0, 0
-            with httpx.stream('GET', url) as r:
-                filesize = int(r.headers['content-length'])
-                bar = Bar(url, max=filesize, suffix='%(percent)d%%')
-                for data in r.iter_bytes():
-                    f.write(data)
-                    total_bytes += len(data)
-                    bar.next(len(data))
-                bar.finish()
-
-    logger.debug('Extracting MiBIG JSON data')
-
-    if os.path.exists(os.path.join(output_path, 'completed')):
-        return True
-
-    mibig_gz = tarfile.open(archive_path, 'r:gz')
-    # extract all the .json files and put them in the "output_path" folder.
-    # annoyingly the 2.0 version has been archived with a subdirectory, while
-    # 1.4 has no subdirectory. So have to handle these slightly differently and
-    # this might need updated for future versions
-    if version == "1.4":
-        mibig_gz.extractall(path=output_path)
-    else:
-        os.makedirs(output_path, exist_ok=True)
-        # assume they'll keep the same format for >2.0, which has a subdirectory
-        # called "mibig_json_2.0" containing the .json files
-        for info in mibig_gz.getmembers():
-            if info.isfile():
-                extracted_file = mibig_gz.extractfile(info)
-                # write the file with only the filename component (ignoring the
-                # subdirectory)
-                with open(
-                        os.path.join(output_path,
-                                     os.path.split(info.path)[1]), 'wb') as f:
-                    f.write(extracted_file.read())
-
-    open(os.path.join(output_path, 'completed'), 'w').close()
-
-    return True
 
 class Downloader():
     # TODO: move to independent config file  ---C.Geng
@@ -517,7 +457,7 @@ class Downloader():
     def _download_mibig_json(self, version):
         output_path = os.path.join(self.project_file_cache, 'mibig_json')
 
-        download_and_extract_mibig_json(self.project_download_cache,
+        download_and_extract_mibig_metadata(self.project_download_cache,
                                         output_path, version)
 
         open(os.path.join(output_path, 'completed'), 'w').close()

@@ -26,7 +26,7 @@ from nplinker.genomics import make_mibig_bgc_dict
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import load_dataset
 from nplinker.pairedomics.downloader import Downloader
-from nplinker.pairedomics.downloader import download_and_extract_mibig_json
+from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.strain_collection import StrainCollection
 
@@ -505,7 +505,7 @@ class DatasetLoader():
                 logger.info(
                     'Attempting to download MiBIG JSON database (v{})...'.
                     format(self._mibig_version))
-                download_and_extract_mibig_json(self._root,
+                download_and_extract_mibig_metadata(self._root,
                                                 self.mibig_json_dir,
                                                 self._mibig_version)
             else:

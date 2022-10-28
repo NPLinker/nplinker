@@ -13,6 +13,7 @@ from .mibigbgc import MiBIGBGC
 
 __all__ = [
     "bgc",
+    "mibig",
     "mibigbgc",
     "gcf",
     "loadBGC_from_cluster_files",
