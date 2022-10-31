@@ -8,7 +8,7 @@ from .bgc import BGC
 from .gcf import GCF
 from .genomics import loadBGC_from_cluster_files
 from .genomics import make_mibig_bgc_dict
-from .mibigbgc import MiBIGBGC
+from .mibigbgc import MibigBGC
 
 
 __all__ = [

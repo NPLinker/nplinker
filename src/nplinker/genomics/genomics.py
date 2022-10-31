@@ -24,7 +24,7 @@ from nplinker.strains import Strain
 
 from .bgc import BGC
 from .gcf import GCF
-from .mibigbgc import MiBIGBGC
+from .mibigbgc import MibigBGC
 
 
 logger = LogConfig.getLogger(__file__)
@@ -369,7 +369,7 @@ def make_mibig_bgc_dict(strains, mibig_metadata_database):
         accession, biosyn_class = extract_mibig_metadata(metadata)
         strain = Strain(accession) # accession is e.g. BGC0000001
         # CG: only contain fake-strain, mibig-name, and product
-        new_bgc = MiBIGBGC(i, strain, accession, biosyn_class)
+        new_bgc = MibigBGC(i, strain, accession, biosyn_class)
         mibig_bgc_product[accession] = new_bgc
         strains.add(strain)
         i += 1
