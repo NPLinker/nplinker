@@ -1,0 +1,3 @@
+import logging
+from .mibig_downloader import download_and_extract_mibig_metadata
+__all__ = {download_and_extract_mibig_metadata}

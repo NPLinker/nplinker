@@ -4,8 +4,10 @@ from nplinker.logconfig import LogConfig
 from nplinker.utils import download_and_extract_archive
 
 logger = LogConfig.getLogger(__file__)
+
 MIBIG_METADATA_URL = "https://dl.secondarymetabolites.org/mibig/mibig_json_{version}.tar.gz"
-MD5_MIBIG_METADATA = {
+
+_MD5_MIBIG_METADATA = {
     "1.0": "035a14e94d2733eb61f615f418c08494",
     "1.1": "e63ceca82363ac27d50650e133ae3fa1",
     "1.2": "46e862018bd076d0b6072e62b7d8cfa2",
@@ -26,11 +28,11 @@ def download_and_extract_mibig_metadata(
 
     Args:
         download_root(str): Path to the directory to place downloaded archive in
-        extract_path(str): Path to the empty directory json files will be
-            extracted to.
-            Note that the extracted is a directory containing the json files,
-            the json files will be moved to `extract_path`, and then the
-            extracted directory will be removed.
+        extract_path(str): Path to the empty directory metadata json files will
+            be extracted to.
+            Note that if it's a directory containing the metadata json files
+            after extraction, the json files will be moved to `extract_path`,
+            and then the extracted directory will be removed.
         version (str, optional): _description_. Defaults to "3.1".
 
     Examples:
@@ -46,7 +48,7 @@ def download_and_extract_mibig_metadata(
         raise ValueError(f'Nonempty directory: "{extract_path}"')
 
     # download and extract
-    md5 = MD5_MIBIG_METADATA[version]
+    md5 = _MD5_MIBIG_METADATA[version]
     download_and_extract_archive(
         url=MIBIG_METADATA_URL.format(version=version),
         download_root=download_root,
