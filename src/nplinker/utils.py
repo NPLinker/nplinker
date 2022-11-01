@@ -149,7 +149,6 @@ def download_url(url: str,
     Path.mkdir(root, exist_ok=True)
 
     # check if file is already present locally
-    # CG: check by md5 or by name?
     if check_integrity(fpath, md5):
         print("Using downloaded and verified file: " + str(fpath))
         return
@@ -336,7 +335,7 @@ def _decompress(from_path: Path,
 
 def extract_archive(from_path: Union[str, Path],
                     to_path: Optional[Union[str, Path]] = None,
-                    remove_finished: bool = False) -> Path:
+                    remove_finished: bool = False) -> str:
     """Extract an archive.
 
     The archive type and a possible compression is automatically detected from
@@ -346,11 +345,11 @@ def extract_archive(from_path: Union[str, Path],
     Args:
         from_path (str, Path): Path to the file to be extracted.
         to_path (str, Path): Path to the directory the file will be extracted to.
-            If omitted, the directory of the file is used.
+            If omitted, the directory of the archive file is used.
         remove_finished (bool): If ``True``, remove the file after the extraction.
 
     Returns:
-        (Path): Path to the directory the file was extracted to.
+        (str): Path to the directory the file was extracted to.
     """
     from_path = Path(from_path)
 
@@ -373,7 +372,7 @@ def extract_archive(from_path: Union[str, Path],
     if remove_finished:
         from_path.unlink()
 
-    return to_path
+    return str(to_path)
 
 
 def download_and_extract_archive(
