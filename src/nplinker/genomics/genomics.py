@@ -24,7 +24,6 @@ from nplinker.strains import Strain
 
 from .bgc import BGC
 from .gcf import GCF
-from .mibigbgc import MibigBGC
 
 
 logger = LogConfig.getLogger(__file__)
@@ -98,6 +97,15 @@ def loadBGC_from_cluster_files(strains, product_class_cluster_file_dict, network
                     nname = name[:name.index('.')]
                     strain = strains.lookup(nname)
                     if strain is None:
+                        # CG: Mibig BGC might be removed in latest version since
+                        # it duplicates with another BGC.
+                        # see example https://mibig.secondarymetabolites.org/repository/BGC0001871/index.html#r1c1
+                        # TODO:
+                        # 1. make clear which version is using in nplinker.
+                        # 2. provide a mapping of duplicates, e.g. BGC0001871 -> BGC0000287
+                        raise ValueError(
+                            'Unknown MIBiG BGC: original={} / parsed={}'.
+                            format(name, nname))
                 else:
                     parsednames = [
                         name[:name.index(d)] for d in antismash_delimiters
