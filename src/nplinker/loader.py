@@ -22,7 +22,7 @@ from nplinker.class_info.chem_classes import ChemClassPredictions
 from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
 from nplinker.genomics import loadBGC_from_cluster_files
-from nplinker.genomics import make_mibig_bgc_dict
+from nplinker.genomics.mibig import MibigBGCLoader
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import load_dataset
 from nplinker.pairedomics.downloader import Downloader
@@ -595,9 +595,15 @@ class DatasetLoader():
         #   bigscape => run BiG-SCAPE before continuing (if using the Docker image)
         self._load_genomics_extra()
 
-        logger.debug(f'make_mibig_bgc_dict({self.mibig_json_dir})')
-        self.mibig_bgc_dict = make_mibig_bgc_dict(self.strains,
-                                                  self.mibig_json_dir)
+
+        logger.debug(f'MibigBGCLoader({self.mibig_json_dir})')
+        mibig_bgc_loader = MibigBGCLoader(self.mibig_json_dir)
+        self.mibig_bgc_dict = mibig_bgc_loader.bgcs
+
+        # add mibig bgc strains
+        for bgc in self.mibig_bgc_dict.values():
+            self.strains.add(bgc.strain)
+
         logger.debug('mibig_bgc_dict has {} entries'.format(
             len(self.mibig_bgc_dict)))
 
