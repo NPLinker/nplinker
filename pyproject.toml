@@ -38,6 +38,7 @@ dependencies = [
     "scipy",
     "sortedcontainers",
     "toml",
+    "tqdm",
     "xdg"
 ]
 
