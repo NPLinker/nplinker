@@ -4,7 +4,7 @@ import json
 class MibigMetadata():
 
     def __init__(self, file):
-        """To represent the MIBiG BGC metadata (json file)
+        """To represent the MIBiG BGC metadata/annotations (in json format)
 
         Args:
             file(str): Path to the json file of MIBiG BGC metadata
@@ -23,7 +23,11 @@ class MibigMetadata():
 
     @property
     def biosyn_class(self):
-        """Get value of metadata item 'biosyn_class'"""
+        """Get value of metadata item 'biosyn_class'.
+
+            It's the biosynthetic class(es) of BGC, i.e. the type of secondary
+            metabolite.
+        """
         return MibigMetadata.get_biosyn_class(self.metadata)
 
     @staticmethod
@@ -37,7 +41,11 @@ class MibigMetadata():
 
     @staticmethod
     def get_biosyn_class(metadata):
-        """Get value of metadata item 'mibig_accession'"""
+        """Get value of metadata item 'biosyn_class'.
+
+            It's the biosynthetic class(es) of BGC, i.e. the type of secondary
+            metabolite.
+        """
         if 'general_params' in metadata:
             biosyn_class = metadata['general_params']['biosyn_class'][0]
         else:  # version≥2.0
