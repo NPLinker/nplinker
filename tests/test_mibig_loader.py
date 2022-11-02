@@ -1,5 +1,3 @@
-import shutil
-import tempfile
 import pytest
 from nplinker.genomics.mibig import MibigBGCLoader
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
@@ -10,12 +8,13 @@ from nplinker.genomics.mibig.mibig_metadata import MibigMetadata
 class TestMibigBGCLoader:
 
     @pytest.fixture
-    def database(self):
-        download_root = tempfile.mkdtemp()
-        extract_path = tempfile.mkdtemp()
+    def database(self, tmp_path):
+        download_root = tmp_path / "download"
+        extract_path = tmp_path / "metadata"
+        download_root.mkdir()
+        extract_path.mkdir()
         download_and_extract_mibig_metadata(download_root, extract_path)
-        yield extract_path
-        shutil.rmtree(download_root)
+        yield str(extract_path)
 
     def test_init(self, database):
         loader = MibigBGCLoader(database)
