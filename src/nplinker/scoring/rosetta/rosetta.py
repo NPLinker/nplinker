@@ -16,7 +16,7 @@ import csv
 import os
 
 from nplinker.scoring.rosetta.rosetta_hit import RosettaHit
-from ...genomics import MiBIGBGC
+from ...genomics import MibigBGC
 from ...logconfig import LogConfig
 from ...parsers.kcb import KCBJSONParser
 from ...parsers.kcb import KCBTextParser
@@ -172,7 +172,7 @@ class Rosetta():
         skipped, errors = 0, 0
 
         for bgc in bgcs:
-            if bgc.antismash_file is None or isinstance(bgc, MiBIGBGC):
+            if bgc.antismash_file is None or isinstance(bgc, MibigBGC):
                 skipped += 1
                 continue
 
@@ -449,7 +449,7 @@ class Rosetta():
         else:
             logger.info('Generating BGC hits')
             self._generate_bgc_hits(bgcs)
-    
+
 
     def _init_spec_hits(self, spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
         spec_hits = load_pickled_data(self._nplinker,
@@ -510,7 +510,7 @@ class Rosetta():
             except Exception as e:
                 logger.warning(
                     f'Failed to parse pickled Rosetta parameters: {e}')
-                    
+
         return params_ok
 
     def _clear_cache(self, ms1_tol, ms2_tol, score_thresh, min_match_peaks):

@@ -22,11 +22,11 @@ from nplinker.class_info.chem_classes import ChemClassPredictions
 from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
 from nplinker.genomics import loadBGC_from_cluster_files
-from nplinker.genomics import make_mibig_bgc_dict
+from nplinker.genomics.mibig import MibigBGCLoader
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import load_dataset
 from nplinker.pairedomics.downloader import Downloader
-from nplinker.pairedomics.downloader import download_and_extract_mibig_json
+from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.strain_collection import StrainCollection
 
@@ -505,7 +505,7 @@ class DatasetLoader():
                 logger.info(
                     'Attempting to download MiBIG JSON database (v{})...'.
                     format(self._mibig_version))
-                download_and_extract_mibig_json(self._root,
+                download_and_extract_mibig_metadata(self._root,
                                                 self.mibig_json_dir,
                                                 self._mibig_version)
             else:
@@ -595,10 +595,15 @@ class DatasetLoader():
         #   bigscape => run BiG-SCAPE before continuing (if using the Docker image)
         self._load_genomics_extra()
 
-        logger.debug(f'make_mibig_bgc_dict({self.mibig_json_dir})')
-        self.mibig_bgc_dict = make_mibig_bgc_dict(self.strains,
-                                                  self.mibig_json_dir,
-                                                  self._mibig_version)
+
+        logger.debug(f'MibigBGCLoader({self.mibig_json_dir})')
+        mibig_bgc_loader = MibigBGCLoader(self.mibig_json_dir)
+        self.mibig_bgc_dict = mibig_bgc_loader.bgcs
+
+        # add mibig bgc strains
+        for bgc in self.mibig_bgc_dict.values():
+            self.strains.add(bgc.strain)
+
         logger.debug('mibig_bgc_dict has {} entries'.format(
             len(self.mibig_bgc_dict)))
 
@@ -694,6 +699,7 @@ class DatasetLoader():
         logger.debug(
             'loadBGC_from_cluster_files(antismash_dir={}, delimiters={})'.
             format(self.antismash_dir, self._antismash_delimiters))
+
         self.gcfs, self.bgcs, self.strains, unknown_strains = loadBGC_from_cluster_files(
             self.strains,
             cluster_files,
