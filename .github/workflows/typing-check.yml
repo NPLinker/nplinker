@@ -38,5 +38,4 @@ jobs:
       # mypy configs are in pyproject.toml
       - name: Check static typing
         run: |
-          mypy src
-          mypy tests
+          mypy src tests
