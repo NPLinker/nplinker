@@ -1,9 +1,9 @@
 from ..bgc import BGC
-
+from nplinker.strains import Strain
 
 class MibigBGC(BGC):
 
-    def __init__(self, id: int, strain: str, name: str, product_prediction: str):
+    def __init__(self, id: int, strain: Strain, name: str, product_prediction: str):
         """The object reprenseting MiBIG BGC annotations/metadata
 
         Args:
