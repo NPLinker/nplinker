@@ -91,7 +91,8 @@ class DataLinks():
     def load_data(self, spectra, gcf_list, strain_list, molfams):
         # load data from spectra, GCFs, and strains
         logger.debug("Create mappings between spectra, gcfs, and strains.")
-        self.collect_mappings_spec_v2(molfams)
+        self.collect_mappings_spec(spectra)
+        # self.collect_mappings_spec_v2(molfams)
         self.collect_mappings_gcf(gcf_list)
         logger.debug(
             "Create co-occurence matrices: spectra<->strains + and gcfs<->strains."
