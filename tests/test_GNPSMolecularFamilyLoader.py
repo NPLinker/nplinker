@@ -1,6 +1,14 @@
 import os
+
+import pytest
 from nplinker.metabolomics.GNPSMolecularFamilyLoader import GNPSMolecularFamilyLoader
 from . import DATA_DIR
+
+@pytest.fixture
+def molecular_families_gnps():
+    filename = os.path.join(DATA_DIR, "edges.pairsinfo")
+    sut = GNPSMolecularFamilyLoader(filename)
+    return sut.families()
 
 
 def test_has_molecular_families():

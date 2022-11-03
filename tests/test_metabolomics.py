@@ -14,6 +14,15 @@ def spec_dict() -> dict:
     return load_spectra(mgf_file, edges_file)
 
 
+@pytest.fixture
+def spec_with_families(spec_dict) -> dict:
+    _make_families(spec_dict.values())
+    return spec_dict
+
+@pytest.fixture
+def molecular_families(spec_dict) -> dict:
+    return _make_families(spec_dict.values())
+
 def test_load_spectra(spec_dict):
     assert len(spec_dict.keys()) > 0
 

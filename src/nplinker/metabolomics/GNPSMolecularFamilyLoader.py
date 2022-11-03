@@ -15,9 +15,9 @@ class GNPSMolecularFamilyLoader(IMolecularFamilyLoader):
         
         for family_id, spectra_ids in _load_molecular_families(filename).items():
             if family_id == -1:
-                for id in spectra_ids:
+                for spectrum_id in spectra_ids:
                     family = SingletonFamily()
-                    family.spectra_ids = [id]
+                    family.spectra_ids = [spectrum_id]
                     self._families.append(family)
             else:
                 family = MolecularFamily(family_id)

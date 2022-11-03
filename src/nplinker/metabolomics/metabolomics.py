@@ -95,7 +95,7 @@ def load_dataset(strains,
 
     # add edges info to the spectra
     molfams = _make_families(spec_dict.values())
-    #molfams = GNPSMolecularFamilyLoader(edges_file).families()
+    # molfams = GNPSMolecularFamilyLoader(edges_file).families()
 
     unknown_strains = load_gnps(strains, nodes_file, quant_table_file,
                                 metadata_table_file, ext_metadata_parsing,
