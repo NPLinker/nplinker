@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+import os
+import os.path
 import bz2
 import gzip
 import hashlib
@@ -25,11 +27,8 @@ import urllib.request
 import zipfile
 from pathlib import Path
 from typing import IO
-from typing import Any
 from typing import Callable
 from typing import Iterator
-from typing import Optional
-from typing import Union
 from tqdm import tqdm
 
 
@@ -60,8 +59,8 @@ USER_AGENT = "NPLinker"
 
 
 def _save_response_content(content: Iterator[bytes],
-                           destination: Union[str, Path],
-                           length: Optional[int] = None) -> None:
+                           destination: str | Path,
+                           length: int | None = None) -> None:
     with open(destination, "wb") as fh, tqdm(total=length) as pbar:
         for chunk in content:
             # filter out keep-alive new chunks
@@ -73,17 +72,18 @@ def _save_response_content(content: Iterator[bytes],
 
 
 def _urlretrieve(url: str,
-                 filename: Union[str, Path],
+                 filename: str | Path,
                  chunk_size: int = 1024 * 32) -> None:
     with urllib.request.urlopen(
             urllib.request.Request(url, headers={"User-Agent":
                                                  USER_AGENT})) as response:
-        _save_response_content(iter(lambda: response.read(chunk_size), b""),
+        _save_response_content(iter(lambda: bytes(response.read(chunk_size)),
+                                    b""),
                                filename,
                                length=response.length)
 
 
-def calculate_md5(fpath: str, chunk_size: int = 1024 * 1024) -> str:
+def calculate_md5(fpath: str | Path, chunk_size: int = 1024 * 1024) -> str:
     # Setting the `usedforsecurity` flag does not change anything about the functionality, but indicates that we are
     # not using the MD5 checksum for cryptography. This enables its usage in restricted environments like FIPS. Without
     # it torchvision.datasets is unusable in these environments since we perform a MD5 check everywhere.
@@ -97,14 +97,12 @@ def calculate_md5(fpath: str, chunk_size: int = 1024 * 1024) -> str:
     return md5.hexdigest()
 
 
-def check_md5(fpath: str, md5: str, **kwargs: Any) -> bool:
-    return md5 == calculate_md5(fpath, **kwargs)
+def check_md5(fpath: str | Path, md5: str) -> bool:
+    return md5 == calculate_md5(fpath)
 
 
-def check_integrity(fpath: Union[str, Path],
-                    md5: Optional[str] = None) -> bool:
-    fpath = Path(fpath)
-    if not fpath.is_file():
+def check_integrity(fpath: str | Path, md5: str | None = None) -> bool:
+    if not os.path.isfile(fpath):
         return False
     if md5 is None:
         return True
@@ -128,9 +126,9 @@ def _get_redirect_url(url: str, max_hops: int = 3) -> str:
 
 
 def download_url(url: str,
-                 root: Union[str, Path],
-                 filename: Optional[str] = None,
-                 md5: Optional[str] = None,
+                 root: str | Path,
+                 filename: str | None = None,
+                 md5: str | None = None,
                  max_redirect_hops: int = 3) -> None:
     """Download a file from a url and place it in root.
 
@@ -175,7 +173,7 @@ def download_url(url: str,
         raise RuntimeError("File not found or corrupted.")
 
 
-def list_dirs(root: Union[str, Path], prefix: bool = False) -> list[str]:
+def list_dirs(root: str | Path, prefix: bool = False) -> list[str]:
     """List all directories at a given root
 
     Args:
@@ -190,8 +188,8 @@ def list_dirs(root: Union[str, Path], prefix: bool = False) -> list[str]:
     return directories
 
 
-def list_files(root: Union[str, Path],
-               suffix: Union[str, tuple[str, ...]],
+def list_files(root: str | Path,
+               suffix: str | tuple[str, ...],
                prefix: bool = False) -> list[str]:
     """List all files ending with a suffix at a given root
 
@@ -203,15 +201,16 @@ def list_files(root: Union[str, Path],
     """
     root = Path(root).expanduser()
     files = [
-        str(p) for p in root.iterdir() if p.is_file() and p.suffix.endswith(suffix)
+        str(p) for p in root.iterdir()
+        if p.is_file() and p.suffix.endswith(suffix)
     ]
     if prefix is False:
         files = [Path(f).name for f in files]
     return files
 
 
-def _extract_tar(from_path: Union[str, Path], to_path: Union[str, Path],
-                 compression: Optional[str]) -> None:
+def _extract_tar(from_path: str | Path, to_path: str | Path,
+                 compression: str | None) -> None:
     with tarfile.open(from_path,
                       f"r:{compression[1:]}" if compression else "r") as tar:
         tar.extractall(to_path)
@@ -223,8 +222,8 @@ _ZIP_COMPRESSION_MAP: dict[str, int] = {
 }
 
 
-def _extract_zip(from_path: Union[str, Path], to_path: Union[str, Path],
-                 compression: Optional[str]) -> None:
+def _extract_zip(from_path: str | Path, to_path: str | Path,
+                 compression: str | None) -> None:
     with zipfile.ZipFile(from_path,
                          "r",
                          compression=_ZIP_COMPRESSION_MAP[compression]
@@ -232,7 +231,7 @@ def _extract_zip(from_path: Union[str, Path], to_path: Union[str, Path],
         zip.extractall(to_path)
 
 
-_ARCHIVE_EXTRACTORS: dict[str, Callable[[str, str, Optional[str]], None]] = {
+_ARCHIVE_EXTRACTORS: dict[str, Callable[[str, str, str | None], None]] = {
     ".tar": _extract_tar,
     ".zip": _extract_zip,
 }
@@ -241,15 +240,14 @@ _COMPRESSED_FILE_OPENERS: dict[str, Callable[..., IO]] = {
     ".gz": gzip.open,
     ".xz": lzma.open,
 }
-_FILE_TYPE_ALIASES: dict[str, tuple[Optional[str], Optional[str]]] = {
+_FILE_TYPE_ALIASES: dict[str, tuple[str | None, str | None]] = {
     ".tbz": (".tar", ".bz2"),
     ".tbz2": (".tar", ".bz2"),
     ".tgz": (".tar", ".gz"),
 }
 
 
-def _detect_file_type(
-        file: Union[str, Path]) -> tuple[str, Optional[str], Optional[str]]:
+def _detect_file_type(file: str | Path) -> tuple[str, str | None, str | None]:
     """Detect the archive type and/or compression of a file.
 
     Args:
@@ -297,9 +295,9 @@ def _detect_file_type(
     )
 
 
-def _decompress(from_path: Path,
-                to_path: Optional[Path] = None,
-                remove_finished: bool = False) -> Path:
+def _decompress(from_path: Path | str,
+                to_path: Path | str | None = None,
+                remove_finished: bool = False) -> str:
     r"""Decompress a file.
 
     The compression is automatically detected from the file name.
@@ -328,13 +326,13 @@ def _decompress(from_path: Path,
         wfh.write(rfh.read())
 
     if remove_finished:
-        from_path.unlink()
+        os.remove(from_path)
 
-    return Path(to_path)
+    return str(to_path)
 
 
-def extract_archive(from_path: Union[str, Path],
-                    to_path: Optional[Union[str, Path]] = None,
+def extract_archive(from_path: str | Path,
+                    to_path: str | Path | None = None,
                     remove_finished: bool = False) -> str:
     """Extract an archive.
 
@@ -368,7 +366,7 @@ def extract_archive(from_path: Union[str, Path],
 
     extractor = _ARCHIVE_EXTRACTORS[archive_type]
 
-    extractor(from_path, to_path, compression)
+    extractor(str(from_path), str(to_path), compression)
     if remove_finished:
         from_path.unlink()
 
@@ -376,13 +374,13 @@ def extract_archive(from_path: Union[str, Path],
 
 
 def download_and_extract_archive(
-        url: str,
-        download_root: Union[str, Path],
-        extract_root: Optional[Union[str, Path]] = None,
-        filename: Optional[str] = None,
-        md5: Optional[str] = None,
-        remove_finished: bool = False,
-    ) -> None:
+    url: str,
+    download_root: str | Path,
+    extract_root: str | Path | None = None,
+    filename: str | None = None,
+    md5: str | None = None,
+    remove_finished: bool = False,
+) -> None:
     """Download a file from url and extract it
 
        This method is a wrapper of `download_url` and `extract_archive` methods.
