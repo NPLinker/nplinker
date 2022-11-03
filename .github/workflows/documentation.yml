@@ -18,8 +18,6 @@ jobs:
   build-documentation:
     name: Build documentation
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python 3.10
