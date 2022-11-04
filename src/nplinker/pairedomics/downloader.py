@@ -18,6 +18,7 @@ import json
 import os
 import re
 import sys
+import shutil
 import tarfile
 import time
 import zipfile
@@ -172,6 +173,7 @@ class Downloader():
         self.strain_mappings_file = os.path.join(self.project_file_cache,
                                                  'strain_mappings.csv')
 
+	# CG: download function
     def get(self, do_bigscape, extra_bigscape_parameters, use_mibig,
             mibig_version):
         logger.info('Going to download the metabolomics data file')
@@ -456,6 +458,12 @@ class Downloader():
 
     def _download_mibig_json(self, version):
         output_path = os.path.join(self.project_file_cache, 'mibig_json')
+
+        # Override existing mibig json files
+        if os.path.exists(output_path):
+            shutil.rmtree(output_path)
+
+        os.makedirs(output_path)
 
         download_and_extract_mibig_metadata(self.project_download_cache,
                                         output_path, version)
