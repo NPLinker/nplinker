@@ -32,7 +32,7 @@ class MibigBGCLoader():
             dict: key is MIBiG BGC accession, value is MibigMetadata object
         """
         metadatas = {}
-        json_files = list_files(database, suffix=".json", prefix=True)
+        json_files = list_files(database, prefix="BGC", suffix=".json")
         logger.info("Found %s MIBiG metadata json files", len(json_files))
         for file in json_files:
             metadata = MibigMetadata(file)
