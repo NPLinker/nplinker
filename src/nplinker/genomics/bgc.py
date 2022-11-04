@@ -90,8 +90,16 @@ class BGC():
         logger.debug(f'SMILES for {self} = {self._smiles}')
         return self._smiles
 
+    # CG: why not providing whole product but only amino acid as product monomer?
+    # this property is not used in NPLinker core business.
     @property
     def aa_predictions(self):
+        """Amino acids as predicted monomers of product.
+
+        Returns:
+            list: list of dicts with key as amino acid and value as prediction
+                probability.
+        """
         # Load aa predictions and cache them
         self._aa_predictions = None
         if self._aa_predictions is None:

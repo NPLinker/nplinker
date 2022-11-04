@@ -201,6 +201,7 @@ class DatasetLoader():
             self._root = self._downloader.project_file_cache
             logger.debug('remote loading mode, configuring root={}'.format(
                 self._root))
+            # CG: to download both MET and GEN data
             self._downloader.get(
                 self._docker.get('run_bigscape', self.RUN_BIGSCAPE_DEFAULT),
                 self._docker.get('extra_bigscape_parameters',
@@ -545,6 +546,7 @@ class DatasetLoader():
         # to run bigscape on a dataset like that it will just refuse. so, to try and avoid anyone
         # having to manually fix this stupid problem, we will attempt to rename every .gbk file here
         # TODO is this something nplinker should do, or dataset authors??
+        logger.debug("\nLoading genomics starts...")
         logger.debug('Collecting .gbk files (and possibly renaming)')
         gbk_files = []
         t = time.time()
@@ -719,6 +721,8 @@ class DatasetLoader():
             us.write('# unknown strain label, filename\n')
             for strain, filename in unknown_strains.items():
                 us.write(f'{strain}, {filename}\n')
+
+        logger.debug("Loading genomics completed\n")
 
         return True
 
