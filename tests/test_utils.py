@@ -118,15 +118,15 @@ class TestListDirs:
         dirs = utils.list_dirs(root=self.root)
         assert isinstance(dirs, list)
         assert len(dirs) >= 1
-        assert "data" in dirs
-        assert str(self.root / "data") not in dirs
-
-    def test_prefix(self):
-        dirs = utils.list_dirs(root=self.root, prefix=True)
-        assert isinstance(dirs, list)
-        assert len(dirs) >= 1
         assert "data" not in dirs
         assert str(self.root / "data") in dirs
+
+    def test_prefix(self):
+        dirs = utils.list_dirs(root=self.root, keep_parent=False)
+        assert isinstance(dirs, list)
+        assert len(dirs) >= 1
+        assert "data" in dirs
+        assert str(self.root / "data") not in dirs
 
 
 class TestListFiles:
@@ -135,13 +135,43 @@ class TestListFiles:
     root = Path(__file__).parent
 
     def test_default(self):
-        files = utils.list_files(self.root, suffix=".py")
+        files = utils.list_files(self.root)
+        assert isinstance(files, list)
+        assert "test_utils.py" not in files
+        assert str(self.root / "test_utils.py") in files
+
+    def test_keep_parent(self):
+        files = utils.list_files(self.root, keep_parent=False)
         assert isinstance(files, list)
         assert "test_utils.py" in files
         assert str(self.root / "test_utils.py") not in files
 
-    def test_prefix(self):
-        files = utils.list_files(self.root, suffix=".py", prefix=True)
+    def test_prefix_str(self):
+        files = utils.list_files(self.root, prefix="__")
         assert isinstance(files, list)
+        assert len(files) == 1
+        assert "__init__.py" not in files
+        assert str(self.root / "__init__.py") in files
+
+    def test_prefix_tuple(self):
+        files = utils.list_files(self.root, prefix=("__", "test_utils"))
+        assert isinstance(files, list)
+        assert len(files) == 2
+        assert "__init__.py" not in files
+        assert str(self.root / "__init__.py") in files
+        assert "test_utils.py" not in files
+        assert str(self.root / "test_utils.py") in files
+
+    def test_suffix(self):
+        files = utils.list_files(self.root, suffix="utils.py")
+        assert isinstance(files, list)
+        assert len(files) == 1
+        assert "test_utils.py" not in files
+        assert str(self.root / "test_utils.py") in files
+
+    def test_prefix_suffix(self):
+        files = utils.list_files(self.root, prefix="test_utils", suffix=".py")
+        assert isinstance(files, list)
+        assert len(files) == 1
         assert "test_utils.py" not in files
         assert str(self.root / "test_utils.py") in files
