@@ -43,13 +43,11 @@ class StrainCollection():
 
     def remove(self, strain: Strain):
         """Remove the specified strain from the aliases.
+        TODO: #90 Implement removing the strain also from self._lookup indices.
 
         Args:
             strain(Strain): Strain to remove.
-
-        Examples:
-            >>> 
-            """
+        """
         if strain.id not in self._lookup:
             return
 
@@ -58,7 +56,7 @@ class StrainCollection():
         for alias in strain.aliases:
             del self._lookup[alias]
 
-    def filter(self, strain_set):
+    def filter(self, strain_set: set[Strain]):
         """
         Remove all strains that are not in strain_set from the strain collection
         """
@@ -67,6 +65,15 @@ class StrainCollection():
             self.remove(strain)
 
     def __contains__(self, strain_id: Union[str, Strain]) -> bool:
+        """Check if the strain or strain id are contained in the lookup table.
+
+        Args:
+            strain_id(Union[str, Strain]): Strain or strain id to look up.
+
+        Returns:
+            bool: Whether the strain is contained in the collection.
+         """
+         
         if isinstance(strain_id, str):
             return strain_id in self._lookup
         # assume it's a Strain object
@@ -78,10 +85,27 @@ class StrainCollection():
     def __next__(self):
         return next(self._strains)
 
-    def lookup_index(self, index):
+    def lookup_index(self, index: int) -> Strain:
+        """Return the strain from lookup by index.
+
+        Args:
+            index(int): Position index from which to retrieve the strain
+
+        Returns:
+            Strain: Strain identified by the given index.
+        """
         return self._lookup_indices[index]
 
     def lookup(self, strain_id: str, default=None) -> Optional[Strain]:
+        """Check whether the strain id is contained in the lookup table. If so, return the strain, otherwise return `default`.
+
+        Args:
+            strain_id(str): Strain id to lookup.
+            default (Strain, optional): Object to return otherwise. Defaults to None.
+
+        Returns:
+            Optional[Strain]: Strain retrieved during lookup or object passed as default.
+        """
         if strain_id not in self._lookup:
             # logger.error('Strain lookup failed for "{}"'.format(strain_id))
             return default
@@ -119,12 +143,20 @@ class StrainCollection():
                 line += 1
 
     def save_to_file(self, filename: str):
+        """Save this strain collection to file.
+
+        Args:
+            filename(str): Output filename.
+
+        Examples:
+            >>> 
+            """
         with open(filename, 'w') as f:
             for strain in self._strains:
                 ids = [strain.id] + list(strain.aliases)
                 f.write(','.join(ids) + '\n')
     
-    def generate_strain_mappings(self, strain_mappings_file, antismash_dir):
+    def generate_strain_mappings(self, strain_mappings_file: str, antismash_dir: str):
         # first time downloading, this file will not exist, should only need done once
         if not os.path.exists(strain_mappings_file):
             logger.info('Generating strain mappings file')
@@ -152,10 +184,10 @@ class StrainCollection():
     
         return self
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._strains)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
 
     def __str__(self):
