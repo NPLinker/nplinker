@@ -182,7 +182,11 @@ class Downloader():
         self._download_genomics_data(self.project_json['genomes'])
         self._parse_genome_labels(self.project_json['genome_metabolome_links'],
                                   self.project_json['genomes'])
-        self._generate_strain_mappings()
+
+        # CG: parse antismash gbk files and add them as strain alias
+        self.strains.generate_strain_mappings(self.strain_mappings_file,
+            os.path.join(self.project_file_cache, 'antismash'))
+
         if use_mibig:
             self._download_mibig_json(mibig_version)
         self._run_bigscape(do_bigscape, extra_bigscape_parameters)
@@ -209,10 +213,6 @@ class Downloader():
             logger.warning(
                 'Failed to run BiG-SCAPE on antismash data, error was "{}"'.
                 format(e))
-
-    def _generate_strain_mappings(self):
-        gen_strains = self.strains.generate_strain_mappings(self.strain_mappings_file,
-            os.path.join(self.project_file_cache, 'antismash'))
 
     def _ncbi_genbank_search(self, genbank_id, retry_time=5.0):
         url = NCBI_LOOKUP_URL_NEW.format(genbank_id)
