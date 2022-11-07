@@ -14,8 +14,6 @@ class GNPSFileMappingLoader(IFileMappingLoader):
     def mapping(self):
         return self._mapping
 
-    def format(self) -> Literal['unknown', 'allfiles', 'uniquefiles', 'fbmn']:
-        return identify_gnps_format(self._filename, False)
 
 def load_file_mappings(filename: str) -> Dict[str, str]:
     with open(filename, mode='rt', encoding='utf-8') as file:

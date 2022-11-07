@@ -60,7 +60,7 @@ def identify_gnps_format(filename: str, has_quant_table: bool) -> Literal['unkno
         >>> 
         """
 
-    headers = _get_headers(filename)
+    headers: list[str] = _get_headers(filename)
 
     if headers is None:
         return GNPS_FORMAT_UNKNOWN
@@ -84,6 +84,8 @@ def identify_gnps_format(filename: str, has_quant_table: bool) -> Literal['unkno
         # table file, that should indicate a new-style dataset like Carnegie
         # TODO check for the required header columns here too
         return GNPS_FORMAT_NEW_FBMN
+    elif len(list(filter(lambda x: "Peak area" in x, headers))) > 1:
+        return GNPS_FORMAT_NEW_FBMN
     else:
         # if we don't match any of the above cases then it's not a recognised format
         return GNPS_FORMAT_UNKNOWN
@@ -105,7 +107,7 @@ def _messy_strain_naming_lookup(mzxml: str, strains: StrainCollection) -> Option
     hyphen_index = mzxml_no_ext.find('-')
     mzxml_trunc_underscore = mzxml_no_ext if underscore_index == -1 else mzxml_no_ext[:underscore_index]
     mzxml_trunc_hyphen = mzxml_no_ext if hyphen_index == -1 else mzxml_no_ext[:hyphen_index]
-    
+
     if underscore_index != -1 and mzxml_trunc_underscore in strains:
         return strains.lookup(mzxml_trunc_underscore)
     if hyphen_index != -1 and mzxml_trunc_hyphen in strains:

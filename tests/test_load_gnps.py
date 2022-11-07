@@ -1,4 +1,6 @@
 from itertools import chain
+
+import pytest
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_OLD_ALLFILES
 from nplinker.metabolomics.load_gnps import identify_gnps_format
@@ -27,11 +29,14 @@ def test_load_gnps(spec_dict):
     assert len(unknown_strains) > 0
 
 
-def test_identify_gnps_format():
-    actual = identify_gnps_format(nodes_file, None)
+@pytest.mark.parametrize("filename, gnps_format", [
+    [nodes_file, GNPS_FORMAT_OLD_ALLFILES],
+    [ DATA_DIR / "nodes_fbmn.csv", GNPS_FORMAT_NEW_FBMN]
+])
+def test_identify_gnps_format(filename, gnps_format):
+    actual = identify_gnps_format(filename, None)
 
-    assert actual is not GNPS_FORMAT_NEW_FBMN
-    assert actual is GNPS_FORMAT_OLD_ALLFILES
+    assert actual is gnps_format
 
 
 def test_load_clusterinfo_old(spec_dict):
