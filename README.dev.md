@@ -11,6 +11,8 @@ See [the guide](https://code.visualstudio.com/docs/getstarted/settings) for more
 
 ## Setup
 
+We use Python 3.10 for development environment.
+
 ```shell
 # Create a virtual environment, e.g. with
 python3 -m venv venv
@@ -69,7 +71,6 @@ coverage report
 
 ## Linting and formatting
 
-
 We use [prospector](https://pypi.org/project/prospector/) for linting, [isort](https://pycqa.github.io/isort/) to sort imports, [unimport](https://github.com/hakancelikdev/unimport) to remove unused imports, and [yapf](https://github.com/google/yapf) for formatting, i.e. fixing readability of your code style.
 
 Running the linters and formatters requires an activated virtual environment with the development tools installed.
@@ -100,6 +101,30 @@ yapf -i filename.py
 **Note:** We have set linter and formatter in VS Code [settings](.vscode),
 so if you're using VS Code, you can also use its shortcut to do linting, sorting and formatting.
 Besides, docstring style is also set, you can use [autoDocString](https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring) to automatically generate docstrings.
+
+## Static typing
+
+We use [inline type annotation](https://typing.readthedocs.io/en/latest/source/libraries.html#how-to-provide-type-annotations) for static typing rather than stub files (i.e. `.pyi` files).
+
+Since Python 3.10 is used as dev environment and NPLinker must support Python version ≥3.9, you may see various typing issues at runtime. Here is [a guide to solve the potential runtime issues](https://mypy.readthedocs.io/en/stable/runtime_troubles.html).
+
+By default, we use `from __future__ import annotations` at module level to stop evaluating annotations at function definition time (see [PEP 563](https://peps.python.org/pep-0563/)), which would solve most of compatibility issues between different Python versions. Make sure you're aware of the [caveats](https://mypy.readthedocs.io/en/stable/runtime_troubles.html#future-annotations-import-pep-563).
+
+We use [Mypy](http://mypy-lang.org/) as static type checker:
+
+```
+# install mypy
+pip install mypy
+
+# run mypy
+mypy path-to-source-code
+```
+
+Mypy configurations are set in [pyproject.toml](pyproject.toml) file.
+
+For more info about static typing and mypy, see:
+- [Static typing with Python](https://typing.readthedocs.io/en/latest/index.html#)
+- [Mypy doc](https://mypy.readthedocs.io/en/stable/)
 
 ## Generating the API docs
 

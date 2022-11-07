@@ -27,8 +27,6 @@ jobs:
   smoke_test:
     name: Smoke test on ubuntu for python 3.10
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.10
