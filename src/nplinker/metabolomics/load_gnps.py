@@ -1,7 +1,10 @@
 import csv
 import os
 import re
+from typing import Literal, Optional
 from nplinker.logconfig import LogConfig
+from nplinker.strain_collection import StrainCollection
+from nplinker.strains import Strain
 
 
 logger = LogConfig.getLogger(__file__)
@@ -19,7 +22,16 @@ GNPS_FORMAT_OLD_UNIQUEFILES = 'uniquefiles'
 GNPS_FORMAT_NEW_FBMN = 'fbmn'
 
 
-def _get_headers(filename, delimiters=['\t', ',']):
+def _get_headers(filename: str, delimiters=['\t', ',']) -> list[str]:
+    """Function to read headers from tab or comma separated table.
+
+    Args:
+        filename(str): Path to the file to read the header from.
+        delimiters (list, optional): List of delimiters to consider. Defaults to ['\t', ','].
+
+    Returns:
+        list[str]: Columns names in header.
+    """
     headers = None
     with open(filename) as f:
         headers = f.readline()
@@ -31,7 +43,23 @@ def _get_headers(filename, delimiters=['\t', ',']):
     return headers
 
 
-def identify_gnps_format(filename, has_quant_table):
+def identify_gnps_format(filename: str, has_quant_table: bool) -> Literal['unknown', 'allfiles', 'uniquefiles', 'fbmn']:
+    """Peek GNPS file format for given file.
+
+    TODO: #89 This should be rewritten to actually return the format always based on only the file and not include the quant table in it.
+
+     Args:
+        filename(str): Path to the file to peek the format for.
+        has_quant_table (bool): If a quant table is present, do return GNPS_FORMAT_NEW_FBMN.
+
+    Returns:
+        Literal['unknown', 'allfiles', 'uniquefiles', 'fbmn']: Constant, one of 
+        [GNPS_FORMAT_UNKNOWN, GNPS_FORMAT_OLD_ALLFILES, GNPS_FORMAT_OLD_UNIQUEFILES, GNPS_FORMAT_NEW_FBMN].
+
+    Examples:
+        >>> 
+        """
+
     headers = _get_headers(filename)
 
     if headers is None:
@@ -61,7 +89,7 @@ def identify_gnps_format(filename, has_quant_table):
         return GNPS_FORMAT_UNKNOWN
 
 
-def _messy_strain_naming_lookup(mzxml, strains):
+def _messy_strain_naming_lookup(mzxml: str, strains: StrainCollection) -> Optional[Strain]:
     if mzxml in strains:
         # life is simple!
         return strains.lookup(mzxml)
@@ -75,10 +103,9 @@ def _messy_strain_naming_lookup(mzxml, strains):
     # 2. if that doesn't work, try using everything up to the first -/_
     underscore_index = mzxml_no_ext.find('_')
     hyphen_index = mzxml_no_ext.find('-')
-    mzxml_trunc_underscore = mzxml_no_ext if underscore_index == -1 else mzxml_no_ext[:
-                                                                                      underscore_index]
-    mzxml_trunc_hyphen = mzxml_no_ext if hyphen_index == -1 else mzxml_no_ext[:
-                                                                              hyphen_index]
+    mzxml_trunc_underscore = mzxml_no_ext if underscore_index == -1 else mzxml_no_ext[:underscore_index]
+    mzxml_trunc_hyphen = mzxml_no_ext if hyphen_index == -1 else mzxml_no_ext[:hyphen_index]
+    
     if underscore_index != -1 and mzxml_trunc_underscore in strains:
         return strains.lookup(mzxml_trunc_underscore)
     if hyphen_index != -1 and mzxml_trunc_hyphen in strains:
