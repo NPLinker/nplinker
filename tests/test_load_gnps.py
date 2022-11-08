@@ -2,7 +2,7 @@ from itertools import chain
 from typing import Optional
 
 import pytest
-from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN, _messy_strain_naming_lookup
+from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN, _get_headers, _messy_strain_naming_lookup, _parse_mzxml_header
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_OLD_ALLFILES
 from nplinker.metabolomics.load_gnps import identify_gnps_format
 from nplinker.metabolomics.load_gnps import _load_clusterinfo_old
@@ -80,3 +80,10 @@ def test_messy_strain_naming_lookup(collection_from_file: StrainCollection, mess
     actual = _messy_strain_naming_lookup(messy_alias, collection_from_file)
 
     assert actual == collection_from_file.lookup(expected)
+
+
+def test_parse_mzxml_header():
+    headers = _get_headers(DATA_DIR / "nodes_fbmn.csv")
+    hdr = headers[10]
+    actual = _parse_mzxml_header(hdr, StrainCollection(), None, None)
+    assert actual is not None
