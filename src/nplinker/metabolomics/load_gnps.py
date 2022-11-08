@@ -93,6 +93,18 @@ def identify_gnps_format(filename: str, has_quant_table: bool) -> Literal['unkno
 
 
 def _messy_strain_naming_lookup(mzxml: str, strains: StrainCollection) -> Optional[Strain]:
+    """Wrapper around StrainCollection::lookup which is more permissive and handles often occuring cases of non perfect aliasing.
+
+    Args:
+        mzxml(str): Messy alias to use as a base for augmented lookup.
+        strains(StrainCollection): StrainCollection in which to search for the strain.
+
+    Returns:
+        Optional[Strain]: The strain identified to be matching or None.
+
+    Examples:
+        >>> 
+    """
     if mzxml in strains:
         # life is simple!
         return strains.lookup(mzxml)
