@@ -1,10 +1,11 @@
 import csv
 import os
 import re
-from typing import Literal, Optional
+from typing import Dict, Literal, Optional
 from nplinker.logconfig import LogConfig
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
+from nplinker.metabolomics.spectrum import Spectrum
 
 
 logger = LogConfig.getLogger(__file__)
@@ -201,7 +202,7 @@ def _parse_mzxml_header(hdr, strains, md_table, ext_metadata_parsing):
     return (strain_name, growth_medium, strain_name not in strains)
 
 
-def _load_clusterinfo_old(gnps_format, strains, filename, spec_dict):
+def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, filename: str, spec_dict: Dict[int, Spectrum]):
     # each line of this file represents a metabolite.
     # columns representing strain IDs are *ignored* here in favour of parsing
     # .mz(X)ML filenames from either the AllFiles or UniqueFileSources column.
