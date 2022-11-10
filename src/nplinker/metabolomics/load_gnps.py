@@ -2,6 +2,8 @@ import csv
 import os
 import re
 from typing import Dict, Literal, Optional
+from deprecated import deprecated
+
 from nplinker.logconfig import LogConfig
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
@@ -149,6 +151,7 @@ def _md_convert(val):
     return val
 
 
+@deprecated
 def _parse_mzxml_header(hdr, strains, md_table, ext_metadata_parsing):
     # given a column header from the quantification_table file produced by GNPS,
     # this method checks if it's one that contains peak information for a given
@@ -285,6 +288,7 @@ def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, filename:
     return unknown_strains
 
 
+@deprecated
 def _parse_metadata_table(filename):
     """Parses the metadata table file from GNPS"""
     if filename is None:
