@@ -8,12 +8,23 @@ from nplinker.utils import find_delimiter
 logger = LogConfig.getLogger(__file__)
 
 FILE_IDENTIFIER_FBMN = " Peak area"
+GNPS_FORMAT_NEW_FBMN = 'fbmn'
+GNPS_FORMAT_OLD_ALLFILES = 'allfiles'
 
 class GNPSFileMappingLoader(IFileMappingLoader):
 
     def __init__(self, filename: str):
         self._filename: str = filename
         self._mapping: Dict[int, list[str]] = {}
+
+        gnps_format = identify_gnps_format(filename, False)
+
+        if gnps_format is GNPS_FORMAT_OLD_ALLFILES:
+            self.load_mapping_allfiles()
+        elif gnps_format is GNPS_FORMAT_NEW_FBMN:
+            self.load_mapping_fbmn()
+        else:
+            raise NotImplementedError("%{gnps_format} reading not implemented.")
 
     def mapping(self) -> Dict[int, list[str]]:
         return self._mapping
