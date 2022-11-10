@@ -15,8 +15,8 @@ def test_default(loader):
     [DATA_DIR / "nodes_fbmn_mwe.csv", 9, 301, ["20210623_10_9A_1uL.mzML", "20210623_16_9C_1uL.mzML", "20210623_12_5B_1uL.mzML", "20210623_13_9B_1uL.mzML"]],
     [DATA_DIR / "nodes_fbmn_mwe.csv", 9, 1465, ["20210623_10_9A_1uL.mzML", "20210623_16_9C_1uL.mzML"]],
     [DATA_DIR / "nodes_fbmn.csv", 994, 304, ["20210623_10_9A_1uL.mzML", "20210623_16_9C_1uL.mzML", "20210623_13_9B_1uL.mzML"]],
-    [ DATA_DIR / "nodes_mwe.csv", 13, 275, ["26c.mzXML", "26c.mzXML", "26c.mzXML"]],
-    [ DATA_DIR / "nodes.tsv", 25935, 223, ["26c.mzXML", "26c.mzXML", "26c.mzXML"]]
+    [DATA_DIR / "nodes_mwe.csv", 13, 275, ["26c.mzXML", "26c.mzXML", "26c.mzXML"]],
+    [DATA_DIR / "nodes.tsv", 25935, 223, ["26c.mzXML", "26c.mzXML", "26c.mzXML"]]
 ])
 def test_load_mapping(filename, expected_length, spectrum_id, samples):
     sut = GNPSFileMappingLoader(filename)
