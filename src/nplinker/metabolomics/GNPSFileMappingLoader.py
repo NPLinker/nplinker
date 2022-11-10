@@ -1,4 +1,5 @@
 import csv
+from io import TextIOWrapper
 from typing import Dict, Literal
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.IFileMappingLoader import IFileMappingLoader
@@ -24,9 +25,15 @@ class GNPSFileMappingLoader(IFileMappingLoader):
             raise NotImplementedError("%{gnps_format} reading not implemented.")
 
     def mapping(self) -> Dict[int, list[str]]:
+        """Return mapping from spectrum id to files in which this spectrum occurs.
+
+        Returns:
+            Dict[int, list[str]]: Mapping.
+        """
         return self._mapping
 
     def load_mapping_allfiles(self):
+        """ Load mapping for GNPS 'AllFiles' style files. """
         with open(self._filename, mode='rt', encoding='utf-8') as file:
             reader = self.dict_reader(file)
  
@@ -40,7 +47,15 @@ class GNPSFileMappingLoader(IFileMappingLoader):
 
                 self._mapping[spectrum_id] = samples
 
-    def dict_reader(self, file):
+    def dict_reader(self, file: TextIOWrapper) -> csv.DictReader:
+        """Get a dict reader with matching delimiter for the passed file.
+
+        Args:
+            file(TextIOWrapper): File for which to get the reader.
+
+        Returns:
+            csv.DictReader: Reader for dict style table access.
+        """
         delimiter = find_delimiter(self._filename)
         reader = csv.reader(file, delimiter=delimiter)
         header: list[str] = next(reader)
@@ -48,6 +63,7 @@ class GNPSFileMappingLoader(IFileMappingLoader):
         return reader
 
     def load_mapping_fbmn(self):
+        """ Load mapping for GNPS 'fbmn' style files. """
         with open(self._filename, mode='rt', encoding='utf-8') as file:
             reader = self.dict_reader(file)
 
