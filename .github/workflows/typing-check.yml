@@ -1,4 +1,4 @@
-name: Check code style
+name: Check static typing
 
 on:
   push:
@@ -8,7 +8,6 @@ on:
     paths:
       - src/**
       - tests/**
-      - setup.py
   pull_request:
     branches:
       - main
@@ -16,7 +15,6 @@ on:
     paths:
       - src/**
       - tests/**
-      - setup.py
 
 jobs:
 
@@ -36,8 +34,8 @@ jobs:
       - name: Upgrade pip and install dependencies
         run: |
           python3 -m pip install --upgrade pip setuptools
-          pip install "prospector[with_pyroma]" isort
-      - name: Check style against standards using prospector
-        run: prospector
-      - name: Check import order
-        run: isort --check-only src tests --diff
+          pip install mypy
+      # mypy configs are in pyproject.toml
+      - name: Check static typing
+        run: |
+          mypy src tests

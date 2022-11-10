@@ -27,8 +27,6 @@ jobs:
   smoke_test:
     name: Smoke test on ubuntu for python 3.10
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.10
@@ -61,7 +59,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest', 'macos-latest']
-        python-version: ['3.7', '3.8', '3.9']
+        python-version: ['3.9', '3.11']
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
