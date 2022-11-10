@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import csv
 import math
 
 
@@ -27,3 +28,10 @@ def sqrt_normalise(peaks):
     for mz, intensity in temp:
         normalised_peaks.append((mz, intensity / norm_facc))
     return normalised_peaks
+
+
+def find_delimiter(filename):
+    sniffer = csv.Sniffer()
+    with open(filename, mode='rt', encoding='utf-8') as fp:
+        delimiter = sniffer.sniff(fp.read(5000)).delimiter
+    return delimiter
