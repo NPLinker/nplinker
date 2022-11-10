@@ -2,26 +2,23 @@ import csv
 from typing import Dict, Literal
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.IFileMappingLoader import IFileMappingLoader
-from nplinker.metabolomics.load_gnps import identify_gnps_format
+from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN, GNPS_FORMAT_OLD_ALLFILES, identify_gnps_format
 from nplinker.utils import find_delimiter
 
 logger = LogConfig.getLogger(__file__)
 
 FILE_IDENTIFIER_FBMN = " Peak area"
-GNPS_FORMAT_NEW_FBMN = 'fbmn'
-GNPS_FORMAT_OLD_ALLFILES = 'allfiles'
 
 class GNPSFileMappingLoader(IFileMappingLoader):
 
     def __init__(self, filename: str):
         self._filename: str = filename
         self._mapping: Dict[int, list[str]] = {}
+        self._gnps_format = identify_gnps_format(filename, False)
 
-        gnps_format = identify_gnps_format(filename, False)
-
-        if gnps_format is GNPS_FORMAT_OLD_ALLFILES:
+        if self._gnps_format is GNPS_FORMAT_OLD_ALLFILES:
             self.load_mapping_allfiles()
-        elif gnps_format is GNPS_FORMAT_NEW_FBMN:
+        elif self._gnps_format is GNPS_FORMAT_NEW_FBMN:
             self.load_mapping_fbmn()
         else:
             raise NotImplementedError("%{gnps_format} reading not implemented.")
@@ -31,7 +28,6 @@ class GNPSFileMappingLoader(IFileMappingLoader):
 
     def load_mapping_allfiles(self):
         with open(self._filename, mode='rt', encoding='utf-8') as file:
-
             reader = self.dict_reader(file)
  
             for row in reader:
@@ -61,11 +57,11 @@ class GNPSFileMappingLoader(IFileMappingLoader):
                 if self._mapping.get(spectrum_id) is not None:
                     logger.warning("Found duplicated row ID: %{spectrum_id}")
 
+                samples = []
+
                 for col in row:
                     if FILE_IDENTIFIER_FBMN in col:
                         if float(row[col]) > 0:
-                            sample = col.strip(FILE_IDENTIFIER_FBMN)
-                            if self._mapping.get(spectrum_id) is None:
-                                self._mapping[spectrum_id] = [sample]
-                            else:
-                                self._mapping[spectrum_id].append(sample)
+                            samples.append(col.strip(FILE_IDENTIFIER_FBMN))
+                
+                self._mapping[spectrum_id] = samples

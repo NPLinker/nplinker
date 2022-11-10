@@ -33,6 +33,7 @@ def test_load_gnps(spec_dict):
 
 @pytest.mark.parametrize("filename, gnps_format", [
     [nodes_file, GNPS_FORMAT_OLD_ALLFILES],
+    [DATA_DIR / "nodes_mwe.csv", GNPS_FORMAT_OLD_ALLFILES],
     [ DATA_DIR / "nodes_fbmn.csv", GNPS_FORMAT_NEW_FBMN]
 ])
 def test_identify_gnps_format(filename, gnps_format):

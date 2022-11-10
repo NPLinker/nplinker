@@ -8,6 +8,7 @@ from nplinker.logconfig import LogConfig
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 from nplinker.metabolomics.spectrum import Spectrum
+from nplinker.utils import find_delimiter
 
 
 logger = LogConfig.getLogger(__file__)
@@ -25,24 +26,20 @@ GNPS_FORMAT_OLD_UNIQUEFILES = 'uniquefiles'
 GNPS_FORMAT_NEW_FBMN = 'fbmn'
 
 
-def _get_headers(filename: str, delimiters=['\t', ',']) -> list[str]:
+def _get_headers(filename: str) -> list[str]:
     """Function to read headers from tab or comma separated table.
 
     Args:
         filename(str): Path to the file to read the header from.
-        delimiters (list, optional): List of delimiters to consider. Defaults to ['\t', ','].
 
     Returns:
         list[str]: Columns names in header.
     """
     headers = None
     with open(filename) as f:
-        headers = f.readline()
-        for dl in delimiters:
-            if len(headers.split(dl)) < 2:
-                continue
-            headers = headers.split(dl)
-            break
+        headers = f.readline().strip()
+        dl = find_delimiter(filename)
+        headers = headers.split(dl)
     return headers
 
 
