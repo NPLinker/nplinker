@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import csv
 from __future__ import annotations
+import csv
 import os
 import os.path
 import bz2
