@@ -8,3 +8,4 @@ scipy
 sortedcontainers
 toml
 xdg
+deprecated
