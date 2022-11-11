@@ -86,25 +86,14 @@ class Downloader():
         self.gnps_massive_id = platform_id
         self.pairedomics_id = None
         self.gnps_task_id = None
-        self.local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data',
-                                        'pairedomics')
-        self.local_download_cache = os.path.join(self.local_cache, 'downloads')
-        self.local_file_cache = os.path.join(self.local_cache, 'extracted')
-        self.all_project_json_file = os.path.join(self.local_cache,
-                                                  'all_projects.json')
-        self.all_project_json = None
-        self.project_json_file = os.path.join(
-            self.local_cache, f'{self.gnps_massive_id}.json')
-        self.project_json = None
-        os.makedirs(self.local_cache, exist_ok=True)
-
-        self.json_data = None
+        self.json_data = None        
         self.strains = StrainCollection()
         self.growth_media = {}
 
-        logger.info('Downloader for {}, caching to {}'.format(
-            platform_id, self.local_cache))
+        self.init_folder_structure()
 
+        # init project json files
+        self.all_project_json = None
         if not os.path.exists(self.project_json_file) or force_download:
             logger.info('Downloading new copy of platform project data...')
             self.all_project_json = self._download_platform_json_to_file(
@@ -137,6 +126,7 @@ class Downloader():
                     self.gnps_massive_id))
 
         # now get the project JSON data
+        self.project_json = None
         logger.info('Found project, retrieving JSON data...')
         self.project_json = self._download_platform_json_to_file(
             PAIREDOMICS_PROJECT_URL.format(self.pairedomics_id),
@@ -148,6 +138,22 @@ class Downloader():
 
         self.gnps_task_id = self.project_json['metabolomics']['project'][
             'molecular_network']
+
+        with open(os.path.join(self.project_file_cache,
+                                  'platform_data.json'),
+                     'w',
+                     encoding='utf-8') as f:
+            f.write(str(self.project_json))
+    
+    def init_folder_structure(self):
+        # init local cache root 
+        self.local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data',
+                                        'pairedomics')
+        self.local_download_cache = os.path.join(self.local_cache, 'downloads')
+        self.local_file_cache = os.path.join(self.local_cache, 'extracted')    
+        os.makedirs(self.local_cache, exist_ok=True)
+        logger.info('Downloader for {}, caching to {}'.format(
+            self.gnps_massive_id, self.local_cache))
 
         # create local cache folders for this dataset
         self.project_download_cache = os.path.join(self.local_download_cache,
@@ -162,15 +168,17 @@ class Downloader():
         for d in ['antismash', 'bigscape']:
             os.makedirs(os.path.join(self.project_file_cache, d),
                         exist_ok=True)
-
-        with open(os.path.join(self.project_file_cache,
-                                  'platform_data.json'),
-                     'w',
-                     encoding='utf-8') as f:
-            f.write(str(self.project_json))
-
+        
+        # init strain mapping filepath
         self.strain_mappings_file = os.path.join(self.project_file_cache,
-                                                 'strain_mappings.csv')
+                                                 'strain_mappings.csv') 
+        
+        # init project paths
+        self.all_project_json_file = os.path.join(self.local_cache,
+                                                  'all_projects.json')
+        self.project_json_file = os.path.join(
+            self.local_cache, f'{self.gnps_massive_id}.json')
+
 
     def get(self, do_bigscape, extra_bigscape_parameters, use_mibig,
             mibig_version):
