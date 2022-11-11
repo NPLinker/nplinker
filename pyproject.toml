@@ -53,6 +53,7 @@ dev = [
     "prospector[with_pyroma]",
     "pytest",
     "pytest-cov",
+    "pytest-lazy-fixture",
     "sphinx",
     "sphinx_rtd_theme",
     "sphinx-autoapi",
