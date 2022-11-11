@@ -82,7 +82,7 @@ class Downloader():
     # TODO: move to independent config file  ---C.Geng
     PFAM_PATH = os.path.join(sys.prefix, 'nplinker_lib')
 
-    def __init__(self, platform_id, force_download=False):
+    def __init__(self, platform_id, force_download=False, local_cache = None):
         self.gnps_massive_id = platform_id
         self.pairedomics_id = None
         self.gnps_task_id = None
@@ -90,7 +90,11 @@ class Downloader():
         self.strains = StrainCollection()
         self.growth_media = {}
 
-        self.init_folder_structure()
+        if local_cache is None:
+            local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data',
+                                        'pairedomics')
+
+        self.init_folder_structure(local_cache)
 
         # init project json files
         self.all_project_json = None
@@ -145,10 +149,9 @@ class Downloader():
                      encoding='utf-8') as f:
             f.write(str(self.project_json))
     
-    def init_folder_structure(self):
-        # init local cache root 
-        self.local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data',
-                                        'pairedomics')
+    def init_folder_structure(self, local_cache):
+        # init local cache root   
+        self.local_cache = local_cache
         self.local_download_cache = os.path.join(self.local_cache, 'downloads')
         self.local_file_cache = os.path.join(self.local_cache, 'extracted')    
         os.makedirs(self.local_cache, exist_ok=True)

@@ -1,14 +1,18 @@
 import os
 from pathlib import Path
+import pytest
 
 from nplinker.pairedomics.downloader import Downloader
 
-def test_default():
+@pytest.mark.parametrize("expected", [
+    Path(os.getenv('HOME'), 'nplinker_data', 'pairedomics'),
+    pytest.lazy_fixture('tmp_path')
+])
+def test_default(expected):
     gnps_id = "MSV000079284"
-    sut = Downloader(gnps_id)
 
-    expected = Path(os.getenv('HOME'), 'nplinker_data',
-                                        'pairedomics')
+    sut = Downloader(gnps_id, local_cache=str(expected))
+
 
     assert sut is not None
     assert sut.gnps_massive_id == gnps_id
