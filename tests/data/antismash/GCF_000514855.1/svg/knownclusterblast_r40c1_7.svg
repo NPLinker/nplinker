@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="280,35 285,30 290,30 290,40 285,40 280,35 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120585&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 5963 - 7058" locus_tag="B113_RS0120585" class="clusterblast-orf" id="dummy-1_q0_0_all"  />
+<polygon points="293,35 298,30 302,30 302,40 298,40 293,35 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120590&lt;/b&gt;&lt;br&gt;LysR family transcriptional regulator&lt;br&gt;Location: 7332 - 8262" locus_tag="B113_RS0120590" class="clusterblast-orf" id="dummy-1_q1_0_all"  />
+<polygon points="303,40 305,40 310,35 305,30 303,30 303,40 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120595&lt;/b&gt;&lt;br&gt;glycine/betaine ABC transporter substrate-binding protein&lt;br&gt;Location: 8397 - 9198" locus_tag="B113_RS0120595" class="clusterblast-orf" id="dummy-1_q2_0_all"  />
+<polygon points="311,40 315,35 311,30 311,40 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120600&lt;/b&gt;&lt;br&gt;VOC family protein&lt;br&gt;Location: 9251 - 9731" locus_tag="B113_RS0120600" class="clusterblast-orf" id="dummy-1_q3_0_all"  />
+<polygon points="317,35 322,30 325,30 325,40 322,40 317,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120605&lt;/b&gt;&lt;br&gt;metallophosphoesterase&lt;br&gt;Location: 9944 - 10784" locus_tag="B113_RS0120605" class="clusterblast-orf" id="dummy-1_q4_0_all"  />
+<polygon points="328,40 336,40 341,35 336,30 328,30 328,40 " style="fill:#5cd815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120610&lt;/b&gt;&lt;br&gt;histidine kinase&lt;br&gt;Location: 11075 - 12479" locus_tag="B113_RS0120610" class="clusterblast-orf" id="dummy-1_q5_0_all"  />
+<polygon points="341,40 342,40 347,35 342,30 341,30 341,40 " style="fill:#15a3d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120615&lt;/b&gt;&lt;br&gt;response regulator transcription factor&lt;br&gt;Location: 12442 - 13105" locus_tag="B113_RS0120615" class="clusterblast-orf" id="dummy-1_q6_0_all"  />
+<polygon points="348,35 353,30 372,30 372,40 353,40 348,35 " style="fill:#c715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120620&lt;/b&gt;&lt;br&gt;FtsX family ABC transporter permease&lt;br&gt;Location: 13200 - 15765" locus_tag="B113_RS0120620" class="clusterblast-orf" id="dummy-1_q7_0_all"  />
+<polygon points="372,35 377,30 379,30 379,40 377,40 372,35 " style="fill:#d88015; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120625&lt;/b&gt;&lt;br&gt;ABC transporter ATP-binding protein&lt;br&gt;Location: 15764 - 16568" locus_tag="B113_RS0120625" class="clusterblast-orf" id="dummy-1_q8_0_all"  />
+<polygon points="380,35 385,30 407,30 407,40 385,40 380,35 " style="fill:#15d839; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120630&lt;/b&gt;&lt;br&gt;AAA family ATPase&lt;br&gt;Location: 16705 - 19546" locus_tag="B113_RS0120630" class="clusterblast-orf" id="dummy-1_q9_0_all"  />
+<polygon points="418,35 423,30 426,30 426,40 423,40 418,35 " style="fill:#1539d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120635&lt;/b&gt;&lt;br&gt;thioesterase&lt;br&gt;Location: 20780 - 21557" locus_tag="B113_RS0120635" class="clusterblast-orf" id="dummy-1_q10_0_all"  />
+<polygon points="430,35 435,30 447,30 447,40 435,40 430,35 " style="fill:#d81580; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120645&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 22033 - 23815" locus_tag="B113_RS0120645" class="clusterblast-orf" id="dummy-1_q11_0_all"  />
+<polygon points="447,40 448,40 453,35 448,30 447,30 447,40 " style="fill:#c7d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120650&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 23898 - 24486" locus_tag="B113_RS0120650" class="clusterblast-orf" id="dummy-1_q12_0_all"  />
+<polygon points="454,35 456,30 456,40 454,35 " style="fill:#15d8a3; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120655&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 24599 - 24866" locus_tag="B113_RS0120655" class="clusterblast-orf" id="dummy-1_q13_0_all"  />
+<polygon points="458,35 463,30 499,30 499,40 463,40 458,35 " style="fill:#5c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120660&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 25074 - 29436" locus_tag="B113_RS0120660" class="clusterblast-orf" id="dummy-1_q14_0_all"  />
+</g>
+<g label="BGC0001349" description="BGC0001349_c1: heronamide A / heronamide B / heronamide C / heronamide D / he... (37% of genes show similarity), NRP + Polyketide" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://mibig.secondarymetabolites.org/go/BGC0001349/1" target="_blank">BGC0001349</a>: heronamide A / heronamide B / heronamide C / heronamide D / heronamide E / heronamide F (37% of genes show similarity), NRP + Polyketide</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a1_000"  >
+<polygon points="0,85 5,80 7,80 7,90 5,90 0,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43748.1&lt;/b&gt;&lt;br&gt;methyltransferase&lt;br&gt;Location: 880 - 1650" locus_tag="AKD43748.1" class="clusterblast-orf" id="dummy-1_h1_7_0"  />
+</g>
+<g id="a1_001"  >
+<polygon points="8,90 8,90 13,85 8,80 8,80 8,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43749.1&lt;/b&gt;&lt;br&gt;transcriptional regulator&lt;br&gt;Location: 1739 - 2281" locus_tag="AKD43749.1" class="clusterblast-orf" id="dummy-1_h1_7_1"  />
+</g>
+<g id="a1_002"  >
+<polygon points="16,85 21,80 26,80 26,90 21,90 16,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43750.1&lt;/b&gt;&lt;br&gt;HerI&lt;br&gt;Location: 2662 - 3774" locus_tag="AKD43750.1" class="clusterblast-orf" id="dummy-1_h1_7_2"  />
+</g>
+<g id="a1_003"  >
+<polygon points="26,85 31,80 46,80 46,90 31,90 26,85 " style="fill:#5c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43751.1&lt;/b&gt;&lt;br&gt;HerC&lt;br&gt;Location: 3771 - 5855&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120660&lt;/b&gt;&lt;br&gt;Percentage identity: 46&lt;br&gt;Percentage coverage: 49&lt;br&gt;BLAST bit score: 479&lt;br&gt;E-value: 1.7e-134" locus_tag="AKD43751.1" class="clusterblast-orf" id="dummy-1_h1_7_3"  />
+</g>
+<g id="a1_004"  >
+<polygon points="46,85 51,80 51,80 51,90 51,90 46,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43752.1&lt;/b&gt;&lt;br&gt;HerU&lt;br&gt;Location: 5886 - 6449" locus_tag="AKD43752.1" class="clusterblast-orf" id="dummy-1_h1_7_4"  />
+</g>
+<g id="a1_005"  >
+<polygon points="51,85 56,80 151,80 151,90 56,90 51,85 " style="fill:#5c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43753.1&lt;/b&gt;&lt;br&gt;HerB&lt;br&gt;Location: 6446 - 17113&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120660&lt;/b&gt;&lt;br&gt;Percentage identity: 52&lt;br&gt;Percentage coverage: 97&lt;br&gt;BLAST bit score: 1197&lt;br&gt;E-value: 0.0" locus_tag="AKD43753.1" class="clusterblast-orf" id="dummy-1_h1_7_5"  />
+</g>
+<g id="a1_006"  >
+<polygon points="152,85 157,80 166,80 166,90 157,90 152,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43754.1&lt;/b&gt;&lt;br&gt;HerJ&lt;br&gt;Location: 17201 - 18799" locus_tag="AKD43754.1" class="clusterblast-orf" id="dummy-1_h1_7_6"  />
+</g>
+<g id="a1_007"  >
+<polygon points="170,90 174,90 179,85 174,80 170,80 170,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43755.1&lt;/b&gt;&lt;br&gt;HerK&lt;br&gt;Location: 19157 - 20098" locus_tag="AKD43755.1" class="clusterblast-orf" id="dummy-1_h1_7_7"  />
+</g>
+<g id="a1_008"  >
+<polygon points="179,85 181,80 181,90 179,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43756.1&lt;/b&gt;&lt;br&gt;HerS&lt;br&gt;Location: 20113 - 20349" locus_tag="AKD43756.1" class="clusterblast-orf" id="dummy-1_h1_7_8"  />
+</g>
+<g id="a1_009"  >
+<polygon points="182,90 191,90 196,85 191,80 182,80 182,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43757.1&lt;/b&gt;&lt;br&gt;HerL&lt;br&gt;Location: 20468 - 21982" locus_tag="AKD43757.1" class="clusterblast-orf" id="dummy-1_h1_7_9"  />
+</g>
+<g id="a1_0010"  >
+<polygon points="196,85 201,80 202,80 202,90 201,90 196,85 " style="fill:#c7d815; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43758.1&lt;/b&gt;&lt;br&gt;HerM&lt;br&gt;Location: 21965 - 22561&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120650&lt;/b&gt;&lt;br&gt;Percentage identity: 50&lt;br&gt;Percentage coverage: 96&lt;br&gt;BLAST bit score: 174&lt;br&gt;E-value: 2e-43" locus_tag="AKD43758.1" class="clusterblast-orf" id="dummy-1_h1_7_10"  />
+</g>
+<g id="a1_0011"  >
+<polygon points="202,90 212,90 217,85 212,80 202,80 202,90 " style="fill:#d81580; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43759.1&lt;/b&gt;&lt;br&gt;HerN&lt;br&gt;Location: 22663 - 24225&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120645&lt;/b&gt;&lt;br&gt;Percentage identity: 49&lt;br&gt;Percentage coverage: 85&lt;br&gt;BLAST bit score: 439&lt;br&gt;E-value: 1e-122" locus_tag="AKD43759.1" class="clusterblast-orf" id="dummy-1_h1_7_11"  />
+</g>
+<g id="a1_0012"  >
+<polygon points="218,85 223,80 229,80 229,90 223,90 218,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43760.1&lt;/b&gt;&lt;br&gt;HerO&lt;br&gt;Location: 24299 - 25546" locus_tag="AKD43760.1" class="clusterblast-orf" id="dummy-1_h1_7_12"  />
+</g>
+<g id="a1_0013"  >
+<polygon points="230,85 235,80 325,80 325,90 235,90 230,85 " style="fill:#5c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43761.1&lt;/b&gt;&lt;br&gt;HerD&lt;br&gt;Location: 25639 - 35769&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120660&lt;/b&gt;&lt;br&gt;Percentage identity: 49&lt;br&gt;Percentage coverage: 101&lt;br&gt;BLAST bit score: 1113&lt;br&gt;E-value: 0.0" locus_tag="AKD43761.1" class="clusterblast-orf" id="dummy-1_h1_7_13"  />
+</g>
+<g id="a1_0014"  >
+<polygon points="325,85 330,80 333,80 333,90 330,90 325,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43762.1&lt;/b&gt;&lt;br&gt;HerP&lt;br&gt;Location: 35777 - 36712" locus_tag="AKD43762.1" class="clusterblast-orf" id="dummy-1_h1_7_14"  />
+</g>
+<g id="a1_0015"  >
+<polygon points="334,85 339,80 390,80 390,90 339,90 334,85 " style="fill:#5c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43763.1&lt;/b&gt;&lt;br&gt;HerG&lt;br&gt;Location: 36832 - 42825&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120660&lt;/b&gt;&lt;br&gt;Percentage identity: 48&lt;br&gt;Percentage coverage: 101&lt;br&gt;BLAST bit score: 1079&lt;br&gt;E-value: 0.0" locus_tag="AKD43763.1" class="clusterblast-orf" id="dummy-1_h1_7_15"  />
+</g>
+<g id="a1_0016"  >
+<polygon points="390,85 395,80 485,80 485,90 395,90 390,85 " style="fill:#5c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43764.1&lt;/b&gt;&lt;br&gt;HerF&lt;br&gt;Location: 42833 - 53002&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120660&lt;/b&gt;&lt;br&gt;Percentage identity: 49&lt;br&gt;Percentage coverage: 96&lt;br&gt;BLAST bit score: 1067&lt;br&gt;E-value: 2.4e-311" locus_tag="AKD43764.1" class="clusterblast-orf" id="dummy-1_h1_7_16"  />
+</g>
+<g id="a1_0017"  >
+<polygon points="486,85 491,80 532,80 532,90 491,90 486,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43765.1&lt;/b&gt;&lt;br&gt;HerE&lt;br&gt;Location: 53050 - 57999" locus_tag="AKD43765.1" class="clusterblast-orf" id="dummy-1_h1_7_17"  />
+</g>
+<g id="a1_0018"  >
+<polygon points="536,90 558,90 563,85 558,80 536,80 536,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43766.1&lt;/b&gt;&lt;br&gt;HerR&lt;br&gt;Location: 58504 - 61344" locus_tag="AKD43766.1" class="clusterblast-orf" id="dummy-1_h1_7_18"  />
+</g>
+<g id="a1_0019"  >
+<polygon points="569,90 591,90 596,85 591,80 569,80 569,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43767.1&lt;/b&gt;&lt;br&gt;HerH&lt;br&gt;Location: 62052 - 64952" locus_tag="AKD43767.1" class="clusterblast-orf" id="dummy-1_h1_7_19"  />
+</g>
+<g id="a1_0020"  >
+<polygon points="602,90 726,90 731,85 726,80 602,80 602,90 " style="fill:#5c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43768.1&lt;/b&gt;&lt;br&gt;HerA1&lt;br&gt;Location: 65521 - 79383&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120660&lt;/b&gt;&lt;br&gt;Percentage identity: 46&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 1059&lt;br&gt;E-value: 3.9e-309" locus_tag="AKD43768.1" class="clusterblast-orf" id="dummy-1_h1_7_20"  />
+</g>
+<g id="a1_0021"  >
+<polygon points="731,90 756,90 761,85 756,80 731,80 731,90 " style="fill:#5c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43769.1&lt;/b&gt;&lt;br&gt;HerA2&lt;br&gt;Location: 79416 - 82562&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120660&lt;/b&gt;&lt;br&gt;Percentage identity: 49&lt;br&gt;Percentage coverage: 47&lt;br&gt;BLAST bit score: 542&lt;br&gt;E-value: 2.1e-153" locus_tag="AKD43769.1" class="clusterblast-orf" id="dummy-1_h1_7_21"  />
+</g>
+<g id="a1_0022"  >
+<polygon points="762,90 766,85 762,80 762,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43770.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 82665 - 83105" locus_tag="AKD43770.1" class="clusterblast-orf" id="dummy-1_h1_7_22"  />
+</g>
+<g id="a1_0023"  >
+<polygon points="769,90 774,90 779,85 774,80 769,80 769,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AKD43771.1&lt;/b&gt;&lt;br&gt;transcriptional regulator&lt;br&gt;Location: 83444 - 84595" locus_tag="AKD43771.1" class="clusterblast-orf" id="dummy-1_h1_7_23"  />
+</g>
+</svg>

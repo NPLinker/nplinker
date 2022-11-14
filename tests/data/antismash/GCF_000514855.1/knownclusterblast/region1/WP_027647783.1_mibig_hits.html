@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>ACN29700.1</td>
+              <td>putative_amidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000814/1">BGC0000814</a></td>
+              <td>Alkaloid</td>
+              <td>41.0</td>
+              <td>107.9</td>
+              <td>299.0</td>
+              <td>7.6e-81</td>
+          </tr>
+    
+          <tr>
+              <td>AAM12940.1</td>
+              <td>MupX</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000182/1">BGC0000182</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Trans-AT type I</td>
+              <td>36.0</td>
+              <td>93.8</td>
+              <td>176.0</td>
+              <td>1.3e-43</td>
+          </tr>
+    
+          <tr>
+              <td>ALJ99875.1</td>
+              <td>FlsN3</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001904/1">BGC0001904</a></td>
+              <td>Polyketide</td>
+              <td>37.0</td>
+              <td>98.9</td>
+              <td>168.0</td>
+              <td>3.4e-41</td>
+          </tr>
+    
+          <tr>
+              <td>AGZ93910.1</td>
+              <td>amidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000937/1">BGC0000937</a></td>
+              <td>Other</td>
+              <td>36.0</td>
+              <td>98.7</td>
+              <td>167.0</td>
+              <td>4.5e-41</td>
+          </tr>
+    
+          <tr>
+              <td>WP_078845181.1</td>
+              <td>amidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001596/1">BGC0001596</a></td>
+              <td>Polyketide</td>
+              <td>37.0</td>
+              <td>95.7</td>
+              <td>163.0</td>
+              <td>1.1e-39</td>
+          </tr>
+    
+          <tr>
+              <td>ARD70881.1</td>
+              <td>amidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001693/1">BGC0001693</a></td>
+              <td>Polyketide</td>
+              <td>34.0</td>
+              <td>102.1</td>
+              <td>163.0</td>
+              <td>1.1e-39</td>
+          </tr>
+    
+          <tr>
+              <td>AEE65490.1</td>
+              <td>amidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000223/1">BGC0000223</a></td>
+              <td>Polyketide:Type II</td>
+              <td>37.0</td>
+              <td>97.7</td>
+              <td>162.0</td>
+              <td>1.9e-39</td>
+          </tr>
+    
+          <tr>
+              <td>AHZ61867.1</td>
+              <td>amidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000240/1">BGC0000240</a></td>
+              <td>Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>35.0</td>
+              <td>97.7</td>
+              <td>158.0</td>
+              <td>2.7e-38</td>
+          </tr>
+    
+          <tr>
+              <td>ABP54656.1</td>
+              <td>Amidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000241/1">BGC0000241</a></td>
+              <td>Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>34.0</td>
+              <td>97.4</td>
+              <td>155.0</td>
+              <td>1.8e-37</td>
+          </tr>
+    
+          <tr>
+              <td>AVV61996.1</td>
+              <td>amidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001477/1">BGC0001477</a></td>
+              <td>NRP + Polyketide:Modular type I</td>
+              <td>32.0</td>
+              <td>99.8</td>
+              <td>144.0</td>
+              <td>4.1e-34</td>
+          </tr>
+    
+          <tr>
+              <td>ADN68490.1</td>
+              <td>SorP</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000184/1">BGC0000184</a></td>
+              <td>Polyketide:Trans-AT type I</td>
+              <td>30.0</td>
+              <td>96.2</td>
+              <td>135.0</td>
+              <td>1.9e-31</td>
+          </tr>
+    
+          <tr>
+              <td>AAG30199.1</td>
+              <td>enantiomer_selective_amidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000261/1">BGC0000261</a></td>
+              <td>Polyketide</td>
+              <td>31.0</td>
+              <td>98.3</td>
+              <td>127.0</td>
+              <td>6.7e-29</td>
+          </tr>
+    
+          <tr>
+              <td>WP_033283300.1</td>
+              <td>amidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001739/1">BGC0001739</a></td>
+              <td>Other</td>
+              <td>31.0</td>
+              <td>79.7</td>
+              <td>111.0</td>
+              <td>3.8e-24</td>
+          </tr>
+    
+          <tr>
+              <td>CAJ76288.1</td>
+              <td>putative_amidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000972/1">BGC0000972</a></td>
+              <td>NRP + Polyketide:Modular type I + Polyketide:Trans-AT type I</td>
+              <td>37.0</td>
+              <td>40.1</td>
+              <td>99.0</td>
+              <td>1.2e-20</td>
+          </tr>
+    
+          <tr>
+              <td>ATJ34008.1</td>
+              <td>amidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001497/1">BGC0001497</a></td>
+              <td>Polyketide</td>
+              <td>30.0</td>
+              <td>95.9</td>
+              <td>97.0</td>
+              <td>4.4e-20</td>
+          </tr>
+    
+          <tr>
+              <td>ADC45523.1</td>
+              <td>secreted_amidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000093/1">BGC0000093</a></td>
+              <td>Polyketide</td>
+              <td>28.0</td>
+              <td>102.6</td>
+              <td>93.0</td>
+              <td>1.1e-18</td>
+          </tr>
+    
+          <tr>
+              <td>BAF98642.1</td>
+              <td>putative_glutamyl-tRNA_amidotransferase_subunit_A</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000651/1">BGC0000651</a></td>
+              <td>Terpene</td>
+              <td>32.0</td>
+              <td>57.1</td>
+              <td>84.0</td>
+              <td>3.8e-16</td>
+          </tr>
+    
+          <tr>
+              <td>ADQ55485.1</td>
+              <td>aspartyl_glutamyl-tRNA_Asn_Gln_amidotransferase_subunit_A</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000350/1">BGC0000350</a></td>
+              <td>NRP:Beta-lactam</td>
+              <td>46.0</td>
+              <td>20.3</td>
+              <td>82.0</td>
+              <td>1.9e-15</td>
+          </tr>
+    
+          <tr>
+              <td>BBC83958.1</td>
+              <td>putative_amidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001636/1">BGC0001636</a></td>
+              <td>NRP</td>
+              <td>31.0</td>
+              <td>42.0</td>
+              <td>72.0</td>
+              <td>1.5e-12</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

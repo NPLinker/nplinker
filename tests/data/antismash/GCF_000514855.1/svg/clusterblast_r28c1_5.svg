@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="10,40 52,40 57,35 52,30 10,30 10,40 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0118325&lt;/b&gt;&lt;br&gt;NAD(P)/FAD-dependent oxidoreductase&lt;br&gt;Location: 1983 - 3312" locus_tag="B113_RS0118325" class="clusterblast-orf" id="dummy-1_q0_0_all"  />
+<polygon points="58,40 107,40 112,35 107,30 58,30 58,40 " style="fill:#43d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0118330&lt;/b&gt;&lt;br&gt;aminotransferase class I/II-fold pyridoxal phosphate-dependent enzyme&lt;br&gt;Location: 3337 - 4882" locus_tag="B113_RS0118330" class="clusterblast-orf" id="dummy-1_q1_0_all"  />
+<polygon points="114,35 119,30 148,30 148,40 119,40 114,35 " style="fill:#15b6d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS27300&lt;/b&gt;&lt;br&gt;phosphotransferase&lt;br&gt;Location: 4950 - 5928" locus_tag="B113_RS27300" class="clusterblast-orf" id="dummy-1_q2_0_all"  />
+<polygon points="158,40 175,40 180,35 175,30 158,30 158,40 " style="fill:#8815d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0118340&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 6195 - 6843" locus_tag="B113_RS0118340" class="clusterblast-orf" id="dummy-1_q3_0_all"  />
+<polygon points="181,35 186,30 201,30 201,40 186,40 181,35 " style="fill:#d85a15; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0118345&lt;/b&gt;&lt;br&gt;MaoC family dehydratase&lt;br&gt;Location: 6864 - 7419" locus_tag="B113_RS0118345" class="clusterblast-orf" id="dummy-1_q4_0_all"  />
+<polygon points="200,35 205,30 244,30 244,40 205,40 200,35 " style="fill:#15d82c; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0118350&lt;/b&gt;&lt;br&gt;aminotransferase class I/II-fold pyridoxal phosphate-dependent enzyme&lt;br&gt;Location: 7408 - 8650" locus_tag="B113_RS0118350" class="clusterblast-orf" id="dummy-1_q5_0_all"  />
+<polygon points="245,35 250,30 275,30 275,40 250,40 245,35 " style="fill:#1571d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0118355&lt;/b&gt;&lt;br&gt;CoA ester lyase&lt;br&gt;Location: 8697 - 9540" locus_tag="B113_RS0118355" class="clusterblast-orf" id="dummy-1_q6_0_all"  />
+<polygon points="275,35 280,30 311,30 311,40 280,40 275,35 " style="fill:#cd15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0118360&lt;/b&gt;&lt;br&gt;zinc-binding dehydrogenase&lt;br&gt;Location: 9539 - 10574" locus_tag="B113_RS0118360" class="clusterblast-orf" id="dummy-1_q7_0_all"  />
+<polygon points="314,35 319,30 361,30 361,40 319,40 314,35 " style="fill:#d89f15; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0118365&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 10662 - 11997" locus_tag="B113_RS0118365" class="clusterblast-orf" id="dummy-1_q8_0_all"  />
+<polygon points="379,40 415,40 420,35 415,30 379,30 379,40 " style="fill:#15d871; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0118370&lt;/b&gt;&lt;br&gt;glycine amidinotransferase&lt;br&gt;Location: 12517 - 13672" locus_tag="B113_RS0118370" class="clusterblast-orf" id="dummy-1_q9_0_all"  />
+<polygon points="423,35 428,30 443,30 443,40 428,40 423,35 " style="fill:#152cd8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0118375&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 13774 - 14347" locus_tag="B113_RS0118375" class="clusterblast-orf" id="dummy-1_q10_0_all"  />
+<polygon points="443,35 448,30 468,30 468,40 448,40 443,35 " style="fill:#d8159f; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0118380&lt;/b&gt;&lt;br&gt;type 1 glutamine amidotransferase domain-containing protein&lt;br&gt;Location: 14348 - 15044" locus_tag="B113_RS0118380" class="clusterblast-orf" id="dummy-1_q11_0_all"  />
+<polygon points="474,40 611,40 616,35 611,30 474,30 474,40 " style="fill:#cdd815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0118385&lt;/b&gt;&lt;br&gt;ATP-dependent RNA helicase HrpA&lt;br&gt;Location: 15236 - 19277" locus_tag="B113_RS0118385" class="clusterblast-orf" id="dummy-1_q12_0_all"  />
+<polygon points="616,35 621,30 649,30 649,40 621,40 616,35 " style="fill:#15d8b6; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0118390&lt;/b&gt;&lt;br&gt;LysR family transcriptional regulator&lt;br&gt;Location: 19273 - 20209" locus_tag="B113_RS0118390" class="clusterblast-orf" id="dummy-1_q13_0_all"  />
+<polygon points="651,40 670,40 675,35 670,30 651,30 651,40 " style="fill:#4315d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0118395&lt;/b&gt;&lt;br&gt;succinate dehydrogenase cytochrome b subunit&lt;br&gt;Location: 20289 - 20973" locus_tag="B113_RS0118395" class="clusterblast-orf" id="dummy-1_q14_0_all"  />
+<polygon points="675,40 738,40 743,35 738,30 675,30 675,40 " style="fill:#d8155a; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0118400&lt;/b&gt;&lt;br&gt;fumarate reductase/succinate dehydrogenase flavoprotein subunit&lt;br&gt;Location: 20975 - 22907" locus_tag="B113_RS0118400" class="clusterblast-orf" id="dummy-1_q15_0_all"  />
+<polygon points="743,40 764,40 769,35 764,30 743,30 743,40 " style="fill:#88d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0118405&lt;/b&gt;&lt;br&gt;succinate dehydrogenase/fumarate reductase iron-sulfur subunit&lt;br&gt;Location: 22903 - 23659" locus_tag="B113_RS0118405" class="clusterblast-orf" id="dummy-1_q16_0_all"  />
+</g>
+<g label="NZ_JHVW01000012" description="NZ_JHVW01000012 (60444-83449): Salinispora tropica CNT250 K261DRAFT scaffold0... (94% of genes show similarity), fused" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_JHVW01000012&amp;start=60444&amp;end=83449" target="_blank">NZ_JHVW01000012 (60444-83449)</a>: Salinispora tropica CNT250 K261DRAFT scaffold0... (94% of genes show similarity), fused</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a1_000"  >
+<polygon points="0,85 5,80 18,80 18,90 5,90 0,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103265&lt;/b&gt;&lt;br&gt;GNAT family N-acetyltransferase&lt;br&gt;Location: 82736 - 82209" locus_tag="K261_RS0103265" class="clusterblast-orf" id="dummy-1_h1_5_0"  />
+</g>
+<g id="a1_001"  >
+<polygon points="22,90 63,90 68,85 63,80 22,80 22,90 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103260&lt;/b&gt;&lt;br&gt;FAD-binding monooxygenase&lt;br&gt;Location: 82095 - 80767&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0118325&lt;/b&gt;&lt;br&gt;Percentage identity: 93&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 847&lt;br&gt;E-value: 5.4e-244" locus_tag="K261_RS0103260" class="clusterblast-orf" id="dummy-1_h1_5_1"  />
+</g>
+<g id="a1_002"  >
+<polygon points="69,90 118,90 123,85 118,80 69,80 69,90 " style="fill:#43d815; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103255&lt;/b&gt;&lt;br&gt;aminotransferase class I/II-fold pyridoxal phosphate-dependent enzyme&lt;br&gt;Location: 80740 - 79196&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0118330&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 965&lt;br&gt;E-value: 1.6e-279" locus_tag="K261_RS0103255" class="clusterblast-orf" id="dummy-1_h1_5_2"  />
+</g>
+<g id="a1_003"  >
+<polygon points="126,85 131,80 160,80 160,90 131,90 126,85 " style="fill:#15b6d8; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103250&lt;/b&gt;&lt;br&gt;aminoglycoside phosphotransferase&lt;br&gt;Location: 79126 - 78149&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS27300&lt;/b&gt;&lt;br&gt;Percentage identity: 88&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 281&lt;br&gt;E-value: 4.2e-74" locus_tag="K261_RS0103250" class="clusterblast-orf" id="dummy-1_h1_5_3"  />
+</g>
+<g id="a1_004"  >
+<polygon points="168,90 186,90 191,85 186,80 168,80 168,90 " style="fill:#8815d8; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103240&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 77913 - 77266&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0118340&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 416&lt;br&gt;E-value: 1.2e-114" locus_tag="K261_RS0103240" class="clusterblast-orf" id="dummy-1_h1_5_4"  />
+</g>
+<g id="a1_005"  >
+<polygon points="192,85 197,80 211,80 211,90 197,90 192,85 " style="fill:#d85a15; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103235&lt;/b&gt;&lt;br&gt;MaoC family dehydratase&lt;br&gt;Location: 77247 - 76693&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0118345&lt;/b&gt;&lt;br&gt;Percentage identity: 94&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 344&lt;br&gt;E-value: 6.2e-93" locus_tag="K261_RS0103235" class="clusterblast-orf" id="dummy-1_h1_5_5"  />
+</g>
+<g id="a1_006"  >
+<polygon points="211,85 216,80 254,80 254,90 216,90 211,85 " style="fill:#15d82c; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103230&lt;/b&gt;&lt;br&gt;aminotransferase class I/II-fold pyridoxal phosphate-dependent enzyme&lt;br&gt;Location: 76703 - 75462&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0118350&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 795&lt;br&gt;E-value: 1.7e-228" locus_tag="K261_RS0103230" class="clusterblast-orf" id="dummy-1_h1_5_6"  />
+</g>
+<g id="a1_007"  >
+<polygon points="256,85 261,80 285,80 285,90 261,90 256,85 " style="fill:#1571d8; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103225&lt;/b&gt;&lt;br&gt;CoA ester lyase&lt;br&gt;Location: 75414 - 74572&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0118355&lt;/b&gt;&lt;br&gt;Percentage identity: 90&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 443&lt;br&gt;E-value: 2e-122" locus_tag="K261_RS0103225" class="clusterblast-orf" id="dummy-1_h1_5_7"  />
+</g>
+<g id="a1_008"  >
+<polygon points="285,85 290,80 322,80 322,90 290,90 285,85 " style="fill:#cd15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103220&lt;/b&gt;&lt;br&gt;zinc-binding dehydrogenase&lt;br&gt;Location: 74572 - 73538&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0118360&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 599&lt;br&gt;E-value: 2.6e-169" locus_tag="K261_RS0103220" class="clusterblast-orf" id="dummy-1_h1_5_8"  />
+</g>
+<g id="a1_009"  >
+<polygon points="325,85 330,80 371,80 371,90 330,90 325,85 " style="fill:#d89f15; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103215&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 73449 - 72115&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0118365&lt;/b&gt;&lt;br&gt;Percentage identity: 90&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 791&lt;br&gt;E-value: 4.6e-227" locus_tag="K261_RS0103215" class="clusterblast-orf" id="dummy-1_h1_5_9"  />
+</g>
+<g id="a1_0010"  >
+<polygon points="390,90 425,90 430,85 425,80 390,80 390,90 " style="fill:#15d871; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103210&lt;/b&gt;&lt;br&gt;scyllo-inosamine-4-phosphate amidinotransferase&lt;br&gt;Location: 71599 - 70445&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0118370&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 768&lt;br&gt;E-value: 3.6e-220" locus_tag="K261_RS0103210" class="clusterblast-orf" id="dummy-1_h1_5_10"  />
+</g>
+<g id="a1_0011"  >
+<polygon points="460,85 465,80 480,80 480,90 465,90 460,85 " style="fill:#152cd8; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103205&lt;/b&gt;&lt;br&gt;TetR family transcriptional regulator&lt;br&gt;Location: 69591 - 69019&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0118375&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 331&lt;br&gt;E-value: 5.6e-89" locus_tag="K261_RS0103205" class="clusterblast-orf" id="dummy-1_h1_5_11"  />
+</g>
+<g id="a1_0012"  >
+<polygon points="480,85 485,80 504,80 504,90 485,90 480,85 " style="fill:#d8159f; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103200&lt;/b&gt;&lt;br&gt;type 1 glutamine amidotransferase domain-containing protein&lt;br&gt;Location: 69017 - 68322&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0118380&lt;/b&gt;&lt;br&gt;Percentage identity: 84&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 392&lt;br&gt;E-value: 2.5e-107" locus_tag="K261_RS0103200" class="clusterblast-orf" id="dummy-1_h1_5_12"  />
+</g>
+<g id="a1_0013"  >
+<polygon points="511,90 647,90 652,85 647,80 511,80 511,90 " style="fill:#cdd815; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103195&lt;/b&gt;&lt;br&gt;ATP-dependent RNA helicase HrpA&lt;br&gt;Location: 68129 - 64110&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0118385&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 2469&lt;br&gt;E-value: 0.0" locus_tag="K261_RS0103195" class="clusterblast-orf" id="dummy-1_h1_5_13"  />
+</g>
+<g id="a1_0014"  >
+<polygon points="652,85 657,80 685,80 685,90 657,90 652,85 " style="fill:#15d8b6; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103190&lt;/b&gt;&lt;br&gt;LysR family transcriptional regulator&lt;br&gt;Location: 64097 - 63162&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0118390&lt;/b&gt;&lt;br&gt;Percentage identity: 94&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 568&lt;br&gt;E-value: 4.5e-160" locus_tag="K261_RS0103190" class="clusterblast-orf" id="dummy-1_h1_5_14"  />
+</g>
+<g id="a1_0015"  >
+<polygon points="688,90 707,90 712,85 707,80 688,80 688,90 " style="fill:#4315d8; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103185&lt;/b&gt;&lt;br&gt;succinate dehydrogenase cytochrome b subunit&lt;br&gt;Location: 63081 - 62398&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0118395&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 432&lt;br&gt;E-value: 2.1e-119" locus_tag="K261_RS0103185" class="clusterblast-orf" id="dummy-1_h1_5_15"  />
+</g>
+<g id="a1_0016"  >
+<polygon points="712,90 774,90 779,85 774,80 712,80 712,90 " style="fill:#d8155a; stroke-width:1; stroke:black; " description="&lt;b&gt;K261_RS0103180&lt;/b&gt;&lt;br&gt;fumarate reductase/succinate dehydrogenase flavoprotein subunit&lt;br&gt;Location: 62395 - 60464&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0118400&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1306&lt;br&gt;E-value: 0.0" locus_tag="K261_RS0103180" class="clusterblast-orf" id="dummy-1_h1_5_16"  />
+</g>
+</svg>

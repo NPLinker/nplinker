@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>AHZ61879.1</td>
+              <td>glyoxalase/bleomycin_resistance_protein/dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000240/1">BGC0000240</a></td>
+              <td>Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>100.0</td>
+              <td>100.0</td>
+              <td>279.0</td>
+              <td>4e-75</td>
+          </tr>
+    
+          <tr>
+              <td>ABP54661.1</td>
+              <td>Glyoxalase/bleomycin_resistance_protein/dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000241/1">BGC0000241</a></td>
+              <td>Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>98.0</td>
+              <td>100.0</td>
+              <td>272.0</td>
+              <td>2.9e-73</td>
+          </tr>
+    
+          <tr>
+              <td>ARD70886.1</td>
+              <td>glyoxalase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001693/1">BGC0001693</a></td>
+              <td>Polyketide</td>
+              <td>90.0</td>
+              <td>99.3</td>
+              <td>255.0</td>
+              <td>6.2e-68</td>
+          </tr>
+    
+          <tr>
+              <td>BAC70712.1</td>
+              <td>putative_lyase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000678/1">BGC0000678</a></td>
+              <td>Terpene</td>
+              <td>55.0</td>
+              <td>97.1</td>
+              <td>164.0</td>
+              <td>1.4e-40</td>
+          </tr>
+    
+          <tr>
+              <td>AHZ61839.1</td>
+              <td>glyoxalase/bleomycin_resistance_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000240/1">BGC0000240</a></td>
+              <td>Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>43.0</td>
+              <td>98.5</td>
+              <td>130.0</td>
+              <td>2.3e-30</td>
+          </tr>
+    
+          <tr>
+              <td>ABP54627.1</td>
+              <td>Glyoxalase/bleomycin_resistance_protein/dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000241/1">BGC0000241</a></td>
+              <td>Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>43.0</td>
+              <td>98.5</td>
+              <td>127.0</td>
+              <td>2e-29</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

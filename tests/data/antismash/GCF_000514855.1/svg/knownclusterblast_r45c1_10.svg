@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="303,35 308,30 355,30 355,40 308,40 303,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS25195&lt;/b&gt;&lt;br&gt;type I polyketide synthase&lt;br&gt;Location: 0 - 5816" locus_tag="B113_RS25195" class="clusterblast-orf" id="dummy-1_q0_0_all"  />
+<polygon points="356,35 358,30 358,40 356,35 " style="fill:#3cd815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121090&lt;/b&gt;&lt;br&gt;ferredoxin&lt;br&gt;Location: 5966 - 6203" locus_tag="B113_RS0121090" class="clusterblast-orf" id="dummy-1_q1_0_all"  />
+<polygon points="358,35 363,30 369,30 369,40 363,40 358,35 " style="fill:#1563d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121095&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 6199 - 7387" locus_tag="B113_RS0121095" class="clusterblast-orf" id="dummy-1_q2_0_all"  />
+<polygon points="372,40 379,40 384,35 379,30 372,30 372,40 " style="fill:#b115d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121100&lt;/b&gt;&lt;br&gt;lysine 2,3-aminomutase&lt;br&gt;Location: 7740 - 9087" locus_tag="B113_RS0121100" class="clusterblast-orf" id="dummy-1_q3_0_all"  />
+<polygon points="384,40 391,40 396,35 391,30 384,30 384,40 " style="fill:#d88a15; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121105&lt;/b&gt;&lt;br&gt;aminotransferase class I/II-fold pyridoxal phosphate-dependent enzyme&lt;br&gt;Location: 9115 - 10372" locus_tag="B113_RS0121105" class="clusterblast-orf" id="dummy-1_q4_0_all"  />
+<polygon points="396,40 399,40 404,35 399,30 396,30 396,40 " style="fill:#15d863; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121110&lt;/b&gt;&lt;br&gt;ACP S-malonyltransferase&lt;br&gt;Location: 10368 - 11316" locus_tag="B113_RS0121110" class="clusterblast-orf" id="dummy-1_q5_0_all"  />
+<polygon points="404,40 413,40 418,35 413,30 404,30 404,40 " style="fill:#3c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121115&lt;/b&gt;&lt;br&gt;AMP-binding protein&lt;br&gt;Location: 11342 - 12887" locus_tag="B113_RS0121115" class="clusterblast-orf" id="dummy-1_q6_0_all"  />
+<polygon points="419,35 424,30 433,30 433,40 424,40 419,35 " style="fill:#d8158a; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121120&lt;/b&gt;&lt;br&gt;AMP-binding protein&lt;br&gt;Location: 12945 - 14538" locus_tag="B113_RS0121120" class="clusterblast-orf" id="dummy-1_q7_0_all"  />
+<polygon points="434,40 437,35 434,30 434,40 " style="fill:#b1d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121125&lt;/b&gt;&lt;br&gt;phosphopantetheine-binding protein&lt;br&gt;Location: 14699 - 14948" locus_tag="B113_RS0121125" class="clusterblast-orf" id="dummy-1_q8_0_all"  />
+<polygon points="438,35 443,30 446,30 446,40 443,40 438,35 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121130&lt;/b&gt;&lt;br&gt;proline iminopeptidase-family hydrolase&lt;br&gt;Location: 15049 - 15970" locus_tag="B113_RS0121130" class="clusterblast-orf" id="dummy-1_q9_0_all"  />
+<polygon points="446,35 451,30 477,30 477,40 451,40 446,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS25200&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 15966 - 19398" locus_tag="B113_RS25200" class="clusterblast-orf" id="dummy-1_q10_0_all"  />
+</g>
+<g label="BGC0000097" description="BGC0000097_c1: ML-449 (45% of genes show similarity), Polyketide:Modular type I" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://mibig.secondarymetabolites.org/go/BGC0000097/1" target="_blank">BGC0000097</a>:                                                                           ML-449 (45% of genes show similarity), Polyketide:Modular type I</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a1_000"  >
+<polygon points="0,85 5,80 5,80 5,90 5,90 0,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94480.1&lt;/b&gt;&lt;br&gt;putative lipoprotein&lt;br&gt;Location: 530 - 1102" locus_tag="ACO94480.1" class="clusterblast-orf" id="dummy-1_h1_10_0"  />
+</g>
+<g id="a1_001"  >
+<polygon points="6,85 11,80 11,80 11,90 11,90 6,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94481.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 1290 - 1838" locus_tag="ACO94481.1" class="clusterblast-orf" id="dummy-1_h1_10_1"  />
+</g>
+<g id="a1_002"  >
+<polygon points="29,90 49,90 54,85 49,80 29,80 29,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94482.1&lt;/b&gt;&lt;br&gt;LuxR-type transcriptional regulator&lt;br&gt;Location: 3783 - 6638" locus_tag="ACO94482.1" class="clusterblast-orf" id="dummy-1_h1_10_2"  />
+</g>
+<g id="a1_003"  >
+<polygon points="59,90 225,90 230,85 225,80 59,80 59,90 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94483.1&lt;/b&gt;&lt;br&gt;polyketide synthase type I&lt;br&gt;Location: 7108 - 26259&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 48&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1552&lt;br&gt;E-value: 0.0" locus_tag="ACO94483.1" class="clusterblast-orf" id="dummy-1_h1_10_3"  />
+</g>
+<g id="a1_004"  >
+<polygon points="231,90 254,90 259,85 254,80 231,80 231,90 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94484.1&lt;/b&gt;&lt;br&gt;polyketide synthase type I&lt;br&gt;Location: 26297 - 29428&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 55&lt;br&gt;Percentage coverage: 53&lt;br&gt;BLAST bit score: 1023&lt;br&gt;E-value: 5.4e-298" locus_tag="ACO94484.1" class="clusterblast-orf" id="dummy-1_h1_10_4"  />
+</g>
+<g id="a1_005"  >
+<polygon points="261,85 266,80 271,80 271,90 266,90 261,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94485.1&lt;/b&gt;&lt;br&gt;glycine oxidase/FAD-dependent oxidoreductase&lt;br&gt;Location: 29667 - 30758" locus_tag="ACO94485.1" class="clusterblast-orf" id="dummy-1_h1_10_5"  />
+</g>
+<g id="a1_006"  >
+<polygon points="271,85 276,80 290,80 290,90 276,90 271,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94486.1&lt;/b&gt;&lt;br&gt;polyketide synthase type I&lt;br&gt;Location: 30755 - 32842" locus_tag="ACO94486.1" class="clusterblast-orf" id="dummy-1_h1_10_6"  />
+</g>
+<g id="a1_007"  >
+<polygon points="290,85 295,80 295,80 295,90 295,90 290,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94487.1&lt;/b&gt;&lt;br&gt;putative NRPS accessory protein&lt;br&gt;Location: 32874 - 33437" locus_tag="ACO94487.1" class="clusterblast-orf" id="dummy-1_h1_10_7"  />
+</g>
+<g id="a1_008"  >
+<polygon points="295,85 300,80 390,80 390,90 300,90 295,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94488.1&lt;/b&gt;&lt;br&gt;polyketide synthase type I&lt;br&gt;Location: 33434 - 44026&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 57&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1904&lt;br&gt;E-value: 0.0&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25200&lt;/b&gt;&lt;br&gt;Percentage identity: 47&lt;br&gt;Percentage coverage: 77&lt;br&gt;BLAST bit score: 638&lt;br&gt;E-value: 2.9e-182" locus_tag="ACO94488.1" class="clusterblast-orf" id="dummy-1_h1_10_8"  />
+</g>
+<g id="a1_009"  >
+<polygon points="390,85 395,80 405,80 405,90 395,90 390,85 " style="fill:#d8158a; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94489.1&lt;/b&gt;&lt;br&gt;putative AMP-dependent acyl-CoA synthetase/ligase&lt;br&gt;Location: 44073 - 45671&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121120&lt;/b&gt;&lt;br&gt;Percentage identity: 60&lt;br&gt;Percentage coverage: 98&lt;br&gt;BLAST bit score: 615&lt;br&gt;E-value: 7.1e-176" locus_tag="ACO94489.1" class="clusterblast-orf" id="dummy-1_h1_10_9"  />
+</g>
+<g id="a1_0010"  >
+<polygon points="407,90 410,90 415,85 410,80 407,80 407,90 " style="fill:#15d863; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94490.1&lt;/b&gt;&lt;br&gt;acyltransferase&lt;br&gt;Location: 45898 - 46839&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121110&lt;/b&gt;&lt;br&gt;Percentage identity: 49&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 299&lt;br&gt;E-value: 5.1e-81" locus_tag="ACO94490.1" class="clusterblast-orf" id="dummy-1_h1_10_10"  />
+</g>
+<g id="a1_0011"  >
+<polygon points="415,85 417,80 417,90 415,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94491.1&lt;/b&gt;&lt;br&gt;peptidyl carrier protein&lt;br&gt;Location: 46855 - 47091" locus_tag="ACO94491.1" class="clusterblast-orf" id="dummy-1_h1_10_11"  />
+</g>
+<g id="a1_0012"  >
+<polygon points="418,90 427,90 432,85 427,80 418,80 418,90 " style="fill:#3c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94492.1&lt;/b&gt;&lt;br&gt;NRPS adenylation domain protein&lt;br&gt;Location: 47209 - 48723&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121115&lt;/b&gt;&lt;br&gt;Percentage identity: 59&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 589&lt;br&gt;E-value: 5.2e-168" locus_tag="ACO94492.1" class="clusterblast-orf" id="dummy-1_h1_10_12"  />
+</g>
+<g id="a1_0013"  >
+<polygon points="432,85 437,80 437,80 437,90 437,90 432,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94493.1&lt;/b&gt;&lt;br&gt;TetR-type transcriptional regulator&lt;br&gt;Location: 48706 - 49302" locus_tag="ACO94493.1" class="clusterblast-orf" id="dummy-1_h1_10_13"  />
+</g>
+<g id="a1_0014"  >
+<polygon points="438,90 447,90 452,85 447,80 438,80 438,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94494.1&lt;/b&gt;&lt;br&gt;MFS-type efflux pump&lt;br&gt;Location: 49403 - 50974" locus_tag="ACO94494.1" class="clusterblast-orf" id="dummy-1_h1_10_14"  />
+</g>
+<g id="a1_0015"  >
+<polygon points="453,85 458,80 464,80 464,90 458,90 453,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94495.1&lt;/b&gt;&lt;br&gt;P450 monooxygenase&lt;br&gt;Location: 51086 - 52321" locus_tag="ACO94495.1" class="clusterblast-orf" id="dummy-1_h1_10_15"  />
+</g>
+<g id="a1_0016"  >
+<polygon points="465,85 470,80 555,80 555,90 470,90 465,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94496.1&lt;/b&gt;&lt;br&gt;polyketide synthase type I&lt;br&gt;Location: 52371 - 62468&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 52&lt;br&gt;Percentage coverage: 94&lt;br&gt;BLAST bit score: 1587&lt;br&gt;E-value: 0.0" locus_tag="ACO94496.1" class="clusterblast-orf" id="dummy-1_h1_10_16"  />
+</g>
+<g id="a1_0017"  >
+<polygon points="555,85 560,80 564,80 564,90 560,90 555,85 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94497.1&lt;/b&gt;&lt;br&gt;putative L-amino acid amidase/proline iminopeptidase&lt;br&gt;Location: 62476 - 63411&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121130&lt;/b&gt;&lt;br&gt;Percentage identity: 66&lt;br&gt;Percentage coverage: 97&lt;br&gt;BLAST bit score: 411&lt;br&gt;E-value: 1.5e-114" locus_tag="ACO94497.1" class="clusterblast-orf" id="dummy-1_h1_10_17"  />
+</g>
+<g id="a1_0018"  >
+<polygon points="565,85 570,80 618,80 618,90 570,90 565,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94498.1&lt;/b&gt;&lt;br&gt;polyketide synthase type I&lt;br&gt;Location: 63505 - 69483&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 53&lt;br&gt;Percentage coverage: 90&lt;br&gt;BLAST bit score: 1554&lt;br&gt;E-value: 0.0" locus_tag="ACO94498.1" class="clusterblast-orf" id="dummy-1_h1_10_18"  />
+</g>
+<g id="a1_0019"  >
+<polygon points="618,85 623,80 709,80 709,90 623,90 618,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94499.1&lt;/b&gt;&lt;br&gt;polyketide synthase type I&lt;br&gt;Location: 69491 - 79612&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 51&lt;br&gt;Percentage coverage: 95&lt;br&gt;BLAST bit score: 1570&lt;br&gt;E-value: 0.0&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25200&lt;/b&gt;&lt;br&gt;Percentage identity: 47&lt;br&gt;Percentage coverage: 76&lt;br&gt;BLAST bit score: 643&lt;br&gt;E-value: 5.2e-184" locus_tag="ACO94499.1" class="clusterblast-orf" id="dummy-1_h1_10_19"  />
+</g>
+<g id="a1_0020"  >
+<polygon points="710,85 715,80 754,80 754,90 715,90 710,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94500.1&lt;/b&gt;&lt;br&gt;polyketide synthase type I&lt;br&gt;Location: 79662 - 84575&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 49&lt;br&gt;Percentage coverage: 89&lt;br&gt;BLAST bit score: 1327&lt;br&gt;E-value: 0.0" locus_tag="ACO94500.1" class="clusterblast-orf" id="dummy-1_h1_10_20"  />
+</g>
+<g id="a1_0021"  >
+<polygon points="759,85 761,80 761,90 759,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94501.1&lt;/b&gt;&lt;br&gt;SimX2-like protein&lt;br&gt;Location: 85138 - 85404" locus_tag="ACO94501.1" class="clusterblast-orf" id="dummy-1_h1_10_21"  />
+</g>
+<g id="a1_0022"  >
+<polygon points="765,90 767,90 772,85 767,80 765,80 765,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94502.1&lt;/b&gt;&lt;br&gt;thioesterase type II&lt;br&gt;Location: 85808 - 86578" locus_tag="ACO94502.1" class="clusterblast-orf" id="dummy-1_h1_10_22"  />
+</g>
+<g id="a1_0023"  >
+<polygon points="773,90 775,90 780,85 775,80 773,80 773,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ACO94503.1&lt;/b&gt;&lt;br&gt;PlsC-type phospholipid/glycerol acyltransferase&lt;br&gt;Location: 86721 - 87437" locus_tag="ACO94503.1" class="clusterblast-orf" id="dummy-1_h1_10_23"  />
+</g>
+</svg>

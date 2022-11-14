@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>ABP55218.1</td>
+              <td>hypothetical_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000142/1">BGC0000142</a></td>
+              <td>Polyketide</td>
+              <td>88.0</td>
+              <td>100.0</td>
+              <td>146.0</td>
+              <td>1.9e-35</td>
+          </tr>
+    
+          <tr>
+              <td>ALA09364.1</td>
+              <td>ACP_starter_unit_biosynthesis_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001303/1">BGC0001303</a></td>
+              <td>Polyketide</td>
+              <td>85.0</td>
+              <td>96.3</td>
+              <td>136.0</td>
+              <td>1.9e-32</td>
+          </tr>
+    
+          <tr>
+              <td>AWR88408.1</td>
+              <td>putative_acyl_carrier_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001522/1">BGC0001522</a></td>
+              <td>Polyketide</td>
+              <td>60.0</td>
+              <td>93.9</td>
+              <td>97.0</td>
+              <td>1e-20</td>
+          </tr>
+    
+          <tr>
+              <td>sipL6</td>
+              <td>acyl_carrier_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001452/1">BGC0001452</a></td>
+              <td>Polyketide</td>
+              <td>60.0</td>
+              <td>93.9</td>
+              <td>96.0</td>
+              <td>2.2e-20</td>
+          </tr>
+    
+          <tr>
+              <td>BAP34717.1</td>
+              <td>acyl_carrier_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000078/1">BGC0000078</a></td>
+              <td>Polyketide</td>
+              <td>60.0</td>
+              <td>90.2</td>
+              <td>92.0</td>
+              <td>4.2e-19</td>
+          </tr>
+    
+          <tr>
+              <td>OAP25803.1</td>
+              <td>Acyl_carrier_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001658/1">BGC0001658</a></td>
+              <td>Polyketide</td>
+              <td>51.0</td>
+              <td>98.8</td>
+              <td>87.0</td>
+              <td>1.4e-17</td>
+          </tr>
+    
+          <tr>
+              <td>BAO66531.1</td>
+              <td>peptidyl_carrier_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000042/1">BGC0000042</a></td>
+              <td>Polyketide</td>
+              <td>49.0</td>
+              <td>93.9</td>
+              <td>82.0</td>
+              <td>2.5e-16</td>
+          </tr>
+    
+          <tr>
+              <td>AAN85529.1</td>
+              <td>peptidyl_carrier_protein_type_II</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001101/1">BGC0001101</a></td>
+              <td>NRP + Polyketide:Modular type I + Polyketide:Trans-AT type I</td>
+              <td>41.0</td>
+              <td>97.6</td>
+              <td>69.0</td>
+              <td>2.2e-12</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

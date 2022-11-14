@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>BAP82658.1</td>
+              <td>amidinotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001148/1">BGC0001148</a></td>
+              <td>NRP + RiPP</td>
+              <td>65.0</td>
+              <td>100.8</td>
+              <td>510.0</td>
+              <td>1.8e-144</td>
+          </tr>
+    
+          <tr>
+              <td>ctg1_5</td>
+              <td></td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001849/1">BGC0001849</a></td>
+              <td>RiPP</td>
+              <td>64.0</td>
+              <td>99.7</td>
+              <td>500.0</td>
+              <td>2.4e-141</td>
+          </tr>
+    
+          <tr>
+              <td>ATL73032.1</td>
+              <td>scyllo-inosamine-4-phosphate_amidinotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001807/1">BGC0001807</a></td>
+              <td>NRP + Polyketide</td>
+              <td>63.0</td>
+              <td>100.3</td>
+              <td>498.0</td>
+              <td>1.2e-140</td>
+          </tr>
+    
+          <tr>
+              <td>EMF00968.1</td>
+              <td>glycine_amidinotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001633/1">BGC0001633</a></td>
+              <td>Other</td>
+              <td>58.0</td>
+              <td>101.8</td>
+              <td>456.0</td>
+              <td>4e-128</td>
+          </tr>
+    
+          <tr>
+              <td>ATL73044.1</td>
+              <td>scyllo-inosamine-4-phosphate_amidinotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001807/1">BGC0001807</a></td>
+              <td>NRP + Polyketide</td>
+              <td>57.0</td>
+              <td>100.8</td>
+              <td>453.0</td>
+              <td>4.4e-127</td>
+          </tr>
+    
+          <tr>
+              <td>AGC09520.1</td>
+              <td>scyllo-inosamine-4-phosphate_amidinotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001183/1">BGC0001183</a></td>
+              <td>Polyketide</td>
+              <td>57.0</td>
+              <td>100.8</td>
+              <td>451.0</td>
+              <td>9.8e-127</td>
+          </tr>
+    
+          <tr>
+              <td>WP_013184323.1</td>
+              <td>amidinotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001692/1">BGC0001692</a></td>
+              <td>NRP</td>
+              <td>33.0</td>
+              <td>100.0</td>
+              <td>202.0</td>
+              <td>1e-51</td>
+          </tr>
+    
+          <tr>
+              <td>CAF32367.1</td>
+              <td>putative_amidinotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000712/1">BGC0000712</a></td>
+              <td>Saccharide</td>
+              <td>33.0</td>
+              <td>101.0</td>
+              <td>189.0</td>
+              <td>9e-48</td>
+          </tr>
+    
+          <tr>
+              <td>EFQ61009.1</td>
+              <td>Inosamine-phosphate_amidinotransferase_1</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001488/1">BGC0001488</a></td>
+              <td>Other</td>
+              <td>32.0</td>
+              <td>99.2</td>
+              <td>177.0</td>
+              <td>4.6e-44</td>
+          </tr>
+    
+          <tr>
+              <td>ABI75097.1</td>
+              <td>amidinotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000928/1">BGC0000928</a></td>
+              <td>Other</td>
+              <td>32.0</td>
+              <td>101.6</td>
+              <td>176.0</td>
+              <td>1e-43</td>
+          </tr>
+    
+          <tr>
+              <td>ABI75136.1</td>
+              <td>amidinotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000887/1">BGC0000887</a></td>
+              <td>Alkaloid</td>
+              <td>31.0</td>
+              <td>102.9</td>
+              <td>173.0</td>
+              <td>5.1e-43</td>
+          </tr>
+    
+          <tr>
+              <td>AVT42383.1</td>
+              <td>amidinotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001476/1">BGC0001476</a></td>
+              <td>Other:Nucleoside</td>
+              <td>32.0</td>
+              <td>106.5</td>
+              <td>157.0</td>
+              <td>5e-38</td>
+          </tr>
+    
+          <tr>
+              <td>ABX60160.1</td>
+              <td>amidinotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000978/1">BGC0000978</a></td>
+              <td>NRP + Alkaloid + Polyketide:Modular type I</td>
+              <td>30.0</td>
+              <td>103.6</td>
+              <td>146.0</td>
+              <td>8.8e-35</td>
+          </tr>
+    
+          <tr>
+              <td>ADF88261.1</td>
+              <td>amidinotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000979/1">BGC0000979</a></td>
+              <td>NRP + Polyketide</td>
+              <td>30.0</td>
+              <td>103.6</td>
+              <td>144.0</td>
+              <td>4.4e-34</td>
+          </tr>
+    
+          <tr>
+              <td>ADF88264.1</td>
+              <td>amidinotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000980/1">BGC0000980</a></td>
+              <td>NRP + Polyketide</td>
+              <td>30.0</td>
+              <td>103.6</td>
+              <td>144.0</td>
+              <td>4.4e-34</td>
+          </tr>
+    
+          <tr>
+              <td>ADF88278.1</td>
+              <td>amidinotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000981/1">BGC0000981</a></td>
+              <td>NRP + Polyketide</td>
+              <td>30.0</td>
+              <td>103.6</td>
+              <td>144.0</td>
+              <td>4.4e-34</td>
+          </tr>
+    
+          <tr>
+              <td>AFU82619.1</td>
+              <td>arginine:glycine_amidinotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000998/1">BGC0000998</a></td>
+              <td>NRP + Polyketide</td>
+              <td>33.0</td>
+              <td>90.6</td>
+              <td>143.0</td>
+              <td>5.7e-34</td>
+          </tr>
+    
+          <tr>
+              <td>AAO65815.1</td>
+              <td>glycine_amidinotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000100/1">BGC0000100</a></td>
+              <td>Polyketide</td>
+              <td>29.0</td>
+              <td>47.1</td>
+              <td>88.0</td>
+              <td>2.2e-17</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

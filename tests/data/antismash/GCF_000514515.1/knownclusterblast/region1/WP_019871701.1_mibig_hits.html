@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>EFE73297.1</td>
+              <td>argininosuccinate_lyase_ArgH</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000431/1">BGC0000431</a></td>
+              <td>NRP:Cyclic depsipeptide</td>
+              <td>63.0</td>
+              <td>94.9</td>
+              <td>557.0</td>
+              <td>2.7e-158</td>
+          </tr>
+    
+          <tr>
+              <td>CAM56768.1</td>
+              <td>DabB</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000354/1">BGC0000354</a></td>
+              <td>NRP</td>
+              <td>35.0</td>
+              <td>93.6</td>
+              <td>198.0</td>
+              <td>1.9e-50</td>
+          </tr>
+    
+          <tr>
+              <td>AEG64687.1</td>
+              <td>diaminobutyric_acid_synthase_B</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000379/1">BGC0000379</a></td>
+              <td>NRP</td>
+              <td>34.0</td>
+              <td>89.1</td>
+              <td>185.0</td>
+              <td>2.8e-46</td>
+          </tr>
+    
+          <tr>
+              <td>ARU08089.1</td>
+              <td>mlcT</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001448/1">BGC0001448</a></td>
+              <td>NRP:Ca+-dependent lipopeptide</td>
+              <td>31.0</td>
+              <td>98.4</td>
+              <td>168.0</td>
+              <td>2.1e-41</td>
+          </tr>
+    
+          <tr>
+              <td>CAN89657.1</td>
+              <td>putative_argininosuccinate_lyase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001070/1">BGC0001070</a></td>
+              <td>NRP + Polyketide:Modular type I + Polyketide:Trans-AT type I</td>
+              <td>31.0</td>
+              <td>96.1</td>
+              <td>158.0</td>
+              <td>3.7e-38</td>
+          </tr>
+    
+          <tr>
+              <td>ADN26253.1</td>
+              <td>argininosuccinate_lyase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000951/1">BGC0000951</a></td>
+              <td>NRP</td>
+              <td>33.0</td>
+              <td>86.2</td>
+              <td>157.0</td>
+              <td>6.3e-38</td>
+          </tr>
+    
+          <tr>
+              <td>ADY76668.1</td>
+              <td>argininosuccinate_lyase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000950/1">BGC0000950</a></td>
+              <td>NRP:Uridylpeptide + Other:Nucleoside</td>
+              <td>33.0</td>
+              <td>73.7</td>
+              <td>146.0</td>
+              <td>1.5e-34</td>
+          </tr>
+    
+          <tr>
+              <td>ATL73047.1</td>
+              <td>putative_argininosuccinate_lyase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001807/1">BGC0001807</a></td>
+              <td>NRP + Polyketide</td>
+              <td>29.0</td>
+              <td>94.7</td>
+              <td>143.0</td>
+              <td>9.4e-34</td>
+          </tr>
+    
+          <tr>
+              <td>AGC09517.1</td>
+              <td>argininosuccinate_lyase/adenylosuccinate_lyase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001183/1">BGC0001183</a></td>
+              <td>Polyketide</td>
+              <td>28.0</td>
+              <td>94.7</td>
+              <td>118.0</td>
+              <td>3.2e-26</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>AFV52152.1</td>
+              <td>epoxide_hydrolase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000081/1">BGC0000081</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Enediyne type I</td>
+              <td>70.0</td>
+              <td>99.7</td>
+              <td>560.0</td>
+              <td>2e-159</td>
+          </tr>
+    
+          <tr>
+              <td>ANY94432.1</td>
+              <td>epoxide_hydrolase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001584/1">BGC0001584</a></td>
+              <td>Polyketide</td>
+              <td>63.0</td>
+              <td>100.5</td>
+              <td>497.0</td>
+              <td>1.6e-140</td>
+          </tr>
+    
+          <tr>
+              <td>AAM78002.1</td>
+              <td>epoxide_hydrolase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000112/1">BGC0000112</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Enediyne type I</td>
+              <td>62.0</td>
+              <td>100.5</td>
+              <td>493.0</td>
+              <td>2.2e-139</td>
+          </tr>
+    
+          <tr>
+              <td>AAL06662.1</td>
+              <td>epoxide_hydrolase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000965/1">BGC0000965</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Enediyne type I</td>
+              <td>62.0</td>
+              <td>100.5</td>
+              <td>492.0</td>
+              <td>8.5e-139</td>
+          </tr>
+    
+          <tr>
+              <td>ALU98426.1</td>
+              <td>epoxide_hydrolase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001397/1">BGC0001397</a></td>
+              <td>NRP + Polyketide</td>
+              <td>62.0</td>
+              <td>100.5</td>
+              <td>492.0</td>
+              <td>8.5e-139</td>
+          </tr>
+    
+          <tr>
+              <td>ABP55155.1</td>
+              <td>Epoxide_hydrolase_domain_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000150/1">BGC0000150</a></td>
+              <td>NRP + Polyketide:Enediyne type I</td>
+              <td>61.0</td>
+              <td>100.0</td>
+              <td>482.0</td>
+              <td>6.8e-136</td>
+          </tr>
+    
+          <tr>
+              <td>AAM77995.1</td>
+              <td>epoxide_hydrolase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000112/1">BGC0000112</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Enediyne type I</td>
+              <td>57.0</td>
+              <td>100.0</td>
+              <td>458.0</td>
+              <td>1e-128</td>
+          </tr>
+    
+          <tr>
+              <td>AFY23023.1</td>
+              <td>hydrolase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000274/1">BGC0000274</a></td>
+              <td>Polyketide:Type II</td>
+              <td>54.0</td>
+              <td>99.7</td>
+              <td>412.0</td>
+              <td>6.6e-115</td>
+          </tr>
+    
+          <tr>
+              <td>QDQ37891.1</td>
+              <td>epoxide_hydrolase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001979/1">BGC0001979</a></td>
+              <td>Polyketide</td>
+              <td>48.0</td>
+              <td>99.5</td>
+              <td>357.0</td>
+              <td>2.5e-98</td>
+          </tr>
+    
+          <tr>
+              <td>TXL86004.1</td>
+              <td>epoxide_hydrolase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0002034/1">BGC0002034</a></td>
+              <td>Other</td>
+              <td>44.0</td>
+              <td>96.9</td>
+              <td>299.0</td>
+              <td>6.2e-81</td>
+          </tr>
+    
+          <tr>
+              <td>CAH60146.1</td>
+              <td>IssA_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000700/1">BGC0000700</a></td>
+              <td>Saccharide</td>
+              <td>38.0</td>
+              <td>100.0</td>
+              <td>265.0</td>
+              <td>1.7e-70</td>
+          </tr>
+    
+          <tr>
+              <td>APY21858.1</td>
+              <td>FmsA</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001659/1">BGC0001659</a></td>
+              <td>Terpene</td>
+              <td>34.0</td>
+              <td>102.6</td>
+              <td>224.0</td>
+              <td>2.5e-58</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

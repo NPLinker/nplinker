@@ -1,0 +1,1087 @@
+ClusterBlast scores for NZ_KI911412.1
+
+Table of genes, locations, strands and annotations of query cluster:
+B170_RS0117485	474254	475166	-	SDR family NAD(P)-dependent oxidoreductase	
+B170_RS0117490	475162	475786	-	TetR/AcrR family transcriptional regulator	
+B170_RS0117495	475893	477195	-	MFS transporter	
+B170_RS0117500	477187	478390	-	cytochrome P450	
+B170_RS0117505	478434	479112	-	hypothetical protein	
+B170_RS0117510	479092	480997	-	RiPP maturation radical SAM protein 1	
+B170_RS0117520	481244	483050	-	S9 family peptidase	
+B170_RS0117525	483215	483650	+	hypothetical protein	
+B170_RS0117530	483692	484382	-	hypothetical protein	
+
+
+Significant hits: 
+1. NZ_KI911412	Salinispora pacifica CNT029 B170DRAFT_scaffold_0.1, whole genome shotgun sequence
+2. NZ_KB913027	Salinispora pacifica DSM 45546 = CNT-133 strain DSM 45546 Salpac5DRAFT_scaffold1.1, whole genome shotgun sequence
+3. NZ_KB895207	Salinispora pacifica CNT045 C554DRAFT_scaffold00001.1, whole genome shotgun sequence
+4. NZ_KB896761	Salinispora pacifica CNT584 C582DRAFT_scaffold00002.2, whole genome shotgun sequence
+5. NZ_AUKU01000002	Salinispora pacifica CNY239 H304DRAFT_scaffold00002.2_C, whole genome shotgun sequence
+6. NZ_KB904831	Salinispora pacifica CNQ768 C581DRAFT_scaffold00008.8, whole genome shotgun sequence
+7. NZ_KI911467	Salinispora pacifica CNR114 B118DRAFT_scaffold_1.2, whole genome shotgun sequence
+8. NZ_AZWC01000001	Salinispora pacifica CNT001 B169DRAFT_scaffold_0.1_C, whole genome shotgun sequence
+9. NZ_KB900388	Salinispora pacifica DSM 45548 = CNT-148 strain DSM 45548 Salpac2DRAFT_Scaffold1.2, whole genome shotgun sequence
+10. NZ_AZWS01000001	Salinispora pacifica CNT855 B113DRAFT_scaffold_0.1_C, whole genome shotgun sequence
+11. NZ_KB905359	Salinispora pacifica DSM 45544 Salpac3DRAFT_Scaffold1.1, whole genome shotgun sequence
+12. NZ_AZVW01000002	Salinispora pacifica CNT603 B175DRAFT_scaffold_1.2_C, whole genome shotgun sequence
+13. NZ_KB904933	Salinispora pacifica CNT609 C584DRAFT_scaffold00019.19, whole genome shotgun sequence
+14. NZ_AUGH01000017	Salinispora pacifica CNS237 H303DRAFT_scaffold_11.12_C, whole genome shotgun sequence
+15. NZ_KB897147	Salinispora tropica CNS416 C590DRAFT_scaffold00004.4, whole genome shotgun sequence
+16. NZ_AUKS01000008	Salinispora tropica CNT261 H301DRAFT_scaffold00005.5_C, whole genome shotgun sequence
+17. NZ_KB895289	Salinispora pacifica CNT124 C555DRAFT_scaffold00003.3, whole genome shotgun sequence
+18. NZ_KB913022	Salinispora pacifica DSM 45543 = CNS-863 strain DSM 45543 SALPACDRAFT_scaffold1.1, whole genome shotgun sequence
+19. NZ_AZXE01000003	Salinispora tropica CNB476 B098DRAFT_scaffold00003.3_C, whole genome shotgun sequence
+20. NZ_AZWK01000006	Salinispora tropica CNS197 B123DRAFT_scaffold_4.5_C, whole genome shotgun sequence
+21. NZ_JHVW01000011	Salinispora tropica CNT250 K261DRAFT_scaffold00005.5_C, whole genome shotgun sequence
+22. NZ_KB894962	Salinispora pacifica CNS055 C550DRAFT_scaffold00001.1, whole genome shotgun sequence
+23. NC_009380	Salinispora tropica CNB-440, complete sequence
+24. NZ_JABZED010000002	Salinispora sp. H7-4 sequence02, whole genome shotgun sequence
+25. NZ_CP022961	Plantactinospora sp. KBS50 chromosome, complete genome
+26. NZ_CP058322	Micromonospora carbonacea strain aurantiaca chromosome, complete genome
+27. NZ_FMCW01000035	Micromonospora haikouensis strain DSM 45626, whole genome shotgun sequence
+28. NZ_JAIY01000014	Kitasatospora sp. MBT66 scaffold14, whole genome shotgun sequence
+29. NZ_CP016076	Actinoalloteichus fjordicus strain ADI127-7 chromosome, complete genome
+30. NZ_LT629775	Streptomyces sp. TLI_053 chromosome I
+31. NZ_CP016076	Actinoalloteichus fjordicus strain ADI127-7 chromosome, complete genome
+32. NZ_CP029788	Streptomyces actuosus strain ATCC 25421 chromosome, complete genome
+33. NZ_CP045178	Streptomyces tsukubensis strain AT3 chromosome, complete genome
+34. NZ_CP023701	Streptomyces subrutilus strain ATCC 27467 chromosome, complete genome
+35. NZ_LWLE01000012	Streptomyces sp. TSRI0281 scaffold2, whole genome shotgun sequence
+36. NZ_LT907981	Streptomyces sp. 2323.1 chromosome I
+37. NZ_KB911710	Streptomyces sp. 303MFCol5.2 H294DRAFT_scaffold00013.13, whole genome shotgun sequence
+38. NZ_CP019457	Streptomyces lydicus strain GS93 isolate 23 chromosome, complete genome
+39. NZ_CP019779	Streptomyces sp. MOE7 chromosome, complete genome
+40. NZ_CP032698	Streptomyces hundungensis strain BH38 chromosome, complete genome
+41. NZ_JH725388	Streptomyces auratus AGR0001 Scaffold2, whole genome shotgun sequence
+42. NZ_CP017157	Streptomyces lydicus strain 103 chromosome, complete genome
+43. NZ_GG657738	Micromonospora sp. ATCC 39149 supercont1.1, whole genome shotgun sequence
+44. NZ_LT629758	Actinoplanes derwentensis strain DSM 43941 chromosome I
+45. NZ_CP029541	Streptomyces sp. NEAU-S7GS2 chromosome, complete genome
+46. NZ_CP023691	Streptomyces platensis strain ATCC 23948 chromosome, complete genome
+47. NZ_CP029042	Streptomyces lydicus strain WYEC 108 chromosome, complete genome
+48. NZ_CP050976	Streptomyces sp. RPA4-5 chromosome
+49. NZ_CP034687	Streptomyces griseoviridis strain F1-27 chromosome, complete genome
+50. NZ_KQ948863	Streptomyces bungoensis strain DSM 41781 PRJNA299233_s013, whole genome shotgun sequence
+
+
+Details:
+
+>>
+1. NZ_KI911412
+Source: Salinispora pacifica CNT029 B170DRAFT_scaffold_0.1, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 6274
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	B170_RS0117485	100	597	100.0	8.7e-169
+B170_RS0117490	B170_RS0117490	100	401	100.0	6.3e-110
+B170_RS0117495	B170_RS0117495	100	768	100.0	3.1e-220
+B170_RS0117500	B170_RS0117500	100	796	100.0	9.9e-229
+B170_RS0117505	B170_RS0117505	100	469	100.0	1.6e-130
+B170_RS0117510	B170_RS0117510	100	1269	100.0	0.0
+B170_RS0117520	B170_RS0117520	100	1240	100.0	0.0
+B170_RS0117525	B170_RS0117525	100	274	100.0	6.2e-72
+B170_RS0117530	B170_RS0117530	100	460	100.0	7.4e-128
+
+
+
+>>
+2. NZ_KB913027
+Source: Salinispora pacifica DSM 45546 = CNT-133 strain DSM 45546 Salpac5DRAFT_scaffold1.1, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 6244
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	SALPAC5_RS0121495	100	594	100.0	4.3e-168
+B170_RS0117490	SALPAC5_RS0121500	100	399	100.0	2.4e-109
+B170_RS0117495	SALPAC5_RS0121505	99	760	100.0	6.5e-218
+B170_RS0117500	SALPAC5_RS0121510	100	796	100.0	9.9e-229
+B170_RS0117505	SALPAC5_RS0121515	100	469	100.0	1.6e-130
+B170_RS0117510	SALPAC5_RS0121520	99	1257	100.0	0.0
+B170_RS0117520	SALPAC5_RS0121530	100	1235	100.0	0.0
+B170_RS0117525	SALPAC5_RS0121535	100	274	100.0	6.2e-72
+B170_RS0117530	SALPAC5_RS0121540	100	460	100.0	7.4e-128
+
+
+
+>>
+3. NZ_KB895207
+Source: Salinispora pacifica CNT045 C554DRAFT_scaffold00001.1, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 5975
+
+Table of genes, locations, strands and annotations of subject cluster:
+C554_RS28820	C554_RS28820	80201	80430	-	hypothetical_protein
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	C554_RS0100435	99	590	100.0	1.1e-166
+B170_RS0117490	C554_RS0100430	98	391	100.0	5e-107
+B170_RS0117495	C554_RS0100425	98	753	100.0	1e-215
+B170_RS0117500	C554_RS0100420	100	793	100.0	1.1e-227
+B170_RS0117505	C554_RS0100415	96	453	100.0	8.9e-126
+B170_RS0117510	C554_RS0100410	98	1249	100.0	0.0
+B170_RS0117520	C554_RS0100400	97	1201	100.49916805324459	0.0
+B170_RS0117525	C554_RS28820	96	101	36.80555555555556	7.2e-20
+B170_RS0117530	C554_RS0100395	97	444	100.0	5.5e-123
+
+
+
+>>
+4. NZ_KB896761
+Source: Salinispora pacifica CNT584 C582DRAFT_scaffold00002.2, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 5933
+
+Table of genes, locations, strands and annotations of subject cluster:
+C582_RS24760	C582_RS24760	273786	274364	-	hypothetical_protein
+C582_RS0102805	C582_RS0102805	274364	275692	+	hypothetical_protein
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	C582_RS0102755	97	579	100.0	1.9e-163
+B170_RS0117490	C582_RS0102760	96	384	100.0	8e-105
+B170_RS0117495	C582_RS0102765	92	700	100.0	1e-199
+B170_RS0117500	C582_RS0102770	99	786	100.0	1.3e-225
+B170_RS0117505	C582_RS0102775	96	449	100.0	2.2e-124
+B170_RS0117510	C582_RS0102780	96	1228	100.0	0.0
+B170_RS0117520	C582_RS0102790	95	1183	100.49916805324459	0.0
+B170_RS0117525	C582_RS0102795	94	257	100.0	1e-66
+B170_RS0117530	C582_RS24760	93	367	83.84279475982532	8.5e-100
+
+
+
+>>
+5. NZ_AUKU01000002
+Source: Salinispora pacifica CNY239 H304DRAFT_scaffold00002.2_C, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 5891
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	H304_RS0101860	95	572	100.0	3e-161
+B170_RS0117490	H304_RS0101855	92	364	99.03381642512076	5e-99
+B170_RS0117495	H304_RS0101850	95	723	100.2309468822171	1.5e-206
+B170_RS0117500	H304_RS0101845	96	774	100.0	6.9e-222
+B170_RS0117505	H304_RS0101840	93	440	100.0	7.8e-122
+B170_RS0117510	H304_RS0101835	95	1214	100.0	0.0
+B170_RS0117520	H304_RS0101825	91	1131	100.49916805324459	0.0
+B170_RS0117525	H304_RS0101820	92	255	100.0	3e-66
+B170_RS0117530	H304_RS0101815	90	418	99.56331877729258	5.5e-115
+
+
+
+>>
+6. NZ_KB904831
+Source: Salinispora pacifica CNQ768 C581DRAFT_scaffold00008.8, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 5887
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	C581_RS0109425	95	574	100.0	4.7e-162
+B170_RS0117490	C581_RS0109420	92	364	99.03381642512076	5e-99
+B170_RS0117495	C581_RS0109415	95	723	100.2309468822171	1.5e-206
+B170_RS0117500	C581_RS0109410	96	774	100.0	6.9e-222
+B170_RS0117505	C581_RS0109405	92	437	100.0	6.6e-121
+B170_RS0117510	C581_RS0109400	95	1212	100.0	0.0
+B170_RS0117520	C581_RS0109390	91	1134	100.49916805324459	0.0
+B170_RS0117525	C581_RS0109385	92	253	100.0	8.6e-66
+B170_RS0117530	C581_RS0109380	90	416	99.56331877729258	1.2e-114
+
+
+
+>>
+7. NZ_KI911467
+Source: Salinispora pacifica CNR114 B118DRAFT_scaffold_1.2, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 5882
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	B118_RS0126125	95	574	100.0	4.7e-162
+B170_RS0117490	B118_RS0126130	91	361	99.03381642512076	4.2e-98
+B170_RS0117495	B118_RS0126135	95	720	100.2309468822171	9.8e-206
+B170_RS0117500	B118_RS0126140	96	774	100.0	6.9e-222
+B170_RS0117505	B118_RS0126145	92	437	100.0	8.6e-121
+B170_RS0117510	B118_RS0126150	95	1209	100.0	0.0
+B170_RS0117520	B118_RS0126160	91	1134	100.49916805324459	0.0
+B170_RS0117525	B118_RS0126165	92	257	100.0	7.8e-67
+B170_RS0117530	B118_RS0126170	90	416	99.56331877729258	1.2e-114
+
+
+
+>>
+8. NZ_AZWC01000001
+Source: Salinispora pacifica CNT001 B169DRAFT_scaffold_0.1_C, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 5880
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	B169_RS0100720	94	568	100.0	3.3e-160
+B170_RS0117490	B169_RS0100715	92	364	99.03381642512076	5e-99
+B170_RS0117495	B169_RS0100710	95	723	100.2309468822171	1.5e-206
+B170_RS0117500	B169_RS0100705	96	774	100.0	6.9e-222
+B170_RS0117505	B169_RS0100700	92	439	100.0	2.3e-121
+B170_RS0117510	B169_RS0100695	95	1214	100.0	0.0
+B170_RS0117520	B169_RS0100685	91	1131	100.49916805324459	0.0
+B170_RS0117525	B169_RS0100680	92	257	100.0	7.8e-67
+B170_RS0117530	B169_RS0100675	89	410	99.56331877729258	1.5e-112
+
+
+
+>>
+9. NZ_KB900388
+Source: Salinispora pacifica DSM 45548 = CNT-148 strain DSM 45548 Salpac2DRAFT_Scaffold1.2, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 5799
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	SALPAC2_RS0104480	95	570	100.0	8.8e-161
+B170_RS0117490	SALPAC2_RS0104485	85	329	98.55072463768117	2.3e-88
+B170_RS0117495	SALPAC2_RS0104490	89	668	100.2309468822171	3.4e-190
+B170_RS0117500	SALPAC2_RS0104495	94	758	100.0	2.3e-217
+B170_RS0117505	SALPAC2_RS0104500	94	446	100.0	1.4e-123
+B170_RS0117510	SALPAC2_RS0104505	95	1213	100.0	0.0
+B170_RS0117520	SALPAC2_RS0104515	91	1133	100.49916805324459	0.0
+B170_RS0117525	SALPAC2_RS0104520	94	257	100.0	7.8e-67
+B170_RS0117530	SALPAC2_RS0104525	92	425	99.56331877729258	4.5e-117
+
+
+
+>>
+10. NZ_AZWS01000001
+Source: Salinispora pacifica CNT855 B113DRAFT_scaffold_0.1_C, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 5632
+
+Table of genes, locations, strands and annotations of subject cluster:
+B113_RS25645	B113_RS25645	166111	166525	+	hypothetical_protein
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	B113_RS0100860	95	573	100.0	1.4e-161
+B170_RS0117490	B113_RS0100855	92	366	99.03381642512076	2.2e-99
+B170_RS0117495	B113_RS0100850	95	719	100.2309468822171	2.2e-205
+B170_RS0117500	B113_RS0100845	96	774	100.0	6.9e-222
+B170_RS0117505	B113_RS0100840	92	435	100.0	4.3e-120
+B170_RS0117510	B113_RS0100835	94	1204	100.0	0.0
+B170_RS0117520	B113_RS0100825	91	1138	100.49916805324459	0.0
+B170_RS0117525	B113_RS0100820	92	257	100.0	7.8e-67
+B170_RS0117530	B113_RS25645	83	166	45.851528384279476	2.9e-39
+
+
+
+>>
+11. NZ_KB905359
+Source: Salinispora pacifica DSM 45544 Salpac3DRAFT_Scaffold1.1, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 5630
+
+Table of genes, locations, strands and annotations of subject cluster:
+SALPAC3_RS26610	SALPAC3_RS26610	610844	611258	+	hypothetical_protein
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	SALPAC3_RS0102835	95	572	100.0	3e-161
+B170_RS0117490	SALPAC3_RS0102830	92	364	99.03381642512076	5e-99
+B170_RS0117495	SALPAC3_RS0102825	95	718	100.2309468822171	4.9e-205
+B170_RS0117500	SALPAC3_RS0102820	96	774	100.0	6.9e-222
+B170_RS0117505	SALPAC3_RS0102815	93	440	100.0	7.8e-122
+B170_RS0117510	SALPAC3_RS0102810	95	1211	100.0	0.0
+B170_RS0117520	SALPAC3_RS0102800	91	1132	100.49916805324459	0.0
+B170_RS0117525	SALPAC3_RS0102795	92	253	100.0	8.6e-66
+B170_RS0117530	SALPAC3_RS26610	83	166	45.851528384279476	2.9e-39
+
+
+
+>>
+12. NZ_AZVW01000002
+Source: Salinispora pacifica CNT603 B175DRAFT_scaffold_1.2_C, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 5630
+
+Table of genes, locations, strands and annotations of subject cluster:
+B175_RS26400	B175_RS26400	287631	288045	-	hypothetical_protein
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	B175_RS0103310	94	568	100.0	3.3e-160
+B170_RS0117490	B175_RS0103315	92	364	99.03381642512076	5e-99
+B170_RS0117495	B175_RS0103320	95	720	100.2309468822171	9.8e-206
+B170_RS0117500	B175_RS0103325	96	772	100.0	1.5e-221
+B170_RS0117505	B175_RS0103330	92	439	100.0	2.3e-121
+B170_RS0117510	B175_RS0103335	95	1213	100.0	0.0
+B170_RS0117520	B175_RS0103345	91	1131	100.49916805324459	0.0
+B170_RS0117525	B175_RS0103350	92	257	100.0	7.8e-67
+B170_RS0117530	B175_RS26400	83	166	45.851528384279476	2.9e-39
+
+
+
+>>
+13. NZ_KB904933
+Source: Salinispora pacifica CNT609 C584DRAFT_scaffold00019.19, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 5583
+
+Table of genes, locations, strands and annotations of subject cluster:
+C584_RS26355	C584_RS26355	91436	91980	-	hypothetical_protein
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	C584_RS0117580	96	578	100.0	3.2e-163
+B170_RS0117490	C584_RS0117585	91	360	99.03381642512076	9.4e-98
+B170_RS0117495	C584_RS0117590	94	708	100.2309468822171	2.9e-202
+B170_RS0117500	C584_RS0117595	94	764	100.0	5.5e-219
+B170_RS0117505	C584_RS0117600	93	437	100.0	6.6e-121
+B170_RS0117510	C584_RS0117605	95	1208	100.0	0.0
+B170_RS0117520	C584_RS0117615	91	1128	100.49916805324459	0.0
+B170_RS0117525	C584_RS0117620	92	255	100.0	3e-66
+B170_RS0117530	C584_RS26355	90	145	35.37117903930131	5.3e-33
+
+
+
+>>
+14. NZ_AUGH01000017
+Source: Salinispora pacifica CNS237 H303DRAFT_scaffold_11.12_C, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 5389
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	H303_RS0106765	92	557	100.0	5.9e-157
+B170_RS0117490	H303_RS0106760	88	346	98.55072463768117	2.4e-93
+B170_RS0117495	H303_RS0106755	91	693	100.0	9.8e-198
+B170_RS0117500	H303_RS0106750	94	758	100.0	3e-217
+B170_RS0117505	H303_RS0106745	89	428	100.0	4e-118
+B170_RS0117510	H303_RS0106740	92	1178	100.0	0.0
+B170_RS0117520	H303_RS0106730	88	1102	100.49916805324459	0.0
+B170_RS0117525	H303_RS0106725	90	245	99.30555555555556	2.4e-63
+B170_RS0117530	H303_RS28405	64	82	24.45414847161572	5.5e-14
+
+
+
+>>
+15. NZ_KB897147
+Source: Salinispora tropica CNS416 C590DRAFT_scaffold00004.4, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 5278
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	C590_RS0106760	91	555	100.0	2.2e-156
+B170_RS0117490	C590_RS0106765	87	340	98.55072463768117	1e-91
+B170_RS0117495	C590_RS0106770	84	631	100.0	4.6e-179
+B170_RS0117500	C590_RS0106775	92	738	100.0	2.5e-211
+B170_RS0117505	C590_RS0106780	85	408	100.0	4.3e-112
+B170_RS0117510	C590_RS0106785	92	1176	100.0	0.0
+B170_RS0117520	C590_RS0106795	86	1073	100.49916805324459	7e-312
+B170_RS0117525	C590_RS0106800	85	232	97.22222222222221	2.1e-59
+B170_RS0117530	C590_RS25750	80	125	31.004366812227076	7.4e-27
+
+
+
+>>
+16. NZ_AUKS01000008
+Source: Salinispora tropica CNT261 H301DRAFT_scaffold00005.5_C, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 5267
+
+Table of genes, locations, strands and annotations of subject cluster:
+H301_RS26200	H301_RS26200	15007	15811	+	hypothetical_protein
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	H301_RS0104760	91	555	100.0	2.2e-156
+B170_RS0117490	H301_RS0104755	87	340	98.55072463768117	1e-91
+B170_RS0117495	H301_RS0104750	84	632	100.0	3.5e-179
+B170_RS0117500	H301_RS0104745	92	738	100.0	2.5e-211
+B170_RS0117505	H301_RS0104740	85	410	100.0	1.5e-112
+B170_RS0117510	H301_RS0104735	92	1178	100.0	0.0
+B170_RS0117520	H301_RS0104725	86	1076	100.49916805324459	0.0
+B170_RS0117525	H301_RS0104720	84	231	97.22222222222221	4.6e-59
+B170_RS0117530	H301_RS26200	67	107	35.37117903930131	2.1e-21
+
+
+
+>>
+17. NZ_KB895289
+Source: Salinispora pacifica CNT124 C555DRAFT_scaffold00003.3, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 5895
+
+Table of genes, locations, strands and annotations of subject cluster:
+C555_RS0103525	C555_RS0103525	9730	10914	-	hypothetical_protein
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	C555_RS0103575	97	581	100.0	6.5e-164
+B170_RS0117490	C555_RS0103570	96	384	100.0	8e-105
+B170_RS0117495	C555_RS0103565	92	700	100.0	1e-199
+B170_RS0117500	C555_RS0103560	99	787	100.0	4.6e-226
+B170_RS0117505	C555_RS0103555	96	452	100.0	2e-125
+B170_RS0117510	C555_RS0103550	97	1231	100.0	0.0
+B170_RS0117520	C555_RS0103540	95	1182	100.49916805324459	0.0
+B170_RS0117525	C555_RS0103535	93	255	100.0	3e-66
+B170_RS0117530	C555_RS26820	91	175	40.61135371179039	6.2e-42
+B170_RS0117530	C555_RS26825	93	148	32.314410480349345	6.2e-34
+
+
+
+>>
+18. NZ_KB913022
+Source: Salinispora pacifica DSM 45543 = CNS-863 strain DSM 45543 SALPACDRAFT_scaffold1.1, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 9
+Cumulative BLAST score: 5758
+
+Table of genes, locations, strands and annotations of subject cluster:
+SALPAC_RS25880	SALPAC_RS25880	2540710	2541191	-	TetR/AcrR_family_transcriptional_regulator
+SALPAC_RS27035	SALPAC_RS27035	2548616	2548845	+	hypothetical_protein
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	SALPAC_RS0111620	98	587	100.0	6.9e-166
+B170_RS0117490	SALPAC_RS25880	86	178	55.072463768115945	8.7e-43
+B170_RS0117495	SALPAC_RS0111630	98	752	100.0	2.3e-215
+B170_RS0117500	SALPAC_RS0111635	99	791	100.0	3.2e-227
+B170_RS0117505	SALPAC_RS0111640	96	453	100.0	1.2e-125
+B170_RS0117510	SALPAC_RS0111645	98	1249	100.0	0.0
+B170_RS0117520	SALPAC_RS0111655	97	1203	100.49916805324459	0.0
+B170_RS0117525	SALPAC_RS27035	96	101	36.80555555555556	7.2e-20
+B170_RS0117530	SALPAC_RS0111660	97	444	100.0	5.5e-123
+
+
+
+>>
+19. NZ_AZXE01000003
+Source: Salinispora tropica CNB476 B098DRAFT_scaffold00003.3_C, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 8
+Cumulative BLAST score: 5203
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	B098_RS0104510	91	555	100.0	2.2e-156
+B170_RS0117490	B098_RS0104515	87	340	98.55072463768117	1e-91
+B170_RS0117495	B098_RS0104520	90	684	100.0	7.8e-195
+B170_RS0117500	B098_RS0104525	92	737	100.0	5.5e-211
+B170_RS0117505	B098_RS0104530	85	409	100.0	1.9e-112
+B170_RS0117510	B098_RS0104535	92	1174	100.0	0.0
+B170_RS0117520	B098_RS0104545	86	1073	100.49916805324459	7e-312
+B170_RS0117525	B098_RS0104550	84	231	97.22222222222221	6e-59
+
+
+
+>>
+20. NZ_AZWK01000006
+Source: Salinispora tropica CNS197 B123DRAFT_scaffold_4.5_C, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 8
+Cumulative BLAST score: 5156
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	B123_RS0106535	91	555	100.0	2.2e-156
+B170_RS0117490	B123_RS0106540	87	340	98.55072463768117	1e-91
+B170_RS0117495	B123_RS0106545	84	631	100.0	4.6e-179
+B170_RS0117500	B123_RS0106550	92	738	100.0	2.5e-211
+B170_RS0117505	B123_RS0106555	85	410	100.0	1.5e-112
+B170_RS0117510	B123_RS0106560	92	1179	100.0	0.0
+B170_RS0117520	B123_RS0106570	86	1071	100.49916805324459	4.2e-311
+B170_RS0117525	B123_RS0106575	85	232	97.22222222222221	2.1e-59
+
+
+
+>>
+21. NZ_JHVW01000011
+Source: Salinispora tropica CNT250 K261DRAFT_scaffold00005.5_C, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 8
+Cumulative BLAST score: 5133
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	K261_RS0101685	91	556	100.0	1.3e-156
+B170_RS0117490	K261_RS0101680	84	323	98.55072463768117	1.7e-86
+B170_RS0117495	K261_RS0101675	84	631	100.0	4.6e-179
+B170_RS0117500	K261_RS0101670	92	735	100.0	2.1e-210
+B170_RS0117505	K261_RS0101665	85	410	100.0	1.5e-112
+B170_RS0117510	K261_RS0101660	92	1176	100.0	0.0
+B170_RS0117520	K261_RS0101650	86	1071	100.49916805324459	2.5e-311
+B170_RS0117525	K261_RS0101645	84	231	97.22222222222221	6e-59
+
+
+
+>>
+22. NZ_KB894962
+Source: Salinispora pacifica CNS055 C550DRAFT_scaffold00001.1, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 8
+Cumulative BLAST score: 5633
+
+Table of genes, locations, strands and annotations of subject cluster:
+C550_RS26165	C550_RS26165	420617	420816	+	IS5/IS1182_family_transposase
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	C550_RS0102055	96	573	100.0	1.4e-161
+B170_RS0117490	C550_RS0102050	94	368	98.55072463768117	3.5e-100
+B170_RS0117495	C550_RS0102045	94	709	100.2309468822171	1.7e-202
+B170_RS0117500	C550_RS0102040	96	764	100.0	5.5e-219
+B170_RS0117505	C550_RS0102035	94	446	100.0	1.4e-123
+B170_RS0117510	C550_RS0102030	95	1212	100.0	0.0
+B170_RS0117520	C550_RS0102020	91	1131	100.49916805324459	0.0
+B170_RS0117530	C550_RS0102015	94	430	99.56331877729258	1.1e-118
+
+
+
+>>
+23. NC_009380
+Source: Salinispora tropica CNB-440, complete sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 8
+Cumulative BLAST score: 5155
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	STROP_RS11505	91	555	100.0	2.2e-156
+B170_RS0117490	STROP_RS11510	87	340	98.55072463768117	1e-91
+B170_RS0117495	STROP_RS11515	84	631	100.0	4.6e-179
+B170_RS0117500	STROP_RS11520	92	738	100.0	2.5e-211
+B170_RS0117505	STROP_RS11525	85	408	100.0	4.3e-112
+B170_RS0117510	STROP_RS11530	92	1179	100.0	0.0
+B170_RS0117520	STROP_RS11535	86	1072	100.49916805324459	1.4e-311
+B170_RS0117525	STROP_RS11540	85	232	97.22222222222221	2.1e-59
+
+
+
+>>
+24. NZ_JABZED010000002
+Source: Salinispora sp. H7-4 sequence02, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 8
+Cumulative BLAST score: 5635
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117485	H0524_RS00585	96	571	100.0	6.7e-161
+B170_RS0117490	H0524_RS00580	94	370	98.55072463768117	9.1e-101
+B170_RS0117495	H0524_RS00575	93	705	100.2309468822171	2.5e-201
+B170_RS0117500	H0524_RS00570	96	765	100.0	1.9e-219
+B170_RS0117505	H0524_RS00565	94	448	100.0	4.9e-124
+B170_RS0117510	H0524_RS00560	94	1210	100.0	0.0
+B170_RS0117520	H0524_RS00550	91	1137	100.49916805324459	0.0
+B170_RS0117530	H0524_RS00545	94	429	99.56331877729258	2.4e-118
+
+
+
+>>
+25. NZ_CP022961
+Source: Plantactinospora sp. KBS50 chromosome, complete genome
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 5
+Cumulative BLAST score: 3405
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117495	CIK06_RS27975	74	557	103.23325635103926	1.1e-156
+B170_RS0117500	CIK06_RS27980	86	691	100.0	5.9e-197
+B170_RS0117505	CIK06_RS27985	69	342	99.11111111111111	2.9e-92
+B170_RS0117510	CIK06_RS27990	79	1010	100.78864353312302	6.9e-293
+B170_RS0117520	CIK06_RS27995	65	805	103.49417637271215	4.2e-231
+
+
+
+>>
+26. NZ_CP058322
+Source: Micromonospora carbonacea strain aurantiaca chromosome, complete genome
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 5
+Cumulative BLAST score: 3014
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117495	HXZ27_RS12680	68	484	99.53810623556582	1.2e-134
+B170_RS0117500	HXZ27_RS12675	81	636	98.75	1.7e-180
+B170_RS0117505	HXZ27_RS12670	59	265	94.66666666666667	3.4e-69
+B170_RS0117510	HXZ27_RS12665	72	916	99.21135646687698	1.4e-264
+B170_RS0117520	HXZ27_RS12660	61	713	96.83860232945092	1.7e-203
+
+
+
+>>
+27. NZ_FMCW01000035
+Source: Micromonospora haikouensis strain DSM 45626, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 5
+Cumulative BLAST score: 2956
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117495	GA0070558_RS27910	63	443	99.53810623556582	1.8e-122
+B170_RS0117500	GA0070558_RS27915	81	634	98.75	6.5e-180
+B170_RS0117505	GA0070558_RS27920	59	262	94.66666666666667	2.9e-68
+B170_RS0117510	GA0070558_RS27925	71	912	99.21135646687698	2e-263
+B170_RS0117520	GA0070558_RS27930	60	705	95.6738768718802	5.9e-201
+
+
+
+>>
+28. NZ_JAIY01000014
+Source: Kitasatospora sp. MBT66 scaffold14, whole genome shotgun sequence
+Type: NRPS,bacteriocin
+Number of proteins with BLAST hits to this cluster: 5
+Cumulative BLAST score: 2468
+
+Table of genes, locations, strands and annotations of subject cluster:
+BI06_RS34865	BI06_RS34865	75640	75968	-	hydrogenase_expression_protein
+BI06_RS51585	BI06_RS51585	76238	76630	-	OmpA_family_protein
+BI06_RS51590	BI06_RS51590	77443	77880	+	hypothetical_protein
+BI06_RS34885	BI06_RS34885	78103	78481	+	hypothetical_protein
+BI06_RS47145	BI06_RS47145	79029	79178	+	DNA_primase
+BI06_RS34895	BI06_RS34895	79953	82133	+	hypothetical_protein
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117495	BI06_RS34850	56	365	96.99769053117782	8e-99
+B170_RS0117500	BI06_RS34845	65	502	99.5	5.1e-140
+B170_RS0117505	BI06_RS34840	48	219	100.0	2.8e-55
+B170_RS0117510	BI06_RS34835	65	816	99.6845425867508	1.9e-234
+B170_RS0117520	BI06_RS34830	49	566	98.33610648918469	4.3e-159
+
+
+
+>>
+29. NZ_CP016076
+Source: Actinoalloteichus fjordicus strain ADI127-7 chromosome, complete genome
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 5
+Cumulative BLAST score: 2532
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117495	UA74_RS19750	57	391	97.45958429561202	8e-107
+B170_RS0117500	UA74_RS19745	69	526	96.5	2.5e-147
+B170_RS0117505	UA74_RS19740	53	223	92.0	2e-56
+B170_RS0117510	UA74_RS19735	64	820	98.42271293375394	1e-235
+B170_RS0117520	UA74_RS19725	50	572	95.34109816971714	6e-161
+
+
+
+>>
+30. NZ_LT629775
+Source: Streptomyces sp. TLI_053 chromosome I
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 5
+Cumulative BLAST score: 2461
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117495	BLU95_RS06955	55	362	96.99769053117782	6.8e-98
+B170_RS0117500	BLU95_RS06960	64	497	100.0	1.2e-138
+B170_RS0117505	BLU95_RS06965	48	221	100.0	7.4e-56
+B170_RS0117510	BLU95_RS06970	65	815	99.36908517350159	3.3e-234
+B170_RS0117520	BLU95_RS06975	48	566	103.49417637271215	4.3e-159
+
+
+
+>>
+31. NZ_CP016076
+Source: Actinoalloteichus fjordicus strain ADI127-7 chromosome, complete genome
+Type: NRPS,T1PKS,bacteriocin
+Number of proteins with BLAST hits to this cluster: 4
+Cumulative BLAST score: 1822
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117500	UA74_RS17595	40	243	98.25	3.2e-62
+B170_RS0117500	UA74_RS17500	35	218	100.75	1.1e-54
+B170_RS0117500	UA74_RS17530	32	187	103.25	2.1e-45
+B170_RS0117505	UA74_RS17710	34	132	99.55555555555556	4.5e-29
+B170_RS0117510	UA74_RS17715	53	644	98.10725552050474	1e-182
+B170_RS0117520	UA74_RS17720	40	398	99.33444259567388	1.5e-108
+
+
+
+>>
+32. NZ_CP029788
+Source: Streptomyces actuosus strain ATCC 25421 chromosome, complete genome
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 4
+Cumulative BLAST score: 1497
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117500	DMT42_RS30850	43	283	96.5	2.8e-74
+B170_RS0117505	DMT42_RS30835	38	150	96.44444444444444	2.1e-34
+B170_RS0117510	DMT42_RS30830	55	669	99.05362776025235	3.8e-190
+B170_RS0117520	DMT42_RS30825	38	395	99.50083194675541	7.7e-108
+
+
+
+>>
+33. NZ_CP045178
+Source: Streptomyces tsukubensis strain AT3 chromosome, complete genome
+Type: T3PKS,bacteriocin
+Number of proteins with BLAST hits to this cluster: 4
+Cumulative BLAST score: 1404
+
+Table of genes, locations, strands and annotations of subject cluster:
+GBW32_RS01700	GBW32_RS01700	403564	403812	-	4-hydroxybenzoate_3-monooxygenase
+GBW32_RS01705	GBW32_RS01705	403883	404304	-	hypothetical_protein
+GBW32_RS01710	GBW32_RS01710	404313	404805	-	hypothetical_protein
+GBW32_RS01715	GBW32_RS01715	404912	405434	+	hypothetical_protein
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117500	GBW32_RS01665	33	189	96.5	7.3e-46
+B170_RS0117505	GBW32_RS01650	39	139	92.0	4.8e-31
+B170_RS0117510	GBW32_RS01645	54	666	100.0	3.2e-189
+B170_RS0117520	GBW32_RS01640	40	410	97.00499168053244	3e-112
+
+
+
+>>
+34. NZ_CP023701
+Source: Streptomyces subrutilus strain ATCC 27467 chromosome, complete genome
+Type: NRPS,bacteriocin
+Number of proteins with BLAST hits to this cluster: 4
+Cumulative BLAST score: 1365
+
+Table of genes, locations, strands and annotations of subject cluster:
+CP968_RS32060	CP968_RS32060	7175188	7175994	-	molybdate_ABC_transporter_substrate-binding_protein
+CP968_RS32095	CP968_RS32095	7183529	7184633	+	SARP_family_transcriptional_regulator
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117500	CP968_RS32120	31	141	99.5	1.3e-31
+B170_RS0117505	CP968_RS32240	34	134	92.0	1.6e-29
+B170_RS0117510	CP968_RS32235	53	661	100.78864353312302	7.9e-188
+B170_RS0117520	CP968_RS32230	44	429	94.34276206322795	6.3e-118
+
+
+
+>>
+35. NZ_LWLE01000012
+Source: Streptomyces sp. TSRI0281 scaffold2, whole genome shotgun sequence
+Type: NRPS,NRPS-like,T1PKS,bacteriocin,betalactone,terpene,transAT-PKS
+Number of proteins with BLAST hits to this cluster: 4
+Cumulative BLAST score: 1300
+
+Table of genes, locations, strands and annotations of subject cluster:
+A6A29_RS44820	A6A29_RS44820	486318	486407	+	ATP-binding_protein
+A6A29_RS20050	A6A29_RS20050	582112	582414	-	VOC_family_protein
+A6A29_RS20075	A6A29_RS20075	586873	587524	-	IS701_family_transposase
+A6A29_RS20080	A6A29_RS20080	587718	587906	+	transposase
+A6A29_RS20105	A6A29_RS20105	594534	595477	-	ornithine_cyclodeaminase_family_protein
+A6A29_RS20110	A6A29_RS20110	595474	596244	-	proline_racemase
+A6A29_RS44095	A6A29_RS44095	596243	597001	-	IS3_family_transposase
+A6A29_RS43150	A6A29_RS43150	597322	597713	+	zinc-binding_dehydrogenase
+A6A29_RS20225	A6A29_RS20225	623240	623422	+	helix-turn-helix_domain-containing_protein
+A6A29_RS44115	A6A29_RS44115	626840	626941	+	IS5/IS1182_family_transposase
+A6A29_RS20250	A6A29_RS20250	627250	627553	+	sodium:calcium_antiporter
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117500	A6A29_RS19815	34	158	100.25	1.1e-36
+B170_RS0117505	A6A29_RS19685	34	133	96.44444444444444	2e-29
+B170_RS0117510	A6A29_RS19690	54	665	98.42271293375394	4.2e-189
+B170_RS0117520	A6A29_RS19695	36	344	99.16805324459234	1.6e-92
+
+
+
+>>
+36. NZ_LT907981
+Source: Streptomyces sp. 2323.1 chromosome I
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 3
+Cumulative BLAST score: 1276
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117505	CPH93_RS32620	38	144	95.55555555555556	1.5e-32
+B170_RS0117510	CPH93_RS32615	56	696	99.05362776025235	1.7e-198
+B170_RS0117520	CPH93_RS32610	42	436	99.33444259567388	3e-120
+
+
+
+>>
+37. NZ_KB911710
+Source: Streptomyces sp. 303MFCol5.2 H294DRAFT_scaffold00013.13, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 3
+Cumulative BLAST score: 1273
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117505	H294_RS0121090	42	163	95.11111111111111	3.1e-38
+B170_RS0117510	H294_RS0121095	56	690	99.21135646687698	2.1e-196
+B170_RS0117520	H294_RS0121105	42	420	98.33610648918469	2.9e-115
+
+
+
+>>
+38. NZ_CP019457
+Source: Streptomyces lydicus strain GS93 isolate 23 chromosome, complete genome
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 3
+Cumulative BLAST score: 1269
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117505	BXT88_RS35480	43	163	92.0	2.4e-38
+B170_RS0117510	BXT88_RS35485	56	696	99.05362776025235	2.2e-198
+B170_RS0117520	BXT88_RS35490	40	410	103.16139767054908	3.9e-112
+
+
+
+>>
+39. NZ_CP019779
+Source: Streptomyces sp. MOE7 chromosome, complete genome
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 3
+Cumulative BLAST score: 1269
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117505	STRMOE7_RS35790	43	162	92.0	4.1e-38
+B170_RS0117510	STRMOE7_RS35795	56	696	99.05362776025235	2.9e-198
+B170_RS0117520	STRMOE7_RS35800	40	411	100.99833610648918	1e-112
+
+
+
+>>
+40. NZ_CP032698
+Source: Streptomyces hundungensis strain BH38 chromosome, complete genome
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 3
+Cumulative BLAST score: 1265
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117505	DWB77_RS05180	40	154	92.44444444444444	1.5e-35
+B170_RS0117510	DWB77_RS05185	53	675	100.94637223974763	5.3e-192
+B170_RS0117520	DWB77_RS05190	45	436	92.34608985024958	3e-120
+
+
+
+>>
+41. NZ_JH725388
+Source: Streptomyces auratus AGR0001 Scaffold2, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 3
+Cumulative BLAST score: 1263
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117505	SU9_RS25830	38	145	96.88888888888889	5.2e-33
+B170_RS0117510	SU9_RS25825	56	689	99.05362776025235	2.7e-196
+B170_RS0117520	SU9_RS25820	42	429	99.33444259567388	4.8e-118
+
+
+
+>>
+42. NZ_CP017157
+Source: Streptomyces lydicus strain 103 chromosome, complete genome
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 3
+Cumulative BLAST score: 1262
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117505	SL103_RS19825	41	161	93.33333333333333	7e-38
+B170_RS0117510	SL103_RS19820	56	691	99.05362776025235	5.5e-197
+B170_RS0117520	SL103_RS19815	40	410	103.16139767054908	3.9e-112
+
+
+
+>>
+43. NZ_GG657738
+Source: Micromonospora sp. ATCC 39149 supercont1.1, whole genome shotgun sequence
+Type: NRPS,bacteriocin,betalactone,transAT-PKS,transAT-PKS-like
+Number of proteins with BLAST hits to this cluster: 3
+Cumulative BLAST score: 1256
+
+Table of genes, locations, strands and annotations of subject cluster:
+MCAG_RS26890	MCAG_RS26890	6174000	6174245	-	hypothetical_protein
+MCAG_RS31470	MCAG_RS31470	6174465	6174695	-	nitroreductase_family_deazaflavin-dependent_oxidoreductase
+MCAG_RS31475	MCAG_RS31475	6174652	6174855	-	DDE-type_integrase/transposase/recombinase
+MCAG_RS33010	MCAG_RS33010	6181223	6181336	+	alpha/beta_hydrolase
+MCAG_RS31485	MCAG_RS31485	6182688	6182980	+	hypothetical_protein
+MCAG_RS31490	MCAG_RS31490	6186274	6186516	+	transposase
+MCAG_RS31495	MCAG_RS31495	6186568	6187240	-	hypothetical_protein
+MCAG_RS31500	MCAG_RS31500	6195139	6195942	+	acyltransferase_domain-containing_protein
+MCAG_RS29975	MCAG_RS29975	6196090	6198542	+	ACP_S-malonyltransferase
+MCAG_RS29980	MCAG_RS29980	6200313	6205925	+	methyltransferase
+MCAG_RS31505	MCAG_RS31505	6206897	6207436	+	SDR_family_oxidoreductase
+MCAG_RS31510	MCAG_RS31510	6207443	6207883	+	hypothetical_protein
+MCAG_RS31520	MCAG_RS31520	6208766	6209254	+	non-ribosomal_peptide_synthetase
+MCAG_RS33025	MCAG_RS33025	6214450	6215256	+	hypothetical_protein
+MCAG_RS33030	MCAG_RS33030	6215413	6215538	+	hypothetical_protein
+MCAG_RS33035	MCAG_RS33035	6215782	6216501	+	polyketide_synthase
+MCAG_RS33040	MCAG_RS33040	6216841	6217434	+	hypothetical_protein
+MCAG_RS27040	MCAG_RS27040	6230985	6232310	+	polyketide_synthase_of_type_I
+MCAG_RS33045	MCAG_RS33045	6237026	6240289	+	hypothetical_protein
+MCAG_RS27060	MCAG_RS27060	6240282	6241142	+	hypothetical_protein
+MCAG_RS31535	MCAG_RS31535	6249866	6250702	+	hypothetical_protein
+MCAG_RS33050	MCAG_RS33050	6264864	6264998	-	IS110_family_transposase
+MCAG_RS31545	MCAG_RS31545	6265020	6265345	-	hypothetical_protein
+MCAG_RS27150	MCAG_RS27150	6276094	6276369	-	transposase
+MCAG_RS27280	MCAG_RS27280	6314368	6314897	-	IS630_family_transposase
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117505	MCAG_RS26910	36	155	95.11111111111111	8.5e-36
+B170_RS0117510	MCAG_RS26905	57	698	98.58044164037855	4.5e-199
+B170_RS0117520	MCAG_RS26900	41	403	93.34442595673876	4.8e-110
+
+
+
+>>
+44. NZ_LT629758
+Source: Actinoplanes derwentensis strain DSM 43941 chromosome I
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 3
+Cumulative BLAST score: 1254
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117505	BLU81_RS34855	35	135	96.88888888888889	7e-30
+B170_RS0117510	BLU81_RS34850	57	701	97.63406940063092	9e-200
+B170_RS0117520	BLU81_RS34845	42	418	92.84525790349417	8.5e-115
+
+
+
+>>
+45. NZ_CP029541
+Source: Streptomyces sp. NEAU-S7GS2 chromosome, complete genome
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 3
+Cumulative BLAST score: 1245
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117505	DKG71_RS38660	37	141	92.0	9.8e-32
+B170_RS0117510	DKG71_RS38655	54	675	99.05362776025235	5.3e-192
+B170_RS0117520	DKG71_RS38650	42	429	99.00166389351082	4.8e-118
+
+
+
+>>
+46. NZ_CP023691
+Source: Streptomyces platensis strain ATCC 23948 chromosome, complete genome
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 3
+Cumulative BLAST score: 1243
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117505	CP981_RS34310	36	133	92.0	2.7e-29
+B170_RS0117510	CP981_RS34305	55	684	100.0	8.7e-195
+B170_RS0117520	CP981_RS34300	42	426	99.33444259567388	4.1e-117
+
+
+
+>>
+47. NZ_CP029042
+Source: Streptomyces lydicus strain WYEC 108 chromosome, complete genome
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 3
+Cumulative BLAST score: 1242
+
+Table of genes, locations, strands and annotations of subject cluster:
+DDE74_RS35995	DDE74_RS35995	8265341	8265672	-	cupin_domain-containing_protein
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117505	DDE74_RS35975	36	139	92.0	4.8e-31
+B170_RS0117510	DDE74_RS35970	54	675	99.05362776025235	4.1e-192
+B170_RS0117520	DDE74_RS35965	42	428	98.50249584026622	8.2e-118
+
+
+
+>>
+48. NZ_CP050976
+Source: Streptomyces sp. RPA4-5 chromosome
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 3
+Cumulative BLAST score: 1241
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117505	HEP86_RS35865	34	133	96.0	3.5e-29
+B170_RS0117510	HEP86_RS35860	55	680	99.05362776025235	1.3e-193
+B170_RS0117520	HEP86_RS35855	42	428	98.83527454242929	1.4e-117
+
+
+
+>>
+49. NZ_CP034687
+Source: Streptomyces griseoviridis strain F1-27 chromosome, complete genome
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 3
+Cumulative BLAST score: 1239
+
+Table of genes, locations, strands and annotations of subject cluster:
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117505	ELQ87_RS24240	36	139	92.0	4.8e-31
+B170_RS0117510	ELQ87_RS24245	54	675	100.47318611987382	4.1e-192
+B170_RS0117520	ELQ87_RS24255	41	425	102.82861896838602	6.9e-117
+
+
+
+>>
+50. NZ_KQ948863
+Source: Streptomyces bungoensis strain DSM 41781 PRJNA299233_s013, whole genome shotgun sequence
+Type: bacteriocin
+Number of proteins with BLAST hits to this cluster: 3
+Cumulative BLAST score: 1238
+
+Table of genes, locations, strands and annotations of subject cluster:
+AQJ66_RS37560	AQJ66_RS37560	124921	125091	+	IS110_family_transposase
+
+Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):
+B170_RS0117505	AQJ66_RS24195	35	141	96.88888888888889	9.8e-32
+B170_RS0117510	AQJ66_RS24190	53	667	98.26498422712933	1.4e-189
+B170_RS0117520	AQJ66_RS24185	42	430	94.50915141430949	2.2e-118
+

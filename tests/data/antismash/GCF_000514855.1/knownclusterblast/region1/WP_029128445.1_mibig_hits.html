@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>CAG38718.1</td>
+              <td>putative_coenzyme_PQQ_synthesis_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000708/1">BGC0000708</a></td>
+              <td>Saccharide</td>
+              <td>65.0</td>
+              <td>99.2</td>
+              <td>489.0</td>
+              <td>5.6e-138</td>
+          </tr>
+    
+          <tr>
+              <td>ABU41512.1</td>
+              <td>NirJ2</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000906/1">BGC0000906</a></td>
+              <td>Other</td>
+              <td>32.0</td>
+              <td>93.6</td>
+              <td>163.0</td>
+              <td>7.1e-40</td>
+          </tr>
+    
+          <tr>
+              <td>ABT18046.1</td>
+              <td>heme_d1_biosynthesis_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000905/1">BGC0000905</a></td>
+              <td>Other</td>
+              <td>32.0</td>
+              <td>93.6</td>
+              <td>160.0</td>
+              <td>4.6e-39</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

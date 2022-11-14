@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>ATJ00796.1</td>
+              <td>putative_flavoprotein_decarboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001802/1">BGC0001802</a></td>
+              <td>RiPP</td>
+              <td>51.0</td>
+              <td>94.1</td>
+              <td>193.0</td>
+              <td>2.5e-49</td>
+          </tr>
+    
+          <tr>
+              <td>BBC15202.1</td>
+              <td>decarboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001696/1">BGC0001696</a></td>
+              <td>RiPP</td>
+              <td>49.0</td>
+              <td>96.0</td>
+              <td>193.0</td>
+              <td>3.3e-49</td>
+          </tr>
+    
+          <tr>
+              <td>BAN83921.1</td>
+              <td>putative_flavoprotein_decarboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001803/1">BGC0001803</a></td>
+              <td>RiPP</td>
+              <td>42.0</td>
+              <td>95.0</td>
+              <td>141.0</td>
+              <td>1.5e-33</td>
+          </tr>
+    
+          <tr>
+              <td>ADD45285.1</td>
+              <td>flavoprotein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000807/1">BGC0000807</a></td>
+              <td>Saccharide</td>
+              <td>42.0</td>
+              <td>81.2</td>
+              <td>113.0</td>
+              <td>5.7e-25</td>
+          </tr>
+    
+          <tr>
+              <td>AJI44175.1</td>
+              <td>phosphopantothenoylcysteine_decarboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001193/1">BGC0001193</a></td>
+              <td>NRP</td>
+              <td>41.0</td>
+              <td>80.2</td>
+              <td>104.0</td>
+              <td>2.6e-22</td>
+          </tr>
+    
+          <tr>
+              <td>AAD56146.1</td>
+              <td>MutD</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000533/1">BGC0000533</a></td>
+              <td>RiPP:Lanthipeptide</td>
+              <td>32.0</td>
+              <td>90.6</td>
+              <td>94.0</td>
+              <td>2.7e-19</td>
+          </tr>
+    
+          <tr>
+              <td>EMC15126.1</td>
+              <td>lantibiotic_biosynthesis_protein,_flavoprotein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000530/1">BGC0000530</a></td>
+              <td>RiPP:Lanthipeptide</td>
+              <td>31.0</td>
+              <td>78.7</td>
+              <td>93.0</td>
+              <td>4.6e-19</td>
+          </tr>
+    
+          <tr>
+              <td>AAG48568.1</td>
+              <td>MutD</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000531/1">BGC0000531</a></td>
+              <td>RiPP:Lanthipeptide</td>
+              <td>32.0</td>
+              <td>90.6</td>
+              <td>93.0</td>
+              <td>4.6e-19</td>
+          </tr>
+    
+          <tr>
+              <td>AFO93363.1</td>
+              <td>putative_flavoprotein,_HFCD_family</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001362/1">BGC0001362</a></td>
+              <td>Other</td>
+              <td>32.0</td>
+              <td>80.7</td>
+              <td>86.0</td>
+              <td>5.7e-17</td>
+          </tr>
+    
+          <tr>
+              <td>CBK62752.1</td>
+              <td></td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001115/1">BGC0001115</a></td>
+              <td>NRP + Polyketide</td>
+              <td>34.0</td>
+              <td>73.8</td>
+              <td>84.0</td>
+              <td>2.2e-16</td>
+          </tr>
+    
+          <tr>
+              <td>ARD24448.1</td>
+              <td>HyiD</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001618/1">BGC0001618</a></td>
+              <td>RiPP</td>
+              <td>28.0</td>
+              <td>70.3</td>
+              <td>64.0</td>
+              <td>1.8e-10</td>
+          </tr>
+    
+          <tr>
+              <td>CAA44255.1</td>
+              <td></td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000508/1">BGC0000508</a></td>
+              <td>RiPP:Lanthipeptide</td>
+              <td>28.0</td>
+              <td>74.3</td>
+              <td>62.0</td>
+              <td>6.7e-10</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

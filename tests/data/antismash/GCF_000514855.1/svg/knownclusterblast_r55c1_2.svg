@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="360,35 365,30 373,30 373,40 365,40 360,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121750&lt;/b&gt;&lt;br&gt;beta-ketoacyl synthase&lt;br&gt;Location: 0 - 1497" locus_tag="B113_RS0121750" class="clusterblast-orf" id="dummy-1_q0_0_all"  />
+<polygon points="373,35 378,30 413,30 413,40 378,40 373,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121755&lt;/b&gt;&lt;br&gt;type I polyketide synthase&lt;br&gt;Location: 1554 - 6309" locus_tag="B113_RS0121755" class="clusterblast-orf" id="dummy-1_q1_0_all"  />
+<polygon points="413,35 418,30 419,30 419,40 418,40 413,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS25300&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 6349 - 7033" locus_tag="B113_RS25300" class="clusterblast-orf" id="dummy-1_q2_0_all"  />
+</g>
+<g label="BGC0000114" description="BGC0000114_c1: nigericin (55% of genes show similarity), Polyketide:Modular type I" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://mibig.secondarymetabolites.org/go/BGC0000114/1" target="_blank">BGC0000114</a>:                                                                        nigericin (55% of genes show similarity), Polyketide:Modular type I</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a1_000"  >
+<polygon points="0,90 4,85 0,80 0,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84472.1&lt;/b&gt;&lt;br&gt;unknown&lt;br&gt;Location: 93948 - 93400" locus_tag="ABC84472.1" class="clusterblast-orf" id="dummy-1_h1_2_0"  />
+</g>
+<g id="a1_001"  >
+<polygon points="4,90 119,90 124,85 119,80 4,80 4,90 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84471.1&lt;/b&gt;&lt;br&gt;NigAVII&lt;br&gt;Location: 93358 - 78995&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121750&lt;/b&gt;&lt;br&gt;Percentage identity: 64&lt;br&gt;Percentage coverage: 101&lt;br&gt;BLAST bit score: 629&lt;br&gt;E-value: 5.8e-180&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121755&lt;/b&gt;&lt;br&gt;Percentage identity: 47&lt;br&gt;Percentage coverage: 103&lt;br&gt;BLAST bit score: 1279&lt;br&gt;E-value: 0.0" locus_tag="ABC84471.1" class="clusterblast-orf" id="dummy-1_h1_2_1"  />
+</g>
+<g id="a1_002"  >
+<polygon points="125,90 175,90 180,85 175,80 125,80 125,90 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84470.1&lt;/b&gt;&lt;br&gt;NIGAVIII&lt;br&gt;Location: 78947 - 72327&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121750&lt;/b&gt;&lt;br&gt;Percentage identity: 66&lt;br&gt;Percentage coverage: 101&lt;br&gt;BLAST bit score: 655&lt;br&gt;E-value: 7.6e-188&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121755&lt;/b&gt;&lt;br&gt;Percentage identity: 54&lt;br&gt;Percentage coverage: 60&lt;br&gt;BLAST bit score: 939&lt;br&gt;E-value: 8.3e-273" locus_tag="ABC84470.1" class="clusterblast-orf" id="dummy-1_h1_2_2"  />
+</g>
+<g id="a1_003"  >
+<polygon points="180,90 224,90 229,85 224,80 180,80 180,90 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84469.1&lt;/b&gt;&lt;br&gt;NigAIX&lt;br&gt;Location: 72278 - 66450&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121750&lt;/b&gt;&lt;br&gt;Percentage identity: 65&lt;br&gt;Percentage coverage: 101&lt;br&gt;BLAST bit score: 639&lt;br&gt;E-value: 3.3e-183" locus_tag="ABC84469.1" class="clusterblast-orf" id="dummy-1_h1_2_3"  />
+</g>
+<g id="a1_004"  >
+<polygon points="229,90 232,85 229,80 229,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84468.1&lt;/b&gt;&lt;br&gt;NigBI&lt;br&gt;Location: 66453 - 66016" locus_tag="ABC84468.1" class="clusterblast-orf" id="dummy-1_h1_2_4"  />
+</g>
+<g id="a1_005"  >
+<polygon points="233,90 237,85 233,80 233,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84467.1&lt;/b&gt;&lt;br&gt;NigBIII&lt;br&gt;Location: 65980 - 65513" locus_tag="ABC84467.1" class="clusterblast-orf" id="dummy-1_h1_2_5"  />
+</g>
+<g id="a1_006"  >
+<polygon points="237,90 244,90 249,85 244,80 237,80 237,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84466.1&lt;/b&gt;&lt;br&gt;NigCI&lt;br&gt;Location: 65478 - 64048" locus_tag="ABC84466.1" class="clusterblast-orf" id="dummy-1_h1_2_6"  />
+</g>
+<g id="a1_007"  >
+<polygon points="249,90 276,90 281,85 276,80 249,80 249,90 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84465.1&lt;/b&gt;&lt;br&gt;NigAX&lt;br&gt;Location: 64051 - 60152&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121750&lt;/b&gt;&lt;br&gt;Percentage identity: 61&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 595&lt;br&gt;E-value: 7.1e-170" locus_tag="ABC84465.1" class="clusterblast-orf" id="dummy-1_h1_2_7"  />
+</g>
+<g id="a1_008"  >
+<polygon points="282,90 285,85 282,80 282,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84464.1&lt;/b&gt;&lt;br&gt;NigAXI&lt;br&gt;Location: 60043 - 59705" locus_tag="ABC84464.1" class="clusterblast-orf" id="dummy-1_h1_2_8"  />
+</g>
+<g id="a1_009"  >
+<polygon points="286,85 291,80 296,80 296,90 291,90 286,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84463.1&lt;/b&gt;&lt;br&gt;NigD&lt;br&gt;Location: 59629 - 58370" locus_tag="ABC84463.1" class="clusterblast-orf" id="dummy-1_h1_2_9"  />
+</g>
+<g id="a1_0010"  >
+<polygon points="298,90 300,90 305,85 300,80 298,80 298,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84462.1&lt;/b&gt;&lt;br&gt;NigCII&lt;br&gt;Location: 58197 - 57331" locus_tag="ABC84462.1" class="clusterblast-orf" id="dummy-1_h1_2_10"  />
+</g>
+<g id="a1_0011"  >
+<polygon points="306,85 311,80 348,80 348,90 311,90 306,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84461.1&lt;/b&gt;&lt;br&gt;NigAVI&lt;br&gt;Location: 57244 - 52139&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121750&lt;/b&gt;&lt;br&gt;Percentage identity: 64&lt;br&gt;Percentage coverage: 103&lt;br&gt;BLAST bit score: 627&lt;br&gt;E-value: 1.7e-179&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121755&lt;/b&gt;&lt;br&gt;Percentage identity: 48&lt;br&gt;Percentage coverage: 108&lt;br&gt;BLAST bit score: 1315&lt;br&gt;E-value: 0.0" locus_tag="ABC84461.1" class="clusterblast-orf" id="dummy-1_h1_2_11"  />
+</g>
+<g id="a1_0012"  >
+<polygon points="348,85 353,80 450,80 450,90 353,90 348,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84460.1&lt;/b&gt;&lt;br&gt;NigAV&lt;br&gt;Location: 52122 - 39985&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121750&lt;/b&gt;&lt;br&gt;Percentage identity: 68&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 652&lt;br&gt;E-value: 6.4e-187" locus_tag="ABC84460.1" class="clusterblast-orf" id="dummy-1_h1_2_12"  />
+</g>
+<g id="a1_0013"  >
+<polygon points="450,85 455,80 551,80 551,90 455,90 450,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84459.1&lt;/b&gt;&lt;br&gt;NigAIV&lt;br&gt;Location: 39942 - 27775&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121750&lt;/b&gt;&lt;br&gt;Percentage identity: 67&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 639&lt;br&gt;E-value: 4.3e-183&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121755&lt;/b&gt;&lt;br&gt;Percentage identity: 56&lt;br&gt;Percentage coverage: 58&lt;br&gt;BLAST bit score: 945&lt;br&gt;E-value: 1.2e-274&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25300&lt;/b&gt;&lt;br&gt;Percentage identity: 57&lt;br&gt;Percentage coverage: 42&lt;br&gt;BLAST bit score: 97&lt;br&gt;E-value: 2.8e-20" locus_tag="ABC84459.1" class="clusterblast-orf" id="dummy-1_h1_2_13"  />
+</g>
+<g id="a1_0014"  >
+<polygon points="552,85 557,80 654,80 654,90 557,90 552,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84458.1&lt;/b&gt;&lt;br&gt;NigAIII&lt;br&gt;Location: 27758 - 15507&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121750&lt;/b&gt;&lt;br&gt;Percentage identity: 72&lt;br&gt;Percentage coverage: 86&lt;br&gt;BLAST bit score: 624&lt;br&gt;E-value: 1.9e-178&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121755&lt;/b&gt;&lt;br&gt;Percentage identity: 56&lt;br&gt;Percentage coverage: 58&lt;br&gt;BLAST bit score: 923&lt;br&gt;E-value: 3.6e-268" locus_tag="ABC84458.1" class="clusterblast-orf" id="dummy-1_h1_2_14"  />
+</g>
+<g id="a1_0015"  >
+<polygon points="654,85 659,80 710,80 710,90 659,90 654,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84457.1&lt;/b&gt;&lt;br&gt;NigAII&lt;br&gt;Location: 15465 - 8764&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121750&lt;/b&gt;&lt;br&gt;Percentage identity: 69&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 655&lt;br&gt;E-value: 5.8e-188&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121755&lt;/b&gt;&lt;br&gt;Percentage identity: 54&lt;br&gt;Percentage coverage: 63&lt;br&gt;BLAST bit score: 944&lt;br&gt;E-value: 2.6e-274" locus_tag="ABC84457.1" class="clusterblast-orf" id="dummy-1_h1_2_15"  />
+</g>
+<g id="a1_0016"  >
+<polygon points="710,85 715,80 771,80 771,90 715,90 710,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84456.1&lt;/b&gt;&lt;br&gt;NigAI&lt;br&gt;Location: 8722 - 1475&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121750&lt;/b&gt;&lt;br&gt;Percentage identity: 67&lt;br&gt;Percentage coverage: 93&lt;br&gt;BLAST bit score: 622&lt;br&gt;E-value: 5.4e-178" locus_tag="ABC84456.1" class="clusterblast-orf" id="dummy-1_h1_2_16"  />
+</g>
+<g id="a1_0017"  >
+<polygon points="773,90 775,90 780,85 775,80 773,80 773,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ABC84455.1&lt;/b&gt;&lt;br&gt;NigE&lt;br&gt;Location: 1232 - 420" locus_tag="ABC84455.1" class="clusterblast-orf" id="dummy-1_h1_2_17"  />
+</g>
+</svg>

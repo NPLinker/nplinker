@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>AHB38505.1</td>
+              <td>proteasome_beta-subunit</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000345/1">BGC0000345</a></td>
+              <td>NRP + Polyketide:Modular type I</td>
+              <td>57.0</td>
+              <td>97.1</td>
+              <td>293.0</td>
+              <td>4.2e-79</td>
+          </tr>
+    
+          <tr>
+              <td>CUX96950.1</td>
+              <td>TmcC</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001829/1">BGC0001829</a></td>
+              <td>NRP + Polyketide</td>
+              <td>57.0</td>
+              <td>97.1</td>
+              <td>291.0</td>
+              <td>1.6e-78</td>
+          </tr>
+    
+          <tr>
+              <td>AKA59433.1</td>
+              <td>proteasome_subunit_beta</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001202/1">BGC0001202</a></td>
+              <td>NRP + Polyketide</td>
+              <td>55.0</td>
+              <td>92.8</td>
+              <td>277.0</td>
+              <td>1.8e-74</td>
+          </tr>
+    
+          <tr>
+              <td>ABP73653.1</td>
+              <td>SalI</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000145/1">BGC0000145</a></td>
+              <td>Polyketide</td>
+              <td>57.0</td>
+              <td>97.5</td>
+              <td>269.0</td>
+              <td>8.5e-72</td>
+          </tr>
+    
+          <tr>
+              <td>ABP53490.1</td>
+              <td>20S_proteasome,_A_and_B_subunits</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001041/1">BGC0001041</a></td>
+              <td>NRP + Polyketide</td>
+              <td>57.0</td>
+              <td>97.5</td>
+              <td>269.0</td>
+              <td>8.5e-72</td>
+          </tr>
+    
+          <tr>
+              <td>CBW54670.1</td>
+              <td>20S_proteasome_beta-subunit</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000971/1">BGC0000971</a></td>
+              <td>NRP + Polyketide:Modular type I</td>
+              <td>50.0</td>
+              <td>100.7</td>
+              <td>257.0</td>
+              <td>2e-68</td>
+          </tr>
+    
+          <tr>
+              <td>AKA59451.1</td>
+              <td>proteasome_subunit_beta</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001203/1">BGC0001203</a></td>
+              <td>NRP + Polyketide</td>
+              <td>53.0</td>
+              <td>93.9</td>
+              <td>244.0</td>
+              <td>2.2e-64</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

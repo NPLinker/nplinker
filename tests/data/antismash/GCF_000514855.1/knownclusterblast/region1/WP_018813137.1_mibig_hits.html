@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>ABP55214.1</td>
+              <td>aminotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000142/1">BGC0000142</a></td>
+              <td>Polyketide</td>
+              <td>91.0</td>
+              <td>100.0</td>
+              <td>748.0</td>
+              <td>5.5e-216</td>
+          </tr>
+    
+          <tr>
+              <td>ALA09368.1</td>
+              <td>aminotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001303/1">BGC0001303</a></td>
+              <td>Polyketide</td>
+              <td>88.0</td>
+              <td>100.0</td>
+              <td>727.0</td>
+              <td>1.3e-209</td>
+          </tr>
+    
+          <tr>
+              <td>sipL3</td>
+              <td>aminotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001452/1">BGC0001452</a></td>
+              <td>Polyketide</td>
+              <td>68.0</td>
+              <td>99.3</td>
+              <td>562.0</td>
+              <td>5.6e-160</td>
+          </tr>
+    
+          <tr>
+              <td>AWR88411.1</td>
+              <td>putative_aminotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001522/1">BGC0001522</a></td>
+              <td>Polyketide</td>
+              <td>69.0</td>
+              <td>98.8</td>
+              <td>561.0</td>
+              <td>9.5e-160</td>
+          </tr>
+    
+          <tr>
+              <td>BAP34709.1</td>
+              <td>(PLP)-dependent_aspartate_aminotransferase_superfamily</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000078/1">BGC0000078</a></td>
+              <td>Polyketide</td>
+              <td>69.0</td>
+              <td>98.6</td>
+              <td>550.0</td>
+              <td>1.7e-156</td>
+          </tr>
+    
+          <tr>
+              <td>BAE95537.1</td>
+              <td>hypothetical_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000703/1">BGC0000703</a></td>
+              <td>Saccharide</td>
+              <td>40.0</td>
+              <td>89.7</td>
+              <td>243.0</td>
+              <td>4.4e-64</td>
+          </tr>
+    
+          <tr>
+              <td>AAT09802.1</td>
+              <td>NocG</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000395/1">BGC0000395</a></td>
+              <td>NRP</td>
+              <td>32.0</td>
+              <td>39.7</td>
+              <td>56.0</td>
+              <td>1e-07</td>
+          </tr>
+    
+          <tr>
+              <td>DAB41663.1</td>
+              <td>PLP-dependent_carbon-sulfur_bond_lyase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001585/1">BGC0001585</a></td>
+              <td>Alkaloid</td>
+              <td>26.0</td>
+              <td>55.3</td>
+              <td>54.0</td>
+              <td>6.5e-07</td>
+          </tr>
+    
+          <tr>
+              <td>EHK22001.1</td>
+              <td>hypothetical_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001609/1">BGC0001609</a></td>
+              <td>NRP</td>
+              <td>28.0</td>
+              <td>47.8</td>
+              <td>53.0</td>
+              <td>1.1e-06</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

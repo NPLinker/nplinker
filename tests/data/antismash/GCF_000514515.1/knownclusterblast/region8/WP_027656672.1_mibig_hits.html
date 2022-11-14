@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>ATV95653.1</td>
+              <td>RNA_polymerase_sigma_factor</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001503/1">BGC0001503</a></td>
+              <td>Polyketide</td>
+              <td>61.0</td>
+              <td>98.8</td>
+              <td>446.0</td>
+              <td>4.4e-125</td>
+          </tr>
+    
+          <tr>
+              <td>ABP55158.1</td>
+              <td>Sigma-70,_region_4_type_2</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000150/1">BGC0000150</a></td>
+              <td>NRP + Polyketide:Enediyne type I</td>
+              <td>54.0</td>
+              <td>97.8</td>
+              <td>392.0</td>
+              <td>7.5e-109</td>
+          </tr>
+    
+          <tr>
+              <td>AIE54221.1</td>
+              <td>PauY1</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001732/1">BGC0001732</a></td>
+              <td>Other</td>
+              <td>48.0</td>
+              <td>98.3</td>
+              <td>287.0</td>
+              <td>2.6e-77</td>
+          </tr>
+    
+          <tr>
+              <td>ADR01063.1</td>
+              <td>Noc-2</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000609/1">BGC0000609</a></td>
+              <td>RiPP:Thiopeptide</td>
+              <td>48.0</td>
+              <td>98.0</td>
+              <td>285.0</td>
+              <td>1.7e-76</td>
+          </tr>
+    
+          <tr>
+              <td>AIE54168.1</td>
+              <td>Pau1</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001731/1">BGC0001731</a></td>
+              <td>Other</td>
+              <td>47.0</td>
+              <td>98.3</td>
+              <td>283.0</td>
+              <td>6.4e-76</td>
+          </tr>
+    
+          <tr>
+              <td>AAT01810.1</td>
+              <td>extra_cytoplasmic_sigma_factor</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000365/1">BGC0000365</a></td>
+              <td>NRP</td>
+              <td>47.0</td>
+              <td>96.8</td>
+              <td>280.0</td>
+              <td>5.4e-75</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

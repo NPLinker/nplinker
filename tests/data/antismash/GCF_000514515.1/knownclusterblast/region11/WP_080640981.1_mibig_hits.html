@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>ABP55137.1</td>
+              <td>transcriptional_regulator,_AraC_family</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000150/1">BGC0000150</a></td>
+              <td>NRP + Polyketide:Enediyne type I</td>
+              <td>54.0</td>
+              <td>99.2</td>
+              <td>242.0</td>
+              <td>5.7e-64</td>
+          </tr>
+    
+          <tr>
+              <td>ABY65996.1</td>
+              <td>transcription_regulatory_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001008/1">BGC0001008</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Enediyne type I</td>
+              <td>52.0</td>
+              <td>97.9</td>
+              <td>232.0</td>
+              <td>7.6e-61</td>
+          </tr>
+    
+          <tr>
+              <td>AFV52137.1</td>
+              <td>AraC-like_transcriptional_regulator</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000081/1">BGC0000081</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Enediyne type I</td>
+              <td>50.0</td>
+              <td>100.4</td>
+              <td>217.0</td>
+              <td>1.9e-56</td>
+          </tr>
+    
+          <tr>
+              <td>AAM78008.1</td>
+              <td>transcriptional_regulator</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000112/1">BGC0000112</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Enediyne type I</td>
+              <td>48.0</td>
+              <td>99.6</td>
+              <td>209.0</td>
+              <td>6.9e-54</td>
+          </tr>
+    
+          <tr>
+              <td>AAL06696.1</td>
+              <td>putative_regulatory_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000965/1">BGC0000965</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Enediyne type I</td>
+              <td>51.0</td>
+              <td>93.4</td>
+              <td>194.0</td>
+              <td>1.8e-49</td>
+          </tr>
+    
+          <tr>
+              <td>ALU98458.1</td>
+              <td>hypothetical_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001397/1">BGC0001397</a></td>
+              <td>NRP + Polyketide</td>
+              <td>51.0</td>
+              <td>93.4</td>
+              <td>194.0</td>
+              <td>1.8e-49</td>
+          </tr>
+    
+          <tr>
+              <td>ANY94467.1</td>
+              <td>AraC_family_transcriptional_regulator</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001584/1">BGC0001584</a></td>
+              <td>Polyketide</td>
+              <td>50.0</td>
+              <td>93.4</td>
+              <td>189.0</td>
+              <td>7.4e-48</td>
+          </tr>
+    
+          <tr>
+              <td>ACB47062.1</td>
+              <td>DynR7</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001060/1">BGC0001060</a></td>
+              <td>Polyketide</td>
+              <td>38.0</td>
+              <td>97.9</td>
+              <td>147.0</td>
+              <td>2.5e-35</td>
+          </tr>
+    
+          <tr>
+              <td>ABS50483.1</td>
+              <td>NapR1</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000652/1">BGC0000652</a></td>
+              <td>Terpene</td>
+              <td>35.0</td>
+              <td>103.3</td>
+              <td>140.0</td>
+              <td>3e-33</td>
+          </tr>
+    
+          <tr>
+              <td>AHZ61842.1</td>
+              <td>AraC_transcriptional_regulator</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000240/1">BGC0000240</a></td>
+              <td>Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>35.0</td>
+              <td>99.6</td>
+              <td>134.0</td>
+              <td>2.2e-31</td>
+          </tr>
+    
+          <tr>
+              <td>ABP54631.1</td>
+              <td>transcriptional_regulator,_AraC_family</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000241/1">BGC0000241</a></td>
+              <td>Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>35.0</td>
+              <td>91.3</td>
+              <td>127.0</td>
+              <td>3.5e-29</td>
+          </tr>
+    
+          <tr>
+              <td>AME17994.1</td>
+              <td>AraC_family_transcriptional_regulator</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001804/1">BGC0001804</a></td>
+              <td>Polyketide</td>
+              <td>35.0</td>
+              <td>78.0</td>
+              <td>125.0</td>
+              <td>1e-28</td>
+          </tr>
+    
+          <tr>
+              <td>ATV95650.1</td>
+              <td>regulatory_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001503/1">BGC0001503</a></td>
+              <td>Polyketide</td>
+              <td>33.0</td>
+              <td>104.6</td>
+              <td>125.0</td>
+              <td>1.3e-28</td>
+          </tr>
+    
+          <tr>
+              <td>AMK92581.1</td>
+              <td>Arac_family_transcriptional_regulator</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001815/1">BGC0001815</a></td>
+              <td>Polyketide</td>
+              <td>32.0</td>
+              <td>100.0</td>
+              <td>120.0</td>
+              <td>4.2e-27</td>
+          </tr>
+    
+          <tr>
+              <td>ARD70856.1</td>
+              <td>AraC_family_transcriptional_regulator</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001693/1">BGC0001693</a></td>
+              <td>Polyketide</td>
+              <td>33.0</td>
+              <td>92.1</td>
+              <td>120.0</td>
+              <td>4.2e-27</td>
+          </tr>
+    
+          <tr>
+              <td>AFV52208.1</td>
+              <td>transcriptional_regulator</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000081/1">BGC0000081</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Enediyne type I</td>
+              <td>38.0</td>
+              <td>76.8</td>
+              <td>113.0</td>
+              <td>5.2e-25</td>
+          </tr>
+    
+          <tr>
+              <td>ABS50455.1</td>
+              <td>putative_regulatory_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001079/1">BGC0001079</a></td>
+              <td>Terpene + Polyketide:Type III</td>
+              <td>60.0</td>
+              <td>36.1</td>
+              <td>111.0</td>
+              <td>1.5e-24</td>
+          </tr>
+    
+          <tr>
+              <td>AAM70331.1</td>
+              <td>CalR7</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000033/1">BGC0000033</a></td>
+              <td>Polyketide</td>
+              <td>51.0</td>
+              <td>38.6</td>
+              <td>96.0</td>
+              <td>8.5e-20</td>
+          </tr>
+    
+          <tr>
+              <td>AHZ61898.1</td>
+              <td>AraC_transcriptional_regulator</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000240/1">BGC0000240</a></td>
+              <td>Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>43.0</td>
+              <td>36.5</td>
+              <td>73.0</td>
+              <td>4.5e-13</td>
+          </tr>
+    
+          <tr>
+              <td>ABP54679.1</td>
+              <td>transcriptional_regulator,_AraC_family</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000241/1">BGC0000241</a></td>
+              <td>Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>42.0</td>
+              <td>36.5</td>
+              <td>72.0</td>
+              <td>1.3e-12</td>
+          </tr>
+    
+          <tr>
+              <td>ARD70907.1</td>
+              <td>transcriptional_regulator</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001693/1">BGC0001693</a></td>
+              <td>Polyketide</td>
+              <td>39.0</td>
+              <td>36.1</td>
+              <td>65.0</td>
+              <td>1.6e-10</td>
+          </tr>
+    
+          <tr>
+              <td>CAL80832.1</td>
+              <td>HTH_AraC-type_regulator</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000997/1">BGC0000997</a></td>
+              <td>NRP + Polyketide</td>
+              <td>32.0</td>
+              <td>36.1</td>
+              <td>59.0</td>
+              <td>8.9e-09</td>
+          </tr>
+    
+          <tr>
+              <td>ACL77553.1</td>
+              <td>transcriptional_regulator,_AraC_family</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001891/1">BGC0001891</a></td>
+              <td>Other</td>
+              <td>28.0</td>
+              <td>39.0</td>
+              <td>52.0</td>
+              <td>8.3e-07</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

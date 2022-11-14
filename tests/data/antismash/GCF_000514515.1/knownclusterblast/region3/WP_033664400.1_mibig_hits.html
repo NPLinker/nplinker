@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>ABV98186.1</td>
+              <td>glycosyltransferase,_MGT_family</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000827/1">BGC0000827</a></td>
+              <td>Alkaloid</td>
+              <td>91.0</td>
+              <td>98.9</td>
+              <td>791.0</td>
+              <td>7.7e-229</td>
+          </tr>
+    
+          <tr>
+              <td>BAC55209.1</td>
+              <td>N-glycosyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000825/1">BGC0000825</a></td>
+              <td>Alkaloid</td>
+              <td>75.0</td>
+              <td>99.8</td>
+              <td>665.0</td>
+              <td>6.4e-191</td>
+          </tr>
+    
+          <tr>
+              <td>EFG04604.1</td>
+              <td>Staurosporine_biosynthesis_N-glycosyltransferase_StaG</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000826/1">BGC0000826</a></td>
+              <td>Alkaloid</td>
+              <td>74.0</td>
+              <td>99.3</td>
+              <td>636.0</td>
+              <td>2.4e-182</td>
+          </tr>
+    
+          <tr>
+              <td>BAC10673.1</td>
+              <td>N-glycosyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000821/1">BGC0000821</a></td>
+              <td>Other:Aminocoumarin</td>
+              <td>59.0</td>
+              <td>96.1</td>
+              <td>490.0</td>
+              <td>3.7e-138</td>
+          </tr>
+    
+          <tr>
+              <td>CAC93713.1</td>
+              <td>putative_glycosyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000822/1">BGC0000822</a></td>
+              <td>Alkaloid</td>
+              <td>59.0</td>
+              <td>96.1</td>
+              <td>490.0</td>
+              <td>3.7e-138</td>
+          </tr>
+    
+          <tr>
+              <td>BAC15749.1</td>
+              <td>N-glycosyl_transferase_RebG</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000823/1">BGC0000823</a></td>
+              <td>Alkaloid</td>
+              <td>59.0</td>
+              <td>96.1</td>
+              <td>490.0</td>
+              <td>3.7e-138</td>
+          </tr>
+    
+          <tr>
+              <td>AGC24262.1</td>
+              <td>prlH</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001038/1">BGC0001038</a></td>
+              <td>NRP + Polyketide:Modular type I</td>
+              <td>58.0</td>
+              <td>96.8</td>
+              <td>484.0</td>
+              <td>1.5e-136</td>
+          </tr>
+    
+          <tr>
+              <td>ACN29718.1</td>
+              <td>N-glycosyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000814/1">BGC0000814</a></td>
+              <td>Alkaloid</td>
+              <td>57.0</td>
+              <td>99.1</td>
+              <td>468.0</td>
+              <td>1.1e-131</td>
+          </tr>
+    
+          <tr>
+              <td>ABC02800.1</td>
+              <td>N-glycosyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000809/1">BGC0000809</a></td>
+              <td>Alkaloid</td>
+              <td>53.0</td>
+              <td>100.7</td>
+              <td>448.0</td>
+              <td>9.4e-126</td>
+          </tr>
+    
+          <tr>
+              <td>ABD59211.1</td>
+              <td>InkG</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000813/1">BGC0000813</a></td>
+              <td>Alkaloid</td>
+              <td>57.0</td>
+              <td>87.4</td>
+              <td>413.0</td>
+              <td>5.7e-115</td>
+          </tr>
+    
+          <tr>
+              <td>ABK58688.1</td>
+              <td>PdmS</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000256/1">BGC0000256</a></td>
+              <td>Polyketide</td>
+              <td>36.0</td>
+              <td>103.2</td>
+              <td>234.0</td>
+              <td>3.6e-61</td>
+          </tr>
+    
+          <tr>
+              <td>AHH99928.1</td>
+              <td>glycosyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000002/1">BGC0000002</a></td>
+              <td>Polyketide</td>
+              <td>27.0</td>
+              <td>97.5</td>
+              <td>96.0</td>
+              <td>9.1e-20</td>
+          </tr>
+    
+          <tr>
+              <td>BAA84592.1</td>
+              <td>glycosyl_transferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000025/1">BGC0000025</a></td>
+              <td>Polyketide</td>
+              <td>25.0</td>
+              <td>97.0</td>
+              <td>92.0</td>
+              <td>1.3e-18</td>
+          </tr>
+    
+          <tr>
+              <td>AHH99938.1</td>
+              <td>antibiotic_resistance_macrolide_glycosyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000002/1">BGC0000002</a></td>
+              <td>Polyketide</td>
+              <td>24.0</td>
+              <td>92.7</td>
+              <td>88.0</td>
+              <td>2.5e-17</td>
+          </tr>
+    
+          <tr>
+              <td>ABB05096.1</td>
+              <td>LipGtf</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001003/1">BGC0001003</a></td>
+              <td>NRP:Lipopeptide + Polyketide:Modular type I + Saccharide:Hybrid/tailoring</td>
+              <td>26.0</td>
+              <td>93.6</td>
+              <td>82.0</td>
+              <td>1.4e-15</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

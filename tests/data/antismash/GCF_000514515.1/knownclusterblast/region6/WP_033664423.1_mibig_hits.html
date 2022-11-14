@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>ASZ00141.1</td>
+              <td>NADPH-dependent_reductase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001785/1">BGC0001785</a></td>
+              <td>Polyketide</td>
+              <td>39.0</td>
+              <td>51.5</td>
+              <td>139.0</td>
+              <td>7.7e-33</td>
+          </tr>
+    
+          <tr>
+              <td>ACP19360.1</td>
+              <td>SaqO</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000267/1">BGC0000267</a></td>
+              <td>Polyketide:Type II + Saccharide:Oligosaccharide</td>
+              <td>35.0</td>
+              <td>53.7</td>
+              <td>106.0</td>
+              <td>1.2e-22</td>
+          </tr>
+    
+          <tr>
+              <td>OWA25249.1</td>
+              <td>NADPH-dependent_oxidoreductase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001438/1">BGC0001438</a></td>
+              <td>Polyketide + Saccharide:Hybrid/tailoring</td>
+              <td>34.0</td>
+              <td>53.5</td>
+              <td>105.0</td>
+              <td>2.1e-22</td>
+          </tr>
+    
+          <tr>
+              <td>OWA25238.1</td>
+              <td>NADPH-dependent_oxidoreductase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001438/1">BGC0001438</a></td>
+              <td>Polyketide + Saccharide:Hybrid/tailoring</td>
+              <td>36.0</td>
+              <td>54.3</td>
+              <td>100.0</td>
+              <td>6.8e-21</td>
+          </tr>
+    
+          <tr>
+              <td>PPQ57497.1</td>
+              <td>NADPH-dependent_FMN_reductase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0002016/1">BGC0002016</a></td>
+              <td>Polyketide</td>
+              <td>34.0</td>
+              <td>52.6</td>
+              <td>97.0</td>
+              <td>5.7e-20</td>
+          </tr>
+    
+          <tr>
+              <td>PPQ57481.1</td>
+              <td>FMN_reductase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0002016/1">BGC0002016</a></td>
+              <td>Polyketide</td>
+              <td>33.0</td>
+              <td>54.3</td>
+              <td>96.0</td>
+              <td>9.8e-20</td>
+          </tr>
+    
+          <tr>
+              <td>QBK46647.1</td>
+              <td>HrsR</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001960/1">BGC0001960</a></td>
+              <td>Polyketide</td>
+              <td>37.0</td>
+              <td>53.5</td>
+              <td>95.0</td>
+              <td>1.7e-19</td>
+          </tr>
+    
+          <tr>
+              <td>BAJ07862.1</td>
+              <td>putative_reductase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000232/1">BGC0000232</a></td>
+              <td>Polyketide</td>
+              <td>35.0</td>
+              <td>54.3</td>
+              <td>94.0</td>
+              <td>2.9e-19</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

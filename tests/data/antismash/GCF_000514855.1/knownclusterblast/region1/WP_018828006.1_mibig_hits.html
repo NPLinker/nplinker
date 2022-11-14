@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>ABP55164.1</td>
+              <td>Acyl-CoA_dehydrogenase,_type_2,_C-terminal_domain</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000150/1">BGC0000150</a></td>
+              <td>NRP + Polyketide:Enediyne type I</td>
+              <td>62.0</td>
+              <td>98.3</td>
+              <td>494.0</td>
+              <td>1.4e-139</td>
+          </tr>
+    
+          <tr>
+              <td>ABY66021.1</td>
+              <td>oxidoreductase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001008/1">BGC0001008</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Enediyne type I</td>
+              <td>31.0</td>
+              <td>91.2</td>
+              <td>125.0</td>
+              <td>1.7e-28</td>
+          </tr>
+    
+          <tr>
+              <td>ADG39438.1</td>
+              <td>AllO</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000886/1">BGC0000886</a></td>
+              <td>Other</td>
+              <td>31.0</td>
+              <td>94.3</td>
+              <td>123.0</td>
+              <td>1.1e-27</td>
+          </tr>
+    
+          <tr>
+              <td>CAC44193.1</td>
+              <td>putative_hydrolase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000194/1">BGC0000194</a></td>
+              <td>Polyketide:Type II</td>
+              <td>30.0</td>
+              <td>93.1</td>
+              <td>111.0</td>
+              <td>4.3e-24</td>
+          </tr>
+    
+          <tr>
+              <td>ALU98446.1</td>
+              <td>acyl-CoA_dehydrogenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001397/1">BGC0001397</a></td>
+              <td>NRP + Polyketide</td>
+              <td>30.0</td>
+              <td>92.4</td>
+              <td>108.0</td>
+              <td>2.8e-23</td>
+          </tr>
+    
+          <tr>
+              <td>ANY94455.1</td>
+              <td>oxidoreductase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001584/1">BGC0001584</a></td>
+              <td>Polyketide</td>
+              <td>29.0</td>
+              <td>91.9</td>
+              <td>107.0</td>
+              <td>6.3e-23</td>
+          </tr>
+    
+          <tr>
+              <td>AAL06685.1</td>
+              <td>oxidoreductase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000965/1">BGC0000965</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Enediyne type I</td>
+              <td>31.0</td>
+              <td>72.7</td>
+              <td>106.0</td>
+              <td>1.1e-22</td>
+          </tr>
+    
+          <tr>
+              <td>CCH63732.1</td>
+              <td>XiaF_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000665/1">BGC0000665</a></td>
+              <td>Terpene + Alkaloid</td>
+              <td>27.0</td>
+              <td>92.9</td>
+              <td>104.0</td>
+              <td>3.1e-22</td>
+          </tr>
+    
+          <tr>
+              <td>QBK46628.1</td>
+              <td>HrsG</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001960/1">BGC0001960</a></td>
+              <td>Polyketide</td>
+              <td>28.0</td>
+              <td>92.4</td>
+              <td>104.0</td>
+              <td>3.1e-22</td>
+          </tr>
+    
+          <tr>
+              <td>AFK78075.1</td>
+              <td>oxidative_terpene_cyclase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000666/1">BGC0000666</a></td>
+              <td>Terpene</td>
+              <td>27.0</td>
+              <td>92.9</td>
+              <td>102.0</td>
+              <td>1.2e-21</td>
+          </tr>
+    
+          <tr>
+              <td>SCO70302.1</td>
+              <td>Dehydrogenase/hydroxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001433/1">BGC0001433</a></td>
+              <td>Polyketide:Modular type I</td>
+              <td>24.0</td>
+              <td>89.9</td>
+              <td>102.0</td>
+              <td>1.2e-21</td>
+          </tr>
+    
+          <tr>
+              <td>ABP55152.1</td>
+              <td>Acyl-CoA_dehydrogenase,_type_2,_C-terminal_domain</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000150/1">BGC0000150</a></td>
+              <td>NRP + Polyketide:Enediyne type I</td>
+              <td>28.0</td>
+              <td>90.9</td>
+              <td>102.0</td>
+              <td>1.5e-21</td>
+          </tr>
+    
+          <tr>
+              <td>ATV95595.1</td>
+              <td>oxidoreductase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001503/1">BGC0001503</a></td>
+              <td>Polyketide</td>
+              <td>33.0</td>
+              <td>48.6</td>
+              <td>101.0</td>
+              <td>2.6e-21</td>
+          </tr>
+    
+          <tr>
+              <td>AKD43518.1</td>
+              <td>Acyl-CoA_dehydrogenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001409/1">BGC0001409</a></td>
+              <td>Polyketide</td>
+              <td>30.0</td>
+              <td>94.8</td>
+              <td>101.0</td>
+              <td>3.4e-21</td>
+          </tr>
+    
+          <tr>
+              <td>WP_018540595.1</td>
+              <td>hypothetical_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001332/1">BGC0001332</a></td>
+              <td>NRP + Polyketide</td>
+              <td>26.0</td>
+              <td>89.7</td>
+              <td>101.0</td>
+              <td>4.5e-21</td>
+          </tr>
+    
+          <tr>
+              <td>ACN64826.1</td>
+              <td>PokU2</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001061/1">BGC0001061</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>31.0</td>
+              <td>94.8</td>
+              <td>98.0</td>
+              <td>2.2e-20</td>
+          </tr>
+    
+          <tr>
+              <td>ARG41915.1</td>
+              <td>IstL</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001622/1">BGC0001622</a></td>
+              <td>Polyketide</td>
+              <td>29.0</td>
+              <td>93.6</td>
+              <td>96.0</td>
+              <td>8.5e-20</td>
+          </tr>
+    
+          <tr>
+              <td>BAT51059.1</td>
+              <td>dehydrogenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001296/1">BGC0001296</a></td>
+              <td>Polyketide</td>
+              <td>24.0</td>
+              <td>89.9</td>
+              <td>96.0</td>
+              <td>1.4e-19</td>
+          </tr>
+    
+          <tr>
+              <td>BAU98045.1</td>
+              <td>FMNH2_dependent_monooxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001386/1">BGC0001386</a></td>
+              <td>Polyketide</td>
+              <td>29.0</td>
+              <td>93.9</td>
+              <td>91.0</td>
+              <td>2.7e-18</td>
+          </tr>
+    
+          <tr>
+              <td>AAD13564.1</td>
+              <td>bifunctional_oxygenase-dehydratase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000239/1">BGC0000239</a></td>
+              <td>Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>27.0</td>
+              <td>92.4</td>
+              <td>89.0</td>
+              <td>1.4e-17</td>
+          </tr>
+    
+          <tr>
+              <td>BAL90269.1</td>
+              <td>putative_oxidoreductase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0002021/1">BGC0002021</a></td>
+              <td>Polyketide</td>
+              <td>29.0</td>
+              <td>93.9</td>
+              <td>88.0</td>
+              <td>3e-17</td>
+          </tr>
+    
+          <tr>
+              <td>BAL92977.1</td>
+              <td>alkylresorcinol_hydroxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001077/1">BGC0001077</a></td>
+              <td>Terpene + Polyketide</td>
+              <td>25.0</td>
+              <td>97.5</td>
+              <td>74.0</td>
+              <td>4.5e-13</td>
+          </tr>
+    
+          <tr>
+              <td>AVT42374.1</td>
+              <td>flavin-dependent_oxidoreductase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001476/1">BGC0001476</a></td>
+              <td>Other:Nucleoside</td>
+              <td>28.0</td>
+              <td>54.5</td>
+              <td>54.0</td>
+              <td>4.8e-07</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

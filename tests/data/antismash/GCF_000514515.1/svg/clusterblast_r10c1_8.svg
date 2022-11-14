@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="0,40 15,40 20,35 15,30 0,30 0,40 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0113565&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 81445 - 81673" locus_tag="B170_RS0113565" class="clusterblast-orf" id="dummy-1_q0_0_all"  />
+<polygon points="24,40 85,40 90,35 85,30 24,30 24,40 " style="fill:#5cd815; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0113570&lt;/b&gt;&lt;br&gt;enoyl-CoA hydratase/isomerase family protein&lt;br&gt;Location: 81719 - 82487" locus_tag="B170_RS0113570" class="clusterblast-orf" id="dummy-1_q1_0_all"  />
+<polygon points="102,40 266,40 271,35 266,30 102,30 102,40 " style="fill:#15a3d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0113575&lt;/b&gt;&lt;br&gt;ABC transporter ATP-binding protein&lt;br&gt;Location: 82632 - 84609" locus_tag="B170_RS0113575" class="clusterblast-orf" id="dummy-1_q2_0_all"  />
+<polygon points="275,35 280,30 341,30 341,40 280,40 275,35 " style="fill:#c715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0113580&lt;/b&gt;&lt;br&gt;SDR family oxidoreductase&lt;br&gt;Location: 84658 - 85420" locus_tag="B170_RS0113580" class="clusterblast-orf" id="dummy-1_q3_0_all"  />
+<polygon points="344,35 349,30 388,30 388,40 349,40 344,35 " style="fill:#d88015; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0113585&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 85461 - 85968" locus_tag="B170_RS0113585" class="clusterblast-orf" id="dummy-1_q4_0_all"  />
+<polygon points="387,35 392,30 457,30 457,40 392,40 387,35 " style="fill:#15d839; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0113590&lt;/b&gt;&lt;br&gt;DUF692 domain-containing protein&lt;br&gt;Location: 85964 - 86783" locus_tag="B170_RS0113590" class="clusterblast-orf" id="dummy-1_q5_0_all"  />
+<polygon points="457,35 462,30 533,30 533,40 462,40 457,35 " style="fill:#1539d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0113595&lt;/b&gt;&lt;br&gt;TIGR04222 domain-containing membrane protein&lt;br&gt;Location: 86779 - 87670" locus_tag="B170_RS0113595" class="clusterblast-orf" id="dummy-1_q6_0_all"  />
+<polygon points="541,35 546,30 590,30 590,40 546,40 541,35 " style="fill:#d81580; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0113600&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 87760 - 88333" locus_tag="B170_RS0113600" class="clusterblast-orf" id="dummy-1_q7_0_all"  />
+<polygon points="607,40 657,40 662,35 657,30 607,30 607,40 " style="fill:#c7d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0113605&lt;/b&gt;&lt;br&gt;HAD hydrolase-like protein&lt;br&gt;Location: 88531 - 89176" locus_tag="B170_RS0113605" class="clusterblast-orf" id="dummy-1_q8_0_all"  />
+<polygon points="675,40 750,40 755,35 750,30 675,30 675,40 " style="fill:#15d8a3; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0113610&lt;/b&gt;&lt;br&gt;phosphotransferase&lt;br&gt;Location: 89330 - 90257" locus_tag="B170_RS0113610" class="clusterblast-orf" id="dummy-1_q9_0_all"  />
+<polygon points="759,35 764,30 780,30 780,40 764,40 759,35 " style="fill:#5c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0113615&lt;/b&gt;&lt;br&gt;DUF2630 family protein&lt;br&gt;Location: 90308 - 90557" locus_tag="B170_RS0113615" class="clusterblast-orf" id="dummy-1_q10_0_all"  />
+</g>
+<g label="NZ_KE384277" description="NZ_KE384277 (89503-100322): Salinispora pacifica CNY239 H304DRAFT scaffold000... (100% of genes show similarity), bacteriocin" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_KE384277&amp;start=89503&amp;end=100322" target="_blank">NZ_KE384277 (89503-100322)</a>: Salinispora pacifica CNY239 H304DRAFT scaffold000... (100% of genes show similarity), bacteriocin</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a1_000"  >
+<polygon points="1,90 15,90 20,85 15,80 1,80 1,90 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0124415&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 90021 - 90248&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0113565&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 139&lt;br&gt;E-value: 1.6e-31" locus_tag="H304_RS0124415" class="clusterblast-orf" id="dummy-1_h1_8_0"  />
+</g>
+<g id="a1_001"  >
+<polygon points="24,90 85,90 90,85 85,80 24,80 24,90 " style="fill:#5cd815; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0124420&lt;/b&gt;&lt;br&gt;enoyl-CoA hydratase/isomerase family protein&lt;br&gt;Location: 90295 - 91062&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0113570&lt;/b&gt;&lt;br&gt;Percentage identity: 97&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 458&lt;br&gt;E-value: 3.1e-127" locus_tag="H304_RS0124420" class="clusterblast-orf" id="dummy-1_h1_8_1"  />
+</g>
+<g id="a1_002"  >
+<polygon points="100,90 264,90 269,85 264,80 100,80 100,90 " style="fill:#15a3d8; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0124425&lt;/b&gt;&lt;br&gt;ABC transporter ATP-binding protein&lt;br&gt;Location: 91176 - 93152&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0113575&lt;/b&gt;&lt;br&gt;Percentage identity: 98&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1198&lt;br&gt;E-value: 0.0" locus_tag="H304_RS0124425" class="clusterblast-orf" id="dummy-1_h1_8_2"  />
+</g>
+<g id="a1_003"  >
+<polygon points="273,85 278,80 338,80 338,90 278,90 273,85 " style="fill:#c715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0124430&lt;/b&gt;&lt;br&gt;SDR family oxidoreductase&lt;br&gt;Location: 93198 - 93959&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0113580&lt;/b&gt;&lt;br&gt;Percentage identity: 91&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 434&lt;br&gt;E-value: 6.3e-120" locus_tag="H304_RS0124430" class="clusterblast-orf" id="dummy-1_h1_8_3"  />
+</g>
+<g id="a1_004"  >
+<polygon points="341,85 346,80 385,80 385,90 346,90 341,85 " style="fill:#d88015; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0124435&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 94001 - 94507&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0113585&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 302&lt;br&gt;E-value: 3.2e-80" locus_tag="H304_RS0124435" class="clusterblast-orf" id="dummy-1_h1_8_4"  />
+</g>
+<g id="a1_005"  >
+<polygon points="384,85 389,80 454,80 454,90 389,90 384,85 " style="fill:#15d839; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0124440&lt;/b&gt;&lt;br&gt;DUF692 domain-containing protein&lt;br&gt;Location: 94504 - 95322&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0113590&lt;/b&gt;&lt;br&gt;Percentage identity: 97&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 514&lt;br&gt;E-value: 5.1e-144" locus_tag="H304_RS0124440" class="clusterblast-orf" id="dummy-1_h1_8_5"  />
+</g>
+<g id="a1_006"  >
+<polygon points="454,85 459,80 530,80 530,90 459,90 454,85 " style="fill:#1539d8; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0124445&lt;/b&gt;&lt;br&gt;TIGR04222 domain-containing membrane protein&lt;br&gt;Location: 95319 - 96206&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0113595&lt;/b&gt;&lt;br&gt;Percentage identity: 88&lt;br&gt;Percentage coverage: 92&lt;br&gt;BLAST bit score: 442&lt;br&gt;E-value: 3.5e-122" locus_tag="H304_RS0124445" class="clusterblast-orf" id="dummy-1_h1_8_6"  />
+</g>
+<g id="a1_007"  >
+<polygon points="538,85 543,80 587,80 587,90 543,90 538,85 " style="fill:#d81580; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0124450&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 96298 - 96870&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0113600&lt;/b&gt;&lt;br&gt;Percentage identity: 98&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 365&lt;br&gt;E-value: 2.7e-99" locus_tag="H304_RS0124450" class="clusterblast-orf" id="dummy-1_h1_8_7"  />
+</g>
+<g id="a1_008"  >
+<polygon points="608,90 658,90 663,85 658,80 608,80 608,90 " style="fill:#c7d815; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0124455&lt;/b&gt;&lt;br&gt;HAD hydrolase-like protein&lt;br&gt;Location: 97110 - 97754&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0113605&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 420&lt;br&gt;E-value: 1.4e-115" locus_tag="H304_RS0124455" class="clusterblast-orf" id="dummy-1_h1_8_8"  />
+</g>
+<g id="a1_009"  >
+<polygon points="676,90 750,90 755,85 750,80 676,80 676,90 " style="fill:#15d8a3; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0124460&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 97908 - 98834&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0113610&lt;/b&gt;&lt;br&gt;Percentage identity: 94&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 578&lt;br&gt;E-value: 3.3e-163" locus_tag="H304_RS0124460" class="clusterblast-orf" id="dummy-1_h1_8_9"  />
+</g>
+<g id="a1_0010"  >
+<polygon points="757,85 762,80 778,80 778,90 762,90 757,85 " style="fill:#5c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0124465&lt;/b&gt;&lt;br&gt;DUF2630 family protein&lt;br&gt;Location: 98856 - 99104&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0113615&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 155&lt;br&gt;E-value: 2.4e-36" locus_tag="H304_RS0124465" class="clusterblast-orf" id="dummy-1_h1_8_10"  />
+</g>
+</svg>

@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="142,35 147,30 167,30 167,40 147,40 142,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121390&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 1687 - 3379" locus_tag="B170_RS0121390" class="clusterblast-orf" id="dummy-1_q0_0_all"  />
+<polygon points="172,35 177,30 194,30 194,40 177,40 172,35 " style="fill:#56d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121395&lt;/b&gt;&lt;br&gt;aminopeptidase P family protein&lt;br&gt;Location: 3659 - 5138" locus_tag="B170_RS0121395" class="clusterblast-orf" id="dummy-1_q1_0_all"  />
+<polygon points="196,40 220,40 225,35 220,30 196,30 196,40 " style="fill:#1597d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121400&lt;/b&gt;&lt;br&gt;asparagine synthase (glutamine-hydrolyzing)&lt;br&gt;Location: 5258 - 7220" locus_tag="B170_RS0121400" class="clusterblast-orf" id="dummy-1_q2_0_all"  />
+<polygon points="229,35 234,30 336,30 336,40 234,40 229,35 " style="fill:#9715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121405&lt;/b&gt;&lt;br&gt;type I polyketide synthase&lt;br&gt;Location: 7429 - 14557" locus_tag="B170_RS0121405" class="clusterblast-orf" id="dummy-1_q3_0_all"  />
+<polygon points="337,35 342,30 350,30 350,40 342,40 337,35 " style="fill:#d85615; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121410&lt;/b&gt;&lt;br&gt;methyltransferase domain-containing protein&lt;br&gt;Location: 14630 - 15488" locus_tag="B170_RS0121410" class="clusterblast-orf" id="dummy-1_q4_0_all"  />
+<polygon points="350,35 355,30 388,30 388,40 355,40 350,35 " style="fill:#15d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121415&lt;/b&gt;&lt;br&gt;lantibiotic dehydratase&lt;br&gt;Location: 15480 - 18000" locus_tag="B170_RS0121415" class="clusterblast-orf" id="dummy-1_q5_0_all"  />
+<polygon points="390,40 403,40 408,35 403,30 390,30 390,40 " style="fill:#1556d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121420&lt;/b&gt;&lt;br&gt;M20 family metallopeptidase&lt;br&gt;Location: 18101 - 19310" locus_tag="B170_RS0121420" class="clusterblast-orf" id="dummy-1_q6_0_all"  />
+<polygon points="408,35 413,30 418,30 418,40 413,40 408,35 " style="fill:#d815d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121425&lt;/b&gt;&lt;br&gt;VOC family protein&lt;br&gt;Location: 19342 - 20014" locus_tag="B170_RS0121425" class="clusterblast-orf" id="dummy-1_q7_0_all"  />
+<polygon points="418,35 423,30 435,30 435,40 423,40 418,35 " style="fill:#d89715; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121430&lt;/b&gt;&lt;br&gt;FAD-binding oxidoreductase&lt;br&gt;Location: 20013 - 21114" locus_tag="B170_RS0121430" class="clusterblast-orf" id="dummy-1_q8_0_all"  />
+<polygon points="435,35 440,30 451,30 451,40 440,40 435,35 " style="fill:#15d856; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121435&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 21088 - 22165" locus_tag="B170_RS0121435" class="clusterblast-orf" id="dummy-1_q9_0_all"  />
+<polygon points="451,35 456,30 470,30 470,40 456,40 451,35 " style="fill:#1515d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121440&lt;/b&gt;&lt;br&gt;peptidase C69&lt;br&gt;Location: 22157 - 23417" locus_tag="B170_RS0121440" class="clusterblast-orf" id="dummy-1_q10_0_all"  />
+<polygon points="470,35 475,30 504,30 504,40 475,40 470,35 " style="fill:#d81597; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121445&lt;/b&gt;&lt;br&gt;lantibiotic dehydratase&lt;br&gt;Location: 23413 - 25663" locus_tag="B170_RS0121445" class="clusterblast-orf" id="dummy-1_q11_0_all"  />
+<polygon points="504,35 509,30 526,30 526,40 509,40 504,35 " style="fill:#d8d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121450&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 25659 - 27129" locus_tag="B170_RS0121450" class="clusterblast-orf" id="dummy-1_q12_0_all"  />
+<polygon points="526,35 531,30 560,30 560,40 531,40 526,35 " style="fill:#15d897; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121455&lt;/b&gt;&lt;br&gt;lantibiotic dehydratase&lt;br&gt;Location: 27125 - 29411" locus_tag="B170_RS0121455" class="clusterblast-orf" id="dummy-1_q13_0_all"  />
+<polygon points="560,35 565,30 597,30 597,40 565,40 560,35 " style="fill:#5615d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121460&lt;/b&gt;&lt;br&gt;lantibiotic dehydratase&lt;br&gt;Location: 29407 - 31843" locus_tag="B170_RS0121460" class="clusterblast-orf" id="dummy-1_q14_0_all"  />
+<polygon points="597,35 602,30 624,30 624,40 602,40 597,35 " style="fill:#d81556; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121465&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 31845 - 33645" locus_tag="B170_RS0121465" class="clusterblast-orf" id="dummy-1_q15_0_all"  />
+<polygon points="624,35 628,30 628,40 624,35 " style="fill:#97d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121470&lt;/b&gt;&lt;br&gt;lymphostin biosynthesis Trp-donating RiPP&lt;br&gt;Location: 33632 - 33893" locus_tag="B170_RS0121470" class="clusterblast-orf" id="dummy-1_q16_0_all"  />
+<polygon points="628,35 633,30 637,30 637,40 633,40 628,35 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0121475&lt;/b&gt;&lt;br&gt;NAD(P)H-dependent oxidoreductase&lt;br&gt;Location: 33911 - 34532" locus_tag="B170_RS0121475" class="clusterblast-orf" id="dummy-1_q17_0_all"  />
+</g>
+<g label="NZ_KB905359" description="NZ_KB905359 (4858015-4910233): Salinispora pacifica DSM 45544 Salpac3DRAFT Sc... (57% of genes show similarity), NRPS-like,T1PKS,bacteriocin" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_KB905359&amp;start=4858015&amp;end=4910233" target="_blank">NZ_KB905359 (4858015-4910233)</a>: Salinispora pacifica DSM 45544 Salpac3DRAFT Sc... (57% of genes show similarity), NRPS-like,T1PKS,bacteriocin</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a1_000"  >
+<polygon points="0,90 3,85 0,80 0,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122310&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 4858533 - 4858760" locus_tag="SALPAC3_RS0122310" class="clusterblast-orf" id="dummy-1_h1_3_0"  />
+</g>
+<g id="a1_001"  >
+<polygon points="4,90 10,90 15,85 10,80 4,80 4,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122315&lt;/b&gt;&lt;br&gt;enoyl-CoA hydratase/isomerase family protein&lt;br&gt;Location: 4858807 - 4859574" locus_tag="SALPAC3_RS0122315" class="clusterblast-orf" id="dummy-1_h1_3_1"  />
+</g>
+<g id="a1_002"  >
+<polygon points="17,90 42,90 47,85 42,80 17,80 17,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122320&lt;/b&gt;&lt;br&gt;ABC transporter ATP-binding protein&lt;br&gt;Location: 4859688 - 4861664" locus_tag="SALPAC3_RS0122320" class="clusterblast-orf" id="dummy-1_h1_3_2"  />
+</g>
+<g id="a1_003"  >
+<polygon points="47,85 52,80 59,80 59,90 52,90 47,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122325&lt;/b&gt;&lt;br&gt;SDR family oxidoreductase&lt;br&gt;Location: 4861710 - 4862471" locus_tag="SALPAC3_RS0122325" class="clusterblast-orf" id="dummy-1_h1_3_3"  />
+</g>
+<g id="a1_004"  >
+<polygon points="60,85 65,80 67,80 67,90 65,90 60,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122330&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 4862513 - 4863019" locus_tag="SALPAC3_RS0122330" class="clusterblast-orf" id="dummy-1_h1_3_4"  />
+</g>
+<g id="a1_005"  >
+<polygon points="67,85 72,80 79,80 79,90 72,90 67,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122335&lt;/b&gt;&lt;br&gt;DUF692 domain-containing protein&lt;br&gt;Location: 4863016 - 4863834" locus_tag="SALPAC3_RS0122335" class="clusterblast-orf" id="dummy-1_h1_3_5"  />
+</g>
+<g id="a1_006"  >
+<polygon points="79,85 84,80 93,80 93,90 84,90 79,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122340&lt;/b&gt;&lt;br&gt;TIGR04222 domain-containing membrane protein&lt;br&gt;Location: 4863831 - 4864721" locus_tag="SALPAC3_RS0122340" class="clusterblast-orf" id="dummy-1_h1_3_6"  />
+</g>
+<g id="a1_007"  >
+<polygon points="94,85 99,80 103,80 103,90 99,90 94,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122345&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 4864813 - 4865385" locus_tag="SALPAC3_RS0122345" class="clusterblast-orf" id="dummy-1_h1_3_7"  />
+</g>
+<g id="a1_008"  >
+<polygon points="106,90 111,90 116,85 111,80 106,80 106,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122350&lt;/b&gt;&lt;br&gt;HAD hydrolase-like protein&lt;br&gt;Location: 4865625 - 4866269" locus_tag="SALPAC3_RS0122350" class="clusterblast-orf" id="dummy-1_h1_3_8"  />
+</g>
+<g id="a1_009"  >
+<polygon points="119,90 128,90 133,85 128,80 119,80 119,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122355&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 4866424 - 4867350" locus_tag="SALPAC3_RS0122355" class="clusterblast-orf" id="dummy-1_h1_3_9"  />
+</g>
+<g id="a1_0010"  >
+<polygon points="133,85 137,80 137,90 133,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122360&lt;/b&gt;&lt;br&gt;DUF2630 family protein&lt;br&gt;Location: 4867372 - 4867620" locus_tag="SALPAC3_RS0122360" class="clusterblast-orf" id="dummy-1_h1_3_10"  />
+</g>
+<g id="a1_0011"  >
+<polygon points="139,85 144,80 182,80 182,90 144,90 139,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122365&lt;/b&gt;&lt;br&gt;aconitate hydratase&lt;br&gt;Location: 4867807 - 4870656" locus_tag="SALPAC3_RS0122365" class="clusterblast-orf" id="dummy-1_h1_3_11"  />
+</g>
+<g id="a1_0012"  >
+<polygon points="190,90 194,90 199,85 194,80 190,80 190,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122375&lt;/b&gt;&lt;br&gt;disulfide bond formation protein B&lt;br&gt;Location: 4871165 - 4871776" locus_tag="SALPAC3_RS0122375" class="clusterblast-orf" id="dummy-1_h1_3_12"  />
+</g>
+<g id="a1_0013"  >
+<polygon points="201,90 239,90 244,85 239,80 201,80 201,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122380&lt;/b&gt;&lt;br&gt;pullulanase-type alpha-1,6-glucosidase&lt;br&gt;Location: 4871901 - 4874744" locus_tag="SALPAC3_RS0122380" class="clusterblast-orf" id="dummy-1_h1_3_13"  />
+</g>
+<g id="a1_0014"  >
+<polygon points="245,85 250,80 280,80 280,90 250,90 245,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122385&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 4874811 - 4877147&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121390&lt;/b&gt;&lt;br&gt;Percentage identity: 40&lt;br&gt;Percentage coverage: 40&lt;br&gt;BLAST bit score: 136&lt;br&gt;E-value: 6e-30" locus_tag="SALPAC3_RS0122385" class="clusterblast-orf" id="dummy-1_h1_3_14"  />
+</g>
+<g id="a1_0015"  >
+<polygon points="286,85 291,80 310,80 310,90 291,90 286,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122390&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 4877492 - 4879132&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121390&lt;/b&gt;&lt;br&gt;Percentage identity: 87&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 760&lt;br&gt;E-value: 1.5e-217" locus_tag="SALPAC3_RS0122390" class="clusterblast-orf" id="dummy-1_h1_3_15"  />
+</g>
+<g id="a1_0016"  >
+<polygon points="315,85 320,80 337,80 337,90 320,90 315,85 " style="fill:#56d815; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122395&lt;/b&gt;&lt;br&gt;aminopeptidase P family protein&lt;br&gt;Location: 4879414 - 4880892&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121395&lt;/b&gt;&lt;br&gt;Percentage identity: 94&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 944&lt;br&gt;E-value: 3.6e-273" locus_tag="SALPAC3_RS0122395" class="clusterblast-orf" id="dummy-1_h1_3_16"  />
+</g>
+<g id="a1_0017"  >
+<polygon points="339,90 363,90 368,85 363,80 339,80 339,90 " style="fill:#1597d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122400&lt;/b&gt;&lt;br&gt;asparagine synthase (glutamine-hydrolyzing)&lt;br&gt;Location: 4881013 - 4882974&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121400&lt;/b&gt;&lt;br&gt;Percentage identity: 98&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1314&lt;br&gt;E-value: 0.0" locus_tag="SALPAC3_RS0122400" class="clusterblast-orf" id="dummy-1_h1_3_17"  />
+</g>
+<g id="a1_0018"  >
+<polygon points="370,85 375,80 478,80 478,90 375,90 370,85 " style="fill:#9715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122405&lt;/b&gt;&lt;br&gt;type I polyketide synthase&lt;br&gt;Location: 4883096 - 4890238&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121405&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 4258&lt;br&gt;E-value: 0.0" locus_tag="SALPAC3_RS0122405" class="clusterblast-orf" id="dummy-1_h1_3_18"  />
+</g>
+<g id="a1_0019"  >
+<polygon points="479,85 484,80 492,80 492,90 484,90 479,85 " style="fill:#d85615; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122410&lt;/b&gt;&lt;br&gt;methyltransferase domain-containing protein&lt;br&gt;Location: 4890328 - 4891185&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121410&lt;/b&gt;&lt;br&gt;Percentage identity: 91&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 510&lt;br&gt;E-value: 7.8e-143" locus_tag="SALPAC3_RS0122410" class="clusterblast-orf" id="dummy-1_h1_3_19"  />
+</g>
+<g id="a1_0020"  >
+<polygon points="493,85 498,80 530,80 530,90 498,90 493,85 " style="fill:#15d815; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122415&lt;/b&gt;&lt;br&gt;lantibiotic dehydratase&lt;br&gt;Location: 4891215 - 4893701&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121415&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 1497&lt;br&gt;E-value: 0.0" locus_tag="SALPAC3_RS0122415" class="clusterblast-orf" id="dummy-1_h1_3_20"  />
+</g>
+<g id="a1_0021"  >
+<polygon points="532,90 545,90 550,85 545,80 532,80 532,90 " style="fill:#1556d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122420&lt;/b&gt;&lt;br&gt;M20 family metallopeptidase&lt;br&gt;Location: 4893803 - 4895011&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121420&lt;/b&gt;&lt;br&gt;Percentage identity: 97&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 750&lt;br&gt;E-value: 6.3e-215" locus_tag="SALPAC3_RS0122420" class="clusterblast-orf" id="dummy-1_h1_3_21"  />
+</g>
+<g id="a1_0022"  >
+<polygon points="550,85 555,80 560,80 560,90 555,90 550,85 " style="fill:#d815d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122425&lt;/b&gt;&lt;br&gt;VOC family protein&lt;br&gt;Location: 4895044 - 4895715&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121425&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 434&lt;br&gt;E-value: 7.2e-120" locus_tag="SALPAC3_RS0122425" class="clusterblast-orf" id="dummy-1_h1_3_22"  />
+</g>
+<g id="a1_0023"  >
+<polygon points="560,85 565,80 577,80 577,90 565,90 560,85 " style="fill:#d89715; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122430&lt;/b&gt;&lt;br&gt;FAD-binding oxidoreductase&lt;br&gt;Location: 4895715 - 4896815&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121430&lt;/b&gt;&lt;br&gt;Percentage identity: 93&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 670&lt;br&gt;E-value: 9.8e-191" locus_tag="SALPAC3_RS0122430" class="clusterblast-orf" id="dummy-1_h1_3_23"  />
+</g>
+<g id="a1_0024"  >
+<polygon points="577,85 582,80 593,80 593,90 582,90 577,85 " style="fill:#15d856; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122435&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 4896790 - 4897866&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121435&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 644&lt;br&gt;E-value: 7.4e-183" locus_tag="SALPAC3_RS0122435" class="clusterblast-orf" id="dummy-1_h1_3_24"  />
+</g>
+<g id="a1_0025"  >
+<polygon points="593,85 598,80 612,80 612,90 598,90 593,85 " style="fill:#1515d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122440&lt;/b&gt;&lt;br&gt;peptidase C69&lt;br&gt;Location: 4897859 - 4899118&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121440&lt;/b&gt;&lt;br&gt;Percentage identity: 93&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 774&lt;br&gt;E-value: 4.2e-222" locus_tag="SALPAC3_RS0122440" class="clusterblast-orf" id="dummy-1_h1_3_25"  />
+</g>
+<g id="a1_0026"  >
+<polygon points="612,85 617,80 646,80 646,90 617,90 612,85 " style="fill:#d81597; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122445&lt;/b&gt;&lt;br&gt;lantibiotic dehydratase&lt;br&gt;Location: 4899115 - 4901364&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121445&lt;/b&gt;&lt;br&gt;Percentage identity: 94&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1425&lt;br&gt;E-value: 0.0" locus_tag="SALPAC3_RS0122445" class="clusterblast-orf" id="dummy-1_h1_3_26"  />
+</g>
+<g id="a1_0027"  >
+<polygon points="646,85 651,80 668,80 668,90 651,90 646,85 " style="fill:#d8d815; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122450&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 4901361 - 4902830&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121450&lt;/b&gt;&lt;br&gt;Percentage identity: 93&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 899&lt;br&gt;E-value: 1.3e-259" locus_tag="SALPAC3_RS0122450" class="clusterblast-orf" id="dummy-1_h1_3_27"  />
+</g>
+<g id="a1_0028"  >
+<polygon points="668,85 673,80 702,80 702,90 673,90 668,85 " style="fill:#15d897; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122455&lt;/b&gt;&lt;br&gt;lantibiotic dehydratase&lt;br&gt;Location: 4902827 - 4905112&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121455&lt;/b&gt;&lt;br&gt;Percentage identity: 94&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1400&lt;br&gt;E-value: 0.0" locus_tag="SALPAC3_RS0122455" class="clusterblast-orf" id="dummy-1_h1_3_28"  />
+</g>
+<g id="a1_0029"  >
+<polygon points="702,85 707,80 739,80 739,90 707,90 702,85 " style="fill:#5615d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122460&lt;/b&gt;&lt;br&gt;lantibiotic dehydratase&lt;br&gt;Location: 4905109 - 4907544&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121460&lt;/b&gt;&lt;br&gt;Percentage identity: 93&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1455&lt;br&gt;E-value: 0.0" locus_tag="SALPAC3_RS0122460" class="clusterblast-orf" id="dummy-1_h1_3_29"  />
+</g>
+<g id="a1_0030"  >
+<polygon points="739,85 744,80 766,80 766,90 744,90 739,85 " style="fill:#d81556; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122465&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 4907547 - 4909346&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121465&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1094&lt;br&gt;E-value: 0.0" locus_tag="SALPAC3_RS0122465" class="clusterblast-orf" id="dummy-1_h1_3_30"  />
+</g>
+<g id="a1_0031"  >
+<polygon points="766,85 770,80 770,90 766,85 " style="fill:#97d815; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122470&lt;/b&gt;&lt;br&gt;lymphostin biosynthesis Trp-donating RiPP&lt;br&gt;Location: 4909334 - 4909594&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121470&lt;/b&gt;&lt;br&gt;Percentage identity: 76&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 116&lt;br&gt;E-value: 1.3e-24" locus_tag="SALPAC3_RS0122470" class="clusterblast-orf" id="dummy-1_h1_3_31"  />
+</g>
+<g id="a1_0032"  >
+<polygon points="770,85 775,80 780,80 780,90 775,90 770,85 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0122475&lt;/b&gt;&lt;br&gt;NAD(P)H-dependent oxidoreductase&lt;br&gt;Location: 4909613 - 4910233&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0121475&lt;/b&gt;&lt;br&gt;Percentage identity: 90&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 354&lt;br&gt;E-value: 6.7e-96" locus_tag="SALPAC3_RS0122475" class="clusterblast-orf" id="dummy-1_h1_3_32"  />
+</g>
+</svg>

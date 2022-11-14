@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>BAW27710.1</td>
+              <td>esterase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001764/1">BGC0001764</a></td>
+              <td>NRP</td>
+              <td>49.0</td>
+              <td>99.0</td>
+              <td>273.0</td>
+              <td>3.9e-73</td>
+          </tr>
+    
+          <tr>
+              <td>AAU93813.2</td>
+              <td>LipN</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000054/1">BGC0000054</a></td>
+              <td>Polyketide</td>
+              <td>48.0</td>
+              <td>85.6</td>
+              <td>230.0</td>
+              <td>3.8e-60</td>
+          </tr>
+    
+          <tr>
+              <td>CAP12611.1</td>
+              <td>lipase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000219/1">BGC0000219</a></td>
+              <td>Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>46.0</td>
+              <td>85.3</td>
+              <td>200.0</td>
+              <td>3.2e-51</td>
+          </tr>
+    
+          <tr>
+              <td>BAK64648.1</td>
+              <td>putative_thioesterase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000135/1">BGC0000135</a></td>
+              <td>Polyketide</td>
+              <td>46.0</td>
+              <td>78.9</td>
+              <td>198.0</td>
+              <td>1.2e-50</td>
+          </tr>
+    
+          <tr>
+              <td>ADZ13563.1</td>
+              <td>YtkX</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000466/1">BGC0000466</a></td>
+              <td>NRP</td>
+              <td>39.0</td>
+              <td>98.1</td>
+              <td>180.0</td>
+              <td>4.5e-45</td>
+          </tr>
+    
+          <tr>
+              <td>BAU98033.1</td>
+              <td>esterase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001386/1">BGC0001386</a></td>
+              <td>Polyketide</td>
+              <td>45.0</td>
+              <td>75.1</td>
+              <td>170.0</td>
+              <td>4.6e-42</td>
+          </tr>
+    
+          <tr>
+              <td>CAQ71836.1</td>
+              <td>putative_ESTERASE/LIPASE_PROTEIN</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001189/1">BGC0001189</a></td>
+              <td>NRP</td>
+              <td>38.0</td>
+              <td>102.9</td>
+              <td>167.0</td>
+              <td>3e-41</td>
+          </tr>
+    
+          <tr>
+              <td>ADJ63843.1</td>
+              <td>esterase/lipase_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000424/1">BGC0000424</a></td>
+              <td>NRP:NRP siderophore</td>
+              <td>37.0</td>
+              <td>100.3</td>
+              <td>166.0</td>
+              <td>6.7e-41</td>
+          </tr>
+    
+          <tr>
+              <td>APR73630.1</td>
+              <td>esterase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001625/1">BGC0001625</a></td>
+              <td>Polyketide</td>
+              <td>44.0</td>
+              <td>75.1</td>
+              <td>164.0</td>
+              <td>2.5e-40</td>
+          </tr>
+    
+          <tr>
+              <td>BAV56003.1</td>
+              <td>esterase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001597/1">BGC0001597</a></td>
+              <td>Polyketide</td>
+              <td>42.0</td>
+              <td>80.8</td>
+              <td>163.0</td>
+              <td>5.7e-40</td>
+          </tr>
+    
+          <tr>
+              <td>ABA41522.1</td>
+              <td>esterase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000722/1">BGC0000722</a></td>
+              <td>Polyketide + Other:Cyclitol</td>
+              <td>36.0</td>
+              <td>83.4</td>
+              <td>128.0</td>
+              <td>2e-29</td>
+          </tr>
+    
+          <tr>
+              <td>AFR69339.1</td>
+              <td>esterase/lipase_SpiI</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001045/1">BGC0001045</a></td>
+              <td>NRP:Cyclic depsipeptide + Polyketide:Modular type I</td>
+              <td>36.0</td>
+              <td>74.1</td>
+              <td>122.0</td>
+              <td>1.4e-27</td>
+          </tr>
+    
+          <tr>
+              <td>ABC38006.1</td>
+              <td>lipase/esterase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000964/1">BGC0000964</a></td>
+              <td>NRP:Cyclic depsipeptide + Polyketide:Trans-AT type I</td>
+              <td>34.0</td>
+              <td>73.5</td>
+              <td>114.0</td>
+              <td>3.9e-25</td>
+          </tr>
+    
+          <tr>
+              <td>ABP57753.1</td>
+              <td>DepI</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000993/1">BGC0000993</a></td>
+              <td>NRP:Cyclic depsipeptide + Polyketide:Modular type I</td>
+              <td>32.0</td>
+              <td>73.5</td>
+              <td>102.0</td>
+              <td>1.2e-21</td>
+          </tr>
+    
+          <tr>
+              <td>CCT69238.1</td>
+              <td>uncharacterized_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000030/1">BGC0000030</a></td>
+              <td>Polyketide</td>
+              <td>30.0</td>
+              <td>85.6</td>
+              <td>78.0</td>
+              <td>2.4e-14</td>
+          </tr>
+    
+          <tr>
+              <td>ADE22328.1</td>
+              <td>hydrolase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000065/1">BGC0000065</a></td>
+              <td>Polyketide:Iterative type I</td>
+              <td>29.0</td>
+              <td>72.2</td>
+              <td>74.0</td>
+              <td>4.5e-13</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

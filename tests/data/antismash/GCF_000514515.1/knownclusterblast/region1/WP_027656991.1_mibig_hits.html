@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>ADR01063.1</td>
+              <td>Noc-2</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000609/1">BGC0000609</a></td>
+              <td>RiPP:Thiopeptide</td>
+              <td>79.0</td>
+              <td>99.7</td>
+              <td>570.0</td>
+              <td>1.9e-162</td>
+          </tr>
+    
+          <tr>
+              <td>AIE54221.1</td>
+              <td>PauY1</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001732/1">BGC0001732</a></td>
+              <td>Other</td>
+              <td>77.0</td>
+              <td>100.3</td>
+              <td>559.0</td>
+              <td>3.3e-159</td>
+          </tr>
+    
+          <tr>
+              <td>AIE54168.1</td>
+              <td>Pau1</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001731/1">BGC0001731</a></td>
+              <td>Other</td>
+              <td>76.0</td>
+              <td>100.3</td>
+              <td>551.0</td>
+              <td>8.9e-157</td>
+          </tr>
+    
+          <tr>
+              <td>AAT01810.1</td>
+              <td>extra_cytoplasmic_sigma_factor</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000365/1">BGC0000365</a></td>
+              <td>NRP</td>
+              <td>72.0</td>
+              <td>100.0</td>
+              <td>511.0</td>
+              <td>1.3e-144</td>
+          </tr>
+    
+          <tr>
+              <td>ATV95653.1</td>
+              <td>RNA_polymerase_sigma_factor</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001503/1">BGC0001503</a></td>
+              <td>Polyketide</td>
+              <td>52.0</td>
+              <td>104.7</td>
+              <td>316.0</td>
+              <td>8.3e-86</td>
+          </tr>
+    
+          <tr>
+              <td>ABP55158.1</td>
+              <td>Sigma-70,_region_4_type_2</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000150/1">BGC0000150</a></td>
+              <td>NRP + Polyketide:Enediyne type I</td>
+              <td>46.0</td>
+              <td>107.7</td>
+              <td>282.0</td>
+              <td>1.3e-75</td>
+          </tr>
+    
+          <tr>
+              <td>BAV55986.1</td>
+              <td>hypothetical_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001597/1">BGC0001597</a></td>
+              <td>Polyketide</td>
+              <td>86.0</td>
+              <td>20.6</td>
+              <td>122.0</td>
+              <td>1.8e-27</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

@@ -1,0 +1,345 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="550" width="800" viewBox="0 0 800 550" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="49,35 54,30 111,30 111,40 54,40 49,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117485&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 474254 - 475166" locus_tag="B170_RS0117485" class="clusterblast-orf" id="general-4_q0_0_all"  />
+<polygon points="110,35 115,30 152,30 152,40 115,40 110,35 " style="fill:#15d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117490&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 475162 - 475786" locus_tag="B170_RS0117490" class="clusterblast-orf" id="general-4_q1_0_all"  />
+<polygon points="160,35 165,30 247,30 247,40 165,40 160,35 " style="fill:#1597d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117495&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 475893 - 477195" locus_tag="B170_RS0117495" class="clusterblast-orf" id="general-4_q2_0_all"  />
+<polygon points="247,35 252,30 328,30 328,40 252,40 247,35 " style="fill:#9715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117500&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 477187 - 478390" locus_tag="B170_RS0117500" class="clusterblast-orf" id="general-4_q3_0_all"  />
+<polygon points="331,35 336,30 376,30 376,40 336,40 331,35 " style="fill:#d89715; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117505&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 478434 - 479112" locus_tag="B170_RS0117505" class="clusterblast-orf" id="general-4_q4_0_all"  />
+<polygon points="375,35 380,30 503,30 503,40 380,40 375,35 " style="fill:#15d897; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117510&lt;/b&gt;&lt;br&gt;RiPP maturation radical SAM protein 1&lt;br&gt;Location: 479092 - 480997" locus_tag="B170_RS0117510" class="clusterblast-orf" id="general-4_q5_0_all"  />
+<polygon points="520,35 525,30 641,30 641,40 525,40 520,35 " style="fill:#1515d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117520&lt;/b&gt;&lt;br&gt;S9 family peptidase&lt;br&gt;Location: 481244 - 483050" locus_tag="B170_RS0117520" class="clusterblast-orf" id="general-4_q6_0_all"  />
+<polygon points="653,40 677,40 682,35 677,30 653,30 653,40 " style="fill:#d81597; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117525&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 483215 - 483650" locus_tag="B170_RS0117525" class="clusterblast-orf" id="general-4_q7_0_all"  />
+<polygon points="685,35 690,30 731,30 731,40 690,40 685,35 " style="fill:#97d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117530&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 483692 - 484382" locus_tag="B170_RS0117530" class="clusterblast-orf" id="general-4_q8_0_all"  />
+</g>
+<g label="NZ_KI911412" description="NZ_KI911412 (474092-485997): Salinispora pacifica CNT029 B170DRAFT scaffold 0... (100% of genes show similarity), bacteriocin" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_KI911412&amp;start=474092&amp;end=485997" target="_blank">NZ_KI911412 (474092-485997)</a>: Salinispora pacifica CNT029 B170DRAFT scaffold 0... (100% of genes show similarity), bacteriocin</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a4_000"  >
+<polygon points="49,85 54,80 110,80 110,90 54,90 49,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117485&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 474255 - 475166&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117485&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 597&lt;br&gt;E-value: 8.7e-169" locus_tag="B170_RS0117485" class="clusterblast-orf" id="general-4_all_4_1_0"  />
+</g>
+<g id="a4_001"  >
+<polygon points="110,85 115,80 152,80 152,90 115,90 110,85 " style="fill:#15d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117490&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 475163 - 475786&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117490&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 401&lt;br&gt;E-value: 6.3e-110" locus_tag="B170_RS0117490" class="clusterblast-orf" id="general-4_all_4_1_1"  />
+</g>
+<g id="a4_002"  >
+<polygon points="159,85 164,80 247,80 247,90 164,90 159,85 " style="fill:#1597d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117495&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 475894 - 477195&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117495&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 768&lt;br&gt;E-value: 3.1e-220" locus_tag="B170_RS0117495" class="clusterblast-orf" id="general-4_all_4_1_2"  />
+</g>
+<g id="a4_003"  >
+<polygon points="246,85 251,80 327,80 327,90 251,90 246,85 " style="fill:#9715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117500&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 477188 - 478390&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117500&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 796&lt;br&gt;E-value: 9.9e-229" locus_tag="B170_RS0117500" class="clusterblast-orf" id="general-4_all_4_1_3"  />
+</g>
+<g id="a4_004"  >
+<polygon points="330,85 335,80 376,80 376,90 335,90 330,85 " style="fill:#d89715; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117505&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 478435 - 479112&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117505&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 469&lt;br&gt;E-value: 1.6e-130" locus_tag="B170_RS0117505" class="clusterblast-orf" id="general-4_all_4_1_4"  />
+</g>
+<g id="a4_005"  >
+<polygon points="374,85 379,80 502,80 502,90 379,90 374,85 " style="fill:#15d897; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117510&lt;/b&gt;&lt;br&gt;RiPP maturation radical SAM protein 1&lt;br&gt;Location: 479093 - 480997&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117510&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1269&lt;br&gt;E-value: 0.0" locus_tag="B170_RS0117510" class="clusterblast-orf" id="general-4_all_4_1_5"  />
+</g>
+<g id="a4_006"  >
+<polygon points="519,85 524,80 641,80 641,90 524,90 519,85 " style="fill:#1515d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117520&lt;/b&gt;&lt;br&gt;S9 family peptidase&lt;br&gt;Location: 481245 - 483050&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117520&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1240&lt;br&gt;E-value: 0.0" locus_tag="B170_RS0117520" class="clusterblast-orf" id="general-4_all_4_1_6"  />
+</g>
+<g id="a4_007"  >
+<polygon points="652,90 676,90 681,85 676,80 652,80 652,90 " style="fill:#d81597; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117525&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 483216 - 483650&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117525&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 274&lt;br&gt;E-value: 6.2e-72" locus_tag="B170_RS0117525" class="clusterblast-orf" id="general-4_all_4_1_7"  />
+</g>
+<g id="a4_008"  >
+<polygon points="684,85 689,80 730,80 730,90 689,90 684,85 " style="fill:#97d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117530&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 483693 - 484382&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117530&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 460&lt;br&gt;E-value: 7.4e-128" locus_tag="B170_RS0117530" class="clusterblast-orf" id="general-4_all_4_1_8"  />
+</g>
+<g label="NZ_KB913027" description="NZ_KB913027 (4671576-4683481): Salinispora pacifica DSM 45546 = CNT-133 strai... (100% of genes show similarity), bacteriocin" class="clusterblast-cluster"  >
+<text x="5" y="120" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_KB913027&amp;start=4671576&amp;end=4683481" target="_blank">NZ_KB913027 (4671576-4683481)</a>: Salinispora pacifica DSM 45546 = CNT-133 strai... (100% of genes show similarity), bacteriocin</text>
+<line x1="10" y1="135" x2="778.0" y2="135" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a4_000"  >
+<polygon points="49,135 54,130 110,130 110,140 54,140 49,135 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC5_RS0121495&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 4671739 - 4672650&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117485&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 594&lt;br&gt;E-value: 4.3e-168" locus_tag="SALPAC5_RS0121495" class="clusterblast-orf" id="general-4_all_4_2_0"  />
+</g>
+<g id="a4_001"  >
+<polygon points="110,135 115,130 152,130 152,140 115,140 110,135 " style="fill:#15d815; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC5_RS0121500&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 4672647 - 4673270&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117490&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 399&lt;br&gt;E-value: 2.4e-109" locus_tag="SALPAC5_RS0121500" class="clusterblast-orf" id="general-4_all_4_2_1"  />
+</g>
+<g id="a4_002"  >
+<polygon points="159,135 164,130 247,130 247,140 164,140 159,135 " style="fill:#1597d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC5_RS0121505&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 4673378 - 4674679&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117495&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 760&lt;br&gt;E-value: 6.5e-218" locus_tag="SALPAC5_RS0121505" class="clusterblast-orf" id="general-4_all_4_2_2"  />
+</g>
+<g id="a4_003"  >
+<polygon points="246,135 251,130 327,130 327,140 251,140 246,135 " style="fill:#9715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC5_RS0121510&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 4674672 - 4675874&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117500&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 796&lt;br&gt;E-value: 9.9e-229" locus_tag="SALPAC5_RS0121510" class="clusterblast-orf" id="general-4_all_4_2_3"  />
+</g>
+<g id="a4_004"  >
+<polygon points="330,135 335,130 376,130 376,140 335,140 330,135 " style="fill:#d89715; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC5_RS0121515&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 4675919 - 4676596&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117505&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 469&lt;br&gt;E-value: 1.6e-130" locus_tag="SALPAC5_RS0121515" class="clusterblast-orf" id="general-4_all_4_2_4"  />
+</g>
+<g id="a4_005"  >
+<polygon points="374,135 379,130 502,130 502,140 379,140 374,135 " style="fill:#15d897; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC5_RS0121520&lt;/b&gt;&lt;br&gt;RiPP maturation radical SAM protein 1&lt;br&gt;Location: 4676577 - 4678481&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117510&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1257&lt;br&gt;E-value: 0.0" locus_tag="SALPAC5_RS0121520" class="clusterblast-orf" id="general-4_all_4_2_5"  />
+</g>
+<g id="a4_006"  >
+<polygon points="519,135 524,130 641,130 641,140 524,140 519,135 " style="fill:#1515d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC5_RS0121530&lt;/b&gt;&lt;br&gt;S9 family peptidase&lt;br&gt;Location: 4678729 - 4680534&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117520&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1235&lt;br&gt;E-value: 0.0" locus_tag="SALPAC5_RS0121530" class="clusterblast-orf" id="general-4_all_4_2_6"  />
+</g>
+<g id="a4_007"  >
+<polygon points="652,140 676,140 681,135 676,130 652,130 652,140 " style="fill:#d81597; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC5_RS0121535&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 4680701 - 4681135&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117525&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 274&lt;br&gt;E-value: 6.2e-72" locus_tag="SALPAC5_RS0121535" class="clusterblast-orf" id="general-4_all_4_2_7"  />
+</g>
+<g id="a4_008"  >
+<polygon points="684,135 689,130 730,130 730,140 689,140 684,135 " style="fill:#97d815; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC5_RS0121540&lt;/b&gt;&lt;br&gt;DUF218 domain-containing protein&lt;br&gt;Location: 4681178 - 4681867&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117530&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 460&lt;br&gt;E-value: 7.4e-128" locus_tag="SALPAC5_RS0121540" class="clusterblast-orf" id="general-4_all_4_2_8"  />
+</g>
+<g label="NZ_KB895207" description="NZ_KB895207 (77642-89547): Salinispora pacifica CNT045 C554DRAFT scaffold0000... (90% of genes show similarity), bacteriocin" class="clusterblast-cluster"  >
+<text x="5" y="170" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_KB895207&amp;start=77642&amp;end=89547" target="_blank">NZ_KB895207 (77642-89547)</a>: Salinispora pacifica CNT045 C554DRAFT scaffold0000... (90% of genes show similarity), bacteriocin</text>
+<line x1="10" y1="185" x2="778.0" y2="185" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a4_000"  >
+<polygon points="0,185 5,180 61,180 61,190 5,190 0,185 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;C554_RS0100435&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 89386 - 88475&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117485&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 590&lt;br&gt;E-value: 1.1e-166" locus_tag="C554_RS0100435" class="clusterblast-orf" id="general-4_all_4_3_0"  />
+</g>
+<g id="a4_001"  >
+<polygon points="61,185 66,180 103,180 103,190 66,190 61,185 " style="fill:#15d815; stroke-width:1; stroke:black; " description="&lt;b&gt;C554_RS0100430&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 88478 - 87855&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117490&lt;/b&gt;&lt;br&gt;Percentage identity: 98&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 391&lt;br&gt;E-value: 5e-107" locus_tag="C554_RS0100430" class="clusterblast-orf" id="general-4_all_4_3_1"  />
+</g>
+<g id="a4_002"  >
+<polygon points="110,185 115,180 197,180 197,190 115,190 110,185 " style="fill:#1597d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C554_RS0100425&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 87748 - 86447&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117495&lt;/b&gt;&lt;br&gt;Percentage identity: 98&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 753&lt;br&gt;E-value: 1e-215" locus_tag="C554_RS0100425" class="clusterblast-orf" id="general-4_all_4_3_2"  />
+</g>
+<g id="a4_003"  >
+<polygon points="197,185 202,180 278,180 278,190 202,190 197,185 " style="fill:#9715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C554_RS0100420&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 86454 - 85252&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117500&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 793&lt;br&gt;E-value: 1.1e-227" locus_tag="C554_RS0100420" class="clusterblast-orf" id="general-4_all_4_3_3"  />
+</g>
+<g id="a4_004"  >
+<polygon points="281,185 286,180 327,180 327,190 286,190 281,185 " style="fill:#d89715; stroke-width:1; stroke:black; " description="&lt;b&gt;C554_RS0100415&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 85205 - 84528&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117505&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 453&lt;br&gt;E-value: 8.9e-126" locus_tag="C554_RS0100415" class="clusterblast-orf" id="general-4_all_4_3_4"  />
+</g>
+<g id="a4_005"  >
+<polygon points="325,185 330,180 453,180 453,190 330,190 325,185 " style="fill:#15d897; stroke-width:1; stroke:black; " description="&lt;b&gt;C554_RS0100410&lt;/b&gt;&lt;br&gt;RiPP maturation radical SAM protein 1&lt;br&gt;Location: 84547 - 82643&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117510&lt;/b&gt;&lt;br&gt;Percentage identity: 98&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1249&lt;br&gt;E-value: 0.0" locus_tag="C554_RS0100410" class="clusterblast-orf" id="general-4_all_4_3_5"  />
+</g>
+<g id="a4_006"  >
+<polygon points="470,185 475,180 592,180 592,190 475,190 470,185 " style="fill:#1515d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C554_RS0100400&lt;/b&gt;&lt;br&gt;S9 family peptidase&lt;br&gt;Location: 82395 - 80581&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117520&lt;/b&gt;&lt;br&gt;Percentage identity: 97&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1201&lt;br&gt;E-value: 0.0" locus_tag="C554_RS0100400" class="clusterblast-orf" id="general-4_all_4_3_6"  />
+</g>
+<g id="a4_007"  >
+<polygon points="602,190 613,190 618,185 613,180 602,180 602,190 " style="fill:#d81597; stroke-width:1; stroke:black; " description="&lt;b&gt;C554_RS28820&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 80430 - 80201&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117525&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 37&lt;br&gt;BLAST bit score: 101&lt;br&gt;E-value: 7.2e-20" locus_tag="C554_RS28820" class="clusterblast-orf" id="general-4_all_4_3_7"  />
+</g>
+<g id="a4_008"  >
+<polygon points="621,185 626,180 667,180 667,190 626,190 621,185 " style="fill:#97d815; stroke-width:1; stroke:black; " description="&lt;b&gt;C554_RS0100395&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 80158 - 79469&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117530&lt;/b&gt;&lt;br&gt;Percentage identity: 97&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 444&lt;br&gt;E-value: 5.5e-123" locus_tag="C554_RS0100395" class="clusterblast-orf" id="general-4_all_4_3_8"  />
+</g>
+<g id="a4_009"  >
+<polygon points="674,190 774,190 779,185 774,180 674,180 674,190 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;C554_RS0100390&lt;/b&gt;&lt;br&gt;murein biosynthesis integral membrane protein MurJ&lt;br&gt;Location: 79362 - 77800" locus_tag="C554_RS0100390" class="clusterblast-orf" id="general-4_all_4_3_9"  />
+</g>
+<g label="NZ_KB896761" description="NZ_KB896761 (264172-276077): Salinispora pacifica CNT584 C582DRAFT scaffold00... (90% of genes show similarity), bacteriocin" class="clusterblast-cluster"  >
+<text x="5" y="220" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_KB896761&amp;start=264172&amp;end=276077" target="_blank">NZ_KB896761 (264172-276077)</a>: Salinispora pacifica CNT584 C582DRAFT scaffold00... (90% of genes show similarity), bacteriocin</text>
+<line x1="10" y1="235" x2="778.0" y2="235" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a4_000"  >
+<polygon points="7,235 12,230 68,230 68,240 12,240 7,235 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;C582_RS0102755&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 264332 - 265243&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117485&lt;/b&gt;&lt;br&gt;Percentage identity: 97&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 579&lt;br&gt;E-value: 1.9e-163" locus_tag="C582_RS0102755" class="clusterblast-orf" id="general-4_all_4_4_0"  />
+</g>
+<g id="a4_001"  >
+<polygon points="68,235 73,230 111,230 111,240 73,240 68,235 " style="fill:#15d815; stroke-width:1; stroke:black; " description="&lt;b&gt;C582_RS0102760&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 265240 - 265872&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117490&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 384&lt;br&gt;E-value: 8e-105" locus_tag="C582_RS0102760" class="clusterblast-orf" id="general-4_all_4_4_1"  />
+</g>
+<g id="a4_002"  >
+<polygon points="117,235 122,230 205,230 205,240 122,240 117,235 " style="fill:#1597d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C582_RS0102765&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 265965 - 267272&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117495&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 700&lt;br&gt;E-value: 1e-199" locus_tag="C582_RS0102765" class="clusterblast-orf" id="general-4_all_4_4_2"  />
+</g>
+<g id="a4_003"  >
+<polygon points="205,235 210,230 285,230 285,240 210,240 205,235 " style="fill:#9715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C582_RS0102770&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 267265 - 268467&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117500&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 786&lt;br&gt;E-value: 1.3e-225" locus_tag="C582_RS0102770" class="clusterblast-orf" id="general-4_all_4_4_3"  />
+</g>
+<g id="a4_004"  >
+<polygon points="289,235 294,230 334,230 334,240 294,240 289,235 " style="fill:#d89715; stroke-width:1; stroke:black; " description="&lt;b&gt;C582_RS0102775&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 268515 - 269192&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117505&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 449&lt;br&gt;E-value: 2.2e-124" locus_tag="C582_RS0102775" class="clusterblast-orf" id="general-4_all_4_4_4"  />
+</g>
+<g id="a4_005"  >
+<polygon points="333,235 338,230 461,230 461,240 338,240 333,235 " style="fill:#15d897; stroke-width:1; stroke:black; " description="&lt;b&gt;C582_RS0102780&lt;/b&gt;&lt;br&gt;RiPP maturation radical SAM protein 1&lt;br&gt;Location: 269173 - 271077&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117510&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1228&lt;br&gt;E-value: 0.0" locus_tag="C582_RS0102780" class="clusterblast-orf" id="general-4_all_4_4_5"  />
+</g>
+<g id="a4_006"  >
+<polygon points="478,235 483,230 600,230 600,240 483,240 478,235 " style="fill:#1515d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C582_RS0102790&lt;/b&gt;&lt;br&gt;S9 family peptidase&lt;br&gt;Location: 271326 - 273140&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117520&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1183&lt;br&gt;E-value: 0.0" locus_tag="C582_RS0102790" class="clusterblast-orf" id="general-4_all_4_4_6"  />
+</g>
+<g id="a4_007"  >
+<polygon points="611,240 636,240 641,235 636,230 611,230 611,240 " style="fill:#d81597; stroke-width:1; stroke:black; " description="&lt;b&gt;C582_RS0102795&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 273308 - 273742&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117525&lt;/b&gt;&lt;br&gt;Percentage identity: 94&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 257&lt;br&gt;E-value: 1e-66" locus_tag="C582_RS0102795" class="clusterblast-orf" id="general-4_all_4_4_7"  />
+</g>
+<g id="a4_008"  >
+<polygon points="644,235 649,230 682,230 682,240 649,240 644,235 " style="fill:#97d815; stroke-width:1; stroke:black; " description="&lt;b&gt;C582_RS24760&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 273786 - 274364&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117530&lt;/b&gt;&lt;br&gt;Percentage identity: 93&lt;br&gt;Percentage coverage: 84&lt;br&gt;BLAST bit score: 367&lt;br&gt;E-value: 8.5e-100" locus_tag="C582_RS24760" class="clusterblast-orf" id="general-4_all_4_4_8"  />
+</g>
+<g id="a4_009"  >
+<polygon points="682,240 767,240 772,235 767,230 682,230 682,240 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;C582_RS0102805&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 274364 - 275692" locus_tag="C582_RS0102805" class="clusterblast-orf" id="general-4_all_4_4_9"  />
+</g>
+<g label="NZ_AUKU01000002" description="NZ_AUKU01000002 (13073-24978): Salinispora pacifica CNY239 H304DRAFT scaffold... (100% of genes show similarity), bacteriocin" class="clusterblast-cluster"  >
+<text x="5" y="270" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_AUKU01000002&amp;start=13073&amp;end=24978" target="_blank">NZ_AUKU01000002 (13073-24978)</a>: Salinispora pacifica CNY239 H304DRAFT scaffold... (100% of genes show similarity), bacteriocin</text>
+<line x1="10" y1="285" x2="778.0" y2="285" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a4_000"  >
+<polygon points="48,285 53,280 109,280 109,290 53,290 48,285 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0101860&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 24824 - 23913&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117485&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 572&lt;br&gt;E-value: 3e-161" locus_tag="H304_RS0101860" class="clusterblast-orf" id="general-4_all_4_5_0"  />
+</g>
+<g id="a4_001"  >
+<polygon points="109,285 114,280 151,280 151,290 114,290 109,285 " style="fill:#15d815; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0101855&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 23916 - 23296&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117490&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 364&lt;br&gt;E-value: 5e-99" locus_tag="H304_RS0101855" class="clusterblast-orf" id="general-4_all_4_5_1"  />
+</g>
+<g id="a4_002"  >
+<polygon points="158,285 163,280 246,280 246,290 163,290 158,285 " style="fill:#1597d8; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0101850&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 23186 - 21885&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117495&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 723&lt;br&gt;E-value: 1.5e-206" locus_tag="H304_RS0101850" class="clusterblast-orf" id="general-4_all_4_5_2"  />
+</g>
+<g id="a4_003"  >
+<polygon points="245,285 250,280 326,280 326,290 250,290 245,285 " style="fill:#9715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0101845&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 21892 - 20690&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117500&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 774&lt;br&gt;E-value: 6.9e-222" locus_tag="H304_RS0101845" class="clusterblast-orf" id="general-4_all_4_5_3"  />
+</g>
+<g id="a4_004"  >
+<polygon points="330,285 335,280 375,280 375,290 335,290 330,285 " style="fill:#d89715; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0101840&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 20636 - 19959&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117505&lt;/b&gt;&lt;br&gt;Percentage identity: 93&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 440&lt;br&gt;E-value: 7.8e-122" locus_tag="H304_RS0101840" class="clusterblast-orf" id="general-4_all_4_5_4"  />
+</g>
+<g id="a4_005"  >
+<polygon points="374,285 379,280 502,280 502,290 379,290 374,285 " style="fill:#15d897; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0101835&lt;/b&gt;&lt;br&gt;RiPP maturation radical SAM protein 1&lt;br&gt;Location: 19978 - 18074&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117510&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1214&lt;br&gt;E-value: 0.0" locus_tag="H304_RS0101835" class="clusterblast-orf" id="general-4_all_4_5_5"  />
+</g>
+<g id="a4_006"  >
+<polygon points="519,285 524,280 641,280 641,290 524,290 519,285 " style="fill:#1515d8; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0101825&lt;/b&gt;&lt;br&gt;S9 family peptidase&lt;br&gt;Location: 17824 - 16010&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117520&lt;/b&gt;&lt;br&gt;Percentage identity: 91&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1131&lt;br&gt;E-value: 0.0" locus_tag="H304_RS0101825" class="clusterblast-orf" id="general-4_all_4_5_6"  />
+</g>
+<g id="a4_007"  >
+<polygon points="653,290 677,290 682,285 677,280 653,280 653,290 " style="fill:#d81597; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0101820&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 15843 - 15409&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117525&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 255&lt;br&gt;E-value: 3e-66" locus_tag="H304_RS0101820" class="clusterblast-orf" id="general-4_all_4_5_7"  />
+</g>
+<g id="a4_008"  >
+<polygon points="685,285 690,280 731,280 731,290 690,290 685,285 " style="fill:#97d815; stroke-width:1; stroke:black; " description="&lt;b&gt;H304_RS0101815&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 15366 - 14677&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117530&lt;/b&gt;&lt;br&gt;Percentage identity: 90&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 418&lt;br&gt;E-value: 5.5e-115" locus_tag="H304_RS0101815" class="clusterblast-orf" id="general-4_all_4_5_8"  />
+</g>
+<g label="NZ_KB904831" description="NZ_KB904831 (144627-156532): Salinispora pacifica CNQ768 C581DRAFT scaffold00... (100% of genes show similarity), bacteriocin" class="clusterblast-cluster"  >
+<text x="5" y="320" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_KB904831&amp;start=144627&amp;end=156532" target="_blank">NZ_KB904831 (144627-156532)</a>: Salinispora pacifica CNQ768 C581DRAFT scaffold00... (100% of genes show similarity), bacteriocin</text>
+<line x1="10" y1="335" x2="778.0" y2="335" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a4_000"  >
+<polygon points="48,335 53,330 109,330 109,340 53,340 48,335 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;C581_RS0109425&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 156377 - 155466&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117485&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 574&lt;br&gt;E-value: 4.7e-162" locus_tag="C581_RS0109425" class="clusterblast-orf" id="general-4_all_4_6_0"  />
+</g>
+<g id="a4_001"  >
+<polygon points="109,335 114,330 151,330 151,340 114,340 109,335 " style="fill:#15d815; stroke-width:1; stroke:black; " description="&lt;b&gt;C581_RS0109420&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 155469 - 154849&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117490&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 364&lt;br&gt;E-value: 5e-99" locus_tag="C581_RS0109420" class="clusterblast-orf" id="general-4_all_4_6_1"  />
+</g>
+<g id="a4_002"  >
+<polygon points="158,335 163,330 246,330 246,340 163,340 158,335 " style="fill:#1597d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C581_RS0109415&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 154739 - 153438&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117495&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 723&lt;br&gt;E-value: 1.5e-206" locus_tag="C581_RS0109415" class="clusterblast-orf" id="general-4_all_4_6_2"  />
+</g>
+<g id="a4_003"  >
+<polygon points="245,335 250,330 326,330 326,340 250,340 245,335 " style="fill:#9715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C581_RS0109410&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 153445 - 152243&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117500&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 774&lt;br&gt;E-value: 6.9e-222" locus_tag="C581_RS0109410" class="clusterblast-orf" id="general-4_all_4_6_3"  />
+</g>
+<g id="a4_004"  >
+<polygon points="330,335 335,330 375,330 375,340 335,340 330,335 " style="fill:#d89715; stroke-width:1; stroke:black; " description="&lt;b&gt;C581_RS0109405&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 152190 - 151513&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117505&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 437&lt;br&gt;E-value: 6.6e-121" locus_tag="C581_RS0109405" class="clusterblast-orf" id="general-4_all_4_6_4"  />
+</g>
+<g id="a4_005"  >
+<polygon points="374,335 379,330 502,330 502,340 379,340 374,335 " style="fill:#15d897; stroke-width:1; stroke:black; " description="&lt;b&gt;C581_RS0109400&lt;/b&gt;&lt;br&gt;RiPP maturation radical SAM protein 1&lt;br&gt;Location: 151532 - 149628&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117510&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1212&lt;br&gt;E-value: 0.0" locus_tag="C581_RS0109400" class="clusterblast-orf" id="general-4_all_4_6_5"  />
+</g>
+<g id="a4_006"  >
+<polygon points="519,335 524,330 641,330 641,340 524,340 519,335 " style="fill:#1515d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C581_RS0109390&lt;/b&gt;&lt;br&gt;S9 family peptidase&lt;br&gt;Location: 149378 - 147564&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117520&lt;/b&gt;&lt;br&gt;Percentage identity: 91&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1134&lt;br&gt;E-value: 0.0" locus_tag="C581_RS0109390" class="clusterblast-orf" id="general-4_all_4_6_6"  />
+</g>
+<g id="a4_007"  >
+<polygon points="653,340 677,340 682,335 677,330 653,330 653,340 " style="fill:#d81597; stroke-width:1; stroke:black; " description="&lt;b&gt;C581_RS0109385&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 147397 - 146963&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117525&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 253&lt;br&gt;E-value: 8.6e-66" locus_tag="C581_RS0109385" class="clusterblast-orf" id="general-4_all_4_6_7"  />
+</g>
+<g id="a4_008"  >
+<polygon points="685,335 690,330 731,330 731,340 690,340 685,335 " style="fill:#97d815; stroke-width:1; stroke:black; " description="&lt;b&gt;C581_RS0109380&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 146920 - 146231&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117530&lt;/b&gt;&lt;br&gt;Percentage identity: 90&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 416&lt;br&gt;E-value: 1.2e-114" locus_tag="C581_RS0109380" class="clusterblast-orf" id="general-4_all_4_6_8"  />
+</g>
+<g label="NZ_KI911467" description="NZ_KI911467 (255435-267340): Salinispora pacifica CNR114 B118DRAFT scaffold 1... (100% of genes show similarity), bacteriocin" class="clusterblast-cluster"  >
+<text x="5" y="370" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_KI911467&amp;start=255435&amp;end=267340" target="_blank">NZ_KI911467 (255435-267340)</a>: Salinispora pacifica CNR114 B118DRAFT scaffold 1... (100% of genes show similarity), bacteriocin</text>
+<line x1="10" y1="385" x2="778.0" y2="385" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a4_000"  >
+<polygon points="48,385 53,380 109,380 109,390 53,390 48,385 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B118_RS0126125&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 255591 - 256502&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117485&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 574&lt;br&gt;E-value: 4.7e-162" locus_tag="B118_RS0126125" class="clusterblast-orf" id="general-4_all_4_7_0"  />
+</g>
+<g id="a4_001"  >
+<polygon points="109,385 114,380 151,380 151,390 114,390 109,385 " style="fill:#15d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B118_RS0126130&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 256499 - 257119&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117490&lt;/b&gt;&lt;br&gt;Percentage identity: 91&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 361&lt;br&gt;E-value: 4.2e-98" locus_tag="B118_RS0126130" class="clusterblast-orf" id="general-4_all_4_7_1"  />
+</g>
+<g id="a4_002"  >
+<polygon points="158,385 163,380 246,380 246,390 163,390 158,385 " style="fill:#1597d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B118_RS0126135&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 257229 - 258530&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117495&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 720&lt;br&gt;E-value: 9.8e-206" locus_tag="B118_RS0126135" class="clusterblast-orf" id="general-4_all_4_7_2"  />
+</g>
+<g id="a4_003"  >
+<polygon points="245,385 250,380 326,380 326,390 250,390 245,385 " style="fill:#9715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B118_RS0126140&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 258523 - 259725&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117500&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 774&lt;br&gt;E-value: 6.9e-222" locus_tag="B118_RS0126140" class="clusterblast-orf" id="general-4_all_4_7_3"  />
+</g>
+<g id="a4_004"  >
+<polygon points="330,385 335,380 375,380 375,390 335,390 330,385 " style="fill:#d89715; stroke-width:1; stroke:black; " description="&lt;b&gt;B118_RS0126145&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 259778 - 260455&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117505&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 437&lt;br&gt;E-value: 8.6e-121" locus_tag="B118_RS0126145" class="clusterblast-orf" id="general-4_all_4_7_4"  />
+</g>
+<g id="a4_005"  >
+<polygon points="374,385 379,380 502,380 502,390 379,390 374,385 " style="fill:#15d897; stroke-width:1; stroke:black; " description="&lt;b&gt;B118_RS0126150&lt;/b&gt;&lt;br&gt;RiPP maturation radical SAM protein 1&lt;br&gt;Location: 260436 - 262340&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117510&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1209&lt;br&gt;E-value: 0.0" locus_tag="B118_RS0126150" class="clusterblast-orf" id="general-4_all_4_7_5"  />
+</g>
+<g id="a4_006"  >
+<polygon points="519,385 524,380 641,380 641,390 524,390 519,385 " style="fill:#1515d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B118_RS0126160&lt;/b&gt;&lt;br&gt;S9 family peptidase&lt;br&gt;Location: 262590 - 264404&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117520&lt;/b&gt;&lt;br&gt;Percentage identity: 91&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1134&lt;br&gt;E-value: 0.0" locus_tag="B118_RS0126160" class="clusterblast-orf" id="general-4_all_4_7_6"  />
+</g>
+<g id="a4_007"  >
+<polygon points="653,390 677,390 682,385 677,380 653,380 653,390 " style="fill:#d81597; stroke-width:1; stroke:black; " description="&lt;b&gt;B118_RS0126165&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 264571 - 265005&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117525&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 257&lt;br&gt;E-value: 7.8e-67" locus_tag="B118_RS0126165" class="clusterblast-orf" id="general-4_all_4_7_7"  />
+</g>
+<g id="a4_008"  >
+<polygon points="685,385 690,380 731,380 731,390 690,390 685,385 " style="fill:#97d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B118_RS0126170&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 265048 - 265737&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117530&lt;/b&gt;&lt;br&gt;Percentage identity: 90&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 416&lt;br&gt;E-value: 1.2e-114" locus_tag="B118_RS0126170" class="clusterblast-orf" id="general-4_all_4_7_8"  />
+</g>
+<g label="NZ_AZWC01000001" description="NZ_AZWC01000001 (121752-133657): Salinispora pacifica CNT001 B169DRAFT scaffo... (100% of genes show similarity), bacteriocin" class="clusterblast-cluster"  >
+<text x="5" y="420" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_AZWC01000001&amp;start=121752&amp;end=133657" target="_blank">NZ_AZWC01000001 (121752-133657)</a>: Salinispora pacifica CNT001 B169DRAFT scaffo... (100% of genes show similarity), bacteriocin</text>
+<line x1="10" y1="435" x2="778.0" y2="435" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a4_000"  >
+<polygon points="48,435 53,430 109,430 109,440 53,440 48,435 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0100720&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 133503 - 132592&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117485&lt;/b&gt;&lt;br&gt;Percentage identity: 94&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 568&lt;br&gt;E-value: 3.3e-160" locus_tag="B169_RS0100720" class="clusterblast-orf" id="general-4_all_4_8_0"  />
+</g>
+<g id="a4_001"  >
+<polygon points="109,435 114,430 151,430 151,440 114,440 109,435 " style="fill:#15d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0100715&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 132595 - 131975&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117490&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 364&lt;br&gt;E-value: 5e-99" locus_tag="B169_RS0100715" class="clusterblast-orf" id="general-4_all_4_8_1"  />
+</g>
+<g id="a4_002"  >
+<polygon points="158,435 163,430 246,430 246,440 163,440 158,435 " style="fill:#1597d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0100710&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 131865 - 130564&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117495&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 723&lt;br&gt;E-value: 1.5e-206" locus_tag="B169_RS0100710" class="clusterblast-orf" id="general-4_all_4_8_2"  />
+</g>
+<g id="a4_003"  >
+<polygon points="245,435 250,430 326,430 326,440 250,440 245,435 " style="fill:#9715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0100705&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 130571 - 129369&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117500&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 774&lt;br&gt;E-value: 6.9e-222" locus_tag="B169_RS0100705" class="clusterblast-orf" id="general-4_all_4_8_3"  />
+</g>
+<g id="a4_004"  >
+<polygon points="330,435 335,430 375,430 375,440 335,440 330,435 " style="fill:#d89715; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0100700&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 129315 - 128638&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117505&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 439&lt;br&gt;E-value: 2.3e-121" locus_tag="B169_RS0100700" class="clusterblast-orf" id="general-4_all_4_8_4"  />
+</g>
+<g id="a4_005"  >
+<polygon points="374,435 379,430 502,430 502,440 379,440 374,435 " style="fill:#15d897; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0100695&lt;/b&gt;&lt;br&gt;RiPP maturation radical SAM protein 1&lt;br&gt;Location: 128657 - 126753&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117510&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1214&lt;br&gt;E-value: 0.0" locus_tag="B169_RS0100695" class="clusterblast-orf" id="general-4_all_4_8_5"  />
+</g>
+<g id="a4_006"  >
+<polygon points="519,435 524,430 641,430 641,440 524,440 519,435 " style="fill:#1515d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0100685&lt;/b&gt;&lt;br&gt;S9 family peptidase&lt;br&gt;Location: 126503 - 124689&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117520&lt;/b&gt;&lt;br&gt;Percentage identity: 91&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1131&lt;br&gt;E-value: 0.0" locus_tag="B169_RS0100685" class="clusterblast-orf" id="general-4_all_4_8_6"  />
+</g>
+<g id="a4_007"  >
+<polygon points="653,440 677,440 682,435 677,430 653,430 653,440 " style="fill:#d81597; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0100680&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 124522 - 124088&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117525&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 257&lt;br&gt;E-value: 7.8e-67" locus_tag="B169_RS0100680" class="clusterblast-orf" id="general-4_all_4_8_7"  />
+</g>
+<g id="a4_008"  >
+<polygon points="685,435 690,430 731,430 731,440 690,440 685,435 " style="fill:#97d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0100675&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 124045 - 123356&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117530&lt;/b&gt;&lt;br&gt;Percentage identity: 89&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 410&lt;br&gt;E-value: 1.5e-112" locus_tag="B169_RS0100675" class="clusterblast-orf" id="general-4_all_4_8_8"  />
+</g>
+<g label="NZ_KB900388" description="NZ_KB900388 (974608-986513): Salinispora pacifica DSM 45548 = CNT-148 strain ... (100% of genes show similarity), bacteriocin" class="clusterblast-cluster"  >
+<text x="5" y="470" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_KB900388&amp;start=974608&amp;end=986513" target="_blank">NZ_KB900388 (974608-986513)</a>: Salinispora pacifica DSM 45548 = CNT-148 strain ... (100% of genes show similarity), bacteriocin</text>
+<line x1="10" y1="485" x2="778.0" y2="485" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a4_000"  >
+<polygon points="47,485 52,480 108,480 108,490 52,490 47,485 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC2_RS0104480&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 974728 - 975639&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117485&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 570&lt;br&gt;E-value: 8.8e-161" locus_tag="SALPAC2_RS0104480" class="clusterblast-orf" id="general-4_all_4_9_0"  />
+</g>
+<g id="a4_001"  >
+<polygon points="108,485 113,480 149,480 149,490 113,490 108,485 " style="fill:#15d815; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC2_RS0104485&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 975636 - 976253&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117490&lt;/b&gt;&lt;br&gt;Percentage identity: 85&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 329&lt;br&gt;E-value: 2.3e-88" locus_tag="SALPAC2_RS0104485" class="clusterblast-orf" id="general-4_all_4_9_1"  />
+</g>
+<g id="a4_002"  >
+<polygon points="159,485 164,480 247,480 247,490 164,490 159,485 " style="fill:#1597d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC2_RS0104490&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 976400 - 977704&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117495&lt;/b&gt;&lt;br&gt;Percentage identity: 89&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 668&lt;br&gt;E-value: 3.4e-190" locus_tag="SALPAC2_RS0104490" class="clusterblast-orf" id="general-4_all_4_9_2"  />
+</g>
+<g id="a4_003"  >
+<polygon points="247,485 252,480 328,480 328,490 252,490 247,485 " style="fill:#9715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC2_RS0104495&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 977697 - 978899&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117500&lt;/b&gt;&lt;br&gt;Percentage identity: 94&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 758&lt;br&gt;E-value: 2.3e-217" locus_tag="SALPAC2_RS0104495" class="clusterblast-orf" id="general-4_all_4_9_3"  />
+</g>
+<g id="a4_004"  >
+<polygon points="331,485 336,480 377,480 377,490 336,490 331,485 " style="fill:#d89715; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC2_RS0104500&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 978951 - 979628&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117505&lt;/b&gt;&lt;br&gt;Percentage identity: 94&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 446&lt;br&gt;E-value: 1.4e-123" locus_tag="SALPAC2_RS0104500" class="clusterblast-orf" id="general-4_all_4_9_4"  />
+</g>
+<g id="a4_005"  >
+<polygon points="375,485 380,480 504,480 504,490 380,490 375,485 " style="fill:#15d897; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC2_RS0104505&lt;/b&gt;&lt;br&gt;RiPP maturation radical SAM protein 1&lt;br&gt;Location: 979609 - 981513&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117510&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1213&lt;br&gt;E-value: 0.0" locus_tag="SALPAC2_RS0104505" class="clusterblast-orf" id="general-4_all_4_9_5"  />
+</g>
+<g id="a4_006"  >
+<polygon points="520,485 525,480 642,480 642,490 525,490 520,485 " style="fill:#1515d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC2_RS0104515&lt;/b&gt;&lt;br&gt;S9 family peptidase&lt;br&gt;Location: 981761 - 983575&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117520&lt;/b&gt;&lt;br&gt;Percentage identity: 91&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1133&lt;br&gt;E-value: 0.0" locus_tag="SALPAC2_RS0104515" class="clusterblast-orf" id="general-4_all_4_9_6"  />
+</g>
+<g id="a4_007"  >
+<polygon points="654,490 678,490 683,485 678,480 654,480 654,490 " style="fill:#d81597; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC2_RS0104520&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 983741 - 984175&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117525&lt;/b&gt;&lt;br&gt;Percentage identity: 94&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 257&lt;br&gt;E-value: 7.8e-67" locus_tag="SALPAC2_RS0104520" class="clusterblast-orf" id="general-4_all_4_9_7"  />
+</g>
+<g id="a4_008"  >
+<polygon points="686,485 691,480 732,480 732,490 691,490 686,485 " style="fill:#97d815; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC2_RS0104525&lt;/b&gt;&lt;br&gt;DUF218 domain-containing protein&lt;br&gt;Location: 984218 - 984907&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117530&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 425&lt;br&gt;E-value: 4.5e-117" locus_tag="SALPAC2_RS0104525" class="clusterblast-orf" id="general-4_all_4_9_8"  />
+</g>
+<g label="NZ_AZWS01000001" description="NZ_AZWS01000001 (164232-176137): Salinispora pacifica CNT855 B113DRAFT scaffo... (90% of genes show similarity), bacteriocin" class="clusterblast-cluster"  >
+<text x="5" y="520" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_AZWS01000001&amp;start=164232&amp;end=176137" target="_blank">NZ_AZWS01000001 (164232-176137)</a>: Salinispora pacifica CNT855 B113DRAFT scaffo... (90% of genes show similarity), bacteriocin</text>
+<line x1="10" y1="535" x2="778.0" y2="535" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a4_000"  >
+<polygon points="0,535 5,530 61,530 61,540 5,540 0,535 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100860&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 175982 - 175071&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117485&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 573&lt;br&gt;E-value: 1.4e-161" locus_tag="B113_RS0100860" class="clusterblast-orf" id="general-4_all_4_10_0"  />
+</g>
+<g id="a4_001"  >
+<polygon points="61,535 66,530 103,530 103,540 66,540 61,535 " style="fill:#15d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100855&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 175074 - 174454&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117490&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 366&lt;br&gt;E-value: 2.2e-99" locus_tag="B113_RS0100855" class="clusterblast-orf" id="general-4_all_4_10_1"  />
+</g>
+<g id="a4_002"  >
+<polygon points="110,535 115,530 198,530 198,540 115,540 110,535 " style="fill:#1597d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100850&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 174344 - 173043&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117495&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 719&lt;br&gt;E-value: 2.2e-205" locus_tag="B113_RS0100850" class="clusterblast-orf" id="general-4_all_4_10_2"  />
+</g>
+<g id="a4_003"  >
+<polygon points="197,535 202,530 278,530 278,540 202,540 197,535 " style="fill:#9715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100845&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 173050 - 171848&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117500&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 774&lt;br&gt;E-value: 6.9e-222" locus_tag="B113_RS0100845" class="clusterblast-orf" id="general-4_all_4_10_3"  />
+</g>
+<g id="a4_004"  >
+<polygon points="282,535 287,530 327,530 327,540 287,540 282,535 " style="fill:#d89715; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100840&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 171795 - 171118&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117505&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 435&lt;br&gt;E-value: 4.3e-120" locus_tag="B113_RS0100840" class="clusterblast-orf" id="general-4_all_4_10_4"  />
+</g>
+<g id="a4_005"  >
+<polygon points="326,535 331,530 454,530 454,540 331,540 326,535 " style="fill:#15d897; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100835&lt;/b&gt;&lt;br&gt;RiPP maturation radical SAM protein 1&lt;br&gt;Location: 171137 - 169233&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117510&lt;/b&gt;&lt;br&gt;Percentage identity: 94&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1204&lt;br&gt;E-value: 0.0" locus_tag="B113_RS0100835" class="clusterblast-orf" id="general-4_all_4_10_5"  />
+</g>
+<g id="a4_006"  >
+<polygon points="471,535 476,530 593,530 593,540 476,540 471,535 " style="fill:#1515d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100825&lt;/b&gt;&lt;br&gt;S9 family peptidase&lt;br&gt;Location: 168983 - 167169&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117520&lt;/b&gt;&lt;br&gt;Percentage identity: 91&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1138&lt;br&gt;E-value: 0.0" locus_tag="B113_RS0100825" class="clusterblast-orf" id="general-4_all_4_10_6"  />
+</g>
+<g id="a4_007"  >
+<polygon points="604,540 629,540 634,535 629,530 604,530 604,540 " style="fill:#d81597; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100820&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 167002 - 166568&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117525&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 257&lt;br&gt;E-value: 7.8e-67" locus_tag="B113_RS0100820" class="clusterblast-orf" id="general-4_all_4_10_7"  />
+</g>
+<g id="a4_008"  >
+<polygon points="636,535 641,530 664,530 664,540 641,540 636,535 " style="fill:#97d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS25645&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 166525 - 166111&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117530&lt;/b&gt;&lt;br&gt;Percentage identity: 83&lt;br&gt;Percentage coverage: 46&lt;br&gt;BLAST bit score: 166&lt;br&gt;E-value: 2.9e-39" locus_tag="B113_RS25645" class="clusterblast-orf" id="general-4_all_4_10_8"  />
+</g>
+<g id="a4_009"  >
+<polygon points="673,540 774,540 779,535 774,530 673,530 673,540 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100815&lt;/b&gt;&lt;br&gt;murein biosynthesis integral membrane protein MurJ&lt;br&gt;Location: 165982 - 164405" locus_tag="B113_RS0100815" class="clusterblast-orf" id="general-4_all_4_10_9"  />
+</g>
+</svg>

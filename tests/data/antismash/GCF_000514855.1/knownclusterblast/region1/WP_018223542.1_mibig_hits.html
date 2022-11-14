@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>ctg1_orf16</td>
+              <td></td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001767/1">BGC0001767</a></td>
+              <td>NRP</td>
+              <td>100.0</td>
+              <td>100.0</td>
+              <td>376.0</td>
+              <td>2e-104</td>
+          </tr>
+    
+          <tr>
+              <td>ADC45572.1</td>
+              <td>TetR-family_transcriptional_regulator</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000093/1">BGC0000093</a></td>
+              <td>Polyketide</td>
+              <td>78.0</td>
+              <td>100.5</td>
+              <td>294.0</td>
+              <td>1.7e-79</td>
+          </tr>
+    
+          <tr>
+              <td>AFY23035.1</td>
+              <td>TamD</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000274/1">BGC0000274</a></td>
+              <td>Polyketide:Type II</td>
+              <td>80.0</td>
+              <td>91.8</td>
+              <td>283.0</td>
+              <td>3.1e-76</td>
+          </tr>
+    
+          <tr>
+              <td>ARE67837.1</td>
+              <td>AbsC2</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001492/1">BGC0001492</a></td>
+              <td>Polyketide</td>
+              <td>38.0</td>
+              <td>94.9</td>
+              <td>89.0</td>
+              <td>8.4e-18</td>
+          </tr>
+    
+          <tr>
+              <td>WP_052482553.1</td>
+              <td>TetR/AcrR_family_transcriptional_regulator</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001596/1">BGC0001596</a></td>
+              <td>Polyketide</td>
+              <td>28.0</td>
+              <td>93.8</td>
+              <td>69.0</td>
+              <td>5.3e-12</td>
+          </tr>
+    
+          <tr>
+              <td>AAO65340.1</td>
+              <td>putative_TetR/AcrR-family_transcriptional_regulator</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000236/1">BGC0000236</a></td>
+              <td>Polyketide</td>
+              <td>29.0</td>
+              <td>97.9</td>
+              <td>67.0</td>
+              <td>2e-11</td>
+          </tr>
+    
+          <tr>
+              <td>BBA66516.1</td>
+              <td>TetR_family_transcriptional_regulator</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001495/1">BGC0001495</a></td>
+              <td>Polyketide</td>
+              <td>30.0</td>
+              <td>80.5</td>
+              <td>51.0</td>
+              <td>1.5e-06</td>
+          </tr>
+    
+          <tr>
+              <td>BAC79022.1</td>
+              <td>Tet-R_family_transcriptional_regulator</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000245/1">BGC0000245</a></td>
+              <td>Polyketide</td>
+              <td>28.0</td>
+              <td>99.5</td>
+              <td>49.0</td>
+              <td>9.7e-06</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

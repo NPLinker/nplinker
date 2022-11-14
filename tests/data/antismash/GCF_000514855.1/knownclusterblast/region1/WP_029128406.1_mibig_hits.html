@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>BAJ19045.1</td>
+              <td>2&#39;-carbamoyl_transferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000288/1">BGC0000288</a></td>
+              <td>NRP</td>
+              <td>67.0</td>
+              <td>100.9</td>
+              <td>752.0</td>
+              <td>5e-217</td>
+          </tr>
+    
+          <tr>
+              <td>AHL44343.1</td>
+              <td>carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000820/1">BGC0000820</a></td>
+              <td>Alkaloid</td>
+              <td>52.0</td>
+              <td>102.4</td>
+              <td>525.0</td>
+              <td>9.9e-149</td>
+          </tr>
+    
+          <tr>
+              <td>ABX24489.1</td>
+              <td>carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000877/1">BGC0000877</a></td>
+              <td>Other</td>
+              <td>48.0</td>
+              <td>106.6</td>
+              <td>475.0</td>
+              <td>1.5e-133</td>
+          </tr>
+    
+          <tr>
+              <td>AZF85938.1</td>
+              <td>nodulation_protein_U</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001963/1">BGC0001963</a></td>
+              <td>NRP + Polyketide</td>
+              <td>45.0</td>
+              <td>105.3</td>
+              <td>454.0</td>
+              <td>2.1e-127</td>
+          </tr>
+    
+          <tr>
+              <td>EDY47112.1</td>
+              <td>3&#39;-hydroxymethylcephem-O-carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000319/1">BGC0000319</a></td>
+              <td>NRP:Beta-lactam</td>
+              <td>32.0</td>
+              <td>99.3</td>
+              <td>195.0</td>
+              <td>2.3e-49</td>
+          </tr>
+    
+          <tr>
+              <td>ABI91475.1</td>
+              <td>Carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001094/1">BGC0001094</a></td>
+              <td>NRP + Polyketide</td>
+              <td>36.0</td>
+              <td>54.6</td>
+              <td>139.0</td>
+              <td>2e-32</td>
+          </tr>
+    
+          <tr>
+              <td>AEZ64590.1</td>
+              <td>carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001065/1">BGC0001065</a></td>
+              <td>Polyketide</td>
+              <td>37.0</td>
+              <td>44.3</td>
+              <td>138.0</td>
+              <td>4.4e-32</td>
+          </tr>
+    
+          <tr>
+              <td>ANQ31714.1</td>
+              <td>carbomoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001395/1">BGC0001395</a></td>
+              <td>Other</td>
+              <td>29.0</td>
+              <td>98.0</td>
+              <td>135.0</td>
+              <td>2.9e-31</td>
+          </tr>
+    
+          <tr>
+              <td>ADD82947.1</td>
+              <td>BatF</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001099/1">BGC0001099</a></td>
+              <td>NRP + Polyketide:Modular type I + Polyketide:Trans-AT type I</td>
+              <td>33.0</td>
+              <td>52.2</td>
+              <td>131.0</td>
+              <td>3.2e-30</td>
+          </tr>
+    
+          <tr>
+              <td>AMB48445.1</td>
+              <td>carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001357/1">BGC0001357</a></td>
+              <td>Polyketide</td>
+              <td>35.0</td>
+              <td>50.7</td>
+              <td>130.0</td>
+              <td>7.1e-30</td>
+          </tr>
+    
+          <tr>
+              <td>BAE98080.1</td>
+              <td>putative_carbamoyl_transferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000719/1">BGC0000719</a></td>
+              <td>Saccharide</td>
+              <td>36.0</td>
+              <td>50.4</td>
+              <td>126.0</td>
+              <td>1.3e-28</td>
+          </tr>
+    
+          <tr>
+              <td>ARK19500.1</td>
+              <td>carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001540/1">BGC0001540</a></td>
+              <td>Other</td>
+              <td>28.0</td>
+              <td>102.9</td>
+              <td>126.0</td>
+              <td>1.7e-28</td>
+          </tr>
+    
+          <tr>
+              <td>CAE22473.1</td>
+              <td>putative_carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000720/1">BGC0000720</a></td>
+              <td>Saccharide</td>
+              <td>35.0</td>
+              <td>50.4</td>
+              <td>125.0</td>
+              <td>2.3e-28</td>
+          </tr>
+    
+          <tr>
+              <td>CAH18554.1</td>
+              <td>putative_6&#39;&#39;-carbamoyltransferase,_TobZ</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000721/1">BGC0000721</a></td>
+              <td>Saccharide</td>
+              <td>35.0</td>
+              <td>50.4</td>
+              <td>125.0</td>
+              <td>2.3e-28</td>
+          </tr>
+    
+          <tr>
+              <td>CAE52324.1</td>
+              <td>putative_carbamoyl_transferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001088/1">BGC0001088</a></td>
+              <td>NRP + Polyketide</td>
+              <td>35.0</td>
+              <td>45.2</td>
+              <td>123.0</td>
+              <td>8.7e-28</td>
+          </tr>
+    
+          <tr>
+              <td>AAD32743.1</td>
+              <td>MmcS</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000915/1">BGC0000915</a></td>
+              <td>Other:Aminocoumarin</td>
+              <td>36.0</td>
+              <td>45.4</td>
+              <td>122.0</td>
+              <td>1.9e-27</td>
+          </tr>
+    
+          <tr>
+              <td>OWA25221.1</td>
+              <td>carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001438/1">BGC0001438</a></td>
+              <td>Polyketide + Saccharide:Hybrid/tailoring</td>
+              <td>36.0</td>
+              <td>45.4</td>
+              <td>118.0</td>
+              <td>2.8e-26</td>
+          </tr>
+    
+          <tr>
+              <td>AAZ94398.1</td>
+              <td>putative_carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000040/1">BGC0000040</a></td>
+              <td>Polyketide</td>
+              <td>32.0</td>
+              <td>59.0</td>
+              <td>117.0</td>
+              <td>8.1e-26</td>
+          </tr>
+    
+          <tr>
+              <td>BAF92586.1</td>
+              <td>carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000118/1">BGC0000118</a></td>
+              <td>Polyketide</td>
+              <td>35.0</td>
+              <td>46.9</td>
+              <td>116.0</td>
+              <td>1.4e-25</td>
+          </tr>
+    
+          <tr>
+              <td>ACJ24860.1</td>
+              <td>putative_carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000119/1">BGC0000119</a></td>
+              <td>Polyketide:Iterative type I + Saccharide:Hybrid/tailoring</td>
+              <td>35.0</td>
+              <td>46.9</td>
+              <td>116.0</td>
+              <td>1.4e-25</td>
+          </tr>
+    
+          <tr>
+              <td>AAF67507.2</td>
+              <td>carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000834/1">BGC0000834</a></td>
+              <td>Saccharide:Hybrid/tailoring + Other:Aminocoumarin</td>
+              <td>35.0</td>
+              <td>44.9</td>
+              <td>116.0</td>
+              <td>1.4e-25</td>
+          </tr>
+    
+          <tr>
+              <td>ANC94988.1</td>
+              <td>AlmDIV</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001396/1">BGC0001396</a></td>
+              <td>Polyketide</td>
+              <td>33.0</td>
+              <td>54.9</td>
+              <td>115.0</td>
+              <td>2.4e-25</td>
+          </tr>
+    
+          <tr>
+              <td>AFU82620.1</td>
+              <td>carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000998/1">BGC0000998</a></td>
+              <td>NRP + Polyketide</td>
+              <td>27.0</td>
+              <td>103.3</td>
+              <td>115.0</td>
+              <td>3.1e-25</td>
+          </tr>
+    
+          <tr>
+              <td>ABB52538.1</td>
+              <td>putative_transferase_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000047/1">BGC0000047</a></td>
+              <td>Polyketide</td>
+              <td>33.0</td>
+              <td>54.9</td>
+              <td>113.0</td>
+              <td>1.2e-24</td>
+          </tr>
+    
+          <tr>
+              <td>AAO06921.1</td>
+              <td>GdmN</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000066/1">BGC0000066</a></td>
+              <td>Polyketide</td>
+              <td>35.0</td>
+              <td>44.1</td>
+              <td>113.0</td>
+              <td>1.2e-24</td>
+          </tr>
+    
+          <tr>
+              <td>ABI93782.1</td>
+              <td>GdmN</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000068/1">BGC0000068</a></td>
+              <td>Polyketide</td>
+              <td>35.0</td>
+              <td>44.1</td>
+              <td>112.0</td>
+              <td>2.6e-24</td>
+          </tr>
+    
+          <tr>
+              <td>AAY28228.1</td>
+              <td>HbmN</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000074/1">BGC0000074</a></td>
+              <td>Polyketide</td>
+              <td>34.0</td>
+              <td>44.1</td>
+              <td>111.0</td>
+              <td>3.4e-24</td>
+          </tr>
+    
+          <tr>
+              <td>WP_020636825.1</td>
+              <td>hypothetical_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0002011/1">BGC0002011</a></td>
+              <td>Polyketide</td>
+              <td>34.0</td>
+              <td>46.2</td>
+              <td>111.0</td>
+              <td>3.4e-24</td>
+          </tr>
+    
+          <tr>
+              <td>ABI75099.1</td>
+              <td>NodU/CmcH-related_carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000928/1">BGC0000928</a></td>
+              <td>Other</td>
+              <td>30.0</td>
+              <td>53.3</td>
+              <td>111.0</td>
+              <td>4.5e-24</td>
+          </tr>
+    
+          <tr>
+              <td>AAM54099.1</td>
+              <td>O-carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000020/1">BGC0000020</a></td>
+              <td>Polyketide</td>
+              <td>34.0</td>
+              <td>44.9</td>
+              <td>111.0</td>
+              <td>5.8e-24</td>
+          </tr>
+    
+          <tr>
+              <td>AQZ37108.1</td>
+              <td>carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001511/1">BGC0001511</a></td>
+              <td>Polyketide</td>
+              <td>34.0</td>
+              <td>44.9</td>
+              <td>111.0</td>
+              <td>5.8e-24</td>
+          </tr>
+    
+          <tr>
+              <td>ABI75139.1</td>
+              <td>NodU/CmcH-related_carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000887/1">BGC0000887</a></td>
+              <td>Alkaloid</td>
+              <td>30.0</td>
+              <td>53.3</td>
+              <td>107.0</td>
+              <td>6.4e-23</td>
+          </tr>
+    
+          <tr>
+              <td>WP_026467817.1</td>
+              <td>carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0002011/1">BGC0002011</a></td>
+              <td>Polyketide</td>
+              <td>33.0</td>
+              <td>46.2</td>
+              <td>106.0</td>
+              <td>1.1e-22</td>
+          </tr>
+    
+          <tr>
+              <td>ABL74951.1</td>
+              <td>carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001048/1">BGC0001048</a></td>
+              <td>NRP:Glycopeptide + Polyketide:Modular type I + Saccharide:Hybrid/tailoring</td>
+              <td>33.0</td>
+              <td>53.7</td>
+              <td>104.0</td>
+              <td>4.2e-22</td>
+          </tr>
+    
+          <tr>
+              <td>ACG60765.1</td>
+              <td>carbamoyltransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001058/1">BGC0001058</a></td>
+              <td>NRP:Glycopeptide + Polyketide:Modular type I + Saccharide:Hybrid/tailoring</td>
+              <td>34.0</td>
+              <td>50.9</td>
+              <td>103.0</td>
+              <td>1.2e-21</td>
+          </tr>
+    
+          <tr>
+              <td>BAU50934.1</td>
+              <td>carbamoyl_transferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001379/1">BGC0001379</a></td>
+              <td>NRP</td>
+              <td>32.0</td>
+              <td>47.6</td>
+              <td>101.0</td>
+              <td>6e-21</td>
+          </tr>
+    
+          <tr>
+              <td>AAG02370.1</td>
+              <td>carbamyltransferase_BlmD</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000963/1">BGC0000963</a></td>
+              <td>NRP:Glycopeptide + Polyketide:Modular type I + Saccharide:Hybrid/tailoring</td>
+              <td>35.0</td>
+              <td>46.7</td>
+              <td>98.0</td>
+              <td>3e-20</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="309,35 314,30 357,30 357,40 314,40 309,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS25195&lt;/b&gt;&lt;br&gt;type I polyketide synthase&lt;br&gt;Location: 0 - 5816" locus_tag="B113_RS25195" class="clusterblast-orf" id="dummy-1_q0_0_all"  />
+<polygon points="358,35 360,30 360,40 358,35 " style="fill:#3cd815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121090&lt;/b&gt;&lt;br&gt;ferredoxin&lt;br&gt;Location: 5966 - 6203" locus_tag="B113_RS0121090" class="clusterblast-orf" id="dummy-1_q1_0_all"  />
+<polygon points="360,35 365,30 370,30 370,40 365,40 360,35 " style="fill:#1563d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121095&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 6199 - 7387" locus_tag="B113_RS0121095" class="clusterblast-orf" id="dummy-1_q2_0_all"  />
+<polygon points="373,40 379,40 384,35 379,30 373,30 373,40 " style="fill:#b115d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121100&lt;/b&gt;&lt;br&gt;lysine 2,3-aminomutase&lt;br&gt;Location: 7740 - 9087" locus_tag="B113_RS0121100" class="clusterblast-orf" id="dummy-1_q3_0_all"  />
+<polygon points="385,40 390,40 395,35 390,30 385,30 385,40 " style="fill:#d88a15; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121105&lt;/b&gt;&lt;br&gt;aminotransferase class I/II-fold pyridoxal phosphate-dependent enzyme&lt;br&gt;Location: 9115 - 10372" locus_tag="B113_RS0121105" class="clusterblast-orf" id="dummy-1_q4_0_all"  />
+<polygon points="395,40 398,40 403,35 398,30 395,30 395,40 " style="fill:#15d863; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121110&lt;/b&gt;&lt;br&gt;ACP S-malonyltransferase&lt;br&gt;Location: 10368 - 11316" locus_tag="B113_RS0121110" class="clusterblast-orf" id="dummy-1_q5_0_all"  />
+<polygon points="403,40 411,40 416,35 411,30 403,30 403,40 " style="fill:#3c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121115&lt;/b&gt;&lt;br&gt;AMP-binding protein&lt;br&gt;Location: 11342 - 12887" locus_tag="B113_RS0121115" class="clusterblast-orf" id="dummy-1_q6_0_all"  />
+<polygon points="417,35 422,30 430,30 430,40 422,40 417,35 " style="fill:#d8158a; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121120&lt;/b&gt;&lt;br&gt;AMP-binding protein&lt;br&gt;Location: 12945 - 14538" locus_tag="B113_RS0121120" class="clusterblast-orf" id="dummy-1_q7_0_all"  />
+<polygon points="431,40 433,35 431,30 431,40 " style="fill:#b1d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121125&lt;/b&gt;&lt;br&gt;phosphopantetheine-binding protein&lt;br&gt;Location: 14699 - 14948" locus_tag="B113_RS0121125" class="clusterblast-orf" id="dummy-1_q8_0_all"  />
+<polygon points="434,35 439,30 442,30 442,40 439,40 434,35 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121130&lt;/b&gt;&lt;br&gt;proline iminopeptidase-family hydrolase&lt;br&gt;Location: 15049 - 15970" locus_tag="B113_RS0121130" class="clusterblast-orf" id="dummy-1_q9_0_all"  />
+<polygon points="442,35 447,30 471,30 471,40 447,40 442,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS25200&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 15966 - 19398" locus_tag="B113_RS25200" class="clusterblast-orf" id="dummy-1_q10_0_all"  />
+</g>
+<g label="BGC0001452" description="BGC0001452_c1: sipanmycin (33% of genes show similarity), Polyketide" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://mibig.secondarymetabolites.org/go/BGC0001452/1" target="_blank">BGC0001452</a>:                                                                       sipanmycin (33% of genes show similarity), Polyketide</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a1_000"  >
+<polygon points="0,85 5,80 9,80 9,90 5,90 0,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipS13&lt;/b&gt;&lt;br&gt;dTDP-4-dehydro-6-deoxyglucose aminotransferase&lt;br&gt;Location: 93434 - 92244" locus_tag="sipS13" class="clusterblast-orf" id="dummy-1_h1_4_0"  />
+</g>
+<g id="a1_001"  >
+<polygon points="9,85 14,80 18,80 18,90 14,90 9,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipS11&lt;/b&gt;&lt;br&gt;NDP-hexose-3-ketoreductase&lt;br&gt;Location: 92254 - 91238" locus_tag="sipS11" class="clusterblast-orf" id="dummy-1_h1_4_1"  />
+</g>
+<g id="a1_002"  >
+<polygon points="18,85 23,80 29,80 29,90 23,90 18,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipS14&lt;/b&gt;&lt;br&gt;glycosyltransferase, MGT family&lt;br&gt;Location: 91241 - 89952" locus_tag="sipS14" class="clusterblast-orf" id="dummy-1_h1_4_2"  />
+</g>
+<g id="a1_003"  >
+<polygon points="29,85 34,80 40,80 40,90 34,90 29,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipO2&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 89929 - 88613" locus_tag="sipO2" class="clusterblast-orf" id="dummy-1_h1_4_3"  />
+</g>
+<g id="a1_004"  >
+<polygon points="41,90 46,90 51,85 46,80 41,80 41,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipS5a&lt;/b&gt;&lt;br&gt;C-methyltransferase&lt;br&gt;Location: 88474 - 87206" locus_tag="sipS5a" class="clusterblast-orf" id="dummy-1_h1_4_4"  />
+</g>
+<g id="a1_005"  >
+<polygon points="52,85 57,80 62,80 62,90 57,90 52,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipS9&lt;/b&gt;&lt;br&gt;glycosyltransferase, MGT family&lt;br&gt;Location: 87171 - 86005" locus_tag="sipS9" class="clusterblast-orf" id="dummy-1_h1_4_5"  />
+</g>
+<g id="a1_006"  >
+<polygon points="62,90 63,90 68,85 63,80 62,80 62,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipS8&lt;/b&gt;&lt;br&gt;N-methyltransferase&lt;br&gt;Location: 85973 - 85245" locus_tag="sipS8" class="clusterblast-orf" id="dummy-1_h1_4_6"  />
+</g>
+<g id="a1_007"  >
+<polygon points="68,85 73,80 80,80 80,90 73,90 68,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipS10&lt;/b&gt;&lt;br&gt;NDP-hexose 2,3-dehydratase&lt;br&gt;Location: 85176 - 83812" locus_tag="sipS10" class="clusterblast-orf" id="dummy-1_h1_4_7"  />
+</g>
+<g id="a1_008"  >
+<polygon points="80,85 85,80 89,80 89,90 85,90 80,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipS6&lt;/b&gt;&lt;br&gt;dTDP-glucose 4,6-dehydratase&lt;br&gt;Location: 83815 - 82766" locus_tag="sipS6" class="clusterblast-orf" id="dummy-1_h1_4_8"  />
+</g>
+<g id="a1_009"  >
+<polygon points="89,85 94,80 97,80 97,90 94,90 89,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipS7&lt;/b&gt;&lt;br&gt;glucose-1-phosphate thymidylyltransferase&lt;br&gt;Location: 82769 - 81699" locus_tag="sipS7" class="clusterblast-orf" id="dummy-1_h1_4_9"  />
+</g>
+<g id="a1_0010"  >
+<polygon points="99,85 104,80 110,80 110,90 104,90 99,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipS4&lt;/b&gt;&lt;br&gt;glycosyltransferase, MGT family&lt;br&gt;Location: 81550 - 80255" locus_tag="sipS4" class="clusterblast-orf" id="dummy-1_h1_4_10"  />
+</g>
+<g id="a1_0011"  >
+<polygon points="111,90 114,90 119,85 114,80 111,80 111,90 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;sipL5&lt;/b&gt;&lt;br&gt;L-proline amide hydrolase&lt;br&gt;Location: 80051 - 79134&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121130&lt;/b&gt;&lt;br&gt;Percentage identity: 64&lt;br&gt;Percentage coverage: 97&lt;br&gt;BLAST bit score: 397&lt;br&gt;E-value: 2.3e-110" locus_tag="sipL5" class="clusterblast-orf" id="dummy-1_h1_4_11"  />
+</g>
+<g id="a1_0012"  >
+<polygon points="119,90 125,90 130,85 125,80 119,80 119,90 " style="fill:#b115d8; stroke-width:1; stroke:black; " description="&lt;b&gt;sipL4&lt;/b&gt;&lt;br&gt;lysine 2,3-aminomutase&lt;br&gt;Location: 79099 - 77750&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121100&lt;/b&gt;&lt;br&gt;Percentage identity: 72&lt;br&gt;Percentage coverage: 97&lt;br&gt;BLAST bit score: 658&lt;br&gt;E-value: 1e-188" locus_tag="sipL4" class="clusterblast-orf" id="dummy-1_h1_4_12"  />
+</g>
+<g id="a1_0013"  >
+<polygon points="131,90 137,90 142,85 137,80 131,80 131,90 " style="fill:#d88a15; stroke-width:1; stroke:black; " description="&lt;b&gt;sipL3&lt;/b&gt;&lt;br&gt;aminotransferase&lt;br&gt;Location: 77729 - 76335&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121105&lt;/b&gt;&lt;br&gt;Percentage identity: 68&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 562&lt;br&gt;E-value: 5.6e-160" locus_tag="sipL3" class="clusterblast-orf" id="dummy-1_h1_4_13"  />
+</g>
+<g id="a1_0014"  >
+<polygon points="143,90 146,90 151,85 146,80 143,80 143,90 " style="fill:#15d863; stroke-width:1; stroke:black; " description="&lt;b&gt;sipL2&lt;/b&gt;&lt;br&gt;malonyl CoA-acyl carrier protein transacylase&lt;br&gt;Location: 76264 - 75266&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121110&lt;/b&gt;&lt;br&gt;Percentage identity: 59&lt;br&gt;Percentage coverage: 97&lt;br&gt;BLAST bit score: 348&lt;br&gt;E-value: 1.2e-95" locus_tag="sipL2" class="clusterblast-orf" id="dummy-1_h1_4_14"  />
+</g>
+<g id="a1_0015"  >
+<polygon points="151,85 156,80 165,80 165,90 156,90 151,85 " style="fill:#d8158a; stroke-width:1; stroke:black; " description="&lt;b&gt;sipL1&lt;/b&gt;&lt;br&gt;AMP-dependent synthetase and ligase&lt;br&gt;Location: 75324 - 73645&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121120&lt;/b&gt;&lt;br&gt;Percentage identity: 68&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 720&lt;br&gt;E-value: 2e-207" locus_tag="sipL1" class="clusterblast-orf" id="dummy-1_h1_4_15"  />
+</g>
+<g id="a1_0016"  >
+<polygon points="165,85 167,80 167,90 165,85 " style="fill:#b1d815; stroke-width:1; stroke:black; " description="&lt;b&gt;sipL6&lt;/b&gt;&lt;br&gt;acyl carrier protein&lt;br&gt;Location: 73551 - 73312&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121125&lt;/b&gt;&lt;br&gt;Percentage identity: 60&lt;br&gt;Percentage coverage: 94&lt;br&gt;BLAST bit score: 96&lt;br&gt;E-value: 2.2e-20" locus_tag="sipL6" class="clusterblast-orf" id="dummy-1_h1_4_16"  />
+</g>
+<g id="a1_0017"  >
+<polygon points="169,90 177,90 182,85 177,80 169,80 169,90 " style="fill:#3c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;sipL7&lt;/b&gt;&lt;br&gt;AMP-dependent synthetase and ligase&lt;br&gt;Location: 73169 - 71520&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121115&lt;/b&gt;&lt;br&gt;Percentage identity: 60&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 601&lt;br&gt;E-value: 1.3e-171" locus_tag="sipL7" class="clusterblast-orf" id="dummy-1_h1_4_17"  />
+</g>
+<g id="a1_0018"  >
+<polygon points="182,90 187,90 192,85 187,80 182,80 182,90 " style="fill:#1563d8; stroke-width:1; stroke:black; " description="&lt;b&gt;sipO1&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 71523 - 70327&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121095&lt;/b&gt;&lt;br&gt;Percentage identity: 58&lt;br&gt;Percentage coverage: 101&lt;br&gt;BLAST bit score: 470&lt;br&gt;E-value: 3.6e-132" locus_tag="sipO1" class="clusterblast-orf" id="dummy-1_h1_4_18"  />
+</g>
+<g id="a1_0019"  >
+<polygon points="194,85 199,80 289,80 289,90 199,90 194,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;sipP1&lt;/b&gt;&lt;br&gt;Type I Modular PKS&lt;br&gt;Location: 70164 - 58714&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 49&lt;br&gt;Percentage coverage: 105&lt;br&gt;BLAST bit score: 1589&lt;br&gt;E-value: 0.0" locus_tag="sipP1" class="clusterblast-orf" id="dummy-1_h1_4_19"  />
+</g>
+<g id="a1_0020"  >
+<polygon points="289,85 294,80 428,80 428,90 294,90 289,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;sipP2&lt;/b&gt;&lt;br&gt;Type I Modular PKS&lt;br&gt;Location: 58708 - 42122&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 47&lt;br&gt;Percentage coverage: 103&lt;br&gt;BLAST bit score: 1485&lt;br&gt;E-value: 0.0&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25200&lt;/b&gt;&lt;br&gt;Percentage identity: 46&lt;br&gt;Percentage coverage: 80&lt;br&gt;BLAST bit score: 635&lt;br&gt;E-value: 1.4e-181" locus_tag="sipP2" class="clusterblast-orf" id="dummy-1_h1_4_20"  />
+</g>
+<g id="a1_0021"  >
+<polygon points="431,90 432,90 437,85 432,80 431,80 431,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipB&lt;/b&gt;&lt;br&gt;thioesterase&lt;br&gt;Location: 41760 - 40972" locus_tag="sipB" class="clusterblast-orf" id="dummy-1_h1_4_21"  />
+</g>
+<g id="a1_0022"  >
+<polygon points="438,85 443,80 445,80 445,90 443,90 438,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipT1&lt;/b&gt;&lt;br&gt;ABC-2 type transporter&lt;br&gt;Location: 40887 - 40090" locus_tag="sipT1" class="clusterblast-orf" id="dummy-1_h1_4_22"  />
+</g>
+<g id="a1_0023"  >
+<polygon points="445,85 450,80 453,80 453,90 450,90 445,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipT2&lt;/b&gt;&lt;br&gt;ABC transporter ATP-binding protein&lt;br&gt;Location: 40093 - 39083" locus_tag="sipT2" class="clusterblast-orf" id="dummy-1_h1_4_23"  />
+</g>
+<g id="a1_0024"  >
+<polygon points="454,90 455,90 460,85 455,80 454,80 454,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipR2&lt;/b&gt;&lt;br&gt;TetR family transcriptional regulator&lt;br&gt;Location: 38987 - 38220" locus_tag="sipR2" class="clusterblast-orf" id="dummy-1_h1_4_24"  />
+</g>
+<g id="a1_0025"  >
+<polygon points="461,85 466,80 552,80 552,90 466,90 461,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;sipP3&lt;/b&gt;&lt;br&gt;Type I Modular PKS&lt;br&gt;Location: 38199 - 27301&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 51&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 1601&lt;br&gt;E-value: 0.0" locus_tag="sipP3" class="clusterblast-orf" id="dummy-1_h1_4_25"  />
+</g>
+<g id="a1_0026"  >
+<polygon points="552,85 557,80 593,80 593,90 557,90 552,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipP4&lt;/b&gt;&lt;br&gt;Type I Modular PKS&lt;br&gt;Location: 27247 - 22367" locus_tag="sipP4" class="clusterblast-orf" id="dummy-1_h1_4_26"  />
+</g>
+<g id="a1_0027"  >
+<polygon points="593,85 598,80 602,80 602,90 598,90 593,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipS15&lt;/b&gt;&lt;br&gt;glycosyltransferase, MGT family&lt;br&gt;Location: 22305 - 21322" locus_tag="sipS15" class="clusterblast-orf" id="dummy-1_h1_4_27"  />
+</g>
+<g id="a1_0028"  >
+<polygon points="602,85 607,80 609,80 609,90 607,90 602,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SipIB2&lt;/b&gt;&lt;br&gt;3-hydroxybutyryl-CoA dehydrogenase&lt;br&gt;Location: 21246 - 20395" locus_tag="SipIB2" class="clusterblast-orf" id="dummy-1_h1_4_28"  />
+</g>
+<g id="a1_0029"  >
+<polygon points="609,85 614,80 618,80 618,90 614,90 609,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipIB1&lt;/b&gt;&lt;br&gt;3-oxoacyl-(acyl carrier protein) synthase III&lt;br&gt;Location: 20398 - 19388" locus_tag="sipIB1" class="clusterblast-orf" id="dummy-1_h1_4_29"  />
+</g>
+<g id="a1_0030"  >
+<polygon points="618,85 623,80 629,80 629,90 623,90 618,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipIB3&lt;/b&gt;&lt;br&gt;crotonyl-CoA carboxylase / reductase&lt;br&gt;Location: 19391 - 18054" locus_tag="sipIB3" class="clusterblast-orf" id="dummy-1_h1_4_30"  />
+</g>
+<g id="a1_0031"  >
+<polygon points="629,85 634,80 725,80 725,90 634,90 629,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;sipP5&lt;/b&gt;&lt;br&gt;Type I Modular PKS&lt;br&gt;Location: 18019 - 6584&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 51&lt;br&gt;Percentage coverage: 94&lt;br&gt;BLAST bit score: 1549&lt;br&gt;E-value: 0.0" locus_tag="sipP5" class="clusterblast-orf" id="dummy-1_h1_4_31"  />
+</g>
+<g id="a1_0032"  >
+<polygon points="727,90 728,90 733,85 728,80 727,80 727,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipS1&lt;/b&gt;&lt;br&gt;N-acetylglucosaminyl deacetilase&lt;br&gt;Location: 6290 - 5610" locus_tag="sipS1" class="clusterblast-orf" id="dummy-1_h1_4_32"  />
+</g>
+<g id="a1_0033"  >
+<polygon points="734,90 740,90 745,85 740,80 734,80 734,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipS2&lt;/b&gt;&lt;br&gt;nucleotide-glucose-dehydrogenase&lt;br&gt;Location: 5408 - 4185" locus_tag="sipS2" class="clusterblast-orf" id="dummy-1_h1_4_33"  />
+</g>
+<g id="a1_0034"  >
+<polygon points="745,90 748,90 753,85 748,80 745,80 745,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipS3&lt;/b&gt;&lt;br&gt;Nucleoside-diphosphate sugar epimerase&lt;br&gt;Location: 4162 - 3176" locus_tag="sipS3" class="clusterblast-orf" id="dummy-1_h1_4_34"  />
+</g>
+<g id="a1_0035"  >
+<polygon points="755,90 775,90 780,85 775,80 755,80 755,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;sipR1&lt;/b&gt;&lt;br&gt;LuxR family transcriptional regulator&lt;br&gt;Location: 2895 - 1" locus_tag="sipR1" class="clusterblast-orf" id="dummy-1_h1_4_35"  />
+</g>
+</svg>

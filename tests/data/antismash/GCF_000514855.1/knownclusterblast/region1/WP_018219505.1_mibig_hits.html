@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>ADE22306.1</td>
+              <td>biotin_carboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000279/1">BGC0000279</a></td>
+              <td>Polyketide</td>
+              <td>63.0</td>
+              <td>96.7</td>
+              <td>546.0</td>
+              <td>3.5e-155</td>
+          </tr>
+    
+          <tr>
+              <td>ASA49571.1</td>
+              <td>acetyl-CoA_carboxylase_biotin_carboxylase_subunit</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001730/1">BGC0001730</a></td>
+              <td>Polyketide</td>
+              <td>64.0</td>
+              <td>98.5</td>
+              <td>544.0</td>
+              <td>1.7e-154</td>
+          </tr>
+    
+          <tr>
+              <td>ACN64839.1</td>
+              <td>PokAC2</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001061/1">BGC0001061</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>61.0</td>
+              <td>98.5</td>
+              <td>539.0</td>
+              <td>7.2e-153</td>
+          </tr>
+    
+          <tr>
+              <td>AKD43510.1</td>
+              <td>Biotin_carboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001409/1">BGC0001409</a></td>
+              <td>Polyketide</td>
+              <td>62.0</td>
+              <td>98.5</td>
+              <td>536.0</td>
+              <td>3.6e-152</td>
+          </tr>
+    
+          <tr>
+              <td>AQP25557.1</td>
+              <td>ACC_biotin_carboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001590/1">BGC0001590</a></td>
+              <td>Polyketide</td>
+              <td>63.0</td>
+              <td>97.8</td>
+              <td>533.0</td>
+              <td>4e-151</td>
+          </tr>
+    
+          <tr>
+              <td>AAG30191.1</td>
+              <td>biotin_carboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000261/1">BGC0000261</a></td>
+              <td>Polyketide</td>
+              <td>62.0</td>
+              <td>97.8</td>
+              <td>531.0</td>
+              <td>1.2e-150</td>
+          </tr>
+    
+          <tr>
+              <td>AFU65905.1</td>
+              <td>DacP1</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000216/1">BGC0000216</a></td>
+              <td>Polyketide</td>
+              <td>62.0</td>
+              <td>95.4</td>
+              <td>525.0</td>
+              <td>8.3e-149</td>
+          </tr>
+    
+          <tr>
+              <td>BBE36461.1</td>
+              <td>pyruvate_carboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001922/1">BGC0001922</a></td>
+              <td>Polyketide</td>
+              <td>61.0</td>
+              <td>95.2</td>
+              <td>507.0</td>
+              <td>3.1e-143</td>
+          </tr>
+    
+          <tr>
+              <td>ABM21735.1</td>
+              <td>PdmP1</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000256/1">BGC0000256</a></td>
+              <td>Polyketide</td>
+              <td>60.0</td>
+              <td>98.0</td>
+              <td>501.0</td>
+              <td>1.7e-141</td>
+          </tr>
+    
+          <tr>
+              <td>ABS74200.1</td>
+              <td>YngH</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001095/1">BGC0001095</a></td>
+              <td>NRP</td>
+              <td>46.0</td>
+              <td>97.4</td>
+              <td>382.0</td>
+              <td>1.1e-105</td>
+          </tr>
+    
+          <tr>
+              <td>AMX23336.1</td>
+              <td>acetyl-/propionyl-coenzyme_A_carboxylase_alpha_chain</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001500/1">BGC0001500</a></td>
+              <td>Polyketide</td>
+              <td>48.0</td>
+              <td>98.9</td>
+              <td>373.0</td>
+              <td>6.9e-103</td>
+          </tr>
+    
+          <tr>
+              <td>AAD37851.1</td>
+              <td>JadJ</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000234/1">BGC0000234</a></td>
+              <td>Polyketide</td>
+              <td>51.0</td>
+              <td>93.9</td>
+              <td>372.0</td>
+              <td>9e-103</td>
+          </tr>
+    
+          <tr>
+              <td>AHW57769.1</td>
+              <td>PgaN</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000262/1">BGC0000262</a></td>
+              <td>Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>51.0</td>
+              <td>93.9</td>
+              <td>371.0</td>
+              <td>1.5e-102</td>
+          </tr>
+    
+          <tr>
+              <td>CAH10108.1</td>
+              <td>putative_Acyl-CoA_carboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000268/1">BGC0000268</a></td>
+              <td>Polyketide</td>
+              <td>50.0</td>
+              <td>94.1</td>
+              <td>370.0</td>
+              <td>4.5e-102</td>
+          </tr>
+    
+          <tr>
+              <td>CAD55505.1</td>
+              <td>AccA1;_Acyl-CoA_carboxylase_alpha-subunit_(biotinylated)</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000038/1">BGC0000038</a></td>
+              <td>Polyketide:Modular type I</td>
+              <td>50.0</td>
+              <td>93.9</td>
+              <td>367.0</td>
+              <td>3.8e-101</td>
+          </tr>
+    
+          <tr>
+              <td>AEE65470.1</td>
+              <td>carboxylase,_alpha_subunit</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000223/1">BGC0000223</a></td>
+              <td>Polyketide:Type II</td>
+              <td>49.0</td>
+              <td>94.1</td>
+              <td>364.0</td>
+              <td>2.4e-100</td>
+          </tr>
+    
+          <tr>
+              <td>AAF08802.1</td>
+              <td>YngH</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001103/1">BGC0001103</a></td>
+              <td>NRP + Polyketide</td>
+              <td>44.0</td>
+              <td>96.9</td>
+              <td>364.0</td>
+              <td>2.4e-100</td>
+          </tr>
+    
+          <tr>
+              <td>AEW31027.1</td>
+              <td>acetyl-CoA_carboxylase_biotin_carboxylase_subunit</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000407/1">BGC0000407</a></td>
+              <td>NRP</td>
+              <td>45.0</td>
+              <td>95.2</td>
+              <td>358.0</td>
+              <td>1.3e-98</td>
+          </tr>
+    
+          <tr>
+              <td>ADQ55468.1</td>
+              <td>acetyl-CoA_carboxylase_biotin_carboxylase_subunit</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000350/1">BGC0000350</a></td>
+              <td>NRP:Beta-lactam</td>
+              <td>48.0</td>
+              <td>85.2</td>
+              <td>355.0</td>
+              <td>1.1e-97</td>
+          </tr>
+    
+          <tr>
+              <td>ALA09346.1</td>
+              <td>hypothetical_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001303/1">BGC0001303</a></td>
+              <td>Polyketide</td>
+              <td>45.0</td>
+              <td>102.0</td>
+              <td>341.0</td>
+              <td>2.2e-93</td>
+          </tr>
+    
+          <tr>
+              <td>CAG14974.1</td>
+              <td>acetyl-CoA_carboxylase_complex,_alpha-chain</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000253/1">BGC0000253</a></td>
+              <td>Polyketide:Type II</td>
+              <td>47.0</td>
+              <td>93.9</td>
+              <td>335.0</td>
+              <td>1.6e-91</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="1,35 6,30 62,30 62,40 6,40 1,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0108755&lt;/b&gt;&lt;br&gt;SGNH/GDSL hydrolase family protein&lt;br&gt;Location: 59270 - 60356" locus_tag="B113_RS0108755" class="clusterblast-orf" id="dummy-1_q0_0_all"  />
+<polygon points="69,40 85,40 90,35 85,30 69,30 69,40 " style="fill:#77d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0108760&lt;/b&gt;&lt;br&gt;DUF1232 domain-containing protein&lt;br&gt;Location: 60477 - 60849" locus_tag="B113_RS0108760" class="clusterblast-orf" id="dummy-1_q1_0_all"  />
+<polygon points="94,40 166,40 171,35 166,30 94,30 94,40 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0108765&lt;/b&gt;&lt;br&gt;cystathionine beta-synthase&lt;br&gt;Location: 60918 - 62289" locus_tag="B113_RS0108765" class="clusterblast-orf" id="dummy-1_q2_0_all"  />
+<polygon points="176,35 181,30 205,30 205,40 181,40 176,35 " style="fill:#7715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0108770&lt;/b&gt;&lt;br&gt;GNAT family N-acetyltransferase&lt;br&gt;Location: 62370 - 62880" locus_tag="B113_RS0108770" class="clusterblast-orf" id="dummy-1_q3_0_all"  />
+<polygon points="204,35 209,30 257,30 257,40 209,40 204,35 " style="fill:#d87715; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0108775&lt;/b&gt;&lt;br&gt;ribonuclease Z&lt;br&gt;Location: 62876 - 63806" locus_tag="B113_RS0108775" class="clusterblast-orf" id="dummy-1_q4_0_all"  />
+<polygon points="278,35 283,30 346,30 346,40 283,40 278,35 " style="fill:#15d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0108780&lt;/b&gt;&lt;br&gt;osmoprotectant NAGGN system M42 family peptidase&lt;br&gt;Location: 64183 - 65377" locus_tag="B113_RS0108780" class="clusterblast-orf" id="dummy-1_q5_0_all"  />
+<polygon points="346,35 351,30 450,30 450,40 351,40 346,35 " style="fill:#1577d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0108785&lt;/b&gt;&lt;br&gt;N-acetylglutaminylglutamine synthetase&lt;br&gt;Location: 65373 - 67221" locus_tag="B113_RS0108785" class="clusterblast-orf" id="dummy-1_q6_0_all"  />
+<polygon points="450,35 455,30 551,30 551,40 455,40 450,35 " style="fill:#d815d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0108790&lt;/b&gt;&lt;br&gt;N-acetylglutaminylglutamine amidotransferase&lt;br&gt;Location: 67223 - 69008" locus_tag="B113_RS0108790" class="clusterblast-orf" id="dummy-1_q7_0_all"  />
+<polygon points="565,35 570,30 602,30 602,40 570,40 565,35 " style="fill:#d8d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0108795&lt;/b&gt;&lt;br&gt;peptide-methionine (S)-S-oxide reductase MsrA&lt;br&gt;Location: 69255 - 69918" locus_tag="B113_RS0108795" class="clusterblast-orf" id="dummy-1_q8_0_all"  />
+<polygon points="608,35 613,30 631,30 631,40 613,40 608,35 " style="fill:#15d877; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0108800&lt;/b&gt;&lt;br&gt;HIT family protein&lt;br&gt;Location: 70012 - 70423" locus_tag="B113_RS0108800" class="clusterblast-orf" id="dummy-1_q9_0_all"  />
+<polygon points="634,40 694,40 699,35 694,30 634,30 634,40 " style="fill:#1515d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0108805&lt;/b&gt;&lt;br&gt;cystathionine gamma-synthase&lt;br&gt;Location: 70480 - 71623" locus_tag="B113_RS0108805" class="clusterblast-orf" id="dummy-1_q10_0_all"  />
+<polygon points="700,40 774,40 779,35 774,30 700,30 700,40 " style="fill:#d81577; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0108810&lt;/b&gt;&lt;br&gt;amidase&lt;br&gt;Location: 71642 - 73052" locus_tag="B113_RS0108810" class="clusterblast-orf" id="dummy-1_q11_0_all"  />
+</g>
+<g label="NZ_KB904925" description="NZ_KB904925 (70372-85197): Salinispora pacifica CNT609 C584DRAFT scaffold0001... (100% of genes show similarity), NAGGN" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_KB904925&amp;start=70372&amp;end=85197" target="_blank">NZ_KB904925 (70372-85197)</a>: Salinispora pacifica CNT609 C584DRAFT scaffold0001... (100% of genes show similarity), NAGGN</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a1_000"  >
+<polygon points="0,85 5,80 61,80 61,90 5,90 0,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0112630&lt;/b&gt;&lt;br&gt;SGNH/GDSL hydrolase family protein&lt;br&gt;Location: 70458 - 71543&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0108755&lt;/b&gt;&lt;br&gt;Percentage identity: 97&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 680&lt;br&gt;E-value: 9.4e-194" locus_tag="C584_RS0112630" class="clusterblast-orf" id="dummy-1_h1_5_0"  />
+</g>
+<g id="a1_001"  >
+<polygon points="68,90 83,90 88,85 83,80 68,80 68,90 " style="fill:#77d815; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0112635&lt;/b&gt;&lt;br&gt;DUF1232 domain-containing protein&lt;br&gt;Location: 71666 - 72022&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0108760&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 96&lt;br&gt;BLAST bit score: 218&lt;br&gt;E-value: 3.4e-55" locus_tag="C584_RS0112635" class="clusterblast-orf" id="dummy-1_h1_5_1"  />
+</g>
+<g id="a1_002"  >
+<polygon points="93,90 165,90 170,85 165,80 93,80 93,90 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0112640&lt;/b&gt;&lt;br&gt;cystathionine beta-synthase&lt;br&gt;Location: 72107 - 73477&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0108765&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 903&lt;br&gt;E-value: 6.6e-261" locus_tag="C584_RS0112640" class="clusterblast-orf" id="dummy-1_h1_5_2"  />
+</g>
+<g id="a1_003"  >
+<polygon points="175,85 180,80 203,80 203,90 180,90 175,85 " style="fill:#7715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0112645&lt;/b&gt;&lt;br&gt;GNAT family N-acetyltransferase&lt;br&gt;Location: 73557 - 74066&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0108770&lt;/b&gt;&lt;br&gt;Percentage identity: 98&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 342&lt;br&gt;E-value: 2.8e-92" locus_tag="C584_RS0112645" class="clusterblast-orf" id="dummy-1_h1_5_3"  />
+</g>
+<g id="a1_004"  >
+<polygon points="203,85 208,80 256,80 256,90 208,90 203,85 " style="fill:#d87715; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0112650&lt;/b&gt;&lt;br&gt;ribonuclease Z&lt;br&gt;Location: 74063 - 74992&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0108775&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 610&lt;br&gt;E-value: 7.8e-173" locus_tag="C584_RS0112650" class="clusterblast-orf" id="dummy-1_h1_5_4"  />
+</g>
+<g id="a1_005"  >
+<polygon points="277,85 282,80 345,80 345,90 282,90 277,85 " style="fill:#15d815; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0112655&lt;/b&gt;&lt;br&gt;osmoprotectant NAGGN system M42 family peptidase&lt;br&gt;Location: 75373 - 76566&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0108780&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 785&lt;br&gt;E-value: 3e-225" locus_tag="C584_RS0112655" class="clusterblast-orf" id="dummy-1_h1_5_5"  />
+</g>
+<g id="a1_006"  >
+<polygon points="344,85 349,80 449,80 449,90 349,90 344,85 " style="fill:#1577d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0112660&lt;/b&gt;&lt;br&gt;N-acetylglutaminylglutamine synthetase&lt;br&gt;Location: 76563 - 78410&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0108785&lt;/b&gt;&lt;br&gt;Percentage identity: 98&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1183&lt;br&gt;E-value: 0.0" locus_tag="C584_RS0112660" class="clusterblast-orf" id="dummy-1_h1_5_6"  />
+</g>
+<g id="a1_007"  >
+<polygon points="449,85 454,80 550,80 550,90 454,90 449,85 " style="fill:#d815d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0112665&lt;/b&gt;&lt;br&gt;N-acetylglutaminylglutamine amidotransferase&lt;br&gt;Location: 78413 - 80197&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0108790&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1174&lt;br&gt;E-value: 0.0" locus_tag="C584_RS0112665" class="clusterblast-orf" id="dummy-1_h1_5_7"  />
+</g>
+<g id="a1_008"  >
+<polygon points="564,85 569,80 601,80 601,90 569,90 564,85 " style="fill:#d8d815; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0112670&lt;/b&gt;&lt;br&gt;peptide-methionine (S)-S-oxide reductase MsrA&lt;br&gt;Location: 80445 - 81107&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0108795&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 460&lt;br&gt;E-value: 7.1e-128" locus_tag="C584_RS0112670" class="clusterblast-orf" id="dummy-1_h1_5_8"  />
+</g>
+<g id="a1_009"  >
+<polygon points="608,85 613,80 631,80 631,90 613,90 608,85 " style="fill:#15d877; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0112675&lt;/b&gt;&lt;br&gt;HIT family protein&lt;br&gt;Location: 81224 - 81634&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0108800&lt;/b&gt;&lt;br&gt;Percentage identity: 97&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 275&lt;br&gt;E-value: 3.4e-72" locus_tag="C584_RS0112675" class="clusterblast-orf" id="dummy-1_h1_5_9"  />
+</g>
+<g id="a1_0010"  >
+<polygon points="634,90 694,90 699,85 694,80 634,80 634,90 " style="fill:#1515d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0112680&lt;/b&gt;&lt;br&gt;cystathionine gamma-synthase&lt;br&gt;Location: 81692 - 82834&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0108805&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 755&lt;br&gt;E-value: 3.1e-216" locus_tag="C584_RS0112680" class="clusterblast-orf" id="dummy-1_h1_5_10"  />
+</g>
+<g id="a1_0011"  >
+<polygon points="700,90 775,90 780,85 775,80 700,80 700,90 " style="fill:#d81577; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0112685&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 82854 - 84263&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0108810&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 918&lt;br&gt;E-value: 2.7e-265" locus_tag="C584_RS0112685" class="clusterblast-orf" id="dummy-1_h1_5_11"  />
+</g>
+</svg>

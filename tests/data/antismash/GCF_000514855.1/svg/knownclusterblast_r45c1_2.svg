@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="319,35 324,30 362,30 362,40 324,40 319,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS25195&lt;/b&gt;&lt;br&gt;type I polyketide synthase&lt;br&gt;Location: 0 - 5816" locus_tag="B113_RS25195" class="clusterblast-orf" id="dummy-1_q0_0_all"  />
+<polygon points="363,35 364,30 364,40 363,35 " style="fill:#3cd815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121090&lt;/b&gt;&lt;br&gt;ferredoxin&lt;br&gt;Location: 5966 - 6203" locus_tag="B113_RS0121090" class="clusterblast-orf" id="dummy-1_q1_0_all"  />
+<polygon points="364,35 369,30 373,30 373,40 369,40 364,35 " style="fill:#1563d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121095&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 6199 - 7387" locus_tag="B113_RS0121095" class="clusterblast-orf" id="dummy-1_q2_0_all"  />
+<polygon points="375,40 380,40 385,35 380,30 375,30 375,40 " style="fill:#b115d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121100&lt;/b&gt;&lt;br&gt;lysine 2,3-aminomutase&lt;br&gt;Location: 7740 - 9087" locus_tag="B113_RS0121100" class="clusterblast-orf" id="dummy-1_q3_0_all"  />
+<polygon points="385,40 389,40 394,35 389,30 385,30 385,40 " style="fill:#d88a15; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121105&lt;/b&gt;&lt;br&gt;aminotransferase class I/II-fold pyridoxal phosphate-dependent enzyme&lt;br&gt;Location: 9115 - 10372" locus_tag="B113_RS0121105" class="clusterblast-orf" id="dummy-1_q4_0_all"  />
+<polygon points="394,40 396,40 401,35 396,30 394,30 394,40 " style="fill:#15d863; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121110&lt;/b&gt;&lt;br&gt;ACP S-malonyltransferase&lt;br&gt;Location: 10368 - 11316" locus_tag="B113_RS0121110" class="clusterblast-orf" id="dummy-1_q5_0_all"  />
+<polygon points="401,40 408,40 413,35 408,30 401,30 401,40 " style="fill:#3c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121115&lt;/b&gt;&lt;br&gt;AMP-binding protein&lt;br&gt;Location: 11342 - 12887" locus_tag="B113_RS0121115" class="clusterblast-orf" id="dummy-1_q6_0_all"  />
+<polygon points="413,35 418,30 425,30 425,40 418,40 413,35 " style="fill:#d8158a; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121120&lt;/b&gt;&lt;br&gt;AMP-binding protein&lt;br&gt;Location: 12945 - 14538" locus_tag="B113_RS0121120" class="clusterblast-orf" id="dummy-1_q7_0_all"  />
+<polygon points="426,40 428,35 426,30 426,40 " style="fill:#b1d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121125&lt;/b&gt;&lt;br&gt;phosphopantetheine-binding protein&lt;br&gt;Location: 14699 - 14948" locus_tag="B113_RS0121125" class="clusterblast-orf" id="dummy-1_q8_0_all"  />
+<polygon points="428,35 433,30 435,30 435,40 433,40 428,35 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121130&lt;/b&gt;&lt;br&gt;proline iminopeptidase-family hydrolase&lt;br&gt;Location: 15049 - 15970" locus_tag="B113_RS0121130" class="clusterblast-orf" id="dummy-1_q9_0_all"  />
+<polygon points="435,35 440,30 460,30 460,40 440,40 435,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS25200&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 15966 - 19398" locus_tag="B113_RS25200" class="clusterblast-orf" id="dummy-1_q10_0_all"  />
+</g>
+<g label="BGC0001303" description="BGC0001303_c1: lobosamide A / lobosamide B / lobosamide C (28% of genes show similarity), Polyketide" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://mibig.secondarymetabolites.org/go/BGC0001303/1" target="_blank">BGC0001303</a>:                                       lobosamide A / lobosamide B / lobosamide C (28% of genes show similarity), Polyketide</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a1_000"  >
+<polygon points="0,85 5,80 6,80 6,90 5,90 0,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09384.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 108348 - 107488" locus_tag="ALA09384.1" class="clusterblast-orf" id="dummy-1_h1_2_0"  />
+</g>
+<g id="a1_001"  >
+<polygon points="7,85 12,80 14,80 14,90 12,90 7,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09383.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 107378 - 106356" locus_tag="ALA09383.1" class="clusterblast-orf" id="dummy-1_h1_2_1"  />
+</g>
+<g id="a1_002"  >
+<polygon points="14,85 19,80 28,80 28,90 19,90 14,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09382.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 106345 - 104444" locus_tag="ALA09382.1" class="clusterblast-orf" id="dummy-1_h1_2_2"  />
+</g>
+<g id="a1_003"  >
+<polygon points="30,90 36,90 41,85 36,80 30,80 30,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09381.1&lt;/b&gt;&lt;br&gt;serine/threonine protein kinase&lt;br&gt;Location: 104091 - 102577" locus_tag="ALA09381.1" class="clusterblast-orf" id="dummy-1_h1_2_3"  />
+</g>
+<g id="a1_004"  >
+<polygon points="41,90 46,90 51,85 46,80 41,80 41,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09380.1&lt;/b&gt;&lt;br&gt;sensor histidine kinase&lt;br&gt;Location: 102580 - 101255" locus_tag="ALA09380.1" class="clusterblast-orf" id="dummy-1_h1_2_4"  />
+</g>
+<g id="a1_005"  >
+<polygon points="51,90 55,85 51,80 51,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09379.1&lt;/b&gt;&lt;br&gt;LuxR family DNA-binding response regulator&lt;br&gt;Location: 101246 - 100629" locus_tag="ALA09379.1" class="clusterblast-orf" id="dummy-1_h1_2_5"  />
+</g>
+<g id="a1_006"  >
+<polygon points="57,85 62,80 75,80 75,90 62,90 57,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09378.1&lt;/b&gt;&lt;br&gt;ABC transporter&lt;br&gt;Location: 100428 - 97864" locus_tag="ALA09378.1" class="clusterblast-orf" id="dummy-1_h1_2_6"  />
+</g>
+<g id="a1_007"  >
+<polygon points="75,85 80,80 81,80 81,90 80,90 75,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09377.1&lt;/b&gt;&lt;br&gt;ABC transporter&lt;br&gt;Location: 97864 - 97058" locus_tag="ALA09377.1" class="clusterblast-orf" id="dummy-1_h1_2_7"  />
+</g>
+<g id="a1_008"  >
+<polygon points="82,85 87,80 89,80 89,90 87,90 82,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09376.1&lt;/b&gt;&lt;br&gt;transcriptional regulator&lt;br&gt;Location: 96917 - 96015" locus_tag="ALA09376.1" class="clusterblast-orf" id="dummy-1_h1_2_8"  />
+</g>
+<g id="a1_009"  >
+<polygon points="89,85 94,80 103,80 103,90 94,90 89,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09375.1&lt;/b&gt;&lt;br&gt;transcriptional regulator&lt;br&gt;Location: 96030 - 94084" locus_tag="ALA09375.1" class="clusterblast-orf" id="dummy-1_h1_2_9"  />
+</g>
+<g id="a1_0010"  >
+<polygon points="112,85 116,80 116,90 112,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09374.1&lt;/b&gt;&lt;br&gt;thioesterase&lt;br&gt;Location: 92804 - 92169" locus_tag="ALA09374.1" class="clusterblast-orf" id="dummy-1_h1_2_10"  />
+</g>
+<g id="a1_0011"  >
+<polygon points="120,85 125,80 132,80 132,90 125,90 120,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09373.1&lt;/b&gt;&lt;br&gt;drug resistance transporter EmrB/QacA&lt;br&gt;Location: 91712 - 89979" locus_tag="ALA09373.1" class="clusterblast-orf" id="dummy-1_h1_2_11"  />
+</g>
+<g id="a1_0012"  >
+<polygon points="133,90 137,85 133,80 133,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09372.1&lt;/b&gt;&lt;br&gt;transcriptional regulator&lt;br&gt;Location: 89897 - 89289" locus_tag="ALA09372.1" class="clusterblast-orf" id="dummy-1_h1_2_12"  />
+</g>
+<g id="a1_0013"  >
+<polygon points="142,85 147,80 295,80 295,90 147,90 142,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09371.1&lt;/b&gt;&lt;br&gt;type I modular PKS&lt;br&gt;Location: 88672 - 67391&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 88&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 3272&lt;br&gt;E-value: 0.0&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25200&lt;/b&gt;&lt;br&gt;Percentage identity: 50&lt;br&gt;Percentage coverage: 77&lt;br&gt;BLAST bit score: 731&lt;br&gt;E-value: 1.9e-210" locus_tag="ALA09371.1" class="clusterblast-orf" id="dummy-1_h1_2_13"  />
+</g>
+<g id="a1_0014"  >
+<polygon points="298,85 303,80 307,80 307,90 303,90 298,85 " style="fill:#1563d8; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09370.1&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 67021 - 65834&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121095&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 730&lt;br&gt;E-value: 1.5e-210" locus_tag="ALA09370.1" class="clusterblast-orf" id="dummy-1_h1_2_14"  />
+</g>
+<g id="a1_0015"  >
+<polygon points="309,90 314,90 319,85 314,80 309,80 309,90 " style="fill:#b115d8; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09369.1&lt;/b&gt;&lt;br&gt;glutamate 2,3- aminomutase&lt;br&gt;Location: 65476 - 64130&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121100&lt;/b&gt;&lt;br&gt;Percentage identity: 93&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 852&lt;br&gt;E-value: 2.9e-247" locus_tag="ALA09369.1" class="clusterblast-orf" id="dummy-1_h1_2_15"  />
+</g>
+<g id="a1_0016"  >
+<polygon points="319,90 323,90 328,85 323,80 319,80 319,90 " style="fill:#d88a15; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09368.1&lt;/b&gt;&lt;br&gt;aminotransferase&lt;br&gt;Location: 64101 - 62845&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121105&lt;/b&gt;&lt;br&gt;Percentage identity: 88&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 727&lt;br&gt;E-value: 1.3e-209" locus_tag="ALA09368.1" class="clusterblast-orf" id="dummy-1_h1_2_16"  />
+</g>
+<g id="a1_0017"  >
+<polygon points="329,90 331,90 336,85 331,80 329,80 329,90 " style="fill:#15d863; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09367.1&lt;/b&gt;&lt;br&gt;amalonyl CoA-acyl carrier protein transacylase&lt;br&gt;Location: 62776 - 61847&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121110&lt;/b&gt;&lt;br&gt;Percentage identity: 89&lt;br&gt;Percentage coverage: 98&lt;br&gt;BLAST bit score: 562&lt;br&gt;E-value: 5.5e-160" locus_tag="ALA09367.1" class="clusterblast-orf" id="dummy-1_h1_2_17"  />
+</g>
+<g id="a1_0018"  >
+<polygon points="336,90 342,90 347,85 342,80 336,80 336,90 " style="fill:#3c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09366.1&lt;/b&gt;&lt;br&gt;AMP-dependent synthetase and ligase&lt;br&gt;Location: 61821 - 60277&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121115&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 972&lt;br&gt;E-value: 2.9e-283" locus_tag="ALA09366.1" class="clusterblast-orf" id="dummy-1_h1_2_18"  />
+</g>
+<g id="a1_0019"  >
+<polygon points="348,85 353,80 359,80 359,90 353,90 348,85 " style="fill:#d8158a; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09365.1&lt;/b&gt;&lt;br&gt;AMP-dependent synthetase and ligase&lt;br&gt;Location: 60135 - 58576&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121120&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 98&lt;br&gt;BLAST bit score: 952&lt;br&gt;E-value: 2.4e-277" locus_tag="ALA09365.1" class="clusterblast-orf" id="dummy-1_h1_2_19"  />
+</g>
+<g id="a1_0020"  >
+<polygon points="361,90 362,85 361,80 361,90 " style="fill:#b1d815; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09364.1&lt;/b&gt;&lt;br&gt;ACP starter unit biosynthesis protein&lt;br&gt;Location: 58381 - 58127&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121125&lt;/b&gt;&lt;br&gt;Percentage identity: 85&lt;br&gt;Percentage coverage: 96&lt;br&gt;BLAST bit score: 136&lt;br&gt;E-value: 1.9e-32" locus_tag="ALA09364.1" class="clusterblast-orf" id="dummy-1_h1_2_20"  />
+</g>
+<g id="a1_0021"  >
+<polygon points="363,85 368,80 368,80 368,90 368,90 363,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09363.1&lt;/b&gt;&lt;br&gt;aldo/keto reductase family oxidoreductase&lt;br&gt;Location: 58061 - 57294" locus_tag="ALA09363.1" class="clusterblast-orf" id="dummy-1_h1_2_21"  />
+</g>
+<g id="a1_0022"  >
+<polygon points="368,85 369,80 369,90 368,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09362.1&lt;/b&gt;&lt;br&gt;aldo/keto reductase family oxidoreductase&lt;br&gt;Location: 57294 - 57151" locus_tag="ALA09362.1" class="clusterblast-orf" id="dummy-1_h1_2_22"  />
+</g>
+<g id="a1_0023"  >
+<polygon points="370,90 373,85 370,80 370,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09361.1&lt;/b&gt;&lt;br&gt;transcriptional regulator&lt;br&gt;Location: 57075 - 56632" locus_tag="ALA09361.1" class="clusterblast-orf" id="dummy-1_h1_2_23"  />
+</g>
+<g id="a1_0024"  >
+<polygon points="374,85 379,80 381,80 381,90 379,90 374,85 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09360.1&lt;/b&gt;&lt;br&gt;peptidase&lt;br&gt;Location: 56519 - 55614&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121130&lt;/b&gt;&lt;br&gt;Percentage identity: 89&lt;br&gt;Percentage coverage: 97&lt;br&gt;BLAST bit score: 555&lt;br&gt;E-value: 5e-158" locus_tag="ALA09360.1" class="clusterblast-orf" id="dummy-1_h1_2_24"  />
+</g>
+<g id="a1_0025"  >
+<polygon points="381,85 386,80 399,80 399,90 386,90 381,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09359.1&lt;/b&gt;&lt;br&gt;type I modular PKS&lt;br&gt;Location: 55590 - 53029&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25200&lt;/b&gt;&lt;br&gt;Percentage identity: 85&lt;br&gt;Percentage coverage: 75&lt;br&gt;BLAST bit score: 1388&lt;br&gt;E-value: 0.0" locus_tag="ALA09359.1" class="clusterblast-orf" id="dummy-1_h1_2_25"  />
+</g>
+<g id="a1_0026"  >
+<polygon points="401,85 406,80 433,80 433,90 406,90 401,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09358.1&lt;/b&gt;&lt;br&gt;type I modular PKS&lt;br&gt;Location: 52861 - 48338&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 56&lt;br&gt;Percentage coverage: 57&lt;br&gt;BLAST bit score: 1067&lt;br&gt;E-value: 2.5e-311" locus_tag="ALA09358.1" class="clusterblast-orf" id="dummy-1_h1_2_26"  />
+</g>
+<g id="a1_0027"  >
+<polygon points="433,85 438,80 498,80 498,90 438,90 433,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09357.1&lt;/b&gt;&lt;br&gt;type I modular PKS&lt;br&gt;Location: 48341 - 39402&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 54&lt;br&gt;Percentage coverage: 95&lt;br&gt;BLAST bit score: 1628&lt;br&gt;E-value: 0.0&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25200&lt;/b&gt;&lt;br&gt;Percentage identity: 48&lt;br&gt;Percentage coverage: 77&lt;br&gt;BLAST bit score: 676&lt;br&gt;E-value: 5.6e-194" locus_tag="ALA09357.1" class="clusterblast-orf" id="dummy-1_h1_2_27"  />
+</g>
+<g id="a1_0028"  >
+<polygon points="498,85 503,80 533,80 533,90 503,90 498,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09356.1&lt;/b&gt;&lt;br&gt;type I modular PKS&lt;br&gt;Location: 39342 - 34582" locus_tag="ALA09356.1" class="clusterblast-orf" id="dummy-1_h1_2_28"  />
+</g>
+<g id="a1_0029"  >
+<polygon points="533,85 538,80 598,80 598,90 538,90 533,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09355.1&lt;/b&gt;&lt;br&gt;type I modular PKS&lt;br&gt;Location: 34541 - 25497" locus_tag="ALA09355.1" class="clusterblast-orf" id="dummy-1_h1_2_29"  />
+</g>
+<g id="a1_0030"  >
+<polygon points="600,85 605,80 638,80 638,90 605,90 600,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09354.1&lt;/b&gt;&lt;br&gt;type I modular PKS&lt;br&gt;Location: 25313 - 20001&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 53&lt;br&gt;Percentage coverage: 87&lt;br&gt;BLAST bit score: 1467&lt;br&gt;E-value: 0.0&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25200&lt;/b&gt;&lt;br&gt;Percentage identity: 49&lt;br&gt;Percentage coverage: 69&lt;br&gt;BLAST bit score: 623&lt;br&gt;E-value: 5.6e-178" locus_tag="ALA09354.1" class="clusterblast-orf" id="dummy-1_h1_2_30"  />
+</g>
+<g id="a1_0031"  >
+<polygon points="640,85 645,80 650,80 650,90 645,90 640,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09353.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 19654 - 18407" locus_tag="ALA09353.1" class="clusterblast-orf" id="dummy-1_h1_2_31"  />
+</g>
+<g id="a1_0032"  >
+<polygon points="652,85 653,80 653,90 652,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09352.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 18082 - 17864" locus_tag="ALA09352.1" class="clusterblast-orf" id="dummy-1_h1_2_32"  />
+</g>
+<g id="a1_0033"  >
+<polygon points="654,85 659,80 662,80 662,90 659,90 654,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09351.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 17787 - 16699" locus_tag="ALA09351.1" class="clusterblast-orf" id="dummy-1_h1_2_33"  />
+</g>
+<g id="a1_0034"  >
+<polygon points="663,85 668,80 668,80 668,90 668,90 663,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09350.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 16498 - 15911" locus_tag="ALA09350.1" class="clusterblast-orf" id="dummy-1_h1_2_34"  />
+</g>
+<g id="a1_0035"  >
+<polygon points="668,85 673,80 676,80 676,90 673,90 668,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09349.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 15792 - 14779" locus_tag="ALA09349.1" class="clusterblast-orf" id="dummy-1_h1_2_35"  />
+</g>
+<g id="a1_0036"  >
+<polygon points="676,85 678,80 678,90 676,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09348.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 14782 - 14510" locus_tag="ALA09348.1" class="clusterblast-orf" id="dummy-1_h1_2_36"  />
+</g>
+<g id="a1_0037"  >
+<polygon points="679,90 683,85 679,80 679,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09347.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 14393 - 13704" locus_tag="ALA09347.1" class="clusterblast-orf" id="dummy-1_h1_2_37"  />
+</g>
+<g id="a1_0038"  >
+<polygon points="685,90 719,90 724,85 719,80 685,80 685,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09346.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 13499 - 8034" locus_tag="ALA09346.1" class="clusterblast-orf" id="dummy-1_h1_2_38"  />
+</g>
+<g id="a1_0039"  >
+<polygon points="728,85 733,80 740,80 740,90 733,90 728,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09345.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 7495 - 5843" locus_tag="ALA09345.1" class="clusterblast-orf" id="dummy-1_h1_2_39"  />
+</g>
+<g id="a1_0040"  >
+<polygon points="742,85 747,80 747,80 747,90 747,90 742,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09344.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 5670 - 4906" locus_tag="ALA09344.1" class="clusterblast-orf" id="dummy-1_h1_2_40"  />
+</g>
+<g id="a1_0041"  >
+<polygon points="747,85 752,80 755,80 755,90 752,90 747,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09343.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 4882 - 3854" locus_tag="ALA09343.1" class="clusterblast-orf" id="dummy-1_h1_2_41"  />
+</g>
+<g id="a1_0042"  >
+<polygon points="755,85 758,80 758,90 755,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09342.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 3823 - 3452" locus_tag="ALA09342.1" class="clusterblast-orf" id="dummy-1_h1_2_42"  />
+</g>
+<g id="a1_0043"  >
+<polygon points="757,85 762,80 763,80 763,90 762,90 757,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09341.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 3470 - 2643" locus_tag="ALA09341.1" class="clusterblast-orf" id="dummy-1_h1_2_43"  />
+</g>
+<g id="a1_0044"  >
+<polygon points="765,90 767,90 772,85 767,80 765,80 765,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09340.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 2462 - 1515" locus_tag="ALA09340.1" class="clusterblast-orf" id="dummy-1_h1_2_44"  />
+</g>
+<g id="a1_0045"  >
+<polygon points="772,90 775,90 780,85 775,80 772,80 772,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;ALA09339.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 1432 - 419" locus_tag="ALA09339.1" class="clusterblast-orf" id="dummy-1_h1_2_45"  />
+</g>
+</svg>

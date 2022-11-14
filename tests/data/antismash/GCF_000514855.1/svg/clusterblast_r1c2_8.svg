@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="0,35 5,30 106,30 106,40 5,40 0,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100815&lt;/b&gt;&lt;br&gt;murein biosynthesis integral membrane protein MurJ&lt;br&gt;Location: 164404 - 165982" locus_tag="B113_RS0100815" class="clusterblast-orf" id="dummy-2_q0_0_all"  />
+<polygon points="115,40 138,40 143,35 138,30 115,30 115,40 " style="fill:#3cd815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS25645&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 166110 - 166525" locus_tag="B113_RS25645" class="clusterblast-orf" id="dummy-2_q1_0_all"  />
+<polygon points="146,35 151,30 175,30 175,40 151,40 146,35 " style="fill:#1563d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100820&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 166567 - 167002" locus_tag="B113_RS0100820" class="clusterblast-orf" id="dummy-2_q2_0_all"  />
+<polygon points="186,40 304,40 309,35 304,30 186,30 186,40 " style="fill:#b115d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100825&lt;/b&gt;&lt;br&gt;S9 family peptidase&lt;br&gt;Location: 167168 - 168983" locus_tag="B113_RS0100825" class="clusterblast-orf" id="dummy-2_q3_0_all"  />
+<polygon points="325,40 449,40 454,35 449,30 325,30 325,40 " style="fill:#d88a15; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100835&lt;/b&gt;&lt;br&gt;RiPP maturation radical SAM protein 1&lt;br&gt;Location: 169232 - 171137" locus_tag="B113_RS0100835" class="clusterblast-orf" id="dummy-2_q4_0_all"  />
+<polygon points="452,40 493,40 498,35 493,30 452,30 452,40 " style="fill:#15d863; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100840&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 171117 - 171795" locus_tag="B113_RS0100840" class="clusterblast-orf" id="dummy-2_q5_0_all"  />
+<polygon points="502,40 578,40 583,35 578,30 502,30 502,40 " style="fill:#3c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100845&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 171847 - 173050" locus_tag="B113_RS0100845" class="clusterblast-orf" id="dummy-2_q6_0_all"  />
+<polygon points="582,40 665,40 670,35 665,30 582,30 582,40 " style="fill:#d8158a; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100850&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 173042 - 174344" locus_tag="B113_RS0100850" class="clusterblast-orf" id="dummy-2_q7_0_all"  />
+<polygon points="677,40 714,40 719,35 714,30 677,30 677,40 " style="fill:#b1d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100855&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 174453 - 175074" locus_tag="B113_RS0100855" class="clusterblast-orf" id="dummy-2_q8_0_all"  />
+<polygon points="719,40 775,40 780,35 775,30 719,30 719,40 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0100860&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 175070 - 175982" locus_tag="B113_RS0100860" class="clusterblast-orf" id="dummy-2_q9_0_all"  />
+</g>
+<g label="NZ_KB913022" description="NZ_KB913022 (2539498-2551403): Salinispora pacifica DSM 45543 = CNS-863 strai... (90% of genes show similarity), bacteriocin" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_KB913022&amp;start=2539498&amp;end=2551403" target="_blank">NZ_KB913022 (2539498-2551403)</a>: Salinispora pacifica DSM 45543 = CNS-863 strai... (90% of genes show similarity), bacteriocin</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a2_000"  >
+<polygon points="4,85 9,80 109,80 109,90 9,90 4,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC_RS0111665&lt;/b&gt;&lt;br&gt;murein biosynthesis integral membrane protein MurJ&lt;br&gt;Location: 2551246 - 2549684&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0100815&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 98&lt;br&gt;BLAST bit score: 842&lt;br&gt;E-value: 2.7e-242" locus_tag="SALPAC_RS0111665" class="clusterblast-orf" id="dummy-2_h2_8_0"  />
+</g>
+<g id="a2_001"  >
+<polygon points="116,90 158,90 163,85 158,80 116,80 116,90 " style="fill:#3cd815; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC_RS0111660&lt;/b&gt;&lt;br&gt;DUF218 domain-containing protein&lt;br&gt;Location: 2549577 - 2548888&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25645&lt;/b&gt;&lt;br&gt;Percentage identity: 80&lt;br&gt;Percentage coverage: 80&lt;br&gt;BLAST bit score: 158&lt;br&gt;E-value: 3.5e-37" locus_tag="SALPAC_RS0111660" class="clusterblast-orf" id="dummy-2_h2_8_1"  />
+</g>
+<g id="a2_002"  >
+<polygon points="166,85 171,80 181,80 181,90 171,90 166,85 " style="fill:#1563d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC_RS27035&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 2548845 - 2548616&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0100820&lt;/b&gt;&lt;br&gt;Percentage identity: 93&lt;br&gt;Percentage coverage: 37&lt;br&gt;BLAST bit score: 99&lt;br&gt;E-value: 2.1e-19" locus_tag="SALPAC_RS27035" class="clusterblast-orf" id="dummy-2_h2_8_2"  />
+</g>
+<g id="a2_003"  >
+<polygon points="191,90 309,90 314,85 309,80 191,80 191,90 " style="fill:#b115d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC_RS0111655&lt;/b&gt;&lt;br&gt;S9 family peptidase&lt;br&gt;Location: 2548465 - 2546651&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0100825&lt;/b&gt;&lt;br&gt;Percentage identity: 91&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1136&lt;br&gt;E-value: 0.0" locus_tag="SALPAC_RS0111655" class="clusterblast-orf" id="dummy-2_h2_8_3"  />
+</g>
+<g id="a2_004"  >
+<polygon points="314,90 320,90 325,85 320,80 314,80 314,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC_RS28820&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 2546645 - 2546487" locus_tag="SALPAC_RS28820" class="clusterblast-orf" id="dummy-2_h2_8_4"  />
+</g>
+<g id="a2_005"  >
+<polygon points="330,90 454,90 459,85 454,80 330,80 330,90 " style="fill:#d88a15; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC_RS0111645&lt;/b&gt;&lt;br&gt;RiPP maturation radical SAM protein 1&lt;br&gt;Location: 2546403 - 2544499&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0100835&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1208&lt;br&gt;E-value: 0.0" locus_tag="SALPAC_RS0111645" class="clusterblast-orf" id="dummy-2_h2_8_5"  />
+</g>
+<g id="a2_006"  >
+<polygon points="457,90 498,90 503,85 498,80 457,80 457,90 " style="fill:#15d863; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC_RS0111640&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 2544518 - 2543841&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0100840&lt;/b&gt;&lt;br&gt;Percentage identity: 92&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 436&lt;br&gt;E-value: 1.5e-120" locus_tag="SALPAC_RS0111640" class="clusterblast-orf" id="dummy-2_h2_8_6"  />
+</g>
+<g id="a2_007"  >
+<polygon points="506,90 582,90 587,85 582,80 506,80 506,90 " style="fill:#3c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC_RS0111635&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 2543794 - 2542592&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0100845&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 769&lt;br&gt;E-value: 1.3e-220" locus_tag="SALPAC_RS0111635" class="clusterblast-orf" id="dummy-2_h2_8_7"  />
+</g>
+<g id="a2_008"  >
+<polygon points="587,90 669,90 674,85 669,80 587,80 587,90 " style="fill:#d8158a; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC_RS0111630&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 2542599 - 2541298&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0100850&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 722&lt;br&gt;E-value: 3.4e-206" locus_tag="SALPAC_RS0111630" class="clusterblast-orf" id="dummy-2_h2_8_8"  />
+</g>
+<g id="a2_009"  >
+<polygon points="681,90 709,90 714,85 709,80 681,80 681,90 " style="fill:#b1d815; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC_RS25880&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 2541191 - 2540710&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0100855&lt;/b&gt;&lt;br&gt;Percentage identity: 80&lt;br&gt;Percentage coverage: 54&lt;br&gt;BLAST bit score: 161&lt;br&gt;E-value: 1.1e-37" locus_tag="SALPAC_RS25880" class="clusterblast-orf" id="dummy-2_h2_8_9"  />
+</g>
+<g id="a2_0010"  >
+<polygon points="714,90 770,90 775,85 770,80 714,80 714,90 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC_RS0111620&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 2540713 - 2539802&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0100860&lt;/b&gt;&lt;br&gt;Percentage identity: 94&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 569&lt;br&gt;E-value: 1.5e-160" locus_tag="SALPAC_RS0111620" class="clusterblast-orf" id="dummy-2_h2_8_10"  />
+</g>
+</svg>

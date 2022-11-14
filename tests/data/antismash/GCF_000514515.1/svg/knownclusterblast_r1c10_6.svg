@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="0,35 5,30 33,30 33,40 5,40 0,35 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119310&lt;/b&gt;&lt;br&gt;transcriptional repressor&lt;br&gt;Location: 856370 - 856793" locus_tag="B170_RS0119310" class="clusterblast-orf" id="dummy-10_q0_0_all"  />
+<polygon points="52,40 80,40 85,35 80,30 52,30 52,40 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119315&lt;/b&gt;&lt;br&gt;MerR family DNA-binding transcriptional regulator&lt;br&gt;Location: 857047 - 857473" locus_tag="B170_RS0119315" class="clusterblast-orf" id="dummy-10_q1_0_all"  />
+<polygon points="84,40 138,40 143,35 138,30 84,30 84,40 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119320&lt;/b&gt;&lt;br&gt;molybdate ABC transporter substrate-binding protein&lt;br&gt;Location: 857469 - 858237" locus_tag="B170_RS0119320" class="clusterblast-orf" id="dummy-10_q2_0_all"  />
+<polygon points="143,40 202,40 207,35 202,30 143,30 143,40 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119325&lt;/b&gt;&lt;br&gt;molybdate ABC transporter permease subunit&lt;br&gt;Location: 858233 - 859079" locus_tag="B170_RS0119325" class="clusterblast-orf" id="dummy-10_q3_0_all"  />
+<polygon points="207,40 283,40 288,35 283,30 207,30 207,40 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119330&lt;/b&gt;&lt;br&gt;ABC transporter ATP-binding protein&lt;br&gt;Location: 859075 - 860140" locus_tag="B170_RS0119330" class="clusterblast-orf" id="dummy-10_q4_0_all"  />
+<polygon points="289,35 294,30 426,30 426,40 294,40 289,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119335&lt;/b&gt;&lt;br&gt;IucA/IucC family siderophore biosynthesis protein&lt;br&gt;Location: 860149 - 861940" locus_tag="B170_RS0119335" class="clusterblast-orf" id="dummy-10_q5_0_all"  />
+<polygon points="426,35 431,30 469,30 469,40 431,40 426,35 " style="fill:#15d863; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119340&lt;/b&gt;&lt;br&gt;acetyltransferase&lt;br&gt;Location: 861936 - 862503" locus_tag="B170_RS0119340" class="clusterblast-orf" id="dummy-10_q6_0_all"  />
+<polygon points="469,35 474,30 567,30 567,40 474,40 469,35 " style="fill:#1563d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119345&lt;/b&gt;&lt;br&gt;SidA/IucD/PvdA family monooxygenase&lt;br&gt;Location: 862499 - 863786" locus_tag="B170_RS0119345" class="clusterblast-orf" id="dummy-10_q7_0_all"  />
+<polygon points="570,35 575,30 692,30 692,40 575,40 570,35 " style="fill:#b115d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119350&lt;/b&gt;&lt;br&gt;aminotransferase class V-fold PLP-dependent enzyme&lt;br&gt;Location: 863821 - 865423" locus_tag="B170_RS0119350" class="clusterblast-orf" id="dummy-10_q8_0_all"  />
+<polygon points="701,35 706,30 780,30 780,40 706,40 701,35 " style="fill:#b1d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119355&lt;/b&gt;&lt;br&gt;ABC transporter substrate-binding protein&lt;br&gt;Location: 865547 - 866579" locus_tag="B170_RS0119355" class="clusterblast-orf" id="dummy-10_q9_0_all"  />
+</g>
+<g label="BGC0001572" description="BGC0001572_c1: desferrioxamine E (75% of genes show similarity), Other" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://mibig.secondarymetabolites.org/go/BGC0001572/1" target="_blank">BGC0001572</a>:                                                                desferrioxamine E (75% of genes show similarity), Other</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a10_000"  >
+<polygon points="141,85 146,80 234,80 234,90 146,90 141,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AWD37884.1&lt;/b&gt;&lt;br&gt;putative siderophore MFS transporter DfoS&lt;br&gt;Location: 4378 - 5604" locus_tag="AWD37884.1" class="clusterblast-orf" id="dummy-10_h10_6_0"  />
+</g>
+<g id="a10_001"  >
+<polygon points="240,85 245,80 420,80 420,90 245,90 240,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;AWD37885.1&lt;/b&gt;&lt;br&gt;putative siderophore biosynthesis protein DfoC&lt;br&gt;Location: 5682 - 8036&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0119335&lt;/b&gt;&lt;br&gt;Percentage identity: 54&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 636&lt;br&gt;E-value: 5.7e-182" locus_tag="AWD37885.1" class="clusterblast-orf" id="dummy-10_h10_6_1"  />
+</g>
+<g id="a10_002"  >
+<polygon points="420,85 425,80 519,80 519,90 425,90 420,85 " style="fill:#1563d8; stroke-width:1; stroke:black; " description="&lt;b&gt;AWD37886.1&lt;/b&gt;&lt;br&gt;putative lysine/ornithine N-monooxygenase DfoA&lt;br&gt;Location: 8038 - 9330&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0119345&lt;/b&gt;&lt;br&gt;Percentage identity: 55&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 470&lt;br&gt;E-value: 3.9e-132" locus_tag="AWD37886.1" class="clusterblast-orf" id="dummy-10_h10_6_2"  />
+</g>
+<g id="a10_003"  >
+<polygon points="520,85 525,80 638,80 638,90 525,90 520,85 " style="fill:#b115d8; stroke-width:1; stroke:black; " description="&lt;b&gt;AWD37887.1&lt;/b&gt;&lt;br&gt;putative pyridoxal-dependent decarboxylase DfoJ&lt;br&gt;Location: 9341 - 10894&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0119350&lt;/b&gt;&lt;br&gt;Percentage identity: 55&lt;br&gt;Percentage coverage: 86&lt;br&gt;BLAST bit score: 467&lt;br&gt;E-value: 4.1e-131" locus_tag="AWD37887.1" class="clusterblast-orf" id="dummy-10_h10_6_3"  />
+</g>
+</svg>

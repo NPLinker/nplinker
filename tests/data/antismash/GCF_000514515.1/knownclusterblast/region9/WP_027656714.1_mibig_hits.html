@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>AGS77338.1</td>
+              <td>HmaS</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001178/1">BGC0001178</a></td>
+              <td>NRP:Glycopeptide</td>
+              <td>53.0</td>
+              <td>96.2</td>
+              <td>349.0</td>
+              <td>8.5e-96</td>
+          </tr>
+    
+          <tr>
+              <td>ABD65945.1</td>
+              <td>4-hydroxyphenylpyruvate_dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000341/1">BGC0000341</a></td>
+              <td>NRP</td>
+              <td>52.0</td>
+              <td>96.7</td>
+              <td>336.0</td>
+              <td>5.7e-92</td>
+          </tr>
+    
+          <tr>
+              <td>CAE53378.1</td>
+              <td>HmaS_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000440/1">BGC0000440</a></td>
+              <td>NRP:Glycopeptide</td>
+              <td>49.0</td>
+              <td>94.8</td>
+              <td>293.0</td>
+              <td>4.2e-79</td>
+          </tr>
+    
+          <tr>
+              <td>CAG15040.1</td>
+              <td>HmaS_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000441/1">BGC0000441</a></td>
+              <td>NRP</td>
+              <td>49.0</td>
+              <td>94.8</td>
+              <td>293.0</td>
+              <td>4.2e-79</td>
+          </tr>
+    
+          <tr>
+              <td>EWS95126.1</td>
+              <td>4-hydroxyphenylpyruvate_dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000306/1">BGC0000306</a></td>
+              <td>NRP:Lipopeptide</td>
+              <td>48.0</td>
+              <td>94.3</td>
+              <td>286.0</td>
+              <td>6.8e-77</td>
+          </tr>
+    
+          <tr>
+              <td>AAK81835.1</td>
+              <td>hydroxyphenyl_pyruvate_dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000326/1">BGC0000326</a></td>
+              <td>NRP</td>
+              <td>52.0</td>
+              <td>83.6</td>
+              <td>276.0</td>
+              <td>5.4e-74</td>
+          </tr>
+    
+          <tr>
+              <td>ATV95608.1</td>
+              <td>p-hydroxymandelate_synthase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001503/1">BGC0001503</a></td>
+              <td>Polyketide</td>
+              <td>48.0</td>
+              <td>95.6</td>
+              <td>274.0</td>
+              <td>3.5e-73</td>
+          </tr>
+    
+          <tr>
+              <td>CAB38519.1</td>
+              <td>4-hydroxymandelic_acid_synthase_(HmaS)</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000315/1">BGC0000315</a></td>
+              <td>NRP:Ca+-dependent lipopeptide</td>
+              <td>46.0</td>
+              <td>95.9</td>
+              <td>273.0</td>
+              <td>4.5e-73</td>
+          </tr>
+    
+          <tr>
+              <td>AQZ69239.1</td>
+              <td>4-hydroxyphenylpyruvate_dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001635/1">BGC0001635</a></td>
+              <td>NRP + Polyketide</td>
+              <td>46.0</td>
+              <td>96.2</td>
+              <td>272.0</td>
+              <td>1e-72</td>
+          </tr>
+    
+          <tr>
+              <td>AAT09803.1</td>
+              <td>NocF</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000395/1">BGC0000395</a></td>
+              <td>NRP</td>
+              <td>48.0</td>
+              <td>93.7</td>
+              <td>266.0</td>
+              <td>7.2e-71</td>
+          </tr>
+    
+          <tr>
+              <td>ABP55171.1</td>
+              <td>4-hydroxyphenylpyruvate_dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000150/1">BGC0000150</a></td>
+              <td>NRP + Polyketide:Enediyne type I</td>
+              <td>45.0</td>
+              <td>94.0</td>
+              <td>264.0</td>
+              <td>3.6e-70</td>
+          </tr>
+    
+          <tr>
+              <td>CAD91197.1</td>
+              <td>putative_hydroxymandelate_synthase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000289/1">BGC0000289</a></td>
+              <td>NRP:Glycopeptide + Saccharide:Hybrid/tailoring</td>
+              <td>46.0</td>
+              <td>94.8</td>
+              <td>264.0</td>
+              <td>3.6e-70</td>
+          </tr>
+    
+          <tr>
+              <td>AAM80551.1</td>
+              <td>HmaS</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000290/1">BGC0000290</a></td>
+              <td>NRP:Glycopeptide</td>
+              <td>46.0</td>
+              <td>95.4</td>
+              <td>261.0</td>
+              <td>1.8e-69</td>
+          </tr>
+    
+          <tr>
+              <td>ALK27901.1</td>
+              <td>putative_hydroxymandelate_synthase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001233/1">BGC0001233</a></td>
+              <td>NRP</td>
+              <td>46.0</td>
+              <td>95.1</td>
+              <td>260.0</td>
+              <td>3e-69</td>
+          </tr>
+    
+          <tr>
+              <td>OLZ52440.1</td>
+              <td>4-hydroxyphenylpyruvate_dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001462/1">BGC0001462</a></td>
+              <td>NRP:Glycopeptide</td>
+              <td>45.0</td>
+              <td>95.4</td>
+              <td>260.0</td>
+              <td>3e-69</td>
+          </tr>
+    
+          <tr>
+              <td>ALV82353.1</td>
+              <td>4-hydroxyphenylpyruvic_acid_dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001370/1">BGC0001370</a></td>
+              <td>NRP</td>
+              <td>44.0</td>
+              <td>95.6</td>
+              <td>260.0</td>
+              <td>5.2e-69</td>
+          </tr>
+    
+          <tr>
+              <td>CAC48371.1</td>
+              <td>putative_hydroxyphenyl_pyruvate_dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000311/1">BGC0000311</a></td>
+              <td>NRP</td>
+              <td>43.0</td>
+              <td>93.7</td>
+              <td>258.0</td>
+              <td>2e-68</td>
+          </tr>
+    
+          <tr>
+              <td>AIE77078.1</td>
+              <td>4-hydroxyphenylpyruvate_dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000418/1">BGC0000418</a></td>
+              <td>NRP</td>
+              <td>44.0</td>
+              <td>97.8</td>
+              <td>254.0</td>
+              <td>2.2e-67</td>
+          </tr>
+    
+          <tr>
+              <td>EME52972.1</td>
+              <td>4-hydroxyphenylpyruvate_dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001460/1">BGC0001460</a></td>
+              <td>NRP:Glycopeptide</td>
+              <td>45.0</td>
+              <td>94.8</td>
+              <td>254.0</td>
+              <td>2.8e-67</td>
+          </tr>
+    
+          <tr>
+              <td>AEI58881.1</td>
+              <td>hydrooxyphenyl_pyruvate_dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000455/1">BGC0000455</a></td>
+              <td>NRP</td>
+              <td>45.0</td>
+              <td>94.8</td>
+              <td>253.0</td>
+              <td>6.3e-67</td>
+          </tr>
+    
+          <tr>
+              <td>DAB41473.1</td>
+              <td>4-hydroxyphenylpyruvate_dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001766/1">BGC0001766</a></td>
+              <td>NRP</td>
+              <td>44.0</td>
+              <td>93.4</td>
+              <td>251.0</td>
+              <td>1.8e-66</td>
+          </tr>
+    
+          <tr>
+              <td>OKA09438.1</td>
+              <td>4-hydroxyphenylpyruvate_dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001459/1">BGC0001459</a></td>
+              <td>NRP:Glycopeptide</td>
+              <td>44.0</td>
+              <td>93.7</td>
+              <td>248.0</td>
+              <td>1.2e-65</td>
+          </tr>
+    
+          <tr>
+              <td>OLZ50901.1</td>
+              <td>4-hydroxyphenylpyruvate_dioxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001461/1">BGC0001461</a></td>
+              <td>NRP:Glycopeptide</td>
+              <td>44.0</td>
+              <td>94.8</td>
+              <td>248.0</td>
+              <td>1.2e-65</td>
+          </tr>
+    
+          <tr>
+              <td>AYA22316.1</td>
+              <td>HmaS</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001955/1">BGC0001955</a></td>
+              <td>Other</td>
+              <td>44.0</td>
+              <td>94.8</td>
+              <td>248.0</td>
+              <td>1.2e-65</td>
+          </tr>
+    
+          <tr>
+              <td>AIG79222.1</td>
+              <td>p-Hydroxymandelate_synthase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000419/1">BGC0000419</a></td>
+              <td>Saccharide + NRP:Glycopeptide</td>
+              <td>43.0</td>
+              <td>94.8</td>
+              <td>247.0</td>
+              <td>2.7e-65</td>
+          </tr>
+    
+          <tr>
+              <td>CAK15824.1</td>
+              <td>4-hydroxyphenylpyruvate_dioxygenase_(4HPPD)_(HPD)_(HPPDase)</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000344/1">BGC0000344</a></td>
+              <td>NRP</td>
+              <td>31.0</td>
+              <td>86.3</td>
+              <td>119.0</td>
+              <td>8.4e-27</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

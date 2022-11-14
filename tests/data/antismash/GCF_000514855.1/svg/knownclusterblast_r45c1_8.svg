@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="248,35 253,30 333,30 333,40 253,40 248,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS25195&lt;/b&gt;&lt;br&gt;type I polyketide synthase&lt;br&gt;Location: 0 - 5816" locus_tag="B113_RS25195" class="clusterblast-orf" id="dummy-1_q0_0_all"  />
+<polygon points="335,35 339,30 339,40 335,35 " style="fill:#3cd815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121090&lt;/b&gt;&lt;br&gt;ferredoxin&lt;br&gt;Location: 5966 - 6203" locus_tag="B113_RS0121090" class="clusterblast-orf" id="dummy-1_q1_0_all"  />
+<polygon points="339,35 344,30 356,30 356,40 344,40 339,35 " style="fill:#1563d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121095&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 6199 - 7387" locus_tag="B113_RS0121095" class="clusterblast-orf" id="dummy-1_q2_0_all"  />
+<polygon points="361,40 376,40 381,35 376,30 361,30 361,40 " style="fill:#b115d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121100&lt;/b&gt;&lt;br&gt;lysine 2,3-aminomutase&lt;br&gt;Location: 7740 - 9087" locus_tag="B113_RS0121100" class="clusterblast-orf" id="dummy-1_q3_0_all"  />
+<polygon points="381,40 394,40 399,35 394,30 381,30 381,40 " style="fill:#d88a15; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121105&lt;/b&gt;&lt;br&gt;aminotransferase class I/II-fold pyridoxal phosphate-dependent enzyme&lt;br&gt;Location: 9115 - 10372" locus_tag="B113_RS0121105" class="clusterblast-orf" id="dummy-1_q4_0_all"  />
+<polygon points="399,40 408,40 413,35 408,30 399,30 399,40 " style="fill:#15d863; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121110&lt;/b&gt;&lt;br&gt;ACP S-malonyltransferase&lt;br&gt;Location: 10368 - 11316" locus_tag="B113_RS0121110" class="clusterblast-orf" id="dummy-1_q5_0_all"  />
+<polygon points="414,40 431,40 436,35 431,30 414,30 414,40 " style="fill:#3c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121115&lt;/b&gt;&lt;br&gt;AMP-binding protein&lt;br&gt;Location: 11342 - 12887" locus_tag="B113_RS0121115" class="clusterblast-orf" id="dummy-1_q6_0_all"  />
+<polygon points="437,35 442,30 460,30 460,40 442,40 437,35 " style="fill:#d8158a; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121120&lt;/b&gt;&lt;br&gt;AMP-binding protein&lt;br&gt;Location: 12945 - 14538" locus_tag="B113_RS0121120" class="clusterblast-orf" id="dummy-1_q7_0_all"  />
+<polygon points="463,40 466,35 463,30 463,40 " style="fill:#b1d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121125&lt;/b&gt;&lt;br&gt;phosphopantetheine-binding protein&lt;br&gt;Location: 14699 - 14948" locus_tag="B113_RS0121125" class="clusterblast-orf" id="dummy-1_q8_0_all"  />
+<polygon points="468,35 473,30 481,30 481,40 473,40 468,35 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0121130&lt;/b&gt;&lt;br&gt;proline iminopeptidase-family hydrolase&lt;br&gt;Location: 15049 - 15970" locus_tag="B113_RS0121130" class="clusterblast-orf" id="dummy-1_q9_0_all"  />
+<polygon points="481,35 486,30 531,30 531,40 486,40 481,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS25200&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 15966 - 19398" locus_tag="B113_RS25200" class="clusterblast-orf" id="dummy-1_q10_0_all"  />
+</g>
+<g label="BGC0001658" description="BGC0001658_c1: macrotermycins (34% of genes show similarity), Polyketide" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://mibig.secondarymetabolites.org/go/BGC0001658/1" target="_blank">BGC0001658</a>:                                                                   macrotermycins (34% of genes show similarity), Polyketide</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a1_000"  >
+<polygon points="0,85 5,80 12,80 12,90 5,90 0,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03199&lt;/b&gt;&lt;br&gt;Daunorubicin/doxorubicin resistance ABC transporter permease protein DrrB&lt;br&gt;Location: 53529 - 52702" locus_tag="A4R44_03199" class="clusterblast-orf" id="dummy-1_h1_8_0"  />
+</g>
+<g id="a1_001"  >
+<polygon points="12,85 17,80 25,80 25,90 17,90 12,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03198&lt;/b&gt;&lt;br&gt;Daunorubicin/doxorubicin resistance ATP-binding protein DrrA&lt;br&gt;Location: 52702 - 51779" locus_tag="A4R44_03198" class="clusterblast-orf" id="dummy-1_h1_8_1"  />
+</g>
+<g id="a1_002"  >
+<polygon points="27,85 32,80 178,80 178,90 32,90 27,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03197&lt;/b&gt;&lt;br&gt;Phenolphthiocerol synthesis polyketide synthase type I Pks15/1&lt;br&gt;Location: 51665 - 41289&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 52&lt;br&gt;Percentage coverage: 94&lt;br&gt;BLAST bit score: 1609&lt;br&gt;E-value: 0.0&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25200&lt;/b&gt;&lt;br&gt;Percentage identity: 46&lt;br&gt;Percentage coverage: 77&lt;br&gt;BLAST bit score: 638&lt;br&gt;E-value: 2.2e-182" locus_tag="A4R44_03197" class="clusterblast-orf" id="dummy-1_h1_8_2"  />
+</g>
+<g id="a1_003"  >
+<polygon points="178,85 183,80 248,80 248,90 183,90 178,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03196&lt;/b&gt;&lt;br&gt;Erythronolide synthase, modules 1 and 2&lt;br&gt;Location: 41255 - 36492" locus_tag="A4R44_03196" class="clusterblast-orf" id="dummy-1_h1_8_3"  />
+</g>
+<g id="a1_004"  >
+<polygon points="248,85 253,80 324,80 324,90 253,90 248,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03195&lt;/b&gt;&lt;br&gt;Phenolphthiocerol synthesis polyketide synthase type I Pks15/1&lt;br&gt;Location: 36495 - 31237&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 51&lt;br&gt;Percentage coverage: 93&lt;br&gt;BLAST bit score: 1508&lt;br&gt;E-value: 0.0" locus_tag="A4R44_03195" class="clusterblast-orf" id="dummy-1_h1_8_4"  />
+</g>
+<g id="a1_005"  >
+<polygon points="328,85 333,80 341,80 341,90 333,90 328,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03194&lt;/b&gt;&lt;br&gt;Desosaminyl transferase EryCIII precursor&lt;br&gt;Location: 30978 - 30082" locus_tag="A4R44_03194" class="clusterblast-orf" id="dummy-1_h1_8_5"  />
+</g>
+<g id="a1_006"  >
+<polygon points="344,85 349,80 350,80 350,90 349,90 344,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03193&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 29861 - 29445" locus_tag="A4R44_03193" class="clusterblast-orf" id="dummy-1_h1_8_6"  />
+</g>
+<g id="a1_007"  >
+<polygon points="356,90 358,85 356,80 356,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03192&lt;/b&gt;&lt;br&gt;UDP-glucose/GDP-mannose dehydrogenase family, NAD binding domain&lt;br&gt;Location: 29095 - 28907" locus_tag="A4R44_03192" class="clusterblast-orf" id="dummy-1_h1_8_7"  />
+</g>
+<g id="a1_008"  >
+<polygon points="366,85 371,80 489,80 489,90 371,90 366,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03191&lt;/b&gt;&lt;br&gt;Phenolphthiocerol synthesis polyketide synthase type I Pks15/1&lt;br&gt;Location: 28408 - 19967&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 49&lt;br&gt;Percentage coverage: 68&lt;br&gt;BLAST bit score: 1082&lt;br&gt;E-value: 0.0" locus_tag="A4R44_03191" class="clusterblast-orf" id="dummy-1_h1_8_8"  />
+</g>
+<g id="a1_009"  >
+<polygon points="493,90 500,90 505,85 500,80 493,80 493,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03190&lt;/b&gt;&lt;br&gt;Linear gramicidin dehydrogenase LgrE&lt;br&gt;Location: 19679 - 18864" locus_tag="A4R44_03190" class="clusterblast-orf" id="dummy-1_h1_8_9"  />
+</g>
+<g id="a1_0010"  >
+<polygon points="506,90 510,85 506,80 506,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03189&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 18757 - 18494" locus_tag="A4R44_03189" class="clusterblast-orf" id="dummy-1_h1_8_10"  />
+</g>
+<g id="a1_0011"  >
+<polygon points="511,85 516,80 559,80 559,90 516,90 511,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03188&lt;/b&gt;&lt;br&gt;Phenolphthiocerol synthesis polyketide synthase type I Pks15/1&lt;br&gt;Location: 18428 - 15150&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25195&lt;/b&gt;&lt;br&gt;Percentage identity: 49&lt;br&gt;Percentage coverage: 55&lt;br&gt;BLAST bit score: 827&lt;br&gt;E-value: 5.6e-239&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS25200&lt;/b&gt;&lt;br&gt;Percentage identity: 47&lt;br&gt;Percentage coverage: 76&lt;br&gt;BLAST bit score: 664&lt;br&gt;E-value: 3.7e-190" locus_tag="A4R44_03188" class="clusterblast-orf" id="dummy-1_h1_8_11"  />
+</g>
+<g id="a1_0012"  >
+<polygon points="559,85 564,80 589,80 589,90 564,90 559,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03187&lt;/b&gt;&lt;br&gt;Phenolphthiocerol synthesis polyketide synthase type I Pks15/1&lt;br&gt;Location: 15141 - 13102" locus_tag="A4R44_03187" class="clusterblast-orf" id="dummy-1_h1_8_12"  />
+</g>
+<g id="a1_0013"  >
+<polygon points="591,85 596,80 608,80 608,90 596,90 591,85 " style="fill:#1563d8; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03186&lt;/b&gt;&lt;br&gt;Cytochrome P450 107B1&lt;br&gt;Location: 12948 - 11752&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121095&lt;/b&gt;&lt;br&gt;Percentage identity: 59&lt;br&gt;Percentage coverage: 101&lt;br&gt;BLAST bit score: 465&lt;br&gt;E-value: 1.1e-130" locus_tag="A4R44_03186" class="clusterblast-orf" id="dummy-1_h1_8_13"  />
+</g>
+<g id="a1_0014"  >
+<polygon points="608,85 613,80 616,80 616,90 613,90 608,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03185&lt;/b&gt;&lt;br&gt;Methylaspartate mutase E chain (MutE)&lt;br&gt;Location: 11752 - 11210" locus_tag="A4R44_03185" class="clusterblast-orf" id="dummy-1_h1_8_14"  />
+</g>
+<g id="a1_0015"  >
+<polygon points="615,85 620,80 627,80 627,90 620,90 615,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03184&lt;/b&gt;&lt;br&gt;Methylaspartate mutase E chain&lt;br&gt;Location: 11268 - 10477" locus_tag="A4R44_03184" class="clusterblast-orf" id="dummy-1_h1_8_15"  />
+</g>
+<g id="a1_0016"  >
+<polygon points="627,85 632,80 634,80 634,90 632,90 627,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03183&lt;/b&gt;&lt;br&gt;Methylaspartate mutase S chain&lt;br&gt;Location: 10480 - 10004" locus_tag="A4R44_03183" class="clusterblast-orf" id="dummy-1_h1_8_16"  />
+</g>
+<g id="a1_0017"  >
+<polygon points="634,85 639,80 651,80 651,90 639,90 634,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03182&lt;/b&gt;&lt;br&gt;L-glutamyl-[BtrI acyl-carrier protein] decarboxylase&lt;br&gt;Location: 10007 - 8793" locus_tag="A4R44_03182" class="clusterblast-orf" id="dummy-1_h1_8_17"  />
+</g>
+<g id="a1_0018"  >
+<polygon points="651,85 656,80 673,80 673,90 656,90 651,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03181&lt;/b&gt;&lt;br&gt;Long-chain-fatty-acid--CoA ligase&lt;br&gt;Location: 8796 - 7336" locus_tag="A4R44_03181" class="clusterblast-orf" id="dummy-1_h1_8_18"  />
+</g>
+<g id="a1_0019"  >
+<polygon points="676,85 681,80 697,80 697,90 681,90 676,85 " style="fill:#3c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03180&lt;/b&gt;&lt;br&gt;Surfactin synthase subunit 1&lt;br&gt;Location: 7136 - 5637&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121115&lt;/b&gt;&lt;br&gt;Percentage identity: 58&lt;br&gt;Percentage coverage: 98&lt;br&gt;BLAST bit score: 569&lt;br&gt;E-value: 7.3e-162" locus_tag="A4R44_03180" class="clusterblast-orf" id="dummy-1_h1_8_19"  />
+</g>
+<g id="a1_0020"  >
+<polygon points="701,90 704,85 701,80 701,90 " style="fill:#b1d815; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03179&lt;/b&gt;&lt;br&gt;Acyl carrier protein&lt;br&gt;Location: 5403 - 5158&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121125&lt;/b&gt;&lt;br&gt;Percentage identity: 51&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 87&lt;br&gt;E-value: 1.4e-17" locus_tag="A4R44_03179" class="clusterblast-orf" id="dummy-1_h1_8_20"  />
+</g>
+<g id="a1_0021"  >
+<polygon points="704,85 709,80 718,80 718,90 709,90 704,85 " style="fill:#15d863; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03178&lt;/b&gt;&lt;br&gt;Malonyl CoA-acyl carrier protein transacylase&lt;br&gt;Location: 5165 - 4206&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121110&lt;/b&gt;&lt;br&gt;Percentage identity: 51&lt;br&gt;Percentage coverage: 99&lt;br&gt;BLAST bit score: 328&lt;br&gt;E-value: 1.3e-89" locus_tag="A4R44_03178" class="clusterblast-orf" id="dummy-1_h1_8_21"  />
+</g>
+<g id="a1_0022"  >
+<polygon points="718,85 723,80 732,80 732,90 723,90 718,85 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03177&lt;/b&gt;&lt;br&gt;L-amino acid amidase&lt;br&gt;Location: 4213 - 3281&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0121130&lt;/b&gt;&lt;br&gt;Percentage identity: 62&lt;br&gt;Percentage coverage: 97&lt;br&gt;BLAST bit score: 387&lt;br&gt;E-value: 2.4e-107" locus_tag="A4R44_03177" class="clusterblast-orf" id="dummy-1_h1_8_22"  />
+</g>
+<g id="a1_0023"  >
+<polygon points="735,90 749,90 754,85 749,80 735,80 735,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03176&lt;/b&gt;&lt;br&gt;Desosaminyl transferase EryCIII precursor&lt;br&gt;Location: 3046 - 1784" locus_tag="A4R44_03176" class="clusterblast-orf" id="dummy-1_h1_8_23"  />
+</g>
+<g id="a1_0024"  >
+<polygon points="753,90 765,90 770,85 765,80 753,80 753,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03175&lt;/b&gt;&lt;br&gt;Sensor histidine kinase LiaS&lt;br&gt;Location: 1793 - 678" locus_tag="A4R44_03175" class="clusterblast-orf" id="dummy-1_h1_8_24"  />
+</g>
+<g id="a1_0025"  >
+<polygon points="770,90 775,90 780,85 775,80 770,80 770,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;A4R44_03174&lt;/b&gt;&lt;br&gt;Transcriptional regulatory protein DegU&lt;br&gt;Location: 654 - 1" locus_tag="A4R44_03174" class="clusterblast-orf" id="dummy-1_h1_8_25"  />
+</g>
+</svg>

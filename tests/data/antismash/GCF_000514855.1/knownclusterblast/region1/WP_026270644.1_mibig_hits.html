@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>CAA77208.2</td>
+              <td>2-epi-5-epi-valiolone_synthase_AcbC</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000691/1">BGC0000691</a></td>
+              <td>Saccharide</td>
+              <td>40.0</td>
+              <td>93.3</td>
+              <td>229.0</td>
+              <td>1e-59</td>
+          </tr>
+    
+          <tr>
+              <td>AAZ91667.1</td>
+              <td>putative_2-epi-5-epi-valiolone_synthase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000701/1">BGC0000701</a></td>
+              <td>Saccharide</td>
+              <td>35.0</td>
+              <td>92.5</td>
+              <td>203.0</td>
+              <td>8e-52</td>
+          </tr>
+    
+          <tr>
+              <td>ABC67267.1</td>
+              <td>2-epi-5-epi-valiolone_synthase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000723/1">BGC0000723</a></td>
+              <td>Saccharide</td>
+              <td>35.0</td>
+              <td>92.5</td>
+              <td>203.0</td>
+              <td>8e-52</td>
+          </tr>
+    
+          <tr>
+              <td>ABA41506.1</td>
+              <td>2-epi-5-epi-valiolone_synthase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000722/1">BGC0000722</a></td>
+              <td>Polyketide + Other:Cyclitol</td>
+              <td>35.0</td>
+              <td>92.5</td>
+              <td>202.0</td>
+              <td>1e-51</td>
+          </tr>
+    
+          <tr>
+              <td>ANY58986.1</td>
+              <td>3-dehydroquinate_synthase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001615/1">BGC0001615</a></td>
+              <td>NRP</td>
+              <td>35.0</td>
+              <td>86.3</td>
+              <td>161.0</td>
+              <td>3.5e-39</td>
+          </tr>
+    
+          <tr>
+              <td>ABA23463.1</td>
+              <td>3-dehydroquinate_synthase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000427/1">BGC0000427</a></td>
+              <td>NRP</td>
+              <td>33.0</td>
+              <td>94.8</td>
+              <td>158.0</td>
+              <td>1.7e-38</td>
+          </tr>
+    
+          <tr>
+              <td>CAE06511.1</td>
+              <td>2-deoxy-scyllo-inosose_synthase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000689/1">BGC0000689</a></td>
+              <td>Saccharide</td>
+              <td>23.0</td>
+              <td>75.3</td>
+              <td>64.0</td>
+              <td>4.4e-10</td>
+          </tr>
+    
+          <tr>
+              <td>CAF31431.1</td>
+              <td>2-deoxy-scyllo-inosose_synthase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000696/1">BGC0000696</a></td>
+              <td>Saccharide</td>
+              <td>23.0</td>
+              <td>75.3</td>
+              <td>64.0</td>
+              <td>4.4e-10</td>
+          </tr>
+    
+          <tr>
+              <td>ACN38345.1</td>
+              <td>2-deoxy-scyllo-inosose_synthase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000714/1">BGC0000714</a></td>
+              <td>Saccharide</td>
+              <td>23.0</td>
+              <td>76.8</td>
+              <td>64.0</td>
+              <td>4.4e-10</td>
+          </tr>
+    
+          <tr>
+              <td>ARV75708.1</td>
+              <td>2-deoxy-scyllo-inosose_synthase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001603/1">BGC0001603</a></td>
+              <td>Saccharide</td>
+              <td>23.0</td>
+              <td>75.3</td>
+              <td>64.0</td>
+              <td>4.4e-10</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

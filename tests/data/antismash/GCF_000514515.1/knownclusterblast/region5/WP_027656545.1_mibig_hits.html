@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>ALU98442.1</td>
+              <td>tyrosine_2,3-aminomutase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001397/1">BGC0001397</a></td>
+              <td>NRP + Polyketide</td>
+              <td>74.0</td>
+              <td>100.6</td>
+              <td>761.0</td>
+              <td>1e-219</td>
+          </tr>
+    
+          <tr>
+              <td>AAL06680.1</td>
+              <td>putative_ammonia_lyase/transferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000965/1">BGC0000965</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Enediyne type I</td>
+              <td>74.0</td>
+              <td>100.6</td>
+              <td>760.0</td>
+              <td>2.3e-219</td>
+          </tr>
+    
+          <tr>
+              <td>ABY66005.1</td>
+              <td>MIO-containing_aminomutase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001008/1">BGC0001008</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Enediyne type I</td>
+              <td>73.0</td>
+              <td>100.2</td>
+              <td>759.0</td>
+              <td>4e-219</td>
+          </tr>
+    
+          <tr>
+              <td>ANY94450.1</td>
+              <td>MIO-dependent_tyrosine_2,3-aminomutase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001584/1">BGC0001584</a></td>
+              <td>Polyketide</td>
+              <td>74.0</td>
+              <td>99.3</td>
+              <td>755.0</td>
+              <td>5.7e-218</td>
+          </tr>
+    
+          <tr>
+              <td>AFV52190.1</td>
+              <td>4-Methylideneimidazole-5-one_(MIO)-containing_aminomutases_</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000081/1">BGC0000081</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Enediyne type I</td>
+              <td>69.0</td>
+              <td>100.4</td>
+              <td>719.0</td>
+              <td>4.6e-207</td>
+          </tr>
+    
+          <tr>
+              <td>AAM77981.1</td>
+              <td>aminotransferase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000112/1">BGC0000112</a></td>
+              <td>Polyketide:Iterative type I + Polyketide:Enediyne type I</td>
+              <td>52.0</td>
+              <td>100.4</td>
+              <td>481.0</td>
+              <td>2.1e-135</td>
+          </tr>
+    
+          <tr>
+              <td>CAJ46694.1</td>
+              <td>tyrosine_aminomutase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000969/1">BGC0000969</a></td>
+              <td>NRP:Cyclic depsipeptide + Polyketide:Modular type I</td>
+              <td>47.0</td>
+              <td>92.7</td>
+              <td>400.0</td>
+              <td>4.7e-111</td>
+          </tr>
+    
+          <tr>
+              <td>AAK57183.1</td>
+              <td>putative_histidine_ammonium_lyase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001022/1">BGC0001022</a></td>
+              <td>NRP + Polyketide</td>
+              <td>42.0</td>
+              <td>98.5</td>
+              <td>359.0</td>
+              <td>9.2e-99</td>
+          </tr>
+    
+          <tr>
+              <td>AAF81735.1</td>
+              <td>putative_phenylalanine_ammonia_lyase_EncP</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000220/1">BGC0000220</a></td>
+              <td>Polyketide:Type II</td>
+              <td>41.0</td>
+              <td>94.8</td>
+              <td>337.0</td>
+              <td>2.9e-92</td>
+          </tr>
+    
+          <tr>
+              <td>BAR73006.1</td>
+              <td>putative_phenylalanine-2,3-aminomutase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001194/1">BGC0001194</a></td>
+              <td>Polyketide</td>
+              <td>40.0</td>
+              <td>94.8</td>
+              <td>324.0</td>
+              <td>2.5e-88</td>
+          </tr>
+    
+          <tr>
+              <td>AAZ23046.1</td>
+              <td>probable_histidine_ammonia-lyase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000291/1">BGC0000291</a></td>
+              <td>NRP</td>
+              <td>42.0</td>
+              <td>97.2</td>
+              <td>320.0</td>
+              <td>6.2e-87</td>
+          </tr>
+    
+          <tr>
+              <td>AAO39102.1</td>
+              <td>AdmH</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000956/1">BGC0000956</a></td>
+              <td>NRP:Beta-lactam + Polyketide:Type II</td>
+              <td>39.0</td>
+              <td>94.2</td>
+              <td>317.0</td>
+              <td>5.2e-86</td>
+          </tr>
+    
+          <tr>
+              <td>QBG38760.1</td>
+              <td>histidine_ammonia-lyase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001975/1">BGC0001975</a></td>
+              <td>NRP</td>
+              <td>40.0</td>
+              <td>94.9</td>
+              <td>316.0</td>
+              <td>6.8e-86</td>
+          </tr>
+    
+          <tr>
+              <td>ABQ04142.1</td>
+              <td>Histidine_ammonia-lyase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000838/1">BGC0000838</a></td>
+              <td>Polyketide</td>
+              <td>38.0</td>
+              <td>87.5</td>
+              <td>314.0</td>
+              <td>2.6e-85</td>
+          </tr>
+    
+          <tr>
+              <td>CAL80815.1</td>
+              <td>histidine_ammonia-lyase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000997/1">BGC0000997</a></td>
+              <td>NRP + Polyketide</td>
+              <td>39.0</td>
+              <td>96.6</td>
+              <td>314.0</td>
+              <td>2.6e-85</td>
+          </tr>
+    
+          <tr>
+              <td>ERM18794.1</td>
+              <td>histidine_ammonia-lyase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000172/1">BGC0000172</a></td>
+              <td>Polyketide</td>
+              <td>39.0</td>
+              <td>89.5</td>
+              <td>303.0</td>
+              <td>7.8e-82</td>
+          </tr>
+    
+          <tr>
+              <td>ERG36772.1</td>
+              <td>histidine_ammonia-lyase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000299/1">BGC0000299</a></td>
+              <td>NRP</td>
+              <td>35.0</td>
+              <td>91.2</td>
+              <td>237.0</td>
+              <td>4e-62</td>
+          </tr>
+    
+          <tr>
+              <td>WP_010369397.1</td>
+              <td>aromatic_amino_acid_lyase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000314/1">BGC0000314</a></td>
+              <td>Polyketide + NRP:Cyclic depsipeptide + Other:Aminocoumarin</td>
+              <td>35.0</td>
+              <td>91.2</td>
+              <td>237.0</td>
+              <td>4e-62</td>
+          </tr>
+    
+          <tr>
+              <td>AAW85347.1</td>
+              <td>phenylalanine_and_histidine_ammonia-lyase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000837/1">BGC0000837</a></td>
+              <td>Other</td>
+              <td>36.0</td>
+              <td>86.5</td>
+              <td>235.0</td>
+              <td>2e-61</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

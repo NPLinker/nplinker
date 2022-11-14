@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>AHZ61864.1</td>
+              <td>4Fe-4S_ferrodoxin</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000240/1">BGC0000240</a></td>
+              <td>Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>100.0</td>
+              <td>100.0</td>
+              <td>259.0</td>
+              <td>2.2e-69</td>
+          </tr>
+    
+          <tr>
+              <td>ABP54653.1</td>
+              <td>4Fe-4S_ferredoxin,_iron-sulfur_binding_domain_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000241/1">BGC0000241</a></td>
+              <td>Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>97.0</td>
+              <td>100.0</td>
+              <td>253.0</td>
+              <td>1.2e-67</td>
+          </tr>
+    
+          <tr>
+              <td>ARD70878.1</td>
+              <td>4Fe-4S_ferredoxin</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001693/1">BGC0001693</a></td>
+              <td>Polyketide</td>
+              <td>80.0</td>
+              <td>99.2</td>
+              <td>207.0</td>
+              <td>1.7e-53</td>
+          </tr>
+    
+          <tr>
+              <td>WP_040253458.1</td>
+              <td>4Fe-4S_ferredoxin</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001596/1">BGC0001596</a></td>
+              <td>Polyketide</td>
+              <td>71.0</td>
+              <td>92.4</td>
+              <td>171.0</td>
+              <td>6e-43</td>
+          </tr>
+    
+          <tr>
+              <td>AEE65492.1</td>
+              <td>putative_ferredoxin</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000223/1">BGC0000223</a></td>
+              <td>Polyketide:Type II</td>
+              <td>72.0</td>
+              <td>81.4</td>
+              <td>161.0</td>
+              <td>6.2e-40</td>
+          </tr>
+    
+          <tr>
+              <td>ALJ99877.1</td>
+              <td>FlsV</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001904/1">BGC0001904</a></td>
+              <td>Polyketide</td>
+              <td>72.0</td>
+              <td>78.8</td>
+              <td>160.0</td>
+              <td>1.4e-39</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

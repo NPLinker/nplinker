@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="158,40 175,40 180,35 175,30 158,30 158,40 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0114740&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 87868 - 88129" locus_tag="B113_RS0114740" class="clusterblast-orf" id="dummy-2_q0_0_all"  />
+<polygon points="179,40 265,40 270,35 265,30 179,30 179,40 " style="fill:#4dd815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0114745&lt;/b&gt;&lt;br&gt;SDR family oxidoreductase&lt;br&gt;Location: 88125 - 89226" locus_tag="B113_RS0114745" class="clusterblast-orf" id="dummy-2_q1_0_all"  />
+<polygon points="270,40 345,40 350,35 345,30 270,30 270,40 " style="fill:#1585d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0114750&lt;/b&gt;&lt;br&gt;nucleoside-diphosphate kinase&lt;br&gt;Location: 89222 - 90203" locus_tag="B113_RS0114750" class="clusterblast-orf" id="dummy-2_q2_0_all"  />
+<polygon points="347,40 419,40 424,35 419,30 347,30 347,40 " style="fill:#d815bc; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0114755&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 90169 - 91108" locus_tag="B113_RS0114755" class="clusterblast-orf" id="dummy-2_q3_0_all"  />
+<polygon points="424,40 492,40 497,35 492,30 424,30 424,40 " style="fill:#d8bc15; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0114760&lt;/b&gt;&lt;br&gt;LLM class F420-dependent oxidoreductase&lt;br&gt;Location: 91107 - 91995" locus_tag="B113_RS0114760" class="clusterblast-orf" id="dummy-2_q4_0_all"  />
+<polygon points="497,40 571,40 576,35 571,30 497,30 497,40 " style="fill:#15d885; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0114765&lt;/b&gt;&lt;br&gt;A-factor biosynthesis protein&lt;br&gt;Location: 91991 - 92951" locus_tag="B113_RS0114765" class="clusterblast-orf" id="dummy-2_q5_0_all"  />
+<polygon points="610,40 617,40 622,35 617,30 610,30 610,40 " style="fill:#4d15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS27175&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 93374 - 93517" locus_tag="B113_RS27175" class="clusterblast-orf" id="dummy-2_q6_0_all"  />
+</g>
+<g label="NZ_AZWC01000027" description="NZ_AZWC01000027 (39364-50324): Salinispora pacifica CNT001 B169DRAFT scaffold... (53% of genes show similarity), butyrolactone" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_AZWC01000027&amp;start=39364&amp;end=50324" target="_blank">NZ_AZWC01000027 (39364-50324)</a>: Salinispora pacifica CNT001 B169DRAFT scaffold... (53% of genes show similarity), butyrolactone</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a2_000"  >
+<polygon points="0,90 16,90 21,85 16,80 0,80 0,90 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0116350&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 49447 - 49187&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0114740&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 170&lt;br&gt;E-value: 9.8e-41" locus_tag="B169_RS0116350" class="clusterblast-orf" id="dummy-2_h2_2_0"  />
+</g>
+<g id="a2_001"  >
+<polygon points="21,90 106,90 111,85 106,80 21,80 21,90 " style="fill:#4dd815; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0116345&lt;/b&gt;&lt;br&gt;SDR family oxidoreductase&lt;br&gt;Location: 49190 - 48090&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0114745&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 714&lt;br&gt;E-value: 4.5e-204" locus_tag="B169_RS0116345" class="clusterblast-orf" id="dummy-2_h2_2_1"  />
+</g>
+<g id="a2_002"  >
+<polygon points="111,90 186,90 191,85 186,80 111,80 111,90 " style="fill:#1585d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0116340&lt;/b&gt;&lt;br&gt;nucleoside-diphosphate kinase&lt;br&gt;Location: 48093 - 47113&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0114750&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 647&lt;br&gt;E-value: 7.9e-184" locus_tag="B169_RS0116340" class="clusterblast-orf" id="dummy-2_h2_2_2"  />
+</g>
+<g id="a2_003"  >
+<polygon points="188,90 260,90 265,85 260,80 188,80 188,90 " style="fill:#d815bc; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0116335&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 47146 - 46208&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0114755&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 597&lt;br&gt;E-value: 9e-169" locus_tag="B169_RS0116335" class="clusterblast-orf" id="dummy-2_h2_2_3"  />
+</g>
+<g id="a2_004"  >
+<polygon points="265,90 333,90 338,85 333,80 265,80 265,90 " style="fill:#d8bc15; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0116330&lt;/b&gt;&lt;br&gt;LLM class F420-dependent oxidoreductase&lt;br&gt;Location: 46208 - 45321&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0114760&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 589&lt;br&gt;E-value: 1.4e-166" locus_tag="B169_RS0116330" class="clusterblast-orf" id="dummy-2_h2_2_4"  />
+</g>
+<g id="a2_005"  >
+<polygon points="338,90 412,90 417,85 412,80 338,80 338,90 " style="fill:#15d885; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0116325&lt;/b&gt;&lt;br&gt;A-factor biosynthesis protein&lt;br&gt;Location: 45324 - 44365&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0114765&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 629&lt;br&gt;E-value: 1.7e-178" locus_tag="B169_RS0116325" class="clusterblast-orf" id="dummy-2_h2_2_5"  />
+</g>
+<g id="a2_006"  >
+<polygon points="438,90 442,90 447,85 442,80 438,80 438,90 " style="fill:#4d15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS28890&lt;/b&gt;&lt;br&gt;alpha/beta hydrolase&lt;br&gt;Location: 44106 - 43993&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS27175&lt;/b&gt;&lt;br&gt;Percentage identity: 91&lt;br&gt;Percentage coverage: 72&lt;br&gt;BLAST bit score: 66&lt;br&gt;E-value: 6.4e-10" locus_tag="B169_RS28890" class="clusterblast-orf" id="dummy-2_h2_2_6"  />
+</g>
+<g id="a2_007"  >
+<polygon points="449,85 454,80 547,80 547,90 454,90 449,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0116320&lt;/b&gt;&lt;br&gt;FAD-dependent oxidoreductase&lt;br&gt;Location: 43975 - 42776" locus_tag="B169_RS0116320" class="clusterblast-orf" id="dummy-2_h2_2_7"  />
+</g>
+<g id="a2_008"  >
+<polygon points="555,90 598,90 603,85 598,80 555,80 555,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0116315&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 42681 - 42091" locus_tag="B169_RS0116315" class="clusterblast-orf" id="dummy-2_h2_2_8"  />
+</g>
+<g id="a2_009"  >
+<polygon points="610,85 615,80 677,80 677,90 615,90 610,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0116310&lt;/b&gt;&lt;br&gt;trypsin-like serine protease&lt;br&gt;Location: 42011 - 41190" locus_tag="B169_RS0116310" class="clusterblast-orf" id="dummy-2_h2_2_9"  />
+</g>
+<g id="a2_0010"  >
+<polygon points="721,85 726,80 746,80 746,90 726,90 721,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0116305&lt;/b&gt;&lt;br&gt;30S ribosomal protein S14&lt;br&gt;Location: 40657 - 40352" locus_tag="B169_RS0116305" class="clusterblast-orf" id="dummy-2_h2_2_10"  />
+</g>
+<g id="a2_0011"  >
+<polygon points="746,85 751,80 760,80 760,90 751,90 746,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0116300&lt;/b&gt;&lt;br&gt;50S ribosomal protein L33&lt;br&gt;Location: 40350 - 40183" locus_tag="B169_RS0116300" class="clusterblast-orf" id="dummy-2_h2_2_11"  />
+</g>
+<g id="a2_0012"  >
+<polygon points="760,85 765,80 780,80 780,90 765,90 760,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B169_RS0116295&lt;/b&gt;&lt;br&gt;50S ribosomal protein L28&lt;br&gt;Location: 40183 - 39947" locus_tag="B169_RS0116295" class="clusterblast-orf" id="dummy-2_h2_2_12"  />
+</g>
+</svg>

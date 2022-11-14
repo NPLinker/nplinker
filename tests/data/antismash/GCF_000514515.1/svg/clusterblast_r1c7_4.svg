@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="6,35 11,30 47,30 47,40 11,40 6,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118560&lt;/b&gt;&lt;br&gt;ABC transporter ATP-binding protein&lt;br&gt;Location: 685503 - 686559" locus_tag="B170_RS0118560" class="clusterblast-orf" id="dummy-7_q0_0_all"  />
+<polygon points="47,35 52,30 99,30 99,40 52,40 47,35 " style="fill:#43d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118565&lt;/b&gt;&lt;br&gt;sugar ABC transporter substrate-binding protein&lt;br&gt;Location: 686555 - 687881" locus_tag="B170_RS0118565" class="clusterblast-orf" id="dummy-7_q1_0_all"  />
+<polygon points="99,35 104,30 133,30 133,40 104,40 99,35 " style="fill:#15b6d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118570&lt;/b&gt;&lt;br&gt;carbohydrate ABC transporter permease&lt;br&gt;Location: 687877 - 688738" locus_tag="B170_RS0118570" class="clusterblast-orf" id="dummy-7_q2_0_all"  />
+<polygon points="134,35 139,30 243,30 243,40 139,40 134,35 " style="fill:#8815d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118575&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 688763 - 691559" locus_tag="B170_RS0118575" class="clusterblast-orf" id="dummy-7_q3_0_all"  />
+<polygon points="248,35 253,30 279,30 279,40 253,40 248,35 " style="fill:#d85a15; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118580&lt;/b&gt;&lt;br&gt;ABC transporter permease&lt;br&gt;Location: 691680 - 692451" locus_tag="B170_RS0118580" class="clusterblast-orf" id="dummy-7_q4_0_all"  />
+<polygon points="278,35 283,30 319,30 319,40 283,40 278,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118585&lt;/b&gt;&lt;br&gt;ABC transporter ATP-binding protein&lt;br&gt;Location: 692447 - 693479" locus_tag="B170_RS0118585" class="clusterblast-orf" id="dummy-7_q5_0_all"  />
+<polygon points="327,40 356,40 361,35 356,30 327,30 327,40 " style="fill:#15d82c; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118590&lt;/b&gt;&lt;br&gt;pentapeptide repeat-containing protein&lt;br&gt;Location: 693687 - 694557" locus_tag="B170_RS0118590" class="clusterblast-orf" id="dummy-7_q6_0_all"  />
+<polygon points="364,40 368,40 373,35 368,30 364,30 364,40 " style="fill:#1571d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118595&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 694637 - 694865" locus_tag="B170_RS0118595" class="clusterblast-orf" id="dummy-7_q7_0_all"  />
+<polygon points="374,35 379,30 424,30 424,40 379,40 374,35 " style="fill:#cd15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118600&lt;/b&gt;&lt;br&gt;lycopene cyclase&lt;br&gt;Location: 694894 - 696154" locus_tag="B170_RS0118600" class="clusterblast-orf" id="dummy-7_q8_0_all"  />
+<polygon points="435,40 477,40 482,35 477,30 435,30 435,40 " style="fill:#d89f15; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118605&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 696430 - 697639" locus_tag="B170_RS0118605" class="clusterblast-orf" id="dummy-7_q9_0_all"  />
+<polygon points="486,35 491,30 535,30 535,40 491,40 486,35 " style="fill:#15d871; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118610&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 697726 - 698974" locus_tag="B170_RS0118610" class="clusterblast-orf" id="dummy-7_q10_0_all"  />
+<polygon points="539,35 544,30 573,30 573,40 544,40 539,35 " style="fill:#152cd8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118615&lt;/b&gt;&lt;br&gt;slipin family protein&lt;br&gt;Location: 699090 - 699948" locus_tag="B170_RS0118615" class="clusterblast-orf" id="dummy-7_q11_0_all"  />
+<polygon points="574,35 579,30 648,30 648,40 579,40 574,35 " style="fill:#d8159f; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118620&lt;/b&gt;&lt;br&gt;long-chain fatty acid--CoA ligase&lt;br&gt;Location: 699976 - 701875" locus_tag="B170_RS0118620" class="clusterblast-orf" id="dummy-7_q12_0_all"  />
+<polygon points="654,40 683,40 688,35 683,30 654,30 654,40 " style="fill:#cdd815; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118625&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 702006 - 702879" locus_tag="B170_RS0118625" class="clusterblast-orf" id="dummy-7_q13_0_all"  />
+<polygon points="688,35 693,30 700,30 700,40 693,40 688,35 " style="fill:#15d8b6; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118630&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 702890 - 703181" locus_tag="B170_RS0118630" class="clusterblast-orf" id="dummy-7_q14_0_all"  />
+<polygon points="700,35 705,30 716,30 716,40 705,40 700,35 " style="fill:#4315d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118635&lt;/b&gt;&lt;br&gt;DUF1622 domain-containing protein&lt;br&gt;Location: 703177 - 703588" locus_tag="B170_RS0118635" class="clusterblast-orf" id="dummy-7_q15_0_all"  />
+<polygon points="720,35 725,30 752,30 752,40 725,40 720,35 " style="fill:#d8155a; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118640&lt;/b&gt;&lt;br&gt;potassium channel family protein&lt;br&gt;Location: 703697 - 704504" locus_tag="B170_RS0118640" class="clusterblast-orf" id="dummy-7_q16_0_all"  />
+<polygon points="753,40 769,40 774,35 769,30 753,30 753,40 " style="fill:#88d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0118645&lt;/b&gt;&lt;br&gt;MarR family transcriptional regulator&lt;br&gt;Location: 704542 - 705073" locus_tag="B170_RS0118645" class="clusterblast-orf" id="dummy-7_q17_0_all"  />
+</g>
+<g label="NZ_KB895288" description="NZ_KB895288 (263414-284674): Salinispora pacifica CNT124 C555DRAFT scaffold00... (84% of genes show similarity), terpene" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_KB895288&amp;start=263414&amp;end=284674" target="_blank">NZ_KB895288 (263414-284674)</a>: Salinispora pacifica CNT124 C555DRAFT scaffold00... (84% of genes show similarity), terpene</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a7_000"  >
+<polygon points="0,90 17,90 22,85 17,80 0,80 0,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103165&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 284366 - 283797" locus_tag="C555_RS0103165" class="clusterblast-orf" id="dummy-7_h7_4_0"  />
+</g>
+<g id="a7_001"  >
+<polygon points="20,85 25,80 38,80 38,90 25,90 20,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS24270&lt;/b&gt;&lt;br&gt;NUDIX domain-containing protein&lt;br&gt;Location: 283852 - 283395" locus_tag="C555_RS24270" class="clusterblast-orf" id="dummy-7_h7_4_1"  />
+</g>
+<g id="a7_002"  >
+<polygon points="49,85 54,80 83,80 83,90 54,90 49,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103155&lt;/b&gt;&lt;br&gt;sugar ABC transporter permease&lt;br&gt;Location: 283106 - 282237" locus_tag="C555_RS0103155" class="clusterblast-orf" id="dummy-7_h7_4_2"  />
+</g>
+<g id="a7_003"  >
+<polygon points="86,85 91,80 127,80 127,90 91,90 86,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103150&lt;/b&gt;&lt;br&gt;ABC transporter ATP-binding protein&lt;br&gt;Location: 282168 - 281113&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118560&lt;/b&gt;&lt;br&gt;Percentage identity: 97&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 654&lt;br&gt;E-value: 7e-186&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118585&lt;/b&gt;&lt;br&gt;Percentage identity: 36&lt;br&gt;Percentage coverage: 66&lt;br&gt;BLAST bit score: 119&lt;br&gt;E-value: 7.9e-25" locus_tag="C555_RS0103150" class="clusterblast-orf" id="dummy-7_h7_4_3"  />
+</g>
+<g id="a7_004"  >
+<polygon points="127,85 132,80 179,80 179,90 132,90 127,85 " style="fill:#43d815; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103145&lt;/b&gt;&lt;br&gt;sugar ABC transporter substrate-binding protein&lt;br&gt;Location: 281116 - 279791&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118565&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 866&lt;br&gt;E-value: 1.1e-249" locus_tag="C555_RS0103145" class="clusterblast-orf" id="dummy-7_h7_4_4"  />
+</g>
+<g id="a7_005"  >
+<polygon points="179,85 184,80 213,80 213,90 184,90 179,85 " style="fill:#15b6d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103140&lt;/b&gt;&lt;br&gt;carbohydrate ABC transporter permease&lt;br&gt;Location: 279794 - 278931&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118570&lt;/b&gt;&lt;br&gt;Percentage identity: 98&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 520&lt;br&gt;E-value: 1.3e-145" locus_tag="C555_RS0103140" class="clusterblast-orf" id="dummy-7_h7_4_5"  />
+</g>
+<g id="a7_006"  >
+<polygon points="214,85 219,80 324,80 324,90 219,90 214,85 " style="fill:#8815d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103135&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 278905 - 276110&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118575&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1899&lt;br&gt;E-value: 0.0" locus_tag="C555_RS0103135" class="clusterblast-orf" id="dummy-7_h7_4_6"  />
+</g>
+<g id="a7_007"  >
+<polygon points="333,90 362,90 367,85 362,80 333,80 333,90 " style="fill:#15d82c; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103130&lt;/b&gt;&lt;br&gt;pentapeptide repeat-containing protein&lt;br&gt;Location: 275877 - 275008&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118590&lt;/b&gt;&lt;br&gt;Percentage identity: 94&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 427&lt;br&gt;E-value: 1.1e-117" locus_tag="C555_RS0103130" class="clusterblast-orf" id="dummy-7_h7_4_7"  />
+</g>
+<g id="a7_008"  >
+<polygon points="370,90 374,90 379,85 374,80 370,80 370,90 " style="fill:#1571d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103125&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 274931 - 274704&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118595&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 149&lt;br&gt;E-value: 9.1e-35" locus_tag="C555_RS0103125" class="clusterblast-orf" id="dummy-7_h7_4_8"  />
+</g>
+<g id="a7_009"  >
+<polygon points="380,85 385,80 429,80 429,90 385,90 380,85 " style="fill:#cd15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103120&lt;/b&gt;&lt;br&gt;lycopene cyclase&lt;br&gt;Location: 274674 - 273415&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118600&lt;/b&gt;&lt;br&gt;Percentage identity: 97&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 824&lt;br&gt;E-value: 6.1e-237" locus_tag="C555_RS0103120" class="clusterblast-orf" id="dummy-7_h7_4_9"  />
+</g>
+<g id="a7_0010"  >
+<polygon points="440,90 483,90 488,85 483,80 440,80 440,90 " style="fill:#d89f15; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103115&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 273139 - 271931&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118605&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 714&lt;br&gt;E-value: 6.5e-204" locus_tag="C555_RS0103115" class="clusterblast-orf" id="dummy-7_h7_4_10"  />
+</g>
+<g id="a7_0011"  >
+<polygon points="490,85 495,80 540,80 540,90 495,90 490,85 " style="fill:#15d871; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103110&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 271860 - 270598&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118610&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 729&lt;br&gt;E-value: 2e-208" locus_tag="C555_RS0103110" class="clusterblast-orf" id="dummy-7_h7_4_11"  />
+</g>
+<g id="a7_0012"  >
+<polygon points="545,85 550,80 578,80 578,90 550,90 545,85 " style="fill:#152cd8; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103105&lt;/b&gt;&lt;br&gt;slipin family protein&lt;br&gt;Location: 270481 - 269624&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118615&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 524&lt;br&gt;E-value: 6.8e-147" locus_tag="C555_RS0103105" class="clusterblast-orf" id="dummy-7_h7_4_12"  />
+</g>
+<g id="a7_0013"  >
+<polygon points="579,85 584,80 654,80 654,90 584,90 579,85 " style="fill:#d8159f; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103100&lt;/b&gt;&lt;br&gt;long-chain fatty acid--CoA ligase&lt;br&gt;Location: 269595 - 267697&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118620&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1239&lt;br&gt;E-value: 0.0" locus_tag="C555_RS0103100" class="clusterblast-orf" id="dummy-7_h7_4_13"  />
+</g>
+<g id="a7_0014"  >
+<polygon points="659,90 688,90 693,85 688,80 659,80 659,90 " style="fill:#cdd815; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103095&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 267565 - 266693&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118625&lt;/b&gt;&lt;br&gt;Percentage identity: 93&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 554&lt;br&gt;E-value: 6.2e-156" locus_tag="C555_RS0103095" class="clusterblast-orf" id="dummy-7_h7_4_14"  />
+</g>
+<g id="a7_0015"  >
+<polygon points="694,85 699,80 705,80 705,90 699,90 694,85 " style="fill:#15d8b6; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103090&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 266681 - 266391&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118630&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 177&lt;br&gt;E-value: 6.8e-43" locus_tag="C555_RS0103090" class="clusterblast-orf" id="dummy-7_h7_4_15"  />
+</g>
+<g id="a7_0016"  >
+<polygon points="705,85 710,80 721,80 721,90 710,90 705,85 " style="fill:#4315d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103085&lt;/b&gt;&lt;br&gt;DUF1622 domain-containing protein&lt;br&gt;Location: 266394 - 265984&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118635&lt;/b&gt;&lt;br&gt;Percentage identity: 97&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 251&lt;br&gt;E-value: 5.3e-65" locus_tag="C555_RS0103085" class="clusterblast-orf" id="dummy-7_h7_4_16"  />
+</g>
+<g id="a7_0017"  >
+<polygon points="725,85 730,80 757,80 757,90 730,90 725,85 " style="fill:#d8155a; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103080&lt;/b&gt;&lt;br&gt;potassium channel family protein&lt;br&gt;Location: 265874 - 265068&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118640&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 492&lt;br&gt;E-value: 3.5e-137" locus_tag="C555_RS0103080" class="clusterblast-orf" id="dummy-7_h7_4_17"  />
+</g>
+<g id="a7_0018"  >
+<polygon points="759,90 775,90 780,85 775,80 759,80 759,90 " style="fill:#88d815; stroke-width:1; stroke:black; " description="&lt;b&gt;C555_RS0103075&lt;/b&gt;&lt;br&gt;MarR family transcriptional regulator&lt;br&gt;Location: 265027 - 264497&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0118645&lt;/b&gt;&lt;br&gt;Percentage identity: 98&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 331&lt;br&gt;E-value: 6.8e-89" locus_tag="C555_RS0103075" class="clusterblast-orf" id="dummy-7_h7_4_18"  />
+</g>
+</svg>

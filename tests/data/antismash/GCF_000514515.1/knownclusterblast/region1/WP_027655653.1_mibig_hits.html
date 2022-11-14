@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>ctg1_3</td>
+              <td></td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001849/1">BGC0001849</a></td>
+              <td>RiPP</td>
+              <td>64.0</td>
+              <td>96.0</td>
+              <td>592.0</td>
+              <td>5.4e-169</td>
+          </tr>
+    
+          <tr>
+              <td>ATJ00798.1</td>
+              <td>hypothetical_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001802/1">BGC0001802</a></td>
+              <td>RiPP</td>
+              <td>55.0</td>
+              <td>99.1</td>
+              <td>477.0</td>
+              <td>3.3e-134</td>
+          </tr>
+    
+          <tr>
+              <td>BBC15204.1</td>
+              <td>YcaO-like_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001696/1">BGC0001696</a></td>
+              <td>RiPP</td>
+              <td>56.0</td>
+              <td>99.1</td>
+              <td>474.0</td>
+              <td>1.6e-133</td>
+          </tr>
+    
+          <tr>
+              <td>BAN83923.1</td>
+              <td>hypothetical_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001803/1">BGC0001803</a></td>
+              <td>RiPP</td>
+              <td>51.0</td>
+              <td>97.8</td>
+              <td>444.0</td>
+              <td>1.8e-124</td>
+          </tr>
+    
+          <tr>
+              <td>PYC67537.1</td>
+              <td>hypothetical_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001473/1">BGC0001473</a></td>
+              <td>RiPP:Thiopeptide</td>
+              <td>31.0</td>
+              <td>96.2</td>
+              <td>144.0</td>
+              <td>3e-34</td>
+          </tr>
+    
+          <tr>
+              <td>PYC80225.1</td>
+              <td>hypothetical_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001474/1">BGC0001474</a></td>
+              <td>RiPP:Thiopeptide</td>
+              <td>32.0</td>
+              <td>95.3</td>
+              <td>138.0</td>
+              <td>2.8e-32</td>
+          </tr>
+    
+          <tr>
+              <td>WP_091614389.1</td>
+              <td>hypothetical_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0002023/1">BGC0002023</a></td>
+              <td>RiPP</td>
+              <td>30.0</td>
+              <td>92.7</td>
+              <td>137.0</td>
+              <td>6.2e-32</td>
+          </tr>
+    
+          <tr>
+              <td>BAE46919.2</td>
+              <td>goadsporin_biosynthetic_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000565/1">BGC0000565</a></td>
+              <td>RiPP:LAP</td>
+              <td>27.0</td>
+              <td>80.4</td>
+              <td>83.0</td>
+              <td>8.2e-16</td>
+          </tr>
+    
+          <tr>
+              <td>WP_091614694.1</td>
+              <td>hypothetical_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0002023/1">BGC0002023</a></td>
+              <td>RiPP</td>
+              <td>25.0</td>
+              <td>95.3</td>
+              <td>59.0</td>
+              <td>1.7e-08</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

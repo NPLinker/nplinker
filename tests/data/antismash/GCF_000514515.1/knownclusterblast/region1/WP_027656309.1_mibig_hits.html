@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>WP_026275164.1</td>
+              <td>LLM_class_F420-dependent_oxidoreductase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001458/1">BGC0001458</a></td>
+              <td>Other:Aminocoumarin</td>
+              <td>95.0</td>
+              <td>100.0</td>
+              <td>571.0</td>
+              <td>6.5e-163</td>
+          </tr>
+    
+          <tr>
+              <td>CAE45677.1</td>
+              <td>putative_dehydrogenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000031/1">BGC0000031</a></td>
+              <td>Polyketide:Modular type I</td>
+              <td>36.0</td>
+              <td>78.0</td>
+              <td>120.0</td>
+              <td>4e-27</td>
+          </tr>
+    
+          <tr>
+              <td>ALV82315.1</td>
+              <td>putative_dehydrogenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001533/1">BGC0001533</a></td>
+              <td>Polyketide</td>
+              <td>36.0</td>
+              <td>78.0</td>
+              <td>120.0</td>
+              <td>4e-27</td>
+          </tr>
+    
+          <tr>
+              <td>AMK51289.1</td>
+              <td>Hex32</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001376/1">BGC0001376</a></td>
+              <td>Polyketide</td>
+              <td>34.0</td>
+              <td>78.0</td>
+              <td>90.0</td>
+              <td>4.4e-18</td>
+          </tr>
+    
+          <tr>
+              <td>ADE34500.1</td>
+              <td>ssfP</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000269/1">BGC0000269</a></td>
+              <td>Polyketide:Type II + Saccharide:Hybrid/tailoring</td>
+              <td>31.0</td>
+              <td>78.6</td>
+              <td>81.0</td>
+              <td>2.7e-15</td>
+          </tr>
+    
+          <tr>
+              <td>BBE36458.1</td>
+              <td>monooxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001922/1">BGC0001922</a></td>
+              <td>Polyketide</td>
+              <td>31.0</td>
+              <td>67.8</td>
+              <td>74.0</td>
+              <td>2.5e-13</td>
+          </tr>
+    
+          <tr>
+              <td>BAJ07847.1</td>
+              <td>putative_oxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000232/1">BGC0000232</a></td>
+              <td>Polyketide</td>
+              <td>38.0</td>
+              <td>39.3</td>
+              <td>73.0</td>
+              <td>7.3e-13</td>
+          </tr>
+    
+          <tr>
+              <td>BBE36486.1</td>
+              <td>hypothetical_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001922/1">BGC0001922</a></td>
+              <td>Polyketide</td>
+              <td>30.0</td>
+              <td>67.5</td>
+              <td>73.0</td>
+              <td>7.3e-13</td>
+          </tr>
+    
+          <tr>
+              <td>AAG52987.1</td>
+              <td>putative_alpha-chain_alkanal_monooxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000136/1">BGC0000136</a></td>
+              <td>Polyketide</td>
+              <td>34.0</td>
+              <td>52.5</td>
+              <td>71.0</td>
+              <td>3.6e-12</td>
+          </tr>
+    
+          <tr>
+              <td>AFX60312.1</td>
+              <td>flavin-dependent_monooxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001031/1">BGC0001031</a></td>
+              <td>NRP + Polyketide</td>
+              <td>38.0</td>
+              <td>32.5</td>
+              <td>70.0</td>
+              <td>6.1e-12</td>
+          </tr>
+    
+          <tr>
+              <td>AMH40433.1</td>
+              <td>mono-oxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001350/1">BGC0001350</a></td>
+              <td>Polyketide</td>
+              <td>32.0</td>
+              <td>44.1</td>
+              <td>68.0</td>
+              <td>1.8e-11</td>
+          </tr>
+    
+          <tr>
+              <td>AWH12641.1</td>
+              <td>Rmp17</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001759/1">BGC0001759</a></td>
+              <td>Polyketide</td>
+              <td>32.0</td>
+              <td>52.5</td>
+              <td>68.0</td>
+              <td>1.8e-11</td>
+          </tr>
+    
+          <tr>
+              <td>AFX60335.1</td>
+              <td>flavin-dependent_monooxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001032/1">BGC0001032</a></td>
+              <td>NRP + Polyketide</td>
+              <td>33.0</td>
+              <td>32.5</td>
+              <td>67.0</td>
+              <td>5.2e-11</td>
+          </tr>
+    
+          <tr>
+              <td>BAJ19083.1</td>
+              <td>putative_luciferase_family_protein</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000288/1">BGC0000288</a></td>
+              <td>NRP</td>
+              <td>33.0</td>
+              <td>53.2</td>
+              <td>65.0</td>
+              <td>1.5e-10</td>
+          </tr>
+    
+          <tr>
+              <td>CBK62723.1</td>
+              <td></td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001115/1">BGC0001115</a></td>
+              <td>NRP + Polyketide</td>
+              <td>28.0</td>
+              <td>53.6</td>
+              <td>61.0</td>
+              <td>2.2e-09</td>
+          </tr>
+    
+          <tr>
+              <td>CCC21141.1</td>
+              <td>putative_G6PDH_family_F420-dependent_oxidoreductase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000171/1">BGC0000171</a></td>
+              <td>Polyketide:Modular type I</td>
+              <td>28.0</td>
+              <td>67.8</td>
+              <td>54.0</td>
+              <td>3.5e-07</td>
+          </tr>
+    
+          <tr>
+              <td>AAD28461.1</td>
+              <td>MitK</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000915/1">BGC0000915</a></td>
+              <td>Other:Aminocoumarin</td>
+              <td>33.0</td>
+              <td>40.7</td>
+              <td>54.0</td>
+              <td>3.5e-07</td>
+          </tr>
+    
+          <tr>
+              <td>AAV97871.1</td>
+              <td>OnnC</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001105/1">BGC0001105</a></td>
+              <td>NRP + Polyketide:Trans-AT type I</td>
+              <td>29.0</td>
+              <td>37.3</td>
+              <td>52.0</td>
+              <td>1.7e-06</td>
+          </tr>
+    
+          <tr>
+              <td>ADA69238.1</td>
+              <td>flavin-dependent_oxygenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001071/1">BGC0001071</a></td>
+              <td>NRP + Polyketide:Modular type I + Polyketide:Trans-AT type I</td>
+              <td>28.0</td>
+              <td>37.3</td>
+              <td>51.0</td>
+              <td>2.3e-06</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

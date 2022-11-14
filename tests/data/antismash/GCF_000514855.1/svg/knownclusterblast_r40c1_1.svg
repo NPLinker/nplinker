@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="278,35 283,30 288,30 288,40 283,40 278,35 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120585&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 5963 - 7058" locus_tag="B113_RS0120585" class="clusterblast-orf" id="dummy-1_q0_0_all"  />
+<polygon points="291,35 296,30 300,30 300,40 296,40 291,35 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120590&lt;/b&gt;&lt;br&gt;LysR family transcriptional regulator&lt;br&gt;Location: 7332 - 8262" locus_tag="B113_RS0120590" class="clusterblast-orf" id="dummy-1_q1_0_all"  />
+<polygon points="301,40 304,40 309,35 304,30 301,30 301,40 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120595&lt;/b&gt;&lt;br&gt;glycine/betaine ABC transporter substrate-binding protein&lt;br&gt;Location: 8397 - 9198" locus_tag="B113_RS0120595" class="clusterblast-orf" id="dummy-1_q2_0_all"  />
+<polygon points="309,40 309,40 314,35 309,30 309,30 309,40 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120600&lt;/b&gt;&lt;br&gt;VOC family protein&lt;br&gt;Location: 9251 - 9731" locus_tag="B113_RS0120600" class="clusterblast-orf" id="dummy-1_q3_0_all"  />
+<polygon points="316,35 321,30 324,30 324,40 321,40 316,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120605&lt;/b&gt;&lt;br&gt;metallophosphoesterase&lt;br&gt;Location: 9944 - 10784" locus_tag="B113_RS0120605" class="clusterblast-orf" id="dummy-1_q4_0_all"  />
+<polygon points="327,40 335,40 340,35 335,30 327,30 327,40 " style="fill:#5cd815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120610&lt;/b&gt;&lt;br&gt;histidine kinase&lt;br&gt;Location: 11075 - 12479" locus_tag="B113_RS0120610" class="clusterblast-orf" id="dummy-1_q5_0_all"  />
+<polygon points="340,40 341,40 346,35 341,30 340,30 340,40 " style="fill:#15a3d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120615&lt;/b&gt;&lt;br&gt;response regulator transcription factor&lt;br&gt;Location: 12442 - 13105" locus_tag="B113_RS0120615" class="clusterblast-orf" id="dummy-1_q6_0_all"  />
+<polygon points="347,35 352,30 371,30 371,40 352,40 347,35 " style="fill:#c715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120620&lt;/b&gt;&lt;br&gt;FtsX family ABC transporter permease&lt;br&gt;Location: 13200 - 15765" locus_tag="B113_RS0120620" class="clusterblast-orf" id="dummy-1_q7_0_all"  />
+<polygon points="371,35 376,30 379,30 379,40 376,40 371,35 " style="fill:#d88015; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120625&lt;/b&gt;&lt;br&gt;ABC transporter ATP-binding protein&lt;br&gt;Location: 15764 - 16568" locus_tag="B113_RS0120625" class="clusterblast-orf" id="dummy-1_q8_0_all"  />
+<polygon points="380,35 385,30 407,30 407,40 385,40 380,35 " style="fill:#15d839; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120630&lt;/b&gt;&lt;br&gt;AAA family ATPase&lt;br&gt;Location: 16705 - 19546" locus_tag="B113_RS0120630" class="clusterblast-orf" id="dummy-1_q9_0_all"  />
+<polygon points="419,35 424,30 426,30 426,40 424,40 419,35 " style="fill:#1539d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120635&lt;/b&gt;&lt;br&gt;thioesterase&lt;br&gt;Location: 20780 - 21557" locus_tag="B113_RS0120635" class="clusterblast-orf" id="dummy-1_q10_0_all"  />
+<polygon points="431,35 436,30 448,30 448,40 436,40 431,35 " style="fill:#d81580; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120645&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 22033 - 23815" locus_tag="B113_RS0120645" class="clusterblast-orf" id="dummy-1_q11_0_all"  />
+<polygon points="449,40 449,40 454,35 449,30 449,30 449,40 " style="fill:#c7d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120650&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 23898 - 24486" locus_tag="B113_RS0120650" class="clusterblast-orf" id="dummy-1_q12_0_all"  />
+<polygon points="455,35 458,30 458,40 455,35 " style="fill:#15d8a3; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120655&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 24599 - 24866" locus_tag="B113_RS0120655" class="clusterblast-orf" id="dummy-1_q13_0_all"  />
+<polygon points="460,35 465,30 501,30 501,40 465,40 460,35 " style="fill:#5c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0120660&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 25074 - 29436" locus_tag="B113_RS0120660" class="clusterblast-orf" id="dummy-1_q14_0_all"  />
+</g>
+<g label="BGC0000142" description="BGC0000142_c1: salinilactam (48% of genes show similarity), Polyketide" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://mibig.secondarymetabolites.org/go/BGC0000142/1" target="_blank">BGC0000142</a>:                                                                     salinilactam (48% of genes show similarity), Polyketide</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a1_000"  >
+<polygon points="0,90 7,90 12,85 7,80 0,80 0,90 " style="fill:#5cd815; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2757&lt;/b&gt;&lt;br&gt;histidine kinase, dimerisation and phosphoacceptor region&lt;br&gt;Location: 1 - 1302&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120610&lt;/b&gt;&lt;br&gt;Percentage identity: 89&lt;br&gt;Percentage coverage: 93&lt;br&gt;BLAST bit score: 733&lt;br&gt;E-value: 1.6e-211" locus_tag="Strop_2757" class="clusterblast-orf" id="dummy-1_h1_1_0"  />
+</g>
+<g id="a1_001"  >
+<polygon points="12,90 13,90 18,85 13,80 12,80 12,90 " style="fill:#15a3d8; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2758&lt;/b&gt;&lt;br&gt;response regulator receiver&lt;br&gt;Location: 1266 - 1928&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120615&lt;/b&gt;&lt;br&gt;Percentage identity: 98&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 412&lt;br&gt;E-value: 3.8e-115" locus_tag="Strop_2758" class="clusterblast-orf" id="dummy-1_h1_1_1"  />
+</g>
+<g id="a1_002"  >
+<polygon points="19,85 24,80 43,80 43,90 24,90 19,85 " style="fill:#c715d8; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2759&lt;/b&gt;&lt;br&gt;protein of unknown function DUF214&lt;br&gt;Location: 2009 - 4573&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120620&lt;/b&gt;&lt;br&gt;Percentage identity: 93&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1471&lt;br&gt;E-value: 0.0" locus_tag="Strop_2759" class="clusterblast-orf" id="dummy-1_h1_1_2"  />
+</g>
+<g id="a1_003"  >
+<polygon points="43,85 48,80 51,80 51,90 48,90 43,85 " style="fill:#d88015; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2760&lt;/b&gt;&lt;br&gt;ABC transporter related&lt;br&gt;Location: 4570 - 5379&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120625&lt;/b&gt;&lt;br&gt;Percentage identity: 93&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 477&lt;br&gt;E-value: 1.5e-134" locus_tag="Strop_2760" class="clusterblast-orf" id="dummy-1_h1_1_3"  />
+</g>
+<g id="a1_004"  >
+<polygon points="52,85 57,80 79,80 79,90 57,90 52,85 " style="fill:#15d839; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2761&lt;/b&gt;&lt;br&gt;regulatory protein, LuxR&lt;br&gt;Location: 5511 - 8342&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120630&lt;/b&gt;&lt;br&gt;Percentage identity: 90&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1657&lt;br&gt;E-value: 0.0" locus_tag="Strop_2761" class="clusterblast-orf" id="dummy-1_h1_1_4"  />
+</g>
+<g id="a1_005"  >
+<polygon points="83,90 86,85 83,80 83,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2762&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 8729 - 9061" locus_tag="Strop_2762" class="clusterblast-orf" id="dummy-1_h1_1_5"  />
+</g>
+<g id="a1_006"  >
+<polygon points="87,85 92,80 95,80 95,90 92,90 87,85 " style="fill:#1539d8; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2763&lt;/b&gt;&lt;br&gt;Thioesterase&lt;br&gt;Location: 9219 - 9995&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120635&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 498&lt;br&gt;E-value: 6.1e-141" locus_tag="Strop_2763" class="clusterblast-orf" id="dummy-1_h1_1_6"  />
+</g>
+<g id="a1_007"  >
+<polygon points="95,85 100,80 109,80 109,90 100,90 95,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2764&lt;/b&gt;&lt;br&gt;Propionyl-CoA carboxylase&lt;br&gt;Location: 10045 - 11484" locus_tag="Strop_2764" class="clusterblast-orf" id="dummy-1_h1_1_7"  />
+</g>
+<g id="a1_008"  >
+<polygon points="111,85 116,80 128,80 128,90 116,90 111,85 " style="fill:#d81580; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2765&lt;/b&gt;&lt;br&gt;major facilitator superfamily MFS 1&lt;br&gt;Location: 11718 - 13472&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120645&lt;/b&gt;&lt;br&gt;Percentage identity: 91&lt;br&gt;Percentage coverage: 97&lt;br&gt;BLAST bit score: 928&lt;br&gt;E-value: 5.5e-270" locus_tag="Strop_2765" class="clusterblast-orf" id="dummy-1_h1_1_8"  />
+</g>
+<g id="a1_009"  >
+<polygon points="128,90 129,90 134,85 129,80 128,80 128,90 " style="fill:#c7d815; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2766&lt;/b&gt;&lt;br&gt;regulatory protein, TetR&lt;br&gt;Location: 13546 - 14142&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120650&lt;/b&gt;&lt;br&gt;Percentage identity: 88&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 332&lt;br&gt;E-value: 3.4e-91" locus_tag="Strop_2766" class="clusterblast-orf" id="dummy-1_h1_1_9"  />
+</g>
+<g id="a1_0010"  >
+<polygon points="135,85 138,80 138,90 135,85 " style="fill:#15d8a3; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2767&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 14251 - 14517&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120655&lt;/b&gt;&lt;br&gt;Percentage identity: 94&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 168&lt;br&gt;E-value: 4.9e-42" locus_tag="Strop_2767" class="clusterblast-orf" id="dummy-1_h1_1_10"  />
+</g>
+<g id="a1_0011"  >
+<polygon points="140,85 145,80 345,80 345,90 145,90 140,85 " style="fill:#5c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2768&lt;/b&gt;&lt;br&gt;beta-ketoacyl synthase&lt;br&gt;Location: 14735 - 36367&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120660&lt;/b&gt;&lt;br&gt;Percentage identity: 88&lt;br&gt;Percentage coverage: 101&lt;br&gt;BLAST bit score: 2441&lt;br&gt;E-value: 0.0" locus_tag="Strop_2768" class="clusterblast-orf" id="dummy-1_h1_1_11"  />
+</g>
+<g id="a1_0012"  >
+<polygon points="346,85 348,80 348,90 346,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2769&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 36387 - 36614" locus_tag="Strop_2769" class="clusterblast-orf" id="dummy-1_h1_1_12"  />
+</g>
+<g id="a1_0013"  >
+<polygon points="348,85 353,80 359,80 359,90 353,90 348,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2770&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 36620 - 37807" locus_tag="Strop_2770" class="clusterblast-orf" id="dummy-1_h1_1_13"  />
+</g>
+<g id="a1_0014"  >
+<polygon points="363,90 370,90 375,85 370,80 363,80 363,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2771&lt;/b&gt;&lt;br&gt;L-lysine 2,3-aminomutase&lt;br&gt;Location: 38163 - 39509" locus_tag="Strop_2771" class="clusterblast-orf" id="dummy-1_h1_1_14"  />
+</g>
+<g id="a1_0015"  >
+<polygon points="376,90 383,90 388,85 383,80 376,80 376,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2772&lt;/b&gt;&lt;br&gt;aminotransferase&lt;br&gt;Location: 39537 - 40793" locus_tag="Strop_2772" class="clusterblast-orf" id="dummy-1_h1_1_15"  />
+</g>
+<g id="a1_0016"  >
+<polygon points="388,90 392,90 397,85 392,80 388,80 388,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2773&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 40790 - 41737" locus_tag="Strop_2773" class="clusterblast-orf" id="dummy-1_h1_1_16"  />
+</g>
+<g id="a1_0017"  >
+<polygon points="397,90 407,90 412,85 407,80 397,80 397,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2774&lt;/b&gt;&lt;br&gt;AMP-dependent synthetase and ligase&lt;br&gt;Location: 41764 - 43308" locus_tag="Strop_2774" class="clusterblast-orf" id="dummy-1_h1_1_17"  />
+</g>
+<g id="a1_0018"  >
+<polygon points="412,85 417,80 428,80 428,90 417,90 412,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2775&lt;/b&gt;&lt;br&gt;AMP-dependent synthetase and ligase&lt;br&gt;Location: 43374 - 45011" locus_tag="Strop_2775" class="clusterblast-orf" id="dummy-1_h1_1_18"  />
+</g>
+<g id="a1_0019"  >
+<polygon points="429,90 431,85 429,80 429,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2776&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 45128 - 45376" locus_tag="Strop_2776" class="clusterblast-orf" id="dummy-1_h1_1_19"  />
+</g>
+<g id="a1_0020"  >
+<polygon points="433,85 438,80 441,80 441,90 438,90 433,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2777&lt;/b&gt;&lt;br&gt;proline-specific peptidase&lt;br&gt;Location: 45539 - 46459" locus_tag="Strop_2777" class="clusterblast-orf" id="dummy-1_h1_1_20"  />
+</g>
+<g id="a1_0021"  >
+<polygon points="441,85 446,80 547,80 547,90 446,90 441,85 " style="fill:#5c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2778&lt;/b&gt;&lt;br&gt;beta-ketoacyl synthase&lt;br&gt;Location: 46456 - 57591&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120660&lt;/b&gt;&lt;br&gt;Percentage identity: 46&lt;br&gt;Percentage coverage: 96&lt;br&gt;BLAST bit score: 1005&lt;br&gt;E-value: 1.1e-292" locus_tag="Strop_2778" class="clusterblast-orf" id="dummy-1_h1_1_21"  />
+</g>
+<g id="a1_0022"  >
+<polygon points="548,85 553,80 593,80 593,90 553,90 548,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2779&lt;/b&gt;&lt;br&gt;acyl transferase domain protein&lt;br&gt;Location: 57650 - 62404" locus_tag="Strop_2779" class="clusterblast-orf" id="dummy-1_h1_1_22"  />
+</g>
+<g id="a1_0023"  >
+<polygon points="594,85 599,80 680,80 680,90 599,90 594,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2780&lt;/b&gt;&lt;br&gt;beta-ketoacyl synthase&lt;br&gt;Location: 62445 - 71546" locus_tag="Strop_2780" class="clusterblast-orf" id="dummy-1_h1_1_23"  />
+</g>
+<g id="a1_0024"  >
+<polygon points="681,85 686,80 780,80 780,90 686,90 681,85 " style="fill:#5c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;Strop_2781&lt;/b&gt;&lt;br&gt;beta-ketoacyl synthase&lt;br&gt;Location: 71598 - 81989&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0120660&lt;/b&gt;&lt;br&gt;Percentage identity: 47&lt;br&gt;Percentage coverage: 101&lt;br&gt;BLAST bit score: 1127&lt;br&gt;E-value: 0.0" locus_tag="Strop_2781" class="clusterblast-orf" id="dummy-1_h1_1_24"  />
+</g>
+</svg>

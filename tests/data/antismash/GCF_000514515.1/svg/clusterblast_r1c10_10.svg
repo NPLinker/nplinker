@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="1,35 6,30 33,30 33,40 6,40 1,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119310&lt;/b&gt;&lt;br&gt;transcriptional repressor&lt;br&gt;Location: 856370 - 856793" locus_tag="B170_RS0119310" class="clusterblast-orf" id="dummy-10_q0_0_all"  />
+<polygon points="52,40 80,40 85,35 80,30 52,30 52,40 " style="fill:#3cd815; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119315&lt;/b&gt;&lt;br&gt;MerR family DNA-binding transcriptional regulator&lt;br&gt;Location: 857047 - 857473" locus_tag="B170_RS0119315" class="clusterblast-orf" id="dummy-10_q1_0_all"  />
+<polygon points="84,40 138,40 143,35 138,30 84,30 84,40 " style="fill:#1563d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119320&lt;/b&gt;&lt;br&gt;molybdate ABC transporter substrate-binding protein&lt;br&gt;Location: 857469 - 858237" locus_tag="B170_RS0119320" class="clusterblast-orf" id="dummy-10_q2_0_all"  />
+<polygon points="143,40 202,40 207,35 202,30 143,30 143,40 " style="fill:#b115d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119325&lt;/b&gt;&lt;br&gt;molybdate ABC transporter permease subunit&lt;br&gt;Location: 858233 - 859079" locus_tag="B170_RS0119325" class="clusterblast-orf" id="dummy-10_q3_0_all"  />
+<polygon points="207,40 283,40 288,35 283,30 207,30 207,40 " style="fill:#d88a15; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119330&lt;/b&gt;&lt;br&gt;ABC transporter ATP-binding protein&lt;br&gt;Location: 859075 - 860140" locus_tag="B170_RS0119330" class="clusterblast-orf" id="dummy-10_q4_0_all"  />
+<polygon points="289,35 294,30 426,30 426,40 294,40 289,35 " style="fill:#15d863; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119335&lt;/b&gt;&lt;br&gt;IucA/IucC family siderophore biosynthesis protein&lt;br&gt;Location: 860149 - 861940" locus_tag="B170_RS0119335" class="clusterblast-orf" id="dummy-10_q5_0_all"  />
+<polygon points="425,35 430,30 469,30 469,40 430,40 425,35 " style="fill:#3c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119340&lt;/b&gt;&lt;br&gt;acetyltransferase&lt;br&gt;Location: 861936 - 862503" locus_tag="B170_RS0119340" class="clusterblast-orf" id="dummy-10_q6_0_all"  />
+<polygon points="468,35 473,30 567,30 567,40 473,40 468,35 " style="fill:#d8158a; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119345&lt;/b&gt;&lt;br&gt;SidA/IucD/PvdA family monooxygenase&lt;br&gt;Location: 862499 - 863786" locus_tag="B170_RS0119345" class="clusterblast-orf" id="dummy-10_q7_0_all"  />
+<polygon points="569,35 574,30 692,30 692,40 574,40 569,35 " style="fill:#b1d815; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119350&lt;/b&gt;&lt;br&gt;aminotransferase class V-fold PLP-dependent enzyme&lt;br&gt;Location: 863821 - 865423" locus_tag="B170_RS0119350" class="clusterblast-orf" id="dummy-10_q8_0_all"  />
+<polygon points="701,35 706,30 780,30 780,40 706,40 701,35 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0119355&lt;/b&gt;&lt;br&gt;ABC transporter substrate-binding protein&lt;br&gt;Location: 865547 - 866579" locus_tag="B170_RS0119355" class="clusterblast-orf" id="dummy-10_q9_0_all"  />
+</g>
+<g label="NZ_KB904922" description="NZ_KB904922 (98368-110159): Salinispora pacifica CNT609 C584DRAFT scaffold000... (100% of genes show similarity), siderophore" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_KB904922&amp;start=98368&amp;end=110159" target="_blank">NZ_KB904922 (98368-110159)</a>: Salinispora pacifica CNT609 C584DRAFT scaffold000... (100% of genes show similarity), siderophore</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a10_000"  >
+<polygon points="0,85 5,80 32,80 32,90 5,90 0,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0110130&lt;/b&gt;&lt;br&gt;transcriptional repressor&lt;br&gt;Location: 108946 - 108524&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0119310&lt;/b&gt;&lt;br&gt;Percentage identity: 98&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 282&lt;br&gt;E-value: 2.2e-74" locus_tag="C584_RS0110130" class="clusterblast-orf" id="dummy-10_h10_10_0"  />
+</g>
+<g id="a10_001"  >
+<polygon points="52,90 79,90 84,85 79,80 52,80 52,90 " style="fill:#3cd815; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0110125&lt;/b&gt;&lt;br&gt;MerR family DNA-binding transcriptional regulator&lt;br&gt;Location: 108261 - 107836&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0119315&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 262&lt;br&gt;E-value: 1.8e-68" locus_tag="C584_RS0110125" class="clusterblast-orf" id="dummy-10_h10_10_1"  />
+</g>
+<g id="a10_002"  >
+<polygon points="84,90 137,90 142,85 137,80 84,80 84,90 " style="fill:#1563d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0110120&lt;/b&gt;&lt;br&gt;molybdate ABC transporter substrate-binding protein&lt;br&gt;Location: 107839 - 107075&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0119320&lt;/b&gt;&lt;br&gt;Percentage identity: 89&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 426&lt;br&gt;E-value: 1.3e-117" locus_tag="C584_RS0110120" class="clusterblast-orf" id="dummy-10_h10_10_2"  />
+</g>
+<g id="a10_003"  >
+<polygon points="142,90 202,90 207,85 202,80 142,80 142,90 " style="fill:#b115d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0110115&lt;/b&gt;&lt;br&gt;molybdate ABC transporter permease subunit&lt;br&gt;Location: 107078 - 106230&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0119325&lt;/b&gt;&lt;br&gt;Percentage identity: 95&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 491&lt;br&gt;E-value: 6.3e-137" locus_tag="C584_RS0110115" class="clusterblast-orf" id="dummy-10_h10_10_3"  />
+</g>
+<g id="a10_004"  >
+<polygon points="207,90 283,90 288,85 283,80 207,80 207,90 " style="fill:#d88a15; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0110110&lt;/b&gt;&lt;br&gt;ABC transporter ATP-binding protein&lt;br&gt;Location: 106233 - 105169&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0119330&lt;/b&gt;&lt;br&gt;Percentage identity: 93&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 645&lt;br&gt;E-value: 3.3e-183" locus_tag="C584_RS0110110" class="clusterblast-orf" id="dummy-10_h10_10_4"  />
+</g>
+<g id="a10_005"  >
+<polygon points="289,85 294,80 425,80 425,90 294,90 289,85 " style="fill:#15d863; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0110105&lt;/b&gt;&lt;br&gt;IucA/IucC family siderophore biosynthesis protein&lt;br&gt;Location: 105159 - 103369&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0119335&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 1166&lt;br&gt;E-value: 0.0" locus_tag="C584_RS0110105" class="clusterblast-orf" id="dummy-10_h10_10_5"  />
+</g>
+<g id="a10_006"  >
+<polygon points="425,85 430,80 468,80 468,90 430,90 425,85 " style="fill:#3c15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0110100&lt;/b&gt;&lt;br&gt;acetyltransferase&lt;br&gt;Location: 103372 - 102806&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0119340&lt;/b&gt;&lt;br&gt;Percentage identity: 93&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 369&lt;br&gt;E-value: 2.4e-100" locus_tag="C584_RS0110100" class="clusterblast-orf" id="dummy-10_h10_10_6"  />
+</g>
+<g id="a10_007"  >
+<polygon points="468,85 473,80 566,80 566,90 473,90 468,85 " style="fill:#d8158a; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0110095&lt;/b&gt;&lt;br&gt;SidA/IucD/PvdA family monooxygenase&lt;br&gt;Location: 102809 - 101523&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0119345&lt;/b&gt;&lt;br&gt;Percentage identity: 96&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 849&lt;br&gt;E-value: 1.8e-244" locus_tag="C584_RS0110095" class="clusterblast-orf" id="dummy-10_h10_10_7"  />
+</g>
+<g id="a10_008"  >
+<polygon points="569,85 574,80 691,80 691,90 574,90 569,85 " style="fill:#b1d815; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0110090&lt;/b&gt;&lt;br&gt;aspartate aminotransferase family protein&lt;br&gt;Location: 101487 - 99889&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0119350&lt;/b&gt;&lt;br&gt;Percentage identity: 93&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 966&lt;br&gt;E-value: 9.7e-280" locus_tag="C584_RS0110090" class="clusterblast-orf" id="dummy-10_h10_10_8"  />
+</g>
+<g id="a10_009"  >
+<polygon points="701,85 706,80 780,80 780,90 706,90 701,85 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;C584_RS0110085&lt;/b&gt;&lt;br&gt;ABC transporter substrate-binding protein&lt;br&gt;Location: 99760 - 98729&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0119355&lt;/b&gt;&lt;br&gt;Percentage identity: 98&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 649&lt;br&gt;E-value: 1.7e-184" locus_tag="C584_RS0110085" class="clusterblast-orf" id="dummy-10_h10_10_9"  />
+</g>
+</svg>

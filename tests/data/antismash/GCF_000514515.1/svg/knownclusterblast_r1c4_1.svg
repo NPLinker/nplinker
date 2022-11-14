@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="181,35 186,30 219,30 219,40 186,40 181,35 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117485&lt;/b&gt;&lt;br&gt;SDR family NAD(P)-dependent oxidoreductase&lt;br&gt;Location: 474254 - 475166" locus_tag="B170_RS0117485" class="clusterblast-orf" id="dummy-4_q0_0_all"  />
+<polygon points="218,35 223,30 244,30 244,40 223,40 218,35 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117490&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 475162 - 475786" locus_tag="B170_RS0117490" class="clusterblast-orf" id="dummy-4_q1_0_all"  />
+<polygon points="249,35 254,30 302,30 302,40 254,40 249,35 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117495&lt;/b&gt;&lt;br&gt;MFS transporter&lt;br&gt;Location: 475893 - 477195" locus_tag="B170_RS0117495" class="clusterblast-orf" id="dummy-4_q2_0_all"  />
+<polygon points="302,35 307,30 352,30 352,40 307,40 302,35 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117500&lt;/b&gt;&lt;br&gt;cytochrome P450&lt;br&gt;Location: 477187 - 478390" locus_tag="B170_RS0117500" class="clusterblast-orf" id="dummy-4_q3_0_all"  />
+<polygon points="353,35 358,30 381,30 381,40 358,40 353,35 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117505&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 478434 - 479112" locus_tag="B170_RS0117505" class="clusterblast-orf" id="dummy-4_q4_0_all"  />
+<polygon points="381,35 386,30 459,30 459,40 386,40 381,35 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117510&lt;/b&gt;&lt;br&gt;RiPP maturation radical SAM protein 1&lt;br&gt;Location: 479092 - 480997" locus_tag="B170_RS0117510" class="clusterblast-orf" id="dummy-4_q5_0_all"  />
+<polygon points="469,35 474,30 544,30 544,40 474,40 469,35 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117520&lt;/b&gt;&lt;br&gt;S9 family peptidase&lt;br&gt;Location: 481244 - 483050" locus_tag="B170_RS0117520" class="clusterblast-orf" id="dummy-4_q6_0_all"  />
+<polygon points="551,40 564,40 569,35 564,30 551,30 551,40 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117525&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 483215 - 483650" locus_tag="B170_RS0117525" class="clusterblast-orf" id="dummy-4_q7_0_all"  />
+<polygon points="570,35 575,30 599,30 599,40 575,40 570,35 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;B170_RS0117530&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 483692 - 484382" locus_tag="B170_RS0117530" class="clusterblast-orf" id="dummy-4_q8_0_all"  />
+</g>
+<g label="BGC0000382" description="BGC0000382_c1: lipstatin (14% of genes show similarity), NRP" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://mibig.secondarymetabolites.org/go/BGC0000382/1" target="_blank">BGC0000382</a>:                                                                        lipstatin (14% of genes show similarity), NRP</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a4_000"  >
+<polygon points="0,90 44,90 49,85 44,80 0,80 0,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AIT38311.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 19364 - 18174" locus_tag="AIT38311.1" class="clusterblast-orf" id="dummy-4_h4_1_0"  />
+</g>
+<g id="a4_001"  >
+<polygon points="52,85 57,80 71,80 71,90 57,90 52,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AIT38310.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 18094 - 17624" locus_tag="AIT38310.1" class="clusterblast-orf" id="dummy-4_h4_1_1"  />
+</g>
+<g id="a4_002"  >
+<polygon points="73,85 78,80 98,80 98,90 78,90 73,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AIT38309.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 17587 - 16988" locus_tag="AIT38309.1" class="clusterblast-orf" id="dummy-4_h4_1_2"  />
+</g>
+<g id="a4_003"  >
+<polygon points="103,90 135,90 140,85 135,80 103,80 103,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AIT38308.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 16858 - 15965" locus_tag="AIT38308.1" class="clusterblast-orf" id="dummy-4_h4_1_3"  />
+</g>
+<g id="a4_004"  >
+<polygon points="141,85 146,80 174,80 174,90 146,90 141,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AIT38307.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 15942 - 15136" locus_tag="AIT38307.1" class="clusterblast-orf" id="dummy-4_h4_1_4"  />
+</g>
+<g id="a4_005"  >
+<polygon points="180,85 185,80 218,80 218,90 185,90 180,85 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;AIT38306.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 14989 - 14069&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117485&lt;/b&gt;&lt;br&gt;Percentage identity: 81&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 482&lt;br&gt;E-value: 7e-136" locus_tag="AIT38306.1" class="clusterblast-orf" id="dummy-4_h4_1_5"  />
+</g>
+<g id="a4_006"  >
+<polygon points="218,85 223,80 243,80 243,90 223,90 218,85 " style="fill:#15d8d8; stroke-width:1; stroke:black; " description="&lt;b&gt;AIT38305.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 14072 - 13464&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B170_RS0117490&lt;/b&gt;&lt;br&gt;Percentage identity: 60&lt;br&gt;Percentage coverage: 96&lt;br&gt;BLAST bit score: 230&lt;br&gt;E-value: 2.5e-60" locus_tag="AIT38305.1" class="clusterblast-orf" id="dummy-4_h4_1_6"  />
+</g>
+<g id="a4_007"  >
+<polygon points="248,85 253,80 274,80 274,90 253,90 248,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AIT38304.1&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 13334 - 12714" locus_tag="AIT38304.1" class="clusterblast-orf" id="dummy-4_h4_1_7"  />
+</g>
+<g id="a4_008"  >
+<polygon points="295,85 300,80 323,80 323,90 300,90 295,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AIT38303.1&lt;/b&gt;&lt;br&gt;LstF&lt;br&gt;Location: 12202 - 11510" locus_tag="AIT38303.1" class="clusterblast-orf" id="dummy-4_h4_1_8"  />
+</g>
+<g id="a4_009"  >
+<polygon points="323,85 328,80 519,80 519,90 328,90 323,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AIT38302.1&lt;/b&gt;&lt;br&gt;LstE&lt;br&gt;Location: 11513 - 6768" locus_tag="AIT38302.1" class="clusterblast-orf" id="dummy-4_h4_1_9"  />
+</g>
+<g id="a4_0010"  >
+<polygon points="519,85 524,80 589,80 589,90 524,90 519,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AIT38301.1&lt;/b&gt;&lt;br&gt;LstD&lt;br&gt;Location: 6771 - 5080" locus_tag="AIT38301.1" class="clusterblast-orf" id="dummy-4_h4_1_10"  />
+</g>
+<g id="a4_0011"  >
+<polygon points="589,85 594,80 697,80 697,90 594,90 589,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AIT38300.1&lt;/b&gt;&lt;br&gt;LstC&lt;br&gt;Location: 5083 - 2459" locus_tag="AIT38300.1" class="clusterblast-orf" id="dummy-4_h4_1_11"  />
+</g>
+<g id="a4_0012"  >
+<polygon points="697,85 702,80 733,80 733,90 702,90 697,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AIT38299.1&lt;/b&gt;&lt;br&gt;LstB&lt;br&gt;Location: 2453 - 1587" locus_tag="AIT38299.1" class="clusterblast-orf" id="dummy-4_h4_1_12"  />
+</g>
+<g id="a4_0013"  >
+<polygon points="733,85 738,80 780,80 780,90 738,90 733,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;AIT38298.1&lt;/b&gt;&lt;br&gt;LstA&lt;br&gt;Location: 1580 - 456" locus_tag="AIT38298.1" class="clusterblast-orf" id="dummy-4_h4_1_13"  />
+</g>
+</svg>

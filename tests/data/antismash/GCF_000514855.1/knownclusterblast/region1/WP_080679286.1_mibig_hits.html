@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>ABP55219.1</td>
+              <td>proline-specific_peptidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000142/1">BGC0000142</a></td>
+              <td>Polyketide</td>
+              <td>94.0</td>
+              <td>100.0</td>
+              <td>596.0</td>
+              <td>2e-170</td>
+          </tr>
+    
+          <tr>
+              <td>ALA09360.1</td>
+              <td>peptidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001303/1">BGC0001303</a></td>
+              <td>Polyketide</td>
+              <td>89.0</td>
+              <td>97.4</td>
+              <td>555.0</td>
+              <td>5e-158</td>
+          </tr>
+    
+          <tr>
+              <td>ANH11401.1</td>
+              <td>SceF</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001908/1">BGC0001908</a></td>
+              <td>Polyketide</td>
+              <td>69.0</td>
+              <td>97.4</td>
+              <td>438.0</td>
+              <td>8.9e-123</td>
+          </tr>
+    
+          <tr>
+              <td>AKD43762.1</td>
+              <td>HerP</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001349/1">BGC0001349</a></td>
+              <td>NRP + Polyketide</td>
+              <td>70.0</td>
+              <td>97.4</td>
+              <td>431.0</td>
+              <td>8.3e-121</td>
+          </tr>
+    
+          <tr>
+              <td>ACO94469.1</td>
+              <td>putative_L-amino_acid_amidase/proline_iminopeptidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000029/1">BGC0000029</a></td>
+              <td>Polyketide:Modular type I</td>
+              <td>67.0</td>
+              <td>97.7</td>
+              <td>417.0</td>
+              <td>2.1e-116</td>
+          </tr>
+    
+          <tr>
+              <td>ACO94497.1</td>
+              <td>putative_L-amino_acid_amidase/proline_iminopeptidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000097/1">BGC0000097</a></td>
+              <td>Polyketide:Modular type I</td>
+              <td>66.0</td>
+              <td>96.7</td>
+              <td>411.0</td>
+              <td>1.5e-114</td>
+          </tr>
+    
+          <tr>
+              <td>BAO66540.1</td>
+              <td>putative_proline_iminopeptidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000042/1">BGC0000042</a></td>
+              <td>Polyketide</td>
+              <td>67.0</td>
+              <td>96.7</td>
+              <td>410.0</td>
+              <td>2.6e-114</td>
+          </tr>
+    
+          <tr>
+              <td>BAR73018.1</td>
+              <td>putative_amidohydrolase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001194/1">BGC0001194</a></td>
+              <td>Polyketide</td>
+              <td>64.0</td>
+              <td>97.4</td>
+              <td>401.0</td>
+              <td>1.6e-111</td>
+          </tr>
+    
+          <tr>
+              <td>BAD08367.1</td>
+              <td>proline_iminopeptidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000167/1">BGC0000167</a></td>
+              <td>Polyketide</td>
+              <td>63.0</td>
+              <td>97.4</td>
+              <td>399.0</td>
+              <td>3.5e-111</td>
+          </tr>
+    
+          <tr>
+              <td>sipL5</td>
+              <td>L-proline_amide_hydrolase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001452/1">BGC0001452</a></td>
+              <td>Polyketide</td>
+              <td>64.0</td>
+              <td>97.4</td>
+              <td>397.0</td>
+              <td>2.3e-110</td>
+          </tr>
+    
+          <tr>
+              <td>AWR88413.1</td>
+              <td>putative_haloalkane_dehalogenase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001522/1">BGC0001522</a></td>
+              <td>Polyketide</td>
+              <td>63.0</td>
+              <td>97.4</td>
+              <td>390.0</td>
+              <td>2.8e-108</td>
+          </tr>
+    
+          <tr>
+              <td>OAP25801.1</td>
+              <td>L-amino_acid_amidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001658/1">BGC0001658</a></td>
+              <td>Polyketide</td>
+              <td>62.0</td>
+              <td>97.4</td>
+              <td>387.0</td>
+              <td>2.4e-107</td>
+          </tr>
+    
+          <tr>
+              <td>BAP34711.1</td>
+              <td>proline_iminopeptidase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000078/1">BGC0000078</a></td>
+              <td>Polyketide</td>
+              <td>63.0</td>
+              <td>98.4</td>
+              <td>386.0</td>
+              <td>5.2e-107</td>
+          </tr>
+    
+          <tr>
+              <td>BAV56008.1</td>
+              <td>amidohydrolase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001597/1">BGC0001597</a></td>
+              <td>Polyketide</td>
+              <td>62.0</td>
+              <td>96.4</td>
+              <td>369.0</td>
+              <td>5.1e-102</td>
+          </tr>
+    
+          <tr>
+              <td>AAN85523.1</td>
+              <td>polyketide_synthase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001101/1">BGC0001101</a></td>
+              <td>NRP + Polyketide:Modular type I + Polyketide:Trans-AT type I</td>
+              <td>26.0</td>
+              <td>66.7</td>
+              <td>61.0</td>
+              <td>3.9e-09</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>

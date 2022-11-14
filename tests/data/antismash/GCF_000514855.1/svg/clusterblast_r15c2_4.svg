@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" height="230" width="800" viewBox="0 0 800 230" preserveAspectRatio="none"  >
+<g label="Query sequence" class="clusterblast-cluster"  >
+<text x="5" y="20" class="clusterblast-acc"  >
+Query sequence</text>
+<line x1="10" y1="35" x2="778.0" y2="35" style="stroke-width:1; stroke:grey; "  />
+<polygon points="159,40 175,40 180,35 175,30 159,30 159,40 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0114740&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 87868 - 88129" locus_tag="B113_RS0114740" class="clusterblast-orf" id="dummy-2_q0_0_all"  />
+<polygon points="180,40 265,40 270,35 265,30 180,30 180,40 " style="fill:#4dd815; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0114745&lt;/b&gt;&lt;br&gt;SDR family oxidoreductase&lt;br&gt;Location: 88125 - 89226" locus_tag="B113_RS0114745" class="clusterblast-orf" id="dummy-2_q1_0_all"  />
+<polygon points="270,40 345,40 350,35 345,30 270,30 270,40 " style="fill:#1585d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0114750&lt;/b&gt;&lt;br&gt;nucleoside-diphosphate kinase&lt;br&gt;Location: 89222 - 90203" locus_tag="B113_RS0114750" class="clusterblast-orf" id="dummy-2_q2_0_all"  />
+<polygon points="347,40 419,40 424,35 419,30 347,30 347,40 " style="fill:#d815bc; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0114755&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 90169 - 91108" locus_tag="B113_RS0114755" class="clusterblast-orf" id="dummy-2_q3_0_all"  />
+<polygon points="424,40 492,40 497,35 492,30 424,30 424,40 " style="fill:#d8bc15; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0114760&lt;/b&gt;&lt;br&gt;LLM class F420-dependent oxidoreductase&lt;br&gt;Location: 91107 - 91995" locus_tag="B113_RS0114760" class="clusterblast-orf" id="dummy-2_q4_0_all"  />
+<polygon points="497,40 570,40 575,35 570,30 497,30 497,40 " style="fill:#15d885; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS0114765&lt;/b&gt;&lt;br&gt;A-factor biosynthesis protein&lt;br&gt;Location: 91991 - 92951" locus_tag="B113_RS0114765" class="clusterblast-orf" id="dummy-2_q5_0_all"  />
+<polygon points="610,40 617,40 622,35 617,30 610,30 610,40 " style="fill:#4d15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;B113_RS27175&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 93374 - 93517" locus_tag="B113_RS27175" class="clusterblast-orf" id="dummy-2_q6_0_all"  />
+</g>
+<g label="NZ_KB905359" description="NZ_KB905359 (5232011-5242971): Salinispora pacifica DSM 45544 Salpac3DRAFT Sc... (53% of genes show similarity), butyrolactone" class="clusterblast-cluster"  >
+<text x="5" y="70" class="clusterblast-acc"  >
+<a xlink:href="https://antismash-db.secondarymetabolites.org/area.html?acc=NZ_KB905359&amp;start=5232011&amp;end=5242971" target="_blank">NZ_KB905359 (5232011-5242971)</a>: Salinispora pacifica DSM 45544 Salpac3DRAFT Sc... (53% of genes show similarity), butyrolactone</text>
+<line x1="10" y1="85" x2="778.0" y2="85" style="stroke-width:1; stroke:grey; "  />
+</g>
+<g id="a2_000"  >
+<polygon points="0,90 16,90 21,85 16,80 0,80 0,90 " style="fill:#d81515; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0124035&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 5242094 - 5241834&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0114740&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 170&lt;br&gt;E-value: 9.8e-41" locus_tag="SALPAC3_RS0124035" class="clusterblast-orf" id="dummy-2_h2_4_0"  />
+</g>
+<g id="a2_001"  >
+<polygon points="21,90 106,90 111,85 106,80 21,80 21,90 " style="fill:#4dd815; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0124030&lt;/b&gt;&lt;br&gt;SDR family oxidoreductase&lt;br&gt;Location: 5241837 - 5240737&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0114745&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 715&lt;br&gt;E-value: 3.5e-204" locus_tag="SALPAC3_RS0124030" class="clusterblast-orf" id="dummy-2_h2_4_1"  />
+</g>
+<g id="a2_002"  >
+<polygon points="110,90 186,90 191,85 186,80 110,80 110,90 " style="fill:#1585d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0124025&lt;/b&gt;&lt;br&gt;nucleoside-diphosphate kinase&lt;br&gt;Location: 5240740 - 5239760&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0114750&lt;/b&gt;&lt;br&gt;Percentage identity: 100&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 644&lt;br&gt;E-value: 3.9e-183" locus_tag="SALPAC3_RS0124025" class="clusterblast-orf" id="dummy-2_h2_4_2"  />
+</g>
+<g id="a2_003"  >
+<polygon points="188,90 260,90 265,85 260,80 188,80 188,90 " style="fill:#d815bc; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0124020&lt;/b&gt;&lt;br&gt;hypothetical protein&lt;br&gt;Location: 5239793 - 5238855&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0114755&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 594&lt;br&gt;E-value: 7.6e-168" locus_tag="SALPAC3_RS0124020" class="clusterblast-orf" id="dummy-2_h2_4_3"  />
+</g>
+<g id="a2_004"  >
+<polygon points="265,90 333,90 338,85 333,80 265,80 265,90 " style="fill:#d8bc15; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0124015&lt;/b&gt;&lt;br&gt;LLM class F420-dependent oxidoreductase&lt;br&gt;Location: 5238855 - 5237968&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0114760&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 586&lt;br&gt;E-value: 2e-165" locus_tag="SALPAC3_RS0124015" class="clusterblast-orf" id="dummy-2_h2_4_4"  />
+</g>
+<g id="a2_005"  >
+<polygon points="337,90 411,90 416,85 411,80 337,80 337,90 " style="fill:#15d885; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0124010&lt;/b&gt;&lt;br&gt;A-factor biosynthesis protein&lt;br&gt;Location: 5237971 - 5237012&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS0114765&lt;/b&gt;&lt;br&gt;Percentage identity: 99&lt;br&gt;Percentage coverage: 100&lt;br&gt;BLAST bit score: 625&lt;br&gt;E-value: 2.4e-177" locus_tag="SALPAC3_RS0124010" class="clusterblast-orf" id="dummy-2_h2_4_5"  />
+</g>
+<g id="a2_006"  >
+<polygon points="439,90 443,90 448,85 443,80 439,80 439,90 " style="fill:#4d15d8; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS28120&lt;/b&gt;&lt;br&gt;alpha/beta hydrolase&lt;br&gt;Location: 5236737 - 5236624&lt;br&gt;&lt;br&gt;&lt;b&gt;BlastP hit with B113_RS27175&lt;/b&gt;&lt;br&gt;Percentage identity: 94&lt;br&gt;Percentage coverage: 77&lt;br&gt;BLAST bit score: 75&lt;br&gt;E-value: 1.4e-12" locus_tag="SALPAC3_RS28120" class="clusterblast-orf" id="dummy-2_h2_4_6"  />
+</g>
+<g id="a2_007"  >
+<polygon points="449,85 454,80 548,80 548,90 454,90 449,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0124005&lt;/b&gt;&lt;br&gt;FAD-dependent oxidoreductase&lt;br&gt;Location: 5236606 - 5235407" locus_tag="SALPAC3_RS0124005" class="clusterblast-orf" id="dummy-2_h2_4_7"  />
+</g>
+<g id="a2_008"  >
+<polygon points="555,90 599,90 604,85 599,80 555,80 555,90 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0124000&lt;/b&gt;&lt;br&gt;TetR/AcrR family transcriptional regulator&lt;br&gt;Location: 5235312 - 5234722" locus_tag="SALPAC3_RS0124000" class="clusterblast-orf" id="dummy-2_h2_4_8"  />
+</g>
+<g id="a2_009"  >
+<polygon points="610,85 615,80 678,80 678,90 615,90 610,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0123995&lt;/b&gt;&lt;br&gt;trypsin-like serine protease&lt;br&gt;Location: 5234642 - 5233821" locus_tag="SALPAC3_RS0123995" class="clusterblast-orf" id="dummy-2_h2_4_9"  />
+</g>
+<g id="a2_0010"  >
+<polygon points="721,85 726,80 746,80 746,90 726,90 721,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0123990&lt;/b&gt;&lt;br&gt;30S ribosomal protein S14&lt;br&gt;Location: 5233287 - 5232982" locus_tag="SALPAC3_RS0123990" class="clusterblast-orf" id="dummy-2_h2_4_10"  />
+</g>
+<g id="a2_0011"  >
+<polygon points="746,85 751,80 760,80 760,90 751,90 746,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0123985&lt;/b&gt;&lt;br&gt;50S ribosomal protein L33&lt;br&gt;Location: 5232980 - 5232813" locus_tag="SALPAC3_RS0123985" class="clusterblast-orf" id="dummy-2_h2_4_11"  />
+</g>
+<g id="a2_0012"  >
+<polygon points="760,85 765,80 780,80 780,90 765,90 760,85 " style="fill:white; stroke-width:1; stroke:black; " description="&lt;b&gt;SALPAC3_RS0123980&lt;/b&gt;&lt;br&gt;50S ribosomal protein L28&lt;br&gt;Location: 5232813 - 5232577" locus_tag="SALPAC3_RS0123980" class="clusterblast-orf" id="dummy-2_h2_4_12"  />
+</g>
+</svg>

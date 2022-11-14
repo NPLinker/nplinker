@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+
+<script type="text/javascript" >
+var counter = 1;
+function addInput(divName){
+     var newdiv = document.createElement('div');
+     newdiv.innerHTML = "<b>Locus " + (counter + 1) + "</b><br> GenBank accession: <input type='text' required name='myInputs[]'> Start nt: <input type='number' name='myStartCoords[]' placeholder='N/A'> End nt: <input type='number' name='myEndCoords[]' placeholder='N/A'> <br><br>";
+     document.getElementById(divName).appendChild(newdiv);
+     counter++;
+}
+</script>
+
+<script>
+$(document).ready(function()
+    {
+        $("#myTable").tablesorter();
+    }
+);
+
+</script>
+<style>
+table {
+    border-width: thin;
+    border-spacing: 2px;
+    border-style: none;
+    border-color: black;
+}
+</style>
+</head>
+<body>
+    <table id="myTable" class="tablesorter" border=1>
+    <thead>
+    <tr>
+        <th>MIBiG Protein</th>
+        <th>Description</th>
+        <th>MIBiG Cluster</th>
+        <th>MiBiG Product</th>
+        <th>% ID</th>
+        <th>% Coverage</th>
+        <th>BLAST Score</th>
+        <th>E-value</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+          <tr>
+              <td>AXO35200.1</td>
+              <td>diphosphomevalonate_decarboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001848/1">BGC0001848</a></td>
+              <td>Other</td>
+              <td>71.0</td>
+              <td>100.9</td>
+              <td>431.0</td>
+              <td>1.5e-120</td>
+          </tr>
+    
+          <tr>
+              <td>EWM63036.1</td>
+              <td>diphosphomevalonate_decarboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000679/1">BGC0000679</a></td>
+              <td>Terpene</td>
+              <td>70.0</td>
+              <td>100.6</td>
+              <td>421.0</td>
+              <td>9.1e-118</td>
+          </tr>
+    
+          <tr>
+              <td>AGH68893.1</td>
+              <td>mevalonate_diphosphate_decarboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001083/1">BGC0001083</a></td>
+              <td>Terpene + Polyketide:Type III</td>
+              <td>69.0</td>
+              <td>100.6</td>
+              <td>410.0</td>
+              <td>2.7e-114</td>
+          </tr>
+    
+          <tr>
+              <td>AHW81462.1</td>
+              <td>EpaC</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000934/1">BGC0000934</a></td>
+              <td>Other:Phenazine</td>
+              <td>68.0</td>
+              <td>100.9</td>
+              <td>400.0</td>
+              <td>2.2e-111</td>
+          </tr>
+    
+          <tr>
+              <td>ABS50447.1</td>
+              <td>putative_mevalonate_decarboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001079/1">BGC0001079</a></td>
+              <td>Terpene + Polyketide:Type III</td>
+              <td>66.0</td>
+              <td>101.5</td>
+              <td>396.0</td>
+              <td>5.4e-110</td>
+          </tr>
+    
+          <tr>
+              <td>CAX48657.1</td>
+              <td>diphosphomevalonate_decarboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001080/1">BGC0001080</a></td>
+              <td>Other:Phenazine</td>
+              <td>66.0</td>
+              <td>101.5</td>
+              <td>390.0</td>
+              <td>2.2e-108</td>
+          </tr>
+    
+          <tr>
+              <td>BAD86801.1</td>
+              <td>mevalonate_diphosphate_decarboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000286/1">BGC0000286</a></td>
+              <td>Polyketide</td>
+              <td>65.0</td>
+              <td>101.2</td>
+              <td>379.0</td>
+              <td>5.2e-105</td>
+          </tr>
+    
+          <tr>
+              <td>BAE78978.1</td>
+              <td>mevalonate_diphosphate_decarboxylase</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0001078/1">BGC0001078</a></td>
+              <td>Terpene + Polyketide</td>
+              <td>66.0</td>
+              <td>93.8</td>
+              <td>358.0</td>
+              <td>9.5e-99</td>
+          </tr>
+    
+          <tr>
+              <td>ABS50474.1</td>
+              <td>NapT5</td>
+              <td><a href="https://mibig.secondarymetabolites.org/go/BGC0000652/1">BGC0000652</a></td>
+              <td>Terpene</td>
+              <td>63.0</td>
+              <td>54.8</td>
+              <td>205.0</td>
+              <td>1e-52</td>
+          </tr>
+    
+    </tbody>
+  </table>
+</body>
