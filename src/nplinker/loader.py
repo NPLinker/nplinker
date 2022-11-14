@@ -29,7 +29,7 @@ from nplinker.pairedomics.downloader import Downloader
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.strain_collection import StrainCollection
-
+from nplinker.genomics.antismash import AntismashBGCLoader
 
 try:
     from importlib.resources import files
@@ -547,10 +547,14 @@ class DatasetLoader():
         # having to manually fix this stupid problem, we will attempt to rename every .gbk file here
         # TODO is this something nplinker should do, or dataset authors??
         logger.debug("\nLoading genomics starts...")
+
+        #----------------------------------------------------------------------
+        # CG: replace space with underscore for antismash folder and file names
+        # TODO:
+        # 1.[] move this part to antismash downloader as post-download process
+        # 2.[x] separete listing gbk files and renaming
+        #----------------------------------------------------------------------
         logger.debug('Collecting .gbk files (and possibly renaming)')
-        gbk_files = []
-        t = time.time()
-        renamed = 0
 
         # if the option is enabled, check for spaces in the folder names under
         # <dataset>/antismash and rename them, replacing spaces with underscores
@@ -566,29 +570,6 @@ class DatasetLoader():
                             'Renaming antiSMASH folder "{}" to "{}" to remove spaces! (suppress with ignore_spaces = true in config file)'
                             .format(d, d.replace(' ', '_')))
 
-        # now want to gather a list of all .gbk files, and if necessary+enabled
-        # rename them to replace spaces with underscores
-        for root, dirs, files in os.walk(self.antismash_dir):
-            for f in files:
-                if f.lower().endswith('.gbk'):
-                    fullpath = os.path.join(root, f)
-
-                    if not ignore_spaces and fullpath.find(' ') != -1:
-                        logger.debug(
-                            'Spaces found in antiSMASH file "{}", renaming it'.
-                            format(fullpath))
-                        newpath = fullpath.replace(' ', '_')
-                        os.rename(fullpath, newpath)
-                        fullpath = newpath
-                        renamed += 1
-
-                    gbk_files.append(fullpath)
-
-        logger.debug(f'.gbk collection took {time.time() - t:.3f}s')
-        if renamed > 0:
-            logger.info(
-                '{}/{} .gbk files were renamed to remove spaces!'.format(
-                    renamed, len(gbk_files)))
 
         # both the bigscape and mibig_json dirs expected by nplinker may not exist at this point. in some
         # cases this will cause an error later in the process, but this can also potentially be
@@ -684,20 +665,17 @@ class DatasetLoader():
             else:
                 self.product_types.append(prodtype)
 
-        # generate a cache of antismash filenames to make matching them to BGC objects easier
-        self.antismash_cache = {}
-        logger.debug('Generating antiSMASH filename cache...')
-        t = time.time()
-        for f in gbk_files:
-            path, filename = os.path.split(f)
-            # cache with key set to bare filename with no extension
-            basename = os.path.splitext(filename)[0]
-            self.antismash_cache[basename] = f
-            # also insert it with the folder name as matching on filename isn't always enough apparently
-            parent = os.path.split(path)[-1]
-            self.antismash_cache[f'{parent}_{basename}'] = f
-        logger.debug(f'Cache generation took {time.time() - t:.3f}s')
 
+
+        #----------------------------------------------------------------------
+        # CG: Parse AntiSMASH dir
+        #----------------------------------------------------------------------
+        logger.debug('Parsing AntiSMASH directory...')
+        antismash_bgc_loader = AntismashBGCLoader(self.antismash_dir)
+
+        #----------------------------------------------------------------------
+        # CG: load all bgcs and gcfs
+        #----------------------------------------------------------------------
         logger.debug(
             'loadBGC_from_cluster_files(antismash_dir={}, delimiters={})'.
             format(self.antismash_dir, self._antismash_delimiters))
@@ -710,7 +688,7 @@ class DatasetLoader():
             self.mibig_bgc_dict,
             self.mibig_json_dir,
             antismash_dir=self.antismash_dir,
-            antismash_filenames=self.antismash_cache,
+            antismash_filenames=antismash_bgc_loader.bgc_files(),
             antismash_format=self._antismash_format,
             antismash_delimiters=self._antismash_delimiters)
 
