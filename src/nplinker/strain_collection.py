@@ -5,7 +5,7 @@ from .strains import Strain
 from .utils import list_dirs
 from .utils import list_files
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 class StrainCollection():

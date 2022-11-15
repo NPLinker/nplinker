@@ -15,7 +15,7 @@
 from nplinker.logconfig import LogConfig
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 # CG: TODO refactor this class to abstract base class

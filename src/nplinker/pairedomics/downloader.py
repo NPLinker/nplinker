@@ -32,7 +32,7 @@ from nplinker.strain_collection import StrainCollection
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 from .runbigscape import run_bigscape
 

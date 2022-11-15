@@ -18,7 +18,7 @@ import sys
 from ..logconfig import LogConfig
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 # NOTE: for simplicity this is currently written with assumption it will only be
 # called in context of nplinker Docker image, where bigscape should be available

@@ -19,7 +19,7 @@ from ...parsers.mgf import LoadMGF
 from .rosetta_functions import fast_cosine
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 class SpecLib():

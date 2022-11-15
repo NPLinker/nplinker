@@ -30,7 +30,7 @@ from .scoring.np_class_scoring import NPClassScoring
 from .scoring.rosetta_scoring import RosettaScoring
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 class NPLinker():

@@ -4,7 +4,7 @@ import re
 from nplinker.logconfig import LogConfig
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 # compile a regex for matching .mzXML and .mzML strings
 RE_MZML_MZXML = re.compile('.mzXML|.mzML')

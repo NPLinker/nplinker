@@ -1,7 +1,7 @@
-import logging
+from nplinker.logconfig import LogConfig
 
 
-logging.getLogger(__name__).addHandler(logging.NullHandler())
+LogConfig.getLogger(__name__)
 
 __author__ = "Cunliang Geng"
 __email__ = "c.geng@esciencecenter.nl"

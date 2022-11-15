@@ -4,7 +4,7 @@ from nplinker.strains import Strain
 from .mibig_bgc import MibigBGC
 from .mibig_metadata import MibigMetadata
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 class MibigBGCLoader():

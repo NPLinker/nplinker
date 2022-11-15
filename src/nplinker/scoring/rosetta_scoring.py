@@ -8,7 +8,7 @@ from nplinker.scoring.object_link import ObjectLink
 from nplinker.scoring.rosetta.rosetta import Rosetta
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 class RosettaScoring(ScoringMethod):
@@ -49,7 +49,7 @@ class RosettaScoring(ScoringMethod):
             score_thresh = rc.get('score_thresh', Rosetta.DEF_SCORE_THRESH)
             min_match_peaks = rc.get('min_match_peaks',
                                      Rosetta.DEF_MIN_MATCH_PEAKS)
-                                     
+
         return ms1_tol,ms2_tol,score_thresh,min_match_peaks
 
     def _include_hit(self, hit):
@@ -131,7 +131,7 @@ class RosettaScoring(ScoringMethod):
                             # have one, hybrid BGCs will have more)
                         for gcf in hit.bgc.parents:
                             results = self._insert_result_met(
-                                    results, spec, gcf, hit)                                
+                                    results, spec, gcf, hit)
         return results
 
     def _collect_results_bgc(self, objects, ro_hits, results):

@@ -24,7 +24,7 @@ from .singleton_family import SingletonFamily
 from .spectrum import Spectrum
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 def mols_to_spectra(ms2, metadata):

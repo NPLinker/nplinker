@@ -12,7 +12,7 @@ from nplinker.scoring.object_link import ObjectLink
 from .linking.data_linking import DataLinks
 from .linking.data_linking import LinkFinder
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 class MetcalfScoring(ScoringMethod):

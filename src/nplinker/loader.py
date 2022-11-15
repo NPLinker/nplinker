@@ -36,7 +36,7 @@ try:
 except ImportError:
     from importlib_resources import files
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 def find_via_glob(path, file_type, optional=False):

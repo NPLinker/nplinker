@@ -26,7 +26,7 @@ try:
 except ImportError:
     from importlib_resources import files
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 class Args():

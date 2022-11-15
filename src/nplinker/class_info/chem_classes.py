@@ -20,7 +20,7 @@ from canopus.classifications_to_gnps import analyse_canopus
 from ..logconfig import LogConfig
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 # load Chem_class_predictions (canopus, molnetenhancer are loaded)

@@ -4,7 +4,7 @@ from .aa_pred import predict_aa
 from .genomics_utilities import get_smiles
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 CLUSTER_REGION_REGEX = re.compile('(.+?)\\.(cluster|region)(\\d+).gbk$')
 
