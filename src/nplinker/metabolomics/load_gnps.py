@@ -32,10 +32,9 @@ def _get_headers(filename: str) -> list[str]:
         list[str]: Columns names in header.
     """
     with open(filename) as f:
-        headers = f.readline().strip()
-        dl = find_delimiter(filename)
-        headers = headers.split(dl)
-        return headers
+        headers: str = f.readline().strip()
+        dl: str = find_delimiter(filename)
+        return headers.split(dl)
 
 
 
