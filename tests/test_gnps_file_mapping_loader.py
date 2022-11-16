@@ -19,7 +19,7 @@ def test_default(loader):
     [DATA_DIR / "nodes.tsv", 25935, 223, ["26c.mzXML", "26c.mzXML", "26c.mzXML"]]
 ])
 def test_load_mapping(filename, expected_length, spectrum_id, samples):
-    sut = GNPSFileMappingLoader(filename)
+    sut = GNPSFileMappingLoader(str(filename))
     actual = sut.mapping()
 
     assert actual[spectrum_id] == samples
