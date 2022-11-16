@@ -1,6 +1,5 @@
 import csv
-from io import TextIOWrapper
-from typing import Dict
+from typing import TextIO
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.IFileMappingLoader import IFileMappingLoader
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN
@@ -17,29 +16,29 @@ class GNPSFileMappingLoader(IFileMappingLoader):
 
     def __init__(self, filename: str):
         self._filename: str = filename
-        self._mapping: Dict[int, list[str]] = {}
+        self._mapping: dict[int, list[str]] = {}
         self._gnps_format = identify_gnps_format(filename, False)
 
         if self._gnps_format is GNPS_FORMAT_OLD_ALLFILES:
-            self.load_mapping_allfiles()
+            self._load_mapping_allfiles()
         elif self._gnps_format is GNPS_FORMAT_NEW_FBMN:
-            self.load_mapping_fbmn()
+            self._load_mapping_fbmn()
         else:
             raise NotImplementedError(
                 "%{gnps_format} reading not implemented.")
 
-    def mapping(self) -> Dict[int, list[str]]:
+    def mapping(self) -> dict[int, list[str]]:
         """Return mapping from spectrum id to files in which this spectrum occurs.
 
         Returns:
-            Dict[int, list[str]]: Mapping.
+            dict[int, list[str]]: Mapping from spectrum id to names of all files in which this spectrum occurs.
         """
         return self._mapping
 
-    def load_mapping_allfiles(self):
+    def _load_mapping_allfiles(self):
         """ Load mapping for GNPS 'AllFiles' style files. """
         with open(self._filename, mode='rt', encoding='utf-8') as file:
-            reader = self.dict_reader(file)
+            reader = self._get_dict_reader(file)
 
             for row in reader:
                 spectrum_id = int(row["cluster index"])
@@ -51,7 +50,7 @@ class GNPSFileMappingLoader(IFileMappingLoader):
 
                 self._mapping[spectrum_id] = samples
 
-    def dict_reader(self, file: TextIOWrapper) -> csv.DictReader:
+    def _get_dict_reader(self, file: TextIO) -> csv.DictReader:
         """Get a dict reader with matching delimiter for the passed file.
 
         Args:
@@ -66,10 +65,10 @@ class GNPSFileMappingLoader(IFileMappingLoader):
         reader = csv.DictReader(file, header, delimiter=delimiter)
         return reader
 
-    def load_mapping_fbmn(self):
+    def _load_mapping_fbmn(self):
         """ Load mapping for GNPS 'fbmn' style files. """
         with open(self._filename, mode='rt', encoding='utf-8') as file:
-            reader = self.dict_reader(file)
+            reader = self._get_dict_reader(file)
 
             for row in reader:
                 spectrum_id = int(row["row ID"])
