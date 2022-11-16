@@ -27,7 +27,7 @@ class StrainCollection():
         if strain.id in self._lookup:
             # if it already exists, just merge the set of aliases and update
             # lookup entries
-            existing = self.lookup(strain.id)
+            existing: Strain = self.lookup(strain.id)
             existing.aliases.update(strain.aliases)
             for alias in strain.aliases:
                 self._lookup[alias] = existing
