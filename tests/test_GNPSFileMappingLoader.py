@@ -1,6 +1,6 @@
 import pytest
 
-from nplinker.metabolomics.GNPSFileMappingLoader import GNPSFileMappingLoader
+from nplinker.metabolomics.gnps_file_mapping_loader import GNPSFileMappingLoader
 from tests import DATA_DIR
 
 @pytest.fixture
