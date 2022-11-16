@@ -2,8 +2,7 @@ import csv
 from typing import TextIO
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.abc import FileMappingLoaderBase
-from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN
-from nplinker.metabolomics.load_gnps import GNPS_FORMAT_OLD_ALLFILES
+from nplinker.metabolomics.load_gnps import GNPSFormat
 from nplinker.metabolomics.load_gnps import identify_gnps_format
 from nplinker.utils import find_delimiter
 
@@ -19,9 +18,9 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         self._mapping: dict[int, list[str]] = {}
         self._gnps_format = identify_gnps_format(filename, False)
 
-        if self._gnps_format is GNPS_FORMAT_OLD_ALLFILES:
+        if self._gnps_format is GNPSFormat.AllFiles:
             self._load_mapping_allfiles()
-        elif self._gnps_format is GNPS_FORMAT_NEW_FBMN:
+        elif self._gnps_format is GNPSFormat.fbmn:
             self._load_mapping_fbmn()
         else:
             raise NotImplementedError(

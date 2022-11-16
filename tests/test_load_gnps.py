@@ -1,8 +1,7 @@
 from itertools import chain
 
 import pytest
-from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN, _get_headers, _messy_strain_naming_lookup, _parse_mzxml_header
-from nplinker.metabolomics.load_gnps import GNPS_FORMAT_OLD_ALLFILES
+from nplinker.metabolomics.load_gnps import  _get_headers, _messy_strain_naming_lookup, _parse_mzxml_header, GNPSFormat
 from nplinker.metabolomics.load_gnps import identify_gnps_format
 from nplinker.metabolomics.load_gnps import _load_clusterinfo_old
 from nplinker.metabolomics.load_gnps import load_gnps
@@ -31,9 +30,9 @@ def test_load_gnps(spec_dict):
 
 
 @pytest.mark.parametrize("filename, gnps_format", [
-    [nodes_file, GNPS_FORMAT_OLD_ALLFILES],
-    [DATA_DIR / "nodes_mwe.csv", GNPS_FORMAT_OLD_ALLFILES],
-    [ DATA_DIR / "nodes_fbmn.csv", GNPS_FORMAT_NEW_FBMN]
+    [nodes_file, GNPSFormat.AllFiles],
+    [DATA_DIR / "nodes_mwe.csv", GNPSFormat.AllFiles],
+    [ DATA_DIR / "nodes_fbmn.csv", GNPSFormat.fbmn]
 ])
 def test_identify_gnps_format(filename, gnps_format):
     actual = identify_gnps_format(filename, None)
@@ -49,7 +48,7 @@ def test_load_clusterinfo_old(spec_dict):
 
 
     sut = _load_clusterinfo_old(
-        GNPS_FORMAT_OLD_ALLFILES,
+        GNPSFormat.AllFiles,
         strains,
         nodes_file,
         spec_dict

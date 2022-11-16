@@ -1,13 +1,14 @@
 import csv
 import os
 import re
-from typing import Any, Literal, Optional
+from enum import Enum
+from typing import Any
+from typing import Literal
 from deprecated import deprecated
-
 from nplinker.logconfig import LogConfig
+from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
-from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.utils import find_delimiter
 
 
@@ -20,11 +21,7 @@ RE_MZML_MZXML = re.compile('.mzXML|.mzML')
 # methods for parsing metabolomics data files
 #
 
-GNPS_FORMAT_UNKNOWN = 'unknown'
-GNPS_FORMAT_OLD_ALLFILES = 'allfiles'
-GNPS_FORMAT_OLD_UNIQUEFILES = 'uniquefiles'
-GNPS_FORMAT_NEW_FBMN = 'fbmn'
-
+GNPSFormat = Enum("GNPSFormat", ["Unknown", "AllFiles", "UniqueFiles", "fbmn"])
 
 def _get_headers(filename: str) -> list[str]:
     """Function to read headers from tab or comma separated table.
@@ -60,7 +57,7 @@ def identify_gnps_format(filename: str, has_quant_table: bool) -> Literal['unkno
     headers: list[str] = _get_headers(filename)
 
     if headers is None:
-        return GNPS_FORMAT_UNKNOWN
+        return GNPSFormat.Unknown
 
     # first, check for AllFiles
     if 'AllFiles' in headers:
@@ -68,24 +65,24 @@ def identify_gnps_format(filename: str, has_quant_table: bool) -> Literal['unkno
         # containing all the necessary info. The AllFiles column should contain pairs
         # of mzXML filenames and scan numbers in this format:
         #   filename1:scannumber1###filename2:scannumber2###...
-        return GNPS_FORMAT_OLD_ALLFILES
+        return GNPSFormat.AllFiles
     elif 'UniqueFileSources' in headers:
         # this is a slightly newer-style dataset, e.g. MSV000084771 on the platform
         # it still just has a single .tsv file, but AllFiles is apparently replaced
         # with a UniqueFileSources column. There is also a UniqueFileSourcesCount
         # column which just indicates the number of entries in the UniqueFileSources
         # column. If there are multiple entries the delimiter is a | character
-        return GNPS_FORMAT_OLD_UNIQUEFILES
+        return GNPSFormat.UniqueFiles
     elif has_quant_table:
         # if there is no AllFiles/UniqueFileSources, but we DO have a quantification
         # table file, that should indicate a new-style dataset like Carnegie
         # TODO check for the required header columns here too
-        return GNPS_FORMAT_NEW_FBMN
+        return GNPSFormat.fbmn
     elif len(list(filter(lambda x: "Peak area" in x, headers))) > 1:
-        return GNPS_FORMAT_NEW_FBMN
+        return GNPSFormat.fbmn
     else:
         # if we don't match any of the above cases then it's not a recognised format
-        return GNPS_FORMAT_UNKNOWN
+        return GNPSFormat.Unknown
 
 
 def _messy_strain_naming_lookup(mzxml: str, strains: StrainCollection) -> Strain|None:
@@ -255,9 +252,9 @@ def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, filename:
         reader = csv.reader(f, delimiter='\t')
         headers = next(reader)
         clu_index_index = headers.index('cluster index')
-        if gnps_format == GNPS_FORMAT_OLD_ALLFILES:
+        if gnps_format == GNPSFormat.AllFiles:
             mzxml_index = headers.index('AllFiles')
-        elif gnps_format == GNPS_FORMAT_OLD_UNIQUEFILES:
+        elif gnps_format == GNPSFormat.UniqueFiles:
             mzxml_index = headers.index('UniqueFileSources')
         else:
             raise Exception(f'Unexpected GNPS format {gnps_format}')
@@ -265,7 +262,7 @@ def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, filename:
         for line in reader:
             # get the values of the important columns
             clu_index = int(line[clu_index_index])
-            if gnps_format == GNPS_FORMAT_OLD_UNIQUEFILES:
+            if gnps_format == GNPSFormat.UniqueFiles:
                 mzxmls = line[mzxml_index].split('|')
             else:
                 mzxmls = line[mzxml_index].split('###')
@@ -275,7 +272,7 @@ def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, filename:
 
             for data in mzxmls:
                 # TODO ok to ignore scan number if available?
-                mzxml = data if gnps_format == GNPS_FORMAT_OLD_UNIQUEFILES else data.split(
+                mzxml = data if gnps_format == GNPSFormat.UniqueFiles else data.split(
                     ':')[0]
 
                 # TODO is this OK/sensible?
@@ -530,12 +527,12 @@ def load_gnps(strains: StrainCollection, nodes_file: str, quant_table_file: str,
                                         is not None)
     logger.debug('Nodes_file: {}, quant_table_exists?: {}'.format(
         nodes_file, quant_table_file is None))
-    if gnps_format == GNPS_FORMAT_UNKNOWN:
+    if gnps_format == GNPSFormat.Unknown:
         raise Exception('Unknown/unsupported GNPS data format')
 
     # now things depend on the dataset format
     # if we don't have a quantification table, must be older-style dataset (or unknown format)
-    if gnps_format != GNPS_FORMAT_NEW_FBMN and quant_table_file is None:
+    if gnps_format != GNPSFormat.fbmn and quant_table_file is None:
         logger.info('Found older-style GNPS dataset, no quantification table')
         unknown_strains = _load_clusterinfo_old(gnps_format, strains,
                                                 nodes_file, spec_dict)
