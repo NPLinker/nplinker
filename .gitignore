@@ -3,6 +3,8 @@
 .eclipse
 .vscode/
 
+.mypy_cache
+
 # Mac
 .DS_Store
 

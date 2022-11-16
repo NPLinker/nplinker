@@ -1,5 +1,4 @@
 import csv
-from typing import Tuple, List
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.abc import MolecularFamilyLoaderBase
 from nplinker.metabolomics.molecular_family import MolecularFamily
@@ -11,7 +10,7 @@ logger = LogConfig.getLogger(__file__)
 
 class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
     def __init__(self, filename: str):
-        self._families: List[MolecularFamily] = []
+        self._families: list[MolecularFamily] = []
         
         for family_id, spectra_ids in _load_molecular_families(filename).items():
             if family_id == -1:
@@ -24,7 +23,7 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
                 family.spectra_ids = spectra_ids
                 self._families.append(family)
     
-    def families(self) -> List[MolecularFamily]:
+    def families(self) -> list[MolecularFamily]:
         return self._families
 
 
@@ -59,7 +58,7 @@ def _load_molecular_families(filename: str) -> dict[int, set[int]]:
 
     return families
 
-def _sniff_column_indices(filename: str, headers: list[str]) -> Tuple[int, int, int]:
+def _sniff_column_indices(filename: str, headers: list[str]) -> tuple[int, int, int]:
     """Get indices of required columns from the file.
 
     Args:
