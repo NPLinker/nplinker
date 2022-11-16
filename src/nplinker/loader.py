@@ -581,7 +581,7 @@ class DatasetLoader():
 
         logger.debug(f'MibigBGCLoader({self.mibig_json_dir})')
         mibig_bgc_loader = MibigBGCLoader(self.mibig_json_dir)
-        self.mibig_bgc_dict = mibig_bgc_loader.bgcs
+        self.mibig_bgc_dict = mibig_bgc_loader.get_bgcs()
 
         # add mibig bgc strains
         for bgc in self.mibig_bgc_dict.values():
