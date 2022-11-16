@@ -1,7 +1,7 @@
 import os
 
 import pytest
-from nplinker.metabolomics.GNPSMolecularFamilyLoader import GNPSMolecularFamilyLoader
+from nplinker.metabolomics.gnps_molecular_family_loader import GNPSMolecularFamilyLoader
 from . import DATA_DIR
 
 @pytest.fixture
