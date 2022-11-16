@@ -1,5 +1,4 @@
 from itertools import chain
-from typing import Optional
 
 import pytest
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN, _get_headers, _messy_strain_naming_lookup, _parse_mzxml_header
@@ -77,7 +76,7 @@ def test_load_clusterinfo_old(spec_dict):
     ["CNB527", None],
     ["GCF_000514775.1", "9b.mzXML"]
 ])
-def test_messy_strain_naming_lookup(collection_from_file: StrainCollection, messy_alias: str, expected: Optional[str]):
+def test_messy_strain_naming_lookup(collection_from_file: StrainCollection, messy_alias: str, expected: str|None):
     actual = _messy_strain_naming_lookup(messy_alias, collection_from_file)
 
     assert actual == collection_from_file.lookup(expected)

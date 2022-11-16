@@ -1,6 +1,5 @@
 import csv
 import os
-from typing import Dict, Optional, Union
 from .logconfig import LogConfig
 from .strains import Strain
 
@@ -12,8 +11,8 @@ class StrainCollection():
 
     def __init__(self):
         self._strains: list[Strain] = []
-        self._lookup: Dict[str, Strain] = {}
-        self._lookup_indices: Dict[int, Strain] = {}
+        self._lookup: dict[str, Strain] = {}
+        self._lookup_indices: dict[int, Strain] = {}
 
     def add(self, strain: Strain):
         """Add the strain to the aliases.
@@ -64,11 +63,11 @@ class StrainCollection():
         for strain in to_remove:
             self.remove(strain)
 
-    def __contains__(self, strain_id: Union[str, Strain]) -> bool:
+    def __contains__(self, strain_id: str|Strain) -> bool:
         """Check if the strain or strain id are contained in the lookup table.
 
         Args:
-            strain_id(Union[str, Strain]): Strain or strain id to look up.
+            strain_id(str|Strain): Strain or strain id to look up.
 
         Returns:
             bool: Whether the strain is contained in the collection.
@@ -96,7 +95,7 @@ class StrainCollection():
         """
         return self._lookup_indices[index]
 
-    def lookup(self, strain_id: str, default=None) -> Optional[Strain]:
+    def lookup(self, strain_id: str, default=None) -> Strain|None:
         """Check whether the strain id is contained in the lookup table. If so, return the strain, otherwise return `default`.
 
         Args:
