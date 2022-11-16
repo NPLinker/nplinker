@@ -28,14 +28,14 @@ class GNPSMolecularFamilyLoader(IMolecularFamilyLoader):
         return self._families
 
 
-def _load_molecular_families(filename: str) -> dict:
+def _load_molecular_families(filename: str) -> dict[int, set[int]]:
     """Load ids of molecular families and corresponding spectra from GNPS output file.
 
     Args:
         filename(str): Path to GNPS .pairsinfo file.
 
     Returns:
-        dict: Mapping from molecular family/cluster id to the spectra ids.
+        dict[int, set[int]]: Mapping from molecular family/cluster id to the spectra ids.
     """
     logger.debug('loading edges file: %s', filename)
 
