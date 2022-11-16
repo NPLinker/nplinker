@@ -379,7 +379,7 @@ def _parse_metadata_table(filename: str) -> dict[str, dict[str, str]]:
 
 
 def _load_clusterinfo_fbmn(strains: StrainCollection, nodes_file: str, extra_nodes_file: str,
-                           md_table_file: str, spec_dict: dict[int, Spectrum], ext_metadata_parsing: bool) -> tuple[dict[int, dict[str, str]], dict[str, int]]:
+                           md_table_file: str, spec_dict: dict[int, Spectrum], ext_metadata_parsing: bool) -> tuple[dict[int, dict[str, str|None]], dict[str, int]]:
     """Load the clusterinfo from a feature based molecular networking run output from GNPS.
 
     Args:
@@ -500,7 +500,7 @@ def _load_clusterinfo_fbmn(strains: StrainCollection, nodes_file: str, extra_nod
 
 
 def load_gnps(strains: StrainCollection, nodes_file: str, quant_table_file: str, metadata_table_file: str,
-              ext_metadata_parsing: str, spec_dict: dict[int, Spectrum]) -> dict[str, int]:
+              ext_metadata_parsing: bool, spec_dict: dict[int, Spectrum]) -> dict[str, int]:
     """Wrapper function to load information from GNPS outputs.
 
     Args:
@@ -508,7 +508,7 @@ def load_gnps(strains: StrainCollection, nodes_file: str, quant_table_file: str,
         nodes_file(str): Path to the file holding the cluster information.
         quant_table_file(str): Path to the quantification table.
         metadata_table_file(str): Path to the metadata table.
-        ext_metadata_parsing(str): Whether to use extended metadata parsing.
+        ext_metadata_parsing(bool): Whether to use extended metadata parsing.
         spec_dict(dict[int, Spectrum]): Mapping from int to spectra loaded from file.
 
     Raises:

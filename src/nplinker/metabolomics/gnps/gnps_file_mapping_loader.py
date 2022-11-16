@@ -61,8 +61,8 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         delimiter = find_delimiter(self._filename)
         reader = csv.reader(file, delimiter=delimiter)
         header: list[str] = next(reader)
-        reader = csv.DictReader(file, header, delimiter=delimiter)
-        return reader
+        dict_reader = csv.DictReader(file, header, delimiter=delimiter)
+        return dict_reader
 
     def _load_mapping_fbmn(self):
         """ Load mapping for GNPS 'fbmn' style files. """

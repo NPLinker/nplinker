@@ -17,7 +17,7 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
             if family_id == -1:
                 for spectrum_id in spectra_ids:
                     family = SingletonFamily()
-                    family.spectra_ids = [spectrum_id]
+                    family.spectra_ids = set([spectrum_id])
                     self._families.append(family)
             else:
                 family = MolecularFamily(family_id)
@@ -59,7 +59,7 @@ def _load_molecular_families(filename: str) -> dict[int, set[int]]:
 
     return families
 
-def _sniff_column_indices(filename: str, headers: str) -> Tuple[int, int, int]:
+def _sniff_column_indices(filename: str, headers: list[str]) -> Tuple[int, int, int]:
     """Get indices of required columns from the file.
 
     Args:
