@@ -95,19 +95,21 @@ class StrainCollection():
         """
         return self._lookup_indices[index]
 
-    def lookup(self, strain_id: str, default=None) -> Strain|None:
+    def lookup(self, strain_id: str) -> Strain:
         """Check whether the strain id is contained in the lookup table. If so, return the strain, otherwise return `default`.
+
+        Raises:
+            Exception if strain_id is not found.
 
         Args:
             strain_id(str): Strain id to lookup.
-            default (Strain, optional): Object to return otherwise. Defaults to None.
 
         Returns:
-            Optional[Strain]: Strain retrieved during lookup or object passed as default.
+            Strain: Strain retrieved during lookup or object passed as default.
         """
         if strain_id not in self._lookup:
             # logger.error('Strain lookup failed for "{}"'.format(strain_id))
-            return default
+            raise Exception(f'Strain lookup failed for "{strain_id}"')
 
         return self._lookup[strain_id]
 
