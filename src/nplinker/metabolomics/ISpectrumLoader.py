@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Iterable
+from collections.abc import Sequence
 
 from nplinker.metabolomics.spectrum import Spectrum
 
@@ -7,5 +7,5 @@ from nplinker.metabolomics.spectrum import Spectrum
 class ISpectrumLoader(ABC):
     
     @abstractmethod
-    def spectra(self) -> Iterable[Spectrum]:
+    def spectra(self) -> Sequence[Spectrum]:
         ...

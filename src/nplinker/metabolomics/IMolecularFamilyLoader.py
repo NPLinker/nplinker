@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Iterable
+from collections.abc import Sequence
 
 from nplinker.metabolomics.molecular_family import MolecularFamily
 
@@ -7,5 +7,5 @@ from nplinker.metabolomics.molecular_family import MolecularFamily
 class IMolecularFamilyLoader(ABC):
     
     @abstractmethod
-    def families(self) -> Iterable[MolecularFamily]:
+    def families(self) -> Sequence[MolecularFamily]:
         ...
