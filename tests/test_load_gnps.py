@@ -70,15 +70,22 @@ def test_load_clusterinfo_old(spec_dict):
 @pytest.mark.parametrize("messy_alias, expected", [
     ["42b.mzXML", "42b.mzXML"],
     ["42b.mzXML.copy", "42b.mzXML"],
-    ["blub", None],
     ["Salinispora arenicola CNB527_blub", "42b.mzXML"],
-    ["CNB527", None],
     ["GCF_000514775.1", "9b.mzXML"]
 ])
 def test_messy_strain_naming_lookup(collection_from_file: StrainCollection, messy_alias: str, expected: str|None):
     actual = _messy_strain_naming_lookup(messy_alias, collection_from_file)
 
     assert actual == collection_from_file.lookup(expected)
+
+@pytest.mark.parametrize("messy_alias", [
+    ["blub"],
+    ["CNB527"]
+])
+def test_messy_strain_naming_lookup_raises(collection_from_file: StrainCollection, messy_alias: str):
+    with pytest.raises(Exception):
+        _messy_strain_naming_lookup(messy_alias, collection_from_file)
+
 
 
 def test_parse_mzxml_header():

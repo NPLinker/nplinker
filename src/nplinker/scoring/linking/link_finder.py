@@ -19,8 +19,8 @@ except ImportError:
         'Warning: plotting functionality will not be available (missing matplotlib and/or seaborn)'
     )
 
-from ...logconfig import LogConfig
-from ...metabolomics import MolecularFamily
+from nplinker.logconfig import LogConfig
+from nplinker.metabolomics import MolecularFamily
 
 
 logger = LogConfig.getLogger(__file__)

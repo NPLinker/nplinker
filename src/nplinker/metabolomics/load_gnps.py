@@ -320,9 +320,6 @@ def _parse_metadata_table(filename: str) -> dict[str, dict[str, str]]:
         dict[str, dict[str, str]]: Parsed metadata, mapping from filenames to the metadata dictionary.
 
     """
-    if filename is None:
-        return None
-
     table = {}
     with open(filename) as f:
         reader = csv.reader(f, delimiter='\t')
@@ -331,10 +328,10 @@ def _parse_metadata_table(filename: str) -> dict[str, dict[str, str]]:
         # check the format is as expected
         if len(headers) < 3 or headers[0] != 'filename':
             # expecting at least 3 columns with the first being 'filename'
-            logger.warning(
+            logger.error(
                 'Unrecognised metadata table format in file "{}"'.format(
                     filename))
-            return None
+            raise Exception("Expecting at least 3 columns with the first being 'filename'")
 
         # find the column numbers we're interested in (can't rely on both of these being present)
         # ATTRIBUTE_SampleType, _Strain, _Medium, _Organism
@@ -382,7 +379,7 @@ def _parse_metadata_table(filename: str) -> dict[str, dict[str, str]]:
 
 
 def _load_clusterinfo_fbmn(strains: StrainCollection, nodes_file: str, extra_nodes_file: str,
-                           md_table_file: str, spec_dict: dict[int, Spectrum], ext_metadata_parsing: bool) -> tuple[dict[int, str], dict[str, int]]:
+                           md_table_file: str, spec_dict: dict[int, Spectrum], ext_metadata_parsing: bool) -> tuple[dict[int, dict[str, str]], dict[str, int]]:
     """Load the clusterinfo from a feature based molecular networking run output from GNPS.
 
     Args:

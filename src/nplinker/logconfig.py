@@ -14,20 +14,21 @@
 
 import logging
 import sys
+from typing_extensions import Self
 
 
 class LogConfig():
 
-    active_loggers = {}
+    active_loggers: dict[Self, logging.Logger] = {}
     logfmt = '%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d, %(message)s'
     default_loglevel = logging.INFO
     # default destination for new Loggers
     default_logdest = logging.StreamHandler(sys.stdout)
     # additional destinations to be added to new Loggers
-    additional_logdests = []
+    additional_logdests: list[logging.Logger] = []
 
     @staticmethod
-    def getLogger(obj, level=default_loglevel, dest=default_logdest):
+    def getLogger(obj: Self, level=default_loglevel, dest=default_logdest) -> logging.Logger:
         """Return a logging.Logger associated with the object <obj>.
 
         The Logger's level and dest values will be set to the corresponding

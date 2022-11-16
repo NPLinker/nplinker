@@ -71,7 +71,9 @@ def test_lookup_index_exception(collection: StrainCollection):
 def test_remove(collection: StrainCollection, strain: Strain):
     collection.remove(strain)
 
-    assert collection.lookup(strain.id) == None
+    with pytest.raises(Exception):
+        collection.lookup(strain.id)
+    
     assert strain not in collection
 
     # needs fixing, see #90
