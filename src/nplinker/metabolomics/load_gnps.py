@@ -486,12 +486,13 @@ def _load_clusterinfo_fbmn(strains: StrainCollection, nodes_file: str, extra_nod
 
             # create a new strain object if the intensity value is a float > 0
             v = _md_convert(v)
-            if strain_name in strains and isinstance(v, float) and v > 0:
+            if strain_name in strains and isinstance(v, float) and float(v) > 0:
                 # find the strain object, and add the growth medium + intensity to it. the
                 # growth medium will only be set if extended_metadata_table_parsing is
                 # enabled in the config file and the metadata table file contains that info
+                v_float = float(v)
                 strain = strains.lookup(strain_name)
-                spectrum.add_strain(strain, growth_medium, v)
+                spectrum.add_strain(strain, growth_medium, v_float)
 
             # record this as an entry in the metadata dict as well
             spectrum.metadata[k] = v
