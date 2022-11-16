@@ -5,7 +5,7 @@ class MolecularFamily():
         self.family_id = family_id
         self.spectra = []
         self.family = None
-        self.spectra_ids: set = set()
+        self.spectra_ids: set[int] = set()
 
     # def has_strain(self, strain):
     #     for spectrum in self.spectra:
