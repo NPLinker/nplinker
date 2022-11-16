@@ -83,7 +83,7 @@ def test_messy_strain_naming_lookup(collection_from_file: StrainCollection, mess
     ["CNB527"]
 ])
 def test_messy_strain_naming_lookup_raises(collection_from_file: StrainCollection, messy_alias: str):
-    with pytest.raises(Exception):
+    with pytest.raises(KeyError):
         _messy_strain_naming_lookup(messy_alias, collection_from_file)
 
 

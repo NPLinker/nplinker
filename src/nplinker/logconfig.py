@@ -25,10 +25,10 @@ class LogConfig():
     # default destination for new Loggers
     default_logdest = logging.StreamHandler(sys.stdout)
     # additional destinations to be added to new Loggers
-    additional_logdests: list[logging.Logger] = []
+    additional_logdests: list[logging.Handler] = []
 
     @staticmethod
-    def getLogger(obj: Self, level=default_loglevel, dest=default_logdest) -> logging.Logger:
+    def getLogger(obj: str, level=default_loglevel, dest=default_logdest) -> logging.Logger:
         """Return a logging.Logger associated with the object <obj>.
 
         The Logger's level and dest values will be set to the corresponding

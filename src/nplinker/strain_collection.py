@@ -109,7 +109,7 @@ class StrainCollection():
         """
         if strain_id not in self._lookup:
             # logger.error('Strain lookup failed for "{}"'.format(strain_id))
-            raise Exception(f'Strain lookup failed for "{strain_id}"')
+            raise KeyError(f'Strain lookup failed for "{strain_id}"')
 
         return self._lookup[strain_id]
 
