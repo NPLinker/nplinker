@@ -55,10 +55,7 @@ def identify_gnps_format(filename: str, has_quant_table: bool) -> Literal['unkno
     Returns:
         Literal['unknown', 'allfiles', 'uniquefiles', 'fbmn']: Constant, one of 
         [GNPS_FORMAT_UNKNOWN, GNPS_FORMAT_OLD_ALLFILES, GNPS_FORMAT_OLD_UNIQUEFILES, GNPS_FORMAT_NEW_FBMN].
-
-    Examples:
-        >>> 
-        """
+    """
 
     headers: list[str] = _get_headers(filename)
 
@@ -100,9 +97,6 @@ def _messy_strain_naming_lookup(mzxml: str, strains: StrainCollection) -> Option
 
     Returns:
         Optional[Strain]: The strain identified to be matching or None.
-
-    Examples:
-        >>> 
     """
     if mzxml in strains:
         # life is simple!

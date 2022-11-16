@@ -33,10 +33,7 @@ class Strain():
 
         Returns:
             bool: Whether the alias is registered in the set of aliases or not.
-
-        Examples:
-            >>> 
-            """
+        """
         return alt_id in self.aliases
 
     def add_alias(self, alt_id: str):
@@ -44,10 +41,7 @@ class Strain():
 
         Args:
             alt_id(str): Alternative id to add to the list of known aliases.
-
-        Examples:
-            >>> 
-            """
+        """
         if len(alt_id) == 0:
             logger.warning(
                 f'Refusing to add zero-length alias to strain {self}')
