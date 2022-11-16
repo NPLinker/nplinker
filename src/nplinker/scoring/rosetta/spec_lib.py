@@ -14,7 +14,7 @@
 
 from sortedcontainers import SortedList
 from ...logconfig import LogConfig
-from nplinker.metabolomics.GNPSSpectrumLoader import GNPSSpectrumLoader
+from nplinker.metabolomics.gnps_spectrum_loader import GNPSSpectrumLoader
 from .rosetta_functions import fast_cosine
 
 
@@ -28,7 +28,7 @@ class SpecLib():
         self.spectra = []
 
     def _load_mgf(self):
-        spectra = GNPSSpectrumLoader(self.mgf_file).spectra()
+        self.spectra = GNPSSpectrumLoader(self.mgf_file).spectra()
 
         self.sort()
 
