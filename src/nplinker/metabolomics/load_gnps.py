@@ -3,7 +3,6 @@ import os
 import re
 from enum import Enum
 from typing import Any
-from typing import Literal
 from deprecated import deprecated
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.spectrum import Spectrum
@@ -32,12 +31,12 @@ def _get_headers(filename: str) -> list[str]:
     Returns:
         list[str]: Columns names in header.
     """
-    headers = None
     with open(filename) as f:
         headers = f.readline().strip()
         dl = find_delimiter(filename)
         headers = headers.split(dl)
-    return headers
+        return headers
+
 
 
 def identify_gnps_format(filename: str, has_quant_table: bool) -> GNPSFormat:
@@ -125,14 +124,14 @@ def _messy_strain_naming_lookup(mzxml: str, strains: StrainCollection) -> Strain
     return None
 
 
-def _md_convert(val: Any) -> int|float|None:
+def _md_convert(val: Any) -> int|float|None|Any:
     """Try to convert raw metadata values from text to integer, then float if that fails.
 
     Args:
         val(Any): Value to parse.
 
     Returns:
-        int|float|None: Value as int or float or None if not possible to parse.
+        int|float|None: Value as int or float or None if it is a string containint 'n/a', Any if not possible to parse.
      """
     try:
         return int(val)
@@ -146,13 +145,13 @@ def _md_convert(val: Any) -> int|float|None:
 
 
 @deprecated
-def _parse_mzxml_header(hdr: str, strains: StrainCollection, md_table: str, ext_metadata_parsing: bool) -> tuple[str|None, str|None, bool]:
+def _parse_mzxml_header(hdr: str, strains: StrainCollection, md_table: dict[str, dict[str, str]], ext_metadata_parsing: bool) -> tuple[str|None, str|None, bool]:
     """Return the file identifier component from the column name.
 
     Args:
         hdr(str): Column name to search for the file identifier component.
         strains(StrainCollection): StrainCollection in which to look for the strain name (= file identifier component)
-        md_table(str): Metadata table from which to parse `strain` and `growthmedium` keys.
+        md_table(dict[str, dict[str, str]]): Metadata table dictionary from which to parse `strain` and `growthmedium` keys.
         ext_metadata_parsing(bool): Whether to use extended metadata parsing or not.
 
     Returns:
