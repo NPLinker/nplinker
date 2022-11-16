@@ -11,16 +11,16 @@ logger = LogConfig.getLogger(__file__)
 
 class GNPSSpectrumLoader(ISpectrumLoader):
 
-    def __init__(self, filename):
+    def __init__(self, filename: str):
         ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([filename])
         logger.info('%d molecules parsed from MGF file', len(ms1))
         self._spectra = mols_to_spectra(ms2, metadata)
     
-    def spectra(self):
+    def spectra(self) -> list[Spectrum]:
         return self._spectra
     
 
-def mols_to_spectra(ms2, metadata):
+def mols_to_spectra(ms2, metadata: dict[str, str]) -> list[Spectrum]:
     ms2_dict = {}
     for m in ms2:
         if not m[3] in ms2_dict:
