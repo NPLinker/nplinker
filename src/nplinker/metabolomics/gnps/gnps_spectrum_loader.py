@@ -20,7 +20,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
         return self._spectra
     
 
-def mols_to_spectra(ms2, metadata: dict[str, str]) -> list[Spectrum]:
+def mols_to_spectra(ms2, metadata: dict[str, dict[str, str]]) -> list[Spectrum]:
     ms2_dict = {}
     for m in ms2:
         if not m[3] in ms2_dict:
