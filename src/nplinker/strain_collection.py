@@ -156,6 +156,15 @@ class StrainCollection():
                 f.write(','.join(ids) + '\n')
     
     def generate_strain_mappings(self, strain_mappings_file: str, antismash_dir: str):
+        """Generate stain mappings file from this strain collection, exporting the strains and their aliases.
+
+        Args:
+            strain_mappings_file(str): Export path.
+            antismash_dir(str): Directory in which to look for gbk files for which to export the aliases.
+
+        Returns:
+            StrainCollection: self
+        """
         # first time downloading, this file will not exist, should only need done once
         if not os.path.exists(strain_mappings_file):
             logger.info('Generating strain mappings file')

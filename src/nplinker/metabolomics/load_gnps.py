@@ -40,7 +40,7 @@ def _get_headers(filename: str) -> list[str]:
     return headers
 
 
-def identify_gnps_format(filename: str, has_quant_table: bool) -> Literal['unknown', 'allfiles', 'uniquefiles', 'fbmn']:
+def identify_gnps_format(filename: str, has_quant_table: bool) -> GNPSFormat:
     """Peek GNPS file format for given file.
 
     TODO: #89 This should be rewritten to actually return the format always based on only the file and not include the quant table in it.
@@ -50,8 +50,7 @@ def identify_gnps_format(filename: str, has_quant_table: bool) -> Literal['unkno
         has_quant_table (bool): If a quant table is present, do return GNPS_FORMAT_NEW_FBMN.
 
     Returns:
-        Literal['unknown', 'allfiles', 'uniquefiles', 'fbmn']: Constant, one of 
-        [GNPS_FORMAT_UNKNOWN, GNPS_FORMAT_OLD_ALLFILES, GNPS_FORMAT_OLD_UNIQUEFILES, GNPS_FORMAT_NEW_FBMN].
+        GNPSFormat: GNPS format identified in the file.
     """
 
     headers: list[str] = _get_headers(filename)
