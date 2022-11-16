@@ -1,7 +1,7 @@
 import csv
 from typing import TextIO
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics.IFileMappingLoader import IFileMappingLoader
+from nplinker.metabolomics.IFileMappingLoader import FileMappingLoaderBase
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_OLD_ALLFILES
 from nplinker.metabolomics.load_gnps import identify_gnps_format
@@ -12,7 +12,7 @@ logger = LogConfig.getLogger(__file__)
 FILE_IDENTIFIER_FBMN = " Peak area"
 
 
-class GNPSFileMappingLoader(IFileMappingLoader):
+class GNPSFileMappingLoader(FileMappingLoaderBase):
 
     def __init__(self, filename: str):
         self._filename: str = filename

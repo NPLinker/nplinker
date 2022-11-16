@@ -2,14 +2,14 @@ from nplinker.annotations import GNPS_DATA_COLUMNS
 from nplinker.annotations import GNPS_KEY
 from nplinker.annotations import create_gnps_annotation
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics.ISpectrumLoader import ISpectrumLoader
+from nplinker.metabolomics.ISpectrumLoader import SpectrumLoaderBase
 from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.parsers.mgf import LoadMGF
 
 
 logger = LogConfig.getLogger(__file__)
 
-class GNPSSpectrumLoader(ISpectrumLoader):
+class GNPSSpectrumLoader(SpectrumLoaderBase):
 
     def __init__(self, filename: str):
         ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([filename])

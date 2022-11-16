@@ -1,7 +1,7 @@
 import csv
 from typing import Tuple, List
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics.IMolecularFamilyLoader import IMolecularFamilyLoader
+from nplinker.metabolomics.IMolecularFamilyLoader import MolecularFamilyLoaderBase
 from nplinker.metabolomics.molecular_family import MolecularFamily
 from nplinker.metabolomics.singleton_family import SingletonFamily
 
@@ -9,7 +9,7 @@ from nplinker.metabolomics.singleton_family import SingletonFamily
 logger = LogConfig.getLogger(__file__)
 
 
-class GNPSMolecularFamilyLoader(IMolecularFamilyLoader):
+class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
     def __init__(self, filename: str):
         self._families: List[MolecularFamily] = []
         
