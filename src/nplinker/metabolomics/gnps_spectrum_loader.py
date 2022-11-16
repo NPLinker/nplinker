@@ -2,7 +2,7 @@ from nplinker.annotations import GNPS_DATA_COLUMNS
 from nplinker.annotations import GNPS_KEY
 from nplinker.annotations import create_gnps_annotation
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics.ISpectrumLoader import SpectrumLoaderBase
+from nplinker.metabolomics.spectrum_loader_base import SpectrumLoaderBase
 from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.parsers.mgf import LoadMGF
 

@@ -1,7 +1,7 @@
 import csv
 from typing import Tuple, List
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics.IMolecularFamilyLoader import MolecularFamilyLoaderBase
+from nplinker.metabolomics.molecular_family_loader_base import MolecularFamilyLoaderBase
 from nplinker.metabolomics.molecular_family import MolecularFamily
 from nplinker.metabolomics.singleton_family import SingletonFamily
 

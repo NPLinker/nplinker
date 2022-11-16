@@ -1,7 +1,7 @@
 import csv
 from typing import TextIO
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics.IFileMappingLoader import FileMappingLoaderBase
+from nplinker.metabolomics.file_mapping_loader_base import FileMappingLoaderBase
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_NEW_FBMN
 from nplinker.metabolomics.load_gnps import GNPS_FORMAT_OLD_ALLFILES
 from nplinker.metabolomics.load_gnps import identify_gnps_format
