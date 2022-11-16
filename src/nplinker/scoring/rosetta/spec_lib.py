@@ -14,7 +14,7 @@
 
 from sortedcontainers import SortedList
 from ...logconfig import LogConfig
-from nplinker.metabolomics.gnps_spectrum_loader import GNPSSpectrumLoader
+from nplinker.metabolomics.gnps.gnps_spectrum_loader import GNPSSpectrumLoader
 from .rosetta_functions import fast_cosine
 
 

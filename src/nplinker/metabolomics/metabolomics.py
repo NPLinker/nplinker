@@ -15,7 +15,7 @@
 import csv
 
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics.gnps_spectrum_loader import GNPSSpectrumLoader
+from nplinker.metabolomics.gnps.gnps_spectrum_loader import GNPSSpectrumLoader
 from .load_gnps import load_gnps
 from .molecular_family import MolecularFamily
 from .singleton_family import SingletonFamily
