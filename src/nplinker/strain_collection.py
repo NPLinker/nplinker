@@ -76,7 +76,9 @@ class StrainCollection():
         if isinstance(strain_id, str):
             return strain_id in self._lookup
         # assume it's a Strain object
-        return strain_id.id in self._lookup
+        if isinstance(strain_id, Strain):
+            return strain_id.id in self._lookup
+        return False
 
     def __iter__(self):
         return iter(self._strains)

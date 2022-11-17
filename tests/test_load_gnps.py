@@ -69,6 +69,7 @@ def test_load_clusterinfo_old(spec_dict):
 
 @pytest.mark.parametrize("messy_alias, expected", [
     ["42b.mzXML", "42b.mzXML"],
+    ["blub", None],
     ["42b.mzXML.copy", "42b.mzXML"],
     ["Salinispora arenicola CNB527_blub", "42b.mzXML"],
     ["GCF_000514775.1", "9b.mzXML"]
@@ -76,20 +77,14 @@ def test_load_clusterinfo_old(spec_dict):
 def test_messy_strain_naming_lookup(collection_from_file: StrainCollection, messy_alias: str, expected: str|None):
     actual = _messy_strain_naming_lookup(messy_alias, collection_from_file)
 
-    assert actual == collection_from_file.lookup(expected)
-
-@pytest.mark.parametrize("messy_alias", [
-    ["blub"],
-    ["CNB527"]
-])
-def test_messy_strain_naming_lookup_raises(collection_from_file: StrainCollection, messy_alias: str):
-    with pytest.raises(KeyError):
-        _messy_strain_naming_lookup(messy_alias, collection_from_file)
-
+    if expected is not None:
+        assert actual == collection_from_file.lookup(expected)
+    else:
+        assert actual == expected
 
 
 def test_parse_mzxml_header():
-    headers = _get_headers(DATA_DIR / "nodes_fbmn.csv")
+    headers = _get_headers(str(DATA_DIR / "nodes_fbmn.csv"))
     hdr = headers[10]
     actual = _parse_mzxml_header(hdr, StrainCollection(), None, None)
     assert actual is not None
