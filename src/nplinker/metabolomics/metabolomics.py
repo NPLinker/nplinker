@@ -13,46 +13,15 @@
 # limitations under the License.
 
 import csv
-from nplinker.annotations import GNPS_DATA_COLUMNS
-from nplinker.annotations import GNPS_KEY
-from nplinker.annotations import create_gnps_annotation
+
 from nplinker.logconfig import LogConfig
-from nplinker.parsers.mgf import LoadMGF
+from nplinker.metabolomics.gnps.gnps_spectrum_loader import GNPSSpectrumLoader
 from .load_gnps import load_gnps
 from .molecular_family import MolecularFamily
 from .singleton_family import SingletonFamily
-from .spectrum import Spectrum
 
 
 logger = LogConfig.getLogger(__file__)
-
-
-def mols_to_spectra(ms2, metadata):
-    ms2_dict = {}
-    for m in ms2:
-        if not m[3] in ms2_dict:
-            ms2_dict[m[3]] = []
-        ms2_dict[m[3]].append((m[0], m[2]))
-
-    spectra = []
-    for i, m in enumerate(ms2_dict.keys()):
-        new_spectrum = Spectrum(i, ms2_dict[m], int(m.name),
-                                metadata[m.name]['precursormass'],
-                                metadata[m.name]['parentmass'])
-        new_spectrum.metadata = metadata[m.name]
-        # add GNPS ID if in metadata under SPECTRUMID (this doesn't seem to be in regular MGF files
-        # from GNPS, but *is* in the rosetta mibig MGF)
-        # note: LoadMGF seems to lowercase (some) metadata keys?
-        if 'spectrumid' in new_spectrum.metadata:
-            # add an annotation for consistency, if not already there
-            if GNPS_KEY not in new_spectrum.annotations:
-                gnps_anno = {k: None for k in GNPS_DATA_COLUMNS}
-                gnps_anno['SpectrumID'] = new_spectrum.metadata['spectrumid']
-                create_gnps_annotation(new_spectrum, gnps_anno)
-        spectra.append(new_spectrum)
-
-    return spectra
-
 
 def load_edges(edges_file, spec_dict):
     logger.debug('loading edges file: {} [{} spectra from MGF]'.format(
@@ -96,6 +65,21 @@ def load_dataset(strains,
                  quant_table_file=None,
                  metadata_table_file=None,
                  ext_metadata_parsing=False):
+    """Wrapper function instead of GNPSLoader.
+    Loads all data required for the metabolomics side.
+
+    Args:
+        strains(StrainCollection): Object holding the strain collections
+        mgf_file(string): Path to spectra file in MGF format
+        edges_file(string): Path to GNPS edges.pairinfo file.
+        nodes_file(string): Path to GNPS networking output file in tsv format.
+        quant_table_file (string, optional): Path to quantification/annotation table. Defaults to None.
+        metadata_table_file (string, optional): Unknown. Defaults to None.
+        ext_metadata_parsing (bool, optional): Unknown. Defaults to False.
+
+    Returns:
+        Tuple[dict, List[Spectrum], List[MolecularFamily], dict]: Loaded Metabolomics data.
+    """
     # common steps to all formats of GNPS data:
     #   - parse the MGF file to create a set of Spectrum objects
     #   - parse the edges file and update the spectra with that data
@@ -103,23 +87,29 @@ def load_dataset(strains,
     # build a set of Spectrum objects by parsing the MGF file
     spec_dict = load_spectra(mgf_file, edges_file)
 
+    # spectra = GNPSSpectrumLoader(mgf_file).spectra()
+    # above returns a list, create a dict indexed by spectrum_id to make
+    # the rest of the parsing a bit simpler
+    # spec_dict = {spec.spectrum_id: spec for spec in spectra}
+
+    # add edges info to the spectra
+    molfams = _make_families(spec_dict.values())
+    # molfams = GNPSMolecularFamilyLoader(edges_file).families()
+
     unknown_strains = load_gnps(strains, nodes_file, quant_table_file,
                                 metadata_table_file, ext_metadata_parsing,
                                 spec_dict)
 
-    molfams = _make_families(spec_dict.values())
     return spec_dict, list(spec_dict.values()), molfams, unknown_strains
 
 
 def load_spectra(mgf_file, edges_file):
-    ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([mgf_file])
-    logger.info(f'{len(ms1)} molecules parsed from MGF file')
-    spectra = mols_to_spectra(ms2, metadata)
+    """ Wrapper function around GNPSSpectrumLoader
+    """
+    spectra = GNPSSpectrumLoader(mgf_file).spectra()
     # above returns a list, create a dict indexed by spectrum_id to make
     # the rest of the parsing a bit simpler
     spec_dict = {spec.spectrum_id: spec for spec in spectra}
-
-    # add edges info to the spectra
     load_edges(edges_file, spec_dict)
     return spec_dict
 
