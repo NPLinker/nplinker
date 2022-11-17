@@ -19,7 +19,7 @@ from typing_extensions import Self
 
 class LogConfig():
 
-    active_loggers: dict[Self, logging.Handler] = {}
+    active_loggers: dict[str, logging.Logger] = {}
     logfmt = '%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d, %(message)s'
     default_loglevel = logging.INFO
     # default destination for new Loggers
