@@ -16,7 +16,7 @@ import csv
 import os
 
 from nplinker.scoring.rosetta.rosetta_hit import RosettaHit
-from ...genomics import MibigBGC
+from ...genomics.mibig import MibigBGC
 from ...logconfig import LogConfig
 from ...parsers.kcb import KCBJSONParser
 from ...parsers.kcb import KCBTextParser

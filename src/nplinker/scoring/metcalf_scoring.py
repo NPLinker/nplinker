@@ -9,8 +9,8 @@ from nplinker.pickler import load_pickled_data
 from nplinker.pickler import save_pickled_data
 from nplinker.scoring.methods import ScoringMethod
 from nplinker.scoring.object_link import ObjectLink
-from .linking.data_linking import DataLinks
-from .linking.data_linking import LinkFinder
+from nplinker.scoring.linking.data_linking import DataLinks
+from nplinker.scoring.linking.link_finder import LinkFinder
 
 logger = LogConfig.getLogger(__file__)
 
@@ -78,7 +78,7 @@ class MetcalfScoring(ScoringMethod):
             )
             MetcalfScoring.DATALINKS = DataLinks()
             MetcalfScoring.DATALINKS.load_data(npl._spectra, npl._gcfs,
-                                               npl._strains)
+                                               npl._strains, npl.molfams)
             # TODO fix crash with this set to True, see https://github.com/sdrogers/nplinker/issues/57
             MetcalfScoring.DATALINKS.find_correlations(
                 include_singletons=False)

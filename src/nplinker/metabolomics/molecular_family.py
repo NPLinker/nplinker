@@ -5,13 +5,14 @@ class MolecularFamily():
         self.family_id = family_id
         self.spectra = []
         self.family = None
+        self.spectra_ids: set[int] = set()
 
-    def has_strain(self, strain):
-        for spectrum in self.spectra:
-            if spectrum.has_strain(strain):
-                return True
+    # def has_strain(self, strain):
+    #     for spectrum in self.spectra:
+    #         if spectrum.has_strain(strain):
+    #             return True
 
-        return False
+    #     return False
 
     @property
     def strains(self):
