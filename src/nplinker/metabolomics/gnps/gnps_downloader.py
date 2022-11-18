@@ -9,7 +9,8 @@ class GNPSDownloader:
         self._task_id = task_id
         self._outpath = outpath
 
-        with open(outpath, 'wb') as f:
+    def download(self):
+        with open(self._outpath, 'wb') as f:
             with httpx.stream('POST', self.url()) as r:
                 for data in r.iter_bytes():
                     f.write(data)
