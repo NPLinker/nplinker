@@ -21,7 +21,7 @@ from nplinker.annotations import load_annotations
 from nplinker.class_info.chem_classes import ChemClassPredictions
 from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
-from nplinker.genomics import loadBGC_from_cluster_files
+from nplinker.genomics import load_gcfs
 from nplinker.genomics.mibig import MibigBGCLoader
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import load_dataset
@@ -590,6 +590,9 @@ class DatasetLoader():
         logger.debug('mibig_bgc_dict has {} entries'.format(
             len(self.mibig_bgc_dict)))
 
+        #----------------------------------------------------------------------
+        # CG: Parse bigscape file path
+        #----------------------------------------------------------------------
         missing_anno_files, missing_cluster_files, missing_network_files = [], [], []
         cluster_files, anno_files, network_files = {}, {}, {}
 
@@ -666,7 +669,6 @@ class DatasetLoader():
                 self.product_types.append(prodtype)
 
 
-
         #----------------------------------------------------------------------
         # CG: Parse AntiSMASH dir
         #----------------------------------------------------------------------
@@ -680,16 +682,12 @@ class DatasetLoader():
             'loadBGC_from_cluster_files(antismash_dir={}, delimiters={})'.
             format(self.antismash_dir, self._antismash_delimiters))
 
-        self.gcfs, self.bgcs, self.strains, unknown_strains = loadBGC_from_cluster_files(
+        self.gcfs, self.bgcs, self.strains, unknown_strains = load_gcfs(
             self.strains,
             cluster_files,
             anno_files,
-            network_files,
             self.mibig_bgc_dict,
-            self.mibig_json_dir,
-            antismash_dir=self.antismash_dir,
-            antismash_filenames=antismash_bgc_loader.bgc_files(),
-            antismash_format=self._antismash_format,
+            antismash_bgc_dict=antismash_bgc_loader.get_bgcs(),
             antismash_delimiters=self._antismash_delimiters)
 
         us_path = os.path.join(self._root, 'unknown_strains_gen.csv')
