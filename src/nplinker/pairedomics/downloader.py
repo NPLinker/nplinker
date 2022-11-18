@@ -671,41 +671,12 @@ class Downloader():
             self.strains.add(strain)
 
     def _download_metabolomics_zipfile(self, gnps_task_id):
-        url = GNPS_DATA_DOWNLOAD_URL.format(gnps_task_id)
+        mbzip = self._load_gnps_data(gnps_task_id)
+        self._extract_metabolomics_data(mbzip)
+        self._log_gnps_format()
 
-        self.metabolomics_zip = os.path.join(self.project_download_cache,
-                                             'metabolomics_data.zip')
 
-        cached = False
-        if os.path.exists(self.metabolomics_zip):
-            logger.info('Found existing metabolomics_zip at {}'.format(
-                self.metabolomics_zip))
-            try:
-                mbzip = zipfile.ZipFile(self.metabolomics_zip)
-                cached = True
-            except zipfile.BadZipFile as bzf:
-                logger.info(
-                    'Invalid metabolomics zipfile found, will download again!')
-                os.unlink(self.metabolomics_zip)
-
-        if not cached:
-            logger.info(f'Downloading metabolomics data from {url}')
-            with open(self.metabolomics_zip, 'wb') as f:
-                # note that this requires a POST, not a GET
-                total_bytes, last_total = 0, 0
-                spinner = Spinner('Downloading metabolomics data... ')
-                with httpx.stream('POST', url) as r:
-                    for data in r.iter_bytes():
-                        f.write(data)
-                        total_bytes += len(data)
-                        spinner.next()
-                spinner.finish()
-
-        logger.info('Downloaded metabolomics data!')
-
-        # this should throw an exception if zip is malformed etc
-        mbzip = zipfile.ZipFile(self.metabolomics_zip)
-
+    def _extract_metabolomics_data(self, mbzip):
         logger.info(f'Extracting files to {self.project_file_cache}')
         # extract the contents to the file cache folder. only want some of the files
         # so pick them out and only extract those:
@@ -731,10 +702,36 @@ class Downloader():
                               path=os.path.join(self.project_file_cache,
                                                 'spectra'))
 
+    def _log_gnps_format(self):
         if self._is_new_gnps_format(self.project_file_cache):
             logger.info('Found NEW GNPS structure')
         else:
             logger.info('Found OLD GNPS structure')
+
+    def _load_gnps_data(self, gnps_task_id):
+
+        self.metabolomics_zip = os.path.join(self.project_download_cache,
+                                             'metabolomics_data.zip')
+
+        # Try read from cache
+        if os.path.exists(self.metabolomics_zip):
+            logger.info('Found existing metabolomics_zip at {}'.format(
+                self.metabolomics_zip))
+            try:
+                mbzip = zipfile.ZipFile(self.metabolomics_zip)
+                return mbzip
+            except zipfile.BadZipFile as bzf:
+                logger.info(
+                    'Invalid metabolomics zipfile found, will download again!')
+                os.unlink(self.metabolomics_zip)
+        else:
+            url = _generate_gnps_download_url(gnps_task_id)
+            _execute_download(url, self.metabolomics_zip)
+
+            # this should throw an exception if zip is malformed etc
+            mbzip = zipfile.ZipFile(self.metabolomics_zip)
+            return mbzip
+
 
     def _download_platform_json_to_file(self, url, local_path):
         resp = httpx.get(url, follow_redirects=True)
@@ -749,6 +746,27 @@ class Downloader():
         logger.debug(f'Downloaded {url} to {local_path}')
 
         return content
+
+
+def _generate_gnps_download_url(gnps_task_id):
+    url = GNPS_DATA_DOWNLOAD_URL.format(gnps_task_id)
+    return url
+
+def _execute_download(url, metabolomics_zip):
+    logger.info(f'Downloading metabolomics data from {url}')
+    with open(metabolomics_zip, 'wb') as f:
+        # note that this requires a POST, not a GET
+        total_bytes, last_total = 0, 0
+        spinner = Spinner('Downloading metabolomics data... ')
+        with httpx.stream('POST', url) as r:
+            for data in r.iter_bytes():
+                f.write(data)
+                total_bytes += len(data)
+                spinner.next()
+        spinner.finish()
+    logger.info('Downloaded metabolomics data!')
+
+
 
 
 if __name__ == "__main__":

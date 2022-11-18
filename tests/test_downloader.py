@@ -1,8 +1,21 @@
 import os
 from pathlib import Path
+import zipfile
+import numpy
 import pytest
+from nplinker import utils
 
 from nplinker.pairedomics.downloader import Downloader
+from nplinker.pairedomics.downloader import _generate_gnps_download_url
+from nplinker.pairedomics.downloader import _execute_download
+from . import DATA_DIR
+
+
+@pytest.fixture
+def gnps_url():
+    return _generate_gnps_download_url("c22f44b14a3d450eb836d607cb9521bb")
+
+
 
 @pytest.mark.parametrize("expected", [
     Path(os.getenv('HOME'), 'nplinker_data', 'pairedomics'),
@@ -31,3 +44,35 @@ def test_default(expected):
     assert sut.project_json_file == str(expected / f"{gnps_id}.json")
 
 
+
+def test_download_metabolomics_zipfile(tmp_path):
+    sut = Downloader("MSV000079284", local_cache=tmp_path)
+    sut._download_metabolomics_zipfile("c22f44b14a3d450eb836d607cb9521bb")
+    expected_path = os.path.join(sut.project_download_cache, 'metabolomics_data.zip')
+
+    assert os.path.exists(expected_path)
+
+
+
+def test_generate_gnps_download_url():
+    gnps_task_id = "c22f44b14a3d450eb836d607cb9521bb"
+    expected = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task=c22f44b14a3d450eb836d607cb9521bb&view=download_clustered_spectra'
+    actual = _generate_gnps_download_url(gnps_task_id)
+    assert actual == expected
+
+
+def test_execute_download(gnps_url: str, tmp_path: Path):
+    outpath = tmp_path / 'metabolomics_data.zip'
+    _execute_download(gnps_url, outpath)
+    assert os.path.exists(outpath)
+
+
+def test_download_gnps_data(tmp_path):
+    gnps_task_id = "c22f44b14a3d450eb836d607cb9521bb"
+    url = _generate_gnps_download_url(gnps_task_id)
+    sut = Downloader("MSV000079284", local_cache=tmp_path / 'actual')
+    actual = sut._load_gnps_data(gnps_task_id)
+    
+    expected = zipfile.ZipFile(DATA_DIR / 'metabolomics_data.zip')
+
+    numpy.testing.assert_array_equal(actual.namelist(), expected.namelist())

@@ -64,6 +64,7 @@ def find_delimiter(filename):
 #    https://github.com/pytorch/vision/blob/main/LICENSE
 
 USER_AGENT = "NPLinker"
+# USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'
 
 
 def _save_response_content(content: Iterator[bytes],
