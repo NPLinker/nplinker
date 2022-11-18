@@ -3,7 +3,7 @@ import pathlib
 import zipfile
 
 import numpy
-from nplinker.pairedomics.gnps_downloader import GNPSDownloader
+from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
 from . import DATA_DIR
 
 
