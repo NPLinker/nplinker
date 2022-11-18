@@ -15,18 +15,16 @@
 import glob
 import os
 import sys
-import time
-import xml.etree.ElementTree as ET
 from nplinker.annotations import load_annotations
 from nplinker.class_info.chem_classes import ChemClassPredictions
 from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
 from nplinker.genomics import load_gcfs
 from nplinker.genomics.mibig import MibigBGCLoader
+from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import load_dataset
 from nplinker.pairedomics.downloader import Downloader
-from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.strain_collection import StrainCollection
 from nplinker.genomics.antismash import AntismashBGCLoader
@@ -91,8 +89,7 @@ def find_via_glob_alts(paths, file_type, optional=False):
 
 
 def find_bigscape_dir(broot):
-    logger.info(
-        f'Trying to discover correct bigscape directory under {broot}')
+    logger.info(f'Trying to discover correct bigscape directory under {broot}')
     for root, dirs, files in os.walk(broot):
         if 'Network_Annotations_Full.tsv' in files:
             logger.info(f'Found network files directory: {root}')
@@ -117,7 +114,10 @@ class DatasetLoader():
     MIBIG_VERSION_DEFAULT = "1.4"
 
     RUN_BIGSCAPE_DEFAULT = True
-    EXTRA_BIGSCAPE_PARAMS_DEFAULT = '--mibig --clans-off'
+
+    # https://git.wageningenur.nl/medema-group/BiG-SCAPE/-/wikis/parameters#mibig
+    # BigScape mibig default version is 2.1
+    EXTRA_BIGSCAPE_PARAMS_DEFAULT = '--mibig --clans-off --mix --include_singletons'
 
     RUN_CANOPUS_DEFAULT = False
     EXTRA_CANOPUS_PARAMS_DEFAULT = '--maxmz 600 formula zodiac structure canopus'
@@ -389,11 +389,13 @@ class DatasetLoader():
 
         # get the list of BGCs which have a strain found in the set we were given
         bgcs_to_retain = {
-            bgc for bgc in self.bgcs if bgc.strain in self.include_only_strains
+            bgc
+            for bgc in self.bgcs if bgc.strain in self.include_only_strains
         }
         # get the list of spectra which have at least one strain in the set
         spectra_to_retain = {
-            spec for spec in self.spectra for sstrain in spec.strains
+            spec
+            for spec in self.spectra for sstrain in spec.strains
             if sstrain in self.include_only_strains
         }
 
@@ -507,8 +509,8 @@ class DatasetLoader():
                     'Attempting to download MiBIG JSON database (v{})...'.
                     format(self._mibig_version))
                 download_and_extract_mibig_metadata(self._root,
-                                                self.mibig_json_dir,
-                                                self._mibig_version)
+                                                    self.mibig_json_dir,
+                                                    self._mibig_version)
             else:
                 logger.warning(
                     'Not downloading MiBIG database automatically, use_mibig = false'
@@ -570,7 +572,9 @@ class DatasetLoader():
                             'Renaming antiSMASH folder "{}" to "{}" to remove spaces! (suppress with ignore_spaces = true in config file)'
                             .format(d, d.replace(' ', '_')))
 
-
+        #----------------------------------------------------------------------
+        # CG: download mibig metadata and run bigscape
+        #----------------------------------------------------------------------
         # both the bigscape and mibig_json dirs expected by nplinker may not exist at this point. in some
         # cases this will cause an error later in the process, but this can also potentially be
         # resolved automatically:
@@ -578,7 +582,10 @@ class DatasetLoader():
         #   bigscape => run BiG-SCAPE before continuing (if using the Docker image)
         self._load_genomics_extra()
 
-
+        #----------------------------------------------------------------------
+        # CG: load mibig metadata to BGC object
+        # and update self.strains with mibig strains
+        #----------------------------------------------------------------------
         logger.debug(f'MibigBGCLoader({self.mibig_json_dir})')
         mibig_bgc_loader = MibigBGCLoader(self.mibig_json_dir)
         self.mibig_bgc_dict = mibig_bgc_loader.get_bgcs()
@@ -590,11 +597,8 @@ class DatasetLoader():
         logger.debug('mibig_bgc_dict has {} entries'.format(
             len(self.mibig_bgc_dict)))
 
-        #----------------------------------------------------------------------
-        # CG: Parse bigscape file path
-        #----------------------------------------------------------------------
-        missing_anno_files, missing_cluster_files, missing_network_files = [], [], []
-        cluster_files, anno_files, network_files = {}, {}, {}
+        missing_annotation_files, missing_clustering_files, missing_network_files = [], [], []
+        clustering_files, annotation_files, network_files = {}, {}, {}
 
         # CG: bigscape data used in NPLinker
         # Take chemical class PKSI as example:
@@ -602,37 +606,36 @@ class DatasetLoader():
         #   PKSI_c0.30.network.tsv
         #   PKSI_clustering_c0.30.tsv
 
-        for folder in self.BIGSCAPE_PRODUCT_TYPES:
-            folder_path = os.path.join(self.bigscape_dir, folder)
-            cutoff_filename = '{}_clustering_c0.{:02d}.tsv'.format(
-                folder, self._bigscape_cutoff)
-            cluster_filename = os.path.join(folder_path, cutoff_filename)
-            annotation_filename = os.path.join(
-                folder_path, f'Network_Annotations_{folder}.tsv')
-            network_filename = os.path.join(
-                folder_path,
-                f'{folder}_c0.{self._bigscape_cutoff:02d}.network')
+        for ptype in self.BIGSCAPE_PRODUCT_TYPES:
+            folder_path = os.path.join(self.bigscape_dir, ptype)
+            clustering_filename = '{}_clustering_c0.{:02d}.tsv'.format(
+                ptype, self._bigscape_cutoff)
+            clustering_fpath = os.path.join(folder_path, clustering_filename)
+            annotation_fpath = os.path.join(
+                folder_path, f'Network_Annotations_{ptype}.tsv')
+            network_fpath = os.path.join(
+                folder_path, f'{ptype}_c0.{self._bigscape_cutoff:02d}.network')
 
             # mandatory
-            if not os.path.exists(annotation_filename):
-                missing_anno_files.append(annotation_filename)
+            if not os.path.exists(annotation_fpath):
+                missing_annotation_files.append(annotation_fpath)
             else:
-                anno_files[folder] = annotation_filename
+                annotation_files[ptype] = annotation_fpath
 
             # also mandatory (?)
-            if not os.path.exists(cluster_filename):
-                missing_cluster_files.append(cluster_filename)
+            if not os.path.exists(clustering_fpath):
+                missing_clustering_files.append(clustering_fpath)
             else:
-                cluster_files[folder] = cluster_filename
+                clustering_files[ptype] = clustering_fpath
 
             # optional (?)
-            if not os.path.exists(network_filename):
-                missing_network_files.append(network_filename)
+            if not os.path.exists(network_fpath):
+                missing_network_files.append(network_fpath)
             else:
-                network_files[folder] = network_filename
+                network_files[ptype] = network_fpath
 
         # no files found here indicates a problem!
-        if len(anno_files) == 0:
+        if len(annotation_files) == 0:
             raise Exception(
                 'Failed to find *any* BiGSCAPE Network_Annotations tsv files under "{}" (incorrect cutoff value? currently set to {})'
                 .format(self.bigscape_dir, self._bigscape_cutoff))
@@ -645,29 +648,28 @@ class DatasetLoader():
                 logger.warning(f'  {i + 1}/{len(l)}: ' + fn)
 
         _list_missing_files(
-            f'{len(missing_anno_files)} missing annotation tsv files:',
-            missing_anno_files)
+            f'{len(missing_annotation_files)} missing annotation tsv files:',
+            missing_annotation_files)
         _list_missing_files(
             '{} missing clustering tsv files:'.format(
-                len(missing_cluster_files)), missing_cluster_files)
+                len(missing_clustering_files)), missing_clustering_files)
         _list_missing_files(
             f'{len(missing_network_files)} missing network files:',
             missing_network_files)
 
         # exclude any product types that don't have both annotation and cluster files
-        self.product_types = []
-        for prodtype in self.BIGSCAPE_PRODUCT_TYPES:
-            if prodtype not in anno_files or prodtype not in cluster_files:
+        self.product_types = []  # product types have bigscape data
+        for ptype in self.BIGSCAPE_PRODUCT_TYPES:
+            if ptype not in annotation_files or ptype not in clustering_files:
                 # remove this product type completely
-                for d in [anno_files, cluster_files, network_files]:
-                    if prodtype in d:
-                        del d[prodtype]
+                for d in [annotation_files, clustering_files, network_files]:
+                    if ptype in d:
+                        del d[ptype]
                 logger.warning(
                     'Product type {} will be skipped due to missing files!'.
-                    format(prodtype))
+                    format(ptype))
             else:
-                self.product_types.append(prodtype)
-
+                self.product_types.append(ptype)
 
         #----------------------------------------------------------------------
         # CG: Parse AntiSMASH dir
@@ -684,12 +686,15 @@ class DatasetLoader():
 
         self.gcfs, self.bgcs, self.strains, unknown_strains = load_gcfs(
             self.strains,
-            cluster_files,
-            anno_files,
+            clustering_files,
+            annotation_files,
             self.mibig_bgc_dict,
-            antismash_bgc_dict=antismash_bgc_loader.get_bgcs(),
+            antismash_bgc_loader.get_bgcs(),
             antismash_delimiters=self._antismash_delimiters)
 
+        #----------------------------------------------------------------------
+        # CG: write unknown strains in genomics to file
+        #----------------------------------------------------------------------
         us_path = os.path.join(self._root, 'unknown_strains_gen.csv')
         logger.warning(
             f'Writing unknown strains from GENOMICS data to {us_path}')
@@ -797,7 +802,7 @@ class DatasetLoader():
             logger.warn(
                 'No strain_mappings.csv file found! Attempting to create one')
             self.strains.generate_strain_mappings(self.strain_mappings_file,
-                                     self.antismash_dir)
+                                                  self.antismash_dir)
             # raise Exception('Unable to load strain_mappings file: {}'.format(self.strain_mappings_file))
         else:
             self.strains.add_from_file(self.strain_mappings_file)
