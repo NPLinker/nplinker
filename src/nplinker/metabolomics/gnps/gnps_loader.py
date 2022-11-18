@@ -7,4 +7,9 @@ class GNPSLoader:
         self._filepath = filepath
     
     def data(self) -> zipfile.ZipFile:
+        """Return the managed archive.
+
+        Returns:
+            zipfile.ZipFile: Archive from which data is loaded.
+        """
         return zipfile.ZipFile(self._filepath)
