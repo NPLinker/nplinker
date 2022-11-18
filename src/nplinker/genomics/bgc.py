@@ -11,17 +11,22 @@ CLUSTER_REGION_REGEX = re.compile('(.+?)\\.(cluster|region)(\\d+).gbk$')
 
 class BGC():
 
-    def __init__(self, id, strain, name, product_prediction, description=None):
+    def __init__(self,
+                 id: int,
+                 strain: str,
+                 name: str,
+                 product_prediction: list[str],
+                 description=None):
         self.id = id
         self.strain = strain
-        self.name = name
-        self.product_prediction = product_prediction
+        self.name = name  # BGC file name
+        self.product_prediction = product_prediction  # can get from gbk SeqFeature "region"
         # allow for multiple parents in the case of hybrid BGCs
         self.parents = set()
-        self.description = description
+        self.description = description  # can get from gbk SeqRecord.description
         # these will get parsed from the .gbk file
-        self.antismash_id = None
-        self.antismash_accession = None
+        self.antismash_id = None  # version in .gbk, id in SeqRecord
+        self.antismash_accession = None  # accession in .gbk, name in SeqRecord
 
         self.region = -1
         self.cluster = -1

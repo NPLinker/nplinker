@@ -3,6 +3,8 @@ from .mibig.mibig_bgc import MibigBGC
 
 
 class GCF():
+    # CG: the most importance info is family id,
+    # the other annotations can be find in BGC gbk files
 
     def __init__(self, id, gcf_id, bigscape_class):
         self.id = id
