@@ -1,8 +1,10 @@
 import zipfile
-
+from pathlib import Path
 import numpy
+from typing_extensions import Self
 from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
 from . import DATA_DIR
+
 
 class GNPSDownloaderBuilder:
     def __init__(self):
@@ -10,11 +12,11 @@ class GNPSDownloaderBuilder:
         self._outpath = None
         pass
     
-    def with_task_id(self, task_id):
+    def with_task_id(self, task_id: str) -> Self:
         self._task_id = task_id
         return self
 
-    def with_outpath(self, outpath):
+    def with_outpath(self, outpath: Path) -> Self:
         self._outpath = outpath
         return self
     
