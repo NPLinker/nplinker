@@ -90,7 +90,7 @@ def find_via_glob_alts(paths, file_type, optional=False):
 
 def find_bigscape_dir(broot):
     logger.info(f'Trying to discover correct bigscape directory under {broot}')
-    for root, dirs, files in os.walk(broot):
+    for root, _, files in os.walk(broot):
         if 'Network_Annotations_Full.tsv' in files:
             logger.info(f'Found network files directory: {root}')
             return root
@@ -282,7 +282,7 @@ class DatasetLoader():
             self.OR_BIGSCAPE) or os.path.join(self._root, 'bigscape')
         # what we really want here is the subdirectory containing the network/annotation files,
         # but in case this is the path to the top level bigscape output, try to figure it out automatically
-        if not os.path.exists(os.path.join(self.bigscape_dir, 'NRPS')):
+        if not os.path.exists(os.path.join(self.bigscape_dir, 'mix')):
             new_bigscape_dir = find_bigscape_dir(self.bigscape_dir)
             if new_bigscape_dir is not None:
                 logger.info(
@@ -597,79 +597,18 @@ class DatasetLoader():
         logger.debug('mibig_bgc_dict has {} entries'.format(
             len(self.mibig_bgc_dict)))
 
-        missing_annotation_files, missing_clustering_files, missing_network_files = [], [], []
-        clustering_files, annotation_files, network_files = {}, {}, {}
-
+        #----------------------------------------------------------------------
+        # CG: Get BigScape files
+        #----------------------------------------------------------------------
         # CG: bigscape data used in NPLinker
         # Take chemical class PKSI as example:
         #   Network_Annotations_PKSI.tsv
         #   PKSI_c0.30.network.tsv
         #   PKSI_clustering_c0.30.tsv
-
-        for ptype in self.BIGSCAPE_PRODUCT_TYPES:
-            folder_path = os.path.join(self.bigscape_dir, ptype)
-            clustering_filename = '{}_clustering_c0.{:02d}.tsv'.format(
-                ptype, self._bigscape_cutoff)
-            clustering_fpath = os.path.join(folder_path, clustering_filename)
-            annotation_fpath = os.path.join(
-                folder_path, f'Network_Annotations_{ptype}.tsv')
-            network_fpath = os.path.join(
-                folder_path, f'{ptype}_c0.{self._bigscape_cutoff:02d}.network')
-
-            # mandatory
-            if not os.path.exists(annotation_fpath):
-                missing_annotation_files.append(annotation_fpath)
-            else:
-                annotation_files[ptype] = annotation_fpath
-
-            # also mandatory (?)
-            if not os.path.exists(clustering_fpath):
-                missing_clustering_files.append(clustering_fpath)
-            else:
-                clustering_files[ptype] = clustering_fpath
-
-            # optional (?)
-            if not os.path.exists(network_fpath):
-                missing_network_files.append(network_fpath)
-            else:
-                network_files[ptype] = network_fpath
-
-        # no files found here indicates a problem!
-        if len(annotation_files) == 0:
-            raise Exception(
-                'Failed to find *any* BiGSCAPE Network_Annotations tsv files under "{}" (incorrect cutoff value? currently set to {})'
-                .format(self.bigscape_dir, self._bigscape_cutoff))
-
-        def _list_missing_files(m, l):
-            if len(l) == 0:
-                return
-            logger.warning(m)
-            for i, fn in enumerate(l):
-                logger.warning(f'  {i + 1}/{len(l)}: ' + fn)
-
-        _list_missing_files(
-            f'{len(missing_annotation_files)} missing annotation tsv files:',
-            missing_annotation_files)
-        _list_missing_files(
-            '{} missing clustering tsv files:'.format(
-                len(missing_clustering_files)), missing_clustering_files)
-        _list_missing_files(
-            f'{len(missing_network_files)} missing network files:',
-            missing_network_files)
-
-        # exclude any product types that don't have both annotation and cluster files
-        self.product_types = []  # product types have bigscape data
-        for ptype in self.BIGSCAPE_PRODUCT_TYPES:
-            if ptype not in annotation_files or ptype not in clustering_files:
-                # remove this product type completely
-                for d in [annotation_files, clustering_files, network_files]:
-                    if ptype in d:
-                        del d[ptype]
-                logger.warning(
-                    'Product type {} will be skipped due to missing files!'.
-                    format(ptype))
-            else:
-                self.product_types.append(ptype)
+        folder_path = os.path.join(self.bigscape_dir, "mix")
+        clustering_filename = 'mix_clustering_c0.{:02d}.tsv'.format(self._bigscape_cutoff)
+        clustering_fpath = os.path.join(folder_path, clustering_filename)
+        annotation_fpath = os.path.join(self.bigscape_dir, "Network_Annotations_Full.tsv")
 
         #----------------------------------------------------------------------
         # CG: Parse AntiSMASH dir
@@ -686,8 +625,8 @@ class DatasetLoader():
 
         self.gcfs, self.bgcs, self.strains, unknown_strains = load_gcfs(
             self.strains,
-            clustering_files,
-            annotation_files,
+            clustering_fpath,
+            annotation_fpath,
             self.mibig_bgc_dict,
             antismash_bgc_loader.get_bgcs(),
             antismash_delimiters=self._antismash_delimiters)

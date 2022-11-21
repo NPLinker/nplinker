@@ -35,8 +35,8 @@ def parse_gbk_header(bgc):
         bgc.antismash_id = records[0].id
 
 
-def load_gcfs(strains: StrainCollection, product_class_cluster_file_dict: dict,
-              network_annotations_file_dict: dict,
+def load_gcfs(strains: StrainCollection, product_class_cluster_file: str,
+              network_annotations_file: str,
               mibig_bgc_dict: dict[str, MibigBGC],
               antismash_bgc_dict: dict[str, BGC], antismash_delimiters: str):
     metadata = {}
@@ -61,12 +61,11 @@ def load_gcfs(strains: StrainCollection, product_class_cluster_file_dict: dict,
     # - Bigscape product type/class [4]
     # - Organism [5]
     # - Taxonomy [6]
-    for a in network_annotations_file_dict.values():
-        with open(a) as f:
-            reader = csv.reader(f, delimiter='\t')
-            next(reader)  # skip headers
-            for line in reader:
-                metadata[line[0]] = line
+    with open(network_annotations_file) as f:
+        reader = csv.reader(f, delimiter='\t')
+        next(reader)  # skip headers
+        for line in reader:
+            metadata[line[0]] = line
 
     logger.info(f'Using antiSMASH filename delimiters {antismash_delimiters}')
 
@@ -74,59 +73,56 @@ def load_gcfs(strains: StrainCollection, product_class_cluster_file_dict: dict,
     # "cluster files" are the various <class>_clustering_c0.xx.tsv files
     # - BGC name
     # - cluster ID
-    for product_class, filename in product_class_cluster_file_dict.items():
-        product_class = os.path.split(filename)[-1]
-        product_class = product_class[:product_class.index('_')]
-        with open(filename, "rt") as f:
-            reader = csv.reader(f, delimiter='\t')
-            next(reader)  # skip headers
-            for line in reader:
-                bgc_name = line[0]
-                family_id = int(line[1])
+    with open(product_class_cluster_file, "rt") as f:
+        reader = csv.reader(f, delimiter='\t')
+        next(reader)  # skip headers
+        for line in reader:
+            bgc_name = line[0]
+            family_id = int(line[1])
 
-                # check strain
-                if bgc_name.startswith('BGC'):
-                    # removing the .<digit> suffix
-                    bgc_name = bgc_name.split(".")[0]
+            # check strain
+            if bgc_name.startswith('BGC'):
+                # removing the .<digit> suffix
+                bgc_name = bgc_name.split(".")[0]
 
-                strain = strains.lookup(bgc_name)
-                if strain is None:
-                    logger.warning(f"Unknown strain ID: {bgc_name}")
-                    unknown_strains[bgc_name] = filename
-                    continue
+            strain = strains.lookup(bgc_name)
+            if strain is None:
+                logger.warning(f"Unknown strain ID: {bgc_name}")
+                unknown_strains[bgc_name] = filename
+                continue
 
-                # get bgc annotations from bigscape file
-                metadata_line = metadata[bgc_name]
-                description = metadata_line[2]
-                bigscape_class = metadata_line[4]
+            # get bgc annotations from bigscape file
+            metadata_line = metadata[bgc_name]
+            description = metadata_line[2]
+            bigscape_class = metadata_line[4]
 
-                # build new bgc
-                if strain.id.startswith('BGC'):
-                    try:
-                        new_bgc = mibig_bgc_dict[strain.id]
-                        num_mibig += 1
-                    except KeyError:
-                        raise Exception(f'Unknown MiBIG: {strain.id}')
-                    new_bgc.description = description
-                else:
-                    try:
-                        new_bgc = antismash_bgc_dict[bgc_name]
-                    except KeyError:
-                        raise Exception(f'Unknown AntiSMASH BGC: {strain.id}')
+            # build new bgc
+            if strain.id.startswith('BGC'):
+                try:
+                    new_bgc = mibig_bgc_dict[strain.id]
+                    num_mibig += 1
+                except KeyError:
+                    raise Exception(f'Unknown MiBIG: {strain.id}')
+                new_bgc.description = description
+            else:
+                try:
+                    new_bgc = antismash_bgc_dict[bgc_name]
+                except KeyError:
+                    raise Exception(f'Unknown AntiSMASH BGC: {strain.id}')
 
-                new_bgc.id = internal_bgc_id
-                bgc_list.append(new_bgc)
-                internal_bgc_id += 1
+            new_bgc.id = internal_bgc_id
+            bgc_list.append(new_bgc)
+            internal_bgc_id += 1
 
-                # build new gcf
-                if family_id not in gcf_dict:
-                    new_gcf = GCF(internal_gcf_id, family_id, bigscape_class)
-                    gcf_dict[family_id] = new_gcf
-                    gcf_list.append(new_gcf)
-                    internal_gcf_id += 1
+            # build new gcf
+            if family_id not in gcf_dict:
+                new_gcf = GCF(internal_gcf_id, family_id, bigscape_class)
+                gcf_dict[family_id] = new_gcf
+                gcf_list.append(new_gcf)
+                internal_gcf_id += 1
 
-                # link bgc to gcf
-                gcf_dict[family_id].add_bgc(new_bgc)
+            # link bgc to gcf
+            gcf_dict[family_id].add_bgc(new_bgc)
 
     logger.info(
         '# MiBIG BGCs = {}, non-MiBIG BGCS = {}, total bgcs = {}, GCFs = {}, strains={}'
