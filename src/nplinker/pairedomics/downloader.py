@@ -179,11 +179,14 @@ class Downloader():
         logger.info('Going to download the metabolomics data file')
 
         self._download_metabolomics_zipfile(self.gnps_task_id)
+
         self._download_genomics_data(self.project_json['genomes'])
+
+        # CG: it extracts strain names and later will be used for strains
         self._parse_genome_labels(self.project_json['genome_metabolome_links'],
                                   self.project_json['genomes'])
 
-        # CG: parse antismash gbk files and add them as strain alias
+        # CG: it generates the strain_mapping.csv file
         self.strains.generate_strain_mappings(self.strain_mappings_file,
             os.path.join(self.project_file_cache, 'antismash'))
 
