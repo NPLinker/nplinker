@@ -681,7 +681,7 @@ class DatasetLoader():
         # CG: load all bgcs and gcfs
         #----------------------------------------------------------------------
         logger.debug(
-            'loadBGC_from_cluster_files(antismash_dir={}, delimiters={})'.
+            'load_gcfs(antismash_dir={}, delimiters={})'.
             format(self.antismash_dir, self._antismash_delimiters))
 
         self.gcfs, self.bgcs, self.strains, unknown_strains = load_gcfs(
