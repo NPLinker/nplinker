@@ -111,12 +111,12 @@ class DatasetLoader():
     BIGSCAPE_CUTOFF_DEFAULT = 30
     EXTENDED_METADATA_TABLE_PARSING_DEFAULT = False
     USE_MIBIG_DEFAULT = True
-    MIBIG_VERSION_DEFAULT = "1.4"
+    MIBIG_VERSION_DEFAULT = "3.1"
 
     RUN_BIGSCAPE_DEFAULT = True
 
     # https://git.wageningenur.nl/medema-group/BiG-SCAPE/-/wikis/parameters#mibig
-    # BigScape mibig default version is 2.1
+    # BigScape mibig default version is 3.1
     EXTRA_BIGSCAPE_PARAMS_DEFAULT = '--mibig --clans-off --mix --include_singletons'
 
     RUN_CANOPUS_DEFAULT = False
