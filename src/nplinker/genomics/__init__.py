@@ -1,17 +1,10 @@
-from nplinker.logconfig import LogConfig
+import logging
 
-
-LogConfig.getLogger(__name__)
-
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 from .bgc import BGC
 from .gcf import GCF
 from .genomics import load_gcfs
 from .abc import BGCLoaderBase
 
-__all__ = [
-    "bgc",
-    "gcf",
-    "load_gcfs",
-    "BGCLoaderBase"
-]
+__all__ = ["bgc", "gcf", "load_gcfs", "BGCLoaderBase"]
