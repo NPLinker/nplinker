@@ -6,6 +6,7 @@ from nplinker.logconfig import LogConfig
 from nplinker.utils import list_dirs
 from nplinker.utils import list_files
 from ..abc import BGCLoaderBase
+from nplinker.strains import Strain
 
 logger = LogConfig.getLogger(__name__)
 
@@ -129,15 +130,16 @@ def parse_bgc_genbank(file: str) -> BGC:
             product_prediction = feature.qualifiers['product']
             break
 
+    strain = Strain(fname)
     if product_prediction is None:
         bgc = BGC(-1,
-                  strain=fname,
+                  strain=strain,
                   name=fname,
                   product_prediction=[],
                   description=description)
     else:
         bgc = BGC(-1,
-                  strain=fname,
+                  strain=strain,
                   name=fname,
                   product_prediction=product_prediction,
                   description=description)

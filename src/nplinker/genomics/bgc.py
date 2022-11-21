@@ -2,6 +2,7 @@ import re
 from nplinker.logconfig import LogConfig
 from .aa_pred import predict_aa
 from .genomics_utilities import get_smiles
+from nplinker.strains import Strain
 
 
 logger = LogConfig.getLogger(__name__)
@@ -13,7 +14,7 @@ class BGC():
 
     def __init__(self,
                  id: int,
-                 strain: str,
+                 strain: Strain,
                  name: str,
                  product_prediction: list[str],
                  description=None):
