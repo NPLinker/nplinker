@@ -171,8 +171,13 @@ def _filter_gcfs(
             for bgc in gcf.bgcs:
                 bgcs_to_remove.add(bgc)
 
+    for bgc in bgcs:
+        if len(bgc.parents) == 0:
+            bgcs_to_remove.add(bgc)
+
     for gcf in gcfs_to_remove:
         gcfs.remove(gcf)
+
     for bgc in bgcs_to_remove:
         bgcs.remove(bgc)
         strains.remove(bgc.strain)
