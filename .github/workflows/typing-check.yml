@@ -35,6 +35,7 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip setuptools
           pip install mypy
+          pip install -r requirements.dev.txt
       # mypy configs are in pyproject.toml
       - name: Check static typing
         run: |
