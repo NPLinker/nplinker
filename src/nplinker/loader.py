@@ -492,8 +492,9 @@ class DatasetLoader():
             self.include_only_strains = StrainCollection()
             for line_num, sid in enumerate(strain_list):
                 sid = sid.strip()  # get rid of newline
-                strain_obj = self.strains.lookup(sid)
-                if strain_obj is None:
+                try:
+                    strain_obj = self.strains.lookup(sid)
+                except KeyError:
                     logger.warning(
                         'Line {} of {}: invalid/unknown strain ID "{}"'.format(
                             line_num + 1, self.include_strains_file, sid))

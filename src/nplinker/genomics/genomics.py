@@ -86,8 +86,9 @@ def load_gcfs(strains: StrainCollection, product_class_cluster_file: str,
             bigscape_class = metadata_line[4]
 
             # check strain
-            strain = strains.lookup(bgc_name)
-            if strain is None:
+            try:
+                strain = strains.lookup(bgc_name)
+            except KeyError:
                 logger.warning(f"Unknown strain ID: {bgc_name}")
                 unknown_strains[bgc_name] = antismash_file_dict[bgc_name]
                 continue
