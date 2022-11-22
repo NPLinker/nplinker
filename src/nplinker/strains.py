@@ -31,7 +31,7 @@ class Strain():
                 f'Refusing to add zero-length alias to strain {self}')
             return
 
-        self.aliases.add(name)
+        self.aliases.add(alt_id)
 
     def __repr__(self) -> str:
         return str(self)
