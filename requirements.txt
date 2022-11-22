@@ -9,4 +9,5 @@ scipy
 sortedcontainers
 toml
 tqdm
+typing_extensions
 xdg

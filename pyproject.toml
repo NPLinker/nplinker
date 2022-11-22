@@ -39,6 +39,7 @@ dependencies = [
     "sortedcontainers",
     "toml",
     "tqdm",
+    "typing_extensions",
     "xdg"
 ]
 
