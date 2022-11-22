@@ -30,6 +30,7 @@ classifiers = [
 dependencies = [
     "beautifulsoup4",
     "biopython",
+    "deprecated",
     "httpx",
     "numpy",
     "pandas",

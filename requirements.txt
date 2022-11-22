@@ -1,5 +1,6 @@
 beautifulsoup4
 biopython
+deprecated
 httpx
 numpy
 pandas
@@ -9,4 +10,3 @@ sortedcontainers
 toml
 tqdm
 xdg
-deprecated
