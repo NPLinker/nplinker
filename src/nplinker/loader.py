@@ -619,9 +619,7 @@ class DatasetLoader():
         #----------------------------------------------------------------------
         # CG: load all bgcs and gcfs
         #----------------------------------------------------------------------
-        logger.debug(
-            'load_gcfs(antismash_dir={}, delimiters={})'.
-            format(self.antismash_dir, self._antismash_delimiters))
+        logger.debug('Loading GCFs...')
 
         self.gcfs, self.bgcs, self.strains, unknown_strains = load_gcfs(
             self.strains,
@@ -629,7 +627,7 @@ class DatasetLoader():
             annotation_fpath,
             self.mibig_bgc_dict,
             antismash_bgc_loader.get_bgcs(),
-            antismash_delimiters=self._antismash_delimiters)
+            antismash_bgc_loader.get_files())
 
         #----------------------------------------------------------------------
         # CG: write unknown strains in genomics to file

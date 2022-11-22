@@ -38,7 +38,8 @@ def parse_gbk_header(bgc):
 def load_gcfs(strains: StrainCollection, product_class_cluster_file: str,
               network_annotations_file: str,
               mibig_bgc_dict: dict[str, MibigBGC],
-              antismash_bgc_dict: dict[str, BGC], antismash_delimiters: str):
+              antismash_bgc_dict: dict[str, BGC],
+              antismash_file_dict: dict[str, str]):
     metadata = {}
 
     num_mibig = 0
@@ -49,6 +50,7 @@ def load_gcfs(strains: StrainCollection, product_class_cluster_file: str,
     gcf_dict = {}
     gcf_list = []
 
+    used_strains = StrainCollection()
     unknown_strains = {}
 
     # CG: bigscape data
@@ -67,8 +69,6 @@ def load_gcfs(strains: StrainCollection, product_class_cluster_file: str,
         for line in reader:
             metadata[line[0]] = line
 
-    logger.info(f'Using antiSMASH filename delimiters {antismash_delimiters}')
-
     # CG: bigscape data
     # "cluster files" are the various <class>_clustering_c0.xx.tsv files
     # - BGC name
@@ -80,35 +80,33 @@ def load_gcfs(strains: StrainCollection, product_class_cluster_file: str,
             bgc_name = line[0]
             family_id = int(line[1])
 
-            # check strain
-            if bgc_name.startswith('BGC'):
-                # removing the .<digit> suffix
-                bgc_name = bgc_name.split(".")[0]
-
-            strain = strains.lookup(bgc_name)
-            if strain is None:
-                logger.warning(f"Unknown strain ID: {bgc_name}")
-                unknown_strains[bgc_name] = filename
-                continue
-
             # get bgc annotations from bigscape file
             metadata_line = metadata[bgc_name]
             description = metadata_line[2]
             bigscape_class = metadata_line[4]
 
+            # check strain
+            strain = strains.lookup(bgc_name)
+            if strain is None:
+                logger.warning(f"Unknown strain ID: {bgc_name}")
+                unknown_strains[bgc_name] = antismash_file_dict[bgc_name]
+                continue
+
             # build new bgc
             if strain.id.startswith('BGC'):
                 try:
                     new_bgc = mibig_bgc_dict[strain.id]
-                    num_mibig += 1
                 except KeyError:
-                    raise Exception(f'Unknown MiBIG: {strain.id}')
+                    raise KeyError(f'Unknown MiBIG: {strain.id}')
+                num_mibig += 1
                 new_bgc.description = description
             else:
                 try:
                     new_bgc = antismash_bgc_dict[bgc_name]
                 except KeyError:
-                    raise Exception(f'Unknown AntiSMASH BGC: {strain.id}')
+                    raise KeyError(f'Unknown AntiSMASH BGC: {bgc_name}')
+                # update strain to make sure consistent strain id
+                new_bgc.strain = strain
 
             new_bgc.id = internal_bgc_id
             bgc_list.append(new_bgc)
@@ -124,6 +122,9 @@ def load_gcfs(strains: StrainCollection, product_class_cluster_file: str,
             # link bgc to gcf
             gcf_dict[family_id].add_bgc(new_bgc)
 
+            # add strain to used strains
+            used_strains.add(strain)
+
     logger.info(
         '# MiBIG BGCs = {}, non-MiBIG BGCS = {}, total bgcs = {}, GCFs = {}, strains={}'
         .format(num_mibig,
@@ -131,13 +132,13 @@ def load_gcfs(strains: StrainCollection, product_class_cluster_file: str,
                 len(strains)))
 
     # filter out MiBIG-only GCFs)
-    gcf_list, bgc_list, strains = _filter_gcfs(gcf_list, bgc_list, strains)
+    gcf_list, bgc_list, used_strains = _filter_gcfs(gcf_list, bgc_list, used_strains)
     logger.info(
         '# after filtering, total bgcs = {}, GCFs = {}, strains={}, unknown_strains={}'
-        .format(len(bgc_list), len(gcf_list), len(strains),
+        .format(len(bgc_list), len(gcf_list), len(used_strains),
                 len(unknown_strains)))
 
-    return gcf_list, bgc_list, strains, unknown_strains
+    return gcf_list, bgc_list, used_strains, unknown_strains
 
 
 def _filter_gcfs(
