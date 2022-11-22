@@ -1,9 +1,13 @@
+from __future__ import annotations
 import re
+from typing import TYPE_CHECKING
 from nplinker.logconfig import LogConfig
 from .aa_pred import predict_aa
 from .genomics_utilities import get_smiles
-from nplinker.strains import Strain
 
+if TYPE_CHECKING:
+    from ..strains import Strain
+    from .gcf import GCF
 
 logger = LogConfig.getLogger(__name__)
 
@@ -17,17 +21,17 @@ class BGC():
                  strain: Strain,
                  name: str,
                  product_prediction: list[str],
-                 description=None):
+                 description: str | None = None):
         self.id = id
         self.strain = strain
         self.name = name  # BGC file name
         self.product_prediction = product_prediction  # can get from gbk SeqFeature "region"
         # allow for multiple parents in the case of hybrid BGCs
-        self.parents = set()
+        self.parents: set[GCF] = set()
         self.description = description  # can get from gbk SeqRecord.description
         # these will get parsed from the .gbk file
-        self.antismash_id = None  # version in .gbk, id in SeqRecord
-        self.antismash_accession = None  # accession in .gbk, name in SeqRecord
+        self.antismash_id: str | None = None  # version in .gbk, id in SeqRecord
+        self.antismash_accession: str | None = None  # accession in .gbk, name in SeqRecord
 
         self.region = -1
         self.cluster = -1
@@ -38,7 +42,7 @@ class BGC():
         self._smiles = None
         self._smiles_parsed = False
 
-        self.edges = set()
+        self.edges: set = set()
 
     def set_filename(self, filename):
         self.antismash_file = filename

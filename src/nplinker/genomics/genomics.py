@@ -11,9 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import csv
-import os
 import re
 from Bio import SeqIO
 from nplinker.genomics.mibig import MibigBGC
@@ -35,23 +34,23 @@ def parse_gbk_header(bgc):
         bgc.antismash_id = records[0].id
 
 
-def load_gcfs(strains: StrainCollection, product_class_cluster_file: str,
+def load_gcfs(strains: StrainCollection,
+              product_class_cluster_file: str,
               network_annotations_file: str,
               mibig_bgc_dict: dict[str, MibigBGC],
               antismash_bgc_dict: dict[str, BGC],
               antismash_file_dict: dict[str, str]):
-    metadata = {}
+    new_bgc: BGC | MibigBGC
+    num_mibig: int = 0
+    internal_bgc_id: int = 0
+    bgc_list: list[BGC | MibigBGC] = []
 
-    num_mibig = 0
-    internal_bgc_id = 0
-    bgc_list = []
+    internal_gcf_id: int = 0
+    gcf_dict: dict[int, GCF] = {}
+    gcf_list: list[GCF] = []
 
-    internal_gcf_id = 0
-    gcf_dict = {}
-    gcf_list = []
-
-    used_strains = StrainCollection()
-    unknown_strains = {}
+    used_strains: StrainCollection = StrainCollection()
+    unknown_strains: dict[str, str] = {}
 
     # CG: bigscape data
     # parse the annotation files (<dataset>/bigscape/<cluster_name>/Network_Annotations_<cluster_name>.tsv
@@ -63,6 +62,7 @@ def load_gcfs(strains: StrainCollection, product_class_cluster_file: str,
     # - Bigscape product type/class [4]
     # - Organism [5]
     # - Taxonomy [6]
+    metadata = {}
     with open(network_annotations_file) as f:
         reader = csv.reader(f, delimiter='\t')
         next(reader)  # skip headers
@@ -133,7 +133,8 @@ def load_gcfs(strains: StrainCollection, product_class_cluster_file: str,
                 len(strains)))
 
     # filter out MiBIG-only GCFs)
-    gcf_list, bgc_list, used_strains = _filter_gcfs(gcf_list, bgc_list, used_strains)
+    gcf_list, bgc_list, used_strains = _filter_gcfs(gcf_list, bgc_list,
+                                                    used_strains)
     logger.info(
         '# after filtering, total bgcs = {}, GCFs = {}, strains={}, unknown_strains={}'
         .format(len(bgc_list), len(gcf_list), len(used_strains),
@@ -143,7 +144,7 @@ def load_gcfs(strains: StrainCollection, product_class_cluster_file: str,
 
 
 def _filter_gcfs(
-    gcfs: list[GCF], bgcs: list[BGC], strains: StrainCollection
+    gcfs: list[GCF], bgcs: list[BGC | MibigBGC], strains: StrainCollection
 ) -> tuple[list[GCF], list[BGC], StrainCollection]:
     """Remove a GCF from given GCF list if it only has MIBiG BGC members,
         correspondingly remove relevant BGC and strain from given list/collection.
