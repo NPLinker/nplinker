@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from __future__ import annotations
+import csv
 import os
 import os.path
 import bz2
@@ -47,6 +49,12 @@ def sqrt_normalise(peaks):
     return normalised_peaks
 
 
+def find_delimiter(filename):
+    sniffer = csv.Sniffer()
+    with open(filename, mode='rt', encoding='utf-8') as fp:
+        delimiter = sniffer.sniff(fp.read(5000)).delimiter
+    return delimiter
+    
 # Functions below are adapted from torchvision library,
 # see: https://github.com/pytorch/vision/blob/main/torchvision/datasets/utils.py.
 #

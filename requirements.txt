@@ -9,3 +9,4 @@ sortedcontainers
 toml
 tqdm
 xdg
+deprecated

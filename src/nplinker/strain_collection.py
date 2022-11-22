@@ -11,15 +11,24 @@ logger = LogConfig.getLogger(__name__)
 class StrainCollection():
 
     def __init__(self):
-        self._strains = []
-        self._lookup = {}
-        self._lookup_indices = {}
+        self._strains: list[Strain] = []
+        self._lookup: dict[str, Strain] = {}
+        self._lookup_indices: dict[int, Strain] = {}
 
-    def add(self, strain):
+    def add(self, strain: Strain):
+        """Add the strain to the aliases.
+        This also adds those strain's aliases to this' strain's aliases.
+
+        Args:
+            strain(Strain): Strain to add to self.
+
+        Examples:
+            >>>
+            """
         if strain.id in self._lookup:
             # if it already exists, just merge the set of aliases and update
             # lookup entries
-            existing = self.lookup(strain.id)
+            existing: Strain = self.lookup(strain.id)
             existing.aliases.update(strain.aliases)
             for alias in strain.aliases:
                 self._lookup[alias] = existing
@@ -32,7 +41,13 @@ class StrainCollection():
         for alias in strain.aliases:
             self._lookup[alias] = strain
 
-    def remove(self, strain):
+    def remove(self, strain: Strain):
+        """Remove the specified strain from the aliases.
+        TODO: #90 Implement removing the strain also from self._lookup indices.
+
+        Args:
+            strain(Strain): Strain to remove.
+        """
         if strain.id not in self._lookup:
             return
 
@@ -41,7 +56,7 @@ class StrainCollection():
         for alias in strain.aliases:
             del self._lookup[alias]
 
-    def filter(self, strain_set):
+    def filter(self, strain_set: set[Strain]):
         """
         Remove all strains that are not in strain_set from the strain collection
         """
@@ -49,7 +64,16 @@ class StrainCollection():
         for strain in to_remove:
             self.remove(strain)
 
-    def __contains__(self, strain_id):
+    def __contains__(self, strain_id: str|Strain) -> bool:
+        """Check if the strain or strain id are contained in the lookup table.
+
+        Args:
+            strain_id(str|Strain): Strain or strain id to look up.
+
+        Returns:
+            bool: Whether the strain is contained in the collection.
+         """
+
         if isinstance(strain_id, str):
             return strain_id in self._lookup
         # assume it's a Strain object
@@ -61,16 +85,42 @@ class StrainCollection():
     def __next__(self):
         return next(self._strains)
 
-    def lookup_index(self, index):
+    def lookup_index(self, index: int) -> Strain:
+        """Return the strain from lookup by index.
+
+        Args:
+            index(int): Position index from which to retrieve the strain
+
+        Returns:
+            Strain: Strain identified by the given index.
+        """
         return self._lookup_indices[index]
 
-    def lookup(self, strain_id) -> Strain | None:
+    def lookup(self, strain_id: str) -> Strain:
+        """Check whether the strain id is contained in the lookup table. If so, return the strain, otherwise return `default`.
+
+        Raises:
+            Exception if strain_id is not found.
+
+        Args:
+            strain_id(str): Strain id to lookup.
+
+        Returns:
+            Strain: Strain retrieved during lookup or object passed as default.
+        """
         if strain_id not in self._lookup:
-            return None
+            # logger.error('Strain lookup failed for "{}"'.format(strain_id))
+            raise KeyError(f'Strain lookup failed for "{strain_id}"')
 
         return self._lookup[strain_id]
 
-    def add_from_file(self, filename):
+    def add_from_file(self, filename: str):
+        """Read strains and aliases from file and store in self.
+
+        Args:
+            filename(str): Path to strain mapping file to load.
+        """
+
         if not os.path.exists(filename):
             logger.warning(f'strain mappings file not found: {filename}')
             return
@@ -93,7 +143,15 @@ class StrainCollection():
 
                 line += 1
 
-    def save_to_file(self, filename):
+    def save_to_file(self, filename: str):
+        """Save this strain collection to file.
+
+        Args:
+            filename(str): Output filename.
+
+        Examples:
+            >>>
+            """
         with open(filename, 'w') as f:
             for strain in self._strains:
                 ids = [strain.id] + list(strain.aliases)
@@ -122,8 +180,9 @@ class StrainCollection():
             antismash_id = os.path.basename(d)
 
             # use antismash_id (e.g. GCF_000016425.1) as strain name to query
-            strain = self.lookup(antismash_id)
-            if strain is None:
+            try:
+                strain = self.lookup(antismash_id)
+            except KeyError:
                 logger.warning(
                     f'Failed to lookup AntiSMASH strain name: {antismash_id}')
                 continue
@@ -137,10 +196,10 @@ class StrainCollection():
         logger.info(f'Saving strains to {strain_mappings_file}')
         self.save_to_file(strain_mappings_file)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._strains)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
 
     def __str__(self):

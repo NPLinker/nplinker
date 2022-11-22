@@ -13,6 +13,13 @@
 # limitations under the License.
 
 from nplinker.logconfig import LogConfig
+from nplinker.metabolomics import MolecularFamily
+from nplinker.metabolomics import Spectrum
+from nplinker.pickler import load_pickled_data
+from nplinker.pickler import save_pickled_data
+from nplinker.scoring.object_link import ObjectLink
+from .linking.data_linking import DataLinks
+from .linking.link_finder import LinkFinder
 
 
 logger = LogConfig.getLogger(__name__)

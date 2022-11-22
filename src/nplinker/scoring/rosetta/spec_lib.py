@@ -14,8 +14,7 @@
 
 from sortedcontainers import SortedList
 from ...logconfig import LogConfig
-from ...metabolomics import mols_to_spectra
-from ...parsers.mgf import LoadMGF
+from nplinker.metabolomics.gnps.gnps_spectrum_loader import GNPSSpectrumLoader
 from .rosetta_functions import fast_cosine
 
 
@@ -29,9 +28,8 @@ class SpecLib():
         self.spectra = []
 
     def _load_mgf(self):
-        ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra(
-            [self.mgf_file])
-        self.spectra = mols_to_spectra(ms2, metadata)
+        self.spectra = GNPSSpectrumLoader(self.mgf_file).spectra()
+
         self.sort()
 
     def sort(self):
