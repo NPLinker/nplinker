@@ -9,5 +9,6 @@ pytest-cov
 sphinx
 sphinx_rtd_theme
 sphinx-autoapi
+types-toml
 myst_parser
 yapf

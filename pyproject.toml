@@ -58,6 +58,7 @@ dev = [
     "sphinx",
     "sphinx_rtd_theme",
     "sphinx-autoapi",
+    "types-toml",
     "myst_parser",
     "unimport",
     "yapf"
