@@ -5,26 +5,29 @@ import httpx
 class GNPSDownloader:
     GNPS_DATA_DOWNLOAD_URL = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_clustered_spectra'
 
-    def __init__(self, task_id: str, outpath: Path):
+    def __init__(self, task_id: str, download_root: Path):
         """Init the class with a gnps_task_id and a output path on where to save the data.
 
         Args:
             task_id(str): GNPS task id, identifying the data to be downloaded.
-            outpath(Path): Path where to store the downloaded archive.
+            download_root(Path): Path where to store the downloaded archive.
 
         Examples:
-            >>> GNPSDownloader("c22f44b14a3d450eb836d607cb9521bb", "archive.zip")
+            >>> GNPSDownloader("c22f44b14a3d450eb836d607cb9521bb", "~/downloads")
             """
         self._task_id = task_id
-        self._outpath = outpath
+        self._download_root = download_root
+
 
     def download(self):
         """Execute the downloading process. """
-        with open(self._outpath, 'wb') as f:
+        with open(self.target(), 'wb') as f:
             with httpx.stream('POST', self.url()) as r:
                 for data in r.iter_bytes():
                     f.write(data)
    
+    def target(self) -> Path:
+        return self._download_root.joinpath(self._task_id + ".zip")
     
     def task_id(self) -> str:
         """Get the GNPS task id.

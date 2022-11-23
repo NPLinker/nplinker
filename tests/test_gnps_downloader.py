@@ -9,19 +9,19 @@ from . import DATA_DIR
 class GNPSDownloaderBuilder:
     def __init__(self):
         self._task_id = None
-        self._outpath = None
+        self._download_root = None
         pass
     
     def with_task_id(self, task_id: str) -> Self:
         self._task_id = task_id
         return self
 
-    def with_outpath(self, outpath: Path) -> Self:
-        self._outpath = outpath
+    def with_download_root(self, download_root: Path) -> Self:
+        self._download_root = download_root
         return self
     
     def build(self) -> GNPSDownloader:
-        return GNPSDownloader(self._task_id, self._outpath)
+        return GNPSDownloader(self._task_id, self._download_root)
     
 
 
@@ -36,8 +36,8 @@ def test_has_url():
 
 
 def test_downloads_file(tmp_path):
-    outpath = tmp_path / "data.zip"
-    sut = GNPSDownloader("c22f44b14a3d450eb836d607cb9521bb", outpath)
+    outpath = tmp_path.joinpath("c22f44b14a3d450eb836d607cb9521bb.zip")
+    sut = GNPSDownloader("c22f44b14a3d450eb836d607cb9521bb", tmp_path)
     sut.download()
     actual = zipfile.ZipFile(outpath)
 
