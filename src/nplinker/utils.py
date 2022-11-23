@@ -381,11 +381,24 @@ def extract_archive(from_path: str | Path,
 
     return str(to_path)
 
-def extract_file_matching_pattern(archive: zipfile.ZipFile, prefix: str, suffix: str, extract_dir: Path, out_filename: str):
+def extract_file_matching_pattern(archive: zipfile.ZipFile, prefix: str, suffix: str, extract_dir: Path, out_filename: str|None = None):
+    """Extract a file matching a pattern from an archive and place it in the extraction directory under the given filename.
+
+    Args:
+        archive(zipfile.ZipFile): Archive from which to extract the file
+        prefix(str): Prefix to match in the filename. Pass empty string for no prefix.
+        suffix(str): Suffix to match in the filename. Pass empty string for no suffix.
+        extract_dir(Path): Path to the folder where to store the extracted file
+        out_filename(str): Name to assign to the extracted file.
+
+    Examples:
+        >>> extract_file_matching_pattern(zipfile.ZipFile("archive.zip"), "", ".txt", ".", "results.txt")
+        """
     files: list[Path] = [x.filename for x in archive.filelist]
     file_to_extract = list(filter(lambda x: x.startswith(prefix) and x.endswith(suffix), files)).pop()
     archive.extract(file_to_extract, extract_dir)
-    os.rename(extract_dir / file_to_extract, extract_dir / out_filename)
+    if out_filename is not None:
+        os.rename(extract_dir / file_to_extract, extract_dir / out_filename)
 
 
 def download_and_extract_archive(
