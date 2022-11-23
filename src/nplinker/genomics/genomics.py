@@ -15,7 +15,6 @@ from __future__ import annotations
 import csv
 import re
 from Bio import SeqIO
-from nplinker.genomics.mibig import MibigBGC
 from nplinker.logconfig import LogConfig
 from nplinker.strain_collection import StrainCollection
 from .bgc import BGC
@@ -37,13 +36,13 @@ def parse_gbk_header(bgc):
 def load_gcfs(strains: StrainCollection,
               product_class_cluster_file: str,
               network_annotations_file: str,
-              mibig_bgc_dict: dict[str, MibigBGC],
+              mibig_bgc_dict: dict[str, BGC],
               antismash_bgc_dict: dict[str, BGC],
               antismash_file_dict: dict[str, str]):
-    new_bgc: BGC | MibigBGC
+    new_bgc: BGC
     num_mibig: int = 0
     internal_bgc_id: int = 0
-    bgc_list: list[BGC | MibigBGC] = []
+    bgc_list: list[BGC] = []
 
     internal_gcf_id: int = 0
     gcf_dict: dict[int, GCF] = {}
@@ -144,7 +143,7 @@ def load_gcfs(strains: StrainCollection,
 
 
 def _filter_gcfs(
-    gcfs: list[GCF], bgcs: list[BGC | MibigBGC], strains: StrainCollection
+    gcfs: list[GCF], bgcs: list[BGC], strains: StrainCollection
 ) -> tuple[list[GCF], list[BGC], StrainCollection]:
     """Remove a GCF from given GCF list if it only has MIBiG BGC members,
         correspondingly remove relevant BGC and strain from given list/collection.

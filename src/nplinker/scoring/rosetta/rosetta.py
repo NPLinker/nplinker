@@ -16,7 +16,7 @@ import csv
 import os
 
 from nplinker.scoring.rosetta.rosetta_hit import RosettaHit
-from ...genomics.mibig import MibigBGC
+from ...genomics import BGC
 from ...logconfig import LogConfig
 from ...parsers.kcb import KCBJSONParser
 from ...parsers.kcb import KCBTextParser
@@ -172,7 +172,7 @@ class Rosetta():
         skipped, errors = 0, 0
 
         for bgc in bgcs:
-            if bgc.antismash_file is None or isinstance(bgc, MibigBGC):
+            if bgc.antismash_file is None or isinstance(bgc, BGC):
                 skipped += 1
                 continue
 

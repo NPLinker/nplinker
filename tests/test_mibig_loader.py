@@ -1,10 +1,10 @@
 import os.path
 import pytest
+from nplinker.genomics import BGC
 from nplinker.genomics import BGCLoaderBase
 from nplinker.genomics.mibig import MibigBGCLoader
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.genomics.mibig import parse_bgc_metadata_json
-from nplinker.genomics.mibig.mibig_bgc import MibigBGC
 from nplinker.genomics.mibig.mibig_metadata import MibigMetadata
 from . import DATA_DIR
 
@@ -64,12 +64,12 @@ class TestMibigBGCLoader:
         assert len(bgcs) == 2502  # MIBiG v3.1 has 2502 BGCs
         assert "BGC0000001" in bgcs
         assert "BGC0000246" not in bgcs
-        assert isinstance(bgcs["BGC0000001"], MibigBGC)
+        assert isinstance(bgcs["BGC0000001"], BGC)
 
 
 def test_parse_bgc_metadata_json():
     json_file = DATA_DIR / "mibig" / "BGC0000001_v3.1.json"
     bgc = parse_bgc_metadata_json(str(json_file))
-    assert isinstance(bgc, MibigBGC)
+    assert isinstance(bgc, BGC)
     assert bgc.id == -1
     assert bgc.name == "BGC0000001"

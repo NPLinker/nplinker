@@ -83,7 +83,6 @@ class BGC():
     def is_hybrid(self):
         return len(self.parents) > 1
 
-    @property
     def is_mibig(self):
         """Check if the BGC is MIBiG reference BGC or not.
 

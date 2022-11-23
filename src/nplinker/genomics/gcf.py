@@ -1,5 +1,5 @@
 from nplinker.strain_collection import StrainCollection
-from .mibig.mibig_bgc import MibigBGC
+from .bgc import BGC
 
 
 class GCF():
@@ -59,11 +59,11 @@ class GCF():
     @property
     def non_mibig_bgcs(self):
         return list(
-            filter(lambda bgc: not isinstance(bgc, MibigBGC), self.bgcs))
+            filter(lambda bgc: not bgc.is_mibig(), self.bgcs))
 
     @property
     def mibig_bgcs(self):
-        return list(filter(lambda bgc: isinstance(bgc, MibigBGC), self.bgcs))
+        return list(filter(lambda bgc: bgc.is_mibig(), self.bgcs))
 
     @property
     def num_mibig_bgcs(self):
