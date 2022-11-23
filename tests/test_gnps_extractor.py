@@ -60,3 +60,13 @@ def test_creates_spectra(extractor: GNPSExtractor):
 
     assert Path.exists(actual)
     assert filecmp.cmp(actual, expected)
+
+
+def test_creates_molecular_families(extractor: GNPSExtractor):
+    extractor.extract()
+
+    actual = extractor.target() / "molecular_families.pairsinfo"
+    expected = DATA_DIR / "edges.pairsinfo"
+
+    assert Path.exists(actual)
+    assert filecmp.cmp(actual, expected)
