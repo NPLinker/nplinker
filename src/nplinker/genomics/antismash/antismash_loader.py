@@ -17,7 +17,7 @@ class AntismashBGCLoader:
         """Build a loader for AntiSMASH BGC genbank (.gbk) files
 
         Note:
-            AntiSMASH BGC direcotry must follow the strcuture below:
+            AntiSMASH BGC directory must follow the structure below:
             antismash
                 ├── antismash_id_1 (one AntiSMASH output, e.g. GCF_000514775.1)
                 │  ├── GCF_000514775.1.gbk
