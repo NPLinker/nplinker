@@ -105,10 +105,9 @@ def load_gcfs(strains: StrainCollection,
                     new_bgc = antismash_bgc_dict[bgc_name]
                 except KeyError:
                     raise KeyError(f'Unknown AntiSMASH BGC: {bgc_name}')
-                # update strain to make sure consistent strain id
-                new_bgc.strain = strain
 
             new_bgc.id = internal_bgc_id
+            new_bgc.strain = strain
             bgc_list.append(new_bgc)
             internal_bgc_id += 1
 

@@ -1,7 +1,6 @@
 import os.path
 from nplinker.logconfig import LogConfig
 from nplinker.utils import list_files
-from nplinker.strains import Strain
 from ..bgc import BGC
 from .mibig_metadata import MibigMetadata
 from ..abc import BGCLoaderBase
@@ -113,9 +112,7 @@ def parse_bgc_metadata_json(file: str) -> BGC:
         MibigBGC: :class:`nplinker.genomics.mibig.MibigBGC` object
     """
     metadata = MibigMetadata(file)
-    strain = Strain(metadata.mibig_accession)
-    mibig_bgc = BGC(-1, strain, metadata.mibig_accession,
-                            metadata.biosyn_class)
+    mibig_bgc = BGC(-1, metadata.mibig_accession, metadata.biosyn_class)
     return mibig_bgc
 
 

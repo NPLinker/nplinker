@@ -18,12 +18,10 @@ class BGC():
 
     def __init__(self,
                  id: int,
-                 strain: Strain,
                  name: str,
                  product_prediction: list[str],
                  description: str | None = None):
         self.id = id
-        self.strain = strain
         self.name = name  # BGC file name
         self.product_prediction = product_prediction  # can get from gbk SeqFeature "region"
         # allow for multiple parents in the case of hybrid BGCs
@@ -43,6 +41,8 @@ class BGC():
         self._smiles_parsed = False
 
         self.edges: set = set()
+
+        self._strain: Strain | None = None
 
     def set_filename(self, filename):
         self.antismash_file = filename
@@ -74,6 +74,14 @@ class BGC():
 
     def __hash__(self):
         return self.id
+
+    @property
+    def strain(self) -> Strain | None:
+        return self._strain
+
+    @strain.setter
+    def strain(self, strain: Strain) -> None:
+        self._strain = strain
 
     @property
     def bigscape_classes(self):
