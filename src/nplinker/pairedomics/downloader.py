@@ -708,7 +708,7 @@ class Downloader():
         else:
             logger.info('Found OLD GNPS structure')
 
-    def _load_gnps_data(self, gnps_task_id):
+    def _load_gnps_data(self, gnps_task_id) -> zipfile.ZipFile:
 
         self.metabolomics_zip = os.path.join(self.project_download_cache,
                                              'metabolomics_data.zip')
