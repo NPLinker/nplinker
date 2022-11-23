@@ -381,6 +381,12 @@ def extract_archive(from_path: str | Path,
 
     return str(to_path)
 
+def extract_file_matching_pattern(archive: zipfile.ZipFile, prefix: str, suffix: str, extract_dir: Path, out_filename: str):
+    files: list[Path] = [x.filename for x in archive.filelist]
+    file_to_extract = list(filter(lambda x: x.startswith(prefix) and x.endswith(suffix), files)).pop()
+    archive.extract(file_to_extract, extract_dir)
+    os.rename(extract_dir / file_to_extract, extract_dir / out_filename)
+
 
 def download_and_extract_archive(
     url: str,
