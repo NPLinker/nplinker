@@ -2,6 +2,8 @@ import zipfile
 from pathlib import Path
 import numpy
 from typing_extensions import Self
+
+import pytest
 from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
 from . import DATA_DIR
 
@@ -35,9 +37,13 @@ def test_has_url():
     assert sut.url() == 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task=c22f44b14a3d450eb836d607cb9521bb&view=download_clustered_spectra'
 
 
-def test_downloads_file(tmp_path):
-    outpath = tmp_path.joinpath("c22f44b14a3d450eb836d607cb9521bb.zip")
-    sut = GNPSDownloader("c22f44b14a3d450eb836d607cb9521bb", tmp_path)
+@pytest.mark.parametrize("task_id", [
+    "92036537c21b44c29e509291e53f6382",
+    "c22f44b14a3d450eb836d607cb9521bb"
+])
+def test_downloads_file(tmp_path, task_id):
+    outpath = tmp_path.joinpath(task_id + ".zip")
+    sut = GNPSDownloader(task_id, tmp_path)
     sut.download()
     actual = zipfile.ZipFile(outpath)
 
