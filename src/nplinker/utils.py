@@ -178,7 +178,7 @@ def download_url(url: str,
 
     # check integrity of downloaded file
     if not check_integrity(fpath, md5):
-        raise RuntimeError("File not found or corrupted.")
+        raise RuntimeError("File not found or corrupted, or md5 validation failed.")
 
 
 def list_dirs(root: str | Path,

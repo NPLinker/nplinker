@@ -36,8 +36,7 @@ class TestDownloadUrl:
     def test_optional_args(self, temppath1):
         utils.download_url(url=BGC_GBK_URL,
                            root=temppath1,
-                           filename="example.gbk",
-                           md5="f33f98481e6d7855c7622d715ef148ac")
+                           filename="example.gbk")
         f = Path(temppath1) / "example.gbk"
         assert f.is_file()
 
