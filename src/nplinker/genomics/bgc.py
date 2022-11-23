@@ -85,6 +85,15 @@ class BGC():
 
     @property
     def is_mibig(self):
+        """Check if the BGC is MIBiG reference BGC or not.
+
+        Note:
+            This method evaluates MIBiG BGC based on the pattern that MIBiG
+            BGC names start with "BGC". It might give false positive result.
+
+        Returns:
+            bool: True if it's MIBiG reference BGC
+        """
         return self.name.startswith('BGC')
 
     @property
