@@ -54,7 +54,9 @@ class GNPSDownloader:
         workflow_tag: Tag = list(filter(lambda x: x.contents == ['Workflow'], tags))[0]
         workflow_format_tag: Tag = workflow_tag.parent.contents[3]
         workflow_format = workflow_format_tag.contents[0].strip()
-        
+
+        if workflow_format == "FEATURE-BASED-MOLECULAR-NETWORKING":
+            return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL_FBMN.format(self._task_id)
         
         return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL.format(self._task_id)
     
