@@ -47,7 +47,7 @@ class MibigMetadata():
             metabolite.
         """
         if 'general_params' in metadata:
-            biosyn_class = metadata['general_params']['biosyn_class'][0]
+            biosyn_class = metadata['general_params']['biosyn_class']
         else:  # version≥2.0
-            biosyn_class = metadata['cluster']['biosyn_class'][0]
+            biosyn_class = metadata['cluster']['biosyn_class']
         return biosyn_class

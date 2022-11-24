@@ -2,8 +2,10 @@ import os
 import shutil
 from nplinker.logconfig import LogConfig
 from nplinker.utils import download_and_extract_archive
+from nplinker.utils import list_dirs
+from nplinker.utils import list_files
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 MIBIG_METADATA_URL = "https://dl.secondarymetabolites.org/mibig/mibig_json_{version}.tar.gz"
 
@@ -42,8 +44,8 @@ def download_and_extract_mibig_metadata(
         raise ValueError(
             "Identical path of download directory and extract directory")
 
-    # check if extract_path is empty (not check dot files)
-    files = [i for i in os.listdir(extract_path) if not i.startswith(".")]
+    # check if extract_path is empty
+    files = [i for i in os.listdir(extract_path)]
     if len(files) != 0:
         raise ValueError(f'Nonempty directory: "{extract_path}"')
 
@@ -57,15 +59,19 @@ def download_and_extract_mibig_metadata(
 
     # After extracting mibig archive, it's either one dir or many json files,
     # if it's a dir, then move all json files from it to extract_path
-    subdirs = [i for i in os.listdir(extract_path) if not i.startswith(".")]
-    if len(subdirs) == 1:
-        subdir_name = subdirs[0]
-        subdir_path = os.path.join(extract_path, subdir_name)
-        for fname in os.listdir(subdir_path):
-            if fname.startswith("BGC"):  # to avoid dot files
-                shutil.move(os.path.join(subdir_path, fname),
-                            os.path.join(extract_path, fname))
+    subdirs = list_dirs(extract_path)
+    if len(subdirs) > 1:
+        raise ValueError(
+            f"Expected one extracted directory, got {len(subdirs)}")
 
+    if len(subdirs) == 1:
+        subdir_path = subdirs[0]
+        for fname in list_files(subdir_path,
+                                prefix="BGC",
+                                suffix=".json",
+                                keep_parent=False):
+            shutil.move(os.path.join(subdir_path, fname),
+                        os.path.join(extract_path, fname))
         # delete subdir
         if subdir_path != extract_path:
             shutil.rmtree(subdir_path)

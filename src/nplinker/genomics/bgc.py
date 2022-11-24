@@ -1,27 +1,37 @@
+from __future__ import annotations
 import re
+from typing import TYPE_CHECKING
 from nplinker.logconfig import LogConfig
 from .aa_pred import predict_aa
 from .genomics_utilities import get_smiles
 
+if TYPE_CHECKING:
+    from ..strains import Strain
+    from .gcf import GCF
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 CLUSTER_REGION_REGEX = re.compile('(.+?)\\.(cluster|region)(\\d+).gbk$')
 
 
 class BGC():
 
-    def __init__(self, id, strain, name, product_prediction, description=None):
+    def __init__(self,
+                 id: int,
+                 strain: Strain,
+                 name: str,
+                 product_prediction: list[str],
+                 description: str | None = None):
         self.id = id
         self.strain = strain
-        self.name = name
-        self.product_prediction = product_prediction
+        self.name = name  # BGC file name
+        self.product_prediction = product_prediction  # can get from gbk SeqFeature "region"
         # allow for multiple parents in the case of hybrid BGCs
-        self.parents = set()
-        self.description = description
+        self.parents: set[GCF] = set()
+        self.description = description  # can get from gbk SeqRecord.description
         # these will get parsed from the .gbk file
-        self.antismash_id = None
-        self.antismash_accession = None
+        self.antismash_id: str | None = None  # version in .gbk, id in SeqRecord
+        self.antismash_accession: str | None = None  # accession in .gbk, name in SeqRecord
 
         self.region = -1
         self.cluster = -1
@@ -32,7 +42,7 @@ class BGC():
         self._smiles = None
         self._smiles_parsed = False
 
-        self.edges = set()
+        self.edges: set = set()
 
     def set_filename(self, filename):
         self.antismash_file = filename
@@ -90,8 +100,16 @@ class BGC():
         logger.debug(f'SMILES for {self} = {self._smiles}')
         return self._smiles
 
+    # CG: why not providing whole product but only amino acid as product monomer?
+    # this property is not used in NPLinker core business.
     @property
     def aa_predictions(self):
+        """Amino acids as predicted monomers of product.
+
+        Returns:
+            list: list of dicts with key as amino acid and value as prediction
+                probability.
+        """
         # Load aa predictions and cache them
         self._aa_predictions = None
         if self._aa_predictions is None:

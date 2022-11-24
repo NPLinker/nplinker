@@ -178,10 +178,11 @@ def download_url(url: str,
 
     # check integrity of downloaded file
     if not check_integrity(fpath, md5):
-        raise RuntimeError("File not found or corrupted.")
+        raise RuntimeError("File not found or corrupted, or md5 validation failed.")
 
 
-def list_dirs(root: str | Path, prefix: bool = False) -> list[str]:
+def list_dirs(root: str | Path,
+              keep_parent: bool = True) -> list[str]:
     """List all directories at a given root
 
     Args:
@@ -191,29 +192,37 @@ def list_dirs(root: str | Path, prefix: bool = False) -> list[str]:
     """
     root = Path(root).expanduser()
     directories = [str(p) for p in root.iterdir() if p.is_dir()]
-    if prefix is False:
-        directories = [Path(d).name for d in directories]
+    if not keep_parent:
+        directories = [os.path.basename(d) for d in directories]
     return directories
 
 
 def list_files(root: str | Path,
-               suffix: str | tuple[str, ...],
-               prefix: bool = False) -> list[str]:
-    """List all files ending with a suffix at a given root
+               prefix: str | tuple[str, ...] = "",
+               suffix: str | tuple[str, ...] = "",
+               keep_parent: bool = True) -> list[str]:
+    """List all files at a given root
 
     Args:
-        root (str or Path): Path to directory whose folders need to be listed
-        suffix (str or tuple): Suffix of the files to match, e.g. '.png' or ('.jpg', '.png').
-        prefix (bool, optional): If true, prepends the path to each result, otherwise
-            only returns the name of the files found
+        root (str or Path): Path to directory whose files need to be listed
+        prefix (str or tuple): Prefix of the file names to match,
+            Defaults to empty string '""'.
+        suffix (str or tuple): Suffix of the files to match, e.g. ".png" or
+            (".jpg", ".png").
+            Defaults to empty string '""'.
+        keep_parent (bool, optional): If true, prepends the parent path to each
+            result, otherwise only returns the name of the files found.
+            Defaults to False.
     """
     root = Path(root).expanduser()
     files = [
-        str(p) for p in root.iterdir()
-        if p.is_file() and p.suffix.endswith(suffix)
+        str(p) for p in root.iterdir() if p.is_file()
+        and p.name.startswith(prefix) and p.name.endswith(suffix)
     ]
-    if prefix is False:
-        files = [Path(f).name for f in files]
+
+    if not keep_parent:
+        files = [os.path.basename(f) for f in files]
+
     return files
 
 

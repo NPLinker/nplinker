@@ -3,7 +3,7 @@ from nplinker.strains import Strain
 
 class MibigBGC(BGC):
 
-    def __init__(self, id: int, strain: Strain, name: str, product_prediction: str):
+    def __init__(self, id: int, strain: Strain, name: str, product_prediction: list[str]):
         """The object reprenseting MiBIG BGC annotations/metadata
 
         Args:

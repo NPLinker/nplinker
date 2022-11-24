@@ -23,7 +23,7 @@ from . import spectrum
 from . import spectrum_filters
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 def normalise_kernel(matrix):

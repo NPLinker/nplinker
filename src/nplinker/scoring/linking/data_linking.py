@@ -40,7 +40,7 @@ SCORING_METHODS = ['metcalf', 'likescore', 'hg']
 from ...logconfig import LogConfig
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 class DataLinks():

@@ -17,7 +17,7 @@ from Bio import SeqIO
 from nplinker.logconfig import LogConfig
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 def get_smiles(bgc):

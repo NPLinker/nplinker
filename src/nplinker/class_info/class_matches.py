@@ -19,7 +19,7 @@ import pandas as pd
 from ..logconfig import LogConfig
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 class ClassMatches:

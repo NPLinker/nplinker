@@ -10,7 +10,7 @@ from nplinker.scoring.methods import ScoringMethod
 from nplinker.scoring.object_link import ObjectLink
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 class NPClassScoring(ScoringMethod):

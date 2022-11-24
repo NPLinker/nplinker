@@ -18,6 +18,7 @@ import json
 import os
 import re
 import sys
+import shutil
 import tarfile
 import time
 import zipfile
@@ -31,7 +32,7 @@ from nplinker.strain_collection import StrainCollection
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 from .runbigscape import run_bigscape
 
@@ -172,15 +173,23 @@ class Downloader():
         self.strain_mappings_file = os.path.join(self.project_file_cache,
                                                  'strain_mappings.csv')
 
+	# CG: download function
     def get(self, do_bigscape, extra_bigscape_parameters, use_mibig,
             mibig_version):
         logger.info('Going to download the metabolomics data file')
 
         self._download_metabolomics_zipfile(self.gnps_task_id)
+
         self._download_genomics_data(self.project_json['genomes'])
+
+        # CG: it extracts strain names and later will be used for strains
         self._parse_genome_labels(self.project_json['genome_metabolome_links'],
                                   self.project_json['genomes'])
-        self._generate_strain_mappings()
+
+        # CG: it generates the strain_mapping.csv file
+        self.strains.generate_strain_mappings(self.strain_mappings_file,
+            os.path.join(self.project_file_cache, 'antismash'))
+
         if use_mibig:
             self._download_mibig_json(mibig_version)
         self._run_bigscape(do_bigscape, extra_bigscape_parameters)
@@ -207,10 +216,6 @@ class Downloader():
             logger.warning(
                 'Failed to run BiG-SCAPE on antismash data, error was "{}"'.
                 format(e))
-
-    def _generate_strain_mappings(self):
-        gen_strains = self.strains.generate_strain_mappings(self.strain_mappings_file,
-            os.path.join(self.project_file_cache, 'antismash'))
 
     def _ncbi_genbank_search(self, genbank_id, retry_time=5.0):
         url = NCBI_LOOKUP_URL_NEW.format(genbank_id)
@@ -456,6 +461,12 @@ class Downloader():
 
     def _download_mibig_json(self, version):
         output_path = os.path.join(self.project_file_cache, 'mibig_json')
+
+        # Override existing mibig json files
+        if os.path.exists(output_path):
+            shutil.rmtree(output_path)
+
+        os.makedirs(output_path)
 
         download_and_extract_mibig_metadata(self.project_download_cache,
                                         output_path, version)

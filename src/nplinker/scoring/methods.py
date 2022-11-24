@@ -22,7 +22,7 @@ from .linking.data_linking import DataLinks
 from .linking.link_finder import LinkFinder
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 # CG: TODO refactor this class to abstract base class
