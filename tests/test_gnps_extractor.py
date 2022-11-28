@@ -29,17 +29,17 @@ class GNPSExtractorBuilder:
         return GNPSExtractor(self._filepath, self._extract_path)
 
 
-def assert_extraction_success(filename, outdir, actual):
+def assert_extraction_success(filename: str, outdir: Path, actual: Path):
     expected = outdir / filename
     assert Path.exists(actual)
     assert filecmp.cmp(actual, expected, shallow=False)
 
 
-def _unpack(archive):
+def _unpack(archive: Path):
     filepath = DATA_DIR / archive
     outdir = DATA_DIR / filepath.stem
     extract_archive(filepath, outdir)
-    return filepath,outdir
+    return filepath, outdir
 
     
 def test_default():
@@ -48,7 +48,7 @@ def test_default():
 
 
 def test_has_zipfile():
-    filepath = DATA_DIR / 'metabolomics_data.zip'
+    filepath = DATA_DIR / 'ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip'
     sut = GNPSExtractorBuilder().with_filepath(filepath).build()
     actual = sut.data()
     
@@ -57,7 +57,7 @@ def test_has_zipfile():
 
 
 def test_has_extract_path(tmp_path):
-    filepath = DATA_DIR / 'metabolomics_data.zip'
+    filepath = DATA_DIR / 'ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip'
     sut = GNPSExtractorBuilder().with_filepath(filepath).with_extract_path(tmp_path).build()
     assert sut.target() == tmp_path
 
