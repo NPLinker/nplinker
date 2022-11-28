@@ -10,7 +10,8 @@ class GNPSExtractor:
     def __init__(self, filepath: Path, extract_path: Path):
         self._filepath = filepath
         self._extract_path = extract_path
-        self._gnps_format = gnps_format_from_archive(self.data())
+        self._is_fbmn = gnps_format_from_archive(self.data()) == GNPSFormat.FBMN
+
 
     def data(self) -> zipfile.ZipFile:
         """Return the managed archive.
@@ -29,32 +30,32 @@ class GNPSExtractor:
         self._extract_file_mappings()
 
     def _extract_spectra(self):
-        is_fbmn = self._gnps_format == GNPSFormat.FBMN
-        prefix = "spectra" if is_fbmn else ""            
+        prefix = "spectra" if self._is_fbmn else ""            
         utils.extract_file_matching_pattern(self.data(), prefix, ".mgf", self.target(), "spectra.mgf")
-        if is_fbmn:
+        if self._is_fbmn:
             os.rmdir(self.target() / prefix)
 
     def _extract_molecular_families(self):       
         prefix = "networkedges_selfloop"
+        suffix = "..selfloop" if self._is_fbmn else ".pairsinfo"
         utils.extract_file_matching_pattern(
             self.data(),
             prefix,
-            ".pairsinfo",
+            suffix,
             self.target(),
             "molecular_families.pairsinfo"
         )
         os.rmdir(self.target() / prefix)
     
     def _extract_file_mappings(self):
-        prefix = "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
-        suffix = ".tsv"
+        prefix = "quantification_table_reformatted" if self._is_fbmn else "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
+        suffix = ".csv" if self._is_fbmn else ".tsv"
         utils.extract_file_matching_pattern(
             self.data(),
             prefix,
             suffix,
             self.target(),
-            "file_mappings.tsv"
+            "file_mappings" + suffix
         )
         os.rmdir(self.target() / prefix)
     
