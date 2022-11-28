@@ -24,12 +24,30 @@ class GNPSExtractor:
     def extract(self):
         utils.extract_file_matching_pattern(self.data(), "", ".mgf", self.target(), "spectra.mgf")
         self._extract_molecular_families()
+        self._extract_file_mappings()
 
     def _extract_molecular_families(self):       
         prefix = "networkedges_selfloop"
-        utils.extract_file_matching_pattern(self.data(), prefix, ".pairsinfo", self.target(), "molecular_families.pairsinfo")
+        utils.extract_file_matching_pattern(
+            self.data(),
+            prefix,
+            ".pairsinfo",
+            self.target(),
+            "molecular_families.pairsinfo"
+        )
         os.rmdir(self.target() / prefix)
-
+    
+    def _extract_file_mappings(self):
+        prefix = "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
+        suffix = ".tsv"
+        utils.extract_file_matching_pattern(
+            self.data(),
+            prefix,
+            suffix,
+            self.target(),
+            "file_mappings.tsv"
+        )
+        os.rmdir(self.target() / prefix)
     
 
         

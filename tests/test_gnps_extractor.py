@@ -26,9 +26,12 @@ class GNPSExtractorBuilder:
     def build(self) -> GNPSExtractor:
         return GNPSExtractor(self._filepath, self._extract_path)
 
-@pytest.fixture
-def extractor(tmp_path) -> GNPSExtractor:
-    filepath = DATA_DIR / 'metabolomics_data.zip'
+@pytest.fixture(params=[
+    "ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip",
+    "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip"
+])
+def extractor(request, tmp_path) -> GNPSExtractor:
+    filepath = DATA_DIR / request.param
     sut = GNPSExtractorBuilder().with_filepath(filepath).with_extract_path(tmp_path).build()
     return sut
     
@@ -67,6 +70,15 @@ def test_creates_molecular_families(extractor: GNPSExtractor):
 
     actual = extractor.target() / "molecular_families.pairsinfo"
     expected = DATA_DIR / "edges.pairsinfo"
+
+    assert Path.exists(actual)
+    assert filecmp.cmp(actual, expected)
+
+
+def test_creates_file_mappings(extractor: GNPSExtractor):
+    extractor.extract()
+    actual = extractor.target() / "file_mappings.tsv"
+    expected = DATA_DIR / "nodes.tsv"
 
     assert Path.exists(actual)
     assert filecmp.cmp(actual, expected)
