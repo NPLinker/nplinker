@@ -38,7 +38,7 @@ def test_has_url():
 
 
 @pytest.mark.parametrize("task_id, filename_expected", [
-    ["92036537c21b44c29e509291e53f6382","ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip"],
+    ["92036537c21b44c29e509291e53f6382", "ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip"],
     ["c22f44b14a3d450eb836d607cb9521bb", "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip"]
 ])
 def test_downloads_file(tmp_path, task_id, filename_expected):
