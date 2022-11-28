@@ -30,17 +30,6 @@ def test_load_gnps(spec_dict):
     assert len(unknown_strains) > 0
 
 
-@pytest.mark.parametrize("filename, gnps_format", [
-    [nodes_file, GNPSFormat.AllFiles],
-    [DATA_DIR / "nodes_mwe.csv", GNPSFormat.AllFiles],
-    [ DATA_DIR / "nodes_fbmn.csv", GNPSFormat.FBMN]
-])
-def test_identify_gnps_format(filename, gnps_format):
-    actual = gnps_format_from_file_mapping(filename, None)
-
-    assert actual is gnps_format
-
-
 def test_load_clusterinfo_old(spec_dict):
     metadata_keys_before = set(chain(*[x.metadata.copy().keys() for x in spec_dict.values()]))
 

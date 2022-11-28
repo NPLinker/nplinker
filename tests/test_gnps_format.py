@@ -1,0 +1,27 @@
+import pytest
+
+from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
+from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_file_mapping
+from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_task_id
+from . import DATA_DIR
+
+
+@pytest.mark.parametrize("filename, gnps_format", [
+    [DATA_DIR / "nodes.tsv", GNPSFormat.AllFiles],
+    [DATA_DIR / "nodes_mwe.csv", GNPSFormat.AllFiles],
+    [DATA_DIR / "nodes_fbmn.csv", GNPSFormat.FBMN]
+])
+def test_identify_gnps_format(filename, gnps_format):
+    actual = gnps_format_from_file_mapping(filename, None)
+
+    assert actual is gnps_format
+
+
+@pytest.mark.parametrize("task_id, expected", [
+    ["92036537c21b44c29e509291e53f6382", GNPSFormat.FBMN],
+    ["c22f44b14a3d450eb836d607cb9521bb", GNPSFormat.AllFiles]
+])
+def test_gnps_format_from_task_id(task_id: str, expected: GNPSFormat):
+    actual = gnps_format_from_task_id(task_id)
+    assert actual is expected
+

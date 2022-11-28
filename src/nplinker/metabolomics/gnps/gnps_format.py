@@ -72,4 +72,4 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
     elif workflow_format == "METABOLOMICS-SNETS":
         return GNPSFormat.AllFiles
     else:
-        return GNPSFormat.Unknown    
+        return GNPSFormat.Unknown
