@@ -61,3 +61,6 @@ tags
 webapp/npapp/static/css/bokeh*.css
 webapp/npapp/static/js/bokeh*.js
 src/nplinker/scoring/iokr/data/SPEC/
+
+tests/data/ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra
+tests/data/ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data
