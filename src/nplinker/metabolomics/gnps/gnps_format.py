@@ -1,4 +1,5 @@
 from enum import Enum
+import zipfile
 
 from bs4 import BeautifulSoup, Tag
 import requests
@@ -73,3 +74,12 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
         return GNPSFormat.AllFiles
     else:
         return GNPSFormat.Unknown
+    
+
+def gnps_format_from_archive(archive: zipfile.ZipFile) -> GNPSFormat:
+    filenames = archive.namelist()
+    if any(["FEATURE-BASED-MOLECULAR-NETWORKING" in x for x in filenames]):
+        return GNPSFormat.FBMN
+    elif any(["METABOLOMICS-SNETS" in x for x in filenames]):
+        return GNPSFormat.AllFiles
+    return GNPSFormat.Unknown
