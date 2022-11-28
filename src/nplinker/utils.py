@@ -55,6 +55,20 @@ def find_delimiter(filename):
         delimiter = sniffer.sniff(fp.read(5000)).delimiter
     return delimiter
     
+def get_headers(filename: str) -> list[str]:
+    """Function to read headers from tab or comma separated table.
+
+    Args:
+        filename(str): Path to the file to read the header from.
+
+    Returns:
+        list[str]: Columns names in header.
+    """
+    with open(filename) as f:
+        headers: str = f.readline().strip()
+        dl: str = find_delimiter(filename)
+        return headers.split(dl)
+
 # Functions below are adapted from torchvision library,
 # see: https://github.com/pytorch/vision/blob/main/torchvision/datasets/utils.py.
 #

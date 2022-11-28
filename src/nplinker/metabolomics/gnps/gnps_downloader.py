@@ -1,11 +1,11 @@
 from pathlib import Path
-from bs4 import BeautifulSoup, Tag
 import httpx
-import requests
+
+from .gnps_format import GNPSFormat
+from .gnps_format import gnps_format_from_task_id
 
 
 class GNPSDownloader:
-    GNPS_TASK_URL = 'https://gnps.ucsd.edu/ProteoSAFe/status.jsp?task={}'
     GNPS_DATA_DOWNLOAD_URL = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_clustered_spectra'
     GNPS_DATA_DOWNLOAD_URL_FBMN = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_cytoscape_data'
 
@@ -48,16 +48,12 @@ class GNPSDownloader:
             str: URL pointing to the data.
         """
         
-        task_html = requests.get(GNPSDownloader.GNPS_TASK_URL.format(self._task_id))        
-        soup = BeautifulSoup(task_html.text)
-        tags = soup.find_all('th')
-        workflow_tag: Tag = list(filter(lambda x: x.contents == ['Workflow'], tags))[0]
-        workflow_format_tag: Tag = workflow_tag.parent.contents[3]
-        workflow_format = workflow_format_tag.contents[0].strip()
+        gnps_format = gnps_format_from_task_id(self._task_id)
 
-        if workflow_format == "FEATURE-BASED-MOLECULAR-NETWORKING":
+        if gnps_format == GNPSFormat.FBMN:
             return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL_FBMN.format(self._task_id)
-        
+                
         return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL.format(self._task_id)
-    
+
+
     

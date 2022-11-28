@@ -1,11 +1,12 @@
 from itertools import chain
 
 import pytest
-from nplinker.metabolomics.load_gnps import  _get_headers, _messy_strain_naming_lookup, _parse_mzxml_header, GNPSFormat
-from nplinker.metabolomics.load_gnps import identify_gnps_format
+from nplinker.metabolomics.load_gnps import _messy_strain_naming_lookup, _parse_mzxml_header
+from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_file_mapping, GNPSFormat
 from nplinker.metabolomics.load_gnps import _load_clusterinfo_old
 from nplinker.metabolomics.load_gnps import load_gnps
 from nplinker.strain_collection import StrainCollection
+from nplinker.utils import get_headers
 from .test_metabolomics import spec_dict
 from .test_strain_collection import collection_from_file
 
@@ -32,10 +33,10 @@ def test_load_gnps(spec_dict):
 @pytest.mark.parametrize("filename, gnps_format", [
     [nodes_file, GNPSFormat.AllFiles],
     [DATA_DIR / "nodes_mwe.csv", GNPSFormat.AllFiles],
-    [ DATA_DIR / "nodes_fbmn.csv", GNPSFormat.fbmn]
+    [ DATA_DIR / "nodes_fbmn.csv", GNPSFormat.FBMN]
 ])
 def test_identify_gnps_format(filename, gnps_format):
-    actual = identify_gnps_format(filename, None)
+    actual = gnps_format_from_file_mapping(filename, None)
 
     assert actual is gnps_format
 
@@ -84,7 +85,7 @@ def test_messy_strain_naming_lookup(collection_from_file: StrainCollection, mess
 
 
 def test_parse_mzxml_header():
-    headers = _get_headers(str(DATA_DIR / "nodes_fbmn.csv"))
+    headers = get_headers(str(DATA_DIR / "nodes_fbmn.csv"))
     hdr = headers[10]
     actual = _parse_mzxml_header(hdr, StrainCollection(), None, None)
     assert actual is not None
