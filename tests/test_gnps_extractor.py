@@ -12,7 +12,7 @@ from . import DATA_DIR
 class GNPSExtractorBuilder:
 
     def __init__(self):
-        self._filepath = None
+        self._filepath = DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip"
         self._extract_path = None
 
     def with_filepath(self, filepath: Path) -> Self:
@@ -56,29 +56,29 @@ def test_has_extract_path(tmp_path):
 
 
 def test_creates_spectra(extractor: GNPSExtractor):
-    extractor.extract()
+    extractor._extract_spectra()
 
     actual = extractor.target() / "spectra.mgf"
     expected = DATA_DIR / "spectra.mgf"
 
     assert Path.exists(actual)
-    assert filecmp.cmp(actual, expected)
+    assert filecmp.cmp(actual, expected, shallow=False)
 
 
 def test_creates_molecular_families(extractor: GNPSExtractor):
-    extractor.extract()
+    extractor._extract_molecular_families()
 
     actual = extractor.target() / "molecular_families.pairsinfo"
     expected = DATA_DIR / "edges.pairsinfo"
 
     assert Path.exists(actual)
-    assert filecmp.cmp(actual, expected)
+    assert filecmp.cmp(actual, expected, shallow=False)
 
 
 def test_creates_file_mappings(extractor: GNPSExtractor):
-    extractor.extract()
+    extractor._extract_file_mappings()
     actual = extractor.target() / "file_mappings.tsv"
     expected = DATA_DIR / "nodes.tsv"
 
     assert Path.exists(actual)
-    assert filecmp.cmp(actual, expected)
+    assert filecmp.cmp(actual, expected, shallow=False)
