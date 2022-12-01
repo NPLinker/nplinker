@@ -4,6 +4,7 @@ import httpx
 
 from .gnps_format import GNPSFormat
 from .gnps_format import gnps_format_from_task_id
+from typing_extensions import Self
 
 
 class GNPSDownloader:
@@ -24,12 +25,13 @@ class GNPSDownloader:
         self._download_root: Path = Path(download_root)
 
 
-    def download(self):
+    def download(self) -> Self:
         """Execute the downloading process. """
         with open(self.get_download_path(), 'wb') as f:
             with httpx.stream('POST', self.url()) as r:
                 for data in r.iter_bytes():
                     f.write(data)
+        return self
    
     def get_download_path(self) -> str:
         return self._download_root.joinpath(self._task_id + ".zip")

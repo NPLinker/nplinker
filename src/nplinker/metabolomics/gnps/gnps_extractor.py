@@ -1,3 +1,4 @@
+from os import PathLike
 import os
 from pathlib import Path
 import zipfile
@@ -7,9 +8,9 @@ from nplinker.metabolomics.gnps.gnps_format import GNPSFormat, gnps_format_from_
 
 
 class GNPSExtractor:
-    def __init__(self, filepath: Path, extract_path: Path):
-        self._filepath = filepath
-        self._extract_path = extract_path
+    def __init__(self, filepath: str | PathLike, extract_path: str | PathLike):
+        self._filepath: Path = Path(filepath)
+        self._extract_path: Path = Path(extract_path)
         self._is_fbmn = gnps_format_from_archive(self.data()) == GNPSFormat.FBMN
 
 
@@ -21,8 +22,8 @@ class GNPSExtractor:
         """
         return zipfile.ZipFile(self._filepath)
 
-    def target(self) -> Path:
-        return self._extract_path
+    def target(self) -> str:
+        return str(self._extract_path)
 
     def extract(self):
         self._extract_spectra()
@@ -31,9 +32,9 @@ class GNPSExtractor:
 
     def _extract_spectra(self):
         prefix = "spectra" if self._is_fbmn else ""            
-        utils.extract_file_matching_pattern(self.data(), prefix, ".mgf", self.target(), "spectra.mgf")
+        utils.extract_file_matching_pattern(self.data(), prefix, ".mgf", self._extract_path, "spectra.mgf")
         if self._is_fbmn:
-            os.rmdir(self.target() / prefix)
+            os.rmdir(self._extract_path / prefix)
 
     def _extract_molecular_families(self):       
         prefix = "networkedges_selfloop"
@@ -42,10 +43,10 @@ class GNPSExtractor:
             self.data(),
             prefix,
             suffix,
-            self.target(),
+            self._extract_path,
             "molecular_families.pairsinfo"
         )
-        os.rmdir(self.target() / prefix)
+        os.rmdir(self._extract_path / prefix)
     
     def _extract_file_mappings(self):
         prefix = "quantification_table_reformatted" if self._is_fbmn else "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
@@ -54,10 +55,10 @@ class GNPSExtractor:
             self.data(),
             prefix,
             suffix,
-            self.target(),
+            self._extract_path,
             "file_mappings" + suffix
         )
-        os.rmdir(self.target() / prefix)
+        os.rmdir(self._extract_path / prefix)
     
 
         

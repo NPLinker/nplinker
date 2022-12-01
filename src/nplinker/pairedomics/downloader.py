@@ -16,6 +16,7 @@ import csv
 import io
 import json
 import os
+from pathlib import Path
 import re
 import sys
 import tarfile
@@ -26,6 +27,8 @@ from bs4 import BeautifulSoup
 from progress.bar import Bar
 from progress.spinner import Spinner
 from nplinker.logconfig import LogConfig
+from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
+from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
 from nplinker.strains import Strain
 from nplinker.strain_collection import StrainCollection
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
@@ -188,6 +191,7 @@ class Downloader():
         logger.info('Going to download the metabolomics data file')
 
         self._download_metabolomics_zipfile(self.gnps_task_id)
+
         self._download_genomics_data(self.project_json['genomes'])
         self._parse_genome_labels(self.project_json['genome_metabolome_links'],
                                   self.project_json['genomes'])
@@ -669,6 +673,11 @@ class Downloader():
             for alias in strain_aliases:
                 strain.add_alias(alias)
             self.strains.add(strain)
+
+    def _download_metabolomics_zipfile_v2(self, gnps_task_id):
+        archive = GNPSDownloader(gnps_task_id, self.project_download_cache).download().get_download_path()
+        GNPSExtractor(archive, self.project_file_cache).extract()
+
 
     def _download_metabolomics_zipfile(self, gnps_task_id):
         mbzip = self._load_gnps_data(gnps_task_id)
