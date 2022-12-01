@@ -73,6 +73,6 @@ def test_download_gnps_data(tmp_path):
     sut = Downloader("MSV000079284", local_cache=tmp_path / 'actual')
     actual = sut._load_gnps_data(gnps_task_id)
     
-    expected = zipfile.ZipFile(DATA_DIR / 'metabolomics_data.zip')
+    expected = "tests/data/ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip"
 
-    numpy.testing.assert_array_equal(actual.namelist(), expected.namelist())
+    actual.filename == expected
