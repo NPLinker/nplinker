@@ -15,6 +15,7 @@
 from __future__ import annotations
 import csv
 import os
+from os import PathLike
 import os.path
 import bz2
 import gzip
@@ -66,7 +67,7 @@ def find_delimiter(filename: Path) -> str:
         delimiter = sniffer.sniff(fp.read(5000)).delimiter
     return delimiter
     
-def get_headers(filename: str) -> list[str]:
+def get_headers(filename: str | PathLike) -> list[str]:
     """Function to read headers from tab or comma separated table.
 
     Args:
@@ -75,7 +76,7 @@ def get_headers(filename: str) -> list[str]:
     Returns:
         list[str]: Columns names in header.
     """
-    with open(filename) as f:
+    with open(os.fspath(filename)) as f:
         headers: str = f.readline().strip()
         dl: str = find_delimiter(filename)
         return headers.split(dl)
