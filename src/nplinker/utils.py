@@ -49,7 +49,18 @@ def sqrt_normalise(peaks):
     return normalised_peaks
 
 
-def find_delimiter(filename):
+def find_delimiter(filename: Path) -> str:
+    """Determine the delimiter in a tabular file.
+
+    Args:
+        filename(Path): Path to tabular file.
+
+    Returns:
+        str: Detected delimiter character.
+
+    Examples:
+        >>> delim = find_delimiter("~/table.csv")
+        """
     sniffer = csv.Sniffer()
     with open(filename, mode='rt', encoding='utf-8') as fp:
         delimiter = sniffer.sniff(fp.read(5000)).delimiter
