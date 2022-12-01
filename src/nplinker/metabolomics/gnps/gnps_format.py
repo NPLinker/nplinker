@@ -1,4 +1,6 @@
 from enum import Enum
+from os import PathLike
+import os
 import zipfile
 
 from bs4 import BeautifulSoup, Tag
@@ -16,7 +18,7 @@ class GNPSFormat(Enum):
 GNPS_TASK_URL = 'https://gnps.ucsd.edu/ProteoSAFe/status.jsp?task={}'
 
 
-def gnps_format_from_file_mapping(filename: str, has_quant_table: bool) -> GNPSFormat:
+def gnps_format_from_file_mapping(filename: str | PathLike, has_quant_table: bool) -> GNPSFormat:
     """Peek GNPS file format for given file.
 
     TODO: #89 This should be rewritten to actually return the format always based on only the file and not include the quant table in it.
@@ -29,7 +31,7 @@ def gnps_format_from_file_mapping(filename: str, has_quant_table: bool) -> GNPSF
         GNPSFormat: GNPS format identified in the file.
     """
 
-    headers: list[str] = get_headers(filename)
+    headers: list[str] = get_headers(os.fspath(filename))
 
     if headers is None:
         return GNPSFormat.Unknown

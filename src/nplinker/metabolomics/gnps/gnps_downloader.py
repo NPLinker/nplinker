@@ -1,3 +1,4 @@
+from os import PathLike
 from pathlib import Path
 import httpx
 
@@ -9,7 +10,7 @@ class GNPSDownloader:
     GNPS_DATA_DOWNLOAD_URL = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_clustered_spectra'
     GNPS_DATA_DOWNLOAD_URL_FBMN = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_cytoscape_data'
 
-    def __init__(self, task_id: str, download_root: Path):
+    def __init__(self, task_id: str, download_root: str | PathLike):
         """Init the class with a gnps_task_id and a output path on where to save the data.
 
         Args:
@@ -20,20 +21,20 @@ class GNPSDownloader:
             >>> GNPSDownloader("c22f44b14a3d450eb836d607cb9521bb", "~/downloads")
             """
         self._task_id = task_id
-        self._download_root = download_root
+        self._download_root: Path = Path(download_root)
 
 
     def download(self):
         """Execute the downloading process. """
-        with open(self.target(), 'wb') as f:
+        with open(self.get_download_path(), 'wb') as f:
             with httpx.stream('POST', self.url()) as r:
                 for data in r.iter_bytes():
                     f.write(data)
    
-    def target(self) -> Path:
+    def get_download_path(self) -> str:
         return self._download_root.joinpath(self._task_id + ".zip")
     
-    def task_id(self) -> str:
+    def get_task_id(self) -> str:
         """Get the GNPS task id.
 
         Returns:
