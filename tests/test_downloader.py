@@ -1,3 +1,4 @@
+import filecmp
 import os
 from pathlib import Path
 import zipfile
@@ -69,10 +70,27 @@ def test_execute_download(gnps_url: str, tmp_path: Path):
 
 def test_download_gnps_data(tmp_path):
     gnps_task_id = "c22f44b14a3d450eb836d607cb9521bb"
-    url = _generate_gnps_download_url(gnps_task_id)
     sut = Downloader("MSV000079284", local_cache=tmp_path / 'actual')
     actual = sut._load_gnps_data(gnps_task_id)
     
-    expected = "tests/data/ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip"
+    expected = zipfile.ZipFile(DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip")
 
-    actual.filename == expected
+    actual.extract("networkedges_selfloop/6da5be36f5b14e878860167fa07004d6.pairsinfo", tmp_path / "actual")
+    expected.extract("networkedges_selfloop/6da5be36f5b14e878860167fa07004d6.pairsinfo", tmp_path / "expected")
+
+    assert filecmp.cmp(
+        tmp_path / "actual/networkedges_selfloop" / "6da5be36f5b14e878860167fa07004d6.pairsinfo",
+        tmp_path / "expected/networkedges_selfloop" / "6da5be36f5b14e878860167fa07004d6.pairsinfo",
+        shallow=False
+    )
+
+
+def test_extract_metabolomics_data(tmp_path):
+    sut = Downloader("MSV000079284", local_cache=tmp_path)
+    archive = zipfile.ZipFile(DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip")
+    sut._extract_metabolomics_data(archive)
+
+    assert (Path(sut.project_file_cache) / "networkedges_selfloop/6da5be36f5b14e878860167fa07004d6.pairsinfo").is_file()
+    assert (Path(sut.project_file_cache) / "clusterinfosummarygroup_attributes_withIDs_withcomponentID/d69356c8e5044c2a9fef3dd2a2f991e1.tsv").is_file()
+    assert (Path(sut.project_file_cache) / "spectra/METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra-main.mgf").is_file()
+
