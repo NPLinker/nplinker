@@ -22,6 +22,7 @@ import sys
 import tarfile
 import time
 import zipfile
+from deprecated import deprecated
 import httpx
 from bs4 import BeautifulSoup
 from progress.bar import Bar
@@ -679,12 +680,14 @@ class Downloader():
         GNPSExtractor(archive, self.project_file_cache).extract()
 
 
+    @deprecated
     def _download_metabolomics_zipfile(self, gnps_task_id):
         mbzip = self._load_gnps_data(gnps_task_id)
         self._extract_metabolomics_data(mbzip)
         self._log_gnps_format()
 
 
+    @deprecated
     def _extract_metabolomics_data(self, mbzip):
         logger.info(f'Extracting files to {self.project_file_cache}')
         # extract the contents to the file cache folder. only want some of the files
@@ -711,12 +714,14 @@ class Downloader():
                               path=os.path.join(self.project_file_cache,
                                                 'spectra'))
 
+    @deprecated
     def _log_gnps_format(self):
         if self._is_new_gnps_format(self.project_file_cache):
             logger.info('Found NEW GNPS structure')
         else:
             logger.info('Found OLD GNPS structure')
 
+    @deprecated
     def _load_gnps_data(self, gnps_task_id) -> zipfile.ZipFile:
 
         self.metabolomics_zip = os.path.join(self.project_download_cache,
@@ -757,10 +762,12 @@ class Downloader():
         return content
 
 
+@deprecated
 def _generate_gnps_download_url(gnps_task_id):
     url = GNPS_DATA_DOWNLOAD_URL.format(gnps_task_id)
     return url
 
+@deprecated
 def _execute_download(url, metabolomics_zip):
     logger.info(f'Downloading metabolomics data from {url}')
     with open(metabolomics_zip, 'wb') as f:
