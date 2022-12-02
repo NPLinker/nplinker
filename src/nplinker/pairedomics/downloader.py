@@ -193,7 +193,7 @@ class Downloader():
             mibig_version):
         logger.info('Going to download the metabolomics data file')
 
-        self._download_metabolomics_zipfile(self.gnps_task_id)
+        self._download_metabolomics_zipfile_v2(self.gnps_task_id)
 
         self._download_genomics_data(self.project_json['genomes'])
 
