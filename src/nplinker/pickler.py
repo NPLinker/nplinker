@@ -21,7 +21,7 @@ from .metabolomics import MolecularFamily
 from .metabolomics import Spectrum
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 # This is based on the example at https://docs.python.org/3/library/pickle.html#pickle-persistent
 # Normally there are serious problems trying to pickle any object with a __hash__,

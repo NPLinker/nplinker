@@ -18,7 +18,7 @@ import re
 from ..logconfig import LogConfig
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 # this will match strings like '...cluster001.gbk' or '...region022.gbk',
 # and allow the number to be extracted easily

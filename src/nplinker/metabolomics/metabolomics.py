@@ -21,7 +21,7 @@ from .molecular_family import MolecularFamily
 from .singleton_family import SingletonFamily
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 def load_edges(edges_file, spec_dict):
     logger.debug('loading edges file: {} [{} spectra from MGF]'.format(

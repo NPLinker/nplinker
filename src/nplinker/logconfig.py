@@ -37,7 +37,7 @@ class LogConfig():
         if obj in LogConfig.active_loggers:
             return LogConfig.active_loggers[obj]
 
-        logger = logging.Logger(obj)
+        logger = logging.getLogger(obj)
         logger.setLevel(level)
         dest.setFormatter(
             logging.Formatter(LogConfig.logfmt, datefmt='%H:%M:%S'))

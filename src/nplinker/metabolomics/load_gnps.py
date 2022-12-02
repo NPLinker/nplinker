@@ -10,7 +10,7 @@ from nplinker.strains import Strain
 from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_file_mapping ,GNPSFormat
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 # compile a regex for matching .mzXML and .mzML strings
 RE_MZML_MZXML = re.compile('.mzXML|.mzML')

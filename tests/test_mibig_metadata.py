@@ -23,4 +23,4 @@ class TestMibigMetadata:
         assert metadata.mibig_accession == "BGC0000001"
 
     def test_biosyn_class(self, metadata):
-        assert metadata.biosyn_class == "Polyketide"
+        assert metadata.biosyn_class == ["Polyketide"]

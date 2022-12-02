@@ -18,7 +18,7 @@ from nplinker.metabolomics.gnps.gnps_spectrum_loader import GNPSSpectrumLoader
 from .rosetta_functions import fast_cosine
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
 
 
 class SpecLib():

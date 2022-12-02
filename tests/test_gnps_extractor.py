@@ -1,5 +1,6 @@
 import filecmp
 import os
+from tempfile import gettempdir
 import zipfile
 from pathlib import Path
 import numpy
@@ -15,7 +16,7 @@ class GNPSExtractorBuilder:
 
     def __init__(self):
         self._filepath = DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip"
-        self._extract_path = None
+        self._extract_path = gettempdir()
 
     def with_filepath(self, filepath: Path) -> Self:
         self._filepath = filepath
@@ -59,7 +60,7 @@ def test_has_zipfile():
 def test_has_extract_path(tmp_path):
     filepath = DATA_DIR / 'ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip'
     sut = GNPSExtractorBuilder().with_filepath(filepath).with_extract_path(tmp_path).build()
-    assert sut.target() == tmp_path
+    assert sut.target() == str(tmp_path)
 
 
 @pytest.mark.parametrize("archive, filename", [
@@ -71,7 +72,7 @@ def test_creates_spectra(archive: Path, filename: str, tmp_path: Path):
 
     sut = GNPSExtractorBuilder().with_filepath(filepath).with_extract_path(tmp_path).build()
     sut._extract_spectra()
-    actual = sut.target() / "spectra.mgf"
+    actual = Path(sut.target()) / "spectra.mgf"
 
     assert_extraction_success(filename, outdir, actual)
 
@@ -85,7 +86,7 @@ def test_creates_molecular_families(archive: Path, filename: str, tmp_path: Path
 
     sut = GNPSExtractorBuilder().with_filepath(filepath).with_extract_path(tmp_path).build()
     sut._extract_molecular_families()
-    actual = sut.target() / "molecular_families.pairsinfo"
+    actual = Path(sut.target()) / "molecular_families.pairsinfo"
     
     assert_extraction_success(filename, outdir, actual)
 
@@ -99,6 +100,6 @@ def test_creates_file_mappings(archive: Path, filename: str, tmp_path: Path):
 
     sut = GNPSExtractorBuilder().with_filepath(filepath).with_extract_path(tmp_path).build()
     sut._extract_file_mappings()
-    actual = sut.target() / ("file_mappings" + str(Path(filename).suffix))
+    actual = Path(sut.target()) / ("file_mappings" + str(Path(filename).suffix))
     
     assert_extraction_success(filename, outdir, actual)

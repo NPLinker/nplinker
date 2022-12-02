@@ -27,44 +27,15 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11"
 ]
-dependencies = [
-    "beautifulsoup4",
-    "biopython",
-    "httpx",
-    "numpy",
-    "pandas",
-    "progress",
-    "scipy",
-    "sortedcontainers",
-    "toml",
-    "tqdm",
-    "xdg"
-]
+dynamic = ["dependencies", "optional-dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+optional-dependencies.dev = {file = ["requirements.dev.txt"]}
 
 [project.urls]
 "Homepage" = "https://github.com/NPLinker/nplinker"
 "Bug Tracker" = "https://github.com/NPLinker/nplinker/issues"
-
-[project.optional-dependencies]
-dev = [
-    "bump2version",
-    "coverage[toml]",
-    "isort",
-    "prospector[with_pyroma]",
-    "pytest",
-    "pytest-cov",
-    "pytest-lazy-fixture",
-    "sphinx",
-    "sphinx_rtd_theme",
-    "sphinx-autoapi",
-    "myst_parser",
-    "unimport",
-    "yapf"
-]
-publishing = [
-    "build",
-    "wheel"
-]
 
 [tool.setuptools.packages.find]
 where = ["src"]
