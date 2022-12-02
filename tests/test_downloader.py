@@ -52,6 +52,9 @@ def test_download_metabolomics_zipfile(tmp_path):
     expected_path = os.path.join(sut.project_download_cache, 'metabolomics_data.zip')
 
     assert os.path.exists(expected_path)
+    assert (Path(sut.project_file_cache) / "networkedges_selfloop/6da5be36f5b14e878860167fa07004d6.pairsinfo").is_file()
+    assert (Path(sut.project_file_cache) / "clusterinfosummarygroup_attributes_withIDs_withcomponentID/d69356c8e5044c2a9fef3dd2a2f991e1.tsv").is_file()
+    assert (Path(sut.project_file_cache) / "spectra/METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra-main.mgf").is_file()
 
 
 def test_download_metabolomics_zipfile_v2(tmp_path):
@@ -60,6 +63,9 @@ def test_download_metabolomics_zipfile_v2(tmp_path):
     expected_path = os.path.join(sut.project_download_cache, 'c22f44b14a3d450eb836d607cb9521bb.zip')
 
     assert os.path.exists(expected_path)
+    assert (Path(sut.project_file_cache) / "molecular_families.pairsinfo").is_file()
+    assert (Path(sut.project_file_cache) / "file_mappings.tsv").is_file()
+    assert (Path(sut.project_file_cache) / "spectra.mgf").is_file()
 
 
 def test_generate_gnps_download_url():
