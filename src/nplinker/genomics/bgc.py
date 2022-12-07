@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from nplinker.logconfig import LogConfig
 from .aa_pred import predict_aa
 from .genomics_utilities import get_smiles
+from deprecated import deprecated
 
 if TYPE_CHECKING:
     from ..strains import Strain
@@ -35,7 +36,6 @@ class BGC():
         self.cluster = -1
 
         self.antismash_file = None
-        self._aa_predictions = None
         self._known_cluster_blast = None
         self._smiles = None
         self._smiles_parsed = False
@@ -115,6 +115,7 @@ class BGC():
     # CG: why not providing whole product but only amino acid as product monomer?
     # this property is not used in NPLinker core business.
     @property
+    @deprecated(version='2.0.0', reason="This method will be removed soon")
     def aa_predictions(self):
         """Amino acids as predicted monomers of product.
 
