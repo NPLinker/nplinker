@@ -19,6 +19,9 @@ from nplinker.logconfig import LogConfig
 from nplinker.strain_collection import StrainCollection
 from .bgc import BGC
 from .gcf import GCF
+from os import PathLike
+import os
+from pathlib import Path
 
 logger = LogConfig.getLogger(__name__)
 
@@ -33,12 +36,17 @@ def parse_gbk_header(bgc):
         bgc.antismash_id = records[0].id
 
 
-def load_gcfs(strains: StrainCollection,
-              product_class_cluster_file: str,
-              network_annotations_file: str,
+def load_gcfs(bigscape_dir: str | PathLike,
+              strains: StrainCollection,
               mibig_bgc_dict: dict[str, BGC],
               antismash_bgc_dict: dict[str, BGC],
-              antismash_file_dict: dict[str, str]):
+              antismash_file_dict: dict[str, str],
+              bigscape_cutoff: int):
+
+    bigscape_dir = Path(bigscape_dir)
+    product_class_cluster_file = bigscape_dir / "mix" / f"mix_clustering_c0.{bigscape_cutoff:02d}.tsv"
+    network_annotations_file = bigscape_dir / "Network_Annotations_Full.tsv"
+
     new_bgc: BGC
     num_mibig: int = 0
     internal_bgc_id: int = 0
