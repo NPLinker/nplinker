@@ -87,10 +87,6 @@ class BGC():
     def bigscape_classes(self):
         return {p.bigscape_class for p in self.parents}
 
-    @property
-    def is_hybrid(self):
-        return len(self.parents) > 1
-
     def is_mibig(self):
         """Check if the BGC is MIBiG reference BGC or not.
 
