@@ -171,7 +171,8 @@ def _filter_gcfs(
     bgcs_to_remove = set()
 
     for gcf in gcfs:
-        if gcf.num_non_mibig_bgcs == 0:
+        num_non_mibig_bgcs = len(list(filter(lambda bgc: not bgc.is_mibig(), gcf.bgcs)))
+        if num_non_mibig_bgcs == 0:
             gcfs_to_remove.add(gcf)
             for bgc in gcf.bgcs:
                 bgcs_to_remove.add(bgc)
