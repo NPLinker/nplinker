@@ -25,13 +25,13 @@ class MolecularFamily():
     #     return False
 
     @property
-    def strains(self) -> StrainCollection:
+    def strains(self) -> set[StrainCollection]:
         """Get strains of spectra in the molecular family.
 
         Returns:
-            StrainCollection: StrainCollection of strains from which the spectra in the molecular family are coming.
+            set[StrainCollection]: StrainCollection of strains from which the spectra in the molecular family are coming.
         """
-        strains = set()
+        strains: set[StrainCollection] = set()
         for spectrum in self.spectra:
             strains = strains.union(spectrum.strains)
         return strains

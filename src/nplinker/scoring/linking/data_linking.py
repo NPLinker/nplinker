@@ -30,14 +30,14 @@ import numpy as np
 import pandas as pd
 
 from nplinker.metabolomics.molecular_family import MolecularFamily
-from ...genomics import GCF
-from ...metabolomics import Spectrum
+from nplinker.genomics.gcf import GCF
+from nplinker.metabolomics.spectrum import Spectrum
 from .data_linking_functions import calc_correlation_matrix
 
 
 SCORING_METHODS = ['metcalf', 'likescore', 'hg']
 
-from ...logconfig import LogConfig
+from nplinker.logconfig import LogConfig
 
 
 logger = LogConfig.getLogger(__name__)
