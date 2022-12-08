@@ -19,5 +19,6 @@ def test_default(config):
 
 def test_has_spectra_path(config):
     sut = DatasetLoader(config)
-    sut.validate()
-    assert sut.mgf_file == config["dataset"]["root"] / "spectra.mgf"
+    sut._init_metabolomics_paths()
+    actual = sut.mgf_file
+    assert actual == config["dataset"]["root"] / "spectra.mgf"
