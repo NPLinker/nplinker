@@ -194,16 +194,16 @@ class DatasetLoader():
         # 2. MET: <root>/clusterinfo_summary/<some UID>.tsv (or .clustersummary apparently...) / nodes_file=<override>
         self.nodes_file = self._overrides.get(
             self.OR_NODES) or find_via_glob_alts([
-                os.path.join(self._root, 'clusterinfo*', '*.tsv'),
                 os.path.join(self._root, 'file_mappings.tsv'),
+                os.path.join(self._root, 'clusterinfo*', '*.tsv'),
                 os.path.join(self._root, 'clusterinfo*', '*.clustersummary')
             ], self.OR_NODES)
 
         # 3. MET: <root>/networkedges_selfloop/<some UID>.selfloop (new) or .pairsinfo (old) / edges_file=<override>
         self.edges_file = self._overrides.get(
             self.OR_EDGES) or find_via_glob_alts([
-                os.path.join(self._root, 'networkedges_selfloop', '*.pairsinfo'),
                 os.path.join(self._root, '*.pairsinfo'),
+                os.path.join(self._root, 'networkedges_selfloop', '*.pairsinfo'),
                 os.path.join(self._root, 'networkedges_selfloop', '*.selfloop')
             ], self.OR_EDGES)
 
@@ -220,8 +220,8 @@ class DatasetLoader():
         # 5. MET: <root>/spectra/*.mgf (or <root>/*.mgf)/ mgf_file=<override>
         self.mgf_file = self._overrides.get(self.OR_MGF) or find_via_glob_alts(
             [
-                os.path.join(self._root, 'spectra', '*.mgf'),
-                os.path.join(self._root, '*.mgf')
+                os.path.join(self._root, '*.mgf'),
+                os.path.join(self._root, 'spectra', '*.mgf')
             ], self.OR_MGF)
 
         # 6. MET: <root>/metadata_table/metadata_table-<number>.txt / metadata_table_file=<override>
