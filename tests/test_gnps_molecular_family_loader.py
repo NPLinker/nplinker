@@ -15,8 +15,11 @@ def molecular_families_gnps():
     return sut.families()
 
 
-def test_has_molecular_families():
-    filename = os.path.join(DATA_DIR, "edges.pairsinfo")
+@pytest.mark.parametrize("filename", [
+    os.path.join(DATA_DIR, "edges.pairsinfo"),
+    DATA_DIR / "edges.pairsinfo"
+])
+def test_has_molecular_families(filename):
     sut = GNPSMolecularFamilyLoader(filename)
     actual = sut.families()
     assert len(actual) == 25769

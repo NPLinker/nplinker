@@ -1,4 +1,5 @@
 import csv
+from os import PathLike
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.abc import MolecularFamilyLoaderBase
 from nplinker.metabolomics.molecular_family import MolecularFamily
@@ -9,7 +10,12 @@ logger = LogConfig.getLogger(__file__)
 
 
 class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
-    def __init__(self, filename: str):
+    def __init__(self, filename: str | PathLike):
+        """Class to load GNPS molecular families.
+
+        Args:
+            filename(str | PathLike): str or PathLike object pointing towards the GNPS molecular families file to load.
+        """
         self._families: list[MolecularFamily] = []
         
         for family_id, spectra_ids in _load_molecular_families(filename).items():
@@ -27,11 +33,11 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
         return self._families
 
 
-def _load_molecular_families(filename: str) -> dict[int, set[int]]:
+def _load_molecular_families(filename: str | PathLike) -> dict[int, set[int]]:
     """Load ids of molecular families and corresponding spectra from GNPS output file.
 
     Args:
-        filename(str): Path to GNPS .pairsinfo file.
+        filename(str | PathLike): Path to GNPS .pairsinfo file.
 
     Returns:
         dict[int, set[int]]: Mapping from molecular family/cluster id to the spectra ids.
@@ -58,11 +64,11 @@ def _load_molecular_families(filename: str) -> dict[int, set[int]]:
 
     return families
 
-def _sniff_column_indices(filename: str, headers: list[str]) -> tuple[int, int, int]:
+def _sniff_column_indices(filename: str | PathLike, headers: list[str]) -> tuple[int, int, int]:
     """Get indices of required columns from the file.
 
     Args:
-        filename(string): Path to the edges file.
+        filename(str | PathLike): Path to the edges file.
         headers(string): Header line of the edges file.
 
     Raises:
