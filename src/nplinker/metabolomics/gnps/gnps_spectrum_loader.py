@@ -1,3 +1,4 @@
+from os import PathLike
 from nplinker.annotations import GNPS_DATA_COLUMNS
 from nplinker.annotations import GNPS_KEY
 from nplinker.annotations import create_gnps_annotation
@@ -11,16 +12,35 @@ logger = LogConfig.getLogger(__file__)
 
 class GNPSSpectrumLoader(SpectrumLoaderBase):
 
-    def __init__(self, filename: str):
-        ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([filename])
+    def __init__(self, filename: str | PathLike):
+        """Load the mass spectra from the MGF file pointed to by `filename`.
+
+        Args:
+            filename(str | PathLike): str or PathLike object pointing to the spectra files to load.
+        """
+        ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([str(filename)])
         logger.info('%d molecules parsed from MGF file', len(ms1))
-        self._spectra = mols_to_spectra(ms2, metadata)
+        self._spectra = _mols_to_spectra(ms2, metadata)
     
     def spectra(self) -> list[Spectrum]:
+        """Get the spectra loaded from the file.
+
+        Returns:
+            list[Spectrum]: Spectra loaded from the file.
+        """
         return self._spectra
     
 
-def mols_to_spectra(ms2, metadata: dict[str, dict[str, str]]) -> list[Spectrum]:
+def _mols_to_spectra(ms2, metadata: dict[str, dict[str, str]]) -> list[Spectrum]:
+    """Function to convert ms2 object and metadata to `Spectrum` objects.
+
+    Args:
+        ms2(_type_): Unknown.
+        metadata(dict[str, dict[str, str]]): Dictionary holding the metadata which was loaded from the original file.
+
+    Returns:
+        list[Spectrum]: List of mass spectra obtained from ms2 and metadata.
+    """
     ms2_dict = {}
     for m in ms2:
         if not m[3] in ms2_dict:
