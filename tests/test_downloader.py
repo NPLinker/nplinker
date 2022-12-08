@@ -22,7 +22,7 @@ def gnps_url():
     Path(os.getenv('HOME'), 'nplinker_data', 'pairedomics'),
     pytest.lazy_fixture('tmp_path')
 ])
-def test_default(expected):
+def test_default(expected: Path):
     gnps_id = "MSV000079284"
 
     sut = Downloader(gnps_id, local_cache=str(expected))

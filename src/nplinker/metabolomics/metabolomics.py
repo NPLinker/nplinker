@@ -13,9 +13,11 @@
 # limitations under the License.
 
 import csv
+from os import PathLike
 
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.gnps.gnps_spectrum_loader import GNPSSpectrumLoader
+from nplinker.metabolomics.spectrum import Spectrum
 from .load_gnps import load_gnps
 from .molecular_family import MolecularFamily
 from .singleton_family import SingletonFamily
@@ -103,13 +105,21 @@ def load_dataset(strains,
     return spec_dict, list(spec_dict.values()), molfams, unknown_strains
 
 
-def load_spectra(mgf_file, edges_file):
-    """ Wrapper function around GNPSSpectrumLoader
+def load_spectra(mgf_file: str | PathLike, edges_file: str | PathLike) -> dict[int, Spectrum]:
+    """Wrapper function to load spectra and init the molecular family links.
+
+    Args:
+        mgf_file(str | PathLike): File storing the mass spectra in MGF format.
+        edges_file(str | PathLike): File storing the molecular family information in .selfloop or .pairsinfo format.
+
+    Returns:
+        dict[int, Spectrum]: Indexed dict of mass spectra.
     """
+
     spectra = GNPSSpectrumLoader(mgf_file).spectra()
     # above returns a list, create a dict indexed by spectrum_id to make
     # the rest of the parsing a bit simpler
-    spec_dict = {spec.spectrum_id: spec for spec in spectra}
+    spec_dict: dict[int, Spectrum] = {spec.spectrum_id: spec for spec in spectra}
     load_edges(edges_file, spec_dict)
     return spec_dict
 
