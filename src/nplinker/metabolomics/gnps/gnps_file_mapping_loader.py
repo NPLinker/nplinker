@@ -16,7 +16,15 @@ FILE_IDENTIFIER_FBMN = " Peak area"
 class GNPSFileMappingLoader(FileMappingLoaderBase):
 
     def __init__(self, filepath: str | PathLike):
-        self._filepath: Path = filepath
+        """Class to load `file mappings` (occurrences of spectra in samples) from GNPS.
+
+        Args:
+            filepath(str | PathLike): Path pointing to the file from which to load the file mappings.
+
+        Raises:
+            NotImplementedError: Raises NotImplementedError if the GNPS format is not recognized.
+        """
+        self._filepath: Path = Path(filepath)
         self._mapping: dict[int, list[str]] = {}
         self._gnps_format = gnps_format_from_file_mapping(filepath, False)
 

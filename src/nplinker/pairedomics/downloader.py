@@ -748,13 +748,12 @@ class Downloader():
                 logger.info(
                     'Invalid metabolomics zipfile found, will download again!')
                 os.unlink(self.metabolomics_zip)
-        else:
-            url = _generate_gnps_download_url(gnps_task_id)
-            _execute_download(url, self.metabolomics_zip)
+        url = _generate_gnps_download_url(gnps_task_id)
+        _execute_download(url, self.metabolomics_zip)
 
-            # this should throw an exception if zip is malformed etc
-            mbzip = zipfile.ZipFile(self.metabolomics_zip)
-            return mbzip
+        # this should throw an exception if zip is malformed etc
+        mbzip = zipfile.ZipFile(self.metabolomics_zip)
+        return mbzip
 
 
     def _download_platform_json_to_file(self, url, local_path):
@@ -791,13 +790,3 @@ def _execute_download(url, metabolomics_zip):
                 spinner.next()
         spinner.finish()
     logger.info('Downloaded metabolomics data!')
-
-
-
-
-if __name__ == "__main__":
-    # salinispora dataset
-    # d = Downloader('MSV000079284')
-
-    d = Downloader('MSV000078836').get(False, "")
-    # d = Downloader('MSV000079284').get(False, "")

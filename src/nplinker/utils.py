@@ -50,11 +50,11 @@ def sqrt_normalise(peaks):
     return normalised_peaks
 
 
-def find_delimiter(filename: Path) -> str:
+def find_delimiter(filename: str | PathLike) -> str:
     """Determine the delimiter in a tabular file.
 
     Args:
-        filename(Path): Path to tabular file.
+        filename(str | PathLike): Path to tabular file.
 
     Returns:
         str: Detected delimiter character.

@@ -39,7 +39,7 @@ class GNPSDownloader:
         Returns:
             str: Download path as string
         """
-        return self._download_root.joinpath(self._task_id + ".zip")
+        return str(self._download_root.joinpath(self._task_id + ".zip"))
     
     def get_task_id(self) -> str:
         """Get the GNPS task id.

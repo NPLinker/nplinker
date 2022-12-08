@@ -16,7 +16,7 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
         Args:
             filename(str | PathLike): str or PathLike object pointing towards the GNPS molecular families file to load.
         """
-        self._families: list[MolecularFamily] = []
+        self._families: list[MolecularFamily | SingletonFamily] = []
         
         for family_id, spectra_ids in _load_molecular_families(filename).items():
             if family_id == -1:
