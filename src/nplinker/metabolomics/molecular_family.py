@@ -49,7 +49,7 @@ class MolecularFamily():
             self.family_id, len(self.spectra))
 
     def __eq__(self, other: Self) -> bool:
-        return self.id == other.id
+        return bool(self.id == other.id)
 
     def __hash__(self) -> int:
         return self.id

@@ -429,7 +429,7 @@ def extract_file_matching_pattern(archive: zipfile.ZipFile, prefix: str, suffix:
     Examples:
         >>> extract_file_matching_pattern(zipfile.ZipFile("archive.zip"), "", ".txt", ".", "results.txt")
         """
-    files: list[Path] = [x.filename for x in archive.filelist]
+    files: list[str] = [x.filename for x in archive.filelist]
     file_to_extract = list(filter(lambda x: x.startswith(prefix) and x.endswith(suffix), files)).pop()
     archive.extract(file_to_extract, extract_dir)
     if out_filename is not None:
