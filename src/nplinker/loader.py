@@ -195,14 +195,15 @@ class DatasetLoader():
         self.nodes_file = self._overrides.get(
             self.OR_NODES) or find_via_glob_alts([
                 os.path.join(self._root, 'clusterinfo*', '*.tsv'),
+                os.path.join(self._root, 'file_mappings.tsv'),
                 os.path.join(self._root, 'clusterinfo*', '*.clustersummary')
             ], self.OR_NODES)
 
         # 3. MET: <root>/networkedges_selfloop/<some UID>.selfloop (new) or .pairsinfo (old) / edges_file=<override>
         self.edges_file = self._overrides.get(
             self.OR_EDGES) or find_via_glob_alts([
-                os.path.join(self._root, 'networkedges_selfloop',
-                             '*.pairsinfo'),
+                os.path.join(self._root, 'networkedges_selfloop', '*.pairsinfo'),
+                os.path.join(self._root, '*.pairsinfo'),
                 os.path.join(self._root, 'networkedges_selfloop', '*.selfloop')
             ], self.OR_EDGES)
 
@@ -211,8 +212,8 @@ class DatasetLoader():
         # => wait for updated dataset with latest output format
         # NOTE: only optional for Crusemann or Crusemann-like dataset format!
         self.extra_nodes_file = self._overrides.get(
-            self.OR_EXTRA_NODES) or find_via_glob(os.path.join(
-                self._root, 'quantification_table_reformatted', '*.csv'),
+            self.OR_EXTRA_NODES) or find_via_glob(
+                os.path.join(self._root, 'quantification_table_reformatted', '*.csv'),
                                                   self.OR_EXTRA_NODES,
                                                   optional=True)
 
