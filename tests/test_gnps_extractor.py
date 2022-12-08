@@ -60,7 +60,7 @@ def test_has_zipfile():
 def test_has_extract_path(tmp_path):
     filepath = DATA_DIR / 'ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip'
     sut = GNPSExtractorBuilder().with_filepath(filepath).with_extract_path(tmp_path).build()
-    assert sut.target() == str(tmp_path)
+    assert sut.get_extract_path() == str(tmp_path)
 
 
 @pytest.mark.parametrize("archive, filename", [
@@ -72,7 +72,7 @@ def test_creates_spectra(archive: Path, filename: str, tmp_path: Path):
 
     sut = GNPSExtractorBuilder().with_filepath(filepath).with_extract_path(tmp_path).build()
     sut._extract_spectra()
-    actual = Path(sut.target()) / "spectra.mgf"
+    actual = Path(sut.get_extract_path()) / "spectra.mgf"
 
     assert_extraction_success(filename, outdir, actual)
 
@@ -86,7 +86,7 @@ def test_creates_molecular_families(archive: Path, filename: str, tmp_path: Path
 
     sut = GNPSExtractorBuilder().with_filepath(filepath).with_extract_path(tmp_path).build()
     sut._extract_molecular_families()
-    actual = Path(sut.target()) / "molecular_families.pairsinfo"
+    actual = Path(sut.get_extract_path()) / "molecular_families.pairsinfo"
     
     assert_extraction_success(filename, outdir, actual)
 
@@ -100,6 +100,6 @@ def test_creates_file_mappings(archive: Path, filename: str, tmp_path: Path):
 
     sut = GNPSExtractorBuilder().with_filepath(filepath).with_extract_path(tmp_path).build()
     sut._extract_file_mappings()
-    actual = Path(sut.target()) / ("file_mappings" + str(Path(filename).suffix))
+    actual = Path(sut.get_extract_path()) / ("file_mappings" + str(Path(filename).suffix))
     
     assert_extraction_success(filename, outdir, actual)
