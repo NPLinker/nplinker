@@ -4,6 +4,7 @@ from pathlib import Path
 import zipfile
 import numpy
 import pytest
+from pytest_lazyfixture import lazy_fixture
 from nplinker import utils
 
 from nplinker.pairedomics.downloader import Downloader
@@ -20,7 +21,7 @@ def gnps_url():
 
 @pytest.mark.parametrize("expected", [
     Path(os.getenv('HOME'), 'nplinker_data', 'pairedomics'),
-    pytest.lazy_fixture('tmp_path')
+    lazy_fixture('tmp_path')
 ])
 def test_default(expected: Path):
     gnps_id = "MSV000079284"
