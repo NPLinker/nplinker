@@ -103,3 +103,16 @@ def test_creates_file_mappings(archive: Path, filename: str, tmp_path: Path):
     actual = Path(sut.get_extract_path()) / ("file_mappings" + str(Path(filename).suffix))
     
     assert_extraction_success(filename, outdir, actual)
+
+
+@pytest.mark.parametrize("archive, filename", [
+    ["ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip", "result_specnets_DB/885e4c5485ba42569e4876d1fe90d759.tsv"],
+    ["ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip", "DB_result/7dc5b46b50d94246a1de12ef485d0f75.tsv"]
+])
+def test_creates_annotations(archive: Path, filename: str, tmp_path: Path):
+    filepath, outdir = _unpack(archive)
+
+    sut = GNPSExtractorBuilder().with_filepath(filepath).with_extract_path(tmp_path).build()
+    sut._extract_annotations()
+    actual = Path(sut.get_extract_path()) / "annotations.tsv" 
+    assert_extraction_success(filename, outdir, actual)

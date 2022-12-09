@@ -41,6 +41,7 @@ class GNPSExtractor:
         self._extract_spectra()
         self._extract_molecular_families()
         self._extract_file_mappings()
+        self._extract_annotations()
 
     def _extract_spectra(self):
         """ Helper function to extract the spectra file from the archive."""
@@ -74,6 +75,19 @@ class GNPSExtractor:
             "file_mappings" + suffix
         )
         os.rmdir(self._extract_path / prefix)
+
+    def _extract_annotations(self):
+        """ Helper function to extract the annotations file from the archive. """
+        prefix = "DB_result" if self._is_fbmn else "result_specnets_DB"            
+        utils.extract_file_matching_pattern(
+            self.data(),
+            prefix,
+            ".tsv",
+            self._extract_path,
+            "annotations.tsv"
+        )
+        if self._is_fbmn:
+            os.rmdir(self._extract_path / prefix)
     
 
         
