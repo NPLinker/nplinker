@@ -28,14 +28,6 @@ logger = LogConfig.getLogger(__name__)
 CLUSTER_REGION_REGEX = re.compile('(.+?)\\.(cluster|region)(\\d+).gbk$')
 
 
-def parse_gbk_header(bgc):
-    """Read AntiSMASH BGC .gbk file to get BGC name and id"""
-    records = list(SeqIO.parse(bgc.antismash_file, format='gb'))
-    if len(records) > 0:
-        bgc.antismash_accession = records[0].name
-        bgc.antismash_id = records[0].id
-
-
 def load_gcfs(bigscape_dir: str | PathLike,
               strains: StrainCollection,
               mibig_bgc_dict: dict[str, BGC],
