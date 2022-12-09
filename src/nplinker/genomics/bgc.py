@@ -1,18 +1,14 @@
 from __future__ import annotations
-import re
 from typing import TYPE_CHECKING
+from deprecated import deprecated
 from nplinker.logconfig import LogConfig
 from .aa_pred import predict_aa
-from .genomics_utilities import get_smiles
-from deprecated import deprecated
 
 if TYPE_CHECKING:
     from ..strains import Strain
     from .gcf import GCF
 
 logger = LogConfig.getLogger(__name__)
-
-CLUSTER_REGION_REGEX = re.compile('(.+?)\\.(cluster|region)(\\d+).gbk$')
 
 
 class BGC():
@@ -22,25 +18,21 @@ class BGC():
                  name: str,
                  product_prediction: list[str],
                  description: str | None = None):
+        # CG TODO: remove name parameter and use BGC file name as id
         self.id = id
         self.name = name  # BGC file name
         self.product_prediction = product_prediction  # can get from gbk SeqFeature "region"
-        # allow for multiple parents in the case of hybrid BGCs
-        self.parents: set[GCF] = set()
         self.description = description  # can get from gbk SeqRecord.description
-        # these will get parsed from the .gbk file
+
+        # CG TODO: change parents to parent
+        self.parents: set[GCF] = set()
+        self.smiles: list[str] = []
+
+        # antismash related
+        self.antismash_file: str | None = None
         self.antismash_id: str | None = None  # version in .gbk, id in SeqRecord
         self.antismash_accession: str | None = None  # accession in .gbk, name in SeqRecord
-
-        self.region = -1
-        self.cluster = -1
-
-        self.antismash_file = None
-        self._known_cluster_blast = None
-        self._smiles = None
-        self._smiles_parsed = False
-
-        self.edges: set = set()
+        self.region = -1  # TODO: to remove it
 
         self._strain: Strain | None = None
 
@@ -84,19 +76,6 @@ class BGC():
             bool: True if it's MIBiG reference BGC
         """
         return self.name.startswith('BGC')
-
-    @property
-    def smiles(self):
-        if self._smiles is not None or self._smiles_parsed:
-            return self._smiles
-
-        if self.antismash_file is None:
-            return None
-
-        self._smiles = get_smiles(self)
-        self._smiles_parsed = True
-        logger.debug(f'SMILES for {self} = {self._smiles}')
-        return self._smiles
 
     # CG: why not providing whole product but only amino acid as product monomer?
     # this property is not used in NPLinker core business.
