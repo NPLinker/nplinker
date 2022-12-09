@@ -247,7 +247,7 @@ class DatasetLoader():
                     os.path.join(self._root, 'result_specnets_DB'),
                 ],
                 self.OR_ANNO,
-                optional=True
+                optional=False
             )
         if self.annotations_dir is not None:
             self.annotations_config_file = self._overrides.get(
