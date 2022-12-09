@@ -44,20 +44,6 @@ class BGC():
 
         self._strain: Strain | None = None
 
-    def set_filename(self, filename):
-        self.antismash_file = filename
-        if filename is None:
-            return
-
-        # try to extract the region or cluster number if provided
-        regex_obj = CLUSTER_REGION_REGEX.search(filename)
-        if regex_obj is not None:
-            c_or_r = regex_obj.group(2)
-            if c_or_r == 'region':
-                self.region = int(regex_obj.group(3))
-            elif c_or_r == 'cluster':
-                self.cluster = int(regex_obj.group(3))
-
     def add_parent(self, gcf):
         self.parents.add(gcf)
 
