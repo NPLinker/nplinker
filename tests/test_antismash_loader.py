@@ -59,3 +59,6 @@ def test_parse_bgc_genbank():
     assert isinstance(bgc, BGC)
     assert bgc.id == -1
     assert bgc.name == "NZ_AZWB01000005.region001"
+    assert bgc.antismash_file == gbk_file
+    assert bgc.product_prediction == ["NRPS", "lanthipeptide"]
+    assert bgc.smiles == ["NC([*])C(=O)NC([*])C(=O)NC(CO)C(=O)NC(Cc1ccccc1)C(=O)NCC(=O)O"]
