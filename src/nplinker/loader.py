@@ -174,16 +174,19 @@ class DatasetLoader():
                                             self.USE_MIBIG_DEFAULT)
         self._mibig_version = self._dataset.get('mibig_version',
                                                 self.MIBIG_VERSION_DEFAULT)
+
         self._root = self._config['dataset']['root']
         self._platform_id = self._config['dataset']['platform_id']
         self._remote_loading = len(self._platform_id) > 0
         self.datadir = files('nplinker').joinpath('data')
         self.dataset_id = os.path.split(
             self._root)[-1] if not self._remote_loading else self._platform_id
+        
         if self._remote_loading:
             self._downloader = Downloader(self._platform_id)
         else:
             self._downloader = None
+        
         self.bgcs, self.gcfs, self.spectra, self.molfams = [], [], [], []
         self.mibig_bgc_dict = {}
         self.product_types = []
@@ -665,9 +668,14 @@ class DatasetLoader():
 
     def _load_metabolomics(self):
         spec_dict, self.spectra, self.molfams, unknown_strains = load_dataset(
-            self.strains, self.mgf_file, self.edges_file, self.nodes_file,
-            self.quantification_table_file, self.metadata_table_file,
-            self._extended_metadata_table_parsing)
+            self.strains,
+            self.mgf_file,
+            self.edges_file,
+            self.nodes_file,
+            self.quantification_table_file,
+            self.metadata_table_file,
+            self._extended_metadata_table_parsing
+        )
 
         us_path = os.path.join(self._root, 'unknown_strains_met.csv')
         logger.warning(
