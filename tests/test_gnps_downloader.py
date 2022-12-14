@@ -1,13 +1,11 @@
 from tempfile import gettempdir
 import zipfile
 from pathlib import Path
-import numpy
 from typing_extensions import Self
 
 import pytest
 from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
 from . import DATA_DIR
-import os
 
 
 class GNPSDownloaderBuilder:

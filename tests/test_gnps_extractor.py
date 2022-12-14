@@ -1,5 +1,4 @@
 import filecmp
-import os
 from tempfile import gettempdir
 import zipfile
 from pathlib import Path
