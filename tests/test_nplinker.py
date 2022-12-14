@@ -1,5 +1,6 @@
 import pytest
 from nplinker.nplinker import NPLinker
+import os
 
 from . import DATA_DIR
 
@@ -17,7 +18,7 @@ def runningInDocker():
                 return True
     return False
 
-@pytest.mark.skipif(runningInDocker(), reason="Skip when running on CI")
+@pytest.mark.skipif(os.environ.get('CI') == 'true', reason="Skip when running on CI")
 def test_load_data(instance: NPLinker):
     assert len(instance.bgcs) == 390
     assert len(instance.gcfs) == 113
@@ -25,7 +26,7 @@ def test_load_data(instance: NPLinker):
     assert len(instance.molfams) == 25769
 
 
-@pytest.mark.skipif(runningInDocker(), reason="Skip when running on CI")
+@pytest.mark.skipif(os.environ.get('CI') == 'true' , reason="Skip when running on CI")
 def test_get_links(instance: NPLinker):
     mc = instance.scoring_method('metcalf')
     mc.cutoff = 3.5
