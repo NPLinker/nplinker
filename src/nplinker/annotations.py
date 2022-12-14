@@ -14,12 +14,13 @@
 
 import csv
 import os
+
+from nplinker.metabolomics.spectrum import Spectrum, GNPS_KEY
 from .logconfig import LogConfig
 
 
 logger = LogConfig.getLogger(__name__)
 
-GNPS_KEY = 'gnps'
 GNPS_URL_FORMAT = 'https://metabolomics-usi.ucsd.edu/{}/?usi=mzspec:GNPSLIBRARY:{}'
 GNPS_INDEX_COLUMN = '#Scan#'
 GNPS_DATA_COLUMNS = ['Compound_Name', 'Organism', 'MQScore', 'SpectrumID']
@@ -53,42 +54,21 @@ def create_gnps_annotation(spec, gnps_anno):
     spec.gnps_id = gnps_anno['SpectrumID']
 
 
-def load_annotations(root, config, spectra, spec_dict):
+def load_annotations(root: str | os.PathLike, config: str | os.PathLike, spectra: list[Spectrum], spec_dict: dict[int, Spectrum]) -> list[Spectrum]:
+    
     if not os.path.exists(root):
         logger.debug(f'Annotation directory not found ({root})')
         return spectra
 
-    ac = {}
-    if os.path.exists(config):
-        # parse annotations config file if it exists
-        with open(config) as f:
-            rdr = csv.reader(f, delimiter='\t')
-            for row in rdr:
-                # expecting 3 columns: filename, index col name, data col name(s)
-                if len(row) != 3:
-                    logger.warning(
-                        'Malformed line in annotations configuration: {}'.
-                        format(row))
-                    continue
-                # record the columns with filename as key
-                data_cols = row[2].split(',')
-                if len(data_cols) == 0:
-                    logger.warning(
-                        'No data columns selected in annotation file {}, skipping it!'
-                        .format(row[0]))
-                    continue
-                ac[row[0]] = (row[1], data_cols)
+    ac = _read_config(config)
 
     logger.debug(f'Parsed {len(ac)} annotations configuration entries')
 
-    annotation_files = []
-    for f in os.listdir(root):
-        if f == os.path.split(config)[1] or not f.endswith('.tsv'):
-            continue
-        annotation_files.append(os.path.join(root, f))
+    annotation_files = _find_annotation_files(root, config)
 
     logger.debug('Found {} annotations .tsv files in {}'.format(
         len(annotation_files), root))
+    
     for af in annotation_files:
         with open(af) as f:
             rdr = csv.reader(f, delimiter='\t')
@@ -172,3 +152,34 @@ def load_annotations(root, config, spectra, spec_dict):
                     spec.set_annotations(filename, anno)
 
     return spectra
+
+def _find_annotation_files(root, config):
+    annotation_files = []
+    for f in os.listdir(root):
+        if f == os.path.split(config)[1] or not f.endswith('.tsv'):
+            continue
+        annotation_files.append(os.path.join(root, f))
+    return annotation_files
+
+def _read_config(config):
+    ac = {}
+    if os.path.exists(config):
+        # parse annotations config file if it exists
+        with open(config) as f:
+            rdr = csv.reader(f, delimiter='\t')
+            for row in rdr:
+                # expecting 3 columns: filename, index col name, data col name(s)
+                if len(row) != 3:
+                    logger.warning(
+                        'Malformed line in annotations configuration: {}'.
+                        format(row))
+                    continue
+                # record the columns with filename as key
+                data_cols = row[2].split(',')
+                if len(data_cols) == 0:
+                    logger.warning(
+                        'No data columns selected in annotation file {}, skipping it!'
+                        .format(row[0]))
+                    continue
+                ac[row[0]] = (row[1], data_cols)
+    return ac
