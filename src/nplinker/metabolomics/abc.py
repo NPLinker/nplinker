@@ -23,3 +23,10 @@ class FileMappingLoaderBase(ABC):
     @abstractmethod
     def mapping(self) -> dict[int, list[str]]:
         ...
+
+
+class AnnotationLoaderBase(ABC):
+
+    @abstractmethod
+    def annotations(self) -> dict[int, dict]:
+        ...
