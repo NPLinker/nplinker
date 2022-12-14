@@ -15,6 +15,8 @@
 import csv
 import os
 
+from deprecated import deprecated
+
 from nplinker.metabolomics.spectrum import Spectrum, GNPS_KEY
 from .logconfig import LogConfig
 
@@ -26,19 +28,23 @@ GNPS_INDEX_COLUMN = '#Scan#'
 GNPS_DATA_COLUMNS = ['Compound_Name', 'Organism', 'MQScore', 'SpectrumID']
 
 
-def headers_match_gnps(headers):
+def _headers_match_gnps(headers: list[str]) -> bool:
     for k in GNPS_DATA_COLUMNS:
         if k not in headers:
             return False
     return True
 
+@deprecated(version="1.3.3", reason="Use GNPSAnnotationLoader class instead.")
+def create_gnps_annotation(spec: Spectrum, gnps_anno: dict):
+    """Function to insert png, json, svg and spectrum information in GNPS annotation data for given spectrum.
 
-# url_type: spectrum, png, svg, json
-def gnps_url(id, url_type='spectrum'):
-    return GNPS_URL_FORMAT.format(url_type, id)
+    Args:
+        spec(Spectrum): Spectrum to which to add the annotation.
+        gnps_anno(dict): Annotation metadata to add and augment.
 
-
-def create_gnps_annotation(spec, gnps_anno):
+    Raises:
+        Exception: Raises exception if the spectrum already contains a GNPS annotation.
+    """
     # also insert useful URLs
     for t in ['png', 'json', 'svg', 'spectrum']:
         gnps_anno[f'{t}_url'] = GNPS_URL_FORMAT.format(
@@ -54,7 +60,22 @@ def create_gnps_annotation(spec, gnps_anno):
     spec.gnps_id = gnps_anno['SpectrumID']
 
 
+@deprecated(version="1.3.3", reason="Use GNPSAnnotationLoader class instead.")
 def load_annotations(root: str | os.PathLike, config: str | os.PathLike, spectra: list[Spectrum], spec_dict: dict[int, Spectrum]) -> list[Spectrum]:
+    """Load the annotations from the GNPS annotation file present in root to the spectra.
+
+    Args:
+        root(str | os.PathLike): Path to the downloaded and extracted GNPS results.
+        config(str | os.PathLike): Path to config file for custom file locations.
+        spectra(list[Spectrum]): List of spectra to annotate.
+        spec_dict(dict[int, Spectrum]): Dictionary mapping to spectra passed in `spectra` variable.
+
+    Raises:
+        Exception: Raises exception if custom annotation config file has invalid content.
+
+    Returns:
+        list[Spectrum]: List of annotated spectra.
+    """
     
     if not os.path.exists(root):
         logger.debug(f'Annotation directory not found ({root})')
@@ -75,7 +96,7 @@ def load_annotations(root: str | os.PathLike, config: str | os.PathLike, spectra
             headers = next(rdr)
             filename = os.path.split(af)[1]
 
-            if headers_match_gnps(headers):
+            if _headers_match_gnps(headers):
                 # assume this is our main annotations file
                 logger.debug(f'Parsing GNPS annotations from {af}')
 
@@ -153,7 +174,16 @@ def load_annotations(root: str | os.PathLike, config: str | os.PathLike, spectra
 
     return spectra
 
-def _find_annotation_files(root, config):
+def _find_annotation_files(root: str, config: str) -> list[str]:
+    """Detect all annotation files in the root folder or specified in the config file.
+
+    Args:
+        root(str): Root folder in which to look for annotation files in .tsv format.
+        config(str): Config file to load custom annotation files.
+
+    Returns:
+        list[str]: List of detected annotation files.
+    """
     annotation_files = []
     for f in os.listdir(root):
         if f == os.path.split(config)[1] or not f.endswith('.tsv'):

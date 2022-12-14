@@ -80,7 +80,6 @@ def _md_convert(val: Any) -> int|float|None|Any:
     return val
 
 
-@deprecated
 def _parse_mzxml_header(hdr: str, strains: StrainCollection, md_table: dict[str, dict[str, str]], ext_metadata_parsing: bool) -> tuple[str|None, str|None, bool]:
     """Return the file identifier component from the column name.
 
@@ -246,7 +245,6 @@ def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, filename:
     return unknown_strains
 
 
-@deprecated
 def _parse_metadata_table(filename: str) -> dict[str, dict[str, str]]:
     """Parses the metadata table file from GNPS.
 
@@ -437,6 +435,7 @@ def _load_clusterinfo_fbmn(strains: StrainCollection, nodes_file: str, extra_nod
     return spec_info, unknown_strains
 
 
+@deprecated(version="1.3.3", reason="Use the GNPSFileMappingLoader class instead.")
 def load_gnps(strains: StrainCollection, nodes_file: str, quant_table_file: str, metadata_table_file: str,
               ext_metadata_parsing: bool, spec_dict: dict[int, Spectrum]) -> dict[str, int]:
     """Wrapper function to load information from GNPS outputs.
