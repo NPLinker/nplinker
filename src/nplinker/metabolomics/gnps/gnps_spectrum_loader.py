@@ -1,7 +1,4 @@
 from os import PathLike
-from nplinker.annotations import GNPS_DATA_COLUMNS
-from nplinker.annotations import GNPS_KEY
-from nplinker.annotations import create_gnps_annotation
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.abc import SpectrumLoaderBase
 from nplinker.metabolomics.spectrum import Spectrum
@@ -53,15 +50,6 @@ def _mols_to_spectra(ms2, metadata: dict[str, dict[str, str]]) -> list[Spectrum]
                                 metadata[m.name]['precursormass'],
                                 metadata[m.name]['parentmass'])
         new_spectrum.metadata = metadata[m.name]
-        # add GNPS ID if in metadata under SPECTRUMID (this doesn't seem to be in regular MGF files
-        # from GNPS, but *is* in the rosetta mibig MGF)
-        # note: LoadMGF seems to lowercase (some) metadata keys?
-        if 'spectrumid' in new_spectrum.metadata:
-            # add an annotation for consistency, if not already there
-            if GNPS_KEY not in new_spectrum.annotations:
-                gnps_anno = {k: None for k in GNPS_DATA_COLUMNS}
-                gnps_anno['SpectrumID'] = new_spectrum.metadata['spectrumid']
-                create_gnps_annotation(new_spectrum, gnps_anno)
         spectra.append(new_spectrum)
 
     return spectra

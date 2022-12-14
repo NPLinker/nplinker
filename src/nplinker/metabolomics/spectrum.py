@@ -1,7 +1,8 @@
 
-from nplinker.annotations import GNPS_KEY
 from nplinker.strain_collection import StrainCollection
 from nplinker.utils import sqrt_normalise
+
+GNPS_KEY = 'gnps'
 
 JCAMP = '##TITLE={}\\n' +\
         '##JCAMP-DX=nplinker vTODO\\n' +\
