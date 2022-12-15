@@ -23,7 +23,7 @@ from nplinker.genomics import load_gcfs
 from nplinker.genomics.mibig import MibigBGCLoader
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics import load_dataset
+from nplinker.metabolomics.metabolomics import load_dataset
 from nplinker.pairedomics.downloader import Downloader
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.strain_collection import StrainCollection
