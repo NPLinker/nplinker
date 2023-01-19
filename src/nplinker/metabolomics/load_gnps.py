@@ -245,7 +245,7 @@ def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, filename:
     return unknown_strains
 
 
-def _parse_metadata_table(filename: str) -> dict[str, dict[str, str]]:
+def _parse_metadata_table(filename: str) -> dict[str, dict[str, str|None]]:
     """Parses the metadata table file from GNPS.
 
     Args:
