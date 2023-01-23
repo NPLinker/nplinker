@@ -30,6 +30,10 @@ pip install --no-cache-dir --editable .[dev]
 install-nplinker-deps
 ```
 
+Note that if you are using a ZSH shell you should use double quotes for `.[dev]`, like the following:
+```
+pip install --no-cache-dir --editable ."[dev]"
+```
 Afterwards check that the install directory is present in the `PATH` environment variable.
 
 ## Running the tests
