@@ -43,8 +43,7 @@ def load_gcfs(bigscape_dir: str | PathLike,
     num_mibig: int = 0
     bgc_list: list[BGC] = []
 
-    internal_gcf_id: int = 0
-    gcf_dict: dict[int, GCF] = {}
+    gcf_dict: dict[str, GCF] = {}
     gcf_list: list[GCF] = []
 
     used_strains: StrainCollection = StrainCollection()
@@ -76,7 +75,7 @@ def load_gcfs(bigscape_dir: str | PathLike,
         next(reader)  # skip headers
         for line in reader:
             bgc_name = line[0]
-            family_id = int(line[1])
+            family_id = line[1]
 
             # get bgc annotations from bigscape file
             metadata_line = metadata[bgc_name]
@@ -110,10 +109,9 @@ def load_gcfs(bigscape_dir: str | PathLike,
 
             # build new gcf
             if family_id not in gcf_dict:
-                new_gcf = GCF(internal_gcf_id, family_id, bigscape_class)
+                new_gcf = GCF(family_id, bigscape_class)
                 gcf_dict[family_id] = new_gcf
                 gcf_list.append(new_gcf)
-                internal_gcf_id += 1
 
             # link bgc to gcf
             gcf_dict[family_id].add_bgc(new_bgc)
@@ -176,10 +174,6 @@ def _filter_gcfs(
     for bgc in bgcs_to_remove:
         bgcs.remove(bgc)
         strains.remove(bgc.strain)
-
-    # keep internal IDs consecutive
-    for index, gcf in enumerate(gcfs):
-        gcf.id = index
 
     logger.info(
         'Remove GCFs that has only MIBiG BGCs: removing {} GCFs and {} BGCs'.

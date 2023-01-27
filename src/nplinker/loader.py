@@ -418,9 +418,8 @@ class DatasetLoader():
             len(self.gcfs), len(gcfs)))
         self.gcfs = list(gcfs)
         # filter each GCF's strain list
-        for i, gcf in enumerate(self.gcfs):
+        for gcf in self.gcfs:
             gcf.strains.filter(self.include_only_strains)
-            gcf.id = i
 
         molfams = {spec.family for spec in self.spectra}
         logger.info('Current / filtered MolFam counts: {} / {}'.format(

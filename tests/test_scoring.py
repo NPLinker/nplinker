@@ -21,12 +21,11 @@ def create_strains(n=10):
 def create_gcfs(strains, n=3):
     gcfs = []
     for i in range(n):
-        gcf = GCF(i, f'fake_gcf_{i}', 'NRPS')
+        gcf = GCF(f'fake_gcf_{i}', 'NRPS')
         num_strains = np.random.randint(1, len(strains))
         randoms = list(range(len(strains)))
         np.random.shuffle(randoms)
         randoms = randoms[:num_strains]
-        gcf.id = i
 
         for j in range(num_strains):
             # (id, strain, name, bigscape_class, product_prediction, description=None):

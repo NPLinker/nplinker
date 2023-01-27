@@ -121,7 +121,7 @@ class DataLinks():
         self.mapping_spec["spec-id"] = mapping_spec[:, 0]
         self.mapping_spec["original spec-id"] = mapping_spec[:, 1]
         self.mapping_spec["fam-id"] = mapping_spec[:, 2]
-    
+
     def collect_mappings_spec_v2(self, molfams: Iterable[MolecularFamily]):
         num_spectra = sum(len(x.spectra_ids) for x in molfams)
         mapping_spec = np.zeros((num_spectra, 3))
@@ -131,11 +131,11 @@ class DataLinks():
         for item in molfams:
             for spectrum_id in item.spectra_ids:
                 inverted_mappings[spectrum_id] = item.family_id
-        
+
         for i, key in enumerate(inverted_mappings):
             mapping_spec[i, 1] = key
             mapping_spec[i, 2] = inverted_mappings[key]
-        
+
         # extend mapping tables:
         self.mapping_spec["spec-id"] = mapping_spec[:, 0]
         self.mapping_spec["original spec-id"] = mapping_spec[:, 1]
@@ -336,7 +336,7 @@ class DataLinks():
             objects_b = [objects_b]
 
         # retrieve object IDs
-        ids_b = [gcf.id for gcf in objects_b]
+        ids_b = [gcf.gcf_id for gcf in objects_b]
         # these might be MolFams or Spectra, either way they'll have a .id attribute
         ids_a = [obj.id for obj in objects_a]
 
@@ -402,5 +402,3 @@ class DataLinks():
 
     # class data_links OUTPUT functions
     # TODO add output functions (e.g. to search for mappings of individual specs, gcfs etc.)
-
-

@@ -195,8 +195,6 @@ for obj, result in results.links.items():
 #    run, this object will not appear in the LinkCollection afterwards.
 #
 # Examples:
-# - exclude any sources for which an arbitrary function is false (sources are GCFs in this example)
-results.filter_sources(lambda gcf: gcf.id % 2 == 0)
 # - exclude any linked objects for which an arbitrary function is false (targets are Spectrum objects here)
 results.filter_targets(lambda spec: spec.id % 1 == 0)
 # - exclude any links for which an arbitrary function is false (<link> is an ObjectLink)

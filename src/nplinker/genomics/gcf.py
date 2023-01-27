@@ -3,11 +3,13 @@ from .bgc import BGC
 
 
 class GCF():
-    # CG: the most importance info is family id,
-    # the other annotations can be find in BGC gbk files
+    def __init__(self, gcf_id: str, bigscape_class: str):
+        """Class to represent gene cluster family.
 
-    def __init__(self, id, gcf_id, bigscape_class):
-        self.id = id
+        Args:
+            gcf_id(str): family id
+            bigscape_class(str): class predicted by bigscape
+        """
         self.gcf_id = gcf_id
         self.bigscape_class = bigscape_class
         self.bgcs = set()
@@ -16,17 +18,17 @@ class GCF():
         self.strains_lookup = {}
 
     def __str__(self):
-        return 'GCF(id={}, class={}, gcf_id={}, strains={})'.format(
-            self.id, self.bigscape_class, self.gcf_id, len(self.strains))
+        return 'GCF(gcf_id={}, class={},  strains={})'.format(
+            self.gcf_id, self.bigscape_class, len(self.strains))
 
     def __repr__(self):
         return str(self)
 
     def __eq__(self, other):
-        return self.id == other.id
+        return self.gcf_id == other.gcf_id
 
     def __hash__(self):
-        return self.id
+        return self.gcf_id
 
     def add_bgc(self, bgc):
         self.bgcs.add(bgc)
