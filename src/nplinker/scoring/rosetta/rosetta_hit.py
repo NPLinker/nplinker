@@ -11,7 +11,7 @@ class RosettaHit():
 
     def __str__(self):
         return 'RosettaHit: {}<-->{} via ({} ({:.3f}), {} ({:.3f}))'.format(
-            self.spec.spectrum_id, self.bgc.name, self.gnps_id,
+            self.spec.spectrum_id, self.bgc.bgc_id, self.gnps_id,
             self.spec_match_score, self.mibig_id, self.bgc_match_score)
 
     def __repr__(self):

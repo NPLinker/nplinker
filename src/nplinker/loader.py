@@ -405,8 +405,6 @@ class DatasetLoader():
             len(self.spectra), len(spectra_to_retain)))
 
         self.bgcs = list(bgcs_to_retain)
-        for i, bgc in enumerate(self.bgcs):
-            bgc.id = i
 
         self.spectra = list(spectra_to_retain)
         # also need to filter the set of strains attached to each spectrum

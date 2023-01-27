@@ -536,12 +536,12 @@ class Rosetta():
 
             csvwriter.writerow([
                 'nplinker spectrum ID', 'spectrum ID', 'GNPS ID',
-                'spectral score', 'nplinker BGC ID', 'BGC ID', 'MiBIG BGC ID',
+                'spectral score', 'BGC ID', 'MiBIG BGC ID',
                 'BGC score'
             ])
             for hit in self._rosetta_hits:
                 csvwriter.writerow([
                     hit.spec.id, hit.spec.spectrum_id, hit.gnps_id,
-                    hit.spec_match_score, hit.bgc.id, hit.bgc.name,
+                    hit.spec_match_score, hit.bgc.bgc_id,
                     hit.mibig_id, hit.bgc_match_score
                 ])

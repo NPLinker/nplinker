@@ -41,7 +41,6 @@ def load_gcfs(bigscape_dir: str | PathLike,
 
     new_bgc: BGC
     num_mibig: int = 0
-    internal_bgc_id: int = 0
     bgc_list: list[BGC] = []
 
     internal_gcf_id: int = 0
@@ -106,10 +105,8 @@ def load_gcfs(bigscape_dir: str | PathLike,
                 except KeyError:
                     raise KeyError(f'Unknown AntiSMASH BGC: {bgc_name}')
 
-            new_bgc.id = internal_bgc_id
             new_bgc.strain = strain
             bgc_list.append(new_bgc)
-            internal_bgc_id += 1
 
             # build new gcf
             if family_id not in gcf_dict:
@@ -181,8 +178,6 @@ def _filter_gcfs(
         strains.remove(bgc.strain)
 
     # keep internal IDs consecutive
-    for index, bgc in enumerate(bgcs):
-        bgc.id = index
     for index, gcf in enumerate(gcfs):
         gcf.id = index
 

@@ -14,13 +14,10 @@ logger = LogConfig.getLogger(__name__)
 class BGC():
 
     def __init__(self,
-                 id: int,
-                 name: str,
+                 bgc_id: str,
                  product_prediction: list[str],
                  description: str | None = None):
-        # CG TODO: remove name parameter and use BGC file name as id
-        self.id = id
-        self.name = name  # BGC file name
+        self.bgc_id = bgc_id  # BGC file name
         self.product_prediction = product_prediction  # can get from gbk SeqFeature "region"
         self.description = description  # can get from gbk SeqRecord.description
 
@@ -43,15 +40,15 @@ class BGC():
         return str(self)
 
     def __str__(self):
-        return '{}(id={}, name={}, strain={}, asid={}, region={})'.format(
-            self.__class__.__name__, self.id, self.name, self.strain,
+        return '{}(bgc_id={}, strain={}, asid={}, region={})'.format(
+            self.__class__.__name__, self.bgc_id, self.strain,
             self.antismash_id, self.region)
 
     def __eq__(self, other):
-        return self.id == other.id
+        return self.bgc_id == other.bgc_id
 
     def __hash__(self):
-        return self.id
+        return self.bgc_id
 
     @property
     def strain(self) -> Strain | None:
@@ -75,7 +72,7 @@ class BGC():
         Returns:
             bool: True if it's MIBiG reference BGC
         """
-        return self.name.startswith('BGC')
+        return self.bgc_id.startswith('BGC')
 
     # CG: why not providing whole product but only amino acid as product monomer?
     # this property is not used in NPLinker core business.

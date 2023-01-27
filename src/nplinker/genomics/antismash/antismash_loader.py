@@ -92,9 +92,8 @@ class AntismashBGCLoader:
             dict[str, BGC]: key is BGC name and value is :class:`~nplinker.genomic.BGC` objects
         """
         bgcs = {}
-        for index, bgc_id in enumerate(bgc_files.keys()):
+        for bgc_id in bgc_files:
             bgc = parse_bgc_genbank(bgc_files[bgc_id])
-            bgc.id = index
             bgcs[bgc_id] = bgc
         return bgcs
 
@@ -102,8 +101,6 @@ def parse_bgc_genbank(file: str) -> BGC:
     """Parse a single BGC gbk file to BGC object.
 
     Note:
-        Since there is only one BGC gbk file, the index of BGC object
-        (bgc.id) is set to `-1`.
         If product info is not available in gbk file, the product of BGC
             object (bgc.product_prediction) is set to empty list.
 
@@ -126,8 +123,7 @@ def parse_bgc_genbank(file: str) -> BGC:
     product_prediction = _parse_product(record)
     smiles = _parse_smiles(record)
 
-    bgc = BGC(-1,
-              name=fname,
+    bgc = BGC(bgc_id=fname,
               product_prediction=product_prediction,
               description=description)
     bgc.antismash_accession = antismash_accession

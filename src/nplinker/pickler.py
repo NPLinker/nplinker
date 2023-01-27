@@ -41,7 +41,7 @@ class NPLinkerPickler(pickle.Pickler):
 
     def persistent_id(self, obj):
         if isinstance(obj, BGC):
-            return ('BGC', obj.id)
+            return ('BGC', obj.bgc_id)
         elif isinstance(obj, GCF):
             return ('GCF', obj.id)
         elif isinstance(obj, Spectrum):

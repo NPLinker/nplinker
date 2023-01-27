@@ -90,20 +90,14 @@ class MibigBGCLoader:
                 MibigBGC object
         """
         bgc_dict = {}
-        i = 0
         for name, file in self._file_dict.items():
             bgc = parse_bgc_metadata_json(file)
-            bgc.id = i
             bgc_dict[name] = bgc
-            i += 1
         return bgc_dict
 
 
 def parse_bgc_metadata_json(file: str) -> BGC:
     """Parse MIBiG metadata file and return MibigBGC object
-
-    Note:
-        Index of MibigBGC object (`MibigBGC.id`) is set to `-1`.
 
     Args:
         file(str): Path to the MIBiG metadata json file
@@ -112,7 +106,7 @@ def parse_bgc_metadata_json(file: str) -> BGC:
         MibigBGC: :class:`nplinker.genomics.mibig.MibigBGC` object
     """
     metadata = MibigMetadata(file)
-    mibig_bgc = BGC(-1, metadata.mibig_accession, metadata.biosyn_class)
+    mibig_bgc = BGC(metadata.mibig_accession, metadata.biosyn_class)
     return mibig_bgc
 
 

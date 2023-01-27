@@ -210,7 +210,7 @@ class NPClassScoring(ScoringMethod):
             # get parent gcf for bgc
             bgc_like_gcf = [
                 gcf for gcf in self.npl.gcfs
-                if bgc_like.id in [b.id for b in gcf.bgcs]
+                if bgc_like.bgc_id in [b.bgc_id for b in gcf.bgcs]
             ][0]
             # gather AS classes and convert to names in scoring dict
             as_classes = self.npl.class_matches.convert_as_classes(

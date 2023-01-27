@@ -71,5 +71,4 @@ def test_parse_bgc_metadata_json():
     json_file = DATA_DIR / "mibig" / "BGC0000001_v3.1.json"
     bgc = parse_bgc_metadata_json(str(json_file))
     assert isinstance(bgc, BGC)
-    assert bgc.id == -1
-    assert bgc.name == "BGC0000001"
+    assert bgc.bgc_id == "BGC0000001"
