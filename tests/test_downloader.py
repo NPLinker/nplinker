@@ -26,7 +26,6 @@ def test_default(expected: Path):
 
     sut = Downloader(gnps_id, local_cache=str(expected))
 
-
     assert sut is not None
     assert sut.gnps_massive_id == gnps_id
     assert sut.local_cache == str(expected)
