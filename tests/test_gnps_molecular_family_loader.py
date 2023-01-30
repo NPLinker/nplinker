@@ -26,7 +26,7 @@ def test_has_molecular_families(filename):
     assert len(actual[0].spectra_ids) == 19
 
 
-def test_families_are_identical(spec_dict, molecular_families: list[MolecularFamily]):
+def test_families_are_identical(spec_dict, molecular_families):
     filename = os.path.join(DATA_DIR, "edges.pairsinfo")
     actual = GNPSMolecularFamilyLoader(filename).families()
 
