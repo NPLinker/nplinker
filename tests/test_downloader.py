@@ -42,8 +42,6 @@ def test_default(expected: Path):
     assert sut.all_project_json_file == str(expected / 'all_projects.json')
     assert sut.project_json_file == str(expected / f"{gnps_id}.json")
 
-
-
 def test_download_metabolomics_zipfile(tmp_path):
     sut = Downloader("MSV000079284", local_cache=tmp_path)
     sut._download_metabolomics_zipfile("c22f44b14a3d450eb836d607cb9521bb")
