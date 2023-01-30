@@ -51,7 +51,7 @@ def sqrt_normalise(peaks):
 
 
 def find_delimiter(filename: str | PathLike) -> str:
-    """Determine the delimiter in a tabular file.
+    """Detect the delimiter for the given tabular file.
 
     Args:
         filename(str | PathLike): Path to tabular file.
