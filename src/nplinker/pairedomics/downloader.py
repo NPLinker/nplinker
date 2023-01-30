@@ -99,7 +99,7 @@ class Downloader():
             local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data',
                                         'pairedomics')
 
-        self.init_folder_structure(local_cache)
+        self._init_folder_structure(local_cache)
 
         # init project json files
         self.all_project_json = None
