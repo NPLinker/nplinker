@@ -17,8 +17,6 @@ from . import DATA_DIR
 def gnps_url():
     return _generate_gnps_download_url("c22f44b14a3d450eb836d607cb9521bb")
 
-
-
 @pytest.mark.parametrize("expected", [
     Path(os.getenv('HOME'), 'nplinker_data', 'pairedomics'),
     lazy_fixture('tmp_path')
