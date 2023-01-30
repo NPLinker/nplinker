@@ -68,7 +68,7 @@ def find_delimiter(filename: str | PathLike) -> str:
     return delimiter
     
 def get_headers(filename: str | PathLike) -> list[str]:
-    """Function to read headers from tab or comma separated table.
+    """Read headers from the given tabular file.
 
     Args:
         filename(str): Path to the file to read the header from.
