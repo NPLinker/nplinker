@@ -196,7 +196,7 @@ def test_extract_file_matching_patter(tmp_path):
         tmp_path,
         "test.csv"
     )
-    expected : Path = tmp_path / "test.csv"
+    expected: Path = tmp_path / "test.csv"
     
     assert expected.exists()
     assert expected.is_file()
