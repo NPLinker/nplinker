@@ -154,7 +154,7 @@ class Downloader():
                      encoding='utf-8') as f:
             f.write(str(self.project_json))
     
-    def init_folder_structure(self, local_cache):
+    def _init_folder_structure(self, local_cache):
         # init local cache root   
         self.local_cache = local_cache
         self.local_download_cache = os.path.join(self.local_cache, 'downloads')
