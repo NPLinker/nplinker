@@ -10,13 +10,6 @@ def instance() -> NPLinker:
     npl.load_data()
     return npl
 
-def runningInDocker():
-    with open('/proc/self/cgroup', 'r') as procfile:
-        for line in procfile:
-            fields = line.strip().split('/')
-            if 'docker' in fields:
-                return True
-    return False
 
 @pytest.mark.skipif(os.environ.get('CI') == 'true', reason="Skip when running on CI")
 def test_load_data(instance: NPLinker):
