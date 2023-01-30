@@ -37,7 +37,7 @@ class MolecularFamily():
         return strains
 
     def add_spectrum(self, spectrum: Spectrum):
-        """Add a spectrum to the list of contained spectra.
+        """Add a spectrum to the spectra list.
 
         Args:
             spectrum(Spectrum): Spectrum to add to the molecular family.
