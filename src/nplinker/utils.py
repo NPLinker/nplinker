@@ -61,7 +61,7 @@ def find_delimiter(filename: str | PathLike) -> str:
 
     Examples:
         >>> delim = find_delimiter("~/table.csv")
-        """
+    """
     sniffer = csv.Sniffer()
     with open(filename, mode='rt', encoding='utf-8') as fp:
         delimiter = sniffer.sniff(fp.read(5000)).delimiter
