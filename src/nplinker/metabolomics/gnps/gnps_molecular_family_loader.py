@@ -11,7 +11,7 @@ logger = LogConfig.getLogger(__file__)
 
 class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
     def __init__(self, filename: str | PathLike):
-        """Class to load GNPS molecular families.
+        """Class to load molecular families from the given GNPS file.
 
         Args:
             filename(str | PathLike): str or PathLike object pointing towards the GNPS molecular families file to load.
