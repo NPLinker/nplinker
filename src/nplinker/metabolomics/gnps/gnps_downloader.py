@@ -34,7 +34,7 @@ class GNPSDownloader:
         return self
    
     def get_download_path(self) -> str:
-        """Get the path where to download the files.
+        """Get the path where to store the downloaded file.
 
         Returns:
             str: Download path as string
