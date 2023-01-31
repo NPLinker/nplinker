@@ -1,3 +1,4 @@
+import filecmp
 from tempfile import gettempdir
 import zipfile
 from pathlib import Path
@@ -47,5 +48,7 @@ def test_downloads_file(tmp_path: Path, task_id, filename_expected):
     actual = zipfile.ZipFile(outpath)
 
     expected = zipfile.ZipFile(DATA_DIR / filename_expected)
-    # TODO: Improve the actual comparison - problem is that the archives are not the same.
-    actual.filename == expected.filename
+
+    actual_names = actual.namelist()
+    expected_names = [x.filename for x in expected.filelist if x.compress_size > 0]
+    assert all(item in actual_names for item in expected_names)

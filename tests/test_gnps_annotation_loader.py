@@ -52,5 +52,8 @@ def test_annotations_are_equal(spec_dict: dict[int, Spectrum]):
 
     actual = GNPSAnnotationLoaderBuilder().with_file(annotations_file).build().annotations()
     
-    for key in expected.keys():
-        assert expected[key].items() <= actual[key].items()
+    for key in expected:
+        expected_annotations = expected[key]
+        actual_annotations = actual[key]
+        for key_entry in expected_annotations:
+            assert expected_annotations[key_entry] == actual_annotations[key_entry] 
