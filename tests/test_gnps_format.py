@@ -8,15 +8,15 @@ from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_archive
 from . import DATA_DIR
 
 
-@pytest.mark.parametrize("filename, gnps_format", [
+@pytest.mark.parametrize("filename, expected", [
     [DATA_DIR / "nodes.tsv", GNPSFormat.AllFiles],
     [DATA_DIR / "nodes_mwe.csv", GNPSFormat.AllFiles],
     [DATA_DIR / "nodes_fbmn.csv", GNPSFormat.FBMN]
 ])
-def test_identify_gnps_format(filename, gnps_format):
-    actual = gnps_format_from_file_mapping(filename, None)
+def test_identify_gnps_format(filename, expected):
+    actual = gnps_format_from_file_mapping(filename, False)
 
-    assert actual is gnps_format
+    assert actual is expected
 
 
 @pytest.mark.parametrize("task_id, expected", [
