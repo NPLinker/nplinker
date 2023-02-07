@@ -33,7 +33,7 @@ class MolecularFamily():
         """
         strains: set[StrainCollection] = set()
         for spectrum in self.spectra:
-            strains = strains.union(spectrum.strains)
+            strains.add(spectrum.strains)
         return strains
 
     def add_spectrum(self, spectrum: Spectrum):
