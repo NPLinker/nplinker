@@ -53,7 +53,7 @@ class GNPSExtractor:
             os.rmdir(self._extract_path / prefix)
 
     def _extract_molecular_families(self):
-        """ Helper function to extract the molecular families file from the archive. """
+        """Helper function to extract the molecular families file from the archive."""
         prefix = "networkedges_selfloop"
         suffix = "..selfloop" if self._is_fbmn else ".pairsinfo"
         utils.extract_file_matching_pattern(
