@@ -71,9 +71,9 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
     Returns:
         GNPSFormat: Format used in the workflow invocation.
 
-    Examples: gnps_format_from_task_id("92036537c21b44c29e509291e53f6382")
-        >>> 
-        """
+    Examples: 
+        >>> gnps_format_from_task_id("92036537c21b44c29e509291e53f6382")
+    """
     task_html = requests.get(GNPS_TASK_URL.format(task_id))        
     soup = BeautifulSoup(task_html.text)
     tags = soup.find_all('th')
