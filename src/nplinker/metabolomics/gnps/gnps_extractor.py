@@ -46,7 +46,7 @@ class GNPSExtractor:
         self._extract_annotations()
 
     def _extract_spectra(self):
-        """ Helper function to extract the spectra file from the archive."""
+        """Helper function to extract the spectra file from the archive."""
         prefix = "spectra" if self._is_fbmn else ""            
         utils.extract_file_matching_pattern(self.data(), prefix, ".mgf", self._extract_path, "spectra.mgf")
         if self._is_fbmn:
