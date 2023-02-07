@@ -9,7 +9,9 @@ from nplinker.metabolomics.gnps.gnps_format import GNPSFormat, gnps_format_from_
 
 class GNPSExtractor:
     def __init__(self, file: str | PathLike, extract_path: str | PathLike):
-        """Class to handle extraction of spectra, molecular families and file mappings files from an archive located at `file` to the `extract_path`
+        """Class to extract files from a GNPS output archive.
+        
+        The GNPS output archive contains files for spectra, molecular families and file mappings.
 
         Args:
             file(str | PathLike): str or PathLike object pointing to the GNPS archive.
@@ -44,14 +46,14 @@ class GNPSExtractor:
         self._extract_annotations()
 
     def _extract_spectra(self):
-        """ Helper function to extract the spectra file from the archive."""
+        """Helper function to extract the spectra file from the archive."""
         prefix = "spectra" if self._is_fbmn else ""            
         utils.extract_file_matching_pattern(self.data(), prefix, ".mgf", self._extract_path, "spectra.mgf")
         if self._is_fbmn:
             os.rmdir(self._extract_path / prefix)
 
     def _extract_molecular_families(self):
-        """ Helper function to extract the molecular families file from the archive. """
+        """Helper function to extract the molecular families file from the archive."""
         prefix = "networkedges_selfloop"
         suffix = "..selfloop" if self._is_fbmn else ".pairsinfo"
         utils.extract_file_matching_pattern(
@@ -64,7 +66,7 @@ class GNPSExtractor:
         os.rmdir(self._extract_path / prefix)
     
     def _extract_file_mappings(self):
-        """ Helper function to extract the file mappings file from the archive. """
+        """Helper function to extract the file mappings file from the archive."""
         prefix = "quantification_table_reformatted" if self._is_fbmn else "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
         suffix = ".csv" if self._is_fbmn else ".tsv"
         utils.extract_file_matching_pattern(
