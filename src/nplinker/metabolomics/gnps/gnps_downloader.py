@@ -28,7 +28,7 @@ class GNPSDownloader:
     def download(self) -> Self:
         """Execute the downloading process. """
         with open(self.get_download_path(), 'wb') as f:
-            with httpx.stream('POST', self.url()) as r:
+            with httpx.stream('POST', self.get_url()) as r:
                 for data in r.iter_bytes():
                     f.write(data)
         return self
@@ -49,7 +49,7 @@ class GNPSDownloader:
         """
         return self._task_id
     
-    def url(self) -> str:
+    def get_url(self) -> str:
         """Get the full URL linking to GNPS data to be dowloaded.
 
         Returns:

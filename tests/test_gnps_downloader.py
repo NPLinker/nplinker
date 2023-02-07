@@ -34,7 +34,7 @@ def test_has_gnps_task_id():
 
 def test_has_url():
     sut = GNPSDownloaderBuilder().with_task_id("c22f44b14a3d450eb836d607cb9521bb").build()
-    assert sut.url() == 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task=c22f44b14a3d450eb836d607cb9521bb&view=download_clustered_spectra'
+    assert sut.get_url() == 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task=c22f44b14a3d450eb836d607cb9521bb&view=download_clustered_spectra'
 
 
 @pytest.mark.parametrize("task_id, filename_expected", [

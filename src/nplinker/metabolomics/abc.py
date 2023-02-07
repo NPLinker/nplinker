@@ -28,5 +28,5 @@ class FileMappingLoaderBase(ABC):
 class AnnotationLoaderBase(ABC):
 
     @abstractmethod
-    def annotations(self) -> dict[int, dict]:
+    def get_annotations(self) -> dict[int, dict]:
         ...

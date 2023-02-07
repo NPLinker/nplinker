@@ -19,7 +19,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         """Class to load `file mappings` (occurrences of spectra in samples) from GNPS.
 
         Args:
-            file(str | PathLike): Path pointing to the file from which to load the file mappings.
+            file(str | PathLike): Path to the GNPS `file mappings` file.
 
         Raises:
             NotImplementedError: Raises NotImplementedError if the GNPS format is not recognized.

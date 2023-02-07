@@ -30,7 +30,7 @@ def test_default():
 ])
 def test_reads_all_annotations(file, expected):
     sut = GNPSAnnotationLoaderBuilder().with_file(file).build()
-    assert len(sut.annotations()) == expected
+    assert len(sut.get_annotations()) == expected
 
 
 def test_annotations_are_equal(spec_dict: dict[int, Spectrum]):
@@ -50,7 +50,7 @@ def test_annotations_are_equal(spec_dict: dict[int, Spectrum]):
         if x.has_annotations():
             expected[x.spectrum_id] = x.gnps_annotations
 
-    actual = GNPSAnnotationLoaderBuilder().with_file(annotations_file).build().annotations()
+    actual = GNPSAnnotationLoaderBuilder().with_file(annotations_file).build().get_annotations()
     
     for key in expected:
         expected_annotations = expected[key]

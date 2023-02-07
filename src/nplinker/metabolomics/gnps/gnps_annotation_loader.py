@@ -30,7 +30,7 @@ class GNPSAnnotationLoader(AnnotationLoaderBase):
 
             
 
-    def annotations(self) -> dict[int, dict]:
+    def get_annotations(self) -> dict[int, dict]:
         """Get annotations.
 
         Returns:

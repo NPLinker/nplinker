@@ -37,7 +37,7 @@ def _load_molecular_families(file: str | PathLike) -> dict[int, set[int]]:
     """Load ids of molecular families and corresponding spectra from GNPS output file.
 
     Args:
-        file(str | PathLike): Path to GNPS .pairsinfo file.
+        file(str | PathLike): path to the GNPS file to load molecular families.
 
     Returns:
         dict[int, set[int]]: Mapping from molecular family/cluster id to the spectra ids.

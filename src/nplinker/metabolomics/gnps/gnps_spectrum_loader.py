@@ -10,10 +10,10 @@ logger = LogConfig.getLogger(__file__)
 class GNPSSpectrumLoader(SpectrumLoaderBase):
 
     def __init__(self, file: str | PathLike):
-        """Load the mass spectra from the MGF file pointed to by `file`.
+        """Class to load mass spectra from the given GNPS MGF file.
 
         Args:
-            file(str | PathLike): str or PathLike object pointing to the spectra files to load.
+            file(str | PathLike): path to the MGF file to load.
         """
         ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([str(file)])
         logger.info('%d molecules parsed from MGF file', len(ms1))
@@ -28,7 +28,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
         return self._spectra
     
 
-def _mols_to_spectra(ms2, metadata: dict[str, dict[str, str]]) -> list[Spectrum]:
+def _mols_to_spectra(ms2: list, metadata: dict[str, dict[str, str]]) -> list[Spectrum]:
     """Function to convert ms2 object and metadata to `Spectrum` objects.
 
     Args:

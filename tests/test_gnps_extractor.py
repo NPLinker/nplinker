@@ -50,7 +50,7 @@ def test_default():
 def test_has_zipfile():
     file = DATA_DIR / 'ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip'
     sut = GNPSExtractorBuilder().with_file(file).build()
-    actual = sut.data()
+    actual = sut.get_data()
     
     expected = zipfile.ZipFile(file)
     numpy.testing.assert_array_equal(actual.namelist(), expected.namelist())

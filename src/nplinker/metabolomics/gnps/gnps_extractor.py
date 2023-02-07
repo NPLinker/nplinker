@@ -19,10 +19,10 @@ class GNPSExtractor:
         """
         self._file: Path = Path(file)
         self._extract_path: Path = Path(extract_path)
-        self._is_fbmn = gnps_format_from_archive(self.data()) == GNPSFormat.FBMN
+        self._is_fbmn = gnps_format_from_archive(self.get_data()) == GNPSFormat.FBMN
 
 
-    def data(self) -> zipfile.ZipFile:
+    def get_data(self) -> zipfile.ZipFile:
         """Get the file object of the archive.
 
         Returns:
@@ -48,7 +48,7 @@ class GNPSExtractor:
     def _extract_spectra(self):
         """Helper function to extract the spectra file from the archive."""
         prefix = "spectra" if self._is_fbmn else ""            
-        utils.extract_file_matching_pattern(self.data(), prefix, ".mgf", self._extract_path, "spectra.mgf")
+        utils.extract_file_matching_pattern(self.get_data(), prefix, ".mgf", self._extract_path, "spectra.mgf")
         if self._is_fbmn:
             os.rmdir(self._extract_path / prefix)
 
@@ -57,7 +57,7 @@ class GNPSExtractor:
         prefix = "networkedges_selfloop"
         suffix = "..selfloop" if self._is_fbmn else ".pairsinfo"
         utils.extract_file_matching_pattern(
-            self.data(),
+            self.get_data(),
             prefix,
             suffix,
             self._extract_path,
@@ -70,7 +70,7 @@ class GNPSExtractor:
         prefix = "quantification_table_reformatted" if self._is_fbmn else "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
         suffix = ".csv" if self._is_fbmn else ".tsv"
         utils.extract_file_matching_pattern(
-            self.data(),
+            self.get_data(),
             prefix,
             suffix,
             self._extract_path,
@@ -82,7 +82,7 @@ class GNPSExtractor:
         """Helper function to extract the annotations file from the archive."""
         prefix = "DB_result" if self._is_fbmn else "result_specnets_DB"            
         utils.extract_file_matching_pattern(
-            self.data(),
+            self.get_data(),
             prefix,
             ".tsv",
             self._extract_path,
