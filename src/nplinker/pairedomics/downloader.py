@@ -105,7 +105,7 @@ class Downloader():
         self.all_project_json = None
         if not os.path.exists(self.project_json_file) or force_download:
             logger.info('Downloading new copy of platform project data...')
-            self.all_project_json = self._download_platform_json_to_file(
+            self.all_project_json = self._download_and_load_json(
                 PAIREDOMICS_PROJECT_DATA_ENDPOINT, self.all_project_json_file)
         else:
             logger.info('Using existing copy of platform project data')
@@ -137,7 +137,7 @@ class Downloader():
         # now get the project JSON data
         self.project_json = None
         logger.info('Found project, retrieving JSON data...')
-        self.project_json = self._download_platform_json_to_file(
+        self.project_json = self._download_and_load_json(
             PAIREDOMICS_PROJECT_URL.format(self.pairedomics_id),
             self.project_json_file)
 
@@ -749,7 +749,7 @@ class Downloader():
         return mbzip
 
 
-    def _download_platform_json_to_file(self, url, local_path):
+    def _download_and_load_json(self, url, local_path):
         resp = httpx.get(url, follow_redirects=True)
         if not resp.status_code == 200:
             raise Exception('Failed to download {} (status code {})'.format(
