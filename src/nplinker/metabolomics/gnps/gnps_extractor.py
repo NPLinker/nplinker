@@ -66,7 +66,7 @@ class GNPSExtractor:
         os.rmdir(self._extract_path / prefix)
     
     def _extract_file_mappings(self):
-        """ Helper function to extract the file mappings file from the archive. """
+        """Helper function to extract the file mappings file from the archive."""
         prefix = "quantification_table_reformatted" if self._is_fbmn else "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
         suffix = ".csv" if self._is_fbmn else ".tsv"
         utils.extract_file_matching_pattern(
