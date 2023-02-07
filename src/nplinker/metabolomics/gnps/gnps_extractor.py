@@ -9,7 +9,9 @@ from nplinker.metabolomics.gnps.gnps_format import GNPSFormat, gnps_format_from_
 
 class GNPSExtractor:
     def __init__(self, filepath: str | PathLike, extract_path: str | PathLike):
-        """Class to handle extraction of spectra, molecular families and file mappings files from an archive located at `filepath` to the `extract_path`
+        """Class to extract files from a GNPS output archive.
+        
+        The GNPS output archive contains files for spectra, molecular families and file mappings.
 
         Args:
             filepath(str | PathLike): str or PathLike object pointing to the GNPS archive.
