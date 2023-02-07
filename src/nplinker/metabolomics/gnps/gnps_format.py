@@ -98,9 +98,9 @@ def gnps_format_from_archive(archive: zipfile.ZipFile) -> GNPSFormat:
     Returns:
         GNPSFormat: Format used in the workflow invocation.
 
-    Examples: gnps_format_from_archive("tests/data/ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip")
-        >>> 
-        """
+    Examples:
+        >>> gnps_format_from_archive("tests/data/ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip")
+     """
     filenames = archive.namelist()
     if any(["FEATURE-BASED-MOLECULAR-NETWORKING" in x for x in filenames]):
         return GNPSFormat.FBMN
