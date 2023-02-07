@@ -193,7 +193,7 @@ class Downloader():
             mibig_version):
         logger.info('Going to download the metabolomics data file')
 
-        self._download_metabolomics_zipfile_v2(self.gnps_task_id)
+        self._download_metabolomics_zipfile(self.gnps_task_id)
 
         self._download_genomics_data(self.project_json['genomes'])
 
@@ -685,16 +685,9 @@ class Downloader():
                 strain.add_alias(alias)
             self.strains.add(strain)
 
-    def _download_metabolomics_zipfile_v2(self, gnps_task_id):
+    def _download_metabolomics_zipfile(self, gnps_task_id):
         archive = GNPSDownloader(gnps_task_id, self.project_download_cache).download().get_download_path()
         GNPSExtractor(archive, self.project_file_cache).extract()
-
-
-    @deprecated
-    def _download_metabolomics_zipfile(self, gnps_task_id):
-        mbzip = self._load_gnps_data(gnps_task_id)
-        self._extract_metabolomics_data(mbzip)
-        self._log_gnps_format()
 
 
     @deprecated

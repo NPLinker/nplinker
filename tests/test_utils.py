@@ -187,7 +187,7 @@ class TestListFiles:
         assert str(ROOT / "test_utils.py") in files
 
 
-def test_extract_file_matching_patter(tmp_path):
+def test_extract_file_matching_pattern(tmp_path):
     archive = zipfile.ZipFile(DATA_DIR / "ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip")
     utils.extract_file_matching_pattern(
         archive,

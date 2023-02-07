@@ -4,7 +4,7 @@ from nplinker.loader import DatasetLoader
 from . import DATA_DIR
 
 @pytest.fixture
-def config(tmp_path: Path):
+def config():
     return {
         "dataset" : {
             "root": DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra",
@@ -14,7 +14,7 @@ def config(tmp_path: Path):
 
 def test_default(config):
     sut = DatasetLoader(config)
-    assert sut is not None
+    assert sut._platform_id == config["dataset"]["platform_id"]
 
 
 def test_has_spectra_path(config):
