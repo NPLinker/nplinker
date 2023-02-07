@@ -8,14 +8,14 @@ from nplinker.metabolomics.gnps.gnps_format import GNPSFormat, gnps_format_from_
 
 
 class GNPSExtractor:
-    def __init__(self, filepath: str | PathLike, extract_path: str | PathLike):
-        """Class to handle extraction of spectra, molecular families and file mappings files from an archive located at `filepath` to the `extract_path`
+    def __init__(self, file: str | PathLike, extract_path: str | PathLike):
+        """Class to handle extraction of spectra, molecular families and file mappings files from an archive located at `file` to the `extract_path`
 
         Args:
-            filepath(str | PathLike): str or PathLike object pointing to the GNPS archive.
+            file(str | PathLike): str or PathLike object pointing to the GNPS archive.
             extract_path(str | PathLike): str or PathLike object pointing to where to extract the files to.
         """
-        self._filepath: Path = Path(filepath)
+        self._file: Path = Path(file)
         self._extract_path: Path = Path(extract_path)
         self._is_fbmn = gnps_format_from_archive(self.data()) == GNPSFormat.FBMN
 
@@ -26,7 +26,7 @@ class GNPSExtractor:
         Returns:
             zipfile.ZipFile: Archive from which data is loaded.
         """
-        return zipfile.ZipFile(self._filepath)
+        return zipfile.ZipFile(self._file)
 
     def get_extract_path(self) -> str:
         """Get the path where to extract the files to.

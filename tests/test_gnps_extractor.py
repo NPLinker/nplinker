@@ -14,11 +14,11 @@ from . import DATA_DIR
 class GNPSExtractorBuilder:
 
     def __init__(self):
-        self._filepath = DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip"
+        self._file = DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip"
         self._extract_path = gettempdir()
 
-    def with_filepath(self, filepath: Path) -> Self:
-        self._filepath = filepath
+    def with_file(self, file: Path) -> Self:
+        self._file = file
         return self
 
     def with_extract_path(self, extract_path: Path) -> Self:
@@ -26,7 +26,7 @@ class GNPSExtractorBuilder:
         return self
     
     def build(self) -> GNPSExtractor:
-        return GNPSExtractor(self._filepath, self._extract_path)
+        return GNPSExtractor(self._file, self._extract_path)
 
 
 def assert_extraction_success(filename: str, outdir: Path, actual: Path):
@@ -36,10 +36,10 @@ def assert_extraction_success(filename: str, outdir: Path, actual: Path):
 
 
 def _unpack(archive: Path):
-    filepath = DATA_DIR / archive
-    outdir = DATA_DIR / filepath.stem
-    extract_archive(filepath, outdir)
-    return filepath, outdir
+    file = DATA_DIR / archive
+    outdir = DATA_DIR / file.stem
+    extract_archive(file, outdir)
+    return file, outdir
 
     
 def test_default():
@@ -48,17 +48,17 @@ def test_default():
 
 
 def test_has_zipfile():
-    filepath = DATA_DIR / 'ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip'
-    sut = GNPSExtractorBuilder().with_filepath(filepath).build()
+    file = DATA_DIR / 'ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip'
+    sut = GNPSExtractorBuilder().with_file(file).build()
     actual = sut.data()
     
-    expected = zipfile.ZipFile(filepath)
+    expected = zipfile.ZipFile(file)
     numpy.testing.assert_array_equal(actual.namelist(), expected.namelist())
 
 
 def test_has_extract_path(tmp_path):
-    filepath = DATA_DIR / 'ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip'
-    sut = GNPSExtractorBuilder().with_filepath(filepath).with_extract_path(tmp_path).build()
+    file = DATA_DIR / 'ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip'
+    sut = GNPSExtractorBuilder().with_file(file).with_extract_path(tmp_path).build()
     assert sut.get_extract_path() == str(tmp_path)
 
 
@@ -67,9 +67,9 @@ def test_has_extract_path(tmp_path):
     ["ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip", "spectra/specs_ms.mgf"]
 ])
 def test_creates_spectra(archive: Path, filename: str, tmp_path: Path):
-    filepath, outdir = _unpack(archive)
+    file, outdir = _unpack(archive)
 
-    sut = GNPSExtractorBuilder().with_filepath(filepath).with_extract_path(tmp_path).build()
+    sut = GNPSExtractorBuilder().with_file(file).with_extract_path(tmp_path).build()
     sut._extract_spectra()
     actual = Path(sut.get_extract_path()) / "spectra.mgf"
 
@@ -81,9 +81,9 @@ def test_creates_spectra(archive: Path, filename: str, tmp_path: Path):
     ["ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip", "networkedges_selfloop/c74fec018736475483e9c8b05e230cce..selfloop"]
 ])
 def test_creates_molecular_families(archive: Path, filename: str, tmp_path: Path):
-    filepath, outdir = _unpack(archive)
+    file, outdir = _unpack(archive)
 
-    sut = GNPSExtractorBuilder().with_filepath(filepath).with_extract_path(tmp_path).build()
+    sut = GNPSExtractorBuilder().with_file(file).with_extract_path(tmp_path).build()
     sut._extract_molecular_families()
     actual = Path(sut.get_extract_path()) / "molecular_families.pairsinfo"
     
@@ -95,9 +95,9 @@ def test_creates_molecular_families(archive: Path, filename: str, tmp_path: Path
     ["ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip", "quantification_table_reformatted/1a12f6fbd2ca4e099ec56bdaea56368f.csv"]
 ])
 def test_creates_file_mappings(archive: Path, filename: str, tmp_path: Path):
-    filepath, outdir = _unpack(archive)
+    file, outdir = _unpack(archive)
 
-    sut = GNPSExtractorBuilder().with_filepath(filepath).with_extract_path(tmp_path).build()
+    sut = GNPSExtractorBuilder().with_file(file).with_extract_path(tmp_path).build()
     sut._extract_file_mappings()
     actual = Path(sut.get_extract_path()) / ("file_mappings" + str(Path(filename).suffix))
     
@@ -109,9 +109,9 @@ def test_creates_file_mappings(archive: Path, filename: str, tmp_path: Path):
     ["ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip", "DB_result/7dc5b46b50d94246a1de12ef485d0f75.tsv"]
 ])
 def test_creates_annotations(archive: Path, filename: str, tmp_path: Path):
-    filepath, outdir = _unpack(archive)
+    file, outdir = _unpack(archive)
 
-    sut = GNPSExtractorBuilder().with_filepath(filepath).with_extract_path(tmp_path).build()
+    sut = GNPSExtractorBuilder().with_file(file).with_extract_path(tmp_path).build()
     sut._extract_annotations()
     actual = Path(sut.get_extract_path()) / "annotations.tsv" 
     assert_extraction_success(filename, outdir, actual)
