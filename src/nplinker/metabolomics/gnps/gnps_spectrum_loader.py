@@ -23,7 +23,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
         """Get the spectra loaded from the file.
 
         Returns:
-            list[Spectrum]: Spectra loaded from the file.
+            list[Spectrum]: the loaded spectra as a list of `Spectrum` objects.
         """
         return self._spectra
     
@@ -32,7 +32,7 @@ def _mols_to_spectra(ms2, metadata: dict[str, dict[str, str]]) -> list[Spectrum]
     """Function to convert ms2 object and metadata to `Spectrum` objects.
 
     Args:
-        ms2(_type_): Unknown.
+        ms2(list): list of ms2 intensity.
         metadata(dict[str, dict[str, str]]): Dictionary holding the metadata which was loaded from the original file.
 
     Returns:

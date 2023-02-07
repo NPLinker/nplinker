@@ -63,13 +63,13 @@ def gnps_format_from_file_mapping(file: str | PathLike, has_quant_table: bool) -
 
 
 def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
-    """Detect the GNPS format given a task_id
+    """Detect the GNPS format for the given task id
 
     Args:
-        task_id(str): GNPS `task_id` (job) for which to detect the used format.
+        task_id(str): GNPS task id.
 
     Returns:
-        GNPSFormat: Format used in the workflow invocation.
+        GNPSFormat: the format used in the GNPS workflow invocation.
 
     Examples: 
         >>> gnps_format_from_task_id("92036537c21b44c29e509291e53f6382")
@@ -96,7 +96,7 @@ def gnps_format_from_archive(archive: zipfile.ZipFile) -> GNPSFormat:
         archive(zipfile.ZipFile): Data downloaded from GNPS workflow.
 
     Returns:
-        GNPSFormat: Format used in the workflow invocation.
+        GNPSFormat: the format used in the GNPS workflow invocation.
 
     Examples:
         >>> gnps_format_from_archive("tests/data/ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip")

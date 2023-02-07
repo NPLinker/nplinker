@@ -12,7 +12,7 @@ class GNPSDownloader:
     GNPS_DATA_DOWNLOAD_URL_FBMN = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_cytoscape_data'
 
     def __init__(self, task_id: str, download_root: str | PathLike):
-        """Init the class with a gnps_task_id and a output path on where to save the data.
+        """Class to download GNPS output archive for the given task id.
 
         Args:
             task_id(str): GNPS task id, identifying the data to be downloaded.
@@ -50,10 +50,10 @@ class GNPSDownloader:
         return self._task_id
     
     def url(self) -> str:
-        """Get the formatted URL pointing to the data to be downloaded for the GNPS task id.
+        """Get the full URL linking to GNPS data to be dowloaded.
 
         Returns:
-            str: URL pointing to the data.
+            str: URL pointing to the GNPS data to be downloaded.
         """
         
         gnps_format = gnps_format_from_task_id(self._task_id)

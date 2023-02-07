@@ -23,10 +23,10 @@ class GNPSExtractor:
 
 
     def data(self) -> zipfile.ZipFile:
-        """Return the managed archive.
+        """Get the file object of the archive.
 
         Returns:
-            zipfile.ZipFile: Archive from which data is loaded.
+            zipfile.ZipFile: the file object where to extract data.
         """
         return zipfile.ZipFile(self._file)
 
@@ -39,7 +39,7 @@ class GNPSExtractor:
         return str(self._extract_path)
 
     def extract(self):
-        """Extract the spectra, molecular family and file mappings file from the handled archive. """
+        """Extract the spectra, molecular family and file mappings files from the handled archive."""
         self._extract_spectra()
         self._extract_molecular_families()
         self._extract_file_mappings()
@@ -79,7 +79,7 @@ class GNPSExtractor:
         os.rmdir(self._extract_path / prefix)
 
     def _extract_annotations(self):
-        """ Helper function to extract the annotations file from the archive. """
+        """Helper function to extract the annotations file from the archive."""
         prefix = "DB_result" if self._is_fbmn else "result_specnets_DB"            
         utils.extract_file_matching_pattern(
             self.data(),
@@ -90,6 +90,3 @@ class GNPSExtractor:
         )
         if self._is_fbmn:
             os.rmdir(self._extract_path / prefix)
-    
-
-        
