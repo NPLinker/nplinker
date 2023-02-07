@@ -116,19 +116,19 @@ class StrainCollection():
 
         return self._lookup[strain_id]
 
-    def add_from_file(self, filename: str):
+    def add_from_file(self, file: str | os.PathLike):
         """Read strains and aliases from file and store in self.
 
         Args:
-            filename(str): Path to strain mapping file to load.
+            file(str): Path to strain mapping file to load.
         """
 
-        if not os.path.exists(filename):
-            logger.warning(f'strain mappings file not found: {filename}')
+        if not os.path.exists(file):
+            logger.warning(f'strain mappings file not found: {file}')
             return
 
         line = 1
-        with open(filename) as f:
+        with open(file) as f:
             reader = csv.reader(f)
             for ids in reader:
                 if len(ids) == 0:
@@ -138,23 +138,23 @@ class StrainCollection():
                     if len(id) == 0:
                         logger.warning(
                             'Found zero-length strain label in {} on line {}'.
-                            format(filename, line))
+                            format(file, line))
                     else:
                         strain.add_alias(id)
                 self.add(strain)
 
                 line += 1
 
-    def save_to_file(self, filename: str):
+    def save_to_file(self, file: str | os.PathLike):
         """Save this strain collection to file.
 
         Args:
-            filename(str): Output filename.
+            file(str): Output file.
 
         Examples:
             >>>
             """
-        with open(filename, 'w') as f:
+        with open(file, 'w') as f:
             for strain in self._strains:
                 ids = [strain.id] + list(strain.aliases)
                 f.write(','.join(ids) + '\n')

@@ -160,13 +160,13 @@ def _parse_mzxml_header(hdr: str, strains: StrainCollection, md_table: dict[str,
     return (strain_name, growth_medium, strain_name not in strains)
 
 
-def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, filename: str, spec_dict: dict[int, Spectrum]) -> dict[str, int]:
+def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, file: str, spec_dict: dict[int, Spectrum]) -> dict[str, int]:
     """ Load info about clusters from old style GNPS files.
 
     Args:
         gnps_format(str): Identifier for the GNPS format of the file. Has to be one of [GNPS_FORMAT_OLD_ALLFILES, GNPS_FORMAT_OLD_UNIQUEFILES]
         strains(StrainCollection): StrainCollection in which to search for the detected strains.
-        filename(str): Path to file from which to load the cluster information.
+        file(str): Path to file from which to load the cluster information.
         spec_dict(dict[int, Spectrum]): Dictionary with already loaded spectra into which the metadata read from the file will be inserted.
 
     Raises:
@@ -181,7 +181,7 @@ def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, filename:
     # both of these list the .mz(X)ML files the molecule was found in (plus the scan
     # number in the file in the AllFiles case)
     unknown_strains = {}
-    with open(filename) as f:
+    with open(file) as f:
         reader = csv.reader(f, delimiter='\t')
         headers = next(reader)
         clu_index_index = headers.index('cluster index')
@@ -245,18 +245,18 @@ def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, filename:
     return unknown_strains
 
 
-def _parse_metadata_table(filename: str) -> dict[str, dict[str, str|None]]:
+def _parse_metadata_table(file: str) -> dict[str, dict[str, str|None]]:
     """Parses the metadata table file from GNPS.
 
     Args:
-        filename(str): Path to metadata table.
+        file(str): Path to metadata table.
 
     Returns:
         dict[str, dict[str, str]]: Parsed metadata, mapping from filenames to the metadata dictionary.
 
     """
     table = {}
-    with open(filename) as f:
+    with open(file) as f:
         reader = csv.reader(f, delimiter='\t')
         headers = next(reader)
 
@@ -265,7 +265,7 @@ def _parse_metadata_table(filename: str) -> dict[str, dict[str, str|None]]:
             # expecting at least 3 columns with the first being 'filename'
             logger.error(
                 'Unrecognised metadata table format in file "{}"'.format(
-                    filename))
+                    file))
             raise Exception("Expecting at least 3 columns with the first being 'filename'")
 
         # find the column numbers we're interested in (can't rely on both of these being present)
@@ -291,7 +291,7 @@ def _parse_metadata_table(filename: str) -> dict[str, dict[str, str|None]]:
                           (strain_col, col_names['strain'])]:
             if col == -1:
                 logger.warning('No {} column in file "{}"'.format(
-                    name, filename))
+                    name, file))
 
         for line in reader:
             # only non-BLANK entries

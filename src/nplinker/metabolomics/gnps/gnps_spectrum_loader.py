@@ -9,13 +9,13 @@ logger = LogConfig.getLogger(__file__)
 
 class GNPSSpectrumLoader(SpectrumLoaderBase):
 
-    def __init__(self, filename: str | PathLike):
-        """Load the mass spectra from the MGF file pointed to by `filename`.
+    def __init__(self, file: str | PathLike):
+        """Load the mass spectra from the MGF file pointed to by `file`.
 
         Args:
-            filename(str | PathLike): str or PathLike object pointing to the spectra files to load.
+            file(str | PathLike): str or PathLike object pointing to the spectra files to load.
         """
-        ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([str(filename)])
+        ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([str(file)])
         logger.info('%d molecules parsed from MGF file', len(ms1))
         self._spectra = _mols_to_spectra(ms2, metadata)
     

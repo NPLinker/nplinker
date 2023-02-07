@@ -18,20 +18,20 @@ class GNPSFormat(Enum):
 GNPS_TASK_URL = 'https://gnps.ucsd.edu/ProteoSAFe/status.jsp?task={}'
 
 
-def gnps_format_from_file_mapping(filename: str | PathLike, has_quant_table: bool) -> GNPSFormat:
+def gnps_format_from_file_mapping(file: str | PathLike, has_quant_table: bool) -> GNPSFormat:
     """Peek GNPS file format for given file.
 
     TODO: #89 This should be rewritten to actually return the format always based on only the file and not include the quant table in it.
 
      Args:
-        filename(str): Path to the file to peek the format for.
+        file(str | PathLike): Path to the file to peek the format for.
         has_quant_table (bool): If a quant table is present, do return GNPS_FORMAT_NEW_FBMN.
 
     Returns:
         GNPSFormat: GNPS format identified in the file.
     """
 
-    headers: list[str] = get_headers(os.fspath(filename))
+    headers: list[str] = get_headers(os.fspath(file))
 
     if headers is None:
         return GNPSFormat.Unknown

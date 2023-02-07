@@ -50,11 +50,11 @@ def sqrt_normalise(peaks):
     return normalised_peaks
 
 
-def find_delimiter(filename: str | PathLike) -> str:
+def find_delimiter(file: str | PathLike) -> str:
     """Detect the delimiter for the given tabular file.
 
     Args:
-        filename(str | PathLike): Path to tabular file.
+        file(str | PathLike): Path to tabular file.
 
     Returns:
         str: Detected delimiter character.
@@ -63,22 +63,22 @@ def find_delimiter(filename: str | PathLike) -> str:
         >>> delim = find_delimiter("~/table.csv")
     """
     sniffer = csv.Sniffer()
-    with open(filename, mode='rt', encoding='utf-8') as fp:
+    with open(file, mode='rt', encoding='utf-8') as fp:
         delimiter = sniffer.sniff(fp.read(5000)).delimiter
     return delimiter
     
-def get_headers(filename: str | PathLike) -> list[str]:
+def get_headers(file: str | PathLike) -> list[str]:
     """Read headers from the given tabular file.
 
     Args:
-        filename(str): Path to the file to read the header from.
+        file(str): Path to the file to read the header from.
 
     Returns:
         list[str]: list of column names from the header.
     """
-    with open(os.fspath(filename)) as f:
+    with open(os.fspath(file)) as f:
         headers: str = f.readline().strip()
-        dl: str = find_delimiter(filename)
+        dl: str = find_delimiter(file)
         return headers.split(dl)
 
 # Functions below are adapted from torchvision library,
