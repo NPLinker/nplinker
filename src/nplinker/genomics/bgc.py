@@ -19,6 +19,9 @@ class BGC():
         self.bgc_id = bgc_id  # BGC file name
         self.product_prediction = product_prediction  # can get from gbk SeqFeature "region"
 
+        # MIBiG biosynthetic class
+        self.mibig_bgc_class: list[str] | None = None
+
         self.description: str | None = None
 
         # CG TODO: change parents to parent

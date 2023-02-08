@@ -107,6 +107,7 @@ def parse_bgc_metadata_json(file: str) -> BGC:
     """
     metadata = MibigMetadata(file)
     mibig_bgc = BGC(metadata.mibig_accession, metadata.biosyn_class)
+    mibig_bgc.mibig_bgc_class = metadata.biosyn_class
     return mibig_bgc
 
 

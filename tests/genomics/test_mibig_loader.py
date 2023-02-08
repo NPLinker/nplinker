@@ -2,8 +2,8 @@ import os.path
 import pytest
 from nplinker.genomics import BGC
 from nplinker.genomics import BGCLoaderBase
-from nplinker.genomics.mibig import MibigBGCLoader
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
+from nplinker.genomics.mibig import MibigBGCLoader
 from nplinker.genomics.mibig import parse_bgc_metadata_json
 from nplinker.genomics.mibig.mibig_metadata import MibigMetadata
 from .. import DATA_DIR
@@ -72,3 +72,4 @@ def test_parse_bgc_metadata_json():
     bgc = parse_bgc_metadata_json(str(json_file))
     assert isinstance(bgc, BGC)
     assert bgc.bgc_id == "BGC0000001"
+    assert bgc.mibig_bgc_class == ["Polyketide"]
