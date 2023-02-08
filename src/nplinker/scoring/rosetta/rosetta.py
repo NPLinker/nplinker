@@ -235,15 +235,15 @@ class Rosetta():
 
                     if pbgc.antismash_id in json_hits:
                         # simplest case where there's a direct match on region number
-                        if pbgc.region in json_hits[pbgc.antismash_id]:
+                        if pbgc.antismash_region in json_hits[pbgc.antismash_id]:
                             logger.debug(
                                 'Matched {} using {} + region{:03d}!'.format(
                                     pbgc.antismash_file, pbgc.antismash_id,
-                                    pbgc.region))
+                                    pbgc.antismash_region))
                             if pbgc not in matched_bgcs:
                                 matched_bgcs[pbgc] = {}
 
-                            hit = json_hits[pbgc.antismash_id][pbgc.region]
+                            hit = json_hits[pbgc.antismash_id][pbgc.antismash_region]
                             matched_bgcs[pbgc][hit['mibig_id']] = hit
                             continue
                         else:
@@ -254,12 +254,12 @@ class Rosetta():
                             for region in json_hits[pbgc.antismash_id]:
                                 if pbgc.antismash_file.endswith(
                                         'region{:03d}.gbk'.format(
-                                            pbgc.region)):
+                                            pbgc.antismash_region)):
                                     logger.debug(
                                         'Matched {} using fallback {} + region{:03d} (orig={})'
                                         .format(pbgc.antismash_file,
                                                 pbgc.antismash_id, region,
-                                                pbgc.region))
+                                                pbgc.antismash_region))
                                     if pbgc not in matched_bgcs:
                                         matched_bgcs[pbgc] = {}
 
@@ -270,7 +270,7 @@ class Rosetta():
                         # this could simply mean no significant hits found
                         logger.info(
                             'Found no matching hits for BGC ID={}, region={}, file={}'
-                            .format(pbgc.antismash_id, pbgc.region,
+                            .format(pbgc.antismash_id, pbgc.antismash_region,
                                     pbgc.antismash_file))
 
             else:

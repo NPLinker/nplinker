@@ -29,7 +29,7 @@ class BGC():
         self.antismash_file: str | None = None
         self.antismash_id: str | None = None  # version in .gbk, id in SeqRecord
         self.antismash_accession: str | None = None  # accession in .gbk, name in SeqRecord
-        self.region = -1  # TODO: to remove it
+        self.antismash_region: int | None = None  # antismash region number
 
         self._strain: Strain | None = None
 
@@ -42,7 +42,7 @@ class BGC():
     def __str__(self):
         return '{}(bgc_id={}, strain={}, asid={}, region={})'.format(
             self.__class__.__name__, self.bgc_id, self.strain,
-            self.antismash_id, self.region)
+            self.antismash_id, self.antismash_region)
 
     def __eq__(self, other):
         return self.bgc_id == other.bgc_id
