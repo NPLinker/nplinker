@@ -123,8 +123,8 @@ def parse_bgc_genbank(file: str) -> BGC:
     smiles = _parse_smiles(record)
 
     bgc = BGC(bgc_id=fname,
-              product_prediction=product_prediction,
-              description=description)
+              product_prediction=product_prediction)
+    bgc.description = description
     bgc.antismash_id = antismash_id
     bgc.antismash_file = file
     bgc.smiles = smiles

@@ -15,11 +15,11 @@ class BGC():
 
     def __init__(self,
                  bgc_id: str,
-                 product_prediction: list[str],
-                 description: str | None = None):
+                 product_prediction: list[str]):
         self.bgc_id = bgc_id  # BGC file name
         self.product_prediction = product_prediction  # can get from gbk SeqFeature "region"
-        self.description = description  # can get from gbk SeqRecord.description
+
+        self.description: str | None = None
 
         # CG TODO: change parents to parent
         self.parents: set[GCF] = set()

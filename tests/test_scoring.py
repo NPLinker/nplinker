@@ -28,9 +28,7 @@ def create_gcfs(strains, n=3):
         randoms = randoms[:num_strains]
 
         for j in range(num_strains):
-            # (id, strain, name, bigscape_class, product_prediction, description=None):
-            bgc = BGC(j, strains[randoms[j]], strains[randoms[j]].id, None,
-                      None)
+            bgc = BGC(j, strains[randoms[j]])
             gcf.add_bgc(bgc)
 
         gcfs.append(gcf)

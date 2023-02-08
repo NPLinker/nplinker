@@ -79,7 +79,6 @@ def load_gcfs(bigscape_dir: str | PathLike,
 
             # get bgc annotations from bigscape file
             metadata_line = metadata[bgc_name]
-            description = metadata_line[2]
             bigscape_class = metadata_line[4]
 
             # check strain
@@ -97,7 +96,6 @@ def load_gcfs(bigscape_dir: str | PathLike,
                 except KeyError:
                     raise KeyError(f'Unknown MiBIG: {strain.id}')
                 num_mibig += 1
-                new_bgc.description = description
             else:
                 try:
                     new_bgc = antismash_bgc_dict[bgc_name]
