@@ -3,7 +3,7 @@ import json
 
 class MibigMetadata():
 
-    def __init__(self, file):
+    def __init__(self, file) -> None:
         """To represent the MIBiG BGC metadata/annotations (in json format)
 
         Args:
@@ -15,39 +15,36 @@ class MibigMetadata():
         self.file = file
         with open(self.file, "rb") as f:
             self.metadata = json.load(f)
+        self._parse_metadata()
 
     @property
-    def mibig_accession(self):
-        """Get value of metadata item 'mibig_accession'"""
-        return MibigMetadata.get_mibig_accession(self.metadata)
+    def mibig_accession(self) -> str:
+        """Get the value of metadata item 'mibig_accession'"""
+        return self._mibig_accession
 
     @property
-    def biosyn_class(self):
-        """Get value of metadata item 'biosyn_class'.
+    def biosyn_class(self) -> list[str]:
+        """Get the value of metadata item 'biosyn_class'.
 
-            It's the biosynthetic class(es) of BGC, i.e. the type of secondary
-            metabolite.
+        The 'biosyn_class' is biosynthetic class(es), namely the type of
+        natural product or secondary metabolite.
+
+        MIBiG defines 6 major biosynthetic classes, including
+        "NRP", "Polyketide", "RiPP", "Terpene", "Saccharide" and "Alkaloid".
+        Note that natural products created by all other biosynthetic
+        mechanisms fall under the category "Other". More details see
+        the publication: https://doi.org/10.1186/s40793-018-0318-y.
         """
-        return MibigMetadata.get_biosyn_class(self.metadata)
+        return self._biosyn_class
 
-    @staticmethod
-    def get_mibig_accession(metadata):
-        """Get value of metadata item 'mibig_accession'"""
-        if 'general_params' in metadata:
-            accession = metadata['general_params']['mibig_accession']
-        else:  # version≥2.0
-            accession = metadata['cluster']['mibig_accession']
-        return accession
-
-    @staticmethod
-    def get_biosyn_class(metadata):
-        """Get value of metadata item 'biosyn_class'.
-
-            It's the biosynthetic class(es) of BGC, i.e. the type of secondary
-            metabolite.
+    def _parse_metadata(self) -> None:
+        """Parse metadata to get 'mibig_accession' and 'biosyn_class' values.
         """
-        if 'general_params' in metadata:
-            biosyn_class = metadata['general_params']['biosyn_class']
+        if 'general_params' in self.metadata:
+            self._mibig_accession = self.metadata['general_params'][
+                'mibig_accession']
+            self._biosyn_class = self.metadata['general_params'][
+                'biosyn_class']
         else:  # version≥2.0
-            biosyn_class = metadata['cluster']['biosyn_class']
-        return biosyn_class
+            self._mibig_accession = self.metadata['cluster']['mibig_accession']
+            self._biosyn_class = self.metadata['cluster']['biosyn_class']
