@@ -28,7 +28,6 @@ class BGC():
         # antismash related
         self.antismash_file: str | None = None
         self.antismash_id: str | None = None  # version in .gbk, id in SeqRecord
-        self.antismash_accession: str | None = None  # accession in .gbk, name in SeqRecord
         self.antismash_region: int | None = None  # antismash region number
 
         self._strain: Strain | None = None

@@ -118,7 +118,6 @@ def parse_bgc_genbank(file: str) -> BGC:
 
     record = SeqIO.read(file, format="genbank")
     description = record.description  # "DEFINITION" in gbk file
-    antismash_accession = record.name  # "ACCESSION" in gbk file
     antismash_id = record.id  # "VERSION" in gbk file
     product_prediction = _parse_product(record)
     smiles = _parse_smiles(record)
@@ -126,7 +125,6 @@ def parse_bgc_genbank(file: str) -> BGC:
     bgc = BGC(bgc_id=fname,
               product_prediction=product_prediction,
               description=description)
-    bgc.antismash_accession = antismash_accession
     bgc.antismash_id = antismash_id
     bgc.antismash_file = file
     bgc.smiles = smiles
