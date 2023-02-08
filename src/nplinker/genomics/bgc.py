@@ -4,6 +4,7 @@ from deprecated import deprecated
 from nplinker.logconfig import LogConfig
 from .aa_pred import predict_aa
 
+
 if TYPE_CHECKING:
     from ..strains import Strain
     from .gcf import GCF
@@ -16,27 +17,73 @@ class BGC():
     def __init__(self,
                  bgc_id: str,
                  product_prediction: list[str]):
-        self.bgc_id = bgc_id  # BGC file name
-        self.product_prediction = product_prediction  # can get from gbk SeqFeature "region"
+        """Class to model BGC (biosynthetic gene cluster) data.
 
-        # MIBiG biosynthetic class
+        BGC data include both annotations and sequence data. This class is
+        mainly designed to model the annotations or metadata.
+
+        The raw BGC data is stored in GenBank format (.gbk). Additional
+        `GenBank features`_ could be added to the GenBank file to annotate
+        BGCs, e.g. antiSMASH has some self-defined features (like "region") in
+        its output GenBank files.
+
+        The annotations of BGC can be stored in JSON format, which is defined
+        and used by MIBiG.
+
+        Args:
+            bgc_id(str): BGC identifier, e.g. MIBiG accession, GenBank accession.
+            product_prediction(list[str]): list of BGC's (predicted) natural
+                products or product classes.
+
+        Attributes:
+            bgc_id(str): BGC identifier, e.g. MIBiG accession, GenBank accession.
+            product_prediction(list[str]): List of BGC's (predicted) natural
+                products or product classes.
+                For antiSMASH's GenBank data, the feature `region /product`
+                gives product information.
+                For MIBiG metadata, its biosynthetic class provides such info.
+            mibig_bgc_class(list[str] | None): List of MIBiG biosynthetic classes to
+                which the BGC belongs.
+                Defaults to None.
+                MIBiG defines 6 major biosynthetic classes for natural products,
+                including "NRP", "Polyketide", "RiPP", "Terpene", "Saccharide"
+                and "Alkaloid". Note that natural products created by all other
+                biosynthetic mechanisms fall under the category "Other".
+                More details see the publication: https://doi.org/10.1186/s40793-018-0318-y.
+            description(str | None): Brief description of the BGC.
+                Defaults to None.
+            smiles(list[str] | None): SMILES formula of the BGC's product.
+                Defaults to None.
+            antismash_file(str | None): The path to the antiSMASH GenBank file.
+                Defaults to None.
+            antismash_id(str | None): Identifier of the antiSMASH BGC, referring
+                to the feature `VERSION` of GenBank file.
+                Defaults to None.
+            antismash_region(int | None): AntiSMASH BGC region number, referring
+                to the feature `region` of GenBank file.
+                Defaults to None.
+            parents(set[GCF]): The set of GCFs that contain the BGC.
+            strain(Strain): The strain of the BGC.
+
+        .. GenBank features:
+            https://www.insdc.org/submitting-standards/feature-table/
+        """
+        # BGC metadata
+        self.bgc_id = bgc_id
+        self.product_prediction = product_prediction
+
         self.mibig_bgc_class: list[str] | None = None
-
         self.description: str | None = None
+        self.smiles: list[str] | None = None
 
-        # CG TODO: change parents to parent
-        self.parents: set[GCF] = set()
-        self.smiles: list[str] = []
-
-        # antismash related
+        # antismash related attributes
         self.antismash_file: str | None = None
         self.antismash_id: str | None = None  # version in .gbk, id in SeqRecord
         self.antismash_region: int | None = None  # antismash region number
 
+        # other attributes
+        self.parents: set[GCF] = set()
         self._strain: Strain | None = None
-
-    def add_parent(self, gcf):
-        self.parents.add(gcf)
 
     def __repr__(self):
         return str(self)
@@ -52,6 +99,14 @@ class BGC():
     def __hash__(self):
         return self.bgc_id
 
+    def add_parent(self, gcf: GCF) -> None:
+        """Add a parent GCF to the BGC.
+
+        Args:
+            gcf(GCF): gene cluster family
+        """
+        self.parents.add(gcf)
+
     @property
     def strain(self) -> Strain | None:
         return self._strain
@@ -61,10 +116,16 @@ class BGC():
         self._strain = strain
 
     @property
-    def bigscape_classes(self):
+    def bigscape_classes(self) -> set[str]:
+        """Get BiG-SCAPE's BGC classes.
+
+        BiG-SCAPE's BGC classes are similar to those defined in MiBIG but have
+        more categories (7 classes). More details see:
+        https://doi.org/10.1038%2Fs41589-019-0400-9.
+        """
         return {p.bigscape_class for p in self.parents}
 
-    def is_mibig(self):
+    def is_mibig(self) -> bool:
         """Check if the BGC is MIBiG reference BGC or not.
 
         Note:
