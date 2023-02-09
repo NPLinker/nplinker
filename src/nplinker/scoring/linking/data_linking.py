@@ -24,7 +24,7 @@
 # fam   stands for molecular family
 
 from collections import Counter
-from typing import Iterable
+from typing import Sequence
 # import packages
 import numpy as np
 import pandas as pd
@@ -108,10 +108,10 @@ class DataLinks():
         self.data_family_mapping(include_singletons=include_singletons)
         self.correlation_matrices(type='fam-gcf')
 
-    def collect_mappings_spec(self, obj: Iterable[Spectrum]|Iterable[MolecularFamily]):
-        if isinstance(next(obj), Spectrum):
+    def collect_mappings_spec(self, obj: Sequence[Spectrum]|Sequence[MolecularFamily]):
+        if isinstance(obj[0], Spectrum):
             mapping_spec = self._collect_mappings_from_spectra(obj)
-        elif isinstance(next(obj), MolecularFamily):
+        elif isinstance(obj[0], MolecularFamily):
             mapping_spec = self._collect_mappings_from_molecular_families(obj)
 
         # extend mapping tables:
@@ -130,7 +130,7 @@ class DataLinks():
 
         return mapping_spec
     
-    def _collect_mappings_from_molecular_families(self, molfams: Iterable[MolecularFamily]) -> np.ndarray[np.float64]:
+    def _collect_mappings_from_molecular_families(self, molfams: Sequence[MolecularFamily]) -> np.ndarray[np.float64]:
         num_spectra = sum(len(x.spectra_ids) for x in molfams)
         mapping_spec = np.zeros((num_spectra, 3))
         mapping_spec[:, 0] = np.arange(0, num_spectra)
