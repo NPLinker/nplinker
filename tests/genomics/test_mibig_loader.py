@@ -6,7 +6,7 @@ from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.genomics.mibig import parse_bgc_metadata_json
 from nplinker.genomics.mibig.mibig_bgc import MibigBGC
 from nplinker.genomics.mibig.mibig_metadata import MibigMetadata
-from . import DATA_DIR
+from .. import DATA_DIR
 
 
 class TestMibigBGCLoader:

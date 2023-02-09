@@ -8,7 +8,7 @@ from typing_extensions import Self
 import pytest
 from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
 from nplinker.utils import extract_archive
-from . import DATA_DIR
+from .. import DATA_DIR
 
 
 class GNPSExtractorBuilder:
@@ -24,7 +24,7 @@ class GNPSExtractorBuilder:
     def with_extract_path(self, extract_path: Path) -> Self:
         self._extract_path = extract_path
         return self
-    
+
     def build(self) -> GNPSExtractor:
         return GNPSExtractor(self._file, self._extract_path)
 
@@ -41,7 +41,7 @@ def _unpack(archive: Path):
     extract_archive(file, outdir)
     return file, outdir
 
-    
+
 def test_default():
     sut = GNPSExtractorBuilder().build()
     assert sut is not None
@@ -51,7 +51,7 @@ def test_has_zipfile():
     file = DATA_DIR / 'ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip'
     sut = GNPSExtractorBuilder().with_file(file).build()
     actual = sut.get_data()
-    
+
     expected = zipfile.ZipFile(file)
     numpy.testing.assert_array_equal(actual.namelist(), expected.namelist())
 
@@ -86,7 +86,7 @@ def test_creates_molecular_families(archive: Path, filename: str, tmp_path: Path
     sut = GNPSExtractorBuilder().with_file(file).with_extract_path(tmp_path).build()
     sut._extract_molecular_families()
     actual = Path(sut.get_extract_path()) / "molecular_families.pairsinfo"
-    
+
     assert_extraction_success(filename, outdir, actual)
 
 
@@ -100,7 +100,7 @@ def test_creates_file_mappings(archive: Path, filename: str, tmp_path: Path):
     sut = GNPSExtractorBuilder().with_file(file).with_extract_path(tmp_path).build()
     sut._extract_file_mappings()
     actual = Path(sut.get_extract_path()) / ("file_mappings" + str(Path(filename).suffix))
-    
+
     assert_extraction_success(filename, outdir, actual)
 
 
@@ -113,5 +113,5 @@ def test_creates_annotations(archive: Path, filename: str, tmp_path: Path):
 
     sut = GNPSExtractorBuilder().with_file(file).with_extract_path(tmp_path).build()
     sut._extract_annotations()
-    actual = Path(sut.get_extract_path()) / "annotations.tsv" 
+    actual = Path(sut.get_extract_path()) / "annotations.tsv"
     assert_extraction_success(filename, outdir, actual)

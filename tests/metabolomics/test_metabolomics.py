@@ -5,7 +5,7 @@ from nplinker.metabolomics.metabolomics import load_spectra
 from nplinker.metabolomics.molecular_family import MolecularFamily
 from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.strain_collection import StrainCollection
-from . import DATA_DIR
+from .. import DATA_DIR
 
 
 @pytest.fixture

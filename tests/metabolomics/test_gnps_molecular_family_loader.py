@@ -6,7 +6,7 @@ from nplinker.metabolomics.gnps.gnps_molecular_family_loader import GNPSMolecula
 from nplinker.metabolomics.molecular_family import MolecularFamily
 
 from .test_metabolomics import molecular_families, spec_dict
-from . import DATA_DIR
+from .. import DATA_DIR
 
 @pytest.fixture
 def molecular_families_gnps():
@@ -36,7 +36,7 @@ def test_families_are_identical(spec_dict, molecular_families):
         x.id = i
         for spec_id in x.spectra_ids:
             x.add_spectrum(spec_dict[spec_id])
-            
+
 
     for x in molecular_families:
         for spec in x.spectra:

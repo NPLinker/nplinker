@@ -1,6 +1,6 @@
 from nplinker.scoring.linking.data_linking import DataLinks
-from .test_metabolomics import spec_dict, spec_with_families
-from .test_gnps_molecular_family_loader import molecular_families_gnps
+from ..metabolomics.test_metabolomics import spec_dict, spec_with_families
+from ..metabolomics.test_gnps_molecular_family_loader import molecular_families_gnps
 
 
 def test_collect_mappings_from_spectra(spec_with_families):

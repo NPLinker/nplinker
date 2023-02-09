@@ -4,18 +4,18 @@ from nplinker.annotations import load_annotations
 from nplinker.metabolomics.gnps.gnps_annotation_loader import \
     GNPSAnnotationLoader
 from nplinker.metabolomics.spectrum import Spectrum
-from . import DATA_DIR
+from .. import DATA_DIR
 from .test_metabolomics import spec_dict
 
 
 class GNPSAnnotationLoaderBuilder:
     def __init__(self):
         self._file = DATA_DIR / "ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data/DB_result/7dc5b46b50d94246a1de12ef485d0f75.tsv"
-    
+
     def with_file(self, file) -> Self:
         self._file = file
         return self
-    
+
     def build(self) -> GNPSAnnotationLoader:
         return GNPSAnnotationLoader(self._file)
 
@@ -51,9 +51,9 @@ def test_annotations_are_equal(spec_dict: dict[int, Spectrum]):
             expected[x.spectrum_id] = x.gnps_annotations
 
     actual = GNPSAnnotationLoaderBuilder().with_file(annotations_file).build().get_annotations()
-    
+
     for key in expected:
         expected_annotations = expected[key]
         actual_annotations = actual[key]
         for key_entry in expected_annotations:
-            assert expected_annotations[key_entry] == actual_annotations[key_entry] 
+            assert expected_annotations[key_entry] == actual_annotations[key_entry]
