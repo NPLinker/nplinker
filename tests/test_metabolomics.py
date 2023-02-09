@@ -1,5 +1,5 @@
 import pytest
-from nplinker.metabolomics.metabolomics import _make_families
+from nplinker.metabolomics.metabolomics import make_families
 from nplinker.metabolomics.metabolomics import load_dataset
 from nplinker.metabolomics.metabolomics import load_spectra
 from nplinker.metabolomics.molecular_family import MolecularFamily
@@ -16,12 +16,12 @@ def spec_dict() -> dict[int, Spectrum]:
 
 @pytest.fixture
 def spec_with_families(spec_dict) -> dict[int, Spectrum]:
-    _make_families(spec_dict.values())
+    make_families(spec_dict.values())
     return spec_dict
 
 @pytest.fixture
 def molecular_families(spec_dict) -> list[MolecularFamily]:
-    return _make_families(spec_dict.values())
+    return make_families(spec_dict.values())
 
 
 def test_load_spectra(spec_dict):
@@ -46,5 +46,5 @@ def test_load_dataset():
 
 
 def test_make_families(spec_dict):
-    families = _make_families(spec_dict.values())
+    families = make_families(spec_dict.values())
     assert len(families) == 25769

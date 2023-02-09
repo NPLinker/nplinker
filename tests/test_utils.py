@@ -1,6 +1,7 @@
 from pathlib import Path
 from shutil import rmtree
 from tempfile import mkdtemp
+import zipfile
 import pytest
 from nplinker import utils
 from nplinker.utils import find_delimiter
@@ -75,7 +76,6 @@ class TestExtractArchive:
         assert dir.exists()
         assert dir.is_dir()
         assert not archive.exists()
-
 
 class TestDownloadAndExtractArchive:
     """Test utils.download_and_extract_archive"""
@@ -185,3 +185,19 @@ class TestListFiles:
         assert len(files) == 1
         assert "test_utils.py" not in files
         assert str(ROOT / "test_utils.py") in files
+
+
+def test_extract_file_matching_pattern(tmp_path):
+    archive = zipfile.ZipFile(DATA_DIR / "ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip")
+    utils.extract_file_matching_pattern(
+        archive,
+        "quantification_table_reformatted",
+        ".csv" ,
+        tmp_path,
+        "test.csv"
+    )
+    expected: Path = tmp_path / "test.csv"
+    
+    assert expected.exists()
+    assert expected.is_file()
+

@@ -24,20 +24,20 @@
 # fam   stands for molecular family
 
 from collections import Counter
-from typing import Iterable
+from typing import Sequence
 # import packages
 import numpy as np
 import pandas as pd
 
 from nplinker.metabolomics.molecular_family import MolecularFamily
-from ...genomics import GCF
-from ...metabolomics import Spectrum
+from nplinker.genomics.gcf import GCF
+from nplinker.metabolomics.spectrum import Spectrum
 from .data_linking_functions import calc_correlation_matrix
 
 
 SCORING_METHODS = ['metcalf', 'likescore', 'hg']
 
-from ...logconfig import LogConfig
+from nplinker.logconfig import LogConfig
 
 
 logger = LogConfig.getLogger(__name__)
@@ -108,7 +108,18 @@ class DataLinks():
         self.data_family_mapping(include_singletons=include_singletons)
         self.correlation_matrices(type='fam-gcf')
 
-    def collect_mappings_spec(self, spectra):
+    def collect_mappings_spec(self, obj: Sequence[Spectrum]|Sequence[MolecularFamily]):
+        if isinstance(obj[0], Spectrum):
+            mapping_spec = self._collect_mappings_from_spectra(obj)
+        elif isinstance(obj[0], MolecularFamily):
+            mapping_spec = self._collect_mappings_from_molecular_families(obj)
+
+        # extend mapping tables:
+        self.mapping_spec["spec-id"] = mapping_spec[:, 0]
+        self.mapping_spec["original spec-id"] = mapping_spec[:, 1]
+        self.mapping_spec["fam-id"] = mapping_spec[:, 2]
+
+    def _collect_mappings_from_spectra(self, spectra) -> np.ndarray[np.float64]:
         # Collect most import mapping tables from input data
         mapping_spec = np.zeros((len(spectra), 3))
         mapping_spec[:, 0] = np.arange(0, len(spectra))
@@ -117,12 +128,9 @@ class DataLinks():
             mapping_spec[i, 1] = spectrum.id
             mapping_spec[i, 2] = spectrum.family.family_id
 
-        # extend mapping tables:
-        self.mapping_spec["spec-id"] = mapping_spec[:, 0]
-        self.mapping_spec["original spec-id"] = mapping_spec[:, 1]
-        self.mapping_spec["fam-id"] = mapping_spec[:, 2]
+        return mapping_spec
     
-    def collect_mappings_spec_v2(self, molfams: Iterable[MolecularFamily]):
+    def _collect_mappings_from_molecular_families(self, molfams: Sequence[MolecularFamily]) -> np.ndarray[np.float64]:
         num_spectra = sum(len(x.spectra_ids) for x in molfams)
         mapping_spec = np.zeros((num_spectra, 3))
         mapping_spec[:, 0] = np.arange(0, num_spectra)
@@ -136,10 +144,7 @@ class DataLinks():
             mapping_spec[i, 1] = key
             mapping_spec[i, 2] = inverted_mappings[key]
         
-        # extend mapping tables:
-        self.mapping_spec["spec-id"] = mapping_spec[:, 0]
-        self.mapping_spec["original spec-id"] = mapping_spec[:, 1]
-        self.mapping_spec["fam-id"] = mapping_spec[:, 2]
+        return mapping_spec
 
     def collect_mappings_gcf(self, gcf_list):
         """

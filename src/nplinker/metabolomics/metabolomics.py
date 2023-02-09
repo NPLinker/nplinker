@@ -13,17 +13,56 @@
 # limitations under the License.
 
 import csv
-
+from os import PathLike
+from deprecated import deprecated
+from nplinker.annotations import create_gnps_annotation
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics.gnps.gnps_spectrum_loader import GNPSSpectrumLoader
+from nplinker.parsers.mgf import LoadMGF
 from .load_gnps import load_gnps
 from .molecular_family import MolecularFamily
 from .singleton_family import SingletonFamily
+from .spectrum import Spectrum
 
 
 logger = LogConfig.getLogger(__name__)
 
-def load_edges(edges_file, spec_dict):
+def _mols_to_spectra(ms2, metadata):
+    ms2_dict = {}
+    for m in ms2:
+        if not m[3] in ms2_dict:
+            ms2_dict[m[3]] = []
+        ms2_dict[m[3]].append((m[0], m[2]))
+
+    spectra = []
+    for i, m in enumerate(ms2_dict.keys()):
+        new_spectrum = Spectrum(i, ms2_dict[m], int(m.name),
+                                metadata[m.name]['precursormass'],
+                                metadata[m.name]['parentmass'])
+        new_spectrum.metadata = metadata[m.name]
+        # add GNPS ID if in metadata under SPECTRUMID (this doesn't seem to be in regular MGF files
+        # from GNPS, but *is* in the rosetta mibig MGF)
+        # note: LoadMGF seems to lowercase (some) metadata keys?
+        if 'spectrumid' in new_spectrum.metadata:
+            # add an annotation for consistency, if not already there
+            if 'gnps' not in new_spectrum.annotations:
+                gnps_anno = {k: None for k in ['Compound_Name', 'Organism', 'MQScore', 'SpectrumID']}
+                gnps_anno['SpectrumID'] = new_spectrum.metadata['spectrumid']
+                create_gnps_annotation(new_spectrum, gnps_anno)
+        spectra.append(new_spectrum)
+
+    return spectra
+
+@deprecated(version="1.3.3", reason="Use the GNPSMolecularFamilyLoader class instead.")
+def load_edges(edges_file: str, spec_dict: dict[int, Spectrum]):
+    """Insert information about the molecular family into the spectra.
+
+    Args:
+        edges_file(str): File containing the molecular families.
+        spec_dict(dict[int, Spectrum]): Dictionary with mapping from spectra_id to Spectrum.
+
+    Raises:
+        Exception: Raises exception if the edges file doesn't contain the correct columns. 
+    """
     logger.debug('loading edges file: {} [{} spectra from MGF]'.format(
         edges_file, len(spec_dict)))
     with open(edges_file) as f:
@@ -58,6 +97,7 @@ def load_edges(edges_file, spec_dict):
                 spec1.family_id = family
 
 
+@deprecated(version="1.3.3", reason="Use the GNPSLoader class instead.")
 def load_dataset(strains,
                  mgf_file,
                  edges_file,
@@ -93,7 +133,7 @@ def load_dataset(strains,
     # spec_dict = {spec.spectrum_id: spec for spec in spectra}
 
     # add edges info to the spectra
-    molfams = _make_families(spec_dict.values())
+    molfams = make_families(spec_dict.values())
     # molfams = GNPSMolecularFamilyLoader(edges_file).families()
 
     unknown_strains = load_gnps(strains, nodes_file, quant_table_file,
@@ -103,18 +143,37 @@ def load_dataset(strains,
     return spec_dict, list(spec_dict.values()), molfams, unknown_strains
 
 
-def load_spectra(mgf_file, edges_file):
-    """ Wrapper function around GNPSSpectrumLoader
+@deprecated(version="1.3.3", reason="Use the GNPSSpectrumLoader class instead.")
+def load_spectra(mgf_file: str | PathLike, edges_file: str | PathLike) -> dict[int, Spectrum]:
+    """Wrapper function to load spectra and init the molecular family links.
+
+    Args:
+        mgf_file(str | PathLike): File storing the mass spectra in MGF format.
+        edges_file(str | PathLike): File storing the molecular family information in .selfloop or .pairsinfo format.
+
+    Returns:
+        dict[int, Spectrum]: Indexed dict of mass spectra.
     """
-    spectra = GNPSSpectrumLoader(mgf_file).spectra()
-    # above returns a list, create a dict indexed by spectrum_id to make
+
+    ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([str(mgf_file)])
+    logger.info('%d molecules parsed from MGF file', len(ms1))
+    spectra = _mols_to_spectra(ms2, metadata)    # above returns a list, create a dict indexed by spectrum_id to make
     # the rest of the parsing a bit simpler
-    spec_dict = {spec.spectrum_id: spec for spec in spectra}
+    spec_dict: dict[int, Spectrum] = {spec.spectrum_id: spec for spec in spectra}
     load_edges(edges_file, spec_dict)
     return spec_dict
 
 
-def _make_families(spectra):
+@deprecated(version="1.3.3", reason="Use the GNPSMolecularFamilyLoader class instead.")
+def make_families(spectra: list[Spectrum]) -> list[MolecularFamily]:
+    """Instantiate the MolecularFamily objects given the cluster id's added to the Spectra objects.
+
+    Args:
+        spectra(list[Spectrum]): Spectra objects from which to read the cluster id's and put them into molecular families.
+
+    Returns:
+        list[MolecularFamily]: Molecular families created from the id's present in the soectra.
+    """
     families = []
     family_dict = {}
     family_index = 0

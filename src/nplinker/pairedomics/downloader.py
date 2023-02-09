@@ -16,17 +16,21 @@ import csv
 import io
 import json
 import os
+from pathlib import Path
 import re
 import sys
 import shutil
 import tarfile
 import time
 import zipfile
+from deprecated import deprecated
 import httpx
 from bs4 import BeautifulSoup
 from progress.bar import Bar
 from progress.spinner import Spinner
 from nplinker.logconfig import LogConfig
+from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
+from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
 from nplinker.strains import Strain
 from nplinker.strain_collection import StrainCollection
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
@@ -83,32 +87,25 @@ class Downloader():
     # TODO: move to independent config file  ---C.Geng
     PFAM_PATH = os.path.join(sys.prefix, 'nplinker_lib')
 
-    def __init__(self, platform_id, force_download=False):
+    def __init__(self, platform_id, force_download=False, local_cache = None):
         self.gnps_massive_id = platform_id
         self.pairedomics_id = None
         self.gnps_task_id = None
-        self.local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data',
-                                        'pairedomics')
-        self.local_download_cache = os.path.join(self.local_cache, 'downloads')
-        self.local_file_cache = os.path.join(self.local_cache, 'extracted')
-        self.all_project_json_file = os.path.join(self.local_cache,
-                                                  'all_projects.json')
-        self.all_project_json = None
-        self.project_json_file = os.path.join(
-            self.local_cache, f'{self.gnps_massive_id}.json')
-        self.project_json = None
-        os.makedirs(self.local_cache, exist_ok=True)
-
-        self.json_data = None
+        self.json_data = None        
         self.strains = StrainCollection()
         self.growth_media = {}
 
-        logger.info('Downloader for {}, caching to {}'.format(
-            platform_id, self.local_cache))
+        if local_cache is None:
+            local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data',
+                                        'pairedomics')
 
+        self._init_folder_structure(local_cache)
+
+        # init project json files
+        self.all_project_json = None
         if not os.path.exists(self.project_json_file) or force_download:
             logger.info('Downloading new copy of platform project data...')
-            self.all_project_json = self._download_platform_json_to_file(
+            self.all_project_json = self._download_and_load_json(
                 PAIREDOMICS_PROJECT_DATA_ENDPOINT, self.all_project_json_file)
         else:
             logger.info('Using existing copy of platform project data')
@@ -138,8 +135,9 @@ class Downloader():
                     self.gnps_massive_id))
 
         # now get the project JSON data
+        self.project_json = None
         logger.info('Found project, retrieving JSON data...')
-        self.project_json = self._download_platform_json_to_file(
+        self.project_json = self._download_and_load_json(
             PAIREDOMICS_PROJECT_URL.format(self.pairedomics_id),
             self.project_json_file)
 
@@ -149,6 +147,21 @@ class Downloader():
 
         self.gnps_task_id = self.project_json['metabolomics']['project'][
             'molecular_network']
+
+        with open(os.path.join(self.project_file_cache,
+                                  'platform_data.json'),
+                     'w',
+                     encoding='utf-8') as f:
+            f.write(str(self.project_json))
+    
+    def _init_folder_structure(self, local_cache):
+        # init local cache root   
+        self.local_cache = local_cache
+        self.local_download_cache = os.path.join(self.local_cache, 'downloads')
+        self.local_file_cache = os.path.join(self.local_cache, 'extracted')    
+        os.makedirs(self.local_cache, exist_ok=True)
+        logger.info('Downloader for {}, caching to {}'.format(
+            self.gnps_massive_id, self.local_cache))
 
         # create local cache folders for this dataset
         self.project_download_cache = os.path.join(self.local_download_cache,
@@ -163,15 +176,17 @@ class Downloader():
         for d in ['antismash', 'bigscape']:
             os.makedirs(os.path.join(self.project_file_cache, d),
                         exist_ok=True)
-
-        with open(os.path.join(self.project_file_cache,
-                                  'platform_data.json'),
-                     'w',
-                     encoding='utf-8') as f:
-            f.write(str(self.project_json))
-
+        
+        # init strain mapping filepath
         self.strain_mappings_file = os.path.join(self.project_file_cache,
-                                                 'strain_mappings.csv')
+                                                 'strain_mappings.csv') 
+        
+        # init project paths
+        self.all_project_json_file = os.path.join(self.local_cache,
+                                                  'all_projects.json')
+        self.project_json_file = os.path.join(
+            self.local_cache, f'{self.gnps_massive_id}.json')
+
 
 	# CG: download function
     def get(self, do_bigscape, extra_bigscape_parameters, use_mibig,
@@ -671,41 +686,12 @@ class Downloader():
             self.strains.add(strain)
 
     def _download_metabolomics_zipfile(self, gnps_task_id):
-        url = GNPS_DATA_DOWNLOAD_URL.format(gnps_task_id)
+        archive = GNPSDownloader(gnps_task_id, self.project_download_cache).download().get_download_path()
+        GNPSExtractor(archive, self.project_file_cache).extract()
 
-        self.metabolomics_zip = os.path.join(self.project_download_cache,
-                                             'metabolomics_data.zip')
 
-        cached = False
-        if os.path.exists(self.metabolomics_zip):
-            logger.info('Found existing metabolomics_zip at {}'.format(
-                self.metabolomics_zip))
-            try:
-                mbzip = zipfile.ZipFile(self.metabolomics_zip)
-                cached = True
-            except zipfile.BadZipFile as bzf:
-                logger.info(
-                    'Invalid metabolomics zipfile found, will download again!')
-                os.unlink(self.metabolomics_zip)
-
-        if not cached:
-            logger.info(f'Downloading metabolomics data from {url}')
-            with open(self.metabolomics_zip, 'wb') as f:
-                # note that this requires a POST, not a GET
-                total_bytes, last_total = 0, 0
-                spinner = Spinner('Downloading metabolomics data... ')
-                with httpx.stream('POST', url) as r:
-                    for data in r.iter_bytes():
-                        f.write(data)
-                        total_bytes += len(data)
-                        spinner.next()
-                spinner.finish()
-
-        logger.info('Downloaded metabolomics data!')
-
-        # this should throw an exception if zip is malformed etc
-        mbzip = zipfile.ZipFile(self.metabolomics_zip)
-
+    @deprecated
+    def _extract_metabolomics_data(self, mbzip):
         logger.info(f'Extracting files to {self.project_file_cache}')
         # extract the contents to the file cache folder. only want some of the files
         # so pick them out and only extract those:
@@ -731,12 +717,39 @@ class Downloader():
                               path=os.path.join(self.project_file_cache,
                                                 'spectra'))
 
+    @deprecated
+    def _log_gnps_format(self):
         if self._is_new_gnps_format(self.project_file_cache):
             logger.info('Found NEW GNPS structure')
         else:
             logger.info('Found OLD GNPS structure')
 
-    def _download_platform_json_to_file(self, url, local_path):
+    @deprecated
+    def _load_gnps_data(self, gnps_task_id) -> zipfile.ZipFile:
+
+        self.metabolomics_zip = os.path.join(self.project_download_cache,
+                                             'metabolomics_data.zip')
+
+        # Try read from cache
+        if os.path.exists(self.metabolomics_zip):
+            logger.info('Found existing metabolomics_zip at {}'.format(
+                self.metabolomics_zip))
+            try:
+                mbzip = zipfile.ZipFile(self.metabolomics_zip)
+                return mbzip
+            except zipfile.BadZipFile as bzf:
+                logger.info(
+                    'Invalid metabolomics zipfile found, will download again!')
+                os.unlink(self.metabolomics_zip)
+        url = _generate_gnps_download_url(gnps_task_id)
+        _execute_download(url, self.metabolomics_zip)
+
+        # this should throw an exception if zip is malformed etc
+        mbzip = zipfile.ZipFile(self.metabolomics_zip)
+        return mbzip
+
+
+    def _download_and_load_json(self, url, local_path):
         resp = httpx.get(url, follow_redirects=True)
         if not resp.status_code == 200:
             raise Exception('Failed to download {} (status code {})'.format(
@@ -751,9 +764,22 @@ class Downloader():
         return content
 
 
-if __name__ == "__main__":
-    # salinispora dataset
-    # d = Downloader('MSV000079284')
+@deprecated
+def _generate_gnps_download_url(gnps_task_id):
+    url = GNPS_DATA_DOWNLOAD_URL.format(gnps_task_id)
+    return url
 
-    d = Downloader('MSV000078836').get(False, "")
-    # d = Downloader('MSV000079284').get(False, "")
+@deprecated
+def _execute_download(url, metabolomics_zip):
+    logger.info(f'Downloading metabolomics data from {url}')
+    with open(metabolomics_zip, 'wb') as f:
+        # note that this requires a POST, not a GET
+        total_bytes, last_total = 0, 0
+        spinner = Spinner('Downloading metabolomics data... ')
+        with httpx.stream('POST', url) as r:
+            for data in r.iter_bytes():
+                f.write(data)
+                total_bytes += len(data)
+                spinner.next()
+        spinner.finish()
+    logger.info('Downloaded metabolomics data!')

@@ -23,7 +23,7 @@ from nplinker.genomics import load_gcfs
 from nplinker.genomics.mibig import MibigBGCLoader
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics import load_dataset
+from nplinker.metabolomics.metabolomics import load_dataset
 from nplinker.pairedomics.downloader import Downloader
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.strain_collection import StrainCollection
@@ -174,50 +174,30 @@ class DatasetLoader():
                                             self.USE_MIBIG_DEFAULT)
         self._mibig_version = self._dataset.get('mibig_version',
                                                 self.MIBIG_VERSION_DEFAULT)
+
         self._root = self._config['dataset']['root']
         self._platform_id = self._config['dataset']['platform_id']
         self._remote_loading = len(self._platform_id) > 0
         self.datadir = files('nplinker').joinpath('data')
         self.dataset_id = os.path.split(
             self._root)[-1] if not self._remote_loading else self._platform_id
+        
         if self._remote_loading:
             self._downloader = Downloader(self._platform_id)
         else:
             self._downloader = None
+        
         self.bgcs, self.gcfs, self.spectra, self.molfams = [], [], [], []
         self.mibig_bgc_dict = {}
         self.product_types = []
         logger.debug('DatasetLoader({}, {}, {})'.format(
             self._root, self._platform_id, self._remote_loading))
 
-    def validate(self):
-        # check antismash format is recognised
-        if self._antismash_format not in self.ANTISMASH_FMTS:
-            raise Exception('Unknown antismash format: {}'.format(
-                self._antismash_format))
-
-        # if remote loading mode, need to download the data here
-        if self._remote_loading:
-            self._root = self._downloader.project_file_cache
-            logger.debug('remote loading mode, configuring root={}'.format(
-                self._root))
-            # CG: to download both MET and GEN data
-            self._downloader.get(
-                self._docker.get('run_bigscape', self.RUN_BIGSCAPE_DEFAULT),
-                self._docker.get('extra_bigscape_parameters',
-                                 self.EXTRA_BIGSCAPE_PARAMS_DEFAULT),
-                self._use_mibig, self._mibig_version)
-
-        # construct the paths and filenames required to load everything else and check
-        # they all seem to exist (but don't parse anything yet)
-
-        # 1. strain mapping are used for everything else so
-        self.strain_mappings_file = self._overrides.get(
-            self.OR_STRAINS) or os.path.join(self._root, 'strain_mappings.csv')
-
+    def _init_metabolomics_paths(self):
         # 2. MET: <root>/clusterinfo_summary/<some UID>.tsv (or .clustersummary apparently...) / nodes_file=<override>
         self.nodes_file = self._overrides.get(
             self.OR_NODES) or find_via_glob_alts([
+                os.path.join(self._root, 'file_mappings.tsv'),
                 os.path.join(self._root, 'clusterinfo*', '*.tsv'),
                 os.path.join(self._root, 'clusterinfo*', '*.clustersummary')
             ], self.OR_NODES)
@@ -225,8 +205,8 @@ class DatasetLoader():
         # 3. MET: <root>/networkedges_selfloop/<some UID>.selfloop (new) or .pairsinfo (old) / edges_file=<override>
         self.edges_file = self._overrides.get(
             self.OR_EDGES) or find_via_glob_alts([
-                os.path.join(self._root, 'networkedges_selfloop',
-                             '*.pairsinfo'),
+                os.path.join(self._root, '*.pairsinfo'),
+                os.path.join(self._root, 'networkedges_selfloop', '*.pairsinfo'),
                 os.path.join(self._root, 'networkedges_selfloop', '*.selfloop')
             ], self.OR_EDGES)
 
@@ -235,16 +215,16 @@ class DatasetLoader():
         # => wait for updated dataset with latest output format
         # NOTE: only optional for Crusemann or Crusemann-like dataset format!
         self.extra_nodes_file = self._overrides.get(
-            self.OR_EXTRA_NODES) or find_via_glob(os.path.join(
-                self._root, 'quantification_table_reformatted', '*.csv'),
+            self.OR_EXTRA_NODES) or find_via_glob(
+                os.path.join(self._root, 'quantification_table_reformatted', '*.csv'),
                                                   self.OR_EXTRA_NODES,
                                                   optional=True)
 
         # 5. MET: <root>/spectra/*.mgf (or <root>/*.mgf)/ mgf_file=<override>
         self.mgf_file = self._overrides.get(self.OR_MGF) or find_via_glob_alts(
             [
-                os.path.join(self._root, 'spectra', '*.mgf'),
-                os.path.join(self._root, '*.mgf')
+                os.path.join(self._root, '*.mgf'),
+                os.path.join(self._root, 'spectra', '*.mgf')
             ], self.OR_MGF)
 
         # 6. MET: <root>/metadata_table/metadata_table-<number>.txt / metadata_table_file=<override>
@@ -264,15 +244,21 @@ class DatasetLoader():
 
         # 8. MET: <root>/DB_result/*.tsv (new) or <root>/result_specnets_DB/*.tsv (old) / annotations_dir=<override>
         self.annotations_dir = self._overrides.get(
-            self.OR_ANNO) or find_via_glob_alts_dir([
-                os.path.join(self._root, 'DB_result'),
-                os.path.join(self._root, 'result_specnets_DB')
-            ], self.OR_ANNO)
-        self.annotations_config_file = self._overrides.get(
-            self.OR_ANNO_CONFIG) or os.path.join(self.annotations_dir,
-                                                 'annotations.tsv')
+            self.OR_ANNO) or find_via_glob_alts_dir(
+                [
+                    os.path.join(self._root, 'DB_result'),
+                    os.path.join(self._root, 'result_specnets_DB'),
+                ],
+                self.OR_ANNO,
+                optional=False
+            )
+        if self.annotations_dir is not None:
+            self.annotations_config_file = self._overrides.get(
+                self.OR_ANNO_CONFIG) or os.path.join(self.annotations_dir,
+                                                     'annotations.tsv')
 
-        # 9. GEN: <root>/antismash / antismash_dir=<override>
+    def _init_genomics_paths(self):
+         # 9. GEN: <root>/antismash / antismash_dir=<override>
         self.antismash_dir = self._overrides.get(
             self.OR_ANTISMASH) or os.path.join(self._root, 'antismash')
         self.antismash_cache = {}
@@ -293,6 +279,15 @@ class DatasetLoader():
         # 11. GEN: <root>/mibig_json / mibig_json_dir=<override>
         self.mibig_json_dir = self._overrides.get(
             self.OR_MIBIG_JSON) or os.path.join(self._root, 'mibig_json')
+    
+    def _init_paths(self):
+        # 1. strain mapping are used for everything else so
+        self.strain_mappings_file = self._overrides.get(
+            self.OR_STRAINS) or os.path.join(self._root, 'strain_mappings.csv')
+
+        self._init_metabolomics_paths()
+
+        self._init_genomics_paths()
 
         # 12. MISC: <root>/params.xml
         self.params_file = os.path.join(self._root, 'params.xml')
@@ -313,7 +308,18 @@ class DatasetLoader():
         self.molnetenhancer_dir = self._overrides.get(
             self.OR_MOLNETENHANCER) or os.path.join(self._root,
                                                     'molnetenhancer')
+    def _start_downloads(self):
+        self._root = self._downloader.project_file_cache
+        logger.debug('remote loading mode, configuring root={}'.format(
+                self._root))
+            # CG: to download both MET and GEN data
+        self._downloader.get(
+                self._docker.get('run_bigscape', self.RUN_BIGSCAPE_DEFAULT),
+                self._docker.get('extra_bigscape_parameters',
+                                 self.EXTRA_BIGSCAPE_PARAMS_DEFAULT),
+                self._use_mibig, self._mibig_version)
 
+    def _validate_paths(self):
         for f in self.required_paths():
             if not os.path.exists(f):
                 raise FileNotFoundError(
@@ -325,6 +331,21 @@ class DatasetLoader():
                 logger.warning(
                     'Optional file/directory "{}" does not exist or is not readable!'
                     .format(f))
+    
+    def validate(self):
+        # check antismash format is recognised
+        if self._antismash_format not in self.ANTISMASH_FMTS:
+            raise Exception('Unknown antismash format: {}'.format(
+                self._antismash_format))
+
+        # if remote loading mode, need to download the data here
+        if self._remote_loading:
+            self._start_downloads()
+
+        # construct the paths and filenames required to load everything else and check
+        # they all seem to exist (but don't parse anything yet)
+        self._init_paths()
+        self._validate_paths()
 
     def load(self, met_only):
         # load strain mappings first
@@ -647,9 +668,14 @@ class DatasetLoader():
 
     def _load_metabolomics(self):
         spec_dict, self.spectra, self.molfams, unknown_strains = load_dataset(
-            self.strains, self.mgf_file, self.edges_file, self.nodes_file,
-            self.quantification_table_file, self.metadata_table_file,
-            self._extended_metadata_table_parsing)
+            self.strains,
+            self.mgf_file,
+            self.edges_file,
+            self.nodes_file,
+            self.quantification_table_file,
+            self.metadata_table_file,
+            self._extended_metadata_table_parsing
+        )
 
         us_path = os.path.join(self._root, 'unknown_strains_met.csv')
         logger.warning(

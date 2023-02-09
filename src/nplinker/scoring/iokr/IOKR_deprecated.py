@@ -54,22 +54,3 @@ def run_iokr_scoring(spec_list, bgc_list):
     rank = iokr_server.score_smiles(spectra, smiles)
 
     return rank
-
-
-if __name__ == "__main__":
-    # peaklist = [
-    # (70.065002,84.632004),
-    # (71.083000,39.488998),
-    # (88.047997,54.071999),
-    # (89.058998,471.227997),
-    # (116.959999,75.615997),
-    # (145.016998,68.410004),
-    # (147.979996,62.558998),
-    # (153.929993,94.302002),
-    # (160.988007,261.783997),
-    # (189.042999,389.872009),
-    # (204.007996,43.602001),
-    # (205.016006,159.628006),
-    # ]
-    # ms_test = Spectrum(id=0, peaks=peaklist, spectrum_id=0, precursor_mz=0, parent_mz=299.99701)
-    run_iokr_scoring()

@@ -3,8 +3,8 @@ import numpy as np
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics import MolecularFamily
-from nplinker.metabolomics import Spectrum
+from nplinker.metabolomics.molecular_family import MolecularFamily
+from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.pickler import load_pickled_data
 from nplinker.pickler import save_pickled_data
 from nplinker.scoring.methods import ScoringMethod
