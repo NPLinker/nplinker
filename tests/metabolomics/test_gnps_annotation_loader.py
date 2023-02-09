@@ -5,7 +5,6 @@ from nplinker.metabolomics.gnps.gnps_annotation_loader import \
     GNPSAnnotationLoader
 from nplinker.metabolomics.spectrum import Spectrum
 from .. import DATA_DIR
-from .test_metabolomics import spec_dict
 
 
 class GNPSAnnotationLoaderBuilder:
