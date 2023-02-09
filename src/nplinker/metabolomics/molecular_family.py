@@ -2,6 +2,7 @@ from typing_extensions import Self
 
 from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.strain_collection import StrainCollection
+from nplinker.strains import Strain
 
 class MolecularFamily():
 
@@ -25,15 +26,16 @@ class MolecularFamily():
     #     return False
 
     @property
-    def strains(self) -> set[StrainCollection]:
+    def strains(self) -> StrainCollection:
         """Get strains of spectra in the molecular family.
 
         Returns:
             set[StrainCollection]: StrainCollection of strains from which the spectra in the molecular family are coming.
         """
-        strains: set[StrainCollection] = set()
+        strains: StrainCollection = StrainCollection()
         for spectrum in self.spectra:
-            strains.add(spectrum.strains)
+            for strain in spectrum.strains:
+                strains.add(strain)
         return strains
 
     def add_spectrum(self, spectrum: Spectrum):
