@@ -9,6 +9,7 @@ from nplinker.utils import list_dirs
 from nplinker.utils import list_files
 from ..abc import BGCLoaderBase
 
+
 logger = LogConfig.getLogger(__name__)
 
 
@@ -97,6 +98,7 @@ class AntismashBGCLoader:
             bgcs[bgc_id] = bgc
         return bgcs
 
+
 def parse_bgc_genbank(file: str) -> BGC:
     """Parse a single BGC gbk file to BGC object.
 
@@ -119,33 +121,37 @@ def parse_bgc_genbank(file: str) -> BGC:
     record = SeqIO.read(file, format="genbank")
     description = record.description  # "DEFINITION" in gbk file
     antismash_id = record.id  # "VERSION" in gbk file
-    product_prediction = _parse_product(record)
-    smiles = _parse_smiles(record)
+    features = _parse_antismash_genbank(record)
+    product_prediction = features["product"]
+    if product_prediction is None:
+        raise ValueError(
+            "Not found product prediction in antiSMASH Genbank file {}".format(
+                file))
 
-    bgc = BGC(bgc_id=fname,
-              product_prediction=product_prediction)
+    # init BGC
+    bgc = BGC(bgc_id=fname, product_prediction=product_prediction)
     bgc.description = description
     bgc.antismash_id = antismash_id
     bgc.antismash_file = file
-    bgc.smiles = smiles
-
+    bgc.antismash_region = features["region_number"]
+    bgc.smiles = features["smiles"]
     return bgc
 
-def _parse_product(record: SeqRecord.SeqRecord) -> list[str]:
+
+def _parse_antismash_genbank(record: SeqRecord.SeqRecord) -> dict:
+    features = {}
     for feature in record.features:
         if feature.type == "region":  # "region" in gbk file
-            return feature.qualifiers.get('product', [])
-    return []
-
-def _parse_smiles(record: SeqRecord.SeqRecord) -> list[str]:
-    for feature in record.features:
+            features["region_number"] = feature.qualifiers.get('region_number')
+            features["product"] = feature.qualifiers.get('product')
         if feature.type == "cand_cluster":
-            smiles = feature.qualifiers.get('SMILES', [])
+            smiles = feature.qualifiers.get('SMILES')
             # space is not allowed in SMILES spec
             # biopython generates space when reading multi-line SMILES from .gbk
-            smiles = [i.replace(' ', '') for i in smiles]
-            return smiles
-    return []
+            if smiles is not None:
+                smiles = [i.replace(' ', '') for i in smiles]
+            features["smiles"] = smiles
+    return features
 
 
 # register as virtual class to prevent metaclass conflicts
