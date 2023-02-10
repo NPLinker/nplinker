@@ -1,6 +1,5 @@
 LOCUS       NZ_KI911412            10969 bp    DNA     linear   CON 29-NOV-2019
-DEFINITION  Salinispora pacifica CNT029 B170DRAFT_scaffold_0.1, whole genome
-            shotgun sequence.
+DEFINITION  Fake sample that has no feature region.
 ACCESSION   NZ_KI911412
 VERSION     NZ_KI911412.1
 KEYWORDS    .
@@ -64,13 +63,6 @@ FEATURES             Location/Qualifiers
                      /kind="single"
                      /product="butyrolactone"
                      /protoclusters="1"
-                     /tool="antismash"
-     region          1..10969
-                     /candidate_cluster_numbers="1"
-                     /contig_edge="False"
-                     /product=""
-                     /region_number="1"
-                     /rules="AfsA"
                      /tool="antismash"
      gene            complement(374..1021)
                      /locus_tag="B170_RS0115745"

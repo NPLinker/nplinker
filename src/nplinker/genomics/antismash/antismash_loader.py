@@ -122,7 +122,7 @@ def parse_bgc_genbank(file: str) -> BGC:
     description = record.description  # "DEFINITION" in gbk file
     antismash_id = record.id  # "VERSION" in gbk file
     features = _parse_antismash_genbank(record)
-    product_prediction = features["product"]
+    product_prediction = features.get("product")
     if product_prediction is None:
         raise ValueError(
             "Not found product prediction in antiSMASH Genbank file {}".format(
@@ -133,16 +133,17 @@ def parse_bgc_genbank(file: str) -> BGC:
     bgc.description = description
     bgc.antismash_id = antismash_id
     bgc.antismash_file = file
-    bgc.antismash_region = features["region_number"]
-    bgc.smiles = features["smiles"]
+    bgc.antismash_region = features.get("region_number")
+    bgc.smiles = features.get("smiles")
     return bgc
 
 
 def _parse_antismash_genbank(record: SeqRecord.SeqRecord) -> dict:
     features = {}
     for feature in record.features:
-        if feature.type == "region":  # "region" in gbk file
-            features["region_number"] = feature.qualifiers.get('region_number')
+        if feature.type == "region":
+            # biopython assumes region numer is a list, but it's actually an int
+            features["region_number"] = feature.qualifiers.get('region_number')[0]
             features["product"] = feature.qualifiers.get('product')
         if feature.type == "cand_cluster":
             smiles = feature.qualifiers.get('SMILES')

@@ -58,6 +58,15 @@ def test_parse_bgc_genbank():
     bgc = parse_bgc_genbank(gbk_file)
     assert isinstance(bgc, BGC)
     assert bgc.bgc_id == "NZ_AZWB01000005.region001"
-    assert bgc.antismash_file == gbk_file
     assert bgc.product_prediction == ["NRPS", "lanthipeptide"]
+    assert "Salinispora pacifica CNT029 B170DRAFT_scaffold" in bgc.description
+    assert bgc.antismash_id == "NZ_AZWB01000005"
+    assert bgc.antismash_file == gbk_file
+    assert bgc.antismash_region == "1"
     assert bgc.smiles == ["NC([*])C(=O)NC([*])C(=O)NC(CO)C(=O)NC(Cc1ccccc1)C(=O)NCC(=O)O"]
+
+def test_parse_bgc_genbank_error():
+    gbk_file = str(DATA_DIR / "fake_antismash.region001.gbk")
+    with pytest.raises(ValueError) as e:
+        parse_bgc_genbank(gbk_file)
+    assert "Not found product prediction in antiSMASH Genbank file" in e.value.args[0]
