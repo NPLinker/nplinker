@@ -1,9 +1,11 @@
 import csv
+from os import PathLike
+from pathlib import Path
 from typing import TextIO
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.abc import FileMappingLoaderBase
-from nplinker.metabolomics.load_gnps import GNPSFormat
-from nplinker.metabolomics.load_gnps import identify_gnps_format
+from .gnps_format import GNPSFormat
+from .gnps_format import gnps_format_from_file_mapping
 from nplinker.utils import find_delimiter
 
 logger = LogConfig.getLogger(__file__)
@@ -13,14 +15,22 @@ FILE_IDENTIFIER_FBMN = " Peak area"
 
 class GNPSFileMappingLoader(FileMappingLoaderBase):
 
-    def __init__(self, filename: str):
-        self._filename: str = filename
+    def __init__(self, file: str | PathLike):
+        """Class to load `file mappings` (occurrences of spectra in samples) from GNPS.
+
+        Args:
+            file(str | PathLike): Path to the GNPS `file mappings` file.
+
+        Raises:
+            NotImplementedError: Raises NotImplementedError if the GNPS format is not recognized.
+        """
+        self._file: Path = Path(file)
         self._mapping: dict[int, list[str]] = {}
-        self._gnps_format = identify_gnps_format(filename, False)
+        self._gnps_format = gnps_format_from_file_mapping(file, False)
 
         if self._gnps_format is GNPSFormat.AllFiles:
             self._load_mapping_allfiles()
-        elif self._gnps_format is GNPSFormat.fbmn:
+        elif self._gnps_format is GNPSFormat.FBMN:
             self._load_mapping_fbmn()
         else:
             raise NotImplementedError(
@@ -36,7 +46,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
 
     def _load_mapping_allfiles(self):
         """ Load mapping for GNPS 'AllFiles' style files. """
-        with open(self._filename, mode='rt', encoding='utf-8') as file:
+        with open(self._file, mode='rt', encoding='utf-8') as file:
             reader = self._get_dict_reader(file)
 
             for row in reader:
@@ -58,7 +68,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         Returns:
             csv.DictReader: Reader for dict style table access.
         """
-        delimiter = find_delimiter(self._filename)
+        delimiter = find_delimiter(self._file)
         reader = csv.reader(file, delimiter=delimiter)
         header: list[str] = next(reader)
         dict_reader = csv.DictReader(file, header, delimiter=delimiter)
@@ -66,7 +76,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
 
     def _load_mapping_fbmn(self):
         """ Load mapping for GNPS 'fbmn' style files. """
-        with open(self._filename, mode='rt', encoding='utf-8') as file:
+        with open(self._file, mode='rt', encoding='utf-8') as file:
             reader = self._get_dict_reader(file)
 
             for row in reader:

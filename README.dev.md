@@ -24,7 +24,7 @@ source venv/bin/activate
 python3 -m pip install --upgrade pip setuptools
 
 # install development dependencies
-pip install --no-cache-dir --editable .[dev]
+pip install --no-cache-dir --editable ".[dev]"
 
 # install non-pypi dependecies
 install-nplinker-deps

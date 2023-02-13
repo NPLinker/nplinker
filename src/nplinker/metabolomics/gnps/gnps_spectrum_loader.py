@@ -1,6 +1,4 @@
-from nplinker.annotations import GNPS_DATA_COLUMNS
-from nplinker.annotations import GNPS_KEY
-from nplinker.annotations import create_gnps_annotation
+from os import PathLike
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.abc import SpectrumLoaderBase
 from nplinker.metabolomics.spectrum import Spectrum
@@ -11,16 +9,35 @@ logger = LogConfig.getLogger(__file__)
 
 class GNPSSpectrumLoader(SpectrumLoaderBase):
 
-    def __init__(self, filename: str):
-        ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([filename])
+    def __init__(self, file: str | PathLike):
+        """Class to load mass spectra from the given GNPS MGF file.
+
+        Args:
+            file(str | PathLike): path to the MGF file to load.
+        """
+        ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([str(file)])
         logger.info('%d molecules parsed from MGF file', len(ms1))
-        self._spectra = mols_to_spectra(ms2, metadata)
+        self._spectra = _mols_to_spectra(ms2, metadata)
     
     def spectra(self) -> list[Spectrum]:
+        """Get the spectra loaded from the file.
+
+        Returns:
+            list[Spectrum]: the loaded spectra as a list of `Spectrum` objects.
+        """
         return self._spectra
     
 
-def mols_to_spectra(ms2, metadata: dict[str, dict[str, str]]) -> list[Spectrum]:
+def _mols_to_spectra(ms2: list, metadata: dict[str, dict[str, str]]) -> list[Spectrum]:
+    """Function to convert ms2 object and metadata to `Spectrum` objects.
+
+    Args:
+        ms2(list): list of ms2 intensity.
+        metadata(dict[str, dict[str, str]]): Dictionary holding the metadata which was loaded from the original file.
+
+    Returns:
+        list[Spectrum]: List of mass spectra obtained from ms2 and metadata.
+    """
     ms2_dict = {}
     for m in ms2:
         if not m[3] in ms2_dict:
@@ -33,15 +50,6 @@ def mols_to_spectra(ms2, metadata: dict[str, dict[str, str]]) -> list[Spectrum]:
                                 metadata[m.name]['precursormass'],
                                 metadata[m.name]['parentmass'])
         new_spectrum.metadata = metadata[m.name]
-        # add GNPS ID if in metadata under SPECTRUMID (this doesn't seem to be in regular MGF files
-        # from GNPS, but *is* in the rosetta mibig MGF)
-        # note: LoadMGF seems to lowercase (some) metadata keys?
-        if 'spectrumid' in new_spectrum.metadata:
-            # add an annotation for consistency, if not already there
-            if GNPS_KEY not in new_spectrum.annotations:
-                gnps_anno = {k: None for k in GNPS_DATA_COLUMNS}
-                gnps_anno['SpectrumID'] = new_spectrum.metadata['spectrumid']
-                create_gnps_annotation(new_spectrum, gnps_anno)
         spectra.append(new_spectrum)
 
     return spectra

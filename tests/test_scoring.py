@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
-from nplinker.metabolomics import Spectrum
+from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.scoring.linking.data_linking import DataLinks
 
 from nplinker.scoring.linking.link_finder import LinkFinder

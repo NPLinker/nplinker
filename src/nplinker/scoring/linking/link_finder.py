@@ -22,7 +22,7 @@ except ImportError:
     )
 
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics import MolecularFamily
+from nplinker.metabolomics.molecular_family import MolecularFamily
 
 
 logger = LogConfig.getLogger(__file__)

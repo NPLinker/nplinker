@@ -15,6 +15,7 @@
 from __future__ import annotations
 import csv
 import os
+from os import PathLike
 import os.path
 import bz2
 import gzip
@@ -49,12 +50,37 @@ def sqrt_normalise(peaks):
     return normalised_peaks
 
 
-def find_delimiter(filename):
+def find_delimiter(file: str | PathLike) -> str:
+    """Detect the delimiter for the given tabular file.
+
+    Args:
+        file(str | PathLike): Path to tabular file.
+
+    Returns:
+        str: Detected delimiter character.
+
+    Examples:
+        >>> delim = find_delimiter("~/table.csv")
+    """
     sniffer = csv.Sniffer()
-    with open(filename, mode='rt', encoding='utf-8') as fp:
+    with open(file, mode='rt', encoding='utf-8') as fp:
         delimiter = sniffer.sniff(fp.read(5000)).delimiter
     return delimiter
     
+def get_headers(file: str | PathLike) -> list[str]:
+    """Read headers from the given tabular file.
+
+    Args:
+        file(str): Path to the file to read the header from.
+
+    Returns:
+        list[str]: list of column names from the header.
+    """
+    with open(os.fspath(file)) as f:
+        headers: str = f.readline().strip()
+        dl: str = find_delimiter(file)
+        return headers.split(dl)
+
 # Functions below are adapted from torchvision library,
 # see: https://github.com/pytorch/vision/blob/main/torchvision/datasets/utils.py.
 #
@@ -64,6 +90,7 @@ def find_delimiter(filename):
 #    https://github.com/pytorch/vision/blob/main/LICENSE
 
 USER_AGENT = "NPLinker"
+# USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'
 
 
 def _save_response_content(content: Iterator[bytes],
@@ -388,6 +415,25 @@ def extract_archive(from_path: str | Path,
         from_path.unlink()
 
     return str(to_path)
+
+def extract_file_matching_pattern(archive: zipfile.ZipFile, prefix: str, suffix: str, extract_dir: Path, out_filename: str|None = None):
+    """Extract a file matching a pattern from an archive and place it in the extraction directory under the given filename.
+
+    Args:
+        archive(zipfile.ZipFile): Archive from which to extract the file
+        prefix(str): Prefix to match in the filename. Pass empty string for no prefix.
+        suffix(str): Suffix to match in the filename. Pass empty string for no suffix.
+        extract_dir(Path): Path to the folder where to store the extracted file
+        out_filename(str): Name to assign to the extracted file.
+
+    Examples:
+        >>> extract_file_matching_pattern(zipfile.ZipFile("archive.zip"), "", ".txt", ".", "results.txt")
+    """
+    files: list[str] = [x.filename for x in archive.filelist]
+    file_to_extract = list(filter(lambda x: x.startswith(prefix) and x.endswith(suffix), files)).pop()
+    archive.extract(file_to_extract, extract_dir)
+    if out_filename is not None:
+        os.rename(extract_dir / file_to_extract, extract_dir / out_filename)
 
 
 def download_and_extract_archive(

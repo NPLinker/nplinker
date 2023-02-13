@@ -5,6 +5,8 @@ httpx
 numpy
 pandas
 progress
+pytest-lazy-fixture
+requests
 scipy
 sortedcontainers
 toml

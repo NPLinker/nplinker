@@ -1,14 +1,13 @@
 import csv
 import os
 import re
-from enum import Enum
 from typing import Any
 from deprecated import deprecated
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
-from nplinker.utils import find_delimiter
+from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_file_mapping ,GNPSFormat
 
 
 logger = LogConfig.getLogger(__name__)
@@ -19,68 +18,6 @@ RE_MZML_MZXML = re.compile('.mzXML|.mzML')
 #
 # methods for parsing metabolomics data files
 #
-
-GNPSFormat = Enum("GNPSFormat", ["Unknown", "AllFiles", "UniqueFiles", "fbmn"])
-
-def _get_headers(filename: str) -> list[str]:
-    """Function to read headers from tab or comma separated table.
-
-    Args:
-        filename(str): Path to the file to read the header from.
-
-    Returns:
-        list[str]: Columns names in header.
-    """
-    with open(filename) as f:
-        headers: str = f.readline().strip()
-        dl: str = find_delimiter(filename)
-        return headers.split(dl)
-
-
-
-def identify_gnps_format(filename: str, has_quant_table: bool) -> GNPSFormat:
-    """Peek GNPS file format for given file.
-
-    TODO: #89 This should be rewritten to actually return the format always based on only the file and not include the quant table in it.
-
-     Args:
-        filename(str): Path to the file to peek the format for.
-        has_quant_table (bool): If a quant table is present, do return GNPS_FORMAT_NEW_FBMN.
-
-    Returns:
-        GNPSFormat: GNPS format identified in the file.
-    """
-
-    headers: list[str] = _get_headers(filename)
-
-    if headers is None:
-        return GNPSFormat.Unknown
-
-    # first, check for AllFiles
-    if 'AllFiles' in headers:
-        # this should be an old-style dataset like Crusemann, with a single .tsv file
-        # containing all the necessary info. The AllFiles column should contain pairs
-        # of mzXML filenames and scan numbers in this format:
-        #   filename1:scannumber1###filename2:scannumber2###...
-        return GNPSFormat.AllFiles
-    elif 'UniqueFileSources' in headers:
-        # this is a slightly newer-style dataset, e.g. MSV000084771 on the platform
-        # it still just has a single .tsv file, but AllFiles is apparently replaced
-        # with a UniqueFileSources column. There is also a UniqueFileSourcesCount
-        # column which just indicates the number of entries in the UniqueFileSources
-        # column. If there are multiple entries the delimiter is a | character
-        return GNPSFormat.UniqueFiles
-    elif has_quant_table:
-        # if there is no AllFiles/UniqueFileSources, but we DO have a quantification
-        # table file, that should indicate a new-style dataset like Carnegie
-        # TODO check for the required header columns here too
-        return GNPSFormat.fbmn
-    elif len(list(filter(lambda x: "Peak area" in x, headers))) > 1:
-        return GNPSFormat.fbmn
-    else:
-        # if we don't match any of the above cases then it's not a recognised format
-        return GNPSFormat.Unknown
-
 
 def _messy_strain_naming_lookup(mzxml: str, strains: StrainCollection) -> Strain|None:
     """Wrapper around StrainCollection::lookup which is more permissive and handles often occuring cases of non perfect aliasing.
@@ -143,7 +80,6 @@ def _md_convert(val: Any) -> int|float|None|Any:
     return val
 
 
-@deprecated
 def _parse_mzxml_header(hdr: str, strains: StrainCollection, md_table: dict[str, dict[str, str]], ext_metadata_parsing: bool) -> tuple[str|None, str|None, bool]:
     """Return the file identifier component from the column name.
 
@@ -224,13 +160,13 @@ def _parse_mzxml_header(hdr: str, strains: StrainCollection, md_table: dict[str,
     return (strain_name, growth_medium, strain_name not in strains)
 
 
-def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, filename: str, spec_dict: dict[int, Spectrum]) -> dict[str, int]:
+def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, file: str, spec_dict: dict[int, Spectrum]) -> dict[str, int]:
     """ Load info about clusters from old style GNPS files.
 
     Args:
         gnps_format(str): Identifier for the GNPS format of the file. Has to be one of [GNPS_FORMAT_OLD_ALLFILES, GNPS_FORMAT_OLD_UNIQUEFILES]
         strains(StrainCollection): StrainCollection in which to search for the detected strains.
-        filename(str): Path to file from which to load the cluster information.
+        file(str): Path to file from which to load the cluster information.
         spec_dict(dict[int, Spectrum]): Dictionary with already loaded spectra into which the metadata read from the file will be inserted.
 
     Raises:
@@ -245,7 +181,7 @@ def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, filename:
     # both of these list the .mz(X)ML files the molecule was found in (plus the scan
     # number in the file in the AllFiles case)
     unknown_strains = {}
-    with open(filename) as f:
+    with open(file) as f:
         reader = csv.reader(f, delimiter='\t')
         headers = next(reader)
         clu_index_index = headers.index('cluster index')
@@ -309,19 +245,18 @@ def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, filename:
     return unknown_strains
 
 
-@deprecated
-def _parse_metadata_table(filename: str) -> dict[str, dict[str, str]]:
+def _parse_metadata_table(file: str) -> dict[str, dict[str, str|None]]:
     """Parses the metadata table file from GNPS.
 
     Args:
-        filename(str): Path to metadata table.
+        file(str): Path to metadata table.
 
     Returns:
         dict[str, dict[str, str]]: Parsed metadata, mapping from filenames to the metadata dictionary.
 
     """
     table = {}
-    with open(filename) as f:
+    with open(file) as f:
         reader = csv.reader(f, delimiter='\t')
         headers = next(reader)
 
@@ -330,7 +265,7 @@ def _parse_metadata_table(filename: str) -> dict[str, dict[str, str]]:
             # expecting at least 3 columns with the first being 'filename'
             logger.error(
                 'Unrecognised metadata table format in file "{}"'.format(
-                    filename))
+                    file))
             raise Exception("Expecting at least 3 columns with the first being 'filename'")
 
         # find the column numbers we're interested in (can't rely on both of these being present)
@@ -356,7 +291,7 @@ def _parse_metadata_table(filename: str) -> dict[str, dict[str, str]]:
                           (strain_col, col_names['strain'])]:
             if col == -1:
                 logger.warning('No {} column in file "{}"'.format(
-                    name, filename))
+                    name, file))
 
         for line in reader:
             # only non-BLANK entries
@@ -500,6 +435,7 @@ def _load_clusterinfo_fbmn(strains: StrainCollection, nodes_file: str, extra_nod
     return spec_info, unknown_strains
 
 
+@deprecated(version="1.3.3", reason="Use the GNPSFileMappingLoader class instead.")
 def load_gnps(strains: StrainCollection, nodes_file: str, quant_table_file: str, metadata_table_file: str,
               ext_metadata_parsing: bool, spec_dict: dict[int, Spectrum]) -> dict[str, int]:
     """Wrapper function to load information from GNPS outputs.
@@ -518,7 +454,7 @@ def load_gnps(strains: StrainCollection, nodes_file: str, quant_table_file: str,
     Returns:
         dict[str, int]: Returns a mapping from unknown strains which are found to spectra ids which occur in these unknown strains. 
         """
-    gnps_format = identify_gnps_format(nodes_file, quant_table_file
+    gnps_format = gnps_format_from_file_mapping(nodes_file, quant_table_file
                                         is not None)
     logger.debug('Nodes_file: {}, quant_table_exists?: {}'.format(
         nodes_file, quant_table_file is None))
@@ -527,7 +463,7 @@ def load_gnps(strains: StrainCollection, nodes_file: str, quant_table_file: str,
 
     # now things depend on the dataset format
     # if we don't have a quantification table, must be older-style dataset (or unknown format)
-    if gnps_format != GNPSFormat.fbmn and quant_table_file is None:
+    if gnps_format != GNPSFormat.FBMN and quant_table_file is None:
         logger.info('Found older-style GNPS dataset, no quantification table')
         unknown_strains = _load_clusterinfo_old(gnps_format, strains,
                                                 nodes_file, spec_dict)

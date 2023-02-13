@@ -4,7 +4,7 @@ import time
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics import Spectrum
+from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.scoring.metcalf_scoring import MetcalfScoring
 from nplinker.scoring.methods import ScoringMethod
 from nplinker.scoring.object_link import ObjectLink
