@@ -1,8 +1,17 @@
-from nplinker.scoring.linking.data_linking import DataLinks
-from nplinker.metabolomics.gnps.gnps_molecular_family_loader import GNPSMolecularFamilyLoader
-from .. import DATA_DIR
 import os
 import pytest
+from nplinker.metabolomics.gnps.gnps_molecular_family_loader import \
+    GNPSMolecularFamilyLoader
+from nplinker.metabolomics.metabolomics import make_families
+from nplinker.metabolomics.spectrum import Spectrum
+from nplinker.scoring.linking.data_linking import DataLinks
+from .. import DATA_DIR
+
+
+@pytest.fixture
+def spec_with_families(spec_dict) -> dict[int, Spectrum]:
+    make_families(spec_dict.values())
+    return spec_dict
 
 @pytest.fixture
 def molecular_families_gnps():

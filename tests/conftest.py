@@ -1,5 +1,5 @@
-import shutil
 from pathlib import Path
+import shutil
 import pytest
 from nplinker.metabolomics.metabolomics import load_spectra
 from nplinker.metabolomics.metabolomics import make_families
@@ -40,12 +40,6 @@ def spec_dict() -> dict[int, Spectrum]:
     mgf_file = DATA_DIR / "spectra.mgf"
     edges_file = DATA_DIR / "edges.pairsinfo"
     return load_spectra(mgf_file, edges_file)
-
-
-@pytest.fixture
-def spec_with_families(spec_dict) -> dict[int, Spectrum]:
-    make_families(spec_dict.values())
-    return spec_dict
 
 
 @pytest.fixture
