@@ -1,10 +1,16 @@
 import os
 import numpy
 import pytest
-from nplinker.metabolomics.gnps.gnps_molecular_family_loader import GNPSMolecularFamilyLoader
-
+from nplinker.metabolomics.gnps.gnps_molecular_family_loader import \
+    GNPSMolecularFamilyLoader
+from nplinker.metabolomics.metabolomics import make_families
+from nplinker.metabolomics.molecular_family import MolecularFamily
 from .. import DATA_DIR
 
+
+@pytest.fixture
+def molecular_families(spec_dict) -> list[MolecularFamily]:
+    return make_families(spec_dict.values())
 
 @pytest.mark.parametrize("filename", [
     os.path.join(DATA_DIR, "edges.pairsinfo"),
