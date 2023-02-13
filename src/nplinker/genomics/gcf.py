@@ -1,5 +1,9 @@
+from typing import TYPE_CHECKING
 from nplinker.strain_collection import StrainCollection
-from .bgc import BGC
+
+
+if TYPE_CHECKING:
+    from .bgc import BGC
 
 
 class GCF():
