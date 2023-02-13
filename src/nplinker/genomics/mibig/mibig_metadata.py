@@ -19,6 +19,9 @@ class MibigMetadata():
         self.file = file
         with open(self.file, "rb") as f:
             self.metadata = json.load(f)
+
+        self._mibig_accession: str
+        self._biosyn_class: list[str]
         self._parse_metadata()
 
     @property
