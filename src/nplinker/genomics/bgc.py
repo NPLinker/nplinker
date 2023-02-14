@@ -97,7 +97,7 @@ class BGC():
         return self.bgc_id == other.bgc_id
 
     def __hash__(self):
-        return self.bgc_id
+        return hash(self.bgc_id)
 
     def add_parent(self, gcf: GCF) -> None:
         """Add a parent GCF to the BGC.

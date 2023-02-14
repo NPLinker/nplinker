@@ -125,7 +125,7 @@ class Spectrum():
         return self.id == other.id
 
     def __hash__(self):
-        return self.id
+        return hash(self.id)
 
     def __cmp__(self, other):
         if self.parent_mz >= other.parent_mz:
