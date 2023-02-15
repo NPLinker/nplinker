@@ -1,9 +1,11 @@
 import os.path
 from nplinker.logconfig import LogConfig
+from nplinker.strains import Strain
 from nplinker.utils import list_files
+from ..abc import BGCLoaderBase
 from ..bgc import BGC
 from .mibig_metadata import MibigMetadata
-from ..abc import BGCLoaderBase
+
 
 logger = LogConfig.getLogger(__name__)
 
@@ -108,6 +110,7 @@ def parse_bgc_metadata_json(file: str) -> BGC:
     metadata = MibigMetadata(file)
     mibig_bgc = BGC(metadata.mibig_accession, metadata.biosyn_class)
     mibig_bgc.mibig_bgc_class = metadata.biosyn_class
+    mibig_bgc.strain = Strain(metadata.mibig_accession)
     return mibig_bgc
 
 

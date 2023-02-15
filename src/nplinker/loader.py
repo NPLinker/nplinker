@@ -610,8 +610,13 @@ class DatasetLoader():
         self.mibig_bgc_dict = mibig_bgc_loader.get_bgcs()
 
         # add mibig bgc strains
+        # CG TODO: update strain assignment logics,
+        #    see issue 104 https://github.com/NPLinker/nplinker/issues/104
         for bgc in self.mibig_bgc_dict.values():
-            self.strains.add(bgc.strain)
+            if bgc.strain is not None:
+                self.strains.add(bgc.strain)
+            else:
+                logger.warning("No strain specified for BGC %s", bgc.bgc_id)
 
         logger.debug('mibig_bgc_dict has {} entries'.format(
             len(self.mibig_bgc_dict)))
