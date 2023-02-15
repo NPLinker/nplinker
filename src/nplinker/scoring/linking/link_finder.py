@@ -8,14 +8,15 @@ from nplinker.scoring.linking.data_linking import SCORING_METHODS
 from .data_linking_functions import pair_prob_approx
 from .data_linking_functions import pair_prob_hg
 
+
 # CG: TODO get_links function does not work any more, need to update its logics
 
 
 # import packages for plotting
 # TODO move plotting to separate module?
 try:
-    import seaborn as sns
     from matplotlib import pyplot as plt
+    import seaborn as sns
 except ImportError:
     print(
         'Warning: plotting functionality will not be available (missing matplotlib and/or seaborn)'
@@ -442,8 +443,8 @@ class LinkFinder():
             link_levels = [0, 1]
 
             # Get necessary ids
-            # CG: TODO update the logics here
-            #   integer gcf.id has been removed, use string gcf.gcf_id instead.
+            # CG: TODO update the logics here:
+            #   don't use integer gcf.id, use string gcf.gcf_id instead.
             input_ids = np.array([gcf.id for gcf in input_object],
                                  dtype=np.int32)
 

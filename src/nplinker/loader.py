@@ -20,14 +20,15 @@ from nplinker.class_info.chem_classes import ChemClassPredictions
 from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
 from nplinker.genomics import load_gcfs
-from nplinker.genomics.mibig import MibigBGCLoader
+from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
+from nplinker.genomics.mibig import MibigBGCLoader
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.metabolomics import load_dataset
 from nplinker.pairedomics.downloader import Downloader
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.strain_collection import StrainCollection
-from nplinker.genomics.antismash import AntismashBGCLoader
+
 
 try:
     from importlib.resources import files
@@ -181,12 +182,12 @@ class DatasetLoader():
         self.datadir = files('nplinker').joinpath('data')
         self.dataset_id = os.path.split(
             self._root)[-1] if not self._remote_loading else self._platform_id
-        
+
         if self._remote_loading:
             self._downloader = Downloader(self._platform_id)
         else:
             self._downloader = None
-        
+
         self.bgcs, self.gcfs, self.spectra, self.molfams = [], [], [], []
         self.mibig_bgc_dict = {}
         self.product_types = []
@@ -279,7 +280,7 @@ class DatasetLoader():
         # 11. GEN: <root>/mibig_json / mibig_json_dir=<override>
         self.mibig_json_dir = self._overrides.get(
             self.OR_MIBIG_JSON) or os.path.join(self._root, 'mibig_json')
-    
+
     def _init_paths(self):
         # 1. strain mapping are used for everything else so
         self.strain_mappings_file = self._overrides.get(
@@ -331,7 +332,7 @@ class DatasetLoader():
                 logger.warning(
                     'Optional file/directory "{}" does not exist or is not readable!'
                     .format(f))
-    
+
     def validate(self):
         # check antismash format is recognised
         if self._antismash_format not in self.ANTISMASH_FMTS:
@@ -639,6 +640,12 @@ class DatasetLoader():
             antismash_bgc_loader.get_bgcs(),
             antismash_bgc_loader.get_files(),
             self._bigscape_cutoff)
+
+        # CG TODO: remove the gcf.id, see issue 103
+        #    https://github.com/NPLinker/nplinker/issues/103
+        # This is only place to set gcf.id value.
+        for i, gcf in enumerate(self.gcfs):
+            gcf.id = i
 
         #----------------------------------------------------------------------
         # CG: write unknown strains in genomics to file
