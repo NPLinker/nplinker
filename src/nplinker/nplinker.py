@@ -508,24 +508,15 @@ class NPLinker():
 
     def lookup_bgc(self, bgc_id):
         """If BGC ``bgc_id`` exists, return it. Otherwise return None"""
-        if bgc_id not in self._bgc_lookup:
-            return None
-
-        return self._bgcs[self._bgc_lookup[bgc_id]]
+        return self._bgcs[self._bgc_lookup[bgc_id]] if self.has_bgc(bgc_id) else None
 
     def lookup_gcf(self, gcf_id):
         """If GCF ``gcf_id`` exists, return it. Otherwise return None"""
-        if gcf_id not in self._gcf_lookup:
-            return None
-
-        return self._gcfs[self._gcf_lookup[gcf_id]]
+        return self._gcfs[self._gcf_lookup[gcf_id]] if gcf_id in self._gcf_lookup else None
 
     def lookup_spectrum(self, name):
         """If Spectrum ``name`` exists, return it. Otherwise return None"""
-        if name not in self._spec_lookup:
-            return None
-
-        return self._spectra[self._spec_lookup[name]]
+        return self._spectra[self._spec_lookup[name]] if name in self._spec_lookup else None
 
     @property
     def strains(self):

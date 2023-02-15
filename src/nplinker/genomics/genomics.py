@@ -22,6 +22,9 @@ from nplinker.logconfig import LogConfig
 from nplinker.strain_collection import StrainCollection
 from .bgc import BGC
 from .gcf import GCF
+from os import PathLike
+import os
+from pathlib import Path
 
 
 logger = LogConfig.getLogger(__name__)
