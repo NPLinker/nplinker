@@ -139,7 +139,7 @@ class DataLinks():
         for item in molfams:
             for spectrum_id in item.spectra_ids:
                 inverted_mappings[spectrum_id] = item.family_id
-        
+
         for i, key in enumerate(inverted_mappings):
             mapping_spec[i, 1] = key
             mapping_spec[i, 2] = inverted_mappings[key]
@@ -341,7 +341,7 @@ class DataLinks():
             objects_b = [objects_b]
 
         # retrieve object IDs
-        ids_b = [gcf.id for gcf in objects_b]
+        ids_b = [gcf.gcf_id for gcf in objects_b]
         # these might be MolFams or Spectra, either way they'll have a .id attribute
         ids_a = [obj.id for obj in objects_a]
 
@@ -407,5 +407,3 @@ class DataLinks():
 
     # class data_links OUTPUT functions
     # TODO add output functions (e.g. to search for mappings of individual specs, gcfs etc.)
-
-

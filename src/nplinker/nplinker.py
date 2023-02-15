@@ -294,7 +294,7 @@ class NPLinker():
         logger.debug('Generating lookup tables: genomics')
         self._bgc_lookup = {}
         for i, bgc in enumerate(self._bgcs):
-            self._bgc_lookup[bgc.name] = i
+            self._bgc_lookup[bgc.bgc_id] = i
 
         self._gcf_lookup = {}
         for i, gcf in enumerate(self._gcfs):
@@ -502,30 +502,21 @@ class NPLinker():
 
         return common_strains
 
-    def has_bgc(self, name):
-        """Returns True if BGC ``name`` exists in the dataset"""
-        return name in self._bgc_lookup
+    def has_bgc(self, bgc_id):
+        """Returns True if BGC ``bgc_id`` exists in the dataset"""
+        return bgc_id in self._bgc_lookup
 
-    def lookup_bgc(self, name):
-        """If BGC ``name`` exists, return it. Otherwise return None"""
-        if name not in self._bgc_lookup:
-            return None
-
-        return self._bgcs[self._bgc_lookup[name]]
+    def lookup_bgc(self, bgc_id):
+        """If BGC ``bgc_id`` exists, return it. Otherwise return None"""
+        return self._bgcs[self._bgc_lookup[bgc_id]] if self.has_bgc(bgc_id) else None
 
     def lookup_gcf(self, gcf_id):
         """If GCF ``gcf_id`` exists, return it. Otherwise return None"""
-        if gcf_id not in self._gcf_lookup:
-            return None
-
-        return self._gcfs[self._gcf_lookup[gcf_id]]
+        return self._gcfs[self._gcf_lookup[gcf_id]] if gcf_id in self._gcf_lookup else None
 
     def lookup_spectrum(self, name):
         """If Spectrum ``name`` exists, return it. Otherwise return None"""
-        if name not in self._spec_lookup:
-            return None
-
-        return self._spectra[self._spec_lookup[name]]
+        return self._spectra[self._spec_lookup[name]] if name in self._spec_lookup else None
 
     @property
     def strains(self):

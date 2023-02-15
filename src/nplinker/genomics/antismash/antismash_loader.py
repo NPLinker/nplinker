@@ -1,12 +1,14 @@
+from __future__ import annotations
 import fnmatch
 import os
 from Bio import SeqIO
+from Bio import SeqRecord
 from nplinker.genomics import BGC
 from nplinker.logconfig import LogConfig
 from nplinker.utils import list_dirs
 from nplinker.utils import list_files
 from ..abc import BGCLoaderBase
-from nplinker.strains import Strain
+
 
 logger = LogConfig.getLogger(__name__)
 
@@ -91,9 +93,8 @@ class AntismashBGCLoader:
             dict[str, BGC]: key is BGC name and value is :class:`~nplinker.genomic.BGC` objects
         """
         bgcs = {}
-        for index, bgc_id in enumerate(bgc_files.keys()):
+        for bgc_id in bgc_files:
             bgc = parse_bgc_genbank(bgc_files[bgc_id])
-            bgc.id = index
             bgcs[bgc_id] = bgc
         return bgcs
 
@@ -102,8 +103,6 @@ def parse_bgc_genbank(file: str) -> BGC:
     """Parse a single BGC gbk file to BGC object.
 
     Note:
-        Since there is only one BGC gbk file, the index of BGC object
-        (bgc.id) is set to `-1`.
         If product info is not available in gbk file, the product of BGC
             object (bgc.product_prediction) is set to empty list.
 
@@ -121,33 +120,39 @@ def parse_bgc_genbank(file: str) -> BGC:
 
     record = SeqIO.read(file, format="genbank")
     description = record.description  # "DEFINITION" in gbk file
-    antismash_accession = record.name  # "ACCESSION" in gbk file
     antismash_id = record.id  # "VERSION" in gbk file
-
-    product_prediction = None
-    for feature in record.features:
-        if feature.type == "region":  # "region" in gbk file
-            product_prediction = feature.qualifiers['product']
-            break
-
-    strain = Strain(fname)
+    features = _parse_antismash_genbank(record)
+    product_prediction = features.get("product")
     if product_prediction is None:
-        bgc = BGC(-1,
-                  strain=strain,
-                  name=fname,
-                  product_prediction=[],
-                  description=description)
-    else:
-        bgc = BGC(-1,
-                  strain=strain,
-                  name=fname,
-                  product_prediction=product_prediction,
-                  description=description)
+        raise ValueError(
+            "Not found product prediction in antiSMASH Genbank file {}".format(
+                file))
 
-    bgc.antismash_accession = antismash_accession
+    # init BGC
+    bgc = BGC(bgc_id=fname, product_prediction=product_prediction)
+    bgc.description = description
     bgc.antismash_id = antismash_id
-
+    bgc.antismash_file = file
+    bgc.antismash_region = features.get("region_number")
+    bgc.smiles = features.get("smiles")
     return bgc
+
+
+def _parse_antismash_genbank(record: SeqRecord.SeqRecord) -> dict:
+    features = {}
+    for feature in record.features:
+        if feature.type == "region":
+            # biopython assumes region numer is a list, but it's actually an int
+            features["region_number"] = feature.qualifiers.get('region_number')[0]
+            features["product"] = feature.qualifiers.get('product')
+        if feature.type == "cand_cluster":
+            smiles = feature.qualifiers.get('SMILES')
+            # space is not allowed in SMILES spec
+            # biopython generates space when reading multi-line SMILES from .gbk
+            if smiles is not None:
+                smiles = [i.replace(' ', '') for i in smiles]
+            features["smiles"] = smiles
+    return features
 
 
 # register as virtual class to prevent metaclass conflicts

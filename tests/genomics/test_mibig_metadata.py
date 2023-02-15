@@ -1,6 +1,6 @@
 import pytest
 from nplinker.genomics.mibig import MibigMetadata
-from . import DATA_DIR
+from .. import DATA_DIR
 
 
 @pytest.mark.parametrize("version", ["v1.4", "v3.1"])

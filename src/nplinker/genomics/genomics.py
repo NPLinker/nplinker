@@ -15,38 +15,35 @@ from __future__ import annotations
 import csv
 import re
 from Bio import SeqIO
-from nplinker.genomics.mibig import MibigBGC
 from nplinker.logconfig import LogConfig
 from nplinker.strain_collection import StrainCollection
 from .bgc import BGC
 from .gcf import GCF
+from os import PathLike
+import os
+from pathlib import Path
 
 logger = LogConfig.getLogger(__name__)
 
 CLUSTER_REGION_REGEX = re.compile('(.+?)\\.(cluster|region)(\\d+).gbk$')
 
 
-def parse_gbk_header(bgc):
-    """Read AntiSMASH BGC .gbk file to get BGC name and id"""
-    records = list(SeqIO.parse(bgc.antismash_file, format='gb'))
-    if len(records) > 0:
-        bgc.antismash_accession = records[0].name
-        bgc.antismash_id = records[0].id
-
-
-def load_gcfs(strains: StrainCollection,
-              product_class_cluster_file: str,
-              network_annotations_file: str,
-              mibig_bgc_dict: dict[str, MibigBGC],
+def load_gcfs(bigscape_dir: str | PathLike,
+              strains: StrainCollection,
+              mibig_bgc_dict: dict[str, BGC],
               antismash_bgc_dict: dict[str, BGC],
-              antismash_file_dict: dict[str, str]):
-    new_bgc: BGC | MibigBGC
-    num_mibig: int = 0
-    internal_bgc_id: int = 0
-    bgc_list: list[BGC | MibigBGC] = []
+              antismash_file_dict: dict[str, str],
+              bigscape_cutoff: int):
 
-    internal_gcf_id: int = 0
-    gcf_dict: dict[int, GCF] = {}
+    bigscape_dir = Path(bigscape_dir)
+    product_class_cluster_file = bigscape_dir / "mix" / f"mix_clustering_c0.{bigscape_cutoff:02d}.tsv"
+    network_annotations_file = bigscape_dir / "Network_Annotations_Full.tsv"
+
+    new_bgc: BGC
+    num_mibig: int = 0
+    bgc_list: list[BGC] = []
+
+    gcf_dict: dict[str, GCF] = {}
     gcf_list: list[GCF] = []
 
     used_strains: StrainCollection = StrainCollection()
@@ -78,11 +75,10 @@ def load_gcfs(strains: StrainCollection,
         next(reader)  # skip headers
         for line in reader:
             bgc_name = line[0]
-            family_id = int(line[1])
+            family_id = line[1]
 
             # get bgc annotations from bigscape file
             metadata_line = metadata[bgc_name]
-            description = metadata_line[2]
             bigscape_class = metadata_line[4]
 
             # check strain
@@ -100,25 +96,20 @@ def load_gcfs(strains: StrainCollection,
                 except KeyError:
                     raise KeyError(f'Unknown MiBIG: {strain.id}')
                 num_mibig += 1
-                new_bgc.description = description
             else:
                 try:
                     new_bgc = antismash_bgc_dict[bgc_name]
                 except KeyError:
                     raise KeyError(f'Unknown AntiSMASH BGC: {bgc_name}')
-                # update strain to make sure consistent strain id
-                new_bgc.strain = strain
 
-            new_bgc.id = internal_bgc_id
+            new_bgc.strain = strain
             bgc_list.append(new_bgc)
-            internal_bgc_id += 1
 
             # build new gcf
             if family_id not in gcf_dict:
-                new_gcf = GCF(internal_gcf_id, family_id, bigscape_class)
+                new_gcf = GCF(family_id, bigscape_class)
                 gcf_dict[family_id] = new_gcf
                 gcf_list.append(new_gcf)
-                internal_gcf_id += 1
 
             # link bgc to gcf
             gcf_dict[family_id].add_bgc(new_bgc)
@@ -144,7 +135,7 @@ def load_gcfs(strains: StrainCollection,
 
 
 def _filter_gcfs(
-    gcfs: list[GCF], bgcs: list[BGC | MibigBGC], strains: StrainCollection
+    gcfs: list[GCF], bgcs: list[BGC], strains: StrainCollection
 ) -> tuple[list[GCF], list[BGC], StrainCollection]:
     """Remove a GCF from given GCF list if it only has MIBiG BGC members,
         correspondingly remove relevant BGC and strain from given list/collection.
@@ -165,7 +156,8 @@ def _filter_gcfs(
     bgcs_to_remove = set()
 
     for gcf in gcfs:
-        if gcf.num_non_mibig_bgcs == 0:
+        num_non_mibig_bgcs = len(list(filter(lambda bgc: not bgc.is_mibig(), gcf.bgcs)))
+        if num_non_mibig_bgcs == 0:
             gcfs_to_remove.add(gcf)
             for bgc in gcf.bgcs:
                 bgcs_to_remove.add(bgc)
@@ -180,12 +172,6 @@ def _filter_gcfs(
     for bgc in bgcs_to_remove:
         bgcs.remove(bgc)
         strains.remove(bgc.strain)
-
-    # keep internal IDs consecutive
-    for index, bgc in enumerate(bgcs):
-        bgc.id = index
-    for index, gcf in enumerate(gcfs):
-        gcf.id = index
 
     logger.info(
         'Remove GCFs that has only MIBiG BGCs: removing {} GCFs and {} BGCs'.

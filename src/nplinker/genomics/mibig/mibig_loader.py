@@ -1,8 +1,7 @@
 import os.path
 from nplinker.logconfig import LogConfig
 from nplinker.utils import list_files
-from nplinker.strains import Strain
-from .mibig_bgc import MibigBGC
+from ..bgc import BGC
 from .mibig_metadata import MibigMetadata
 from ..abc import BGCLoaderBase
 
@@ -74,7 +73,7 @@ class MibigBGCLoader:
             metadata_dict[name] = metadata
         return metadata_dict
 
-    def get_bgcs(self) -> dict[str, MibigBGC]:
+    def get_bgcs(self) -> dict[str, BGC]:
         """Get MibigBGC objects.
 
         Returns:
@@ -83,7 +82,7 @@ class MibigBGCLoader:
         """
         return self._bgc_dict
 
-    def _parse_bgcs(self) -> dict[str, MibigBGC]:
+    def _parse_bgcs(self) -> dict[str, BGC]:
         """Parse all metadata files as MibigBGC objects
 
         Returns:
@@ -91,20 +90,14 @@ class MibigBGCLoader:
                 MibigBGC object
         """
         bgc_dict = {}
-        i = 0
         for name, file in self._file_dict.items():
             bgc = parse_bgc_metadata_json(file)
-            bgc.id = i
             bgc_dict[name] = bgc
-            i += 1
         return bgc_dict
 
 
-def parse_bgc_metadata_json(file: str) -> MibigBGC:
+def parse_bgc_metadata_json(file: str) -> BGC:
     """Parse MIBiG metadata file and return MibigBGC object
-
-    Note:
-        Index of MibigBGC object (`MibigBGC.id`) is set to `-1`.
 
     Args:
         file(str): Path to the MIBiG metadata json file
@@ -113,9 +106,8 @@ def parse_bgc_metadata_json(file: str) -> MibigBGC:
         MibigBGC: :class:`nplinker.genomics.mibig.MibigBGC` object
     """
     metadata = MibigMetadata(file)
-    strain = Strain(metadata.mibig_accession)
-    mibig_bgc = MibigBGC(-1, strain, metadata.mibig_accession,
-                            metadata.biosyn_class)
+    mibig_bgc = BGC(metadata.mibig_accession, metadata.biosyn_class)
+    mibig_bgc.mibig_bgc_class = metadata.biosyn_class
     return mibig_bgc
 
 

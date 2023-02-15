@@ -10,6 +10,7 @@ sphinx
 sphinx_rtd_theme
 sphinx-autoapi
 types-toml
+types-Deprecated
 myst_parser
 wheel
 yapf
