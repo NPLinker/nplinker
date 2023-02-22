@@ -13,6 +13,9 @@
 # limitations under the License.
 from __future__ import annotations
 import csv
+import os
+from os import PathLike
+from pathlib import Path
 import re
 from Bio import SeqIO
 from nplinker.logconfig import LogConfig
@@ -22,6 +25,7 @@ from .gcf import GCF
 from os import PathLike
 import os
 from pathlib import Path
+
 
 logger = LogConfig.getLogger(__name__)
 
@@ -107,7 +111,7 @@ def load_gcfs(bigscape_dir: str | PathLike,
 
             # build new gcf
             if family_id not in gcf_dict:
-                new_gcf = GCF(family_id, bigscape_class)
+                new_gcf = GCF(family_id)
                 gcf_dict[family_id] = new_gcf
                 gcf_list.append(new_gcf)
 
