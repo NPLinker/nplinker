@@ -16,7 +16,7 @@ import csv
 import os
 
 from nplinker.scoring.rosetta.rosetta_hit import RosettaHit
-from ...genomics.mibig import MibigBGC
+from ...genomics import BGC
 from ...logconfig import LogConfig
 from ...parsers.kcb import KCBJSONParser
 from ...parsers.kcb import KCBTextParser
@@ -172,7 +172,7 @@ class Rosetta():
         skipped, errors = 0, 0
 
         for bgc in bgcs:
-            if bgc.antismash_file is None or isinstance(bgc, MibigBGC):
+            if bgc.antismash_file is None or isinstance(bgc, BGC):
                 skipped += 1
                 continue
 
@@ -235,15 +235,15 @@ class Rosetta():
 
                     if pbgc.antismash_id in json_hits:
                         # simplest case where there's a direct match on region number
-                        if pbgc.region in json_hits[pbgc.antismash_id]:
+                        if pbgc.antismash_region in json_hits[pbgc.antismash_id]:
                             logger.debug(
                                 'Matched {} using {} + region{:03d}!'.format(
                                     pbgc.antismash_file, pbgc.antismash_id,
-                                    pbgc.region))
+                                    pbgc.antismash_region))
                             if pbgc not in matched_bgcs:
                                 matched_bgcs[pbgc] = {}
 
-                            hit = json_hits[pbgc.antismash_id][pbgc.region]
+                            hit = json_hits[pbgc.antismash_id][pbgc.antismash_region]
                             matched_bgcs[pbgc][hit['mibig_id']] = hit
                             continue
                         else:
@@ -254,12 +254,12 @@ class Rosetta():
                             for region in json_hits[pbgc.antismash_id]:
                                 if pbgc.antismash_file.endswith(
                                         'region{:03d}.gbk'.format(
-                                            pbgc.region)):
+                                            pbgc.antismash_region)):
                                     logger.debug(
                                         'Matched {} using fallback {} + region{:03d} (orig={})'
                                         .format(pbgc.antismash_file,
                                                 pbgc.antismash_id, region,
-                                                pbgc.region))
+                                                pbgc.antismash_region))
                                     if pbgc not in matched_bgcs:
                                         matched_bgcs[pbgc] = {}
 
@@ -270,7 +270,7 @@ class Rosetta():
                         # this could simply mean no significant hits found
                         logger.info(
                             'Found no matching hits for BGC ID={}, region={}, file={}'
-                            .format(pbgc.antismash_id, pbgc.region,
+                            .format(pbgc.antismash_id, pbgc.antismash_region,
                                     pbgc.antismash_file))
 
             else:
@@ -536,12 +536,12 @@ class Rosetta():
 
             csvwriter.writerow([
                 'nplinker spectrum ID', 'spectrum ID', 'GNPS ID',
-                'spectral score', 'nplinker BGC ID', 'BGC ID', 'MiBIG BGC ID',
+                'spectral score', 'BGC ID', 'MiBIG BGC ID',
                 'BGC score'
             ])
             for hit in self._rosetta_hits:
                 csvwriter.writerow([
                     hit.spec.id, hit.spec.spectrum_id, hit.gnps_id,
-                    hit.spec_match_score, hit.bgc.id, hit.bgc.name,
+                    hit.spec_match_score, hit.bgc.bgc_id,
                     hit.mibig_id, hit.bgc_match_score
                 ])

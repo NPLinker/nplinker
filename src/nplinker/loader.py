@@ -426,8 +426,6 @@ class DatasetLoader():
             len(self.spectra), len(spectra_to_retain)))
 
         self.bgcs = list(bgcs_to_retain)
-        for i, bgc in enumerate(self.bgcs):
-            bgc.id = i
 
         self.spectra = list(spectra_to_retain)
         # also need to filter the set of strains attached to each spectrum
@@ -441,9 +439,8 @@ class DatasetLoader():
             len(self.gcfs), len(gcfs)))
         self.gcfs = list(gcfs)
         # filter each GCF's strain list
-        for i, gcf in enumerate(self.gcfs):
+        for gcf in self.gcfs:
             gcf.strains.filter(self.include_only_strains)
-            gcf.id = i
 
         molfams = {spec.family for spec in self.spectra}
         logger.info('Current / filtered MolFam counts: {} / {}'.format(
@@ -620,19 +617,6 @@ class DatasetLoader():
             len(self.mibig_bgc_dict)))
 
         #----------------------------------------------------------------------
-        # CG: Get BigScape files
-        #----------------------------------------------------------------------
-        # CG: bigscape data used in NPLinker
-        # Take chemical class PKSI as example:
-        #   Network_Annotations_PKSI.tsv
-        #   PKSI_c0.30.network.tsv
-        #   PKSI_clustering_c0.30.tsv
-        folder_path = os.path.join(self.bigscape_dir, "mix")
-        clustering_filename = 'mix_clustering_c0.{:02d}.tsv'.format(self._bigscape_cutoff)
-        clustering_fpath = os.path.join(folder_path, clustering_filename)
-        annotation_fpath = os.path.join(self.bigscape_dir, "Network_Annotations_Full.tsv")
-
-        #----------------------------------------------------------------------
         # CG: Parse AntiSMASH dir
         #----------------------------------------------------------------------
         logger.debug('Parsing AntiSMASH directory...')
@@ -644,12 +628,12 @@ class DatasetLoader():
         logger.debug('Loading GCFs...')
 
         self.gcfs, self.bgcs, self.strains, unknown_strains = load_gcfs(
+            self.bigscape_dir,
             self.strains,
-            clustering_fpath,
-            annotation_fpath,
             self.mibig_bgc_dict,
             antismash_bgc_loader.get_bgcs(),
-            antismash_bgc_loader.get_files())
+            antismash_bgc_loader.get_files(),
+            self._bigscape_cutoff)
 
         #----------------------------------------------------------------------
         # CG: write unknown strains in genomics to file

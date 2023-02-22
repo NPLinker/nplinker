@@ -484,7 +484,7 @@ class NPLinker_classes(NPLinker):
         # gather correct classes based on input, dict for bgcs and list for spec
         if is_bgc:
             # get parent gcf for bgc
-            bgc_like_gcf = [gcf for gcf in self.gcfs if bgc_like.id in [b.id for b in gcf.bgcs]][0]
+            bgc_like_gcf = [gcf for gcf in self.gcfs if bgc_like.bgc_id in [b.bgc_id for b in gcf.bgcs]][0]
             # gather AS classes and convert to names in scoring dict
             as_classes = self.class_links.convert_as_classes(bgc_like.product_prediction.split("."))
             bgc_like_classes_dict = {"bigscape_class": bgc_like_gcf.bigscape_class,  # str - always one bigscape class right?
@@ -582,7 +582,7 @@ class NPLinker_classes(NPLinker):
         # gather correct classes based on input, dict for bgcs and list for spec
         if is_bgc:
             # get parent gcf for bgc
-            bgc_like_gcf = [gcf for gcf in self.gcfs if bgc_like.id in [b.id for b in gcf.bgcs]][0]
+            bgc_like_gcf = [gcf for gcf in self.gcfs if bgc_like.bgc_id in [b.bgc_id for b in gcf.bgcs]][0]
             # gather AS classes and convert to names in scoring dict
             as_classes = self.class_links.convert_as_classes(bgc_like.product_prediction.split("."))
             bgc_like_classes_dict = {"bigscape_class": bgc_like_gcf.bigscape_class,  # str - always one bigscape class right?

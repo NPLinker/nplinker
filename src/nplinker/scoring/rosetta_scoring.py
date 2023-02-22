@@ -137,7 +137,7 @@ class RosettaScoring(ScoringMethod):
     def _collect_results_bgc(self, objects, ro_hits, results):
         for bgc in objects:
             for hit in ro_hits:
-                if bgc.id == hit.bgc.id:
+                if bgc.bgc_id == hit.bgc.bgc_id:
                     if not self.bgc_to_gcf:
                             # can use the BGC directly
                         results = self._insert_result_gen(

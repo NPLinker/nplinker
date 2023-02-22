@@ -80,7 +80,7 @@ class NPLinkerIOKR():
         if isinstance(gcf_like, GCF):
             gcf = gcf_like
         else:
-            gcf = GCF(-1, -1, -1)
+            gcf = GCF("-1", "-1")
             gcf.bgcs = [gcf_like]
 
         potential_scores = []
