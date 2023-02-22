@@ -210,3 +210,9 @@ class StrainCollection():
 
         return f'StrainCollection(n={len(self)}) [' + ','.join(
             s.id for s in self._strains) + ']'
+    
+    def __eq__(self, other):
+        result = self._strains == other._strains
+        result &= self._lookup == other._lookup
+        result &= self._lookup_indices == other._lookup_indices
+        return result
