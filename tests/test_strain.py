@@ -2,12 +2,6 @@ import pytest
 from nplinker.strains import Strain
 
 
-@pytest.fixture
-def strain() -> Strain:
-    item = Strain("peter")
-    item.aliases = set(["dieter"])
-    return item
-
 def test_default():
     sut = Strain("peter")
     assert sut.id == "peter"

@@ -7,10 +7,8 @@ from nplinker.metabolomics.load_gnps import _load_clusterinfo_old
 from nplinker.metabolomics.load_gnps import load_gnps
 from nplinker.strain_collection import StrainCollection
 from nplinker.utils import get_headers
-from .test_metabolomics import spec_dict
-from .test_strain_collection import collection_from_file
 
-from . import DATA_DIR
+from .. import DATA_DIR
 
 
 nodes_file = DATA_DIR / "nodes.tsv"
