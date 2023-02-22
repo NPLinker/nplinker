@@ -1,6 +1,7 @@
 from os import PathLike
 import os
 from pathlib import Path
+import shutil
 import zipfile
 
 from nplinker import utils
@@ -88,5 +89,5 @@ class GNPSExtractor:
             self._extract_path,
             "annotations.tsv"
         )
-        if self._is_fbmn:
-            os.rmdir(self._extract_path / prefix)
+        
+        shutil.rmtree(self._extract_path / prefix)        
