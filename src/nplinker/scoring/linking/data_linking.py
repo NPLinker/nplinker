@@ -341,7 +341,7 @@ class DataLinks():
             objects_b = [objects_b]
 
         # retrieve object IDs
-        ids_b = [gcf.id for gcf in objects_b]
+        ids_b = [gcf.gcf_id for gcf in objects_b]
         # these might be MolFams or Spectra, either way they'll have a .id attribute
         ids_a = [obj.id for obj in objects_a]
 

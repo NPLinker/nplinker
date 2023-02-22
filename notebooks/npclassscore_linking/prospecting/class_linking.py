@@ -2,15 +2,19 @@
 '''
 Initial code for NPClassScore
 '''
-import sys
-import os
 import glob
+import os
+import sys
+from collections import Counter
+from collections import defaultdict
 import pandas as pd
-from collections import defaultdict, Counter
+
 
 sys.path.append('../../src')
-from nplinker.nplinker import BGC, GCF, Spectrum
+from nplinker.nplinker import BGC
+from nplinker.nplinker import GCF
 from nplinker.nplinker import NPLinker
+from nplinker.nplinker import Spectrum
 
 
 class Class_links:
@@ -482,17 +486,8 @@ class NPLinker_classes(NPLinker):
             is_bgc = True
 
         # gather correct classes based on input, dict for bgcs and list for spec
-        if is_bgc:
-            # get parent gcf for bgc
-            bgc_like_gcf = [gcf for gcf in self.gcfs if bgc_like.bgc_id in [b.bgc_id for b in gcf.bgcs]][0]
-            # gather AS classes and convert to names in scoring dict
-            as_classes = self.class_links.convert_as_classes(bgc_like.product_prediction.split("."))
-            bgc_like_classes_dict = {"bigscape_class": bgc_like_gcf.bigscape_class,  # str - always one bigscape class right?
-                                     "as_classes": as_classes}  # list(str)
-        else:
-            as_classes = self.class_links.convert_as_classes(self.class_links.get_gcf_as_classes(bgc_like, 0.5))
-            bgc_like_classes_dict = {"bigscape_class": bgc_like.bigscape_class,  # str - always one bigscape class right?
-                                     "as_classes": as_classes}  # list(str)
+        bgc_like_classes_dict = self._get_bgc_like_classes(bgc_like, is_bgc)
+
         if is_spectrum:
             # list of list of tuples/None - todo: add to spectrum object
             spec_like_classes = self.canopus.spectra_classes.get(str(spec_like.spectrum_id))
@@ -580,17 +575,7 @@ class NPLinker_classes(NPLinker):
             "in the options check if the class predictions (canopus, etc.) are loaded correctly")
 
         # gather correct classes based on input, dict for bgcs and list for spec
-        if is_bgc:
-            # get parent gcf for bgc
-            bgc_like_gcf = [gcf for gcf in self.gcfs if bgc_like.bgc_id in [b.bgc_id for b in gcf.bgcs]][0]
-            # gather AS classes and convert to names in scoring dict
-            as_classes = self.class_links.convert_as_classes(bgc_like.product_prediction.split("."))
-            bgc_like_classes_dict = {"bigscape_class": bgc_like_gcf.bigscape_class,  # str - always one bigscape class right?
-                                     "as_classes": as_classes}  # list(str)
-        else:
-            as_classes = self.class_links.convert_as_classes(self.class_links.get_gcf_as_classes(bgc_like, 0.5))
-            bgc_like_classes_dict = {"bigscape_class": bgc_like.bigscape_class,  # str - always one bigscape class right?
-                                     "as_classes": as_classes}  # list(str)
+        bgc_like_classes_dict = self._get_bgc_like_classes(bgc_like, is_bgc)
 
         # gather classes for spectra, choose right method
         # choose the main method here by including it as 'main' in the method parameter
@@ -673,3 +658,23 @@ class NPLinker_classes(NPLinker):
     @property
     def class_predict_options(self):
         return self._class_predict_options
+
+
+    def _get_bgc_like_classes(self, bgc_like, is_bgc):
+        # gather correct classes based on input, dict for bgcs and list for spec
+        if is_bgc:
+            # get parent gcf for bgc
+            bgc_like_gcf = self._get_bgc_like_gcf(bgc_like)
+            # gather AS classes and convert to names in scoring dict
+            as_classes = self.class_links.convert_as_classes(bgc_like.product_prediction.split("."))
+            bgc_like_classes_dict = {"bigscape_class": bgc_like_gcf.bigscape_class,  # str - always one bigscape class right?
+                                     "as_classes": as_classes}  # list(str)
+        else:
+            as_classes = self.class_links.convert_as_classes(self.class_links.get_gcf_as_classes(bgc_like, 0.5))
+            bgc_like_classes_dict = {"bigscape_class": bgc_like.bigscape_class,  # str - always one bigscape class right?
+                                     "as_classes": as_classes}  # list(str)
+
+        return bgc_like_classes_dict
+
+    def _get_bgc_like_gcf(self, bgc_like):
+        return [gcf for gcf in self.gcfs if bgc_like.bgc_id in [b.bgc_id for b in gcf.bgcs]][0]

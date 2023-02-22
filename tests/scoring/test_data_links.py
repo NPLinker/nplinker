@@ -1,7 +1,23 @@
+import os
+import pytest
+from nplinker.metabolomics.gnps.gnps_molecular_family_loader import \
+    GNPSMolecularFamilyLoader
+from nplinker.metabolomics.metabolomics import make_families
+from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.scoring.linking.data_linking import DataLinks
-from .test_metabolomics import spec_dict, spec_with_families
-from .test_gnps_molecular_family_loader import molecular_families_gnps
+from .. import DATA_DIR
 
+
+@pytest.fixture
+def spec_with_families(spec_dict) -> dict[int, Spectrum]:
+    make_families(spec_dict.values())
+    return spec_dict
+
+@pytest.fixture
+def molecular_families_gnps():
+    filename = os.path.join(DATA_DIR, "edges.pairsinfo")
+    sut = GNPSMolecularFamilyLoader(filename)
+    return sut.families()
 
 def test_collect_mappings_from_spectra(spec_with_families):
     sut = DataLinks()

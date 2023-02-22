@@ -1,19 +1,16 @@
 import os
 import numpy
-
 import pytest
-from nplinker.metabolomics.gnps.gnps_molecular_family_loader import GNPSMolecularFamilyLoader
+from nplinker.metabolomics.gnps.gnps_molecular_family_loader import \
+    GNPSMolecularFamilyLoader
+from nplinker.metabolomics.metabolomics import make_families
 from nplinker.metabolomics.molecular_family import MolecularFamily
+from .. import DATA_DIR
 
-from .test_metabolomics import molecular_families, spec_dict
-from . import DATA_DIR
 
 @pytest.fixture
-def molecular_families_gnps():
-    filename = os.path.join(DATA_DIR, "edges.pairsinfo")
-    sut = GNPSMolecularFamilyLoader(filename)
-    return sut.families()
-
+def molecular_families(spec_dict) -> list[MolecularFamily]:
+    return make_families(spec_dict.values())
 
 @pytest.mark.parametrize("filename", [
     os.path.join(DATA_DIR, "edges.pairsinfo"),
@@ -36,7 +33,7 @@ def test_families_are_identical(spec_dict, molecular_families):
         x.id = i
         for spec_id in x.spectra_ids:
             x.add_spectrum(spec_dict[spec_id])
-            
+
 
     for x in molecular_families:
         for spec in x.spectra:

@@ -6,14 +6,14 @@ from typing_extensions import Self
 
 import pytest
 from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
-from . import DATA_DIR
+from .. import DATA_DIR
 
 
 class GNPSDownloaderBuilder:
     def __init__(self):
         self._task_id = None
         self._download_root = gettempdir()
-    
+
     def with_task_id(self, task_id: str) -> Self:
         self._task_id = task_id
         return self
@@ -21,10 +21,10 @@ class GNPSDownloaderBuilder:
     def with_download_root(self, download_root: Path) -> Self:
         self._download_root = download_root
         return self
-    
+
     def build(self) -> GNPSDownloader:
         return GNPSDownloader(self._task_id, self._download_root)
-    
+
 
 
 def test_has_gnps_task_id():

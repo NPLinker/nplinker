@@ -1,6 +1,6 @@
 from nplinker.parsers.mgf import LoadMGF
 
-from . import DATA_DIR
+from .. import DATA_DIR
 
 
 def test_load_mgf():
