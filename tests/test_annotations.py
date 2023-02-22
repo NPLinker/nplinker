@@ -1,6 +1,5 @@
 from nplinker.annotations import load_annotations
 
-from .test_metabolomics import spec_dict
 from . import DATA_DIR
 
 

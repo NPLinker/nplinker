@@ -5,7 +5,7 @@ from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
 from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_file_mapping
 from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_task_id
 from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_archive
-from . import DATA_DIR
+from .. import DATA_DIR
 
 
 @pytest.mark.parametrize("filename, expected", [

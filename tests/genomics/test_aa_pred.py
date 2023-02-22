@@ -1,7 +1,7 @@
 import pytest
 from Bio import SeqIO
 from nplinker.genomics.aa_pred import AntiSmash5Record, predict_aa
-from . import DATA_DIR
+from .. import DATA_DIR
 
 
 ANTISMASH_FILE = DATA_DIR / "antismash_v5_GCF_000016425.1_NC_009380.1.region017.gbk"
