@@ -58,6 +58,16 @@ def test_has_metabolomics_paths_new_gnps(config_with_new_gnps_extractor):
     assert sut.annotations_config_file == str(config_with_new_gnps_extractor["dataset"]["root"] / "annotations.tsv")
 
 
+def test_load_metabolomics(config):
+    sut = DatasetLoader(config)
+    sut._init_paths()
+    sut._load_strain_mappings()
+    sut._load_metabolomics()
+
+    assert sut.spectra is not []
+    assert sut.molfams is not []
+
+
 def test_has_strain_mappings(config):
     sut = DatasetLoader(config)
     sut._init_paths()
