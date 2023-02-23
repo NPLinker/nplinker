@@ -1,16 +1,17 @@
 import os.path
 from nplinker.logconfig import LogConfig
 from nplinker.utils import list_files
+from ..abc import BGCLoaderBase
 from ..bgc import BGC
 from .mibig_metadata import MibigMetadata
-from ..abc import BGCLoaderBase
+
 
 logger = LogConfig.getLogger(__name__)
 
 
 class MibigBGCLoader:
     def __init__(self, data_dir: str):
-        """Parse MIBiG metadata files and return MibigBGC objects
+        """Parse MIBiG metadata files and return BGC objects
 
         MIBiG metadata file (json) contains annotations/metadata information
         for each BGC. See https://mibig.secondarymetabolites.org/download.
@@ -74,20 +75,20 @@ class MibigBGCLoader:
         return metadata_dict
 
     def get_bgcs(self) -> dict[str, BGC]:
-        """Get MibigBGC objects.
+        """Get BGC objects.
 
         Returns:
-            dict[str, MibigBGC]: key is BGC name and value is
-                :class:`nplinker.genomics.mibig.MibigBGC` object
+            dict[str, BGC]: key is BGC name and value is
+                :class:`nplinker.genomics.BGC` object
         """
         return self._bgc_dict
 
     def _parse_bgcs(self) -> dict[str, BGC]:
-        """Parse all metadata files as MibigBGC objects
+        """Parse all metadata files as BGC objects
 
         Returns:
-            dict[str, MibigBGC]: key is BGC accession (file name) and value is
-                MibigBGC object
+            dict[str, BGC]: key is BGC accession (file name) and value is
+                BGC object
         """
         bgc_dict = {}
         for name, file in self._file_dict.items():
@@ -97,13 +98,13 @@ class MibigBGCLoader:
 
 
 def parse_bgc_metadata_json(file: str) -> BGC:
-    """Parse MIBiG metadata file and return MibigBGC object
+    """Parse MIBiG metadata file and return BGC object
 
     Args:
         file(str): Path to the MIBiG metadata json file
 
     Returns:
-        MibigBGC: :class:`nplinker.genomics.mibig.MibigBGC` object
+        BGC: :class:`nplinker.genomics.BGC` object
     """
     metadata = MibigMetadata(file)
     mibig_bgc = BGC(metadata.mibig_accession, metadata.biosyn_class)
