@@ -1,6 +1,7 @@
 import pytest
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
+from tests import DATA_DIR
 
 
 @pytest.fixture
@@ -68,3 +69,10 @@ def test_remove(collection: StrainCollection, strain: Strain):
 
     # needs fixing, see #90
     assert collection.lookup_index(0) == strain
+
+
+def test_equal(collection_from_file: StrainCollection):
+    other = StrainCollection()
+    other.add_from_file(DATA_DIR / "strain_mappings.csv")
+
+    assert collection_from_file == other

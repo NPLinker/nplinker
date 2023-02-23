@@ -19,3 +19,10 @@ def test_has_alias(strain: Strain, alias: str, expected: bool):
 def test_add_alias(strain: Strain):
     strain.add_alias("test")
     assert len(strain.aliases) == 2
+
+
+def test_equal(strain: Strain):
+    other = Strain("peter")
+    other.add_alias("dieter")
+
+    assert strain == other
