@@ -40,6 +40,8 @@ class Strain():
         return f'Strain({self.id}) [{len(self.aliases)} aliases]'
     
     def __eq__(self, other):
-        result = self.id == other.id
-        result &= self.aliases == other.aliases
-        return result
+        return (
+            isinstance(other, Strain)
+            and self.id == other.id
+            and self.aliases == other.aliases
+        )
