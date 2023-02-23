@@ -5,6 +5,7 @@ from Bio import SeqIO
 from Bio import SeqRecord
 from nplinker.genomics import BGC
 from nplinker.logconfig import LogConfig
+from nplinker.strains import Strain
 from nplinker.utils import list_dirs
 from nplinker.utils import list_files
 from ..abc import BGCLoaderBase
@@ -135,6 +136,7 @@ def parse_bgc_genbank(file: str) -> BGC:
     bgc.antismash_file = file
     bgc.antismash_region = features.get("region_number")
     bgc.smiles = features.get("smiles")
+    bgc.strain = Strain(fname)
     return bgc
 
 

@@ -35,6 +35,9 @@ class GCF():
         self._bgcs: set[BGC] = set()
         self.strains: StrainCollection = StrainCollection()
         self.bigscape_class: str | None = None
+        # CG TODO: remove attribute id, see issue 103
+        #    https://github.com/NPLinker/nplinker/issues/103
+        self.id: int | None = None
 
     def __str__(self):
         return f"GCF(id={self.gcf_id}, #bgcs={len(self.bgcs)}, #strains={len(self.strains)})."

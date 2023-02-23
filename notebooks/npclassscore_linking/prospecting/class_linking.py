@@ -2,11 +2,11 @@
 '''
 Initial code for NPClassScore
 '''
-from collections import Counter
-from collections import defaultdict
 import glob
 import os
 import sys
+from collections import Counter
+from collections import defaultdict
 import pandas as pd
 
 

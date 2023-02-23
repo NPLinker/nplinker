@@ -129,7 +129,7 @@ class DataLinks():
             mapping_spec[i, 2] = spectrum.family.family_id
 
         return mapping_spec
-    
+
     def _collect_mappings_from_molecular_families(self, molfams: Sequence[MolecularFamily]) -> np.ndarray[np.float64]:
         num_spectra = sum(len(x.spectra_ids) for x in molfams)
         mapping_spec = np.zeros((num_spectra, 3))
@@ -143,7 +143,7 @@ class DataLinks():
         for i, key in enumerate(inverted_mappings):
             mapping_spec[i, 1] = key
             mapping_spec[i, 2] = inverted_mappings[key]
-        
+
         return mapping_spec
 
     def collect_mappings_gcf(self, gcf_list):
