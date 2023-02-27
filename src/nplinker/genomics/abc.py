@@ -1,6 +1,8 @@
 from abc import ABC
 from abc import abstractmethod
+from collections.abc import Sequence
 from .bgc import BGC
+from .gcf import GCF
 
 
 class BGCLoaderBase(ABC):
@@ -29,4 +31,16 @@ class BGCLoaderBase(ABC):
         Returns:
             dict[str, BGC]: key is BGC name and value is
                 :class:`~nplinker.genomic.BGC` objects
+        """
+
+
+
+class GCFLoaderBase(ABC):
+
+    @abstractmethod
+    def get_gcfs(self) -> Sequence[GCF]:
+        """Get GCF objects
+
+        Returns:
+            Sequence[GCF]: a list of :class:`~nplinker.genomic.GCF` objects
         """
