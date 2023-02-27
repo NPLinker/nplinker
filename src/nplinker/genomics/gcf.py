@@ -38,6 +38,7 @@ class GCF():
         # CG TODO: remove attribute id, see issue 103
         #    https://github.com/NPLinker/nplinker/issues/103
         self.id: int | None = None
+        self.bgc_ids: set[str] = set()
 
     def __str__(self):
         return f"GCF(id={self.gcf_id}, #bgcs={len(self.bgcs)}, #strains={len(self.strains)})."
