@@ -31,9 +31,7 @@ def config_with_new_gnps_extractor():
             }
         }
     }
-    shutil.rmtree(
-        DATA_DIR /
-        "extracted")
+    shutil.rmtree(DATA_DIR / "extracted")
 
 def test_default(config):
     sut = DatasetLoader(config)
