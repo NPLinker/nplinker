@@ -48,7 +48,7 @@ class ObjectLink():
 
     def __hash__(self):
         # return the nplinker internal ID as hash value (for set/dict etc)
-        return self.source.id
+        return hash(self.source.id)
 
     def __str__(self):
         return 'ObjectLink(source={}, target={}, #methods={})'.format(

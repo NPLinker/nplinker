@@ -3,8 +3,6 @@ from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 from tests import DATA_DIR
 
-from .test_strain import strain
-
 
 @pytest.fixture
 def collection(strain: Strain) -> StrainCollection:
@@ -12,13 +10,6 @@ def collection(strain: Strain) -> StrainCollection:
     sut.add(strain)
     return sut
 
-
-@pytest.fixture
-def collection_from_file() -> StrainCollection:
-    filename = DATA_DIR / "strain_mappings.csv"
-    sut = StrainCollection()
-    sut.add_from_file(filename)
-    return sut
 
 def test_default():
     sut = StrainCollection()
@@ -73,8 +64,15 @@ def test_remove(collection: StrainCollection, strain: Strain):
 
     with pytest.raises(KeyError):
         collection.lookup(strain.id)
-    
+
     assert strain not in collection
 
     # needs fixing, see #90
     assert collection.lookup_index(0) == strain
+
+
+def test_equal(collection_from_file: StrainCollection):
+    other = StrainCollection()
+    other.add_from_file(DATA_DIR / "strain_mappings.csv")
+
+    assert collection_from_file == other

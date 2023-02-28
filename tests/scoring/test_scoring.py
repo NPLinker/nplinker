@@ -4,7 +4,6 @@ from nplinker.genomics import BGC
 from nplinker.genomics import GCF
 from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.scoring.linking.data_linking import DataLinks
-
 from nplinker.scoring.linking.link_finder import LinkFinder
 from nplinker.scoring.linking.misc_deprecated import hg_scoring
 from nplinker.scoring.linking.misc_deprecated import metcalf_scoring
@@ -21,7 +20,7 @@ def create_strains(n=10):
 def create_gcfs(strains, n=3):
     gcfs = []
     for i in range(n):
-        gcf = GCF(f'fake_gcf_{i}', 'NRPS')
+        gcf = GCF(f'fake_gcf_{i}')
         num_strains = np.random.randint(1, len(strains))
         randoms = list(range(len(strains)))
         np.random.shuffle(randoms)

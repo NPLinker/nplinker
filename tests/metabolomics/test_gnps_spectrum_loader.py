@@ -1,7 +1,7 @@
 import pytest
 from nplinker.metabolomics.gnps.gnps_spectrum_loader import GNPSSpectrumLoader
 
-from . import DATA_DIR
+from .. import DATA_DIR
 
 @pytest.mark.parametrize("file, expected", [
     [DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra/METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra-main.mgf", 435],

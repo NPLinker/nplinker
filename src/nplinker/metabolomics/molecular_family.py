@@ -54,4 +54,4 @@ class MolecularFamily():
         return bool(self.id == other.id)
 
     def __hash__(self) -> int:
-        return self.id
+        return hash(self.id)
