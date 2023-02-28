@@ -33,7 +33,6 @@ class GCF():
         """
         self.gcf_id = gcf_id
         self._bgcs: set[BGC] = set()
-        self.strains: StrainCollection = StrainCollection()
         self.bigscape_class: str | None = None
         # CG TODO: remove attribute id, see issue 103
         #    https://github.com/NPLinker/nplinker/issues/103
@@ -61,10 +60,17 @@ class GCF():
         """Add a BGC object to the GCF."""
         self._bgcs.add(bgc)
         bgc.add_parent(self)
-        if bgc.strain is not None:
-            self.strains.add(bgc.strain)
-        else:
-            logger.warning("No strain specified for the BGC %s", bgc.bgc_id)
+
+    @property
+    def strains(self) -> StrainCollection:
+        """Get the collection of strains"""
+        sc = StrainCollection()
+        for bgc in self._bgcs:
+            if bgc.strain is not None:
+                sc.add(bgc.strain)
+            else:
+                logger.warning("No strain specified for the BGC %s", bgc.bgc_id)
+        return sc
 
     def has_strain(self, strain: str | Strain) -> bool:
         """Check if the given strain exists.
