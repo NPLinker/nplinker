@@ -59,7 +59,12 @@ class GCF():
     def add_bgc(self, bgc: BGC) -> None:
         """Add a BGC object to the GCF."""
         self._bgcs.add(bgc)
-        bgc.add_parent(self)
+        bgc.parents.add(self)
+
+    def detach_bgc(self, bgc: BGC) -> None:
+        """Remove a child BGC object."""
+        self._bgcs.remove(bgc)
+        bgc.parents.remove(self)
 
     @property
     def strains(self) -> StrainCollection:
