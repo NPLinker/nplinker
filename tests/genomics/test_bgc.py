@@ -1,4 +1,5 @@
 from nplinker.genomics import BGC
+from nplinker.genomics import GCF
 from nplinker.strains import Strain
 
 
@@ -15,3 +16,12 @@ def test_default():
     strain = Strain("sample_strain")
     bgc.strain = strain
     assert bgc.strain == strain
+
+
+def test_add_and_detach_parent():
+    bgc = BGC("BGC0000001", ["Polyketide"])
+    gcf = GCF("1")
+    bgc.add_parent(gcf)
+    assert bgc.parents == {gcf}
+    bgc.detach_parent(gcf)
+    assert bgc.parents == set()

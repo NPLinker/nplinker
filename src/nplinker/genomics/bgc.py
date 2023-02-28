@@ -105,7 +105,11 @@ class BGC():
         Args:
             gcf(GCF): gene cluster family
         """
-        self.parents.add(gcf)
+        gcf.add_bgc(self)
+
+    def detach_parent(self, gcf: GCF) -> None:
+        """Remove a parent GCF"""
+        gcf.detach_bgc(self)
 
     @property
     def strain(self) -> Strain | None:
