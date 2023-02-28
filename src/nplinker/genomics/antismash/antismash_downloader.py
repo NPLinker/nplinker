@@ -322,7 +322,7 @@ def _extract_antismash_zip(antismash_obj, project_file_cache):
 
     return True
 
-def download_antismash_data(genome_records, project_download_cache):
+def download_antismash_data(genome_records, project_download_cache, project_file_cache):
     genome_status = {}
 
     # this file records genome IDs and local filenames to avoid having to repeat HTTP requests
@@ -390,7 +390,7 @@ def download_antismash_data(genome_records, project_download_cache):
                 continue
 
             # if we got a refseq ID, now try to download the data from antismash
-            if _download_antismash_zip(genome_obj):
+            if _download_antismash_zip(genome_obj, project_download_cache):
                 logger.info(
                     'Genome data successfully downloaded for {}'.format(
                         best_id))
@@ -404,7 +404,7 @@ def download_antismash_data(genome_records, project_download_cache):
             with open(genome_status_file, 'a+', newline='\n') as f:
                 f.write(genome_obj.to_csv() + '\n')
 
-        _extract_antismash_zip(genome_obj)
+        _extract_antismash_zip(genome_obj, project_file_cache)
 
     missing = len(
         [x for x in genome_status.values() if len(x.filename) == 0])

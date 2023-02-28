@@ -156,7 +156,7 @@ class Downloader():
 
         self._download_metabolomics_zipfile(self.gnps_task_id)
 
-        download_antismash_data(self.project_json['genomes'])
+        download_antismash_data(self.project_json['genomes'], self.project_download_cache, self.project_file_cache)
 
         # CG: it extracts strain names and later will be used for strains
         self._parse_genome_labels(self.project_json['genome_metabolome_links'],
