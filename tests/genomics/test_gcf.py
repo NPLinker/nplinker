@@ -57,3 +57,15 @@ def test_has_strain(bgc_with_strain):
     gcf.add_bgc(bgc_with_strain)
     assert gcf.has_strain("strain001") is True
     assert gcf.has_strain("strain002") is False
+
+def test_has_mibig_only():
+    mibig_bgc = BGC("BGC0000001", ["NPR"])
+    nonmibig_bgc = BGC("S0001", ["NPR"])
+    gcf = GCF("1")
+    gcf.add_bgc(mibig_bgc)
+    assert gcf.has_mibig_only() is True
+    gcf.detach_bgc(mibig_bgc)
+    gcf.add_bgc(nonmibig_bgc)
+    assert gcf.has_mibig_only() is False
+    gcf.add_bgc(mibig_bgc)
+    assert gcf.has_mibig_only() is False
