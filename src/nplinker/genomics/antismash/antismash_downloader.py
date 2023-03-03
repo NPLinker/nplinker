@@ -4,6 +4,7 @@ import re
 import time
 import zipfile
 import httpx
+from deprecated import deprecated
 from bs4 import BeautifulSoup
 from progress.bar import Bar
 from nplinker.logconfig import LogConfig
@@ -11,7 +12,7 @@ from nplinker.logconfig import LogConfig
 
 logger = LogConfig.getLogger(__name__)
 
-
+# urls to be given to download antismash data
 ANTISMASH_DB_PAGE_URL = 'https://antismash-db.secondarymetabolites.org/output/{}/'
 ANTISMASH_DB_DOWNLOAD_URL = 'https://antismash-db.secondarymetabolites.org/output/{}/{}'
 
@@ -322,7 +323,87 @@ def _extract_antismash_zip(antismash_obj, project_file_cache):
 
     return True
 
-def download_antismash_data(genome_records, project_download_cache, project_file_cache):
+def download_and_extract_antismash_data(item_id, download_root, extract_path): 
+    genome_status = {}
+
+    # this file records genome IDs and local filenames to avoid having to repeat HTTP requests
+    # each time the app is loaded (this can take a lot of time if there are dozens of genomes)
+    genome_status_file = os.path.join(download_root,
+                                        'genome_status.txt')
+
+    # genome lookup status info
+    if os.path.exists(genome_status_file):
+        with open(genome_status_file) as f:
+            for line in csv.reader(f):
+                asobj = GenomeStatus.from_csv(*line)
+                genome_status[asobj.original_id] = asobj
+
+    # use this to check if the lookup has already been attempted and if
+    # so if the file is cached locally
+    if item_id not in genome_status:
+        genome_status[item_id] = GenomeStatus(item_id, None)
+
+    genome_obj = genome_status[item_id]
+
+    logger.info(
+        'Checking for antismash data for genome ID={}'.
+        format(item_id))
+    # first check if file is cached locally
+    if os.path.exists(genome_obj.filename):
+        # file already downloaded
+        logger.info('Genome ID {} already downloaded to {}'.format(
+            item_id, genome_obj.filename))
+    elif genome_obj.attempted:
+        # lookup attempted previously but failed
+        logger.info(
+            'Genome ID {} skipped due to previous failure'.format(
+                item_id))
+    else:
+        # if no existing file and no lookup attempted, can start process of
+        # trying to retrieve the data
+
+        # lookup the ID
+        logger.info('Beginning lookup process for genome ID {}'.format(
+            item_id))
+
+        genome_obj.resolved_id = item_id # TO CHECK (Cunliang) not sure if this is what we want; in a general case,
+        # I don't think we have different possible ids (as in podp json file, for genome_ID nested dicts),
+        # so maybe it makes sense to put genome_obj.resolved_id equal to the item_id and only in podp case do the check
+        # (through _resolve_genome_id_data, was done here before) outside this function.
+        # If this is true, then I think we need to modify GenomeStatus class attributes logic for original_id and resolved_id,
+        # which in this way would be the same thing. Then we should modify also the code below, which assumes original_id
+        # to be eventually different
+        genome_obj.attempted = True
+
+        if genome_obj.resolved_id is None:
+            # give up on this one
+            logger.warning(
+                f'Failed lookup for genome ID {item_id}')
+            with open(genome_status_file, 'a+') as f:
+                f.write(genome_obj.to_csv() + '\n')
+
+        # if we got a refseq ID, now try to download the data from antismash
+        if _download_antismash_zip(genome_obj, download_root):
+            logger.info(
+                'Genome data successfully downloaded for {}'.format(
+                    item_id))
+        else:
+            logger.warning(
+                'Failed to download antiSMASH data for genome ID {} ({})'
+                .format(genome_obj.resolved_id,
+                        genome_obj.original_id))
+
+        with open(genome_status_file, 'a+', newline='\n') as f:
+            f.write(genome_obj.to_csv() + '\n')
+
+    _extract_antismash_zip(genome_obj, extract_path)
+
+    with open(genome_status_file, 'w', newline='\n') as f:
+        for obj in genome_status.values():
+            f.write(obj.to_csv() + '\n')
+
+@deprecated(version="1.3.3", reason="Use download_and_extract_antismash_data class instead.")
+def download_antismash_data(genome_records, project_download_cache, project_file_cache): 
     genome_status = {}
 
     # this file records genome IDs and local filenames to avoid having to repeat HTTP requests
