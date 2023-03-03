@@ -5,6 +5,7 @@ from .strains import Strain
 from .utils import list_dirs
 from .utils import list_files
 
+
 logger = LogConfig.getLogger(__name__)
 
 
@@ -182,6 +183,7 @@ class StrainCollection():
             antismash_id = os.path.basename(d)
 
             # use antismash_id (e.g. GCF_000016425.1) as strain name to query
+            # TODO: self is empty at the moment, why lookup here?
             try:
                 strain = self.lookup(antismash_id)
             except KeyError:
@@ -210,7 +212,7 @@ class StrainCollection():
 
         return f'StrainCollection(n={len(self)}) [' + ','.join(
             s.id for s in self._strains) + ']'
-    
+
     def __eq__(self, other):
         result = self._strains == other._strains
         result &= self._lookup == other._lookup

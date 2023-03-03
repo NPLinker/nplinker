@@ -270,6 +270,8 @@ class NPLinker():
             if not self._loader.load(met_only=met_only):
                 return False
         else:
+            # CG: only reload genomics data when changing bigscape cutoff
+            # TODO: this part should be removed, reload everything if bigscape data changes.
             logger.debug(
                 f'load_data with new cutoff = {new_bigscape_cutoff}')
             # 1. change the cutoff (which by itself doesn't do anything)

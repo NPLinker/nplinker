@@ -14,6 +14,7 @@
 
 import glob
 import os
+from pathlib import Path
 import sys
 from nplinker.annotations import load_annotations
 from nplinker.class_info.chem_classes import ChemClassPredictions
@@ -21,15 +22,14 @@ from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
 from nplinker.genomics import load_gcfs
 from nplinker.genomics.antismash import AntismashBGCLoader
-from nplinker.genomics.mibig import MibigBGCLoader
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
+from nplinker.genomics.mibig import MibigBGCLoader
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.metabolomics import load_dataset
 from nplinker.pairedomics.downloader import Downloader
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.strain_collection import StrainCollection
-from nplinker.genomics.antismash import AntismashBGCLoader
-from pathlib import Path
+
 
 try:
     from importlib.resources import files
@@ -339,12 +339,15 @@ class DatasetLoader():
                     .format(f))
 
     def validate(self):
+        """Download data and build paths for local data"""
+
         # check antismash format is recognised
         if self._antismash_format not in self.ANTISMASH_FMTS:
             raise Exception('Unknown antismash format: {}'.format(
                 self._antismash_format))
 
         # if remote loading mode, need to download the data here
+        # CG: for PODP workflow, strain_mappings.csv is generated in the download step
         if self._remote_loading:
             self._start_downloads()
 
@@ -752,6 +755,7 @@ class DatasetLoader():
         self.chem_classes = chem_classes
         return True
 
+    # TODO: this function should be refactored to Loader class
     def _load_strain_mappings(self):
         # this file should be a csv file, one line per strain, containing a list
         # of possible alternative IDs (the first one being the preferred ID).
@@ -762,6 +766,9 @@ class DatasetLoader():
 
         # now load the dataset mapping in the same way
         # TODO: what happens in case of clashes (differing primary IDs?)
+        # CG: the `if` never happens for PODP pipeline; for non-PODP pipeline,
+        # self.strains is empty and will cause error.
+        # TODO: remove the `if` condition
         if not os.path.exists(self.strain_mappings_file):
             # create an empty placeholder file and show a warning
             logger.warn(
@@ -777,6 +784,10 @@ class DatasetLoader():
         return True
 
     def _init_global_strain_id_mapping(self):
+        """The global strain mapping is predefined by the NPLinker package.
+
+            See `src/nplinker/strain_id_mapping.csv`
+        """
         self.strains = StrainCollection()
         global_strain_id_file = self.datadir.joinpath('strain_id_mapping.csv')
         self.strains.add_from_file(global_strain_id_file)
