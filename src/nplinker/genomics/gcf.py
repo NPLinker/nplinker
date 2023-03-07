@@ -59,11 +59,13 @@ class GCF():
     def add_bgc(self, bgc: BGC) -> None:
         """Add a BGC object to the GCF."""
         self._bgcs.add(bgc)
+        self.bgc_ids.add(bgc.bgc_id)
         bgc.parents.add(self)
 
     def detach_bgc(self, bgc: BGC) -> None:
         """Remove a child BGC object."""
         self._bgcs.remove(bgc)
+        self.bgc_ids.remove(bgc.bgc_id)
         bgc.parents.remove(self)
 
     @property
