@@ -26,7 +26,7 @@ from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
 from nplinker.strains import Strain
 from nplinker.strain_collection import StrainCollection
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
-from nplinker.genomics.antismash import download_antismash_data
+from . import download_antismash_data
 
 
 logger = LogConfig.getLogger(__name__)
