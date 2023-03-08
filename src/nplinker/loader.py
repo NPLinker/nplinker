@@ -21,8 +21,8 @@ from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
 from nplinker.genomics import load_gcfs
 from nplinker.genomics.antismash import AntismashBGCLoader
-from nplinker.genomics.mibig import MibigBGCLoader
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
+from nplinker.genomics.mibig import MibigBGCLoader
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.metabolomics import load_dataset
 from nplinker.pairedomics.downloader import Downloader
@@ -637,6 +637,16 @@ class DatasetLoader():
         # CG: load all bgcs and gcfs
         #----------------------------------------------------------------------
         logger.debug('Loading GCFs...')
+
+        # TODO: refactor load_gcfs to independent steps
+        # Step 1: load all strains
+        # Step 2: load all bgcs
+        # Step 3: load all gcfs
+        # Step 4: connect bgc to strain with `map_strain_to_bgc`
+        # Step 5: connect gcf to bgcs with `map_bgc_to_gcf`
+        # Step 6: `filter_mibig_only_gcf`
+        # Step 7: get clean gcfs, bgcs and strains with `get_bgcs_from_gcfs`
+        #   and `get_strains_from_bgcs`
 
         self.gcfs, self.bgcs, self.strains, unknown_strains = load_gcfs(
             self.bigscape_dir,

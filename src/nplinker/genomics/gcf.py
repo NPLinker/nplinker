@@ -33,11 +33,11 @@ class GCF():
         """
         self.gcf_id = gcf_id
         self._bgcs: set[BGC] = set()
-        self.strains: StrainCollection = StrainCollection()
         self.bigscape_class: str | None = None
         # CG TODO: remove attribute id, see issue 103
         #    https://github.com/NPLinker/nplinker/issues/103
         self.id: int | None = None
+        self.bgc_ids: set[str] = set()
 
     def __str__(self):
         return f"GCF(id={self.gcf_id}, #bgcs={len(self.bgcs)}, #strains={len(self.strains)})."
@@ -59,11 +59,25 @@ class GCF():
     def add_bgc(self, bgc: BGC) -> None:
         """Add a BGC object to the GCF."""
         self._bgcs.add(bgc)
-        bgc.add_parent(self)
-        if bgc.strain is not None:
-            self.strains.add(bgc.strain)
-        else:
-            logger.warning("No strain specified for the BGC %s", bgc.bgc_id)
+        self.bgc_ids.add(bgc.bgc_id)
+        bgc.parents.add(self)
+
+    def detach_bgc(self, bgc: BGC) -> None:
+        """Remove a child BGC object."""
+        self._bgcs.remove(bgc)
+        self.bgc_ids.remove(bgc.bgc_id)
+        bgc.parents.remove(self)
+
+    @property
+    def strains(self) -> StrainCollection:
+        """Get the collection of strains"""
+        sc = StrainCollection()
+        for bgc in self._bgcs:
+            if bgc.strain is not None:
+                sc.add(bgc.strain)
+            else:
+                logger.warning("No strain specified for the BGC %s", bgc.bgc_id)
+        return sc
 
     def has_strain(self, strain: str | Strain) -> bool:
         """Check if the given strain exists.
@@ -75,3 +89,11 @@ class GCF():
             bool: True when the given strain exist.
         """
         return strain in self.strains
+
+    def has_mibig_only(self) -> bool:
+        """Check if the GCF's children are only BGC objects from MIBiG.
+
+        Returns:
+            bool: True if `GCF.bgcs` are only MIBiG BGC objects
+        """
+        return all(map(lambda bgc: bgc.is_mibig(), self.bgcs))

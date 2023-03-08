@@ -1,44 +1,100 @@
-# Copyright 2021 The NPLinker Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 from __future__ import annotations
 import csv
-import os
 from os import PathLike
 from pathlib import Path
-import re
-from Bio import SeqIO
+from deprecated import deprecated
 from nplinker.logconfig import LogConfig
 from nplinker.strain_collection import StrainCollection
 from .bgc import BGC
 from .gcf import GCF
-from os import PathLike
-import os
-from pathlib import Path
-
 
 
 logger = LogConfig.getLogger(__name__)
 
-CLUSTER_REGION_REGEX = re.compile('(.+?)\\.(cluster|region)(\\d+).gbk$')
+def map_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]):
+    """To set BGC object's strain with representative strain object.
+
+    This method changes the list `bgcs` in place.
+
+    It's assumed that BGC.bgc_id is used as strain's name or alias. Then it's
+    possible to lookup the representative strain in the StrainCollection object.
+
+    Args:
+        strains(StrainCollection): A collection of all strain objects.
+        bgcs(list[BGC]): A list of BGC objects.
+
+    Raises:
+        KeyError: Strain id not found in the strain collection.
+    """
+    for bgc in bgcs:
+        try:
+            # assume that bgc.bgc_id is a strain name or alias
+            strain = strains.lookup(bgc.bgc_id)
+        except KeyError as e:
+            raise KeyError(
+                f"Strain id {bgc.bgc_id} from BGC object {bgc.bgc_id} "
+                "not found in the StrainCollection object.") from e
+        bgc.strain = strain
 
 
-def load_gcfs(bigscape_dir: str | PathLike,
-              strains: StrainCollection,
-              mibig_bgc_dict: dict[str, BGC],
-              antismash_bgc_dict: dict[str, BGC],
-              antismash_file_dict: dict[str, str],
-              bigscape_cutoff: int):
+def map_bgc_to_gcf(bgcs: list[BGC], gcfs: list[GCF]):
+    """To add BGC objects to GCF object based on GCF's BGC ids.
+
+    This method changes the lists `bgcs` and `gcfs` in place.
+
+    Args:
+        bgcs(list[BGC]): A list of BGC objects.
+        gcfs(list[GCF]): A list of GCF objects.
+
+    Raises:
+        KeyError: BGC id not found in the list of BGC objects.
+    """
+    bgc_dict = {bgc.bgc_id: bgc for bgc in bgcs}
+    for gcf in gcfs:
+        for bgc_id in gcf.bgc_ids:
+            try:
+                bgc = bgc_dict[bgc_id]
+            except KeyError as e:
+                raise KeyError(f"BGC id {bgc_id} from GCF object {gcf.gcf_id} "
+                               "not found in the list of BGC objects.") from e
+            gcf.add_bgc(bgc)
+
+
+def filter_mibig_only_gcf(gcfs: list[GCF]) -> list[GCF]:
+    """Filter out GCFs that contain only MIBiG BGC objects.
+
+        This method returns a new list of GCFs that have at least one non-MIBiG
+        BGC object as its child.
+    """
+    return [gcf for gcf in gcfs if gcf.has_mibig_only() is False]
+
+
+def get_bgcs_from_gcfs(gcfs: list[GCF]) -> list[BGC]:
+    """Get all BGC objects from given GCF objects."""
+    s = set()
+    for gcf in gcfs:
+        s |= gcf.bgcs
+    return list(s)
+
+
+def get_strains_from_bgcs(bgcs: list[BGC]) -> StrainCollection:
+    """Get all strain objects from given BGC objects."""
+    sc = StrainCollection()
+    for bgc in bgcs:
+        if bgc.strain is not None:
+            sc.add(bgc.strain)
+        else:
+            logger.warning("Strain is None for BGC %s", bgc.bgc_id)
+    return sc
+
+
+@deprecated(version="1.3.3", reason="It is split to separate functions: " \
+            "map_strain_to_bgc, map_bgc_to_gcf, filter_mibig_only_gcf, " \
+            "get_bgcs_from_gcfs and get_strains_from_bgcs.")
+def load_gcfs(bigscape_dir: str | PathLike, strains: StrainCollection,
+              mibig_bgc_dict: dict[str, BGC], antismash_bgc_dict: dict[str,
+                                                                       BGC],
+              antismash_file_dict: dict[str, str], bigscape_cutoff: int):
 
     bigscape_dir = Path(bigscape_dir)
     product_class_cluster_file = bigscape_dir / "mix" / f"mix_clustering_c0.{bigscape_cutoff:02d}.tsv"
@@ -82,6 +138,7 @@ def load_gcfs(bigscape_dir: str | PathLike,
             bgc_name = line[0]
             family_id = line[1]
 
+            # TODO: is it necessary to keep bigscape_class for GCF class?
             # get bgc annotations from bigscape file
             metadata_line = metadata[bgc_name]
             bigscape_class = metadata_line[4]
@@ -139,6 +196,8 @@ def load_gcfs(bigscape_dir: str | PathLike,
     return gcf_list, bgc_list, used_strains, unknown_strains
 
 
+@deprecated(version="1.3.3", reason="It is split to separate functions: " \
+            "filter_mibig_only_gcf, get_bgcs_from_gcfs and get_strains_from_bgcs.")
 def _filter_gcfs(
     gcfs: list[GCF], bgcs: list[BGC], strains: StrainCollection
 ) -> tuple[list[GCF], list[BGC], StrainCollection]:
@@ -161,7 +220,8 @@ def _filter_gcfs(
     bgcs_to_remove = set()
 
     for gcf in gcfs:
-        num_non_mibig_bgcs = len(list(filter(lambda bgc: not bgc.is_mibig(), gcf.bgcs)))
+        num_non_mibig_bgcs = len(
+            list(filter(lambda bgc: not bgc.is_mibig(), gcf.bgcs)))
         if num_non_mibig_bgcs == 0:
             gcfs_to_remove.add(gcf)
             for bgc in gcf.bgcs:
