@@ -19,7 +19,7 @@ class BigscapeGCFLoader():
                 the filename has a pattern of "<class>_clustering_c0.xx.tsv".
 
         Attributes:
-            cluster_file(str): path to the BiG-SCAPE clsuter file.
+            cluster_file(str): path to the BiG-SCAPE cluster file.
         """
         self.cluster_file = str(cluster_file)
         self._gcf_dict = self._parse_gcf(self.cluster_file)
