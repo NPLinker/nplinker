@@ -84,17 +84,18 @@ def load_edges(edges_file: str, spec_dict: dict[int, Spectrum]):
             cosine = float(line[cos_index])
             family = int(line[fam_index])
 
-            spec1 = spec_dict[spec1_id]
-            spec2 = spec_dict[spec2_id]
+            if spec1_id in spec_dict and spec2_id in spec_dict:
+                spec1 = spec_dict[spec1_id]
+                spec2 = spec_dict[spec2_id]
 
-            if family != -1:  # singletons
-                spec1.family_id = family
-                spec2.family_id = family
+                if family != -1:  # singletons
+                    spec1.family_id = family
+                    spec2.family_id = family
 
-                spec1.edges.append((spec2.id, spec2.spectrum_id, cosine))
-                spec2.edges.append((spec1.id, spec1.spectrum_id, cosine))
-            else:
-                spec1.family_id = family
+                    spec1.edges.append((spec2.id, spec2.spectrum_id, cosine))
+                    spec2.edges.append((spec1.id, spec1.spectrum_id, cosine))
+                else:
+                    spec1.family_id = family
 
 
 @deprecated(version="1.3.3", reason="Use the GNPSLoader class instead.")
