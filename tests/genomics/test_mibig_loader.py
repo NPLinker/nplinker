@@ -32,6 +32,13 @@ class TestMibigBGCLoader:
     def test_init(self, loader, data_dir):
         assert loader.data_dir == data_dir
 
+    def test_get_bgc_genome_mapping(self, loader):
+        mapping = loader.get_bgc_genome_mapping()
+        assert isinstance(mapping, dict)
+        assert len(mapping) == 2502
+        for bid in mapping:
+            assert bid == mapping[bid]
+
     def test_get_files(self, loader):
         files = loader.get_files()
         assert isinstance(files, dict)
