@@ -51,8 +51,7 @@ def download_and_extract_antismash_metadata(
     Examples:
         >>> download_and_extract_antismash_metadata("GCF_004339725.1", "/data/download", "/data/extracted")
         """
-    
-    extract_path = extract_root + f'/antismash/{refseq_assembly_id}'
+    extract_path = os.path.join(extract_root, "antismash", refseq_assembly_id)
 
     _check_roots(download_root, extract_root)
     _check_extract_path(extract_path)
