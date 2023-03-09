@@ -23,7 +23,7 @@ def _check_roots(download_root, extract_root):
 def _check_extract_path(extract_path):
     if os.path.exists(extract_path):
         # check if extract_path is empty
-        files = [i for i in os.listdir(extract_path)]
+        files = list(os.listdir(extract_path))
         if len(files) != 0:
             raise ValueError(f'Nonempty directory: "{extract_path}"')
     else:
@@ -63,7 +63,7 @@ def download_and_extract_antismash_metadata(refseq_assembly_id: str,
         download_and_extract_archive(url, download_root, extract_path,
                                      refseq_assembly_id + '.zip')
         logger.info(
-            f'Genome data successfully extracted for {refseq_assembly_id}')
+            'Genome data successfully extracted for %s', refseq_assembly_id)
         break
 
     # delete subdirs
@@ -78,5 +78,5 @@ def download_and_extract_antismash_metadata(refseq_assembly_id: str,
         if file not in files_to_keep:
             os.remove(file)
     logger.info(
-        f'download_and_extract_antismash_metadata process for {refseq_assembly_id} is over'
+        'download_and_extract_antismash_metadata process for %s is over', refseq_assembly_id
     )

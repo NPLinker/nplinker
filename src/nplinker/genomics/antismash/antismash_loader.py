@@ -126,8 +126,7 @@ def parse_bgc_genbank(file: str) -> BGC:
     product_prediction = features.get("product")
     if product_prediction is None:
         raise ValueError(
-            "Not found product prediction in antiSMASH Genbank file {}".format(
-                file))
+            f"Not found product prediction in antiSMASH Genbank file {file}")
 
     # init BGC
     bgc = BGC(bgc_id=fname, product_prediction=product_prediction)
