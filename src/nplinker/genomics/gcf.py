@@ -38,6 +38,7 @@ class GCF():
         #    https://github.com/NPLinker/nplinker/issues/103
         self.id: int | None = None
         self.bgc_ids: set[str] = set()
+        self.strains: StrainCollection = StrainCollection()
 
     def __str__(self):
         return f"GCF(id={self.gcf_id}, #bgcs={len(self.bgcs)}, #strains={len(self.strains)})."
@@ -58,26 +59,24 @@ class GCF():
 
     def add_bgc(self, bgc: BGC) -> None:
         """Add a BGC object to the GCF."""
+        bgc.parents.add(self)
         self._bgcs.add(bgc)
         self.bgc_ids.add(bgc.bgc_id)
-        bgc.parents.add(self)
+        if bgc.strain is not None:
+            self.strains.add(bgc.strain)
+        else:
+            logger.warning("No strain specified for the BGC %s", bgc.bgc_id)
 
     def detach_bgc(self, bgc: BGC) -> None:
         """Remove a child BGC object."""
+        bgc.parents.remove(self)
         self._bgcs.remove(bgc)
         self.bgc_ids.remove(bgc.bgc_id)
-        bgc.parents.remove(self)
-
-    @property
-    def strains(self) -> StrainCollection:
-        """Get the collection of strains"""
-        sc = StrainCollection()
-        for bgc in self._bgcs:
-            if bgc.strain is not None:
-                sc.add(bgc.strain)
-            else:
-                logger.warning("No strain specified for the BGC %s", bgc.bgc_id)
-        return sc
+        if bgc.strain is not None:
+            for other_bgc in self._bgcs:
+                if other_bgc.strain == bgc.strain:
+                    return
+            self.strains.remove(bgc.strain)
 
     def has_strain(self, strain: str | Strain) -> bool:
         """Check if the given strain exists.
