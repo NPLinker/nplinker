@@ -9,17 +9,6 @@ class Strain():
         self.id: str = primary_strain_id
         self.aliases: set[str] = set()
 
-    def has_alias(self, alt_id: str) -> bool:
-        """Check if strain has an alias.
-
-        Args:
-            alt_id(str): Alias to check.
-
-        Returns:
-            bool: Whether the alias is registered in the set of aliases or not.
-        """
-        return alt_id in self.aliases
-
     def add_alias(self, alt_id: str):
         """Add an alias to the list of known aliases.
 
