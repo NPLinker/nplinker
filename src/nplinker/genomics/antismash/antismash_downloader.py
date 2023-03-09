@@ -1,7 +1,10 @@
 import os
 import shutil
 from nplinker.logconfig import LogConfig
-from nplinker.utils import download_and_extract_archive, list_dirs, list_files
+from nplinker.utils import download_and_extract_archive
+from nplinker.utils import list_dirs
+from nplinker.utils import list_files
+
 
 logger = LogConfig.getLogger(__name__)
 
