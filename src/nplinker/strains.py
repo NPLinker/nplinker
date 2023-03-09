@@ -1,39 +1,50 @@
 from .logconfig import LogConfig
 
+
 logger = LogConfig.getLogger(__name__)
 
 
 class Strain():
+    def __init__(self, primary_id: str) -> None:
+        """To model the mapping between strain id and its aliases.
 
-    def __init__(self, primary_strain_id: str):
-        self.id: str = primary_strain_id
-        self.aliases: set[str] = set()
+        It's recommended to use NCBI taxonomy strain id or name as the primary
+        id.
 
-    def add_alias(self, alt_id: str):
+        Args:
+            primary_id(str): the representative id of the strain.
+        """
+        self.id: str = primary_id
+        self._aliases: set[str] = set()
+
+    @property
+    def aliases(self) -> set[str]:
+        return self._aliases
+
+    def add_alias(self, alias: str) -> None:
         """Add an alias to the list of known aliases.
 
         Args:
-            alt_id(str): Alternative id to add to the list of known aliases.
+            alias(str): The alias to add to the list of known aliases.
         """
-        if len(alt_id) == 0:
+        if len(alias) == 0:
             logger.warning(
-                f'Refusing to add zero-length alias to strain {self}')
-            return
-
-        self.aliases.add(alt_id)
+                'Refusing to add an empty-string alias to strain {%s}', self)
+        else:
+            self._aliases.add(alias)
 
     def __repr__(self) -> str:
         return str(self)
 
     def __str__(self) -> str:
-        return f'Strain({self.id}) [{len(self.aliases)} aliases]'
-    
-    def __eq__(self, other):
+        return f'Strain({self.id}) [{len(self._aliases)} aliases]'
+
+    def __eq__(self, other) -> bool:
         return (
             isinstance(other, Strain)
             and self.id == other.id
-            and self.aliases == other.aliases
+            and self._aliases == other._aliases
         )
-    
+
     def __hash__(self) -> int:
         return hash(self.id)
