@@ -17,13 +17,13 @@ ANTISMASH_DBV2_PAGE_URL = 'https://antismash-dbv2.secondarymetabolites.org/outpu
 ANTISMASH_DBV2_DOWNLOAD_URL = 'https://antismash-dbv2.secondarymetabolites.org/output/{}/{}'
 
 
-def _check_roots(download_root, extract_root):
+def _check_roots(download_root: str, extract_root: str):
     if download_root == extract_root:
         raise ValueError(
             "Identical path of download directory and extract directory")
 
 
-def _check_extract_path(extract_path):
+def _check_extract_path(extract_path: str):
     if os.path.exists(extract_path):
         # check if extract_path is empty
         files = list(os.listdir(extract_path))
