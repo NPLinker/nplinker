@@ -63,10 +63,14 @@ def test_parse_bgc_genbank():
     assert bgc.antismash_id == "NZ_AZWB01000005"
     assert bgc.antismash_file == gbk_file
     assert bgc.antismash_region == "1"
-    assert bgc.smiles == ["NC([*])C(=O)NC([*])C(=O)NC(CO)C(=O)NC(Cc1ccccc1)C(=O)NCC(=O)O"]
+    assert bgc.smiles == [
+        "NC([*])C(=O)NC([*])C(=O)NC(CO)C(=O)NC(Cc1ccccc1)C(=O)NCC(=O)O"
+    ]
+
 
 def test_parse_bgc_genbank_error():
     gbk_file = str(DATA_DIR / "fake_antismash.region001.gbk")
     with pytest.raises(ValueError) as e:
         parse_bgc_genbank(gbk_file)
-    assert "Not found product prediction in antiSMASH Genbank file" in e.value.args[0]
+    assert "Not found product prediction in antiSMASH Genbank file" in e.value.args[
+        0]

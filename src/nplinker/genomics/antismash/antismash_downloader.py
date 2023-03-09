@@ -13,10 +13,12 @@ ANTISMASH_DB_DOWNLOAD_URL = 'https://antismash-db.secondarymetabolites.org/outpu
 ANTISMASH_DBV2_PAGE_URL = 'https://antismash-dbv2.secondarymetabolites.org/output/{}/'
 ANTISMASH_DBV2_DOWNLOAD_URL = 'https://antismash-dbv2.secondarymetabolites.org/output/{}/{}'
 
+
 def _check_roots(download_root, extract_root):
     if download_root == extract_root:
         raise ValueError(
             "Identical path of download directory and extract directory")
+
 
 def _check_extract_path(extract_path):
     if os.path.exists(extract_path):
@@ -27,11 +29,10 @@ def _check_extract_path(extract_path):
     else:
         os.makedirs(extract_path, exist_ok=True)
 
-# TODO: add unit tests (only public func)
-def download_and_extract_antismash_metadata(
-        refseq_assembly_id: str,
-        download_root: str,
-        extract_root: str):
+
+def download_and_extract_antismash_metadata(refseq_assembly_id: str,
+                                            download_root: str,
+                                            extract_root: str):
     """Download and extract Antismash files for a specified refseq_assembly_id.
 
     Args:
@@ -56,12 +57,11 @@ def download_and_extract_antismash_metadata(
     _check_roots(download_root, extract_root)
     _check_extract_path(extract_path)
 
-    for base_url in [
-            ANTISMASH_DB_DOWNLOAD_URL, ANTISMASH_DBV2_DOWNLOAD_URL
-    ]:
+    for base_url in [ANTISMASH_DB_DOWNLOAD_URL, ANTISMASH_DBV2_DOWNLOAD_URL]:
         url = base_url.format(refseq_assembly_id, refseq_assembly_id + '.zip')
 
-        download_and_extract_archive(url, download_root, extract_path, refseq_assembly_id + '.zip')
+        download_and_extract_archive(url, download_root, extract_path,
+                                     refseq_assembly_id + '.zip')
         logger.info(
             f'Genome data successfully extracted for {refseq_assembly_id}')
         break
@@ -77,4 +77,6 @@ def download_and_extract_antismash_metadata(
     for file in list_files(extract_path):
         if file not in files_to_keep:
             os.remove(file)
-    logger.info(f'download_and_extract_antismash_metadata process for {refseq_assembly_id} is over')
+    logger.info(
+        f'download_and_extract_antismash_metadata process for {refseq_assembly_id} is over'
+    )
