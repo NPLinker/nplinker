@@ -19,7 +19,7 @@ def map_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC],
     This method changes the list `bgcs` in place.
 
     It's assumed that BGC's genome id is used as strain's name or alias, and
-    the genome id is used lookup the representative strain.
+    the genome id is used to lookup the representative strain.
 
     Args:
         strains(StrainCollection): A collection of all strain objects.
