@@ -27,7 +27,7 @@ class MibigBGCLoader:
         self._bgc_dict = self._parse_bgcs()
 
     def get_bgc_genome_mapping(self) -> dict[str, str]:
-        """Get the mapping from BGC to geonme.
+        """Get the mapping from BGC to genome.
 
         Note that for MIBiG BGC, same value is used for BGC id and genome id.
         Users don't have to provide genome id for MIBiG BGCs in the
