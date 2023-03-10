@@ -39,7 +39,7 @@ class AntismashBGCLoader:
         self._bgc_dict = self._parse_bgcs(self._file_dict)
 
     def get_bgc_genome_mapping(self) -> dict[str, str]:
-        """Get the mapping from BGC to geonme.
+        """Get the mapping from BGC to genome.
 
         Note that the directory name of the gbk file is treated as genome id.
 
