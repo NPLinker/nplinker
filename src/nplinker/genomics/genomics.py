@@ -36,7 +36,7 @@ def map_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC],
             genome_id = bgc_genome_mapping[bgc.bgc_id]
         except KeyError as e:
             raise KeyError(
-                f"Not found BGC id {bgc.bgc_id} in BGC-geonme mappings.") from e
+                f"Not found BGC id {bgc.bgc_id} in BGC-genome mappings.") from e
         try:
             strain = strains.lookup(genome_id)
         except KeyError as e:
