@@ -22,12 +22,12 @@ class AntismashBGCLoader:
         Note:
             AntiSMASH BGC directory must follow the structure below:
             antismash
-                ├── antismash_id_1 (one AntiSMASH output, e.g. GCF_000514775.1)
-                │  ├── GCF_000514775.1.gbk
-                │  ├── NZ_AZWO01000004.region001.gbk
-                │  └── ...
-                ├── antismash_id_2
-                │  ├── ...
+                ├── genome_id_1 (one AntiSMASH output, e.g. GCF_000514775.1)
+                │  ├── GCF_000514775.1.gbk
+                │  ├── NZ_AZWO01000004.region001.gbk
+                │  └── ...
+                ├── genome_id_2
+                │  ├── ...
                 └── ...
 
         Args:
@@ -37,6 +37,20 @@ class AntismashBGCLoader:
         self.data_dir = data_dir
         self._file_dict = self._parse_data_dir(self.data_dir)
         self._bgc_dict = self._parse_bgcs(self._file_dict)
+
+    def get_bgc_genome_mapping(self) -> dict[str, str]:
+        """Get the mapping from BGC to genome.
+
+        Note that the directory name of the gbk file is treated as genome id.
+
+        Returns:
+            dict[str, str]: key is BGC name (gbk file name) and value is genome
+                id (the directory name of the gbk file).
+        """
+        return {
+            bid: os.path.basename(os.path.dirname(bpath))
+            for bid, bpath in self._file_dict.items()
+        }
 
     def get_files(self) -> dict[str, str]:
         """Get BGC gbk files
@@ -144,7 +158,8 @@ def _parse_antismash_genbank(record: SeqRecord.SeqRecord) -> dict:
     for feature in record.features:
         if feature.type == "region":
             # biopython assumes region numer is a list, but it's actually an int
-            features["region_number"] = feature.qualifiers.get('region_number')[0]
+            features["region_number"] = feature.qualifiers.get(
+                'region_number')[0]
             features["product"] = feature.qualifiers.get('product')
         if feature.type == "cand_cluster":
             smiles = feature.qualifiers.get('SMILES')

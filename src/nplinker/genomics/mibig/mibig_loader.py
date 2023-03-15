@@ -11,6 +11,7 @@ logger = LogConfig.getLogger(__name__)
 
 
 class MibigBGCLoader:
+
     def __init__(self, data_dir: str):
         """Parse MIBiG metadata files and return BGC objects
 
@@ -24,6 +25,19 @@ class MibigBGCLoader:
         self._file_dict = self.parse_data_dir(self.data_dir)
         self._metadata_dict = self._parse_metadatas()
         self._bgc_dict = self._parse_bgcs()
+
+    def get_bgc_genome_mapping(self) -> dict[str, str]:
+        """Get the mapping from BGC to genome.
+
+        Note that for MIBiG BGC, same value is used for BGC id and genome id.
+        Users don't have to provide genome id for MIBiG BGCs in the
+        `strain_mapping.csv` file.
+
+        Returns:
+            dict[str, str]: key is BGC id/accession, value is
+                genome id that uses the value of BGC accession.
+        """
+        return {bid: bid for bid in self._file_dict}
 
     def get_files(self) -> dict[str, str]:
         """Get the path of all MIBiG metadata json files.
