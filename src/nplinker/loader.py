@@ -28,7 +28,8 @@ from nplinker.metabolomics.metabolomics import load_dataset
 from nplinker.pairedomics.downloader import Downloader
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.strain_collection import StrainCollection
-
+from nplinker.genomics.antismash import AntismashBGCLoader
+from pathlib import Path
 
 try:
     from importlib.resources import files
@@ -244,19 +245,23 @@ class DatasetLoader():
                                             optional=True)
 
         # 8. MET: <root>/DB_result/*.tsv (new) or <root>/result_specnets_DB/*.tsv (old) / annotations_dir=<override>
-        self.annotations_dir = self._overrides.get(
-            self.OR_ANNO) or find_via_glob_alts_dir(
-                [
-                    os.path.join(self._root, 'DB_result'),
-                    os.path.join(self._root, 'result_specnets_DB'),
-                ],
-                self.OR_ANNO,
-                optional=False
-            )
-        if self.annotations_dir is not None:
-            self.annotations_config_file = self._overrides.get(
-                self.OR_ANNO_CONFIG) or os.path.join(self.annotations_dir,
-                                                     'annotations.tsv')
+        if Path.is_file(Path(self._root) / "annotations.tsv"):
+            self.annotations_dir = str(self._root)
+            self.annotations_config_file = os.path.join(self._root, "annotations.tsv")
+        else:
+            self.annotations_dir = self._overrides.get(
+                self.OR_ANNO) or find_via_glob_alts_dir(
+                    [
+                        os.path.join(self._root, 'DB_result'),
+                        os.path.join(self._root, 'result_specnets_DB'),
+                    ],
+                    self.OR_ANNO,
+                    optional=False
+                )
+            if self.annotations_dir is not None:
+                self.annotations_config_file = self._overrides.get(
+                    self.OR_ANNO_CONFIG) or os.path.join(self.annotations_dir,
+                                                         'annotations.tsv')
 
     def _init_genomics_paths(self):
          # 9. GEN: <root>/antismash / antismash_dir=<override>
