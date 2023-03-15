@@ -20,8 +20,10 @@
   // python docstring
   "autoDocstring.docstringFormat": "google",
   "autoDocstring.customTemplatePath": ".vscode/vscode_docstring_google_adapted.mustache",
+
+  // Jupyter
+  "jupyter.sendSelectionToInteractiveWindow": true,
   "jupyter.askForKernelRestart": false,
   "notebook.lineNumbers": "on",
-  "notebook.diff.ignoreMetadata": true,
-  "jupyter.interactiveWindow.textEditor.executeSelection": true
+  "notebook.diff.ignoreMetadata": true
 }

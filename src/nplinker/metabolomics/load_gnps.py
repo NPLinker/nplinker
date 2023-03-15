@@ -229,13 +229,13 @@ def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, file: str
                         unknown_strains[mzxml] += 1
                 # else:
                 #     print('{} ===> {}'.format(mzxml, strain))
-                if clu_index in spec_dict:
-                    if strain is not None:
-                        # TODO this need fixed somehow (missing growth medium info)
-                        spec_dict[clu_index].add_strain(strain, None, 1)
 
-                    # update metadata on Spectrum object
-                    spec_dict[clu_index].metadata.update(metadata)
+                if strain is not None:
+                    # TODO this need fixed somehow (missing growth medium info)
+                    spec_dict[clu_index].add_strain(strain, None, 1)
+
+                # update metadata on Spectrum object
+                spec_dict[clu_index].metadata.update(metadata)
 
     if len(unknown_strains) > 0:
         logger.warning(

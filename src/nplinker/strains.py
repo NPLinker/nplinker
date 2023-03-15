@@ -45,6 +45,3 @@ class Strain():
             and self.id == other.id
             and self.aliases == other.aliases
         )
-    
-    def __hash__(self) -> int:
-        return hash(self.id)
