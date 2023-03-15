@@ -14,17 +14,25 @@ from nplinker.strains import Strain
 @pytest.fixture
 def strain_collection() -> StrainCollection:
     sc = StrainCollection()
-    sc.add(Strain("SAMPLE0001"))
+    sc.add(Strain("G-SAMPLE0001"))
+
+    strain = Strain("S-EXAMPLE002")
+    strain.add_alias("G-SAMPLE0002")
+    sc.add(strain)
+
     sc.add(Strain("BGC0000001"))
-
-    strain = Strain("EXAMPLE002")
-    strain.add_alias("SAMPLE0002")
-    sc.add(strain)
-
-    strain = Strain("EXAMPLE003")
-    strain.add_alias("BGC0000002")
-    sc.add(strain)
+    sc.add(Strain("BGC0000002"))
     return sc
+
+
+@pytest.fixture
+def bgc_genome_mapping() -> dict[str, str]:
+    return {
+        "SAMPLE0001": "G-SAMPLE0001",
+        "SAMPLE0002": "G-SAMPLE0002",
+        "BGC0000001": "BGC0000001",
+        "BGC0000002": "BGC0000002"
+    }
 
 
 @pytest.fixture
@@ -34,14 +42,6 @@ def bgc_list() -> list[BGC]:
         BGC("SAMPLE0002", ["Alkaloid"]),
         BGC("BGC0000001", ["Polyketide"]),
         BGC("BGC0000002", ["Terpene"])
-    ]
-
-
-@pytest.fixture
-def bgc_list_error() -> list[BGC]:
-    return [
-        BGC("SAMPLE0003", ["NPR"]),
-        BGC("BGC0000003", ["Polyketide"]),
     ]
 
 
@@ -61,24 +61,30 @@ def gcf_list_error() -> list[GCF]:
     return [gcf1]
 
 
-def test_map_strain_to_bgc(strain_collection, bgc_list):
+def test_map_strain_to_bgc(strain_collection, bgc_list, bgc_genome_mapping):
     for bgc in bgc_list:
         assert bgc.strain is None
-    map_strain_to_bgc(strain_collection, bgc_list)
+    map_strain_to_bgc(strain_collection, bgc_list, bgc_genome_mapping)
     for bgc in bgc_list:
         assert bgc.strain is not None
-    assert bgc_list[0].strain.id == "SAMPLE0001"
-    assert bgc_list[1].strain.id == "EXAMPLE002"
+    assert bgc_list[0].strain.id == "G-SAMPLE0001"
+    assert bgc_list[1].strain.id == "S-EXAMPLE002"
     assert bgc_list[2].strain.id == "BGC0000001"
-    assert bgc_list[3].strain.id == "EXAMPLE003"
+    assert bgc_list[3].strain.id == "BGC0000002"
 
 
-def test_map_strain_to_bgc_error(strain_collection, bgc_list_error):
-    for bgc in bgc_list_error:
-        assert bgc.strain is None
+def test_map_strain_to_bgc_error(strain_collection):
+    bgc_genome_mapping = {"SAMPLE0003": "G-SAMPLE0003"}
+    bgcs = [BGC("BGC0000003", ["Polyketide"])]
     with pytest.raises(KeyError) as e:
-        map_strain_to_bgc(strain_collection, bgc_list_error)
-    assert "Strain id SAMPLE0003 from BGC object SAMPLE0003 not found" in e.value.args[
+        map_strain_to_bgc(strain_collection, bgcs, bgc_genome_mapping)
+    assert "Not found BGC id BGC0000003 in BGC-geonme mappings." in e.value.args[
+        0]
+
+    bgcs = [BGC("SAMPLE0003", ["NPR"])]
+    with pytest.raises(KeyError) as e:
+        map_strain_to_bgc(strain_collection, bgcs, bgc_genome_mapping)
+    assert "Strain id G-SAMPLE0003 from BGC object SAMPLE0003 not found" in e.value.args[
         0]
 
 
@@ -120,8 +126,9 @@ def test_get_bgcs_from_gcfs(bgc_list, gcf_list):
         assert isinstance(i, BGC)
 
 
-def test_get_strains_from_bgcs(strain_collection, bgc_list):
-    map_strain_to_bgc(strain_collection, bgc_list)
+def test_get_strains_from_bgcs(strain_collection, bgc_list,
+                               bgc_genome_mapping):
+    map_strain_to_bgc(strain_collection, bgc_list, bgc_genome_mapping)
     strains = get_strains_from_bgcs(bgc_list)
     assert isinstance(strains, StrainCollection)
     for strain in strain_collection:
