@@ -1,7 +1,7 @@
 import logging
-from .downloader import download_and_extract_antismash_metadata
-from .loader import AntismashBGCLoader
-from .loader import parse_bgc_genbank
+from .antismash_downloader import download_and_extract_antismash_metadata
+from .antismash_loader import AntismashBGCLoader
+from .antismash_loader import parse_bgc_genbank
 
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
