@@ -78,7 +78,7 @@ def test_map_strain_to_bgc_error(strain_collection):
     bgcs = [BGC("BGC0000003", ["Polyketide"])]
     with pytest.raises(KeyError) as e:
         map_strain_to_bgc(strain_collection, bgcs, bgc_genome_mapping)
-    assert "Not found BGC id BGC0000003 in BGC-geonme mappings." in e.value.args[
+    assert "Not found BGC id BGC0000003 in BGC-genome mappings." in e.value.args[
         0]
 
     bgcs = [BGC("SAMPLE0003", ["NPR"])]
