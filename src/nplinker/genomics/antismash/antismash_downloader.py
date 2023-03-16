@@ -19,20 +19,22 @@ ANTISMASH_DBV2_PAGE_URL = 'https://antismash-dbv2.secondarymetabolites.org/outpu
 ANTISMASH_DBV2_DOWNLOAD_URL = 'https://antismash-dbv2.secondarymetabolites.org/output/{}/{}'
 
 
-def download_and_extract_antismash_metadata(refseq_assembly_id: str,
-                                            download_root: str | PathLike,
-                                            extract_root: str | PathLike):
-    """Download and extract Antismash files for a specified refseq_assembly_id.
+def download_and_extract_antismash_data(antismash_id: str,
+                                        download_root: str | PathLike,
+                                        extract_root: str | PathLike):
+    """Download and extract antiSMASH BGC archive for a specified genome.
+    The antiSMASH database (https://antismash-db.secondarymetabolites.org/)
+    is used to download the BGC archive. And antiSMASH use RefSeq assembly id
+    of a genome as the id of the archive.
 
     Args:
-        refseq_assembly_id(str | PathLike): Assembled genomic RefSeq (reference sequence) id.
+        antismash_id(str): The id used to download BGC archive from antiSMASH database.
             If the id is versioned (e.g., "GCF_004339725.1") please be sure to 
             specify the version as well. 
         download_root(str | PathLike): Path to the directory to place downloaded archive in.
         extract_root(str | PathLike): Path to the directory data files will be extracted to.
-            Note that if it will create an antismash/ directory in the specified extract_root, if
-            it doesn't already exist.
-            The files will be extracted to <extract_root>/antismash/<refseq_assembly_id>/ dir.
+            Note that an `antismash` directory will be created in the specified `extract_root` if
+            it doesn't exist. The files will be extracted to `<extract_root>/antismash/<antismash_id>` directory.
 
     Raises:
         ValueError: if download_root and extract_root dirs are the same.
@@ -40,26 +42,23 @@ def download_and_extract_antismash_metadata(refseq_assembly_id: str,
 
     Examples:
         >>> download_and_extract_antismash_metadata("GCF_004339725.1", "/data/download", "/data/extracted")
-        """
+    """
     download_root: Path = Path(download_root)
     extract_root: Path = Path(extract_root)
 
-    extract_path = extract_root / "antismash" / refseq_assembly_id
+    extract_path = extract_root / "antismash" / antismash_id
 
     _check_roots(download_root, extract_root)
     _check_extract_path(extract_path)
 
     for base_url in [ANTISMASH_DB_DOWNLOAD_URL, ANTISMASH_DBV2_DOWNLOAD_URL]:
-        url = base_url.format(refseq_assembly_id, refseq_assembly_id + '.zip')
+        url = base_url.format(antismash_id, antismash_id + '.zip')
 
         download_and_extract_archive(url, download_root, extract_path,
-                                     refseq_assembly_id + '.zip')
-        logger.info(
-            'Genome data successfully extracted for %s', refseq_assembly_id)
+                                     antismash_id + '.zip')
         break
 
     # delete subdirs
-    logger.info('Deleting unnecessary extracted subdirs and files')
     subdirs = list_dirs(extract_path)
     for subdir_path in subdirs:
         shutil.rmtree(subdir_path)
@@ -70,7 +69,7 @@ def download_and_extract_antismash_metadata(refseq_assembly_id: str,
         if file not in files_to_keep:
             os.remove(file)
     logger.info(
-        'download_and_extract_antismash_metadata process for %s is over', refseq_assembly_id
+        'antiSMASH BGC data of %s is downloaded and extracted.', antismash_id
     )
 
 
@@ -83,7 +82,7 @@ def _check_roots(download_root: str | PathLike, extract_root: str | PathLike):
 def _check_extract_path(extract_path: str | PathLike):
     if os.path.exists(extract_path):
         # check if extract_path is empty
-        files = list(os.listdir(extract_path))
+        files = os.listdir(extract_path)
         if len(files) != 0:
             raise ValueError(f'Nonempty directory: "{extract_path}"')
     else:
