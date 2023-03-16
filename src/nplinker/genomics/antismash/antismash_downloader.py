@@ -1,4 +1,6 @@
 import os
+from os import PathLike
+from pathlib import Path
 import shutil
 from nplinker.logconfig import LogConfig
 from nplinker.utils import download_and_extract_archive
@@ -17,33 +19,17 @@ ANTISMASH_DBV2_PAGE_URL = 'https://antismash-dbv2.secondarymetabolites.org/outpu
 ANTISMASH_DBV2_DOWNLOAD_URL = 'https://antismash-dbv2.secondarymetabolites.org/output/{}/{}'
 
 
-def _check_roots(download_root: str, extract_root: str):
-    if download_root == extract_root:
-        raise ValueError(
-            "Identical path of download directory and extract directory")
-
-
-def _check_extract_path(extract_path: str):
-    if os.path.exists(extract_path):
-        # check if extract_path is empty
-        files = list(os.listdir(extract_path))
-        if len(files) != 0:
-            raise ValueError(f'Nonempty directory: "{extract_path}"')
-    else:
-        os.makedirs(extract_path, exist_ok=True)
-
-
 def download_and_extract_antismash_metadata(refseq_assembly_id: str,
-                                            download_root: str,
-                                            extract_root: str):
+                                            download_root: str | PathLike,
+                                            extract_root: str | PathLike):
     """Download and extract Antismash files for a specified refseq_assembly_id.
 
     Args:
-        refseq_assembly_id(str): Assembled genomic RefSeq (reference sequence) id.
+        refseq_assembly_id(str | PathLike): Assembled genomic RefSeq (reference sequence) id.
             If the id is versioned (e.g., "GCF_004339725.1") please be sure to 
             specify the version as well. 
-        download_root(str): Path to the directory to place downloaded archive in.
-        extract_root(str): Path to the directory data files will be extracted to.
+        download_root(str | PathLike): Path to the directory to place downloaded archive in.
+        extract_root(str | PathLike): Path to the directory data files will be extracted to.
             Note that if it will create an antismash/ directory in the specified extract_root, if
             it doesn't already exist.
             The files will be extracted to <extract_root>/antismash/<refseq_assembly_id>/ dir.
@@ -55,7 +41,10 @@ def download_and_extract_antismash_metadata(refseq_assembly_id: str,
     Examples:
         >>> download_and_extract_antismash_metadata("GCF_004339725.1", "/data/download", "/data/extracted")
         """
-    extract_path = os.path.join(extract_root, "antismash", refseq_assembly_id)
+    download_root: Path = Path(download_root)
+    extract_root: Path = Path(extract_root)
+
+    extract_path = extract_root / "antismash" / refseq_assembly_id
 
     _check_roots(download_root, extract_root)
     _check_extract_path(extract_path)
@@ -83,3 +72,19 @@ def download_and_extract_antismash_metadata(refseq_assembly_id: str,
     logger.info(
         'download_and_extract_antismash_metadata process for %s is over', refseq_assembly_id
     )
+
+
+def _check_roots(download_root: str | PathLike, extract_root: str | PathLike):
+    if download_root == extract_root:
+        raise ValueError(
+            "Identical path of download directory and extract directory")
+
+
+def _check_extract_path(extract_path: str | PathLike):
+    if os.path.exists(extract_path):
+        # check if extract_path is empty
+        files = list(os.listdir(extract_path))
+        if len(files) != 0:
+            raise ValueError(f'Nonempty directory: "{extract_path}"')
+    else:
+        os.makedirs(extract_path, exist_ok=True)
