@@ -7,7 +7,6 @@ from nplinker.utils import download_and_extract_archive
 from nplinker.utils import list_dirs
 from nplinker.utils import list_files
 
-
 logger = LogConfig.getLogger(__name__)
 
 # urls to be given to download antismash data
@@ -68,9 +67,8 @@ def download_and_extract_antismash_data(antismash_id: str,
     for file in list_files(extract_path):
         if file not in files_to_keep:
             os.remove(file)
-    logger.info(
-        'antiSMASH BGC data of %s is downloaded and extracted.', antismash_id
-    )
+    logger.info('antiSMASH BGC data of %s is downloaded and extracted.',
+                antismash_id)
 
 
 def _check_roots(download_root: str | PathLike, extract_root: str | PathLike):
