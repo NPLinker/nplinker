@@ -26,8 +26,7 @@ class TestDownloadAndExtractAntismashData():
         assert archive.exists()
         assert archive.is_file()
         assert extracted_folder.exists()
-        assert len(expected_files) == len(all_files)
-        assert len(expected_files) == len(original_expected_files)
+        assert extracted_files.sort() == original_expected_files.sort()
 
     def test_error_same_path(self, tmp_path):
         with pytest.raises(ValueError) as e:
