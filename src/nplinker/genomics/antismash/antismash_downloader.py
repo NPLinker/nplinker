@@ -71,14 +71,14 @@ def download_and_extract_antismash_data(antismash_id: str,
                 antismash_id)
 
 
-def _check_roots(download_root: str | PathLike, extract_root: str | PathLike):
+def _check_roots(download_root: PathLike, extract_root: PathLike):
     if download_root == extract_root:
         raise ValueError(
             "Identical path of download directory and extract directory")
 
 
-def _check_extract_path(extract_path: str | PathLike):
-    if os.path.exists(extract_path):
+def _check_extract_path(extract_path: PathLike):
+    if Path.exists(extract_path):
         # check if extract_path is empty
         files = os.listdir(extract_path)
         if len(files) != 0:
