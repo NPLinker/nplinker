@@ -20,7 +20,7 @@ ANTISMASH_DBV2_DOWNLOAD_URL = 'https://antismash-dbv2.secondarymetabolites.org/o
 
 def download_and_extract_antismash_data(antismash_id: str,
                                         download_root: str | PathLike,
-                                        extract_root: str | PathLike):
+                                        extract_root: str | PathLike) -> None:
     """Download and extract antiSMASH BGC archive for a specified genome.
     The antiSMASH database (https://antismash-db.secondarymetabolites.org/)
     is used to download the BGC archive. And antiSMASH use RefSeq assembly id
