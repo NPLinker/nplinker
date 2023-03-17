@@ -22,7 +22,8 @@ class TestDownloadAndExtractAntismashData():
         # extract zip folder without removing any files
         extract_archive(archive, original_extract_root)
         original_expected_files = list_files(original_extract_root,
-                                             suffix=(".json", ".gbk"), keep_parent=False)
+                                             suffix=(".json", ".gbk"),
+                                             keep_parent=False)
         assert archive.exists()
         assert archive.is_file()
         assert extracted_folder.exists()
