@@ -22,6 +22,7 @@ def download_and_extract_antismash_data(antismash_id: str,
                                         download_root: str | PathLike,
                                         extract_root: str | PathLike) -> None:
     """Download and extract antiSMASH BGC archive for a specified genome.
+
     The antiSMASH database (https://antismash-db.secondarymetabolites.org/)
     is used to download the BGC archive. And antiSMASH use RefSeq assembly id
     of a genome as the id of the archive.
@@ -44,7 +45,6 @@ def download_and_extract_antismash_data(antismash_id: str,
     """
     download_root: Path = Path(download_root)
     extract_root: Path = Path(extract_root)
-
     extract_path = extract_root / "antismash" / antismash_id
     if not Path.exists(extract_path):
         os.makedirs(extract_path)
@@ -55,21 +55,20 @@ def download_and_extract_antismash_data(antismash_id: str,
 
     for base_url in [ANTISMASH_DB_DOWNLOAD_URL, ANTISMASH_DBV2_DOWNLOAD_URL]:
         url = base_url.format(antismash_id, antismash_id + '.zip')
-
         download_and_extract_archive(url, download_root, extract_path,
                                      antismash_id + '.zip')
         break
 
     # delete subdirs
-    subdirs = list_dirs(extract_path)
-    for subdir_path in subdirs:
+    for subdir_path in list_dirs(extract_path):
         shutil.rmtree(subdir_path)
 
+    # delete unnecessary files
     files_to_keep = list_files(extract_path, suffix=(".json", ".gbk"))
-
     for file in list_files(extract_path):
         if file not in files_to_keep:
             os.remove(file)
+
     logger.info('antiSMASH BGC data of %s is downloaded and extracted.',
                 antismash_id)
 
@@ -82,6 +81,5 @@ def _check_roots(download_root: PathLike, extract_root: PathLike):
 
 def _check_extract_path(extract_path: PathLike):
     # check if extract_path is empty
-    files = os.listdir(extract_path)
-    if len(files) != 0:
+    if os.listdir(extract_path):
         raise ValueError(f'Nonempty directory: "{extract_path}"')

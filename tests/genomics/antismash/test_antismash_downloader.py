@@ -18,12 +18,11 @@ class TestDownloadAndExtractAntismashData():
                                             extract_root)
         archive = download_root / "GCF_004339725.1.zip"
         extracted_folder = extract_root / "antismash" / "GCF_004339725.1"
-        expected_files = list_files(extracted_folder, suffix=(".json", ".gbk"))
-        all_files = list_files(extracted_folder)
+        extracted_files = list_files(extracted_folder, keep_parent=False)
         # extract zip folder without removing any files
         extract_archive(archive, original_extract_root)
         original_expected_files = list_files(original_extract_root,
-                                             suffix=(".json", ".gbk"))
+                                             suffix=(".json", ".gbk"), keep_parent=False)
         assert archive.exists()
         assert archive.is_file()
         assert extracted_folder.exists()
