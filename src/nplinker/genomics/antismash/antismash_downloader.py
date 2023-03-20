@@ -81,5 +81,5 @@ def _check_roots(download_root: PathLike, extract_root: PathLike):
 
 def _check_extract_path(extract_path: PathLike):
     # check if extract_path is empty
-    if os.listdir(extract_path):
+    if any(os.scandir(extract_path)):
         raise ValueError(f'Nonempty directory: "{extract_path}"')
