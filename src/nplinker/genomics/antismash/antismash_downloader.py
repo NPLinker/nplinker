@@ -46,12 +46,11 @@ def download_and_extract_antismash_data(antismash_id: str,
     download_root = Path(download_root)
     extract_root = Path(extract_root)
     extract_path = extract_root / "antismash" / antismash_id
+    _check_roots(download_root, extract_root)
     if extract_path.exists():
         _check_extract_path(extract_path)
     else:
         extract_path.mkdir(parents=True, exist_ok=True)
-
-    _check_roots(download_root, extract_root)
 
     for base_url in [ANTISMASH_DB_DOWNLOAD_URL, ANTISMASH_DBV2_DOWNLOAD_URL]:
         url = base_url.format(antismash_id, antismash_id + '.zip')
