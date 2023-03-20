@@ -46,10 +46,10 @@ def download_and_extract_antismash_data(antismash_id: str,
     download_root: Path = Path(download_root)
     extract_root: Path = Path(extract_root)
     extract_path = extract_root / "antismash" / antismash_id
-    if not Path.exists(extract_path):
-        os.makedirs(extract_path)
-    else:
+    if extract_path.exists():
         _check_extract_path(extract_path)
+    else:
+        extract_path.mkdir(parents=True, exist_ok=True)
 
     _check_roots(download_root, extract_root)
 
