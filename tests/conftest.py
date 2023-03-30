@@ -52,6 +52,6 @@ def collection_from_file() -> StrainCollection:
 
 @pytest.fixture
 def strain() -> Strain:
-    item = Strain("peter")
-    item.add_alias("dieter")
+    item = Strain("strain_1")
+    item.add_alias("strain_1_a")
     return item
