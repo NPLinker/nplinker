@@ -6,6 +6,7 @@ logger = LogConfig.getLogger(__name__)
 
 
 class Strain():
+
     def __init__(self, primary_id: str) -> None:
         """To model the mapping between strain id and its aliases.
 
@@ -17,6 +18,19 @@ class Strain():
         """
         self.id: str = primary_id
         self._aliases: set[str] = set()
+
+    def __repr__(self) -> str:
+        return str(self)
+
+    def __str__(self) -> str:
+        return f'Strain({self.id}) [{len(self._aliases)} aliases]'
+
+    def __eq__(self, other) -> bool:
+        return (isinstance(other, Strain) and self.id == other.id
+                and self._aliases == other._aliases)
+
+    def __hash__(self) -> int:
+        return hash(self.id)
 
     @property
     def aliases(self) -> set[str]:
@@ -38,19 +52,3 @@ class Strain():
                 'Refusing to add an empty-string alias to strain {%s}', self)
         else:
             self._aliases.add(alias)
-
-    def __repr__(self) -> str:
-        return str(self)
-
-    def __str__(self) -> str:
-        return f'Strain({self.id}) [{len(self._aliases)} aliases]'
-
-    def __eq__(self, other) -> bool:
-        return (
-            isinstance(other, Strain)
-            and self.id == other.id
-            and self._aliases == other._aliases
-        )
-
-    def __hash__(self) -> int:
-        return hash(self.id)
