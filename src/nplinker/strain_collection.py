@@ -37,22 +37,14 @@ class StrainCollection():
         result &= self._strain_dict_index == other._strain_dict_index
         return result
 
-    def __contains__(self, strain_id: str | Strain) -> bool:
-        """Check if the strain or strain id are contained in the lookup table.
-
-        Args:
-            strain_id(str|Strain): Strain or strain id to look up.
-
-        Returns:
-            bool: Whether the strain is contained in the collection.
-         """
-
-        if isinstance(strain_id, str):
-            return strain_id in self._lookup
-        # assume it's a Strain object
-        if isinstance(strain_id, Strain):
-            return strain_id.id in self._lookup
-        return False
+    def __contains__(self, strain: str | Strain) -> bool:
+        if isinstance(strain, str):
+            value = strain in self._strain_dict_id
+        elif isinstance(strain, Strain):
+            value = strain.id in self._strain_dict_id
+        else:
+            raise TypeError(f"Expected Strain or str, got {type(strain)}")
+        return value
 
     def __iter__(self) -> Iterator[Strain]:
         return iter(self._strains)

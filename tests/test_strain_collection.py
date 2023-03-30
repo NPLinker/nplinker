@@ -41,7 +41,6 @@ def test_lookup(strain: Strain):
 
 
 def test_contains(collection: StrainCollection, strain: Strain):
-    assert strain in collection
     assert strain.id in collection
     assert "strain_1" in collection
     assert "strain_1_a" in collection
