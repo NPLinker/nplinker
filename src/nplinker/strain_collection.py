@@ -16,6 +16,48 @@ class StrainCollection():
         self._lookup: dict[str, Strain] = {}
         self._lookup_indices: dict[int, Strain] = {}
 
+    def __repr__(self) -> str:
+        return str(self)
+
+    def __str__(self):
+        if len(self) > 20:
+            return f'StrainCollection(n={len(self)})'
+
+        return f'StrainCollection(n={len(self)}) [' + ','.join(
+            s.id for s in self._strains) + ']'
+
+    def __len__(self) -> int:
+        return len(self._strains)
+
+    def __eq__(self, other):
+        result = self._strains == other._strains
+        result &= self._lookup == other._lookup
+        result &= self._lookup_indices == other._lookup_indices
+        return result
+
+    def __contains__(self, strain_id: str | Strain) -> bool:
+        """Check if the strain or strain id are contained in the lookup table.
+
+        Args:
+            strain_id(str|Strain): Strain or strain id to look up.
+
+        Returns:
+            bool: Whether the strain is contained in the collection.
+         """
+
+        if isinstance(strain_id, str):
+            return strain_id in self._lookup
+        # assume it's a Strain object
+        if isinstance(strain_id, Strain):
+            return strain_id.id in self._lookup
+        return False
+
+    def __iter__(self):
+        return iter(self._strains)
+
+    def __next__(self):
+        return next(self._strains)
+
     def add(self, strain: Strain):
         """Add the strain to the aliases.
         This also adds those strain's aliases to this' strain's aliases.
@@ -64,29 +106,6 @@ class StrainCollection():
         to_remove = [x for x in self._strains if x not in strain_set]
         for strain in to_remove:
             self.remove(strain)
-
-    def __contains__(self, strain_id: str|Strain) -> bool:
-        """Check if the strain or strain id are contained in the lookup table.
-
-        Args:
-            strain_id(str|Strain): Strain or strain id to look up.
-
-        Returns:
-            bool: Whether the strain is contained in the collection.
-         """
-
-        if isinstance(strain_id, str):
-            return strain_id in self._lookup
-        # assume it's a Strain object
-        if isinstance(strain_id, Strain):
-            return strain_id.id in self._lookup
-        return False
-
-    def __iter__(self):
-        return iter(self._strains)
-
-    def __next__(self):
-        return next(self._strains)
 
     def lookup_index(self, index: int) -> Strain:
         """Return the strain from lookup by index.
@@ -199,22 +218,3 @@ class StrainCollection():
 
         logger.info(f'Saving strains to {strain_mappings_file}')
         self.save_to_file(strain_mappings_file)
-
-    def __len__(self) -> int:
-        return len(self._strains)
-
-    def __repr__(self) -> str:
-        return str(self)
-
-    def __str__(self):
-        if len(self) > 20:
-            return f'StrainCollection(n={len(self)})'
-
-        return f'StrainCollection(n={len(self)}) [' + ','.join(
-            s.id for s in self._strains) + ']'
-
-    def __eq__(self, other):
-        result = self._strains == other._strains
-        result &= self._lookup == other._lookup
-        result &= self._lookup_indices == other._lookup_indices
-        return result
