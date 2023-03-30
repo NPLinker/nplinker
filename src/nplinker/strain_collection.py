@@ -1,5 +1,6 @@
 import csv
 import os
+from typing import Iterator
 from .logconfig import LogConfig
 from .strains import Strain
 from .utils import list_dirs
@@ -12,6 +13,7 @@ logger = LogConfig.getLogger(__name__)
 class StrainCollection():
 
     def __init__(self):
+        """A collection of Strain objects."""
         self._strains: list[Strain] = []
         self._lookup: dict[str, Strain] = {}
         self._lookup_indices: dict[int, Strain] = {}
@@ -19,7 +21,7 @@ class StrainCollection():
     def __repr__(self) -> str:
         return str(self)
 
-    def __str__(self):
+    def __str__(self) -> str:
         if len(self) > 20:
             return f'StrainCollection(n={len(self)})'
 
@@ -29,7 +31,7 @@ class StrainCollection():
     def __len__(self) -> int:
         return len(self._strains)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         result = self._strains == other._strains
         result &= self._lookup == other._lookup
         result &= self._lookup_indices == other._lookup_indices
@@ -52,25 +54,19 @@ class StrainCollection():
             return strain_id.id in self._lookup
         return False
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Strain]:
         return iter(self._strains)
 
-    def __next__(self):
-        return next(self._strains)
+    def add(self, strain: Strain) -> None:
+        """Add strain to the collection.
 
-    def add(self, strain: Strain):
-        """Add the strain to the aliases.
-        This also adds those strain's aliases to this' strain's aliases.
+        If the strain already exists, merge the aliases.
 
         Args:
-            strain(Strain): Strain to add to self.
-
-        Examples:
-            >>>
-            """
+            strain(Strain): The strain to add.
+        """
+        # if the strain exists, merge the aliases
         if strain.id in self._lookup:
-            # if it already exists, just merge the set of aliases and update
-            # lookup entries
             existing: Strain = self.lookup(strain.id)
             for alias in strain.aliases:
                 existing.add_alias(alias)
@@ -79,17 +75,15 @@ class StrainCollection():
 
         self._lookup_indices[len(self)] = strain
         self._strains.append(strain)
-        # insert a mapping from strain=>strain, plus all its aliases
         self._lookup[strain.id] = strain
         for alias in strain.aliases:
             self._lookup[alias] = strain
 
     def remove(self, strain: Strain):
-        """Remove the specified strain from the aliases.
-        TODO: #90 Implement removing the strain also from self._lookup indices.
+        """Remove a strain from the collection.
 
         Args:
-            strain(Strain): Strain to remove.
+            strain(Strain): The strain to remove.
         """
         if strain.id not in self._lookup:
             return
