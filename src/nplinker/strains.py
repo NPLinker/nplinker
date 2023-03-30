@@ -1,3 +1,4 @@
+from __future__ import annotations
 from .logconfig import LogConfig
 
 
@@ -19,6 +20,11 @@ class Strain():
 
     @property
     def aliases(self) -> set[str]:
+        """Get the set of known aliases.
+
+        Returns:
+            set[str]: A set of aliases associated with the strain.
+        """
         return self._aliases
 
     def add_alias(self, alias: str) -> None:
