@@ -66,7 +66,7 @@ def find_delimiter(file: str | PathLike) -> str:
     with open(file, mode='rt', encoding='utf-8') as fp:
         delimiter = sniffer.sniff(fp.read(5000)).delimiter
     return delimiter
-    
+
 def get_headers(file: str | PathLike) -> list[str]:
     """Read headers from the given tabular file.
 
@@ -94,7 +94,7 @@ USER_AGENT = "NPLinker"
 
 
 def _save_response_content(content: Iterator[bytes],
-                           destination: str | Path,
+                           destination: str | PathLike,
                            length: int | None = None) -> None:
     with open(destination, "wb") as fh, tqdm(total=length) as pbar:
         for chunk in content:
@@ -107,7 +107,7 @@ def _save_response_content(content: Iterator[bytes],
 
 
 def _urlretrieve(url: str,
-                 filename: str | Path,
+                 filename: str | PathLike,
                  chunk_size: int = 1024 * 32) -> None:
     with urllib.request.urlopen(
             urllib.request.Request(url, headers={"User-Agent":
@@ -118,7 +118,7 @@ def _urlretrieve(url: str,
                                length=response.length)
 
 
-def calculate_md5(fpath: str | Path, chunk_size: int = 1024 * 1024) -> str:
+def calculate_md5(fpath: str | PathLike, chunk_size: int = 1024 * 1024) -> str:
     # Setting the `usedforsecurity` flag does not change anything about the functionality, but indicates that we are
     # not using the MD5 checksum for cryptography. This enables its usage in restricted environments like FIPS. Without
     # it torchvision.datasets is unusable in these environments since we perform a MD5 check everywhere.
@@ -132,11 +132,11 @@ def calculate_md5(fpath: str | Path, chunk_size: int = 1024 * 1024) -> str:
     return md5.hexdigest()
 
 
-def check_md5(fpath: str | Path, md5: str) -> bool:
+def check_md5(fpath: str | PathLike, md5: str) -> bool:
     return md5 == calculate_md5(fpath)
 
 
-def check_integrity(fpath: str | Path, md5: str | None = None) -> bool:
+def check_integrity(fpath: str | PathLike, md5: str | None = None) -> bool:
     if not os.path.isfile(fpath):
         return False
     if md5 is None:
@@ -161,7 +161,7 @@ def _get_redirect_url(url: str, max_hops: int = 3) -> str:
 
 
 def download_url(url: str,
-                 root: str | Path,
+                 root: str | PathLike,
                  filename: str | None = None,
                  md5: str | None = None,
                  max_redirect_hops: int = 3) -> None:
@@ -208,7 +208,7 @@ def download_url(url: str,
         raise RuntimeError("File not found or corrupted, or md5 validation failed.")
 
 
-def list_dirs(root: str | Path,
+def list_dirs(root: str | PathLike,
               keep_parent: bool = True) -> list[str]:
     """List all directories at a given root
 
@@ -224,7 +224,7 @@ def list_dirs(root: str | Path,
     return directories
 
 
-def list_files(root: str | Path,
+def list_files(root: str | PathLike,
                prefix: str | tuple[str, ...] = "",
                suffix: str | tuple[str, ...] = "",
                keep_parent: bool = True) -> list[str]:
@@ -253,7 +253,7 @@ def list_files(root: str | Path,
     return files
 
 
-def _extract_tar(from_path: str | Path, to_path: str | Path,
+def _extract_tar(from_path: str | PathLike, to_path: str | PathLike,
                  compression: str | None) -> None:
     with tarfile.open(from_path,
                       f"r:{compression[1:]}" if compression else "r") as tar:
@@ -266,7 +266,7 @@ _ZIP_COMPRESSION_MAP: dict[str, int] = {
 }
 
 
-def _extract_zip(from_path: str | Path, to_path: str | Path,
+def _extract_zip(from_path: str | PathLike, to_path: str | PathLike,
                  compression: str | None) -> None:
     with zipfile.ZipFile(from_path,
                          "r",
@@ -375,7 +375,7 @@ def _decompress(from_path: Path | str,
     return str(to_path)
 
 
-def extract_archive(from_path: str | Path,
+def extract_archive(from_path: str | PathLike,
                     to_path: str | Path | None = None,
                     remove_finished: bool = False) -> str:
     """Extract an archive.
@@ -438,7 +438,7 @@ def extract_file_matching_pattern(archive: zipfile.ZipFile, prefix: str, suffix:
 
 def download_and_extract_archive(
     url: str,
-    download_root: str | Path,
+    download_root: str | PathLike,
     extract_root: str | Path | None = None,
     filename: str | None = None,
     md5: str | None = None,
