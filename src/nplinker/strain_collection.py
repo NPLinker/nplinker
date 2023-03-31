@@ -1,11 +1,11 @@
 import csv
+import os
 from os import PathLike
 from typing import Iterator
 from .logconfig import LogConfig
 from .strains import Strain
 from .utils import list_dirs
 from .utils import list_files
-
 
 logger = LogConfig.getLogger(__name__)
 
@@ -141,17 +141,14 @@ class StrainCollection():
                     strain.add_alias(alias)
                 self.add(strain)
 
-    def save_to_file(self, file: str | PathLike):
-        """Save this strain collection to file.
+    def save_to_file(self, file: str | PathLike) -> None:
+        """Save strains to a strain mapping file (.csv).
 
         Args:
-            file(str): Output file.
-
-        Examples:
-            >>>
-            """
+            file(str | PathLike): Path to strain mapping file (.csv).
+        """
         with open(file, 'w') as f:
-            for strain in self._strains:
+            for strain in self:
                 ids = [strain.id] + list(strain.aliases)
                 f.write(','.join(ids) + '\n')
 
