@@ -102,23 +102,24 @@ class StrainCollection():
         """
         return self._strain_dict_index[index]
 
-    def lookup(self, strain_id: str) -> Strain:
-        """Check whether the strain id is contained in the lookup table. If so, return the strain, otherwise return `default`.
+    def lookup(self, name: str) -> Strain:
+        """Lookup a strain by name (id or alias).
 
-        Raises:
-            Exception if strain_id is not found.
+        If the name is found, return the strain object; Otherwise, raise a
+        KeyError.
 
         Args:
-            strain_id(str): Strain id to lookup.
+            name(str): Strain name (id or alias) to lookup.
 
         Returns:
-            Strain: Strain retrieved during lookup or object passed as default.
-        """
-        if strain_id not in self._strain_dict_id:
-            # logger.error('Strain lookup failed for "{}"'.format(strain_id))
-            raise KeyError(f'Strain lookup failed for "{strain_id}"')
+            Strain: Strain identified by the given name.
 
-        return self._strain_dict_id[strain_id]
+        Raises:
+            KeyError: If the strain name is not found.
+        """
+        if name not in self._strain_dict_id:
+            raise KeyError(f"Strain {name} not found in strain collection.")
+        return self._strain_dict_id[name]
 
     def add_from_file(self, file: str | os.PathLike):
         """Read strains and aliases from file and store in self.

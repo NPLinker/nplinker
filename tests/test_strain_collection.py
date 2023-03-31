@@ -33,11 +33,12 @@ def test_add():
     assert sut.lookup_index(0) == item
 
 
-def test_lookup(strain: Strain):
-    sut = StrainCollection()
-    sut.add(strain)
-
-    assert sut.lookup(strain.id) == strain
+def test_lookup(collection: StrainCollection, strain: Strain):
+    assert collection.lookup(strain.id) == strain
+    for alias in strain.aliases:
+        assert collection.lookup(alias) == strain
+    with pytest.raises(KeyError):
+        collection.lookup("strain_not_exist")
 
 
 def test_contains(collection: StrainCollection, strain: Strain):
