@@ -41,12 +41,6 @@ def test_iter(collection: StrainCollection, strain: Strain):
     for actual in collection:
         assert actual == strain
 
-
-def test_add_from_file(collection_from_file: StrainCollection):
-    assert len(collection_from_file) == 27
-    assert len(collection_from_file.lookup_index(1).aliases) == 29
-
-
 def test_add(strain: Strain):
     sut = StrainCollection()
     sut.add(strain)
@@ -89,3 +83,10 @@ def test_lookup(collection: StrainCollection, strain: Strain):
         assert collection.lookup(alias) == strain
     with pytest.raises(KeyError):
         collection.lookup("strain_not_exist")
+
+
+def test_add_from_file():
+    sut = StrainCollection()
+    sut.add_from_file(DATA_DIR / "strain_mappings.csv")
+    assert len(sut) == 27
+    assert len(sut.lookup_index(1).aliases) == 29

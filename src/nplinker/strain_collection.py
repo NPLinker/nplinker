@@ -1,5 +1,5 @@
 import csv
-import os
+from os import PathLike
 from typing import Iterator
 from .logconfig import LogConfig
 from .strains import Strain
@@ -121,36 +121,27 @@ class StrainCollection():
             raise KeyError(f"Strain {name} not found in strain collection.")
         return self._strain_dict_id[name]
 
-    def add_from_file(self, file: str | os.PathLike):
-        """Read strains and aliases from file and store in self.
+    def add_from_file(self, file: str | PathLike) -> None:
+        """Add strains from a strain mapping file.
+
+        A strain mapping file is a csv file with the first column being the
+        id of the strain, and the remaining columns being aliases for the
+        strain.
 
         Args:
-            file(str): Path to strain mapping file to load.
+            file(str | PathLike): Path to strain mapping file (.csv).
         """
-
-        if not os.path.exists(file):
-            logger.warning(f'strain mappings file not found: {file}')
-            return
-
-        line = 1
         with open(file) as f:
             reader = csv.reader(f)
-            for ids in reader:
-                if len(ids) == 0:
+            for names in reader:
+                if len(names) == 0:
                     continue
-                strain = Strain(ids[0])
-                for id in ids[1:]:
-                    if len(id) == 0:
-                        logger.warning(
-                            'Found zero-length strain label in {} on line {}'.
-                            format(file, line))
-                    else:
-                        strain.add_alias(id)
+                strain = Strain(names[0])
+                for alias in names[1:]:
+                    strain.add_alias(alias)
                 self.add(strain)
 
-                line += 1
-
-    def save_to_file(self, file: str | os.PathLike):
+    def save_to_file(self, file: str | PathLike):
         """Save this strain collection to file.
 
         Args:
