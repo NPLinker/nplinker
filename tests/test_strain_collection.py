@@ -59,15 +59,23 @@ def test_lookup_index_exception(collection: StrainCollection):
 
 
 def test_remove(collection: StrainCollection, strain: Strain):
+    assert strain in collection
     collection.remove(strain)
-
     with pytest.raises(KeyError):
         collection.lookup(strain.id)
-
     assert strain not in collection
+    # TODO: issue #90
+    # with pytest.raises(KeyError):
+    #     collection.lookup_index(0)
 
-    # needs fixing, see #90
-    assert collection.lookup_index(0) == strain
+
+def test_filter(collection: StrainCollection, strain: Strain):
+    assert strain in collection
+    collection.add(Strain("strain_2"))
+    collection.filter({strain})
+    assert strain in collection
+    assert "strain_2" not in collection
+    assert len(collection) == 1
 
 
 def test_equal(collection_from_file: StrainCollection):
