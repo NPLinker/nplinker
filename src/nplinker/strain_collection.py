@@ -1,7 +1,9 @@
 import csv
 import os
 from os import PathLike
+from pathlib import Path
 from typing import Iterator
+from deprecated import deprecated
 from .logconfig import LogConfig
 from .strains import Strain
 from .utils import list_dirs
@@ -152,8 +154,10 @@ class StrainCollection():
                 ids = [strain.id] + list(strain.aliases)
                 f.write(','.join(ids) + '\n')
 
-    def generate_strain_mappings(self, strain_mappings_file: str,
-                                 antismash_dir: str) -> None:
+    # TODO to move this method to a separate class
+    @deprecated(version="1.3.3", reason="This method will be removed")
+    def generate_strain_mappings(self, strain_mappings_file: str | PathLike,
+                                 antismash_dir: str | PathLike) -> None:
         """Add AntiSMASH BGC file names as strain alias to strain mappings file.
 
             Note that if AntiSMASH ID (e.g. GCF_000016425.1) is not found in
@@ -161,10 +165,10 @@ class StrainCollection():
             added.
 
         Args:
-            strain_mappings_file(str): Path to strain mappings file
-            antismash_dir(str): Path to AntiSMASH directory
+            strain_mappings_file(str | PathLike): Path to strain mappings file.
+            antismash_dir(str | PathLike): Path to AntiSMASH output directory.
         """
-        if os.path.exists(strain_mappings_file):
+        if Path(strain_mappings_file).exists():
             logger.info('Strain mappings file exist')
             return
 
@@ -172,7 +176,7 @@ class StrainCollection():
         logger.info('Generating strain mappings file')
         subdirs = list_dirs(antismash_dir)
         for d in subdirs:
-            antismash_id = os.path.basename(d)
+            antismash_id = Path(d).name
 
             # use antismash_id (e.g. GCF_000016425.1) as strain name to query
             # TODO: self is empty at the moment, why lookup here?
@@ -186,7 +190,7 @@ class StrainCollection():
             # if strain `antismash_id` exist, add all gbk file names as strain alias
             gbk_files = list_files(d, suffix=".gbk", keep_parent=False)
             for f in gbk_files:
-                gbk_filename = os.path.splitext(f)[0]
+                gbk_filename = Path(f).stem
                 strain.add_alias(gbk_filename)
 
         logger.info(f'Saving strains to {strain_mappings_file}')
