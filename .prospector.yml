@@ -28,3 +28,10 @@ pydocstyle:
         D213,  # Multi-line docstring summary should start at the second line
         D404,  # First word of the docstring should not be This
     ]
+
+pylint:
+    disable: [
+       W0212, # Access to a protected member %s of a client class
+       W1514, # Using open without explicitly specifying an encoding
+       W1203, # Use %s formatting in logging functions
+]
