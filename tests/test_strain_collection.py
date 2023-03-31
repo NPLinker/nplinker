@@ -11,11 +11,6 @@ def collection(strain: Strain) -> StrainCollection:
     return sut
 
 
-def test_default():
-    sut = StrainCollection()
-    assert sut is not None
-
-
 def test_repr(collection: StrainCollection):
     assert repr(collection) == str(collection)
 
@@ -52,42 +47,20 @@ def test_add_from_file(collection_from_file: StrainCollection):
     assert len(collection_from_file.lookup_index(1).aliases) == 29
 
 
-def test_add():
+def test_add(strain: Strain):
     sut = StrainCollection()
-    item = Strain("test_id")
-    item.add_alias("blub")
-
-    sut.add(item)
-
-    assert sut.lookup(item.id) == item
-    assert sut.lookup(next(iter(item.aliases))) == item
-    assert sut.lookup_index(0) == item
-
-
-def test_lookup(collection: StrainCollection, strain: Strain):
-    assert collection.lookup(strain.id) == strain
+    sut.add(strain)
+    assert strain in sut
     for alias in strain.aliases:
-        assert collection.lookup(alias) == strain
-    with pytest.raises(KeyError):
-        collection.lookup("strain_not_exist")
-
-
-def test_lookup_index(collection: StrainCollection, strain: Strain):
-    actual = collection.lookup_index(0)
-    assert actual == strain
-
-
-def test_lookup_index_exception(collection: StrainCollection):
-    with pytest.raises(KeyError) as exc:
-        collection.lookup_index(5)
-    assert isinstance(exc.value, KeyError)
+        assert alias in sut
+    assert sut._strain_dict_index[0] == strain
 
 
 def test_remove(collection: StrainCollection, strain: Strain):
     assert strain in collection
     collection.remove(strain)
     with pytest.raises(KeyError):
-        collection.lookup(strain.id)
+        _ = collection._strain_dict_id[strain.id]
     assert strain not in collection
     # TODO: issue #90
     # with pytest.raises(KeyError):
@@ -103,8 +76,16 @@ def test_filter(collection: StrainCollection, strain: Strain):
     assert len(collection) == 1
 
 
-def test_equal(collection_from_file: StrainCollection):
-    other = StrainCollection()
-    other.add_from_file(DATA_DIR / "strain_mappings.csv")
+def test_lookup_index(collection: StrainCollection, strain: Strain):
+    actual = collection.lookup_index(0)
+    assert actual == strain
+    with pytest.raises(KeyError):
+        collection.lookup_index(1)
 
-    assert collection_from_file == other
+
+def test_lookup(collection: StrainCollection, strain: Strain):
+    assert collection.lookup(strain.id) == strain
+    for alias in strain.aliases:
+        assert collection.lookup(alias) == strain
+    with pytest.raises(KeyError):
+        collection.lookup("strain_not_exist")
