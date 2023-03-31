@@ -16,6 +16,37 @@ def test_default():
     assert sut is not None
 
 
+def test_repr(collection: StrainCollection):
+    assert repr(collection) == str(collection)
+
+
+def test_str(collection: StrainCollection):
+    assert str(collection) == 'StrainCollection(n=1) [strain_1]'
+
+
+def test_len(collection: StrainCollection):
+    assert len(collection) == 1
+
+
+def test_eq(collection: StrainCollection, strain: Strain):
+    other = StrainCollection()
+    other.add(strain)
+    assert collection == other
+
+
+def test_contains(collection: StrainCollection, strain: Strain):
+    assert strain in collection
+    assert strain.id in collection
+    for alias in strain.aliases:
+        assert alias in collection
+    assert "strain_not_exist" not in collection
+
+
+def test_iter(collection: StrainCollection, strain: Strain):
+    for actual in collection:
+        assert actual == strain
+
+
 def test_add_from_file(collection_from_file: StrainCollection):
     assert len(collection_from_file) == 27
     assert len(collection_from_file.lookup_index(1).aliases) == 29
@@ -39,13 +70,6 @@ def test_lookup(collection: StrainCollection, strain: Strain):
         assert collection.lookup(alias) == strain
     with pytest.raises(KeyError):
         collection.lookup("strain_not_exist")
-
-
-def test_contains(collection: StrainCollection, strain: Strain):
-    assert strain.id in collection
-    assert "strain_1" in collection
-    assert "strain_1_a" in collection
-    assert "test" not in collection
 
 
 def test_lookup_index(collection: StrainCollection, strain: Strain):
