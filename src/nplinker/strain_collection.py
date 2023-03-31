@@ -32,10 +32,9 @@ class StrainCollection():
         return len(self._strains)
 
     def __eq__(self, other) -> bool:
-        result = self._strains == other._strains
-        result &= self._strain_dict_id == other._strain_dict_id
-        result &= self._strain_dict_index == other._strain_dict_index
-        return result
+        return (self._strains == other._strains
+                and self._strain_dict_id == other._strain_dict_id
+                and self._strain_dict_index == other._strain_dict_index)
 
     def __contains__(self, strain: str | Strain) -> bool:
         if isinstance(strain, str):
