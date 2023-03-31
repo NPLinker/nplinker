@@ -62,13 +62,12 @@ class StrainCollection():
             for alias in strain.aliases:
                 existing.add_alias(alias)
                 self._strain_dict_id[alias] = existing
-            return
-
-        self._strain_dict_index[len(self)] = strain
-        self._strains.append(strain)
-        self._strain_dict_id[strain.id] = strain
-        for alias in strain.aliases:
-            self._strain_dict_id[alias] = strain
+        else:
+            self._strain_dict_index[len(self)] = strain
+            self._strains.append(strain)
+            self._strain_dict_id[strain.id] = strain
+            for alias in strain.aliases:
+                self._strain_dict_id[alias] = strain
 
     def remove(self, strain: Strain):
         """Remove a strain from the collection.
