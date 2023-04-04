@@ -4,10 +4,11 @@ import re
 import time
 import zipfile
 import httpx
-from deprecated import deprecated
 from bs4 import BeautifulSoup
+from deprecated import deprecated
 from progress.bar import Bar
 from nplinker.logconfig import LogConfig
+
 
 logger = LogConfig.getLogger(__name__)
 

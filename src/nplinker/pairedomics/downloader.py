@@ -14,18 +14,18 @@
 
 import json
 import os
-import sys
 import shutil
+import sys
 import zipfile
-from deprecated import deprecated
 import httpx
+from deprecated import deprecated
 from progress.spinner import Spinner
+from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
 from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
-from nplinker.strains import Strain
 from nplinker.strain_collection import StrainCollection
-from nplinker.genomics.mibig import download_and_extract_mibig_metadata
+from nplinker.strains import Strain
 from . import download_antismash_data
 
 
