@@ -26,7 +26,7 @@ from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.genomics.mibig import MibigBGCLoader
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.metabolomics import load_dataset
-from nplinker.pairedomics.downloader import Downloader
+from nplinker.pairedomics.downloader import PODPDownloader
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.strain_collection import StrainCollection
 
@@ -185,7 +185,7 @@ class DatasetLoader():
             self._root)[-1] if not self._remote_loading else self._platform_id
 
         if self._remote_loading:
-            self._downloader = Downloader(self._platform_id)
+            self._downloader = PODPDownloader(self._platform_id)
         else:
             self._downloader = None
 

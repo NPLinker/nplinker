@@ -44,7 +44,7 @@ MIBIG_BGC_METADATA_URL = 'https://mibig.secondarymetabolites.org/repository/{}/a
 # MIBIG_BGC_JSON_URL = 'https://mibig.secondarymetabolites.org/repository/{}/{}.json'
 
 
-class Downloader():
+class PODPDownloader():
     # TODO: move to independent config file  ---C.Geng
     PFAM_PATH = os.path.join(sys.prefix, 'nplinker_lib')
 
@@ -121,7 +121,7 @@ class Downloader():
         self.local_download_cache = os.path.join(self.local_cache, 'downloads')
         self.local_file_cache = os.path.join(self.local_cache, 'extracted')    
         os.makedirs(self.local_cache, exist_ok=True)
-        logger.info('Downloader for {}, caching to {}'.format(
+        logger.info('PODPDownloader for {}, caching to {}'.format(
             self.gnps_massive_id, self.local_cache))
 
         # create local cache folders for this dataset
