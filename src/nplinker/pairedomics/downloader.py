@@ -82,14 +82,14 @@ class PODPDownloader():
 
             if gnps_massive_id == platform_id:
                 self.pairedomics_id = pairedomics_id
-                logger.debug(
-                    'platform_id %s matched to pairedomics_id %s',
-                    self.gnps_massive_id, self.pairedomics_id)
+                logger.debug('platform_id %s matched to pairedomics_id %s',
+                             self.gnps_massive_id, self.pairedomics_id)
                 break
 
         if self.pairedomics_id is None:
             raise Exception(
-                f'Failed to find a pairedomics project with ID {self.gnps_massive_id}')
+                f'Failed to find a pairedomics project with ID {self.gnps_massive_id}'
+            )
 
         # now get the project JSON data
         self.project_json = None
@@ -116,7 +116,8 @@ class PODPDownloader():
         self.local_download_cache = os.path.join(self.local_cache, 'downloads')
         self.local_file_cache = os.path.join(self.local_cache, 'extracted')
         os.makedirs(self.local_cache, exist_ok=True)
-        logger.info('PODPDownloader for %s, caching to %s', self.gnps_massive_id, self.local_cache)
+        logger.info('PODPDownloader for %s, caching to %s',
+                    self.gnps_massive_id, self.local_cache)
 
         # create local cache folders for this dataset
         self.project_download_cache = os.path.join(self.local_download_cache,
@@ -141,6 +142,7 @@ class PODPDownloader():
                                                   'all_projects.json')
         self.project_json_file = os.path.join(self.local_cache,
                                               f'{self.gnps_massive_id}.json')
+
 
 # CG: download function
 
@@ -178,7 +180,8 @@ class PODPDownloader():
             logger.info('BiG-SCAPE disabled by configuration, not running it')
             return
 
-        logger.info('Running BiG-SCAPE! extra_bigscape_parameters="%s"', extra_bigscape_parameters)
+        logger.info('Running BiG-SCAPE! extra_bigscape_parameters="%s"',
+                    extra_bigscape_parameters)
         try:
             run_bigscape('bigscape.py',
                          os.path.join(self.project_file_cache, 'antismash'),
@@ -200,7 +203,9 @@ class PODPDownloader():
         download_and_extract_mibig_metadata(self.project_download_cache,
                                             output_path, version)
 
-        with open(os.path.join(output_path, 'completed'), 'w', encoding="utf-8"):
+        with open(os.path.join(output_path, 'completed'),
+                  'w',
+                  encoding='utf-8'):
             pass
 
         return True
@@ -245,7 +250,8 @@ class PODPDownloader():
             if accession is None:
                 # this will happen for genomes where we couldn't retrieve data or resolve the ID
                 logger.warning(
-                    'Failed to extract accession from genome with label %s', label)
+                    'Failed to extract accession from genome with label %s',
+                    label)
                 continue
 
             if label in temp:
@@ -255,7 +261,7 @@ class PODPDownloader():
                 gc += 1
 
         logger.info('Extracted %s strains from JSON (met=%s, gen=%s)',
-            len(temp), mc, gc)
+                    len(temp), mc, gc)
         for strain_label, strain_aliases in temp.items():
             strain = Strain(strain_label)
             for alias in strain_aliases:
@@ -280,12 +286,11 @@ class PODPDownloader():
         # - root/metadata_table*
         # - root/DB_result*
 
-        prefixes = ['clusterinfosummarygroup_attributes_withIDs_withcomponentID',
-                    'networkedges_selfloop',
-                    'quantification_table',
-                    'metadata_table',
-                    'DB_result',
-                    'result_specnets_DB']
+        prefixes = [
+            'clusterinfosummarygroup_attributes_withIDs_withcomponentID',
+            'networkedges_selfloop', 'quantification_table', 'metadata_table',
+            'DB_result', 'result_specnets_DB'
+        ]
 
         for member in mbzip.namelist():
             if any(member.startswith(prefix) for prefix in prefixes):
@@ -313,7 +318,8 @@ class PODPDownloader():
 
         # Try read from cache
         if os.path.exists(self.metabolomics_zip):
-            logger.info('Found existing metabolomics_zip at %s', self.metabolomics_zip)
+            logger.info('Found existing metabolomics_zip at %s',
+                        self.metabolomics_zip)
             try:
                 with zipfile.ZipFile(self.metabolomics_zip) as mbzip:
                     return mbzip
@@ -331,7 +337,8 @@ class PODPDownloader():
     def _download_and_load_json(self, url, local_path):
         resp = httpx.get(url, follow_redirects=True)
         if not resp.status_code == 200:
-            raise Exception(f'Failed to download {url} (status code {resp.status_code})')
+            raise Exception(
+                f'Failed to download {url} (status code {resp.status_code})')
 
         content = json.loads(resp.content)
         with open(local_path, 'w', encoding='utf-8') as f:
