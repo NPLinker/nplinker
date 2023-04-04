@@ -9,7 +9,6 @@ from deprecated import deprecated
 from progress.bar import Bar
 from nplinker.logconfig import LogConfig
 
-
 logger = LogConfig.getLogger(__name__)
 
 # urls to be given to download antismash data

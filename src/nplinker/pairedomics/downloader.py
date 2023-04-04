@@ -28,11 +28,9 @@ from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 from . import download_antismash_data
 
-
 logger = LogConfig.getLogger(__name__)
 
 from .runbigscape import run_bigscape
-
 
 PAIREDOMICS_PROJECT_DATA_ENDPOINT = 'https://pairedomicsdata.bioinformatics.nl/api/projects'
 PAIREDOMICS_PROJECT_URL = 'https://pairedomicsdata.bioinformatics.nl/api/projects/{}'
@@ -48,17 +46,17 @@ class PODPDownloader():
     # TODO: move to independent config file  ---C.Geng
     PFAM_PATH = os.path.join(sys.prefix, 'nplinker_lib')
 
-    def __init__(self, platform_id, force_download=False, local_cache = None):
+    def __init__(self, platform_id, force_download=False, local_cache=None):
         self.gnps_massive_id = platform_id
         self.pairedomics_id = None
         self.gnps_task_id = None
-        self.json_data = None        
+        self.json_data = None
         self.strains = StrainCollection()
         self.growth_media = {}
 
         if local_cache is None:
             local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data',
-                                        'pairedomics')
+                                       'pairedomics')
 
         self._init_folder_structure(local_cache)
 
@@ -109,17 +107,16 @@ class PODPDownloader():
         self.gnps_task_id = self.project_json['metabolomics']['project'][
             'molecular_network']
 
-        with open(os.path.join(self.project_file_cache,
-                                  'platform_data.json'),
-                     'w',
-                     encoding='utf-8') as f:
+        with open(os.path.join(self.project_file_cache, 'platform_data.json'),
+                  'w',
+                  encoding='utf-8') as f:
             f.write(str(self.project_json))
-    
+
     def _init_folder_structure(self, local_cache):
-        # init local cache root   
+        # init local cache root
         self.local_cache = local_cache
         self.local_download_cache = os.path.join(self.local_cache, 'downloads')
-        self.local_file_cache = os.path.join(self.local_cache, 'extracted')    
+        self.local_file_cache = os.path.join(self.local_cache, 'extracted')
         os.makedirs(self.local_cache, exist_ok=True)
         logger.info('PODPDownloader for {}, caching to {}'.format(
             self.gnps_massive_id, self.local_cache))
@@ -137,33 +134,36 @@ class PODPDownloader():
         for d in ['antismash', 'bigscape']:
             os.makedirs(os.path.join(self.project_file_cache, d),
                         exist_ok=True)
-        
+
         # init strain mapping filepath
         self.strain_mappings_file = os.path.join(self.project_file_cache,
-                                                 'strain_mappings.csv') 
-        
+                                                 'strain_mappings.csv')
+
         # init project paths
         self.all_project_json_file = os.path.join(self.local_cache,
                                                   'all_projects.json')
-        self.project_json_file = os.path.join(
-            self.local_cache, f'{self.gnps_massive_id}.json')
+        self.project_json_file = os.path.join(self.local_cache,
+                                              f'{self.gnps_massive_id}.json')
 
+# CG: download function
 
-	# CG: download function
     def get(self, do_bigscape, extra_bigscape_parameters, use_mibig,
             mibig_version):
         logger.info('Going to download the metabolomics data file')
 
         self._download_metabolomics_zipfile(self.gnps_task_id)
 
-        download_antismash_data(self.project_json['genomes'], self.project_download_cache, self.project_file_cache)
+        download_antismash_data(self.project_json['genomes'],
+                                self.project_download_cache,
+                                self.project_file_cache)
 
         # CG: it extracts strain names and later will be used for strains
         self._parse_genome_labels(self.project_json['genome_metabolome_links'],
                                   self.project_json['genomes'])
 
         # CG: it generates the strain_mapping.csv file
-        self.strains.generate_strain_mappings(self.strain_mappings_file,
+        self.strains.generate_strain_mappings(
+            self.strain_mappings_file,
             os.path.join(self.project_file_cache, 'antismash'))
 
         if use_mibig:
@@ -203,7 +203,7 @@ class PODPDownloader():
         os.makedirs(output_path)
 
         download_and_extract_mibig_metadata(self.project_download_cache,
-                                        output_path, version)
+                                            output_path, version)
 
         open(os.path.join(output_path, 'completed'), 'w').close()
 
@@ -241,8 +241,7 @@ class PODPDownloader():
             if label in self.growth_media:
                 self.growth_media[label].add(rec['sample_preparation_label'])
             else:
-                self.growth_media[label] = {
-                    rec['sample_preparation_label']}
+                self.growth_media[label] = {rec['sample_preparation_label']}
 
         for rec in gen_records:
             label = rec['genome_label']
@@ -269,9 +268,10 @@ class PODPDownloader():
             self.strains.add(strain)
 
     def _download_metabolomics_zipfile(self, gnps_task_id):
-        archive = GNPSDownloader(gnps_task_id, self.project_download_cache).download().get_download_path()
+        archive = GNPSDownloader(
+            gnps_task_id,
+            self.project_download_cache).download().get_download_path()
         GNPSExtractor(archive, self.project_file_cache).extract()
-
 
     @deprecated
     def _extract_metabolomics_data(self, mbzip):
@@ -331,7 +331,6 @@ class PODPDownloader():
         mbzip = zipfile.ZipFile(self.metabolomics_zip)
         return mbzip
 
-
     def _download_and_load_json(self, url, local_path):
         resp = httpx.get(url, follow_redirects=True)
         if not resp.status_code == 200:
@@ -352,6 +351,7 @@ def _generate_gnps_download_url(gnps_task_id):
     url = GNPS_DATA_DOWNLOAD_URL.format(gnps_task_id)
     return url
 
+
 @deprecated
 def _execute_download(url, metabolomics_zip):
     logger.info(f'Downloading metabolomics data from {url}')
@@ -366,4 +366,3 @@ def _execute_download(url, metabolomics_zip):
                 spinner.next()
         spinner.finish()
     logger.info('Downloaded metabolomics data!')
-    
