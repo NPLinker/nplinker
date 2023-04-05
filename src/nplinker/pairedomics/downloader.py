@@ -321,8 +321,8 @@ class PODPDownloader():
             logger.info('Found existing metabolomics_zip at %s',
                         self.metabolomics_zip)
             try:
-                with zipfile.ZipFile(self.metabolomics_zip) as mbzip:
-                    return mbzip
+                mbzip = zipfile.ZipFile(self.metabolomics_zip)
+                return mbzip
             except zipfile.BadZipFile:
                 logger.info(
                     'Invalid metabolomics zipfile found, will download again!')
@@ -331,8 +331,8 @@ class PODPDownloader():
         _execute_download(url, self.metabolomics_zip)
 
         # this should throw an exception if zip is malformed etc
-        with zipfile.ZipFile(self.metabolomics_zip) as mbzip:
-            return mbzip
+        mbzip = zipfile.ZipFile(self.metabolomics_zip)
+        return mbzip
 
     def _download_and_load_json(self, url, local_path):
         resp = httpx.get(url, follow_redirects=True)
