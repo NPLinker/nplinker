@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .runbigscape import run_bigscape
 import json
 import os
 import shutil
@@ -28,6 +27,7 @@ from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 from . import download_antismash_data
+from .runbigscape import run_bigscape
 
 logger = LogConfig.getLogger(__name__)
 
@@ -203,12 +203,15 @@ class PODPDownloader():
         download_and_extract_mibig_metadata(self.project_download_cache,
                                             output_path, version)
 
+        self._create_completed_file(output_path)
+
+        return True
+
+    def _create_completed_file(self, output_path):
         with open(os.path.join(output_path, 'completed'),
                   'w',
                   encoding='utf-8'):
             pass
-
-        return True
 
     def _parse_genome_labels(self, met_records, gen_records):
         temp = {}
@@ -321,7 +324,7 @@ class PODPDownloader():
             logger.info('Found existing metabolomics_zip at %s',
                         self.metabolomics_zip)
             try:
-                mbzip = zipfile.ZipFile(self.metabolomics_zip) # pylint: disable=consider-using-with
+                mbzip = zipfile.ZipFile(self.metabolomics_zip)  # pylint: disable=consider-using-with
                 return mbzip
             except zipfile.BadZipFile:
                 logger.info(
@@ -331,7 +334,7 @@ class PODPDownloader():
         _execute_download(url, self.metabolomics_zip)
 
         # this should throw an exception if zip is malformed etc
-        mbzip = zipfile.ZipFile(self.metabolomics_zip) # pylint: disable=consider-using-with
+        mbzip = zipfile.ZipFile(self.metabolomics_zip)  # pylint: disable=consider-using-with
         return mbzip
 
     def _download_and_load_json(self, url, local_path):
