@@ -4,7 +4,6 @@ from deprecated import deprecated
 from nplinker.logconfig import LogConfig
 from .aa_pred import predict_aa
 
-
 if TYPE_CHECKING:
     from ..strains import Strain
     from .gcf import GCF
@@ -14,9 +13,7 @@ logger = LogConfig.getLogger(__name__)
 
 class BGC():
 
-    def __init__(self,
-                 bgc_id: str,
-                 *product_prediction: str):
+    def __init__(self, bgc_id: str, /, *product_prediction: str):
         """Class to model BGC (biosynthetic gene cluster) data.
 
         BGC data include both annotations and sequence data. This class is
