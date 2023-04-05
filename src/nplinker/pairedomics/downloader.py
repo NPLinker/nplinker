@@ -321,7 +321,7 @@ class PODPDownloader():
             logger.info('Found existing metabolomics_zip at %s',
                         self.metabolomics_zip)
             try:
-                mbzip = zipfile.ZipFile(self.metabolomics_zip)
+                mbzip = zipfile.ZipFile(self.metabolomics_zip) # pylint: disable=consider-using-with
                 return mbzip
             except zipfile.BadZipFile:
                 logger.info(
@@ -331,7 +331,7 @@ class PODPDownloader():
         _execute_download(url, self.metabolomics_zip)
 
         # this should throw an exception if zip is malformed etc
-        mbzip = zipfile.ZipFile(self.metabolomics_zip)
+        mbzip = zipfile.ZipFile(self.metabolomics_zip) # pylint: disable=consider-using-with
         return mbzip
 
     def _download_and_load_json(self, url, local_path):
