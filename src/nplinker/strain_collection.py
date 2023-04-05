@@ -86,9 +86,10 @@ class StrainCollection():
         """
         Remove all strains that are not in strain_set from the strain collection
         """
-        to_remove = [x for x in self._strains if x not in strain_set]
-        for strain in to_remove:
-            self.remove(strain)
+        # note that we need to copy the list of strains, as we are modifying it
+        for strain in self._strains.copy():
+            if strain not in strain_set:
+                self.remove(strain)
 
     def lookup_index(self, index: int) -> Strain:
         """Return the strain from lookup by index.
