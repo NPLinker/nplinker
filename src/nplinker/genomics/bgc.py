@@ -91,11 +91,14 @@ class BGC():
             self.__class__.__name__, self.bgc_id, self.strain,
             self.antismash_id, self.antismash_region)
 
-    def __eq__(self, other):
-        return self.bgc_id == other.bgc_id
+    def __eq__(self, other) -> bool:
+        if isinstance(other, BGC):
+            return (self.bgc_id == other.bgc_id
+                    and self.product_prediction == other.product_prediction)
+        return NotImplemented
 
-    def __hash__(self):
-        return hash(self.bgc_id)
+    def __hash__(self) -> int:
+        return hash((self.bgc_id, self.product_prediction))
 
     def add_parent(self, gcf: GCF) -> None:
         """Add a parent GCF to the BGC.
