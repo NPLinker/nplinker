@@ -16,7 +16,7 @@ class BGC():
 
     def __init__(self,
                  bgc_id: str,
-                 product_prediction: list[str]):
+                 *product_prediction: str):
         """Class to model BGC (biosynthetic gene cluster) data.
 
         BGC data include both annotations and sequence data. This class is
@@ -32,18 +32,18 @@ class BGC():
 
         Args:
             bgc_id(str): BGC identifier, e.g. MIBiG accession, GenBank accession.
-            product_prediction(list[str]): list of BGC's (predicted) natural
-                products or product classes.
+            product_prediction(tuple[str]): BGC's (predicted) natural products
+                or product classes.
 
         Attributes:
             bgc_id(str): BGC identifier, e.g. MIBiG accession, GenBank accession.
-            product_prediction(list[str]): List of BGC's (predicted) natural
-                products or product classes.
+            product_prediction(tuple[str]): A tuple of (predicted) natural
+                products or product classes of the BGC.
                 For antiSMASH's GenBank data, the feature `region /product`
                 gives product information.
                 For MIBiG metadata, its biosynthetic class provides such info.
-            mibig_bgc_class(list[str] | None): List of MIBiG biosynthetic classes to
-                which the BGC belongs.
+            mibig_bgc_class(tuple[str] | None): A tuple of MIBiG biosynthetic
+                classes to which the BGC belongs.
                 Defaults to None.
                 MIBiG defines 6 major biosynthetic classes for natural products,
                 including "NRP", "Polyketide", "RiPP", "Terpene", "Saccharide"
@@ -52,7 +52,8 @@ class BGC():
                 More details see the publication: https://doi.org/10.1186/s40793-018-0318-y.
             description(str | None): Brief description of the BGC.
                 Defaults to None.
-            smiles(list[str] | None): SMILES formula of the BGC's product.
+            smiles(tuple[str] | None): A tuple of SMILES formulas of the BGC's
+                products.
                 Defaults to None.
             antismash_file(str | None): The path to the antiSMASH GenBank file.
                 Defaults to None.
@@ -72,9 +73,9 @@ class BGC():
         self.bgc_id = bgc_id
         self.product_prediction = product_prediction
 
-        self.mibig_bgc_class: list[str] | None = None
+        self.mibig_bgc_class: tuple[str] | None = None
         self.description: str | None = None
-        self.smiles: list[str] | None = None
+        self.smiles: tuple[str] | None = None
 
         # antismash related attributes
         self.antismash_file: str | None = None

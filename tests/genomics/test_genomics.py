@@ -38,10 +38,10 @@ def bgc_genome_mapping() -> dict[str, str]:
 @pytest.fixture
 def bgc_list() -> list[BGC]:
     return [
-        BGC("SAMPLE0001", ["NPR"]),
-        BGC("SAMPLE0002", ["Alkaloid"]),
-        BGC("BGC0000001", ["Polyketide"]),
-        BGC("BGC0000002", ["Terpene"])
+        BGC("SAMPLE0001", "NPR"),
+        BGC("SAMPLE0002", "Alkaloid"),
+        BGC("BGC0000001", "Polyketide"),
+        BGC("BGC0000002", "Terpene")
     ]
 
 

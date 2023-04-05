@@ -79,4 +79,4 @@ def test_parse_bgc_metadata_json():
     bgc = parse_bgc_metadata_json(str(json_file))
     assert isinstance(bgc, BGC)
     assert bgc.bgc_id == "BGC0000001"
-    assert bgc.mibig_bgc_class == ["Polyketide"]
+    assert bgc.mibig_bgc_class == ("Polyketide",)

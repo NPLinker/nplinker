@@ -122,7 +122,7 @@ def parse_bgc_metadata_json(file: str) -> BGC:
         BGC: :class:`nplinker.genomics.BGC` object
     """
     metadata = MibigMetadata(file)
-    mibig_bgc = BGC(metadata.mibig_accession, metadata.biosyn_class)
+    mibig_bgc = BGC(metadata.mibig_accession, *metadata.biosyn_class)
     mibig_bgc.mibig_bgc_class = metadata.biosyn_class
     mibig_bgc.strain = Strain(metadata.mibig_accession)
     return mibig_bgc

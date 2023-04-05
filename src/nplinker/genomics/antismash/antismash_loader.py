@@ -117,10 +117,6 @@ class AntismashBGCLoader:
 def parse_bgc_genbank(file: str) -> BGC:
     """Parse a single BGC gbk file to BGC object.
 
-    Note:
-        If product info is not available in gbk file, the product of BGC
-            object (bgc.product_prediction) is set to empty list.
-
     Args:
         file(str): Path to BGC gbk file
 
@@ -143,7 +139,7 @@ def parse_bgc_genbank(file: str) -> BGC:
             f"Not found product prediction in antiSMASH Genbank file {file}")
 
     # init BGC
-    bgc = BGC(bgc_id=fname, product_prediction=product_prediction)
+    bgc = BGC(fname, *product_prediction)
     bgc.description = description
     bgc.antismash_id = antismash_id
     bgc.antismash_file = file
@@ -166,7 +162,7 @@ def _parse_antismash_genbank(record: SeqRecord.SeqRecord) -> dict:
             # space is not allowed in SMILES spec
             # biopython generates space when reading multi-line SMILES from .gbk
             if smiles is not None:
-                smiles = [i.replace(' ', '') for i in smiles]
+                smiles = tuple(i.replace(' ', '') for i in smiles)
             features["smiles"] = smiles
     return features
 
