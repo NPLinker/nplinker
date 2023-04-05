@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 from nplinker.logconfig import LogConfig
 from nplinker.strain_collection import StrainCollection
 
-
 if TYPE_CHECKING:
     from nplinker.strains import Strain
     from .bgc import BGC
@@ -46,10 +45,17 @@ class GCF():
     def __repr__(self):
         return str(self)
 
-    def __eq__(self, other):
-        return self.gcf_id == other.gcf_id
+    def __eq__(self, other) -> bool:
+        if isinstance(other, GCF):
+            return (self.gcf_id == other.gcf_id and self.bgcs == other.bgcs)
+        return NotImplemented
 
-    def __hash__(self):
+    def __hash__(self) -> int:
+        """Hash the GCF object.
+
+        Note that GCF class is a mutable container. We only hash the GCF id to
+        avoid the hash value changes when `self._bgcs` is updated.
+        """
         return hash(self.gcf_id)
 
     @property
