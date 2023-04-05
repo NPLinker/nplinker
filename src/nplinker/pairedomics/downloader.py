@@ -207,7 +207,8 @@ class PODPDownloader():
 
         return True
 
-    def _create_completed_file(self, output_path):
+    @staticmethod
+    def _create_completed_file(output_path):
         with open(os.path.join(output_path, 'completed'),
                   'w',
                   encoding='utf-8'):
