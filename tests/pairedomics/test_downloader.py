@@ -7,7 +7,7 @@ import pytest
 from pytest_lazyfixture import lazy_fixture
 from nplinker import utils
 
-from nplinker.pairedomics.downloader import Downloader
+from nplinker.pairedomics.downloader import PODPDownloader
 from nplinker.pairedomics.downloader import _generate_gnps_download_url
 from nplinker.pairedomics.downloader import _execute_download
 from .. import DATA_DIR
@@ -24,7 +24,7 @@ def gnps_url():
 def test_default(expected: Path):
     gnps_id = "MSV000079284"
 
-    sut = Downloader(gnps_id, local_cache=str(expected))
+    sut = PODPDownloader(gnps_id, local_cache=str(expected))
 
     assert sut.gnps_massive_id == gnps_id
     assert sut.local_cache == str(expected)
@@ -42,7 +42,7 @@ def test_default(expected: Path):
     assert sut.project_json_file == str(expected / f"{gnps_id}.json")
 
 def test_download_metabolomics_zipfile(tmp_path):
-    sut = Downloader("MSV000079284", local_cache=tmp_path)
+    sut = PODPDownloader("MSV000079284", local_cache=tmp_path)
     sut._download_metabolomics_zipfile("c22f44b14a3d450eb836d607cb9521bb")
     expected_path = os.path.join(sut.project_download_cache, 'metabolomics_data.zip')
 
@@ -53,7 +53,7 @@ def test_download_metabolomics_zipfile(tmp_path):
 
 
 def test_download_metabolomics_zipfile(tmp_path):
-    sut = Downloader("MSV000079284", local_cache=tmp_path)
+    sut = PODPDownloader("MSV000079284", local_cache=tmp_path)
     sut._download_metabolomics_zipfile("c22f44b14a3d450eb836d607cb9521bb")
     expected_path = os.path.join(sut.project_download_cache, 'c22f44b14a3d450eb836d607cb9521bb.zip')
 
@@ -78,7 +78,7 @@ def test_execute_download(gnps_url: str, tmp_path: Path):
 
 def test_download_gnps_data(tmp_path):
     gnps_task_id = "c22f44b14a3d450eb836d607cb9521bb"
-    sut = Downloader("MSV000079284", local_cache=tmp_path / 'actual')
+    sut = PODPDownloader("MSV000079284", local_cache=tmp_path / 'actual')
     actual = sut._load_gnps_data(gnps_task_id)
 
     expected = zipfile.ZipFile(DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip")
@@ -94,7 +94,7 @@ def test_download_gnps_data(tmp_path):
 
 
 def test_extract_metabolomics_data(tmp_path):
-    sut = Downloader("MSV000079284", local_cache=tmp_path)
+    sut = PODPDownloader("MSV000079284", local_cache=tmp_path)
     archive = zipfile.ZipFile(DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip")
     sut._extract_metabolomics_data(archive)
 

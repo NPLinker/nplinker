@@ -79,7 +79,7 @@ def run_canopus(mgf_file,
         result.returncode))
     # use subprocess.CompletedProcess.check_returncode() to test if the CANOPUS
     # process exited successfully. This throws an exception for non-zero returncodes
-    # which will indicate to the Downloader module that something went wrong.
+    # which will indicate to the PODPDownloader module that something went wrong.
     result.check_returncode()
 
     # use presence of this file as a quick way to check if a previous run

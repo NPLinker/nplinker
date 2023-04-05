@@ -17,7 +17,6 @@ import subprocess
 import sys
 from ..logconfig import LogConfig
 
-
 logger = LogConfig.getLogger(__name__)
 
 # NOTE: for simplicity this is currently written with assumption it will only be
@@ -37,16 +36,14 @@ def run_bigscape(bigscape_py_path, antismash_path, output_path, pfam_path,
         return True
 
     try:
-        subprocess.run([bigscape_py_path, '-h'],
-                       capture_output=True)
+        subprocess.run([bigscape_py_path, '-h'], capture_output=True)
     except Exception as e:
         raise Exception(
             'Failed to find/run bigscape.py (path={}, err={})'.format(
                 bigscape_py_path, e))
 
     if not os.path.exists(antismash_path):
-        raise Exception(
-            f'antismash_path "{antismash_path}" does not exist!')
+        raise Exception(f'antismash_path "{antismash_path}" does not exist!')
 
     # configure the IO-related parameters, including pfam_dir
     args = [
@@ -64,7 +61,7 @@ def run_bigscape(bigscape_py_path, antismash_path, output_path, pfam_path,
         result.returncode))
     # use subprocess.CompletedProcess.check_returncode() to test if the BiG-SCAPE
     # process exited successfully. This throws an exception for non-zero returncodes
-    # which will indicate to the Downloader module that something went wrong.
+    # which will indicate to the PODPDownloader module that something went wrong.
     result.check_returncode()
 
     # use presence of this file as a quick way to check if a previous run
