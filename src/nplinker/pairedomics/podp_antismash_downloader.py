@@ -1,5 +1,6 @@
 import csv
 import os
+from pathlib import Path
 import re
 import time
 import zipfile
@@ -8,6 +9,7 @@ from bs4 import BeautifulSoup
 from deprecated import deprecated
 from progress.bar import Bar
 from nplinker.logconfig import LogConfig
+from . import download_and_extract_antismash_data
 
 logger = LogConfig.getLogger(__name__)
 
@@ -321,6 +323,120 @@ def _extract_antismash_zip(antismash_obj, project_file_cache):
     open(os.path.join(output_path, 'completed'), 'w').close()
 
     return True
+
+
+def podp_download_and_extract_antismash_data(genome_records, project_download_cache,
+                            project_file_cache):
+    genome_status = {}
+
+    # this file records genome IDs and local filenames to avoid having to repeat HTTP requests
+    # each time the app is loaded (this can take a lot of time if there are dozens of genomes)
+    genome_status_file = os.path.join(project_download_cache,
+                                      'genome_status.txt')
+
+    # genome lookup status info
+    if os.path.exists(genome_status_file):
+        with open(genome_status_file) as f:
+            for line in csv.reader(f):
+                asobj = GenomeStatus.from_csv(*line)
+                genome_status[asobj.original_id] = asobj
+
+    for i, genome_record in enumerate(genome_records):
+        # get the best available ID from the dict
+        best_id = _get_best_available_genome_id(genome_record['genome_ID'])
+        if best_id is None:
+            logger.warning(
+                'Ignoring genome record "{}" due to missing genome ID field'.
+                format(genome_record))
+            continue
+
+        # use this to check if the lookup has already been attempted and if
+        # so if the file is cached locally
+        if best_id not in genome_status:
+            genome_status[best_id] = GenomeStatus(best_id, None)
+
+        genome_obj = genome_status[best_id]
+
+        logger.info(
+            'Checking for antismash data {}/{}, current genome ID={}'.format(
+                i + 1, len(genome_records), best_id))
+        # first check if file is cached locally
+        if os.path.exists(genome_obj.filename):
+            # file already downloaded
+            logger.info('Genome ID {} already downloaded to {}'.format(
+                best_id, genome_obj.filename))
+            genome_record['resolved_id'] = genome_obj.resolved_id
+        elif genome_obj.attempted:
+            # lookup attempted previously but failed
+            logger.info(
+                'Genome ID {} skipped due to previous failure'.format(best_id))
+            genome_record['resolved_id'] = genome_obj.resolved_id
+        else:
+            # if no existing file and no lookup attempted, can start process of
+            # trying to retrieve the data
+
+            # lookup the ID
+            logger.info(
+                'Beginning lookup process for genome ID {}'.format(best_id))
+
+            genome_obj.resolved_id = _resolve_genome_id_data(
+                genome_record['genome_ID'])
+            genome_obj.attempted = True
+
+            if genome_obj.resolved_id is None:
+                # give up on this one
+                logger.warning(f'Failed lookup for genome ID {best_id}')
+                with open(genome_status_file, 'a+') as f:
+                    f.write(genome_obj.to_csv() + '\n')
+                continue
+            extract_path = Path(project_file_cache, 'antismash', 'genome_obj.resolved_id')
+            try:
+                download_and_extract_antismash_data(
+                    genome_obj.resolved_id,
+                    project_download_cache, 
+                    project_file_cache)
+                genome_record['resolved_id'] = genome_obj.resolved_id
+            except ValueError(f'Nonempty directory: "{extract_path}"'):
+                logger.debug(f'Checking for existing antismash zip at {extract_path}')
+
+                cached = False
+                # if the file exists locally
+                logger.info(f'Found cached file at {extract_path}')
+                try:
+                    # check if it's a valid zip file, if so treat it as cached
+                    _ = zipfile.ZipFile(extract_path)
+                    cached = True
+                    genome_obj.filename = extract_path
+                except zipfile.BadZipFile as bzf:
+                    # otherwise delete and redownload
+                    logger.info(
+                        'Invalid antismash zipfile found ({}). Will download again'.
+                        format(bzf))
+                    os.unlink(extract_path)
+                    genome_obj.filename = ""
+
+                if not cached:
+                    download_and_extract_antismash_data(
+                        genome_obj.resolved_id,
+                        project_download_cache, 
+                        project_file_cache)
+                    genome_obj.filename = extract_path
+                    genome_record['resolved_id'] = genome_obj.resolved_id
+
+            with open(genome_status_file, 'a+', newline='\n') as f:
+                f.write(genome_obj.to_csv() + '\n')
+
+    missing = len([x for x in genome_status.values() if len(x.filename) == 0])
+    logger.info(
+        'Dataset has {} missing sets of antiSMASH data (from a total of {})'.
+        format(missing, len(genome_records)))
+
+    with open(genome_status_file, 'w', newline='\n') as f:
+        for obj in genome_status.values():
+            f.write(obj.to_csv() + '\n')
+
+    if missing == len(genome_records):
+        logger.warning('Failed to successfully retrieve ANY genome data!')
 
 
 @deprecated(version="1.3.3",

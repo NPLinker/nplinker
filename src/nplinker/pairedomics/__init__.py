@@ -1,1 +1,3 @@
+from ..genomics.antismash.antismash_downloader import download_and_extract_antismash_data
 from .podp_antismash_downloader import download_antismash_data
+from .podp_antismash_downloader import podp_download_and_extract_antismash_data
