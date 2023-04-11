@@ -9,6 +9,7 @@ from .strains import Strain
 from .utils import list_dirs
 from .utils import list_files
 
+
 logger = LogConfig.getLogger(__name__)
 
 
@@ -41,14 +42,20 @@ class StrainCollection():
                     and self._strain_dict_index == other._strain_dict_index)
         return NotImplemented
 
-    def __contains__(self, strain: str | Strain) -> bool:
-        if isinstance(strain, str):
-            value = strain in self._strain_dict_id
-        elif isinstance(strain, Strain):
-            value = strain.id in self._strain_dict_id
+    def __contains__(self, item: str | Strain) -> bool:
+        """Check if the strain collection contains the given strain.
+
+        The given strain could be a Strain object, or a strain id or alias.
+        """
+        if isinstance(item, str):
+            for strain in self:
+                if item == strain.id or item in strain:
+                    return True
+        elif isinstance(item, Strain):
+            return item in self._strains
         else:
-            raise TypeError(f"Expected Strain or str, got {type(strain)}")
-        return value
+            raise TypeError(f"Expected Strain or str, got {type(item)}")
+        return False
 
     def __iter__(self) -> Iterator[Strain]:
         return iter(self._strains)
