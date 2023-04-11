@@ -9,7 +9,6 @@ from .strains import Strain
 from .utils import list_dirs
 from .utils import list_files
 
-
 logger = LogConfig.getLogger(__name__)
 
 
@@ -18,6 +17,7 @@ class StrainCollection():
     def __init__(self):
         """A collection of Strain objects."""
         self._strains: list[Strain] = []
+        # dict of strain name (id and alias) to strain object
         self._strain_dict_id: dict[str, Strain] = {}
         self._strain_dict_index: dict[int, Strain] = {}
 
@@ -122,9 +122,10 @@ class StrainCollection():
         Raises:
             KeyError: If the strain name is not found.
         """
-        if name not in self._strain_dict_id:
-            raise KeyError(f"Strain {name} not found in strain collection.")
-        return self._strain_dict_id[name]
+        for strain in self:
+            if name == strain.id or name in strain:
+                return strain
+        raise KeyError(f"Strain {name} not found in strain collection.")
 
     def add_from_file(self, file: str | PathLike) -> None:
         """Add strains from a strain mapping file.
