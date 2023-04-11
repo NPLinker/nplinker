@@ -51,7 +51,7 @@ class GCF():
         return NotImplemented
 
     def __hash__(self) -> int:
-        """Hash the GCF object.
+        """Hash function for GCF.
 
         Note that GCF class is a mutable container. We only hash the GCF id to
         avoid the hash value changes when `self._bgcs` is updated.
