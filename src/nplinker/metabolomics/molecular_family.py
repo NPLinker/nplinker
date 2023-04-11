@@ -61,6 +61,7 @@ class MolecularFamily():
         """Hash function for MolecularFamily.
 
         Note that MolecularFamily is a mutable container, so here we hash on
-        the id and family_id only.
+        the id and family_id only to avoid the hash value changing when
+        `self.spectra` is updated.
         """
         return hash((self.id, self.family_id))
