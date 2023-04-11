@@ -179,6 +179,10 @@ def _resolve_jgi_accession(jgi_id):
 
 
 def _resolve_genome_id_data(genome_id_data):
+    # TODO: describe what it does better in the doc string. You get the refseq id to which genome accession linked
+    '''
+    Check https://pairedomicsdata.bioinformatics.nl/schema.json.
+    '''
     if 'RefSeq_accession' in genome_id_data:
         # best case, can use this directly
         return genome_id_data['RefSeq_accession']
@@ -439,10 +443,12 @@ def podp_download_and_extract_antismash_data(genome_records, project_download_ca
         logger.warning('Failed to successfully retrieve ANY genome data!')
 
 
+# TODO: just add comments and doc strings, change names of variables and funct, only after that change the logic
+# TODO: load the drawio on the one drive
 @deprecated(version="1.3.3",
             reason="Use download_and_extract_antismash_data class instead.")
 def download_antismash_data(genome_records, project_download_cache,
-                            project_file_cache):
+                            project_file_cache): 
     genome_status = {}
 
     # this file records genome IDs and local filenames to avoid having to repeat HTTP requests
@@ -450,6 +456,8 @@ def download_antismash_data(genome_records, project_download_cache,
     genome_status_file = os.path.join(project_download_cache,
                                       'genome_status.txt')
 
+    # TODO: wrap following lines in a function (genome_status dict as well and return it, see the flowchart)
+    # TODO: comment that stuff is read there, updated in the loop and then saved again in the txt file
     # genome lookup status info
     if os.path.exists(genome_status_file):
         with open(genome_status_file) as f:
@@ -459,6 +467,7 @@ def download_antismash_data(genome_records, project_download_cache,
 
     for i, genome_record in enumerate(genome_records):
         # get the best available ID from the dict
+        # TODO: rename best_id as raw_genome_id
         best_id = _get_best_available_genome_id(genome_record['genome_ID'])
         if best_id is None:
             logger.warning(
@@ -495,6 +504,7 @@ def download_antismash_data(genome_records, project_download_cache,
             logger.info(
                 'Beginning lookup process for genome ID {}'.format(best_id))
 
+            # TODO: rename resolved_id as resolved_refseq_id
             genome_obj.resolved_id = _resolve_genome_id_data(
                 genome_record['genome_ID'])
             genome_obj.attempted = True
@@ -505,7 +515,7 @@ def download_antismash_data(genome_records, project_download_cache,
                 with open(genome_status_file, 'a+') as f:
                     f.write(genome_obj.to_csv() + '\n')
                 continue
-
+            
             # if we got a refseq ID, now try to download the data from antismash
             if _download_antismash_zip(genome_obj, project_download_cache):
                 logger.info(
