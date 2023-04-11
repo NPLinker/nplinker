@@ -48,6 +48,8 @@ class ObjectLink():
 
     def __hash__(self):
         # return the nplinker internal ID as hash value (for set/dict etc)
+        # TODO: hashable object should also have `__eq__` defined, see #136.
+        # this implementation is not ideal as the hash value is not unique
         return hash(self.source.id)
 
     def __str__(self):
