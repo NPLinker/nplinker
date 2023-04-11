@@ -1,5 +1,6 @@
 from __future__ import annotations
 from .logconfig import LogConfig
+from typing import Iterator
 
 
 logger = LogConfig.getLogger(__name__)
@@ -38,6 +39,11 @@ class Strain():
         to avoid the hash value changes when `self._aliases` is updated.
         """
         return hash(self.id)
+
+    def __contains__(self, alias: str) -> bool:
+        if not isinstance(alias, str):
+            raise TypeError(f'Expected str, got {type(alias)}')
+        return alias in self._aliases
 
     @property
     def aliases(self) -> set[str]:
