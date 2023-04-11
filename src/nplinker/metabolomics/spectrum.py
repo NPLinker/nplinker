@@ -121,11 +121,16 @@ class Spectrum():
     def __repr__(self):
         return str(self)
 
-    def __eq__(self, other):
-        return self.id == other.id
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Spectrum):
+            return (self.id == other.id
+                    and self.spectrum_id == other.spectrum_id
+                    and self.precursor_mz == other.precursor_mz
+                    and self.parent_mz == other.parent_mz)
+        return NotImplemented
 
-    def __hash__(self):
-        return hash(self.id)
+    def __hash__(self) -> int:
+        return hash((self.id, self.spectrum_id, self.precursor_mz, self.parent_mz))
 
     def __cmp__(self, other):
         if self.parent_mz >= other.parent_mz:
