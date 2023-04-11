@@ -54,6 +54,8 @@ class Strain():
         Args:
             alias(str): The alias to add to the list of known aliases.
         """
+        if not isinstance(alias, str):
+            raise TypeError(f'Expected str, got {type(alias)}')
         if len(alias) == 0:
             logger.warning(
                 'Refusing to add an empty-string alias to strain {%s}', self)
