@@ -38,7 +38,6 @@ class StrainCollection():
     def __eq__(self, other) -> bool:
         if isinstance(other, StrainCollection):
             return (self._strains == other._strains
-                    and self._strain_dict_id == other._strain_dict_id
                     and self._strain_dict_index == other._strain_dict_index)
         return NotImplemented
 
