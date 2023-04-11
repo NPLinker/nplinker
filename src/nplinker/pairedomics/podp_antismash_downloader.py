@@ -179,6 +179,7 @@ def _resolve_jgi_accession(jgi_id):
 
 
 def _resolve_genome_id_data(genome_id_data):
+    # TODO: rename the function to smt more direct (resolve refseq accession id)
     # TODO: describe what it does better in the doc string. You get the refseq id to which genome accession linked
     '''
     Check https://pairedomicsdata.bioinformatics.nl/schema.json.
