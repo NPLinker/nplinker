@@ -28,8 +28,7 @@ class Strain():
 
     def __eq__(self, other) -> bool:
         if isinstance(other, Strain):
-            return (self.id == other.id
-                    and self.aliases == other.aliases)
+            return self.id == other.id
         return NotImplemented
 
     def __hash__(self) -> int:
