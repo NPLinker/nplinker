@@ -28,9 +28,8 @@ from typing import Sequence
 # import packages
 import numpy as np
 import pandas as pd
-
-from nplinker.metabolomics.molecular_family import MolecularFamily
 from nplinker.genomics.gcf import GCF
+from nplinker.metabolomics.molecular_family import MolecularFamily
 from nplinker.metabolomics.spectrum import Spectrum
 from .data_linking_functions import calc_correlation_matrix
 
@@ -55,6 +54,8 @@ class DataLinks():
         # matrices that store co-occurences with respect to strains
         # values = 1 where gcf/spec/fam occur in strain
         # values = 0 where gcf/spec/fam do not occur in strain
+
+        # 2D array [gcf: int, strain: int]
         self.M_gcf_strain = []
         self.M_spec_strain = []
         self.M_fam_strain = []
@@ -209,10 +210,10 @@ class DataLinks():
         # Collect co-ocurences in M_spec_strain matrix
         M_gcf_strain = np.zeros((len(gcf_list), len(strain_list)))
 
-        for i, strain in enumerate(strain_list):
-            for m, gcf in enumerate(gcf_list):
+        for i, gcf in enumerate(gcf_list):
+            for j, strain in enumerate(strain_list):
                 if gcf.has_strain(strain):
-                    M_gcf_strain[m, i] = 1
+                    M_gcf_strain[i, j] = 1
 
         self.M_gcf_strain = M_gcf_strain
         # extend mapping tables:
@@ -304,7 +305,7 @@ class DataLinks():
         self.mapping_fam["no of members"] = num_members
         return self.family_members
 
-    def common_strains(self, objects_a, objects_b, filter_no_shared=False):
+    def common_strains(self, metabolome_objects, gcfs, filter_no_shared=False) -> dict:
         """
         Obtain the set of common strains between all pairs from the lists objects_a
         and objects_b.
@@ -320,11 +321,11 @@ class DataLinks():
 
         # TODO make this work for BGCs too?
 
-        is_list_a = isinstance(objects_a, list)
-        is_list_b = isinstance(objects_b, list)
+        is_list_a = isinstance(metabolome_objects, list)
+        is_list_b = isinstance(gcfs, list)
 
-        type_a = type(objects_a[0]) if is_list_a else type(objects_a)
-        type_b = type(objects_b[0]) if is_list_b else type(objects_b)
+        type_a = type(metabolome_objects[0]) if is_list_a else type(metabolome_objects)
+        type_b = type(gcfs[0]) if is_list_b else type(gcfs)
 
         if type_a == type_b:
             raise Exception('Must supply objects with different types!')
@@ -333,33 +334,40 @@ class DataLinks():
         if type_a == GCF:
             type_a, type_b = type_b, type_a
             is_list_a, is_list_b = is_list_b, is_list_a
-            objects_a, objects_b = objects_b, objects_a
+            metabolome_objects, gcfs = gcfs, metabolome_objects
 
         if not is_list_a:
-            objects_a = [objects_a]
+            metabolome_objects = [metabolome_objects]
         if not is_list_b:
-            objects_b = [objects_b]
+            gcfs = [gcfs]
 
         # retrieve object IDs
         # TODO: issue #103 stop using gcf.id, but note that the ids_b should be
         # a list of int
-        ids_b = [gcf.id for gcf in objects_b]
+        gcfs_id_list = [gcf.id for gcf in gcfs]
         # these might be MolFams or Spectra, either way they'll have a .id attribute
-        ids_a = [obj.id for obj in objects_a]
+        ids_a = [obj.id for obj in metabolome_objects]
 
         data_a = self.M_spec_strain if type_a == Spectrum else self.M_fam_strain
-        data_b = self.M_gcf_strain
 
         results = {}
-        for a, obj_a in enumerate(objects_a):
-            for b, obj_b in enumerate(objects_b):
+        for i, obj_meta in enumerate(metabolome_objects):
+            for j, obj_gcf in enumerate(gcfs):
                 # just AND both arrays and extract the indices with positive results
+
+                # self.M_gcf_strain is a 2D np.array [index of gcf_list, index of strain_list]
+                # TODO: bug here. self.M_gcf_strain use the enumerate count of the gcf_list as index
+                # it's wrong to assume that enumerate count is same as the gcf.id.
+                # self.M_gcf_strain should use dataframe
+                # TODO: Bug: the result is 1D array of the enumerated count of strain_list
+                # for the common strains. Same here, the enumerate count is not
+                # the same as the strain.id
                 result = np.where(
-                    np.logical_and(data_a[ids_a[a]], data_b[ids_b[b]]))[0]
+                    np.logical_and(data_a[ids_a[i]], self.M_gcf_strain[gcfs_id_list[j]]))[0]
                 # if we want to exclude results with no shared strains
                 if (filter_no_shared
                         and len(result) > 0) or not filter_no_shared:
-                    results[(obj_a, obj_b)] = result
+                    results[(obj_meta, obj_gcf)] = result
 
         return results
 
