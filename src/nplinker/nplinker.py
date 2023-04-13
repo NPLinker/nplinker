@@ -493,13 +493,17 @@ class NPLinker():
 
         # this is a dict with structure:
         #   (Spectrum/MolecularFamily, GCF) => list of strain indices
-        common_strains = self._datalinks.common_strains(
+        common_strains_index_dict = self._datalinks.common_strains(
             objects_a, objects_b, filter_no_shared)
 
+        common_strains = {}
         # replace the lists of strain indices with actual strain objects
-        for objpair in common_strains.keys():
-            common_strains[objpair] = [
-                self._strains.lookup_index(x) for x in common_strains[objpair]
+        # TODO: bug here, the index value of common_strains_index_dict is
+        #       not the same as the index value of self._strains
+        # Solution: lookup with strain.id instead of index
+        for key in common_strains_index_dict:
+            common_strains[key] = [
+                self._strains.lookup_index(x) for x in common_strains_index_dict[key]
             ]
 
         return common_strains
