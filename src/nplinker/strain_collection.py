@@ -19,7 +19,7 @@ class StrainCollection():
         """A collection of Strain objects."""
         self._strains: list[Strain] = []
         # dict of strain name (id and alias) to strain object
-        self._strain_dict_id: dict[str, Strain] = {}
+        self._strain_dict_name: dict[str, Strain] = {}
         self._strain_dict_index: dict[int, Strain] = {}
 
     def __repr__(self) -> str:
@@ -68,17 +68,17 @@ class StrainCollection():
             strain(Strain): The strain to add.
         """
         # if the strain exists, merge the aliases
-        if strain.id in self._strain_dict_id:
+        if strain.id in self._strain_dict_name:
             existing: Strain = self.lookup(strain.id)
             for alias in strain.aliases:
                 existing.add_alias(alias)
-                self._strain_dict_id[alias] = existing
+                self._strain_dict_name[alias] = existing
         else:
             self._strain_dict_index[len(self)] = strain
             self._strains.append(strain)
-            self._strain_dict_id[strain.id] = strain
+            self._strain_dict_name[strain.id] = strain
             for alias in strain.aliases:
-                self._strain_dict_id[alias] = strain
+                self._strain_dict_name[alias] = strain
 
     def remove(self, strain: Strain):
         """Remove a strain from the collection.
@@ -86,12 +86,12 @@ class StrainCollection():
         Args:
             strain(Strain): The strain to remove.
         """
-        if strain.id in self._strain_dict_id:
+        if strain.id in self._strain_dict_name:
             self._strains.remove(strain)
             # remove from dict id
-            del self._strain_dict_id[strain.id]
+            del self._strain_dict_name[strain.id]
             for alias in strain.aliases:
-                del self._strain_dict_id[alias]
+                del self._strain_dict_name[alias]
 
     def filter(self, strain_set: set[Strain]):
         """

@@ -54,7 +54,7 @@ def test_remove(collection: StrainCollection, strain: Strain):
     assert strain in collection
     collection.remove(strain)
     with pytest.raises(KeyError):
-        _ = collection._strain_dict_id[strain.id]
+        _ = collection._strain_dict_name[strain.id]
     assert strain not in collection
     # TODO: issue #90
     # with pytest.raises(KeyError):
