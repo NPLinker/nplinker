@@ -260,6 +260,7 @@ class NPLinker():
         Returns:
             bool: True if successful, False otherwise
         """
+        # TODO: the met_only is useless, remove it. NPlinker will stop working if met_only=True
         # typical case where load_data is being called with no params
         if new_bigscape_cutoff is None:
             logger.debug(
