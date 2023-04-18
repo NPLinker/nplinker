@@ -453,6 +453,7 @@ class LinkFinder():
 
             if main_score == 'likescore':
                 likescores = [
+                    # TODO CG: use dataframe instead of numpy array
                     self.likescores_spec_gcf[:, input_ids],
                     self.likescores_fam_gcf[:, input_ids]
                 ]
