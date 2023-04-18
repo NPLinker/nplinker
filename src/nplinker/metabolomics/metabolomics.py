@@ -35,7 +35,7 @@ def _mols_to_spectra(ms2, metadata):
 
     spectra = []
     for i, m in enumerate(ms2_dict.keys()):
-        new_spectrum = Spectrum(i, ms2_dict[m], int(m.name),
+        new_spectrum = Spectrum(i, ms2_dict[m], m.name,
                                 metadata[m.name]['precursormass'],
                                 metadata[m.name]['parentmass'])
         new_spectrum.metadata = metadata[m.name]
@@ -53,15 +53,15 @@ def _mols_to_spectra(ms2, metadata):
     return spectra
 
 @deprecated(version="1.3.3", reason="Use the GNPSMolecularFamilyLoader class instead.")
-def load_edges(edges_file: str, spec_dict: dict[int, Spectrum]):
+def load_edges(edges_file: str, spec_dict: dict[str, Spectrum]):
     """Insert information about the molecular family into the spectra.
 
     Args:
         edges_file(str): File containing the molecular families.
-        spec_dict(dict[int, Spectrum]): Dictionary with mapping from spectra_id to Spectrum.
+        spec_dict(dict[str, Spectrum]): Dictionary with mapping from spectra_id to Spectrum.
 
     Raises:
-        Exception: Raises exception if the edges file doesn't contain the correct columns. 
+        Exception: Raises exception if the edges file doesn't contain the correct columns.
     """
     logger.debug('loading edges file: {} [{} spectra from MGF]'.format(
         edges_file, len(spec_dict)))
@@ -145,7 +145,7 @@ def load_dataset(strains,
 
 
 @deprecated(version="1.3.3", reason="Use the GNPSSpectrumLoader class instead.")
-def load_spectra(mgf_file: str | PathLike, edges_file: str | PathLike) -> dict[int, Spectrum]:
+def load_spectra(mgf_file: str | PathLike, edges_file: str | PathLike) -> dict[str, Spectrum]:
     """Wrapper function to load spectra and init the molecular family links.
 
     Args:
@@ -153,14 +153,14 @@ def load_spectra(mgf_file: str | PathLike, edges_file: str | PathLike) -> dict[i
         edges_file(str | PathLike): File storing the molecular family information in .selfloop or .pairsinfo format.
 
     Returns:
-        dict[int, Spectrum]: Indexed dict of mass spectra.
+        dict[str, Spectrum]: Indexed dict of mass spectra.
     """
 
     ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([str(mgf_file)])
     logger.info('%d molecules parsed from MGF file', len(ms1))
     spectra = _mols_to_spectra(ms2, metadata)    # above returns a list, create a dict indexed by spectrum_id to make
     # the rest of the parsing a bit simpler
-    spec_dict: dict[int, Spectrum] = {spec.spectrum_id: spec for spec in spectra}
+    spec_dict: dict[str, Spectrum] = {spec.spectrum_id: spec for spec in spectra}
     load_edges(edges_file, spec_dict)
     return spec_dict
 

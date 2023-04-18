@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import Counter
 import glob
 import os
-from collections import Counter
 from canopus import Canopus
 from canopus.classifications_to_gnps import analyse_canopus
 from ..logconfig import LogConfig
@@ -409,7 +409,7 @@ class CanopusResults:
 
             classes_per_spectra = []
             for spec in spectra:
-                spec_classes = self.spectra_classes.get(str(spec.spectrum_id))
+                spec_classes = self.spectra_classes.get(spec.spectrum_id)
                 if spec_classes:  # account for spectra without prediction
                     classes_per_spectra.append(spec_classes)
 

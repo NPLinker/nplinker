@@ -48,7 +48,7 @@ def _mols_to_spectra(ms2: list, metadata: dict[str, dict[str, str]]) -> list[Spe
 
     spectra = []
     for i, m in enumerate(ms2_dict.keys()): # m is `nplinker.parsers.mgf.MS1` object
-        new_spectrum = Spectrum(i, ms2_dict[m], int(m.name),
+        new_spectrum = Spectrum(i, ms2_dict[m], m.name,
                                 metadata[m.name]['precursormass'],
                                 metadata[m.name]['parentmass'])
         new_spectrum.metadata = metadata[m.name]

@@ -1,8 +1,8 @@
 from typing_extensions import Self
-
 from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
+
 
 class MolecularFamily():
 
@@ -16,7 +16,7 @@ class MolecularFamily():
         self.family_id: int = family_id
         self.spectra: list[Spectrum] = []
         self.family = None
-        self.spectra_ids: set[int] = set()
+        self.spectra_ids: set[str] = set()
 
     # def has_strain(self, strain):
     #     for spectrum in self.spectra:

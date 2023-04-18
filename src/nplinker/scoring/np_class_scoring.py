@@ -261,7 +261,7 @@ class NPClassScoring(ScoringMethod):
                 # list of list of tuples/None - todo: add to spectrum object?
                 # take only 'best' (first) classification per ontology level
                 all_classes = self.npl.chem_classes.canopus. \
-                    spectra_classes.get(str(spec_like.spectrum_id))
+                    spectra_classes.get(spec_like.spectrum_id)
                 if all_classes:
                     spec_like_classes = [
                         cls_per_lvl for lvl in all_classes

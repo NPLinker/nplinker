@@ -2,6 +2,7 @@
 from nplinker.strain_collection import StrainCollection
 from nplinker.utils import sqrt_normalise
 
+
 GNPS_KEY = 'gnps'
 
 JCAMP = '##TITLE={}\\n' +\
@@ -22,7 +23,7 @@ class Spectrum():
     def __init__(self,
                  id,
                  peaks,
-                 spectrum_id,
+                 spectrum_id: str,
                  precursor_mz,
                  parent_mz=None,
                  rt=None):
@@ -34,8 +35,7 @@ class Spectrum():
             intensity for mz, intensity in self.peaks)
         self.total_ms2_intensity = sum(
             intensity for mz, intensity in self.peaks)
-        assert (isinstance(spectrum_id, int))
-        self.spectrum_id = spectrum_id # == metadata.get('cluster_index')
+        self.spectrum_id = spectrum_id  # MS1.name
         self.rt = rt
         self.precursor_mz = precursor_mz
         self.parent_mz = parent_mz
