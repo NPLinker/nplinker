@@ -1,13 +1,13 @@
 from itertools import chain
-
 import pytest
-from nplinker.metabolomics.load_gnps import _messy_strain_naming_lookup, _parse_mzxml_header
-from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_file_mapping, GNPSFormat
+from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_file_mapping
+from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
 from nplinker.metabolomics.load_gnps import _load_clusterinfo_old
+from nplinker.metabolomics.load_gnps import _messy_strain_naming_lookup
+from nplinker.metabolomics.load_gnps import _parse_mzxml_header
 from nplinker.metabolomics.load_gnps import load_gnps
 from nplinker.strain_collection import StrainCollection
 from nplinker.utils import get_headers
-
 from .. import DATA_DIR
 
 
@@ -51,7 +51,7 @@ def test_load_clusterinfo_old(spec_dict):
     for spectrum_id, spec in spec_dict.items():
         metadata = spec.metadata
         assert len(metadata.get('files')) > 1
-        assert isinstance(metadata.get('cluster_index'), int)
+        assert isinstance(metadata.get('cluster_index'), str)
         assert spectrum_id == metadata.get('cluster_index')
 
 
