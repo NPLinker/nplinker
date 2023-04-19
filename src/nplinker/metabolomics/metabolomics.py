@@ -53,7 +53,7 @@ def _mols_to_spectra(ms2, metadata):
     return spectra
 
 @deprecated(version="1.3.3", reason="Use the GNPSMolecularFamilyLoader class instead.")
-def load_edges(edges_file: str, spec_dict: dict[str, Spectrum]):
+def load_edges(edges_file: str | PathLike, spec_dict: dict[str, Spectrum]):
     """Insert information about the molecular family into the spectra.
 
     Args:
@@ -79,8 +79,8 @@ def load_edges(edges_file: str, spec_dict: dict[str, Spectrum]):
                     edges_file))
 
         for line in reader:
-            spec1_id = int(line[cid1_index])
-            spec2_id = int(line[cid2_index])
+            spec1_id = line[cid1_index]
+            spec2_id = line[cid2_index]
             cosine = float(line[cos_index])
             family = int(line[fam_index])
 
@@ -134,7 +134,7 @@ def load_dataset(strains,
     # spec_dict = {spec.spectrum_id: spec for spec in spectra}
 
     # add edges info to the spectra
-    molfams = make_families(spec_dict.values())
+    molfams = make_families(list(spec_dict.values()))
     # molfams = GNPSMolecularFamilyLoader(edges_file).families()
 
     unknown_strains = load_gnps(strains, nodes_file, quant_table_file,

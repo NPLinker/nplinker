@@ -9,7 +9,7 @@ from .. import DATA_DIR
 
 
 @pytest.fixture
-def spec_with_families(spec_dict) -> dict[int, Spectrum]:
+def spec_with_families(spec_dict) -> dict[str, Spectrum]:
     make_families(spec_dict.values())
     return spec_dict
 
