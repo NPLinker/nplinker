@@ -395,7 +395,7 @@ def podp_download_and_extract_antismash_data(genome_records, project_download_ca
     
     genome_status_file = os.path.join(project_download_cache,
                                     'genome_status.txt')
-    genome_status = _get_genome_status_log(genome_status_file) 
+    genome_status = _get_genome_status_log(genome_status_file)
 
     for i, genome_record in enumerate(genome_records):
         # get the best available ID from the dict
@@ -445,22 +445,20 @@ def podp_download_and_extract_antismash_data(genome_records, project_download_ca
                 with open(genome_status_file, 'a+') as f:
                     f.write(genome_obj.to_csv() + '\n')
                 continue
-            
-            # if we got a refseq ID, now try to download the data from antismash
-            if _download_antismash_zip(genome_obj, project_download_cache):
-                logger.info(
-                    'Genome data successfully downloaded for {}'.format(
-                        raw_genome_id))
-                genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
-            else:
-                logger.warning(
-                    'Failed to download antiSMASH data for genome ID {} ({})'.
-                    format(genome_obj.resolved_refseq_id, genome_obj.original_id))
 
-            with open(genome_status_file, 'a+', newline='\n') as f:
-                f.write(genome_obj.to_csv() + '\n')
+        # if we got a refseq ID, now try to download and extract the data from antismash
+        download_and_extract_antismash_data(genome_obj.resolved_refseq_id,
+                                        project_download_cache,
+                                        project_file_cache)
 
-        _extract_antismash_zip(genome_obj, project_file_cache)
+        with open(genome_status_file, 'a+', newline='\n') as f:
+            f.write(genome_obj.to_csv() + '\n')
+
+        output_path = os.path.join(project_file_cache, 'antismash',
+                                genome_obj.resolved_refseq_id)
+        if not os.path.exists(
+            os.path.join(output_path, 'completed')):
+            open(os.path.join(output_path, 'completed'), 'w').close()
 
     missing = len([x for x in genome_status.values() if len(x.filename) == 0])
     logger.info(
