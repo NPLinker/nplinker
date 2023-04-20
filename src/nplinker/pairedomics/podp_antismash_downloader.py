@@ -30,20 +30,20 @@ USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 
 
 class GenomeStatus:
 
-    def __init__(self, original_id, resolved_id, attempted=False, filename=""):
+    def __init__(self, original_id, resolved_refseq_id, attempted=False, filename=""):
         self.original_id = ';'.join(original_id.split(','))
-        self.resolved_id = None if resolved_id == 'None' else resolved_id
+        self.resolved_refseq_id = None if resolved_refseq_id == 'None' else resolved_refseq_id
         self.attempted = True if attempted == 'True' else False
         self.filename = filename
 
     @classmethod
-    def from_csv(cls, original_id, resolved_id, attempted, filename):
-        return cls(original_id, resolved_id, attempted, filename)
+    def from_csv(cls, original_id, resolved_refseq_id, attempted, filename):
+        return cls(original_id, resolved_refseq_id, attempted, filename)
 
     def to_csv(self):
         return ','.join([
             str(self.original_id),
-            str(self.resolved_id),
+            str(self.resolved_refseq_id),
             str(self.attempted), self.filename
         ])
 
@@ -201,7 +201,7 @@ def _get_antismash_db_page(genome_obj):
     # want to try up to 4 different links here, v1 and v2 databases, each
     # with and without the .1 suffix on the accesssion ID
 
-    accesssions = [genome_obj.resolved_id, genome_obj.resolved_id + '.1']
+    accesssions = [genome_obj.resolved_refseq_id, genome_obj.resolved_refseq_id + '.1']
     for base_url in [ANTISMASH_DB_PAGE_URL, ANTISMASH_DBV2_PAGE_URL]:
         for accession in accesssions:
             url = base_url.format(accession)
@@ -223,7 +223,7 @@ def _get_antismash_db_page(genome_obj):
                     'antiSMASH lookup succeeded! Filename is {}'.format(
                         link['href']))
                 # save with the .1 suffix if that worked
-                genome_obj.resolved_id = accession
+                genome_obj.resolved_refseq_id = accession
                 return link['href']
 
     return None
@@ -261,7 +261,7 @@ def _get_antismash_zip_data(accession_id, filename, local_path):
 def _download_antismash_zip(antismash_obj, project_download_cache):
     # save zip files to avoid having to repeat above lookup every time
     local_path = os.path.join(project_download_cache,
-                              f'{antismash_obj.resolved_id}.zip')
+                              f'{antismash_obj.resolved_refseq_id}.zip')
     logger.debug(f'Checking for existing antismash zip at {local_path}')
 
     cached = False
@@ -286,7 +286,7 @@ def _download_antismash_zip(antismash_obj, project_download_cache):
         if filename is None:
             return False
 
-        _get_antismash_zip_data(antismash_obj.resolved_id, filename,
+        _get_antismash_zip_data(antismash_obj.resolved_refseq_id, filename,
                                 local_path)
         antismash_obj.filename = local_path
 
@@ -298,7 +298,7 @@ def _extract_antismash_zip(antismash_obj, project_file_cache):
         return False
 
     output_path = os.path.join(project_file_cache, 'antismash',
-                               antismash_obj.resolved_id)
+                               antismash_obj.resolved_refseq_id)
     exists_already = os.path.exists(output_path) and os.path.exists(
         os.path.join(output_path, 'completed'))
 
@@ -313,7 +313,7 @@ def _extract_antismash_zip(antismash_obj, project_file_cache):
         os.makedirs(output_path, exist_ok=True)
 
     antismash_zip = zipfile.ZipFile(antismash_obj.filename)
-    kc_prefix1 = f'{antismash_obj.resolved_id}/knownclusterblast'
+    kc_prefix1 = f'{antismash_obj.resolved_refseq_id}/knownclusterblast'
     kc_prefix2 = 'knownclusterblast'
     for zip_member in antismash_zip.namelist():
         # TODO other files here?
@@ -369,12 +369,12 @@ def podp_download_and_extract_antismash_data(genome_records, project_download_ca
             # file already downloaded
             logger.info('Genome ID {} already downloaded to {}'.format(
                 raw_genome_id, genome_obj.filename))
-            genome_record['resolved_id'] = genome_obj.resolved_id
+            genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
         elif genome_obj.attempted:
             # lookup attempted previously but failed
             logger.info(
                 'Genome ID {} skipped due to previous failure'.format(raw_genome_id))
-            genome_record['resolved_id'] = genome_obj.resolved_id
+            genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
         else:
             # if no existing file and no lookup attempted, can start process of
             # trying to retrieve the data
@@ -383,23 +383,23 @@ def podp_download_and_extract_antismash_data(genome_records, project_download_ca
             logger.info(
                 'Beginning lookup process for genome ID {}'.format(raw_genome_id))
 
-            genome_obj.resolved_id = _resolve_refseq_access_id(
+            genome_obj.resolved_refseq_id = _resolve_refseq_access_id(
                 genome_record['genome_ID'])
             genome_obj.attempted = True
 
-            if genome_obj.resolved_id is None:
+            if genome_obj.resolved_refseq_id is None:
                 # give up on this one
                 logger.warning(f'Failed lookup for genome ID {raw_genome_id}')
                 with open(genome_status_file, 'a+') as f:
                     f.write(genome_obj.to_csv() + '\n')
                 continue
-            extract_path = Path(project_file_cache, 'antismash', 'genome_obj.resolved_id')
+            extract_path = Path(project_file_cache, 'antismash', 'genome_obj.resolved_refseq_id')
             try:
                 download_and_extract_antismash_data(
-                    genome_obj.resolved_id,
+                    genome_obj.resolved_refseq_id,
                     project_download_cache, 
                     project_file_cache)
-                genome_record['resolved_id'] = genome_obj.resolved_id
+                genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
             except ValueError(f'Nonempty directory: "{extract_path}"'):
                 logger.debug(f'Checking for existing antismash zip at {extract_path}')
 
@@ -421,11 +421,11 @@ def podp_download_and_extract_antismash_data(genome_records, project_download_ca
 
                 if not cached:
                     download_and_extract_antismash_data(
-                        genome_obj.resolved_id,
+                        genome_obj.resolved_refseq_id,
                         project_download_cache, 
                         project_file_cache)
                     genome_obj.filename = extract_path
-                    genome_record['resolved_id'] = genome_obj.resolved_id
+                    genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
 
             with open(genome_status_file, 'a+', newline='\n') as f:
                 f.write(genome_obj.to_csv() + '\n')
@@ -488,12 +488,12 @@ def download_antismash_data(genome_records, project_download_cache,
             # file already downloaded
             logger.info('Genome ID {} already downloaded to {}'.format(
                 raw_genome_id, genome_obj.filename))
-            genome_record['resolved_id'] = genome_obj.resolved_id
+            genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
         elif genome_obj.attempted:
             # lookup attempted previously but failed
             logger.info(
                 'Genome ID {} skipped due to previous failure'.format(raw_genome_id))
-            genome_record['resolved_id'] = genome_obj.resolved_id
+            genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
         else:
             # if no existing file and no lookup attempted, can start process of
             # trying to retrieve the data
@@ -502,12 +502,11 @@ def download_antismash_data(genome_records, project_download_cache,
             logger.info(
                 'Beginning lookup process for genome ID {}'.format(raw_genome_id))
 
-            # TODO: rename resolved_id as resolved_refseq_id
-            genome_obj.resolved_id = _resolve_refseq_access_id(
+            genome_obj.resolved_refseq_id = _resolve_refseq_access_id(
                 genome_record['genome_ID'])
             genome_obj.attempted = True
 
-            if genome_obj.resolved_id is None:
+            if genome_obj.resolved_refseq_id is None:
                 # give up on this one
                 logger.warning(f'Failed lookup for genome ID {raw_genome_id}')
                 with open(genome_status_file, 'a+') as f:
@@ -519,11 +518,11 @@ def download_antismash_data(genome_records, project_download_cache,
                 logger.info(
                     'Genome data successfully downloaded for {}'.format(
                         raw_genome_id))
-                genome_record['resolved_id'] = genome_obj.resolved_id
+                genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
             else:
                 logger.warning(
                     'Failed to download antiSMASH data for genome ID {} ({})'.
-                    format(genome_obj.resolved_id, genome_obj.original_id))
+                    format(genome_obj.resolved_refseq_id, genome_obj.original_id))
 
             with open(genome_status_file, 'a+', newline='\n') as f:
                 f.write(genome_obj.to_csv() + '\n')
