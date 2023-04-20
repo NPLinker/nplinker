@@ -179,10 +179,10 @@ def _resolve_jgi_accession(jgi_id):
 
 
 def _resolve_refseq_access_id(genome_id_data):
-    # TODO: describe what it does better in the doc string. You get the refseq id to which genome accession linked
-    '''
+    """Get the RefSeq ID to which the genome accession is linked. 
+
     Check https://pairedomicsdata.bioinformatics.nl/schema.json.
-    '''
+    """
     if 'RefSeq_accession' in genome_id_data:
         # best case, can use this directly
         return genome_id_data['RefSeq_accession']
