@@ -178,8 +178,7 @@ def _resolve_jgi_accession(jgi_id):
     return _resolve_genbank_accession(link.text)
 
 
-def _resolve_genome_id_data(genome_id_data):
-    # TODO: rename the function to smt more direct (resolve refseq accession id)
+def _resolve_refseq_access_id(genome_id_data):
     # TODO: describe what it does better in the doc string. You get the refseq id to which genome accession linked
     '''
     Check https://pairedomicsdata.bioinformatics.nl/schema.json.
@@ -384,7 +383,7 @@ def podp_download_and_extract_antismash_data(genome_records, project_download_ca
             logger.info(
                 'Beginning lookup process for genome ID {}'.format(best_id))
 
-            genome_obj.resolved_id = _resolve_genome_id_data(
+            genome_obj.resolved_id = _resolve_refseq_access_id(
                 genome_record['genome_ID'])
             genome_obj.attempted = True
 
@@ -506,7 +505,7 @@ def download_antismash_data(genome_records, project_download_cache,
                 'Beginning lookup process for genome ID {}'.format(best_id))
 
             # TODO: rename resolved_id as resolved_refseq_id
-            genome_obj.resolved_id = _resolve_genome_id_data(
+            genome_obj.resolved_id = _resolve_refseq_access_id(
                 genome_record['genome_ID'])
             genome_obj.attempted = True
 
