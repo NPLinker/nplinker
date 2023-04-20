@@ -1,6 +1,6 @@
 import csv
 import os
-from pathlib import Path
+from os import PathLike
 import re
 import time
 import zipfile
@@ -48,7 +48,42 @@ class GenomeStatus:
         ])
 
 
-def _get_best_available_genome_id(genome_id_data):
+def _get_genome_status_log(genome_status_file: str | PathLike) -> dict:
+    """Read genome_status.txt in a dict if it exists, otherwise create
+    the dictionary. 
+
+    Args:
+        genome_status_file(str | PathLike): it records genome IDs and local filenames to avoid having to repeat HTTP requests
+        each time the app is loaded (this can take a lot of time if there are dozens of genomes).
+
+    Returns:
+        dict: log for information about the read genome IDs.
+        """
+
+    genome_status = {}
+
+    # 'genome_status.txt' is read, then in the for loop over the genome records it gets updated, 
+    # and finally it is saved again in 'genome_status.txt' which is overwritten
+    if os.path.exists(genome_status_file):
+        with open(genome_status_file) as f:
+            for line in csv.reader(f):
+                asobj = GenomeStatus.from_csv(*line)
+                genome_status[asobj.original_id] = asobj
+
+    return genome_status
+
+
+def _get_best_available_genome_id(genome_id_data: dict) -> str | None:
+    """Get the best available ID from genome_id_data dict.
+
+    Args:
+        genome_id_data(dict): dictionary containing information
+        for each genome record present.
+
+    Returns:
+        str | None: ID for the genome, if present, otherwise None. 
+
+        """
     if 'RefSeq_accession' in genome_id_data:
         return genome_id_data['RefSeq_accession']
     elif 'GenBank_accession' in genome_id_data:
@@ -98,7 +133,19 @@ def _ncbi_genbank_search(genbank_id, retry_time=5.0):
     return None
 
 
-def _resolve_genbank_accession(genbank_id):
+def _resolve_genbank_accession(genbank_id: str) -> str | None:
+    """Try to get RefSeq_accession through GenBank. 
+
+    Args:
+        genbank_id(str): ID for GenBank accession. 
+
+    Raises:
+        Exception: "Unknown HTML format" if the search of genbank does not give any results. 
+        Exception: "Expected HTML elements not found" if no match with RefSeq assembly accession is found.
+
+    Returns:
+        str | None: RefSeq ID if the search is successful, otherwise None. 
+        """
     logger.info(
         'Attempting to resolve Genbank accession {} to RefSeq accession'.
         format(genbank_id))
@@ -153,7 +200,15 @@ def _resolve_genbank_accession(genbank_id):
     return None
 
 
-def _resolve_jgi_accession(jgi_id):
+def _resolve_jgi_accession(jgi_id: str) -> str | None:
+    """_summary_
+
+    Args:
+        jgi_id(str): JGI_Genome_ID for GenBank accession. 
+
+    Returns:
+        str | None: GenBank accession ID if search is successful, otherwise None.
+        """
     url = JGI_GENOME_LOOKUP_URL.format(jgi_id)
     logger.info(
         'Attempting to resolve JGI_Genome_ID {} to GenBank accession via {}'.
@@ -178,11 +233,17 @@ def _resolve_jgi_accession(jgi_id):
     return _resolve_genbank_accession(link.text)
 
 
-def _resolve_refseq_access_id(genome_id_data):
-    """Get the RefSeq ID to which the genome accession is linked. 
-
+def _resolve_refseq_access_id(genome_id_data: dict) -> str | None:
+    """Get the RefSeq ID to which the genome accession is linked.
     Check https://pairedomicsdata.bioinformatics.nl/schema.json.
-    """
+
+    Args:
+        genome_id_data(dict): dictionary containing information
+        for each genome record present.
+
+    Returns:
+        str | None: ID for the accession genome, if present, otherwise None. 
+        """
     if 'RefSeq_accession' in genome_id_data:
         # best case, can use this directly
         return genome_id_data['RefSeq_accession']
@@ -331,19 +392,10 @@ def _extract_antismash_zip(antismash_obj, project_file_cache):
 
 def podp_download_and_extract_antismash_data(genome_records, project_download_cache,
                             project_file_cache):
-    genome_status = {}
-
-    # this file records genome IDs and local filenames to avoid having to repeat HTTP requests
-    # each time the app is loaded (this can take a lot of time if there are dozens of genomes)
+    
     genome_status_file = os.path.join(project_download_cache,
-                                      'genome_status.txt')
-
-    # genome lookup status info
-    if os.path.exists(genome_status_file):
-        with open(genome_status_file) as f:
-            for line in csv.reader(f):
-                asobj = GenomeStatus.from_csv(*line)
-                genome_status[asobj.original_id] = asobj
+                                    'genome_status.txt')
+    genome_status = _get_genome_status_log(genome_status_file) 
 
     for i, genome_record in enumerate(genome_records):
         # get the best available ID from the dict
@@ -393,42 +445,22 @@ def podp_download_and_extract_antismash_data(genome_records, project_download_ca
                 with open(genome_status_file, 'a+') as f:
                     f.write(genome_obj.to_csv() + '\n')
                 continue
-            extract_path = Path(project_file_cache, 'antismash', 'genome_obj.resolved_refseq_id')
-            try:
-                download_and_extract_antismash_data(
-                    genome_obj.resolved_refseq_id,
-                    project_download_cache, 
-                    project_file_cache)
+            
+            # if we got a refseq ID, now try to download the data from antismash
+            if _download_antismash_zip(genome_obj, project_download_cache):
+                logger.info(
+                    'Genome data successfully downloaded for {}'.format(
+                        raw_genome_id))
                 genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
-            except ValueError(f'Nonempty directory: "{extract_path}"'):
-                logger.debug(f'Checking for existing antismash zip at {extract_path}')
-
-                cached = False
-                # if the file exists locally
-                logger.info(f'Found cached file at {extract_path}')
-                try:
-                    # check if it's a valid zip file, if so treat it as cached
-                    _ = zipfile.ZipFile(extract_path)
-                    cached = True
-                    genome_obj.filename = extract_path
-                except zipfile.BadZipFile as bzf:
-                    # otherwise delete and redownload
-                    logger.info(
-                        'Invalid antismash zipfile found ({}). Will download again'.
-                        format(bzf))
-                    os.unlink(extract_path)
-                    genome_obj.filename = ""
-
-                if not cached:
-                    download_and_extract_antismash_data(
-                        genome_obj.resolved_refseq_id,
-                        project_download_cache, 
-                        project_file_cache)
-                    genome_obj.filename = extract_path
-                    genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
+            else:
+                logger.warning(
+                    'Failed to download antiSMASH data for genome ID {} ({})'.
+                    format(genome_obj.resolved_refseq_id, genome_obj.original_id))
 
             with open(genome_status_file, 'a+', newline='\n') as f:
                 f.write(genome_obj.to_csv() + '\n')
+
+        _extract_antismash_zip(genome_obj, project_file_cache)
 
     missing = len([x for x in genome_status.values() if len(x.filename) == 0])
     logger.info(
@@ -443,26 +475,14 @@ def podp_download_and_extract_antismash_data(genome_records, project_download_ca
         logger.warning('Failed to successfully retrieve ANY genome data!')
 
 
-# TODO: just add comments and doc strings, change names of variables and funct, only after that change the logic
 @deprecated(version="1.3.3",
             reason="Use download_and_extract_antismash_data class instead.")
 def download_antismash_data(genome_records, project_download_cache,
-                            project_file_cache): 
-    genome_status = {}
-
-    # this file records genome IDs and local filenames to avoid having to repeat HTTP requests
-    # each time the app is loaded (this can take a lot of time if there are dozens of genomes)
+                            project_file_cache):
+    
     genome_status_file = os.path.join(project_download_cache,
-                                      'genome_status.txt')
-
-    # TODO: wrap following lines in a function (genome_status dict as well and return it, see the flowchart)
-    # TODO: comment that stuff is read there, updated in the loop and then saved again in the txt file
-    # genome lookup status info
-    if os.path.exists(genome_status_file):
-        with open(genome_status_file) as f:
-            for line in csv.reader(f):
-                asobj = GenomeStatus.from_csv(*line)
-                genome_status[asobj.original_id] = asobj
+                                    'genome_status.txt')
+    genome_status = _get_genome_status_log(genome_status_file) 
 
     for i, genome_record in enumerate(genome_records):
         # get the best available ID from the dict
