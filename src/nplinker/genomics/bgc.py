@@ -4,7 +4,6 @@ from deprecated import deprecated
 from nplinker.logconfig import LogConfig
 from .aa_pred import predict_aa
 
-
 if TYPE_CHECKING:
     from ..strains import Strain
     from .gcf import GCF
@@ -14,9 +13,7 @@ logger = LogConfig.getLogger(__name__)
 
 class BGC():
 
-    def __init__(self,
-                 bgc_id: str,
-                 product_prediction: list[str]):
+    def __init__(self, bgc_id: str, /, *product_prediction: str):
         """Class to model BGC (biosynthetic gene cluster) data.
 
         BGC data include both annotations and sequence data. This class is
@@ -32,18 +29,18 @@ class BGC():
 
         Args:
             bgc_id(str): BGC identifier, e.g. MIBiG accession, GenBank accession.
-            product_prediction(list[str]): list of BGC's (predicted) natural
-                products or product classes.
+            product_prediction(tuple[str]): BGC's (predicted) natural products
+                or product classes.
 
         Attributes:
             bgc_id(str): BGC identifier, e.g. MIBiG accession, GenBank accession.
-            product_prediction(list[str]): List of BGC's (predicted) natural
-                products or product classes.
+            product_prediction(tuple[str]): A tuple of (predicted) natural
+                products or product classes of the BGC.
                 For antiSMASH's GenBank data, the feature `region /product`
                 gives product information.
                 For MIBiG metadata, its biosynthetic class provides such info.
-            mibig_bgc_class(list[str] | None): List of MIBiG biosynthetic classes to
-                which the BGC belongs.
+            mibig_bgc_class(tuple[str] | None): A tuple of MIBiG biosynthetic
+                classes to which the BGC belongs.
                 Defaults to None.
                 MIBiG defines 6 major biosynthetic classes for natural products,
                 including "NRP", "Polyketide", "RiPP", "Terpene", "Saccharide"
@@ -52,7 +49,8 @@ class BGC():
                 More details see the publication: https://doi.org/10.1186/s40793-018-0318-y.
             description(str | None): Brief description of the BGC.
                 Defaults to None.
-            smiles(list[str] | None): SMILES formula of the BGC's product.
+            smiles(tuple[str] | None): A tuple of SMILES formulas of the BGC's
+                products.
                 Defaults to None.
             antismash_file(str | None): The path to the antiSMASH GenBank file.
                 Defaults to None.
@@ -72,9 +70,9 @@ class BGC():
         self.bgc_id = bgc_id
         self.product_prediction = product_prediction
 
-        self.mibig_bgc_class: list[str] | None = None
+        self.mibig_bgc_class: tuple[str] | None = None
         self.description: str | None = None
-        self.smiles: list[str] | None = None
+        self.smiles: tuple[str] | None = None
 
         # antismash related attributes
         self.antismash_file: str | None = None
@@ -93,11 +91,14 @@ class BGC():
             self.__class__.__name__, self.bgc_id, self.strain,
             self.antismash_id, self.antismash_region)
 
-    def __eq__(self, other):
-        return self.bgc_id == other.bgc_id
+    def __eq__(self, other) -> bool:
+        if isinstance(other, BGC):
+            return (self.bgc_id == other.bgc_id
+                    and self.product_prediction == other.product_prediction)
+        return NotImplemented
 
-    def __hash__(self):
-        return hash(self.bgc_id)
+    def __hash__(self) -> int:
+        return hash((self.bgc_id, self.product_prediction))
 
     def add_parent(self, gcf: GCF) -> None:
         """Add a parent GCF to the BGC.

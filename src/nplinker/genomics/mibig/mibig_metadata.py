@@ -21,7 +21,7 @@ class MibigMetadata():
             self.metadata = json.load(f)
 
         self._mibig_accession: str
-        self._biosyn_class: list[str]
+        self._biosyn_class: tuple[str]
         self._parse_metadata()
 
     @property
@@ -30,7 +30,7 @@ class MibigMetadata():
         return self._mibig_accession
 
     @property
-    def biosyn_class(self) -> list[str]:
+    def biosyn_class(self) -> tuple[str]:
         """Get the value of metadata item 'biosyn_class'.
 
         The 'biosyn_class' is biosynthetic class(es), namely the type of
@@ -50,8 +50,8 @@ class MibigMetadata():
         if 'general_params' in self.metadata:
             self._mibig_accession = self.metadata['general_params'][
                 'mibig_accession']
-            self._biosyn_class = self.metadata['general_params'][
-                'biosyn_class']
+            self._biosyn_class = tuple(self.metadata['general_params'][
+                'biosyn_class'])
         else:  # version≥2.0
             self._mibig_accession = self.metadata['cluster']['mibig_accession']
-            self._biosyn_class = self.metadata['cluster']['biosyn_class']
+            self._biosyn_class = tuple(self.metadata['cluster']['biosyn_class'])
