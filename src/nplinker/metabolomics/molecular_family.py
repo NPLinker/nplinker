@@ -53,8 +53,7 @@ class MolecularFamily():
     def __eq__(self, other: Self) -> bool:
         if isinstance(other, MolecularFamily):
             return (self.id == other.id
-                    and self.family_id == other.family_id
-                    and set(self.spectra) == set(other.spectra))
+                    and self.family_id == other.family_id)
         return NotImplemented
 
     def __hash__(self) -> int:
