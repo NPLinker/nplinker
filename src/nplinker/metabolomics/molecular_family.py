@@ -6,24 +6,17 @@ from nplinker.strains import Strain
 
 class MolecularFamily():
 
-    def __init__(self, family_id: int):
+    def __init__(self, family_id: str):
         """Class to model molecular families.
 
         Args:
-            family_id(int): Id for the molecular family.
+            family_id(str): Id for the molecular family.
         """
         self.id: int = -1
-        self.family_id: int = family_id
+        self.family_id: str = family_id
         self.spectra: list[Spectrum] = []
         self.family = None
         self.spectra_ids: set[str] = set()
-
-    # def has_strain(self, strain):
-    #     for spectrum in self.spectra:
-    #         if spectrum.has_strain(strain):
-    #             return True
-
-    #     return False
 
     @property
     def strains(self) -> StrainCollection:

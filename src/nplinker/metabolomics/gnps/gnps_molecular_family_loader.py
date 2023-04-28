@@ -19,7 +19,7 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
         self._families: list[MolecularFamily | SingletonFamily] = []
 
         for family_id, spectra_ids in _load_molecular_families(file).items():
-            if family_id == -1:
+            if family_id == '-1':
                 for spectrum_id in spectra_ids:
                     family = SingletonFamily()
                     family.spectra_ids = set([spectrum_id])
@@ -33,14 +33,14 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
         return self._families
 
 
-def _load_molecular_families(file: str | PathLike) -> dict[int, set[str]]:
+def _load_molecular_families(file: str | PathLike) -> dict[str, set[str]]:
     """Load ids of molecular families and corresponding spectra from GNPS output file.
 
     Args:
         file(str | PathLike): path to the GNPS file to load molecular families.
 
     Returns:
-        dict[int, set[str]]: Mapping from molecular family/cluster id to the spectra ids.
+        dict[str, set[str]]: Mapping from molecular family/cluster id to the spectra ids.
     """
     logger.debug('loading edges file: %s', file)
 
@@ -54,7 +54,7 @@ def _load_molecular_families(file: str | PathLike) -> dict[int, set[str]]:
         for line in reader:
             spec1_id = line[cid1_index]
             spec2_id = line[cid2_index]
-            family_id = int(line[fam_index])
+            family_id = line[fam_index]
 
             if families.get(family_id) is None:
                 families[family_id] = set([spec1_id, spec2_id])

@@ -82,13 +82,13 @@ def load_edges(edges_file: str | PathLike, spec_dict: dict[str, Spectrum]):
             spec1_id = line[cid1_index]
             spec2_id = line[cid2_index]
             cosine = float(line[cos_index])
-            family = int(line[fam_index])
+            family = line[fam_index]
 
             if spec1_id in spec_dict and spec2_id in spec_dict:
                 spec1 = spec_dict[spec1_id]
                 spec2 = spec_dict[spec2_id]
 
-                if family != -1:  # singletons
+                if family != '-1':  # singletons
                     spec1.family_id = family
                     spec2.family_id = family
 
@@ -181,7 +181,7 @@ def make_families(spectra: list[Spectrum]) -> list[MolecularFamily]:
     fams, singles = 0, 0
     for spectrum in spectra:
         family_id = spectrum.family_id
-        if family_id == -1:  # singleton
+        if family_id == '-1':  # singleton
             new_family = SingletonFamily()
             new_family.id = family_index
             family_index += 1
