@@ -134,7 +134,7 @@ def _ncbi_genbank_search(genbank_id, retry_time=5.0):
 
 
 def _resolve_genbank_accession(genbank_id: str) -> str | None:
-    """Try to get RefSeq_accession through GenBank. 
+    """Try to get RefSeq id through given GenBank id. 
 
     Args:
         genbank_id(str): ID for GenBank accession. 
@@ -201,7 +201,7 @@ def _resolve_genbank_accession(genbank_id: str) -> str | None:
 
 
 def _resolve_jgi_accession(jgi_id: str) -> str | None:
-    """_summary_
+    """Try to get RefSeq id through given JGI id.
 
     Args:
         jgi_id(str): JGI_Genome_ID for GenBank accession. 
@@ -233,7 +233,7 @@ def _resolve_jgi_accession(jgi_id: str) -> str | None:
     return _resolve_genbank_accession(link.text)
 
 
-def _resolve_refseq_access_id(genome_id_data: dict) -> str | None:
+def _resolve_refseq_id(genome_id_data: dict) -> str | None:
     """Get the RefSeq ID to which the genome accession is linked.
     Check https://pairedomicsdata.bioinformatics.nl/schema.json.
 
@@ -435,7 +435,7 @@ def podp_download_and_extract_antismash_data(genome_records, project_download_ca
             logger.info(
                 'Beginning lookup process for genome ID {}'.format(raw_genome_id))
 
-            genome_obj.resolved_refseq_id = _resolve_refseq_access_id(
+            genome_obj.resolved_refseq_id = _resolve_refseq_id(
                 genome_record['genome_ID'])
             genome_obj.attempted = True
 
@@ -520,7 +520,7 @@ def download_antismash_data(genome_records, project_download_cache,
             logger.info(
                 'Beginning lookup process for genome ID {}'.format(raw_genome_id))
 
-            genome_obj.resolved_refseq_id = _resolve_refseq_access_id(
+            genome_obj.resolved_refseq_id = _resolve_refseq_id(
                 genome_record['genome_ID'])
             genome_obj.attempted = True
 
