@@ -15,9 +15,9 @@ class MolecularFamily():
         self.id: int = -1
         self.family_id: str = family_id
         self.spectra: list[Spectrum] = []
-        self.family = None
         self.spectra_ids: set[str] = set()
 
+    # TODO: change property to attibute
     @property
     def strains(self) -> StrainCollection:
         """Get strains of spectra in the molecular family.
@@ -31,6 +31,18 @@ class MolecularFamily():
                 strains.add(strain)
         return strains
 
+    def has_strain(self, strain: str | Strain) -> bool:
+        """Check if the given strain exists.
+
+        Args:
+            strain(str | Strain): strain id or `Strain` object.
+
+        Returns:
+            bool: True when the given strain exist.
+        """
+        return strain in self.strains
+
+    # TODO: update the logics, mf should also be added to the spectrum object
     def add_spectrum(self, spectrum: Spectrum):
         """Add a spectrum to the spectra list.
 
