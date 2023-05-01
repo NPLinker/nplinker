@@ -146,7 +146,7 @@ def _ncbi_genbank_search(
     return None
 
 
-def _resolve_genbank_accession(genbank_id: str) -> str | None:
+def _resolve_genbank_accession(genbank_id: str) -> NavigableString | None:
     """Try to get RefSeq id through given GenBank id. 
 
     Args:
@@ -270,7 +270,7 @@ def _resolve_refseq_id(genome_id_data: Dict[str, str]) -> str | None:
     return None
 
 
-def _get_antismash_db_page(genome_obj: GenomeStatus) -> str | None:
+def _get_antismash_db_page(genome_obj: GenomeStatus) -> NavigableString | None:
     # want to try up to 4 different links here, v1 and v2 databases, each
     # with and without the .1 suffix on the accesssion ID
 
@@ -410,7 +410,7 @@ def _extract_antismash_zip(antismash_obj: GenomeStatus,
 
 
 def podp_download_and_extract_antismash_data(
-        genome_records: list[Dict[str, Dict[str, str]]],
+        genome_records: list[Dict[str, Dict[str, str] | str]],
         project_download_cache: str | PathLike,
         project_file_cache: str | PathLike):
 
@@ -420,6 +420,7 @@ def podp_download_and_extract_antismash_data(
 
     for i, genome_record in enumerate(genome_records):
         # get the best available ID from the dict
+        assert isinstance(genome_record['genome_ID'], dict)
         raw_genome_id = _get_best_available_genome_id(
             genome_record['genome_ID'])
         if raw_genome_id is None:
@@ -498,7 +499,7 @@ def podp_download_and_extract_antismash_data(
 
 @deprecated(version="1.3.3",
             reason="Use download_and_extract_antismash_data class instead.")
-def download_antismash_data(genome_records: list[Dict[str, Dict[str, str]]],
+def download_antismash_data(genome_records: list[Dict[str, Dict[str, str] | str]],
                             project_download_cache: str | PathLike,
                             project_file_cache: str | PathLike):
 
@@ -508,6 +509,7 @@ def download_antismash_data(genome_records: list[Dict[str, Dict[str, str]]],
 
     for i, genome_record in enumerate(genome_records):
         # get the best available ID from the dict
+        assert isinstance(genome_record['genome_ID'], dict)
         raw_genome_id = _get_best_available_genome_id(
             genome_record['genome_ID'])
         if raw_genome_id is None:

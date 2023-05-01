@@ -26,7 +26,6 @@ from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
 from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
-from . import download_antismash_data
 from . import podp_download_and_extract_antismash_data
 from .runbigscape import run_bigscape
 
