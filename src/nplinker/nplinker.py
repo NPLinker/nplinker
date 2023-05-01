@@ -28,6 +28,7 @@ from .scoring.link_collection import LinkCollection
 from .scoring.metcalf_scoring import MetcalfScoring
 from .scoring.np_class_scoring import NPClassScoring
 from .scoring.rosetta_scoring import RosettaScoring
+from .strain_collection import StrainCollection
 
 
 logger = LogConfig.getLogger(__name__)
@@ -289,7 +290,7 @@ class NPLinker():
         self._bgcs = self._loader.bgcs
         self._gcfs = self._loader.gcfs
         self._mibig_bgc_dict = self._loader.mibig_bgc_dict
-        self._strains = self._loader.strains
+        self._strains: StrainCollection = self._loader.strains
         self._product_types = self._loader.product_types
         self._chem_classes = self._loader.chem_classes
         self._class_matches = self._loader.class_matches
@@ -433,24 +434,20 @@ class NPLinker():
             targets = list(
                 filter(lambda x: not isinstance(x, BGC), link_data.keys()))
             if len(targets) > 0:
-                shared_strains = self._datalinks.common_strains([source],
-                                                                targets, True)
-                for objpair in shared_strains.keys():
-                    shared_strains[objpair] = [
-                        self._strains.lookup_index(x)
-                        for x in shared_strains[objpair]
-                    ]
-
                 if isinstance(source, GCF):
+                    shared_strains = self._datalinks.common_strains(targets, [source], True)
                     for target, link in link_data.items():
                         if (target, source) in shared_strains:
-                            link.shared_strains = shared_strains[(target,
-                                                                  source)]
+                            link.shared_strains = [
+                                self._strains.lookup(strain_id) for strain_id
+                                in shared_strains[(target, source)]]
                 else:
+                    shared_strains = self._datalinks.common_strains([source], targets, True)
                     for target, link in link_data.items():
                         if (source, target) in shared_strains:
-                            link.shared_strains = shared_strains[(source,
-                                                                  target)]
+                            link.shared_strains = [
+                                self._strains.lookup(strain_id) for strain_id
+                                in shared_strains[(source, target)]]
 
         logger.debug('Finished calculating shared strain information')
 
@@ -601,55 +598,3 @@ class NPLinker():
             self._scoring_methods_setup_complete[name] = True
 
         return self._scoring_methods.get(name, None)(self)
-
-
-if __name__ == "__main__":
-    # can set default logging configuration this way...
-    LogConfig.setLogLevel(logging.DEBUG)
-
-    # initialise NPLinker from the command-line arguments
-    npl = NPLinker(Args().get_args())
-
-    # load the dataset
-    if not npl.load_data():
-        print('Failed to load the dataset!')
-        sys.exit(-1)
-
-    # create a metcalf scoring object
-    mc = npl.scoring_method('metcalf')
-    if mc is not None:
-        # set a scoring cutoff threshold
-        mc.cutoff = 0.5
-
-        # pick some GCFs to get links for
-        test_gcfs = npl.gcfs[:10]
-
-        # tell nplinker to find links for this set of GCFs using metcalf
-        # scoring
-        results = npl.get_links(test_gcfs, mc)
-
-        # check if any links were found
-        if len(results) == 0:
-            print('No links found!')
-            sys.exit(0)
-
-        # the "result" object will be a LinkCollection, holding all the information
-        # returned by the scoring method(s) used
-        print(f'{len(results)} total links found')
-
-        # display some information about each object and its links
-        for obj, result in results.links.items():
-            print('Results for object: {}, {} total links, {} methods used'.
-                  format(obj, len(result), results.method_count))
-
-            # get links for this object, sorted by metcalf score
-            sorted_links = results.get_sorted_links(mc, obj)
-            for link_data in sorted_links:
-                print('  --> [{}] {} | {} | # shared_strains = {}'.format(
-                    ','.join(method.name for method in link_data.methods),
-                    link_data.target, link_data[mc],
-                    len(link_data.shared_strains)))
-
-    rs = npl.scoring_method('rosetta')
-    if rs is not None:
-        print('OK')
