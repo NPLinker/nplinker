@@ -5,7 +5,8 @@ import re
 import time
 import zipfile
 import httpx
-from bs4 import BeautifulSoup
+from typing import Dict
+from bs4 import BeautifulSoup, Tag, NavigableString
 from deprecated import deprecated
 from progress.bar import Bar
 from nplinker.logconfig import LogConfig
@@ -48,7 +49,7 @@ class GenomeStatus:
         ])
 
 
-def _get_genome_status_log(genome_status_file: str | PathLike) -> dict:
+def _get_genome_status_log(genome_status_file: str | PathLike) -> Dict[str, GenomeStatus]:
     """Read genome_status.txt in a dict if it exists, otherwise create
     the dictionary. 
 
@@ -73,7 +74,7 @@ def _get_genome_status_log(genome_status_file: str | PathLike) -> dict:
     return genome_status
 
 
-def _get_best_available_genome_id(genome_id_data: dict) -> str | None:
+def _get_best_available_genome_id(genome_id_data: Dict[str, str]) -> str | None:
     """Get the best available ID from genome_id_data dict.
 
     Args:
@@ -96,7 +97,7 @@ def _get_best_available_genome_id(genome_id_data: dict) -> str | None:
     return None
 
 
-def _ncbi_genbank_search(genbank_id, retry_time=5.0):
+def _ncbi_genbank_search(genbank_id: str, retry_time: float = 5.0) -> Tag | NavigableString | None:
     url = NCBI_LOOKUP_URL_NEW.format(genbank_id)
     logger.debug('Looking up GenBank data for {} at {}'.format(
         genbank_id, url))
@@ -233,7 +234,7 @@ def _resolve_jgi_accession(jgi_id: str) -> str | None:
     return _resolve_genbank_accession(link.text)
 
 
-def _resolve_refseq_id(genome_id_data: dict) -> str | None:
+def _resolve_refseq_id(genome_id_data: Dict[str, str]) -> str | None:
     """Get the RefSeq ID to which the genome accession is linked.
     Check https://pairedomicsdata.bioinformatics.nl/schema.json.
 
@@ -258,7 +259,7 @@ def _resolve_refseq_id(genome_id_data: dict) -> str | None:
     return None
 
 
-def _get_antismash_db_page(genome_obj):
+def _get_antismash_db_page(genome_obj: GenomeStatus) -> str | None:
     # want to try up to 4 different links here, v1 and v2 databases, each
     # with and without the .1 suffix on the accesssion ID
 
@@ -290,7 +291,7 @@ def _get_antismash_db_page(genome_obj):
     return None
 
 
-def _get_antismash_zip_data(accession_id, filename, local_path):
+def _get_antismash_zip_data(accession_id: str, filename: str, local_path: str | PathLike) -> bool:
     for base_url in [ANTISMASH_DB_DOWNLOAD_URL, ANTISMASH_DBV2_DOWNLOAD_URL]:
         zipfile_url = base_url.format(accession_id, filename)
         with open(local_path, 'wb') as f:
@@ -319,7 +320,7 @@ def _get_antismash_zip_data(accession_id, filename, local_path):
     return False
 
 
-def _download_antismash_zip(antismash_obj, project_download_cache):
+def _download_antismash_zip(antismash_obj: GenomeStatus, project_download_cache: str | PathLike) -> bool:
     # save zip files to avoid having to repeat above lookup every time
     local_path = os.path.join(project_download_cache,
                               f'{antismash_obj.resolved_refseq_id}.zip')
@@ -354,7 +355,7 @@ def _download_antismash_zip(antismash_obj, project_download_cache):
     return True
 
 
-def _extract_antismash_zip(antismash_obj, project_file_cache):
+def _extract_antismash_zip(antismash_obj: GenomeStatus, project_file_cache: str | PathLike) -> bool:
     if antismash_obj.filename is None or len(antismash_obj.filename) == 0:
         return False
 
@@ -390,8 +391,10 @@ def _extract_antismash_zip(antismash_obj, project_file_cache):
     return True
 
 
-def podp_download_and_extract_antismash_data(genome_records, project_download_cache,
-                            project_file_cache):
+def podp_download_and_extract_antismash_data(
+        genome_records: list[Dict[str, Dict[str, str]]],
+        project_download_cache: str | PathLike,
+        project_file_cache: str | PathLike):
     
     genome_status_file = os.path.join(project_download_cache,
                                     'genome_status.txt')
@@ -475,8 +478,10 @@ def podp_download_and_extract_antismash_data(genome_records, project_download_ca
 
 @deprecated(version="1.3.3",
             reason="Use download_and_extract_antismash_data class instead.")
-def download_antismash_data(genome_records, project_download_cache,
-                            project_file_cache):
+def download_antismash_data(
+    genome_records: list[Dict[str, Dict[str, str]]],
+    project_download_cache: str | PathLike,
+    project_file_cache: str | PathLike):
     
     genome_status_file = os.path.join(project_download_cache,
                                     'genome_status.txt')
