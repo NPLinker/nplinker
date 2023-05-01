@@ -435,14 +435,14 @@ class NPLinker():
                 filter(lambda x: not isinstance(x, BGC), link_data.keys()))
             if len(targets) > 0:
                 if isinstance(source, GCF):
-                    shared_strains = self._datalinks.common_strains(targets, [source], True)
+                    shared_strains = self._datalinks.get_common_strains(targets, [source], True)
                     for target, link in link_data.items():
                         if (target, source) in shared_strains:
                             link.shared_strains = [
                                 self._strains.lookup(strain_id) for strain_id
                                 in shared_strains[(target, source)]]
                 else:
-                    shared_strains = self._datalinks.common_strains([source], targets, True)
+                    shared_strains = self._datalinks.get_common_strains([source], targets, True)
                     for target, link in link_data.items():
                         if (source, target) in shared_strains:
                             link.shared_strains = [
@@ -491,7 +491,7 @@ class NPLinker():
 
         # this is a dict with structure:
         #   (Spectrum/MolecularFamily, GCF) => list of strain indices
-        common_strains_index_dict = self._datalinks.common_strains(
+        common_strains_index_dict = self._datalinks.get_common_strains(
             objects_a, objects_b, filter_no_shared)
 
         common_strains = {}

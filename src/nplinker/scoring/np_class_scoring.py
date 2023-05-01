@@ -339,7 +339,7 @@ class NPClassScoring(ScoringMethod):
                 MetcalfScoring.NAME).datalinks
         # this is a dict with structure:
         #   tup(Spectrum/MolecularFamily, GCF) => array of strain indices
-        common_strains = self.npl._datalinks.common_strains(
+        common_strains = self.npl._datalinks.get_common_strains(
             objects, targets, True)
         logger.info(f"Calculating NPClassScore for {len(objects)} objects to "
                     f"{len(targets)} targets ({len(common_strains)} pairwise "
