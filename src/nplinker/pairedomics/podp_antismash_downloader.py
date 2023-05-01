@@ -1,17 +1,20 @@
+import ast
 import csv
 import os
-from os import PathLike
-import ast
 import re
 import time
 import zipfile
-import httpx
+from os import PathLike
 from typing import Dict
-from bs4 import BeautifulSoup, Tag, NavigableString
+import httpx
+from bs4 import BeautifulSoup
+from bs4 import NavigableString
+from bs4 import Tag
 from deprecated import deprecated
 from progress.bar import Bar
 from nplinker.logconfig import LogConfig
 from . import download_and_extract_antismash_data
+
 
 logger = LogConfig.getLogger(__name__)
 
