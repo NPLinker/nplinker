@@ -7,10 +7,11 @@ from nplinker.metabolomics.molecular_family import MolecularFamily
 from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.pickler import load_pickled_data
 from nplinker.pickler import save_pickled_data
-from nplinker.scoring.methods import ScoringMethod
-from nplinker.scoring.object_link import ObjectLink
 from nplinker.scoring.linking.data_linking import DataLinks
 from nplinker.scoring.linking.link_finder import LinkFinder
+from nplinker.scoring.methods import ScoringMethod
+from nplinker.scoring.object_link import ObjectLink
+
 
 logger = LogConfig.getLogger(__name__)
 
@@ -80,8 +81,7 @@ class MetcalfScoring(ScoringMethod):
             MetcalfScoring.DATALINKS.load_data(npl._spectra, npl._gcfs,
                                                npl._strains, npl.molfams)
             # TODO fix crash with this set to True, see https://github.com/sdrogers/nplinker/issues/57
-            MetcalfScoring.DATALINKS.find_correlations(
-                include_singletons=False)
+            MetcalfScoring.DATALINKS.find_correlations()
             MetcalfScoring.LINKFINDER = LinkFinder()
             MetcalfScoring.LINKFINDER.metcalf_scoring(MetcalfScoring.DATALINKS,
                                                       type='spec-gcf')
