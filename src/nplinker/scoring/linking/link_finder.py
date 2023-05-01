@@ -4,12 +4,8 @@ import pandas as pd
 from scipy.stats import hypergeom
 from nplinker.genomics.gcf import GCF
 from nplinker.metabolomics.spectrum import Spectrum
-from nplinker.scoring.linking.data_linking import SCORING_METHODS
 from .data_linking_functions import pair_prob_approx
 from .data_linking_functions import pair_prob_hg
-
-
-# CG: TODO get_links function does not work any more, need to update its logics
 
 
 # CG: TODO get_links function does not work any more, need to update its logics
@@ -31,6 +27,7 @@ from nplinker.metabolomics.molecular_family import MolecularFamily
 
 logger = LogConfig.getLogger(__file__)
 
+SCORING_METHODS = ['metcalf', 'likescore', 'hg']
 
 class LinkFinder():
     """
