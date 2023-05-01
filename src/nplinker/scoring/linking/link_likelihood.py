@@ -49,12 +49,12 @@ class LinkLikelihood():
             M_type1_type2 = data_links.M_spec_gcf
             M_type1_nottype2 = data_links.M_spec_notgcf
             M_nottype1_type2 = data_links.M_notspec_gcf
-            M_type1_cond = data_links.M_spec_strain
+            M_type1_cond = data_links.spec_strain_occurrence
         elif type == 'fam-gcf':
             M_type1_type2 = data_links.M_fam_gcf
             M_type1_nottype2 = data_links.M_fam_notgcf
             M_nottype1_type2 = data_links.M_notfam_gcf
-            M_type1_cond = data_links.M_fam_strain
+            M_type1_cond = data_links.mf_strain_occurrence
         elif type == 'spec-bgc' or type == 'fam-bgc':
             raise Exception("Given types are not yet supported... ")
         else:
@@ -67,7 +67,7 @@ class LinkLikelihood():
         # Calculate likelihood matrices using calc_likelihood_matrix()
         P_type2_given_type1, P_type2_not_type1, P_type1_given_type2, \
             P_type1_not_type2 = calc_likelihood_matrix(M_type1_cond,
-                                                                              data_links.M_gcf_strain,
+                                                                              data_links.gcf_strain_occurrence,
                                                                               M_type1_type2,
                                                                               M_type1_nottype2,
                                                                               M_nottype1_type2)

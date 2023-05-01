@@ -18,8 +18,8 @@ from .data_linking_functions import pair_prob_hg
 # import packages for plotting
 # TODO move plotting to separate module?
 try:
-    import seaborn as sns
     from matplotlib import pyplot as plt
+    import seaborn as sns
 except ImportError:
     print(
         'Warning: plotting functionality will not be available (missing matplotlib and/or seaborn)'
@@ -104,7 +104,7 @@ class LinkFinder():
 
         # Compute the expected values for all possible values of spec and gcf strains
         # we need the total number of strains
-        _, n_strains = data_links.M_gcf_strain.shape
+        _, n_strains = data_links.gcf_strain_occurrence.shape
         if self.metcalf_expected is None:
             sz = (n_strains + 1, n_strains + 1)
             self.metcalf_expected = np.zeros(sz)
@@ -177,7 +177,7 @@ class LinkFinder():
 
         if type == 'spec-gcf':
             num_strains = np.ones(
-                data_links.M_spec_gcf.shape) * data_links.M_gcf_strain.shape[1]
+                data_links.M_spec_gcf.shape) * data_links.gcf_strain_occurrence.shape[1]
             overlap_counts = data_links.M_spec_gcf
             gcf_counts = overlap_counts + data_links.M_notspec_gcf
             spec_counts = overlap_counts + data_links.M_spec_notgcf
@@ -189,7 +189,7 @@ class LinkFinder():
             self.hg_spec_gcf = hg_scores
         elif type == 'fam-gcf':
             num_strains = np.ones(
-                data_links.M_fam_gcf.shape) * data_links.M_gcf_strain.shape[1]
+                data_links.M_fam_gcf.shape) * data_links.gcf_strain_occurrence.shape[1]
             overlap_counts = data_links.M_fam_gcf
             gcf_counts = overlap_counts + data_links.M_notfam_gcf
             fam_counts = overlap_counts + data_links.M_fam_notgcf
@@ -350,7 +350,7 @@ class LinkFinder():
         P_str = np.array(data_links.mapping_strain["no of spectra"])
         P_str = P_str / np.sum(P_str)
 
-        num_strains = data_links.M_gcf_strain.shape[1]
+        num_strains = data_links.gcf_strain_occurrence.shape[1]
 
         # Calculate the hypergeometric probability (as before)
         for i in range(link_candidates.shape[1]):
@@ -361,11 +361,11 @@ class LinkFinder():
 
         # Calculate the GCF specific probability
         for i in range(link_candidates.shape[1]):
-            id_spec = int(link_candidates[0, i])
-            id_gcf = int(link_candidates[1, i])
+            id_spec = link_candidates[0, i]
+            id_gcf = link_candidates[1, i]
 
             # find set of strains which contain GCF with id link_candidates[1,i]
-            XG = np.where(data_links.M_gcf_strain[id_gcf, :] == 1)[0]
+            XG = np.where(data_links.gcf_strain_occurrence.loc[id_gcf, :] == 1)[0]
 
             link_candidates[10,
                             i] = pair_prob_approx(P_str, XG,
@@ -374,11 +374,11 @@ class LinkFinder():
             # Calculate the link specific probability
             # Find strains where GCF and spectra/family co-occur
             if type == 'spec-gcf':
-                XGS = np.where((data_links.M_gcf_strain[id_gcf, :] == 1) &
-                               (data_links.M_spec_strain[id_spec, :] == 1))[0]
+                XGS = np.where((data_links.gcf_strain_occurrence[id_gcf, :] == 1) &
+                               (data_links.spec_strain_occurrence[id_spec, :] == 1))[0]
             elif type == 'fam-gcf':
-                XGS = np.where((data_links.M_gcf_strain[id_gcf, :] == 1)
-                               & (data_links.M_fam_strain[id_spec, :] == 1))[0]
+                XGS = np.where((data_links.gcf_strain_occurrence[id_gcf, :] == 1)
+                               & (data_links.mf_strain_occurrence[id_spec, :] == 1))[0]
             link_candidates[11,
                             i] = link_prob(P_str, XGS, int(Nx_list[id_gcf]),
                                            int(Ny_list[id_spec]), num_strains)
