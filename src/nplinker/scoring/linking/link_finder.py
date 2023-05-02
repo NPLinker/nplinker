@@ -1,4 +1,5 @@
 
+from deprecated import deprecated
 import numpy as np
 import pandas as pd
 from scipy.stats import hypergeom
@@ -387,6 +388,7 @@ class LinkFinder():
         # add other potentially relevant knowdledge
         # If this will grow to more collected information -> create separate function/class
         bgc_class = []
+        # TODO CG: bgc class should be obtained from GCF object
         for i in link_candidates_pd["GCF id"].astype(int):
             bgc_class.append(data_links.mapping_gcf["bgc class"][i])
         link_candidates_pd["BGC class"] = bgc_class
@@ -574,6 +576,7 @@ class LinkFinder():
 
         return links
 
+    @deprecated(version="1.3.3", reason="The unworkable method will be removed")
     def create_cytoscape_files(self,
                                data_links,
                                network_filename,
