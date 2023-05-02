@@ -77,11 +77,8 @@ class MetcalfScoring(ScoringMethod):
             logger.info(
                 'MetcalfScoring.setup preprocessing dataset (this may take some time)'
             )
-            MetcalfScoring.DATALINKS = DataLinks()
-            MetcalfScoring.DATALINKS.load_data(npl._spectra, npl._gcfs,
+            MetcalfScoring.DATALINKS = DataLinks(npl._spectra, npl._gcfs,
                                                npl._strains, npl.molfams)
-            # TODO fix crash with this set to True, see https://github.com/sdrogers/nplinker/issues/57
-            MetcalfScoring.DATALINKS.find_correlations()
             MetcalfScoring.LINKFINDER = LinkFinder()
             MetcalfScoring.LINKFINDER.metcalf_scoring(MetcalfScoring.DATALINKS,
                                                       type='spec-gcf')
