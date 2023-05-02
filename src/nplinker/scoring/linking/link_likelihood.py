@@ -46,14 +46,14 @@ class LinkLikelihood():
 
         # Make selection for scenario spec<->gcf or fam<->gcf
         if type == 'spec-gcf':
-            M_type1_type2 = data_links.M_spec_gcf
-            M_type1_nottype2 = data_links.M_spec_notgcf
-            M_nottype1_type2 = data_links.M_notspec_gcf
+            M_type1_type2 = data_links.cooccurrence_spec_gcf
+            M_type1_nottype2 = data_links.cooccurrence_spec_notgcf
+            M_nottype1_type2 = data_links.cooccurrence_notspec_gcf
             M_type1_cond = data_links.spec_strain_occurrence
         elif type == 'fam-gcf':
-            M_type1_type2 = data_links.M_fam_gcf
-            M_type1_nottype2 = data_links.M_fam_notgcf
-            M_nottype1_type2 = data_links.M_notfam_gcf
+            M_type1_type2 = data_links.cooccurrence_fam_gcf
+            M_type1_nottype2 = data_links.cooccurrence_fam_notgcf
+            M_nottype1_type2 = data_links.cooccurrence_notfam_gcf
             M_type1_cond = data_links.mf_strain_occurrence
         elif type == 'spec-bgc' or type == 'fam-bgc':
             raise Exception("Given types are not yet supported... ")

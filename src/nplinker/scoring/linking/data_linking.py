@@ -37,7 +37,7 @@ class DataLinks():
     """
 
     def __init__(self):
-        # DataFrame to store occurence of objects with respect to strains
+        # DataFrame to store occurrence of objects with respect to strains
         # values = 1 where gcf/spec/fam occur in strain, 0 otherwise
         self.gcf_strain_occurrence = pd.DataFrame()
         self.spec_strain_occurrence = pd.DataFrame()
@@ -50,17 +50,6 @@ class DataLinks():
         self.mapping_fam = pd.DataFrame()
         self.mapping_strain = pd.DataFrame()
 
-        # correlation matrices for spectra <-> GCFs
-        self.M_spec_gcf = [
-        ]  # = int: Number of strains where spec_x and gcf_y co_occure
-        self.M_spec_notgcf = [
-        ]  # = int: Number of strains where spec_x and NOT-gcf_y co_occure
-        self.M_notspec_gcf = [
-        ]  # = int: Number of strains where NOT-spec_x and gcf_y co_occure
-        # and the same for mol.families <-> GCFs
-        self.M_fam_gcf = []
-        self.M_fam_notgcf = []
-        self.M_notfam_gcf = []
 
     def load_data(self, spectra: Sequence[Spectrum], gcfs: Sequence[GCF],
                   strains: StrainCollection,
@@ -90,9 +79,9 @@ class DataLinks():
     def find_correlations(self):
         # collect correlations/ co-occurences
         logger.debug("Create correlation matrices: spectra<->gcfs.")
-        self.correlation_matrices(type='spec-gcf')
+        self._get_cooccurrence(link_type='spec-gcf')
         logger.debug("Create correlation matrices: mol-families<->gcfs.")
-        self.correlation_matrices(type='fam-gcf')
+        self._get_cooccurrence(link_type='fam-gcf')
 
     def _get_gcf_strain_occurrence(self, gcfs: Sequence[GCF],
                                    strains: StrainCollection) -> None:
@@ -202,45 +191,35 @@ class DataLinks():
                 results[(obj, gcf)] = shared_strains.to_list()
         return results
 
-    def correlation_matrices(self, type='spec-gcf'):
-        """
-        Collect co-occurrences accros strains:
-        IF type='spec-gcf':
-            number of co-occurences of spectra and GCFS
-            --> Output: M_spec_gcf matrix
-        IF type='fam-gcf':
-            number of co-occurences of mol.families and GCFS
-            --> Output: M_fam_gcf matrix
-        """
+    def _get_cooccurrence(self, link_type: str = 'spec-gcf'):
+        """Calculate co-occurrence for given link types across strains.
 
-        # Make selection for scenario spec<->gcf or fam<->gcf
-        if type == 'spec-gcf':
-            M_type1_strain = self.spec_strain_occurrence
-        elif type == 'fam-gcf':
-            M_type1_strain = self.mf_strain_occurrence
-        elif type == 'spec-bgc' or type == 'fam-bgc':
-            raise Exception("Given types are not yet supported... ")
+        Args:
+            link_type(str): Type of link to calculate co-occurrence for,
+                either 'spec-gcf' or 'fam-gcf'.
+        """
+        if link_type == 'spec-gcf':
+            met_strain_occurrence = self.spec_strain_occurrence
+        elif link_type == 'fam-gcf':
+            met_strain_occurrence = self.mf_strain_occurrence
         else:
-            raise Exception(
-                "Wrong correlation 'type' given. Must be one of 'spec-gcf', 'fam-gcf', ..."
+            raise ValueError(
+                f"Link type {link_type} is not supported. Use 'spec-gcf' or 'fam-gcf' instead."
             )
 
-        logger.debug(f"Calculating correlation matrices of type: {type}")
+        logger.debug(f"Calculating correlation matrices of type: {link_type}")
 
-        # Calculate correlation matrix from co-occurence matrices
-        M_type1_gcf, M_type1_notgcf, M_nottype1_gcf, M_nottype1_notgcf = calc_correlation_matrix(
-            M_type1_strain, self.gcf_strain_occurrence)
+        met_gcf_corr, met_notgcf_corr, notmet_gcf_corr, notmet_notgcf_corr = calc_correlation_matrix(
+            met_strain_occurrence, self.gcf_strain_occurrence)
 
-        # return results:
-        if type == 'spec-gcf':
-            self.M_spec_gcf = M_type1_gcf
-            self.M_spec_notgcf = M_type1_notgcf
-            self.M_notspec_gcf = M_nottype1_gcf
-            self.M_notspec_notgcf = M_nottype1_notgcf
-        elif type == 'fam-gcf':
-            self.M_fam_gcf = M_type1_gcf
-            self.M_fam_notgcf = M_type1_notgcf
-            self.M_notfam_gcf = M_nottype1_gcf
-            self.M_notfam_notgcf = M_nottype1_notgcf
+        if link_type == 'spec-gcf':
+            # co-occurrence of spectrum and GCF across strains
+            self.cooccurrence_spec_gcf = met_gcf_corr
+            self.cooccurrence_spec_notgcf = met_notgcf_corr
+            self.cooccurrence_notspec_gcf = notmet_gcf_corr
+            self.cooccurrence_notspec_notgcf = notmet_notgcf_corr
         else:
-            raise Exception("No correct correlation matrix was created.")
+            self.cooccurrence_fam_gcf = met_gcf_corr
+            self.cooccurrence_fam_notgcf = met_notgcf_corr
+            self.cooccurrence_notfam_gcf = notmet_gcf_corr
+            self.cooccurrence_notfam_notgcf = notmet_notgcf_corr

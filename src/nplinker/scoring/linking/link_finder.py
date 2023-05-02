@@ -141,19 +141,19 @@ class LinkFinder():
         # at expected_metcalf[3,6] and sqrt of the variance in the same position
 
         if type == 'spec-gcf':
-            metcalf_scores = np.zeros(data_links.M_spec_gcf.shape)
-            metcalf_scores = (data_links.M_spec_gcf * both +
-                              data_links.M_spec_notgcf * type1_not_gcf +
-                              data_links.M_notspec_gcf * gcf_not_type1 +
-                              data_links.M_notspec_notgcf * not_type1_not_gcf)
+            metcalf_scores = np.zeros(data_links.cooccurrence_spec_gcf.shape)
+            metcalf_scores = (data_links.cooccurrence_spec_gcf * both +
+                              data_links.cooccurrence_spec_notgcf * type1_not_gcf +
+                              data_links.cooccurrence_notspec_gcf * gcf_not_type1 +
+                              data_links.cooccurrence_notspec_notgcf * not_type1_not_gcf)
             self.metcalf_spec_gcf = metcalf_scores
 
         elif type == 'fam-gcf':
-            metcalf_scores = np.zeros(data_links.M_fam_gcf.shape)
-            metcalf_scores = (data_links.M_fam_gcf * both +
-                              data_links.M_fam_notgcf * type1_not_gcf +
-                              data_links.M_notfam_gcf * gcf_not_type1 +
-                              data_links.M_notfam_notgcf * not_type1_not_gcf)
+            metcalf_scores = np.zeros(data_links.cooccurrence_fam_gcf.shape)
+            metcalf_scores = (data_links.cooccurrence_fam_gcf * both +
+                              data_links.cooccurrence_fam_notgcf * type1_not_gcf +
+                              data_links.cooccurrence_notfam_gcf * gcf_not_type1 +
+                              data_links.cooccurrence_notfam_notgcf * not_type1_not_gcf)
 
             self.metcalf_fam_gcf = metcalf_scores
         return metcalf_scores
@@ -168,17 +168,17 @@ class LinkFinder():
         # Instead of "number of strains only in GCF", it requires "number of strains in the
         # GCF PLUS the number shared between the GCF and the other object".
         # e.g. if a spectrum has 3 strains, a GCF has 1 strain and there is 1 shared strain,
-        # M_spec_gcf will correctly contain "1", but M_type1_notgcf will contain "2" instead
+        # cooccurrence_spec_gcf will correctly contain "1", but M_type1_notgcf will contain "2" instead
         # of "3", because the spectrum only has 2 distinct strains vs the GCF.
-        # To fix this the M_spec_gcf/M_fam_gcf matrix can just be added onto the others to give
+        # To fix this the cooccurrence_spec_gcf/cooccurrence_fam_gcf matrix can just be added onto the others to give
         # the correct totals.
 
         if type == 'spec-gcf':
             num_strains = np.ones(
-                data_links.M_spec_gcf.shape) * data_links.gcf_strain_occurrence.shape[1]
-            overlap_counts = data_links.M_spec_gcf
-            gcf_counts = overlap_counts + data_links.M_notspec_gcf
-            spec_counts = overlap_counts + data_links.M_spec_notgcf
+                data_links.cooccurrence_spec_gcf.shape) * data_links.gcf_strain_occurrence.shape[1]
+            overlap_counts = data_links.cooccurrence_spec_gcf
+            gcf_counts = overlap_counts + data_links.cooccurrence_notspec_gcf
+            spec_counts = overlap_counts + data_links.cooccurrence_spec_notgcf
             hg_scores = hypergeom.sf(overlap_counts,
                                      num_strains,
                                      gcf_counts,
@@ -187,10 +187,10 @@ class LinkFinder():
             self.hg_spec_gcf = hg_scores
         elif type == 'fam-gcf':
             num_strains = np.ones(
-                data_links.M_fam_gcf.shape) * data_links.gcf_strain_occurrence.shape[1]
-            overlap_counts = data_links.M_fam_gcf
-            gcf_counts = overlap_counts + data_links.M_notfam_gcf
-            fam_counts = overlap_counts + data_links.M_fam_notgcf
+                data_links.cooccurrence_fam_gcf.shape) * data_links.gcf_strain_occurrence.shape[1]
+            overlap_counts = data_links.cooccurrence_fam_gcf
+            gcf_counts = overlap_counts + data_links.cooccurrence_notfam_gcf
+            fam_counts = overlap_counts + data_links.cooccurrence_fam_notgcf
             hg_scores = hypergeom.sf(overlap_counts,
                                      num_strains,
                                      gcf_counts,
@@ -224,19 +224,19 @@ class LinkFinder():
         """
 
         if type == 'spec-gcf':
-            likelihood_scores = np.zeros(data_links.M_spec_gcf.shape)
+            likelihood_scores = np.zeros(data_links.cooccurrence_spec_gcf.shape)
             likelihood_scores = (
                 likelihoods.P_gcf_given_spec *
                 (1 - likelihoods.P_spec_not_gcf) *
-                (1 - np.exp(-alpha_weighing * data_links.M_spec_gcf)))
+                (1 - np.exp(-alpha_weighing * data_links.cooccurrence_spec_gcf)))
 
             self.likescores_spec_gcf = likelihood_scores
 
         elif type == 'fam-gcf':
-            likelihood_scores = np.zeros(data_links.M_fam_gcf.shape)
+            likelihood_scores = np.zeros(data_links.cooccurrence_fam_gcf.shape)
             likelihood_scores = (
                 likelihoods.P_gcf_given_fam * (1 - likelihoods.P_fam_not_gcf) *
-                (1 - np.exp(-alpha_weighing * data_links.M_fam_gcf)))
+                (1 - np.exp(-alpha_weighing * data_links.cooccurrence_fam_gcf)))
 
             self.likescores_fam_gcf = likelihood_scores
         return likelihood_scores
@@ -275,7 +275,7 @@ class LinkFinder():
             P_gcf_not_type1 = likelihoods.P_gcf_not_spec
             P_type1_given_gcf = likelihoods.P_spec_given_gcf
             P_type1_not_gcf = likelihoods.P_spec_not_gcf
-            M_type1_gcf = data_links.M_spec_gcf
+            M_type1_gcf = data_links.cooccurrence_spec_gcf
             metcalf_scores = self.metcalf_spec_gcf
             likescores = self.likescores_spec_gcf
             index_names = [
@@ -290,7 +290,7 @@ class LinkFinder():
             P_gcf_not_type1 = likelihoods.P_gcf_not_fam
             P_type1_given_gcf = likelihoods.P_fam_given_gcf
             P_type1_not_gcf = likelihoods.P_fam_not_gcf
-            M_type1_gcf = data_links.M_fam_gcf
+            M_type1_gcf = data_links.cooccurrence_fam_gcf
             metcalf_scores = self.metcalf_fam_gcf
             likescores = self.likescores_fam_gcf
             index_names = [
