@@ -43,10 +43,11 @@ class DataLinks():
         self.spec_strain_occurrence = pd.DataFrame()
         self.mf_strain_occurrence = pd.DataFrame()
 
-        # mappings (lookup lists to map between different ids and categories
+        # mapping tables, check `_get_mappings_from_occurance` for details
+        # TODO: these mappings could be removed when refactoring LinkFinder
         self.mapping_spec = pd.DataFrame()
         self.mapping_gcf = pd.DataFrame()
-        self.mapping_fam = pd.DataFrame()  # labels for strain-family matrix
+        self.mapping_fam = pd.DataFrame()
         self.mapping_strain = pd.DataFrame()
 
         # correlation matrices for spectra <-> GCFs
@@ -64,28 +65,27 @@ class DataLinks():
     def load_data(self, spectra: Sequence[Spectrum], gcfs: Sequence[GCF],
                   strains: StrainCollection,
                   molfams: Sequence[MolecularFamily]):
-        # load data from spectra, GCFs, and strains
-        logger.debug("Create mappings between spectra, gcfs, and strains.")
-        self.collect_mappings_spec(spectra)
-        self.collect_mappings_gcf(gcfs)
         logger.debug(
             "Create co-occurence matrices: spectra<->strains, gcfs<->strains and mfs<->strains."
         )
         self._get_gcf_strain_occurrence(gcfs, strains)
         self._get_spec_strain_occurrence(spectra, strains)
         self._get_mf_strain_occurrence(molfams, strains)
-
         self._get_mappings_from_occurrence()
 
     def _get_mappings_from_occurrence(self):
+        # pd.Series with index = gcf.gcf_id and value = number of strains where gcf occurs
         self.mapping_gcf["no of strains"] = np.sum(self.gcf_strain_occurrence,
                                                    axis=1)
+        # pd.Series with index = spectrum.spectrum_id and value = number of strains where spec occurs
         self.mapping_spec["no of strains"] = np.sum(
             self.spec_strain_occurrence, axis=1)
-        self.mapping_strain["no of spectra"] = np.sum(
-            self.spec_strain_occurrence, axis=0)
+        # pd.Series with index = mf.family_id and value = number of strains where mf occurs
         self.mapping_fam["no of strains"] = np.sum(self.mf_strain_occurrence,
                                                    axis=1)
+        # pd.Series with index = strain.id and value = number of spectra in strain
+        self.mapping_strain["no of spectra"] = np.sum(
+            self.spec_strain_occurrence, axis=0)
 
     def find_correlations(self):
         # collect correlations/ co-occurences
@@ -93,105 +93,6 @@ class DataLinks():
         self.correlation_matrices(type='spec-gcf')
         logger.debug("Create correlation matrices: mol-families<->gcfs.")
         self.correlation_matrices(type='fam-gcf')
-
-    def collect_mappings_spec(self, obj: Sequence[Spectrum]
-                              | Sequence[MolecularFamily]):
-        if isinstance(obj[0], Spectrum):
-            mapping_spec = self._collect_mappings_from_spectra(obj)
-        elif isinstance(obj[0], MolecularFamily):
-            mapping_spec = self._collect_mappings_from_molecular_families(obj)
-
-        # extend mapping tables:
-        # TODO: why do we need the mappings???
-        # "spec-id" is defined as the index of the spectrum in the input data
-        self.mapping_spec["fam-id"] = mapping_spec[:, 2]
-
-    def _collect_mappings_from_spectra(self,
-                                       spectra) -> np.ndarray[np.float64]:
-        # Collect most import mapping tables from input data
-        mapping_spec = np.zeros((len(spectra), 3))
-        mapping_spec[:, 0] = np.arange(0, len(spectra))
-
-        for i, spectrum in enumerate(spectra):
-            mapping_spec[i, 1] = spectrum.id
-            mapping_spec[i, 2] = spectrum.family.family_id
-
-        return mapping_spec
-
-    def _collect_mappings_from_molecular_families(
-            self,
-            molfams: Sequence[MolecularFamily]) -> np.ndarray[np.float64]:
-        num_spectra = sum(len(x.spectra_ids) for x in molfams)
-        mapping_spec = np.zeros((num_spectra, 3))
-        mapping_spec[:, 0] = np.arange(0, num_spectra)
-
-        inverted_mappings = {}
-        for item in molfams:
-            for spectrum_id in item.spectra_ids:
-                inverted_mappings[spectrum_id] = item.family_id
-
-        for i, key in enumerate(inverted_mappings):
-            mapping_spec[i, 1] = key
-            mapping_spec[i, 2] = inverted_mappings[key]
-
-        return mapping_spec
-
-    def collect_mappings_gcf(self, gcf_list):
-        """
-        Find classes of gene cluster (nrps, pksi etc.)
-        collect most likely class (most occuring name, preferentially not "Others")
-        additional score shows fraction of chosen class among all given ones
-        """
-
-        # TODO: not only collect bigclass types but also product predictions
-        bigscape_bestguess = []
-        for i, gcf in enumerate(gcf_list):
-            #bigscape_class = []
-            #for i, bgc in enumerate(gcf_list[i].bgcs):
-            #    # bigscape_class.append(gcf_list[i].bgc_list[m].bigscape_class)
-            #    bigscape_class.append(bgc.bigscape_class)
-            #    class_counter = Counter(bigscape_class)
-
-            # TODO: this might need properly rewritten due to changes in the way GCF/BGC
-            # objects store bigscape class information and handle hybrid BGCs (see genomics.py). the
-            # original version i've left above iterates over every BGC in the current GCF
-            # and extracts its .bigscape_class attribute, but now each BGC can have multiple
-            # classes if it happens to be a hybrid and i'm not sure the version below
-            # still makes sense.
-            #
-            # doesn't seem to be very important for calculating the metcalf scores though so not urgent for now.
-            bigscape_class = []
-            for bgc in gcf.bgcs:
-                bigscape_class.extend(bgc.bigscape_classes)
-            class_counter = Counter(bigscape_class)
-
-            # try not to select "Others":
-            if class_counter.most_common(1)[0][0] is None:
-                bigscape_bestguess.append(["Others", 0])
-            elif class_counter.most_common(
-                    1)[0][0] == "Others" and class_counter.most_common(
-                        1)[0][1] < len(bigscape_class):
-                if class_counter.most_common(2)[1][0] is None:
-                    bigscape_bestguess.append([
-                        class_counter.most_common(1)[0][0],
-                        class_counter.most_common(1)[0][1] /
-                        len(bigscape_class)
-                    ])
-                else:
-                    bigscape_bestguess.append([
-                        class_counter.most_common(2)[1][0],
-                        class_counter.most_common(2)[1][1] /
-                        len(bigscape_class)
-                    ])
-            else:
-                bigscape_bestguess.append([
-                    class_counter.most_common(1)[0][0],
-                    class_counter.most_common(1)[0][1] / len(bigscape_class)
-                ])
-
-        # extend mapping tables:
-        bigscape_guess, bigscape_guessscore = zip(*bigscape_bestguess)
-        self.mapping_gcf["bgc class"] = bigscape_guess
 
     def _get_gcf_strain_occurrence(self, gcfs: Sequence[GCF],
                                    strains: StrainCollection) -> None:
