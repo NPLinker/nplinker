@@ -122,6 +122,7 @@ class NPLinker():
         self._class_matches = None
 
         self._bgc_lookup = {}
+        self._gcf_lookup = {}
         self._spec_lookup = {}
 
         self._scoring_methods = {}
@@ -286,25 +287,17 @@ class NPLinker():
         self._class_matches = self._loader.class_matches
 
         logger.debug('Generating lookup tables: genomics')
-        self._bgc_lookup = {}
-        for i, bgc in enumerate(self._bgcs):
-            self._bgc_lookup[bgc.bgc_id] = i
-
-        self._gcf_lookup = {}
-        for i, gcf in enumerate(self._gcfs):
-            self._gcf_lookup[gcf.gcf_id] = i
+        self._bgc_lookup = {bgc.bgc_id: bgc for bgc in self._bgcs}
+        self._gcf_lookup = {gcf.gcf_id: gcf for gcf in self._gcfs}
 
         # don't need to do these two if cutoff changed (indicating genomics data
         # was reloaded but not metabolomics)
         if new_bigscape_cutoff is None:
             logger.debug('Generating lookup tables: metabolomics')
-            self._spec_lookup = {}
-            for i, spec in enumerate(self._spectra):
-                self._spec_lookup[spec.spectrum_id] = i
-
-            self._molfam_lookup = {}
-            for i, molfam in enumerate(self._molfams):
-                self._molfam_lookup[molfam.id] = i
+            self._spec_lookup = {
+                spec.spectrum_id: spec
+                for spec in self._spectra
+            }
 
         logger.debug('load_data: completed')
         return True
@@ -479,18 +472,15 @@ class NPLinker():
 
     def lookup_bgc(self, bgc_id):
         """If BGC ``bgc_id`` exists, return it. Otherwise return None"""
-        return self._bgcs[self._bgc_lookup[bgc_id]] if self.has_bgc(
-            bgc_id) else None
+        return self._bgc_lookup.get(bgc_id, None)
 
     def lookup_gcf(self, gcf_id):
         """If GCF ``gcf_id`` exists, return it. Otherwise return None"""
-        return self._gcfs[
-            self._gcf_lookup[gcf_id]] if gcf_id in self._gcf_lookup else None
+        return self._gcf_lookup.get(gcf_id, None)
 
-    def lookup_spectrum(self, name):
+    def lookup_spectrum(self, spectrum_id):
         """If Spectrum ``name`` exists, return it. Otherwise return None"""
-        return self._spectra[
-            self._spec_lookup[name]] if name in self._spec_lookup else None
+        return self._spec_lookup.get(spectrum_id, None)
 
     @property
     def strains(self):
