@@ -77,13 +77,13 @@ class MetcalfScoring(ScoringMethod):
             logger.info(
                 'MetcalfScoring.setup preprocessing dataset (this may take some time)'
             )
-            MetcalfScoring.DATALINKS = DataLinks(npl._spectra, npl._gcfs,
-                                               npl._strains, npl.molfams)
+            MetcalfScoring.DATALINKS = DataLinks(npl._gcfs, npl._spectra,
+                                                 npl._molfams, npl._strains)
             MetcalfScoring.LINKFINDER = LinkFinder()
             MetcalfScoring.LINKFINDER.metcalf_scoring(MetcalfScoring.DATALINKS,
                                                       type='spec-gcf')
             MetcalfScoring.LINKFINDER.metcalf_scoring(MetcalfScoring.DATALINKS,
-                                                      type='fam-gcf')
+                                                      type='mf-gcf')
             logger.debug('MetcalfScoring.setup caching results')
             save_pickled_data((dataset_counts, MetcalfScoring.DATALINKS,
                                MetcalfScoring.LINKFINDER), cache_file)
@@ -238,7 +238,7 @@ class MetcalfScoring(ScoringMethod):
                 'MetcalfScoring: input_type=GCF, result_type=Spec/MolFam, inputs={}, results={}'
                 .format(len(objects), results[0].shape))
             # for GCF input, results contains two arrays of shape (3, x),
-            # which contain spec-gcf and fam-gcf links respectively
+            # which contain spec-gcf and mf-gcf links respectively
             result_gcf_spec, result_gcf_fam = results[0], results[1]
 
             for res, type_ in [(result_gcf_spec, Spectrum),

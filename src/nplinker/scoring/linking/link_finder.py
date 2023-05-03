@@ -72,17 +72,17 @@ class LinkFinder():
         if method == 'metcalf':
             if type_ == 'spec-gcf':
                 return self.metcalf_spec_gcf
-            elif type_ == 'fam-gcf':
+            elif type_ == 'mf-gcf':
                 return self.metcalf_fam_gcf
         elif method == 'likescore':
             if type_ == 'spec-gcf':
                 return self.likescores_spec_gcf
-            elif type_ == 'fam-gcf':
+            elif type_ == 'mf-gcf':
                 return self.likescores_fam_gcf
         elif method == 'hg':
             if type_ == 'spec-gcf':
                 return self.hg_spec_gcf
-            elif type_ == 'fam-gcf':
+            elif type_ == 'mf-gcf':
                 return self.hg_fam_gcf
 
         raise Exception(
@@ -102,7 +102,7 @@ class LinkFinder():
 
         # Compute the expected values for all possible values of spec and gcf strains
         # we need the total number of strains
-        _, n_strains = data_links.gcf_strain_occurrence.shape
+        _, n_strains = data_links.occurrence_gcf_strain.shape
         if self.metcalf_expected is None:
             sz = (n_strains + 1, n_strains + 1)
             self.metcalf_expected = np.zeros(sz)
@@ -148,12 +148,12 @@ class LinkFinder():
                               data_links.cooccurrence_notspec_notgcf * not_type1_not_gcf)
             self.metcalf_spec_gcf = metcalf_scores
 
-        elif type == 'fam-gcf':
-            metcalf_scores = np.zeros(data_links.cooccurrence_fam_gcf.shape)
-            metcalf_scores = (data_links.cooccurrence_fam_gcf * both +
-                              data_links.cooccurrence_fam_notgcf * type1_not_gcf +
-                              data_links.cooccurrence_notfam_gcf * gcf_not_type1 +
-                              data_links.cooccurrence_notfam_notgcf * not_type1_not_gcf)
+        elif type == 'mf-gcf':
+            metcalf_scores = np.zeros(data_links.cooccurrence_mf_gcf.shape)
+            metcalf_scores = (data_links.cooccurrence_mf_gcf * both +
+                              data_links.cooccurrence_mf_notgcf * type1_not_gcf +
+                              data_links.cooccurrence_notmf_gcf * gcf_not_type1 +
+                              data_links.cooccurrence_notmf_notgcf * not_type1_not_gcf)
 
             self.metcalf_fam_gcf = metcalf_scores
         return metcalf_scores
@@ -170,12 +170,12 @@ class LinkFinder():
         # e.g. if a spectrum has 3 strains, a GCF has 1 strain and there is 1 shared strain,
         # cooccurrence_spec_gcf will correctly contain "1", but M_type1_notgcf will contain "2" instead
         # of "3", because the spectrum only has 2 distinct strains vs the GCF.
-        # To fix this the cooccurrence_spec_gcf/cooccurrence_fam_gcf matrix can just be added onto the others to give
+        # To fix this the cooccurrence_spec_gcf/cooccurrence_mf_gcf matrix can just be added onto the others to give
         # the correct totals.
 
         if type == 'spec-gcf':
             num_strains = np.ones(
-                data_links.cooccurrence_spec_gcf.shape) * data_links.gcf_strain_occurrence.shape[1]
+                data_links.cooccurrence_spec_gcf.shape) * data_links.occurrence_gcf_strain.shape[1]
             overlap_counts = data_links.cooccurrence_spec_gcf
             gcf_counts = overlap_counts + data_links.cooccurrence_notspec_gcf
             spec_counts = overlap_counts + data_links.cooccurrence_spec_notgcf
@@ -185,12 +185,12 @@ class LinkFinder():
                                      spec_counts,
                                      loc=1)
             self.hg_spec_gcf = hg_scores
-        elif type == 'fam-gcf':
+        elif type == 'mf-gcf':
             num_strains = np.ones(
-                data_links.cooccurrence_fam_gcf.shape) * data_links.gcf_strain_occurrence.shape[1]
-            overlap_counts = data_links.cooccurrence_fam_gcf
-            gcf_counts = overlap_counts + data_links.cooccurrence_notfam_gcf
-            fam_counts = overlap_counts + data_links.cooccurrence_fam_notgcf
+                data_links.cooccurrence_mf_gcf.shape) * data_links.occurrence_gcf_strain.shape[1]
+            overlap_counts = data_links.cooccurrence_mf_gcf
+            gcf_counts = overlap_counts + data_links.cooccurrence_notmf_gcf
+            fam_counts = overlap_counts + data_links.cooccurrence_mf_notgcf
             hg_scores = hypergeom.sf(overlap_counts,
                                      num_strains,
                                      gcf_counts,
@@ -232,11 +232,11 @@ class LinkFinder():
 
             self.likescores_spec_gcf = likelihood_scores
 
-        elif type == 'fam-gcf':
-            likelihood_scores = np.zeros(data_links.cooccurrence_fam_gcf.shape)
+        elif type == 'mf-gcf':
+            likelihood_scores = np.zeros(data_links.cooccurrence_mf_gcf.shape)
             likelihood_scores = (
                 likelihoods.P_gcf_given_fam * (1 - likelihoods.P_fam_not_gcf) *
-                (1 - np.exp(-alpha_weighing * data_links.cooccurrence_fam_gcf)))
+                (1 - np.exp(-alpha_weighing * data_links.cooccurrence_mf_gcf)))
 
             self.likescores_fam_gcf = likelihood_scores
         return likelihood_scores
@@ -247,11 +247,11 @@ class LinkFinder():
                                P_cutoff=0.8,
                                main_score='likescore',
                                score_cutoff=0,
-                               type='fam-gcf'):
+                               type='mf-gcf'):
         """
         Look for potential best candidate for links between
         IF type='spec-gcf': GCFs and spectra
-        IF type='fam-gcf': GCFs and mol.families
+        IF type='mf-gcf': GCFs and mol.families
 
         Parameters
         ----------
@@ -269,7 +269,7 @@ class LinkFinder():
             score >= score_cutoff
         """
 
-        # Select scenario: spec<->gcf or fam<->gcf
+        # Select scenario: spec<->gcf or mf<->gcf
         if type == 'spec-gcf':
             P_gcf_given_type1 = likelihoods.P_gcf_given_spec
             P_gcf_not_type1 = likelihoods.P_gcf_not_spec
@@ -285,12 +285,12 @@ class LinkFinder():
                 "link prob specific"
             ]
 
-        elif type == 'fam-gcf':
+        elif type == 'mf-gcf':
             P_gcf_given_type1 = likelihoods.P_gcf_given_fam
             P_gcf_not_type1 = likelihoods.P_gcf_not_fam
             P_type1_given_gcf = likelihoods.P_fam_given_gcf
             P_type1_not_gcf = likelihoods.P_fam_not_gcf
-            M_type1_gcf = data_links.cooccurrence_fam_gcf
+            M_type1_gcf = data_links.cooccurrence_mf_gcf
             metcalf_scores = self.metcalf_fam_gcf
             likescores = self.likescores_fam_gcf
             index_names = [
@@ -304,7 +304,7 @@ class LinkFinder():
             raise Exception("Given types are not yet supported... ")
         else:
             raise Exception(
-                "Wrong correlation 'type' given. Must be one of 'spec-gcf', 'fam-gcf'..."
+                "Wrong correlation 'type' given. Must be one of 'spec-gcf', 'mf-gcf'..."
             )
 
         dim1, dim2 = P_gcf_given_type1.shape
@@ -341,14 +341,14 @@ class LinkFinder():
         Nx_list = data_links.mapping_gcf["no of strains"]
         if type == 'spec-gcf':
             Ny_list = data_links.mapping_spec["no of strains"]
-        elif type == 'fam-gcf':
+        elif type == 'mf-gcf':
             Ny_list = data_links.mapping_fam["no of strains"]
 
         # Calculate probabilities of finding a spectrum in a certain strain
         P_str = np.array(data_links.mapping_strain["no of spectra"])
         P_str = P_str / np.sum(P_str)
 
-        num_strains = data_links.gcf_strain_occurrence.shape[1]
+        num_strains = data_links.occurrence_gcf_strain.shape[1]
 
         # Calculate the hypergeometric probability (as before)
         for i in range(link_candidates.shape[1]):
@@ -363,7 +363,7 @@ class LinkFinder():
             id_gcf = link_candidates[1, i]
 
             # find set of strains which contain GCF with id link_candidates[1,i]
-            XG = np.where(data_links.gcf_strain_occurrence.loc[id_gcf, :] == 1)[0]
+            XG = np.where(data_links.occurrence_gcf_strain.loc[id_gcf, :] == 1)[0]
 
             link_candidates[10,
                             i] = pair_prob_approx(P_str, XG,
@@ -372,11 +372,11 @@ class LinkFinder():
             # Calculate the link specific probability
             # Find strains where GCF and spectra/family co-occur
             if type == 'spec-gcf':
-                XGS = np.where((data_links.gcf_strain_occurrence[id_gcf, :] == 1) &
-                               (data_links.spec_strain_occurrence[id_spec, :] == 1))[0]
-            elif type == 'fam-gcf':
-                XGS = np.where((data_links.gcf_strain_occurrence[id_gcf, :] == 1)
-                               & (data_links.mf_strain_occurrence[id_spec, :] == 1))[0]
+                XGS = np.where((data_links.occurrence_gcf_strain[id_gcf, :] == 1) &
+                               (data_links.occurrence_spec_strain[id_spec, :] == 1))[0]
+            elif type == 'mf-gcf':
+                XGS = np.where((data_links.occurrence_gcf_strain[id_gcf, :] == 1)
+                               & (data_links.occurrence_mf_strain[id_spec, :] == 1))[0]
             link_candidates[11,
                             i] = link_prob(P_str, XGS, int(Nx_list[id_gcf]),
                                            int(Ny_list[id_spec]), num_strains)
@@ -401,7 +401,7 @@ class LinkFinder():
         # return results
         if type == 'spec-gcf':
             self.link_candidates_gcf_spec = link_candidates_pd
-        elif type == 'fam-gcf':
+        elif type == 'mf-gcf':
             self.link_candidates_gcf_fam = link_candidates_pd
         else:
             raise Exception("No candidate selection was created.")
@@ -580,7 +580,7 @@ class LinkFinder():
     def create_cytoscape_files(self,
                                data_links,
                                network_filename,
-                               link_type='fam-gcf',
+                               link_type='mf-gcf',
                                score_type='metcalf'):
         """
         Create network file for import into Cytoscape.
@@ -603,7 +603,7 @@ class LinkFinder():
         import networkx as nx
         NPlinker_net = nx.Graph()
 
-        if link_type == 'fam-gcf':
+        if link_type == 'mf-gcf':
             link_candidates = self.link_candidates_gcf_fam
             type1str = 'family_id'
         elif link_type == 'spec-gcf':
@@ -669,7 +669,7 @@ class LinkFinder():
                         P_cutoff=0.8,
                         score_type='likescore',
                         score_cutoff=0,
-                        type='fam-gcf'):
+                        type='mf-gcf'):
         """
         Plot best rated correlations between gcfs and spectra/families
         plot in form of seaborn clustermap
@@ -690,7 +690,7 @@ class LinkFinder():
             selected_ids = np.where(
                 (link_candidates["P(gcf|spec)"] > P_cutoff)
                 & (link_candidates[scorestr] > score_cutoff))[0]
-        elif type == 'fam-gcf':
+        elif type == 'mf-gcf':
             link_candidates = self.link_candidates_gcf_fam
             selected_ids = np.where(
                 (link_candidates["P(gcf|fam)"] > P_cutoff)
@@ -731,7 +731,7 @@ class LinkFinder():
                                columns=mapping_gcfs.astype(int))
         if type == 'spec-gcf':
             M_links.index.name = 'spectrum number'
-        elif type == 'fam-gcf':
+        elif type == 'mf-gcf':
             M_links.index.name = 'molecular family number'
         M_links.columns.name = 'gene cluster family (GCF)'
 

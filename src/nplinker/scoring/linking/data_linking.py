@@ -1,5 +1,4 @@
 from __future__ import annotations
-from collections import Counter
 from typing import Sequence, TYPE_CHECKING
 import numpy as np
 import pandas as pd
@@ -18,46 +17,93 @@ logger = LogConfig.getLogger(__name__)
 
 
 class DataLinks():
-    """
-    DataLinks collects and structures co-occurence data
-    1) Co-occurences of spectra, families, and GCFs with respect to strains
-    2) Mappings: Lookup-tables that link different ids and categories
-    3) Correlation matrices that show how often spectra/families and GCFs co-occur
-    """
-    def __init__(self, spectra: Sequence[Spectrum], gcfs: Sequence[GCF],
-                 strains: StrainCollection,
-                 molfams: Sequence[MolecularFamily]):
+
+    def __init__(self, gcfs: Sequence[GCF], spectra: Sequence[Spectrum],
+                 mfs: Sequence[MolecularFamily],
+                 strains: StrainCollection):
+        """DataLinks class to store occurrence and co-occurrence information.
+
+        Occurrence refers to the presence of a spectrum/gcf/mf in a strain.
+        Co-occurrence refers to the presence of a spectrum/mf and a gcf in a strain.
+
+        Args:
+            gcfs(Sequence[GCF]): A list of GCF objects.
+            spectra(Sequence[Spectrum]): A list of Spectrum objects.
+            mfs(Sequence[MolecularFamily]): A list of MolecularFamily objects.
+            strains(StrainCollection): A StrainCollection object.
+
+        Attributes:
+            occurrence_gcf_strain(pd.DataFrame): A DataFrame to store occurrence of
+                gcfs with respect to strains.
+            occurrence_spec_strain(pd.DataFrame): A DataFrame to store occurrence of
+                spectra with respect to strains.
+            occurrence_mf_strain(pd.DataFrame): A DataFrame to store occurrence of
+                molecular families with respect to strains.
+            cooccurrence_spec_gcf(np.array): A 2D numpy array to store co-occurrence
+                of spectra<->gcfs.
+            cooccurrence_spec_notgcf(np.array): A 2D numpy array to store co-occurrence
+                of spectra<->not gcfs.
+            cooccurrence_notspec_gcf(np.array): A 2D numpy array to store co-occurrence
+                of not spectra<->gcfs.
+            cooccurrence_notspec_notgcf(np.array): A 2D numpy array to store co-occurrence
+                of not spectra<->not gcfs.
+            cooccurrence_mf_gcf(np.array): A 2D numpy array to store co-occurrence
+                of molecular families<->gcfs.
+            cooccurrence_mf_notgcf(np.array): A 2D numpy array to store co-occurrence
+                of molecular families<->not gcfs.
+            cooccurrence_notmf_gcf(np.array): A 2D numpy array to store co-occurrence
+                of not molecular families<->gcfs.
+            cooccurrence_notmf_notgcf(np.array): A 2D numpy array to store co-occurrence
+                of not molecular families<->not gcfs.
+            mapping_gcf(pd.DataFrame): A DataFrame to store mappings for gcfs.
+            mapping_spec(pd.DataFrame): A DataFrame to store mappings for spectra.
+            mapping_mf(pd.DataFrame): A DataFrame to store mappings for molecular families.
+            mapping_strain(pd.DataFrame): A DataFrame to store mappings for strains.
+        """
         logger.debug(
             "Create occurrence dataframes: spectra<->strains, gcfs<->strains and mfs<->strains."
         )
         # DataFrame to store occurrence of gcfs/spectra/mfs with respect to strains
         # values = 1 where gcf/spec/fam occur in strain, 0 otherwise
-        self._get_gcf_strain_occurrence(gcfs, strains)
-        self._get_spec_strain_occurrence(spectra, strains)
-        self._get_mf_strain_occurrence(molfams, strains)
+        self.occurrence_gcf_strain = self._get_occurrence_gcf_strain(
+            gcfs, strains)
+        self.occurrence_spec_strain = self._get_occurrence_spec_strain(
+            spectra, strains)
+        self.occurrence_mf_strain = self._get_occurrence_mf_strain(
+            mfs, strains)
 
         # DataFrame to store mapping tables, check `_get_mappings_from_occurance` for details
         # TODO: these mappings could be removed when refactoring LinkFinder
+        self.mapping_spec = pd.DataFrame()
+        self.mapping_gcf = pd.DataFrame()
+        self.mapping_fam = pd.DataFrame()
+        self.mapping_strain = pd.DataFrame()
         self._get_mappings_from_occurrence()
 
         # np.array to store co-occurrence of "spectra<->gcf" or "mfs<->gcf"
         logger.debug("Create correlation matrices: spectra<->gcfs.")
-        self._get_cooccurrence(link_type='spec-gcf')
+        (self.cooccurrence_spec_gcf, self.cooccurrence_spec_notgcf,
+         self.cooccurrence_notspec_gcf,
+         self.cooccurrence_notspec_notgcf) = self._get_cooccurrence(
+             link_type='spec-gcf')
         logger.debug("Create correlation matrices: mol-families<->gcfs.")
-        self._get_cooccurrence(link_type='fam-gcf')
+        (self.cooccurrence_mf_gcf, self.cooccurrence_mf_notgcf,
+         self.cooccurrence_notmf_gcf,
+         self.cooccurrence_notmf_notgcf) = self._get_cooccurrence(
+             link_type='mf-gcf')
 
     def get_common_strains(
         self,
-        spectra_or_molfams: Sequence[Spectrum] | Sequence[MolecularFamily],
+        spectra_or_mfs: Sequence[Spectrum] | Sequence[MolecularFamily],
         gcfs: Sequence[GCF],
         filter_no_shared: bool = False
     ) -> dict[tuple[Spectrum | MolecularFamily, GCF], list[str]]:
         """Get common strains between given spectra/molecular families and GCFs.
 
-        Note that SingletonFamily objects are excluded from given `spectra_or_molfams`.
+        Note that SingletonFamily objects are excluded from given `spectra_or_mfs`.
 
         Args:
-            spectra_or_molfams(Sequence[Spectrum] | Sequence[MolecularFamily]):
+            spectra_or_mfs(Sequence[Spectrum] | Sequence[MolecularFamily]):
                 A list of Spectrum or MolecularFamily objects.
             gcfs(Sequence[GCF]): A list of GCF objects.
             filter_no_shared(bool): If True, return only the pair of
@@ -69,7 +115,7 @@ class DataLinks():
             dict: A dict where the keys are tuples of (Spectrum/MolecularFamily, GCF)
             and values are a list of strain ids that appear in both objects.
         """
-        if not isinstance(spectra_or_molfams[0], (Spectrum, MolecularFamily)):
+        if not isinstance(spectra_or_mfs[0], (Spectrum, MolecularFamily)):
             raise ValueError(
                 'Must provide Spectra or MolecularFamilies as the first argument!'
             )
@@ -77,27 +123,27 @@ class DataLinks():
             raise ValueError('Must provide GCFs as the second argument!')
 
         # Assume that 3 occurrence dataframes have same df.columns (strain ids)
-        strain_ids = self.gcf_strain_occurrence.columns
+        strain_ids = self.occurrence_gcf_strain.columns
         results = {}
-        for obj in spectra_or_molfams:
+        for obj in spectra_or_mfs:
             if isinstance(obj, SingletonFamily):
                 continue
             for gcf in gcfs:
                 if isinstance(obj, Spectrum):
                     shared_strains = strain_ids[np.logical_and(
-                        self.spec_strain_occurrence.loc[obj.spectrum_id],
-                        self.gcf_strain_occurrence.loc[gcf.gcf_id])]
+                        self.occurrence_spec_strain.loc[obj.spectrum_id],
+                        self.occurrence_gcf_strain.loc[gcf.gcf_id])]
                 else:
                     shared_strains = strain_ids[np.logical_and(
-                        self.mf_strain_occurrence.loc[obj.family_id],
-                        self.gcf_strain_occurrence.loc[gcf.gcf_id])]
+                        self.occurrence_mf_strain.loc[obj.family_id],
+                        self.occurrence_gcf_strain.loc[gcf.gcf_id])]
                 if filter_no_shared and len(shared_strains) == 0:
                     continue
                 results[(obj, gcf)] = shared_strains.to_list()
         return results
 
-    def _get_gcf_strain_occurrence(self, gcfs: Sequence[GCF],
-                                   strains: StrainCollection) -> None:
+    def _get_occurrence_gcf_strain(self, gcfs: Sequence[GCF],
+                                   strains: StrainCollection) -> pd.DataFrame:
         """Get the occurence of strains in gcfs.
 
         The occurence is a DataFrame with gcfs as rows and strains as columns,
@@ -111,10 +157,10 @@ class DataLinks():
             for strain in strains:
                 if gcf.has_strain(strain):
                     df_gcf_strain.loc[gcf.gcf_id, strain.id] = 1
-        self.gcf_strain_occurrence = df_gcf_strain
+        return df_gcf_strain
 
-    def _get_spec_strain_occurrence(self, spectra: Sequence[Spectrum],
-                                    strains: StrainCollection) -> None:
+    def _get_occurrence_spec_strain(self, spectra: Sequence[Spectrum],
+                                    strains: StrainCollection) -> pd.DataFrame:
         """Get the occurence of strains in spectra.
 
         The occurence is a DataFrame with spectra as rows and strains as columns,
@@ -129,10 +175,10 @@ class DataLinks():
             for strain in strains:
                 if spectrum.has_strain(strain):
                     df_spec_strain.loc[spectrum.spectrum_id, strain.id] = 1
-        self.spec_strain_occurrence = df_spec_strain
+        return df_spec_strain
 
-    def _get_mf_strain_occurrence(self, mfs: Sequence[MolecularFamily],
-                                  strains: StrainCollection) -> None:
+    def _get_occurrence_mf_strain(self, mfs: Sequence[MolecularFamily],
+                                  strains: StrainCollection) -> pd.DataFrame:
         """Get the occurence of strains in molecular families.
 
         The occurence is a DataFrame with molecular families as rows and
@@ -152,56 +198,41 @@ class DataLinks():
             for strain in strains:
                 if mf.has_strain(strain):
                     df_mf_strain.loc[mf.family_id, strain.id] = 1
-        self.mf_strain_occurrence = df_mf_strain
+        return df_mf_strain
 
     def _get_mappings_from_occurrence(self):
-        self.mapping_spec = pd.DataFrame()
-        self.mapping_gcf = pd.DataFrame()
-        self.mapping_fam = pd.DataFrame()
-        self.mapping_strain = pd.DataFrame()
 
         # pd.Series with index = gcf.gcf_id and value = number of strains where gcf occurs
-        self.mapping_gcf["no of strains"] = np.sum(self.gcf_strain_occurrence,
-                                                   axis=1)
+        self.mapping_gcf["no of strains"] = self.occurrence_gcf_strain.sum(
+            axis=1)
         # pd.Series with index = spectrum.spectrum_id and value = number of strains where spec occurs
-        self.mapping_spec["no of strains"] = np.sum(
-            self.spec_strain_occurrence, axis=1)
+        self.mapping_spec["no of strains"] = self.occurrence_spec_strain.sum(
+            axis=1)
         # pd.Series with index = mf.family_id and value = number of strains where mf occurs
-        self.mapping_fam["no of strains"] = np.sum(self.mf_strain_occurrence,
-                                                   axis=1)
+        self.mapping_fam["no of strains"] = self.occurrence_mf_strain.sum(
+            axis=1)
         # pd.Series with index = strain.id and value = number of spectra in strain
-        self.mapping_strain["no of spectra"] = np.sum(
-            self.spec_strain_occurrence, axis=0)
+        self.mapping_strain["no of spectra"] = self.occurrence_spec_strain.sum(
+            axis=0)
 
-    def _get_cooccurrence(self, link_type: str = 'spec-gcf'):
+    def _get_cooccurrence(
+        self,
+        link_type: str = 'spec-gcf'
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Calculate co-occurrence for given link types across strains.
 
         Args:
             link_type(str): Type of link to calculate co-occurrence for,
-                either 'spec-gcf' or 'fam-gcf'.
+                either 'spec-gcf' or 'mf-gcf'.
         """
         if link_type == 'spec-gcf':
-            met_strain_occurrence = self.spec_strain_occurrence
-        elif link_type == 'fam-gcf':
-            met_strain_occurrence = self.mf_strain_occurrence
+            met_strain_occurrence = self.occurrence_spec_strain
+        elif link_type == 'mf-gcf':
+            met_strain_occurrence = self.occurrence_mf_strain
         else:
             raise ValueError(
-                f"Link type {link_type} is not supported. Use 'spec-gcf' or 'fam-gcf' instead."
+                f"Link type {link_type} is not supported. Use 'spec-gcf' or 'mf-gcf' instead."
             )
-
         logger.debug(f"Calculating correlation matrices of type: {link_type}")
-
-        met_gcf_corr, met_notgcf_corr, notmet_gcf_corr, notmet_notgcf_corr = calc_correlation_matrix(
-            met_strain_occurrence, self.gcf_strain_occurrence)
-
-        if link_type == 'spec-gcf':
-            # co-occurrence of spectrum and GCF across strains
-            self.cooccurrence_spec_gcf = met_gcf_corr
-            self.cooccurrence_spec_notgcf = met_notgcf_corr
-            self.cooccurrence_notspec_gcf = notmet_gcf_corr
-            self.cooccurrence_notspec_notgcf = notmet_notgcf_corr
-        else:
-            self.cooccurrence_fam_gcf = met_gcf_corr
-            self.cooccurrence_fam_notgcf = met_notgcf_corr
-            self.cooccurrence_notfam_gcf = notmet_gcf_corr
-            self.cooccurrence_notfam_notgcf = notmet_notgcf_corr
+        return calc_correlation_matrix(met_strain_occurrence,
+                                       self.occurrence_gcf_strain)

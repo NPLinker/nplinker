@@ -71,7 +71,7 @@ def do_scoring_old(gcfs, spectra, strains, standardised):
 
 
 def do_scoring_new(gcfs, spectra, strains, standardised):
-    datalinks = DataLinks(spectra, gcfs, strains)
+    datalinks = DataLinks(gcfs, spectra, strains)
     lf = LinkFinder()
     scores = lf.metcalf_scoring(datalinks)
 
@@ -102,7 +102,7 @@ def do_scoring_old_hg(gcfs, spectra, strains):
 
 
 def do_scoring_new_hg(gcfs, spectra, strains):
-    datalinks = DataLinks(spectra, gcfs, strains)
+    datalinks = DataLinks(gcfs, spectra, strains)
     lf = LinkFinder()
     scores = lf.hg_scoring(datalinks)
     return scores
