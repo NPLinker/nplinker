@@ -1,19 +1,19 @@
-import ast
 import csv
 import os
 import re
 import time
 import zipfile
 from os import PathLike
-from typing import Dict
+from pathlib import Path
 import httpx
 from bs4 import BeautifulSoup
 from bs4 import NavigableString
 from bs4 import Tag
 from deprecated import deprecated
 from progress.bar import Bar
+from nplinker.genomics.antismash.antismash_downloader import \
+    download_and_extract_antismash_data
 from nplinker.logconfig import LogConfig
-from . import download_and_extract_antismash_data
 
 logger = LogConfig.getLogger(__name__)
 
@@ -31,8 +31,20 @@ JGI_GENOME_LOOKUP_URL = 'https://img.jgi.doe.gov/cgi-bin/m/main.cgi?section=Taxo
 
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'
 
+GENOME_STATUS_FILENAME = "genome_status.txt"
 
+
+#TODO fix mypy errors
+#TODO add type hints
 class GenomeStatus:
+    """Defines the status relative to a certain genome ID.
+
+    Attributes:
+        original_id(str): original ID for the genome. 
+        resolved_refseq_id(str): ID after having applied _resolve_refseq_id. 
+        attempted(bool): if the attempt of resolving the genome ID has already been done. Defaults to False. 
+        filename(str|PathLike): file in which the data for the genome, if present, are saved. Defaults to "". 
+        """
 
     def __init__(self,
                  original_id,
@@ -40,53 +52,137 @@ class GenomeStatus:
                  attempted=False,
                  filename=""):
         self.original_id = ';'.join(original_id.split(','))
-        self.resolved_refseq_id = None if resolved_refseq_id == 'None' else resolved_refseq_id
-        if ast.literal_eval(attempted):
+        self.resolved_refseq_id = "" if resolved_refseq_id == 'None' else resolved_refseq_id
+        if attempted == 'True':
             self.attempted = True
         else:
             self.attempted = False
         self.filename = filename
 
-    @classmethod
-    def from_csv(cls, original_id, resolved_refseq_id, attempted, filename):
-        return cls(original_id, resolved_refseq_id, attempted, filename)
-
-    def to_csv(self):
-        return ','.join([
+    def add_line(self, file):
+        """Adds a line to file, containing info for the current genome ID. 
+        """
+        line = ','.join([
             str(self.original_id),
             str(self.resolved_refseq_id),
-            str(self.attempted), self.filename
+            str(self.attempted),
+            str(self.filename)
         ])
+
+        with open(file, 'a+') as f:
+            f.write(line + '\n')
+
+
+def podp_download_and_extract_antismash_data(
+        genome_records: list[dict[str, dict[str, str] | str]],
+        project_download_cache: str | Path, project_file_cache: str | Path):
+
+    genome_status_file = Path(project_download_cache, GENOME_STATUS_FILENAME)
+    genome_status = _get_genome_status_log(genome_status_file)
+
+    for i, genome_record in enumerate(genome_records):
+        # get the best available ID from the dict
+        raw_genome_id = _get_best_available_genome_id(
+            genome_record['genome_ID'])
+        if raw_genome_id is None:
+            logger.warning(
+                f'Ignoring genome record "{genome_record}" due to missing genome ID field'
+            )
+            continue
+
+        # use this to check if the lookup has already been attempted and if
+        # so if the file is cached locally
+        if raw_genome_id not in genome_status:
+            genome_status[raw_genome_id] = GenomeStatus(raw_genome_id, None)
+
+        genome_obj = genome_status[raw_genome_id]
+
+        logger.info(
+            f'Checking for antismash data {i + 1}/{len(genome_records)}, current genome ID={raw_genome_id}'
+        )
+        # first check if file is cached locally
+        if Path.exists(genome_obj.filename):
+            # file already downloaded
+            logger.info(
+                f'Genome ID {raw_genome_id} already downloaded to {genome_obj.filename}'
+            )
+            genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
+        elif genome_obj.attempted:
+            # lookup attempted previously but failed
+            logger.info(
+                f'Genome ID {raw_genome_id} skipped due to previous failure')
+            genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
+        else:
+            # if no existing file and no lookup attempted, can start process of
+            # trying to retrieve the data
+
+            # lookup the ID
+            logger.info(
+                f'Beginning lookup process for genome ID {raw_genome_id}')
+
+            genome_obj.resolved_refseq_id = _resolve_refseq_id(
+                genome_record['genome_ID'])
+            genome_obj.attempted = True
+
+            if genome_obj.resolved_refseq_id == "":
+                # give up on this one
+                logger.warning(f'Failed lookup for genome ID {raw_genome_id}')
+                genome_obj.add_line(genome_status_file)
+                continue
+
+        # if we got a refseq ID, now try to download and extract the data from antismash
+        download_and_extract_antismash_data(genome_obj.resolved_refseq_id,
+                                            project_download_cache,
+                                            project_file_cache)
+
+        genome_obj.add_line(genome_status_file)
+
+        output_path = Path(project_file_cache, 'antismash',
+                           genome_obj.resolved_refseq_id)
+        if not Path.exists(Path(output_path, 'completed')):
+            with open(Path(output_path, 'completed'), 'w'):
+                pass
+
+    missing = len([x for x in genome_status.values() if len(x.filename) == 0])
+    logger.info(
+        f'Dataset has {missing} missing sets of antiSMASH data (from a total of {len(genome_records)})'
+    )
+
+    for obj in genome_status.values():
+        obj.add_line(genome_status_file)
+
+    if missing == len(genome_records):
+        logger.warning('Failed to successfully retrieve ANY genome data!')
 
 
 def _get_genome_status_log(
-        genome_status_file: str | PathLike) -> Dict[str, GenomeStatus]:
-    """Read genome_status.txt in a dict if it exists, otherwise create
-    the dictionary. 
+        genome_status_file: str | PathLike) -> dict[str, GenomeStatus]:
+    """Get a dict of GenomeStatus objects by reading given genome status file.
+    Note that a empty dict is returned if the given file does not exist.
 
     Args:
         genome_status_file(str | PathLike): it records genome IDs and local filenames to avoid having to repeat HTTP requests
         each time the app is loaded (this can take a lot of time if there are dozens of genomes).
 
     Returns:
-        dict: log for information about the read genome IDs.
+        dict: dict keys are genome original id and values are GenomeStatus objects.
         """
 
     genome_status = {}
 
-    # 'genome_status.txt' is read, then in the for loop over the genome records it gets updated,
-    # and finally it is saved again in 'genome_status.txt' which is overwritten
-    if os.path.exists(genome_status_file):
+    # GENOME_STATUS_FILENAME is read, then in the for loop over the genome records it gets updated,
+    # and finally it is saved again in GENOME_STATUS_FILENAME which is overwritten
+    if Path.exists(genome_status_file):
         with open(genome_status_file) as f:
             for line in csv.reader(f):
-                asobj = GenomeStatus.from_csv(*line)
+                asobj = GenomeStatus(*line)
                 genome_status[asobj.original_id] = asobj
 
     return genome_status
 
 
 def _get_best_available_genome_id(
-        genome_id_data: Dict[str, str]) -> str | None:
+        genome_id_data: dict[str, str]) -> str | None:
     """Get the best available ID from genome_id_data dict.
 
     Args:
@@ -95,8 +191,8 @@ def _get_best_available_genome_id(
 
     Returns:
         str | None: ID for the genome, if present, otherwise None. 
+    """
 
-        """
     if 'RefSeq_accession' in genome_id_data:
         return genome_id_data['RefSeq_accession']
     if 'GenBank_accession' in genome_id_data:
@@ -109,36 +205,30 @@ def _get_best_available_genome_id(
     return None
 
 
-def _ncbi_genbank_search(
-        genbank_id: str,
-        retry_time: float = 5.0) -> Tag | NavigableString | None:
+def _ncbi_genbank_search(genbank_id: str,
+                         retry_times: int = 3) -> Tag | NavigableString | None:
+
     url = NCBI_LOOKUP_URL_NEW.format(genbank_id)
-    logger.debug(f'Looking up GenBank data for {genbank_id} at {url}')
-    resp = httpx.get(url, follow_redirects=True)
-
-    if resp.status_code == httpx.codes.OK:
-        # the page should contain a <dl> element with class "assembly_summary_new". retrieving
-        # the page seems to fail occasionally in the middle of lengthy sequences of genome
-        # lookups, so there might be some throttling going on. this will automatically retry
-        # the lookup if the expected content isn't found the first time
-        soup = BeautifulSoup(resp.content, 'html.parser')
-        # find the <dl> element with class "assembly_summary_new"
-        dl_element = soup.find('dl', {'class': 'assembly_summary_new'})
-        if dl_element is not None:
-            return dl_element
-
-    logger.debug(
-        f'NCBI lookup failed, status code {resp.status_code}. Trying again in {retry_time} seconds'
-    )
-    time.sleep(retry_time)
-    logger.debug(f'Looking up GenBank data for {genbank_id} at {url}')
-    resp = httpx.get(url, follow_redirects=True)
-    if resp.status_code == httpx.codes.OK:
-        soup = BeautifulSoup(resp.content, 'html.parser')
-        # find the <dl> element with class "assembly_summary_new"
-        dl_element = soup.find('dl', {'class': 'assembly_summary_new'})
-        if dl_element is not None:
-            return dl_element
+    retry = 1
+    while retry <= retry_times:
+        logger.debug(f'Looking up GenBank data for {genbank_id} at {url}')
+        resp = httpx.get(url, follow_redirects=True)
+        if resp.status_code == httpx.codes.OK:
+            # the page should contain a <dl> element with class "assembly_summary_new". retrieving
+            # the page seems to fail occasionally in the middle of lengthy sequences of genome
+            # lookups, so there might be some throttling going on. this will automatically retry
+            # the lookup if the expected content isn't found the first time
+            soup = BeautifulSoup(resp.content, 'html.parser')
+            # find the <dl> element with class "assembly_summary_new"
+            dl_element = soup.find('dl', {'class': 'assembly_summary_new'})
+            if dl_element is not None:
+                return dl_element
+        if retry < retry_times:
+            logger.debug(
+                f'NCBI lookup failed, status code {resp.status_code}. Trying again other {retry_times - retry} times.'
+            )
+        retry = retry + 1
+        time.sleep(5)
 
     logger.warning(
         f'Failed to resolve NCBI genome ID {genbank_id} at URL {url} (after retrying)'
@@ -146,7 +236,7 @@ def _ncbi_genbank_search(
     return None
 
 
-def _resolve_genbank_accession(genbank_id: str) -> NavigableString | None:
+def _resolve_genbank_accession(genbank_id: str) -> str | None:
     """Try to get RefSeq id through given GenBank id. 
 
     Args:
@@ -158,7 +248,7 @@ def _resolve_genbank_accession(genbank_id: str) -> NavigableString | None:
 
     Returns:
         str | None: RefSeq ID if the search is successful, otherwise None. 
-        """
+    """
     logger.info(
         f'Attempting to resolve Genbank accession {genbank_id} to RefSeq accession'
     )
@@ -219,8 +309,8 @@ def _resolve_jgi_accession(jgi_id: str) -> str | None:
         jgi_id(str): JGI_Genome_ID for GenBank accession. 
 
     Returns:
-        str | None: GenBank accession ID if search is successful, otherwise None.
-        """
+        str | None: Return RefSeq ID if search is successful, otherwise None.
+    """
     url = JGI_GENOME_LOOKUP_URL.format(jgi_id)
     logger.info(
         f'Attempting to resolve JGI_Genome_ID {jgi_id} to GenBank accession via {url}'
@@ -245,7 +335,7 @@ def _resolve_jgi_accession(jgi_id: str) -> str | None:
     return _resolve_genbank_accession(link.text)
 
 
-def _resolve_refseq_id(genome_id_data: Dict[str, str]) -> str | None:
+def _resolve_refseq_id(genome_id_data: dict[str, str]) -> str | None:
     """Get the RefSeq ID to which the genome accession is linked.
     Check https://pairedomicsdata.bioinformatics.nl/schema.json.
 
@@ -254,8 +344,8 @@ def _resolve_refseq_id(genome_id_data: Dict[str, str]) -> str | None:
         for each genome record present.
 
     Returns:
-        str | None: ID for the accession genome, if present, otherwise None. 
-        """
+        str | None: Return RefSeq ID if present, otherwise None. 
+    """
     if 'RefSeq_accession' in genome_id_data:
         # best case, can use this directly
         return genome_id_data['RefSeq_accession']
@@ -270,7 +360,19 @@ def _resolve_refseq_id(genome_id_data: Dict[str, str]) -> str | None:
     return None
 
 
-def _get_antismash_db_page(genome_obj: GenomeStatus) -> NavigableString | None:
+#TODO add doc string
+def _get_antismash_filename(genome_obj: GenomeStatus) -> str | None:
+    """_summary_
+
+    Args:
+        genome_obj(GenomeStatus): _description_
+
+    Returns:
+        str | None: _description_
+
+    Examples:
+        >>> 
+        """
     # want to try up to 4 different links here, v1 and v2 databases, each
     # with and without the .1 suffix on the accesssion ID
 
@@ -302,6 +404,97 @@ def _get_antismash_db_page(genome_obj: GenomeStatus) -> NavigableString | None:
     return None
 
 
+@deprecated(version="1.3.3",
+            reason="Use download_and_extract_antismash_data class instead.")
+def download_antismash_data(genome_records: list[dict[str,
+                                                      dict[str, str] | str]],
+                            project_download_cache: str | PathLike,
+                            project_file_cache: str | PathLike):
+
+    genome_status_file = os.path.join(project_download_cache,
+                                      GENOME_STATUS_FILENAME)
+    genome_status = _get_genome_status_log(genome_status_file)
+
+    for i, genome_record in enumerate(genome_records):
+        # get the best available ID from the dict
+        assert isinstance(genome_record['genome_ID'], dict)
+        raw_genome_id = _get_best_available_genome_id(
+            genome_record['genome_ID'])
+        if raw_genome_id is None:
+            logger.warning(
+                f'Ignoring genome record "{genome_record}" due to missing genome ID field'
+            )
+            continue
+
+        # use this to check if the lookup has already been attempted and if
+        # so if the file is cached locally
+        if raw_genome_id not in genome_status:
+            genome_status[raw_genome_id] = GenomeStatus(raw_genome_id, None)
+
+        genome_obj = genome_status[raw_genome_id]
+
+        logger.info(
+            f'Checking for antismash data {i + 1}/{len(genome_records)}, current genome ID={raw_genome_id}'
+        )
+        # first check if file is cached locally
+        if os.path.exists(genome_obj.filename):
+            # file already downloaded
+            logger.info(
+                f'Genome ID {raw_genome_id} already downloaded to {genome_obj.filename}'
+            )
+            genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
+        elif genome_obj.attempted:
+            # lookup attempted previously but failed
+            logger.info(
+                f'Genome ID {raw_genome_id} skipped due to previous failure')
+            genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
+        else:
+            # if no existing file and no lookup attempted, can start process of
+            # trying to retrieve the data
+
+            # lookup the ID
+            logger.info(
+                f'Beginning lookup process for genome ID {raw_genome_id}')
+
+            genome_obj.resolved_refseq_id = _resolve_refseq_id(
+                genome_record['genome_ID'])
+            genome_obj.attempted = True
+
+            if genome_obj.resolved_refseq_id == "":
+                # give up on this one
+                logger.warning(f'Failed lookup for genome ID {raw_genome_id}')
+                genome_obj.add_line(genome_status_file)
+                continue
+
+            # if we got a refseq ID, now try to download the data from antismash
+            if _download_antismash_zip(genome_obj, project_download_cache):
+                logger.info(
+                    f'Genome data successfully downloaded for {raw_genome_id}')
+                genome_record[
+                    'resolved_refseq_id'] = genome_obj.resolved_refseq_id
+            else:
+                logger.warning(
+                    f'Failed to download antiSMASH data for genome ID {genome_obj.resolved_refseq_id} ({genome_obj.original_id})'
+                )
+
+            genome_obj.add_line(genome_status_file)
+
+        _extract_antismash_zip(genome_obj, project_file_cache)
+
+    missing = len([x for x in genome_status.values() if len(x.filename) == 0])
+    logger.info(
+        f'Dataset has {missing} missing sets of antiSMASH data (from a total of {len(genome_records)})'
+    )
+
+    for obj in genome_status.values():
+        obj.add_line(genome_status_file)
+
+    if missing == len(genome_records):
+        logger.warning('Failed to successfully retrieve ANY genome data!')
+
+
+@deprecated(version="1.3.3",
+            reason="Use download_and_extract_antismash_data class instead.")
 def _get_antismash_zip_data(accession_id: str, filename: str,
                             local_path: str | PathLike) -> bool:
     for base_url in [ANTISMASH_DB_DOWNLOAD_URL, ANTISMASH_DBV2_DOWNLOAD_URL]:
@@ -333,6 +526,8 @@ def _get_antismash_zip_data(accession_id: str, filename: str,
     return False
 
 
+@deprecated(version="1.3.3",
+            reason="Use download_and_extract_antismash_data class instead.")
 def _download_antismash_zip(antismash_obj: GenomeStatus,
                             project_download_cache: str | PathLike) -> bool:
     # save zip files to avoid having to repeat above lookup every time
@@ -358,7 +553,7 @@ def _download_antismash_zip(antismash_obj: GenomeStatus,
             antismash_obj.filename = ""
 
     if not cached:
-        filename = _get_antismash_db_page(antismash_obj)
+        filename = _get_antismash_filename(antismash_obj)
         if filename is None:
             return False
 
@@ -369,6 +564,8 @@ def _download_antismash_zip(antismash_obj: GenomeStatus,
     return True
 
 
+@deprecated(version="1.3.3",
+            reason="Use download_and_extract_antismash_data class instead.")
 def _extract_antismash_zip(antismash_obj: GenomeStatus,
                            project_file_cache: str | PathLike) -> bool:
     if antismash_obj.filename is None or len(antismash_obj.filename) == 0:
@@ -407,182 +604,3 @@ def _extract_antismash_zip(antismash_obj: GenomeStatus,
         pass
 
     return True
-
-
-def podp_download_and_extract_antismash_data(
-        genome_records: list[Dict[str, Dict[str, str] | str]],
-        project_download_cache: str | PathLike,
-        project_file_cache: str | PathLike):
-
-    genome_status_file = os.path.join(project_download_cache,
-                                      'genome_status.txt')
-    genome_status = _get_genome_status_log(genome_status_file)
-
-    for i, genome_record in enumerate(genome_records):
-        # get the best available ID from the dict
-        assert isinstance(genome_record['genome_ID'], dict)
-        raw_genome_id = _get_best_available_genome_id(
-            genome_record['genome_ID'])
-        if raw_genome_id is None:
-            logger.warning(
-                f'Ignoring genome record "{genome_record}" due to missing genome ID field'
-            )
-            continue
-
-        # use this to check if the lookup has already been attempted and if
-        # so if the file is cached locally
-        if raw_genome_id not in genome_status:
-            genome_status[raw_genome_id] = GenomeStatus(raw_genome_id, None)
-
-        genome_obj = genome_status[raw_genome_id]
-
-        logger.info(
-            f'Checking for antismash data {i + 1}/{len(genome_records)}, current genome ID={raw_genome_id}'
-        )
-        # first check if file is cached locally
-        if os.path.exists(genome_obj.filename):
-            # file already downloaded
-            logger.info(
-                f'Genome ID {raw_genome_id} already downloaded to {genome_obj.filename}'
-            )
-            genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
-        elif genome_obj.attempted:
-            # lookup attempted previously but failed
-            logger.info(
-                f'Genome ID {raw_genome_id} skipped due to previous failure')
-            genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
-        else:
-            # if no existing file and no lookup attempted, can start process of
-            # trying to retrieve the data
-
-            # lookup the ID
-            logger.info(
-                f'Beginning lookup process for genome ID {raw_genome_id}')
-
-            genome_obj.resolved_refseq_id = _resolve_refseq_id(
-                genome_record['genome_ID'])
-            genome_obj.attempted = True
-
-            if genome_obj.resolved_refseq_id is None:
-                # give up on this one
-                logger.warning(f'Failed lookup for genome ID {raw_genome_id}')
-                with open(genome_status_file, 'a+') as f:
-                    f.write(genome_obj.to_csv() + '\n')
-                continue
-
-        # if we got a refseq ID, now try to download and extract the data from antismash
-        download_and_extract_antismash_data(genome_obj.resolved_refseq_id,
-                                            project_download_cache,
-                                            project_file_cache)
-
-        with open(genome_status_file, 'a+', newline='\n') as f:
-            f.write(genome_obj.to_csv() + '\n')
-
-        output_path = os.path.join(project_file_cache, 'antismash',
-                                   genome_obj.resolved_refseq_id)
-        if not os.path.exists(os.path.join(output_path, 'completed')):
-            with open(os.path.join(output_path, 'completed'), 'w'):
-                pass
-
-    missing = len([x for x in genome_status.values() if len(x.filename) == 0])
-    logger.info(
-        f'Dataset has {missing} missing sets of antiSMASH data (from a total of {len(genome_records)})'
-    )
-
-    with open(genome_status_file, 'w', newline='\n') as f:
-        for obj in genome_status.values():
-            f.write(obj.to_csv() + '\n')
-
-    if missing == len(genome_records):
-        logger.warning('Failed to successfully retrieve ANY genome data!')
-
-
-@deprecated(version="1.3.3",
-            reason="Use download_and_extract_antismash_data class instead.")
-def download_antismash_data(genome_records: list[Dict[str, Dict[str, str] | str]],
-                            project_download_cache: str | PathLike,
-                            project_file_cache: str | PathLike):
-
-    genome_status_file = os.path.join(project_download_cache,
-                                      'genome_status.txt')
-    genome_status = _get_genome_status_log(genome_status_file)
-
-    for i, genome_record in enumerate(genome_records):
-        # get the best available ID from the dict
-        assert isinstance(genome_record['genome_ID'], dict)
-        raw_genome_id = _get_best_available_genome_id(
-            genome_record['genome_ID'])
-        if raw_genome_id is None:
-            logger.warning(
-                f'Ignoring genome record "{genome_record}" due to missing genome ID field'
-            )
-            continue
-
-        # use this to check if the lookup has already been attempted and if
-        # so if the file is cached locally
-        if raw_genome_id not in genome_status:
-            genome_status[raw_genome_id] = GenomeStatus(raw_genome_id, None)
-
-        genome_obj = genome_status[raw_genome_id]
-
-        logger.info(
-            f'Checking for antismash data {i + 1}/{len(genome_records)}, current genome ID={raw_genome_id}'
-        )
-        # first check if file is cached locally
-        if os.path.exists(genome_obj.filename):
-            # file already downloaded
-            logger.info(
-                f'Genome ID {raw_genome_id} already downloaded to {genome_obj.filename}'
-            )
-            genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
-        elif genome_obj.attempted:
-            # lookup attempted previously but failed
-            logger.info(
-                f'Genome ID {raw_genome_id} skipped due to previous failure')
-            genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
-        else:
-            # if no existing file and no lookup attempted, can start process of
-            # trying to retrieve the data
-
-            # lookup the ID
-            logger.info(
-                f'Beginning lookup process for genome ID {raw_genome_id}')
-
-            genome_obj.resolved_refseq_id = _resolve_refseq_id(
-                genome_record['genome_ID'])
-            genome_obj.attempted = True
-
-            if genome_obj.resolved_refseq_id is None:
-                # give up on this one
-                logger.warning(f'Failed lookup for genome ID {raw_genome_id}')
-                with open(genome_status_file, 'a+') as f:
-                    f.write(genome_obj.to_csv() + '\n')
-                continue
-
-            # if we got a refseq ID, now try to download the data from antismash
-            if _download_antismash_zip(genome_obj, project_download_cache):
-                logger.info(
-                    f'Genome data successfully downloaded for {raw_genome_id}')
-                genome_record[
-                    'resolved_refseq_id'] = genome_obj.resolved_refseq_id
-            else:
-                logger.warning(
-                    f'Failed to download antiSMASH data for genome ID {genome_obj.resolved_refseq_id} ({genome_obj.original_id})'
-                )
-
-            with open(genome_status_file, 'a+', newline='\n') as f:
-                f.write(genome_obj.to_csv() + '\n')
-
-        _extract_antismash_zip(genome_obj, project_file_cache)
-
-    missing = len([x for x in genome_status.values() if len(x.filename) == 0])
-    logger.info(
-        f'Dataset has {missing} missing sets of antiSMASH data (from a total of {len(genome_records)})'
-    )
-
-    with open(genome_status_file, 'w', newline='\n') as f:
-        for obj in genome_status.values():
-            f.write(obj.to_csv() + '\n')
-
-    if missing == len(genome_records):
-        logger.warning('Failed to successfully retrieve ANY genome data!')
