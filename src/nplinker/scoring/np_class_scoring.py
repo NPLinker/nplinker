@@ -337,10 +337,12 @@ class NPClassScoring(ScoringMethod):
         if not self.npl._datalinks:
             self.npl._datalinks = self.npl.scoring_method(
                 MetcalfScoring.NAME).datalinks
-        # this is a dict with structure:
-        #   tup(Spectrum/MolecularFamily, GCF) => array of strain indices
-        common_strains = self.npl._datalinks.get_common_strains(
-            objects, targets, True)
+        if obj_is_gen:
+            common_strains = self.npl.get_common_strains(
+                targets, objects)
+        else:
+            common_strains = self.npl.get_common_strains(
+                objects, targets)
         logger.info(f"Calculating NPClassScore for {len(objects)} objects to "
                     f"{len(targets)} targets ({len(common_strains)} pairwise "
                     f"interactions that share at least 1 strain). This might "

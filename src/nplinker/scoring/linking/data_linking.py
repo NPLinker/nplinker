@@ -12,6 +12,8 @@ from .data_linking_functions import calc_correlation_matrix
 
 if TYPE_CHECKING:
     from nplinker.strain_collection import StrainCollection
+    from nplinker.strains import Strain
+
 
 logger = LogConfig.getLogger(__name__)
 
@@ -60,6 +62,8 @@ class DataLinks():
             mapping_mf(pd.DataFrame): A DataFrame to store mappings for molecular families.
             mapping_strain(pd.DataFrame): A DataFrame to store mappings for strains.
         """
+        self._strains = strains
+
         logger.debug(
             "Create occurrence dataframes: spectra<->strains, gcfs<->strains and mfs<->strains."
         )
@@ -97,7 +101,7 @@ class DataLinks():
         spectra_or_mfs: Sequence[Spectrum] | Sequence[MolecularFamily],
         gcfs: Sequence[GCF],
         filter_no_shared: bool = False
-    ) -> dict[tuple[Spectrum | MolecularFamily, GCF], list[str]]:
+    ) -> dict[tuple[Spectrum | MolecularFamily, GCF], list[Strain]]:
         """Get common strains between given spectra/molecular families and GCFs.
 
         Note that SingletonFamily objects are excluded from given `spectra_or_mfs`.
@@ -106,14 +110,12 @@ class DataLinks():
             spectra_or_mfs(Sequence[Spectrum] | Sequence[MolecularFamily]):
                 A list of Spectrum or MolecularFamily objects.
             gcfs(Sequence[GCF]): A list of GCF objects.
-            filter_no_shared(bool): If True, return only the pair of
-                spectrum/molecular family and GCF that have common strains;
-                otherwise, return all pairs no matter they have common strains
-                or not.
+            filter_no_shared(bool): If True, the pairs of spectrum/mf and GCF
+                without common strains will be removed from the returned dict;
 
         Returns:
             dict: A dict where the keys are tuples of (Spectrum/MolecularFamily, GCF)
-            and values are a list of strain ids that appear in both objects.
+            and values are a list of shared Strain objects.
         """
         if not isinstance(spectra_or_mfs[0], (Spectrum, MolecularFamily)):
             raise ValueError(
@@ -139,7 +141,7 @@ class DataLinks():
                         self.occurrence_gcf_strain.loc[gcf.gcf_id])]
                 if filter_no_shared and len(shared_strains) == 0:
                     continue
-                results[(obj, gcf)] = shared_strains.to_list()
+                results[(obj, gcf)] = [self._strains.lookup(strain_id) for strain_id in shared_strains]
         return results
 
     def _get_occurrence_gcf_strain(self, gcfs: Sequence[GCF],

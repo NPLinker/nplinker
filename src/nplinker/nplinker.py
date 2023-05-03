@@ -1,20 +1,8 @@
-# Copyright 2021 The NPLinker Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+from __future__ import annotations
 import copy
 import logging
 import sys
+from typing import TYPE_CHECKING
 from .config import Args
 from .config import Config
 from .genomics import BGC
@@ -30,6 +18,9 @@ from .scoring.np_class_scoring import NPClassScoring
 from .scoring.rosetta_scoring import RosettaScoring
 from .strain_collection import StrainCollection
 
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from .strains import Strain
 
 logger = LogConfig.getLogger(__name__)
 
@@ -274,8 +265,7 @@ class NPLinker():
         else:
             # CG: only reload genomics data when changing bigscape cutoff
             # TODO: this part should be removed, reload everything if bigscape data changes.
-            logger.debug(
-                f'load_data with new cutoff = {new_bigscape_cutoff}')
+            logger.debug(f'load_data with new cutoff = {new_bigscape_cutoff}')
             # 1. change the cutoff (which by itself doesn't do anything)
             self._loader._bigscape_cutoff = new_bigscape_cutoff
             # 2. reload the strain mappings (MiBIG filtering may have removed strains
@@ -435,19 +425,19 @@ class NPLinker():
                 filter(lambda x: not isinstance(x, BGC), link_data.keys()))
             if len(targets) > 0:
                 if isinstance(source, GCF):
-                    shared_strains = self._datalinks.get_common_strains(targets, [source], True)
+                    shared_strains = self._datalinks.get_common_strains(
+                        targets, [source], True)
                     for target, link in link_data.items():
                         if (target, source) in shared_strains:
-                            link.shared_strains = [
-                                self._strains.lookup(strain_id) for strain_id
-                                in shared_strains[(target, source)]]
+                            link.shared_strains = shared_strains[(target,
+                                                                  source)]
                 else:
-                    shared_strains = self._datalinks.get_common_strains([source], targets, True)
+                    shared_strains = self._datalinks.get_common_strains(
+                        [source], targets, True)
                     for target, link in link_data.items():
                         if (source, target) in shared_strains:
-                            link.shared_strains = [
-                                self._strains.lookup(strain_id) for strain_id
-                                in shared_strains[(source, target)]]
+                            link.shared_strains = shared_strains[(source,
+                                                                  target)]
 
         logger.debug('Finished calculating shared strain information')
 
@@ -455,55 +445,32 @@ class NPLinker():
             len(link_collection)))
         return link_collection
 
-    def get_common_strains(self, objects_a, objects_b, filter_no_shared=True):
-        """Retrive strains shared by arbitrary pairs of objects.
+    def get_common_strains(
+        self,
+        met: Sequence[Spectrum] | Sequence[MolecularFamily],
+        gcfs: Sequence[GCF],
+        filter_no_shared: bool = True
+    ) -> dict[tuple[Spectrum | MolecularFamily, GCF], list[Strain]]:
+        """Get common strains between given spectra/molecular families and GCFs.
 
-        Two lists of objects are required as input. Typically one list will be
-        MolecularFamily or Spectrum objects and the other GCF (which list is which
-        doesn't matter).
-
-        The return value is a dict mapping pairs of objects to lists of Strain objects
-        shared by that pair. This list may be empty if ``filter_no_shared`` is False,
-        indicating no shared strains were found.
-
-        If ``filter_no_shared`` is True, every entry in the dict with no shared strains
-        will be removed before it is returned, so the only entries will be those for
-        which shared strains exist.
+        Note that SingletonFamily objects are excluded from given molecular families.
 
         Args:
-            objects_a (list): a list of Spectrum/MolecularFamily/GCF objects
-            objects_b (list): a list of Spectrum/MolecularFamily/GCF objects
-            filter_no_shared (bool): if True, remove result entries for which no shared strains exist
+            met(Sequence[Spectrum] | Sequence[MolecularFamily]):
+                A list of Spectrum or MolecularFamily objects.
+            gcfs(Sequence[GCF]): A list of GCF objects.
+            filter_no_shared(bool): If True, the pairs of spectrum/mf and GCF
+                without common strains will be removed from the returned dict;
 
         Returns:
-            A dict mapping pairs of objects (obj1, obj2) to lists of Strain objects.
-
-            NOTE: The ordering of the pairs is *fixed* to be (metabolomic, genomic). In
-            other words, if objects_a = [GCF1, GC2, ...] and objects_b = [Spectrum1,
-            Spectrum2, ...], the object pairs will be (Spectrum1, GCF1), (Spectrum2,
-            GCF2), and so on. The same applies if objects_a and objects_b are swapped,
-            the metabolomic objects (Spectrum or MolecularFamily) will be the obj1
-            entry in each pair.
+            dict: A dict where the keys are tuples of (Spectrum/MolecularFamily, GCF)
+            and values are a list of shared Strain objects.
         """
         if not self._datalinks:
             self._datalinks = self.scoring_method(
                 MetcalfScoring.NAME).datalinks
-
-        # this is a dict with structure:
-        #   (Spectrum/MolecularFamily, GCF) => list of strain indices
-        common_strains_index_dict = self._datalinks.get_common_strains(
-            objects_a, objects_b, filter_no_shared)
-
-        common_strains = {}
-        # replace the lists of strain indices with actual strain objects
-        # TODO: bug here, the index value of common_strains_index_dict is
-        #       not the same as the index value of self._strains
-        # Solution: lookup with strain.id instead of index
-        for key in common_strains_index_dict:
-            common_strains[key] = [
-                self._strains.lookup_index(x) for x in common_strains_index_dict[key]
-            ]
-
+        common_strains = self._datalinks.get_common_strains(
+            met, gcfs, filter_no_shared)
         return common_strains
 
     def has_bgc(self, bgc_id):
@@ -512,15 +479,18 @@ class NPLinker():
 
     def lookup_bgc(self, bgc_id):
         """If BGC ``bgc_id`` exists, return it. Otherwise return None"""
-        return self._bgcs[self._bgc_lookup[bgc_id]] if self.has_bgc(bgc_id) else None
+        return self._bgcs[self._bgc_lookup[bgc_id]] if self.has_bgc(
+            bgc_id) else None
 
     def lookup_gcf(self, gcf_id):
         """If GCF ``gcf_id`` exists, return it. Otherwise return None"""
-        return self._gcfs[self._gcf_lookup[gcf_id]] if gcf_id in self._gcf_lookup else None
+        return self._gcfs[
+            self._gcf_lookup[gcf_id]] if gcf_id in self._gcf_lookup else None
 
     def lookup_spectrum(self, name):
         """If Spectrum ``name`` exists, return it. Otherwise return None"""
-        return self._spectra[self._spec_lookup[name]] if name in self._spec_lookup else None
+        return self._spectra[
+            self._spec_lookup[name]] if name in self._spec_lookup else None
 
     @property
     def strains(self):
