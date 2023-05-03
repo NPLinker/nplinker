@@ -439,15 +439,14 @@ class LinkFinder():
             query_size = 1
 
         # Check type of input_object:
+        # TODO CG: replace integer ids with string ids
         # If GCF:
         if isinstance(input_object[0], GCF):
             input_type = "gcf"
             link_levels = [0, 1]
 
             # Get necessary ids
-            # CG: TODO update the logics here:
-            #   don't use integer gcf.id, use string gcf.gcf_id instead.
-            input_ids = np.array([gcf.id for gcf in input_object],
+            input_ids = np.array([gcf.gcf_id for gcf in input_object],
                                  dtype=np.int32)
 
             if main_score == 'likescore':
