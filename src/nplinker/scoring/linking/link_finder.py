@@ -1,4 +1,3 @@
-
 from deprecated import deprecated
 import numpy as np
 import pandas as pd
@@ -8,9 +7,7 @@ from nplinker.metabolomics.spectrum import Spectrum
 from .data_linking_functions import pair_prob_approx
 from .data_linking_functions import pair_prob_hg
 
-
 # CG: TODO get_links function does not work any more, need to update its logics
-
 
 # import packages for plotting
 # TODO move plotting to separate module?
@@ -25,10 +22,10 @@ except ImportError:
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.molecular_family import MolecularFamily
 
-
 logger = LogConfig.getLogger(__file__)
 
 SCORING_METHODS = ['metcalf', 'likescore', 'hg']
+
 
 class LinkFinder():
     """
@@ -142,18 +139,20 @@ class LinkFinder():
 
         if type == 'spec-gcf':
             metcalf_scores = np.zeros(data_links.cooccurrence_spec_gcf.shape)
-            metcalf_scores = (data_links.cooccurrence_spec_gcf * both +
-                              data_links.cooccurrence_spec_notgcf * type1_not_gcf +
-                              data_links.cooccurrence_notspec_gcf * gcf_not_type1 +
-                              data_links.cooccurrence_notspec_notgcf * not_type1_not_gcf)
+            metcalf_scores = (
+                data_links.cooccurrence_spec_gcf * both +
+                data_links.cooccurrence_spec_notgcf * type1_not_gcf +
+                data_links.cooccurrence_notspec_gcf * gcf_not_type1 +
+                data_links.cooccurrence_notspec_notgcf * not_type1_not_gcf)
             self.metcalf_spec_gcf = metcalf_scores
 
         elif type == 'mf-gcf':
             metcalf_scores = np.zeros(data_links.cooccurrence_mf_gcf.shape)
-            metcalf_scores = (data_links.cooccurrence_mf_gcf * both +
-                              data_links.cooccurrence_mf_notgcf * type1_not_gcf +
-                              data_links.cooccurrence_notmf_gcf * gcf_not_type1 +
-                              data_links.cooccurrence_notmf_notgcf * not_type1_not_gcf)
+            metcalf_scores = (
+                data_links.cooccurrence_mf_gcf * both +
+                data_links.cooccurrence_mf_notgcf * type1_not_gcf +
+                data_links.cooccurrence_notmf_gcf * gcf_not_type1 +
+                data_links.cooccurrence_notmf_notgcf * not_type1_not_gcf)
 
             self.metcalf_fam_gcf = metcalf_scores
         return metcalf_scores
@@ -174,8 +173,8 @@ class LinkFinder():
         # the correct totals.
 
         if type == 'spec-gcf':
-            num_strains = np.ones(
-                data_links.cooccurrence_spec_gcf.shape) * data_links.occurrence_gcf_strain.shape[1]
+            num_strains = np.ones(data_links.cooccurrence_spec_gcf.shape
+                                  ) * data_links.occurrence_gcf_strain.shape[1]
             overlap_counts = data_links.cooccurrence_spec_gcf
             gcf_counts = overlap_counts + data_links.cooccurrence_notspec_gcf
             spec_counts = overlap_counts + data_links.cooccurrence_spec_notgcf
@@ -186,8 +185,8 @@ class LinkFinder():
                                      loc=1)
             self.hg_spec_gcf = hg_scores
         elif type == 'mf-gcf':
-            num_strains = np.ones(
-                data_links.cooccurrence_mf_gcf.shape) * data_links.occurrence_gcf_strain.shape[1]
+            num_strains = np.ones(data_links.cooccurrence_mf_gcf.shape
+                                  ) * data_links.occurrence_gcf_strain.shape[1]
             overlap_counts = data_links.cooccurrence_mf_gcf
             gcf_counts = overlap_counts + data_links.cooccurrence_notmf_gcf
             fam_counts = overlap_counts + data_links.cooccurrence_mf_notgcf
@@ -224,11 +223,13 @@ class LinkFinder():
         """
 
         if type == 'spec-gcf':
-            likelihood_scores = np.zeros(data_links.cooccurrence_spec_gcf.shape)
+            likelihood_scores = np.zeros(
+                data_links.cooccurrence_spec_gcf.shape)
             likelihood_scores = (
                 likelihoods.P_gcf_given_spec *
                 (1 - likelihoods.P_spec_not_gcf) *
-                (1 - np.exp(-alpha_weighing * data_links.cooccurrence_spec_gcf)))
+                (1 -
+                 np.exp(-alpha_weighing * data_links.cooccurrence_spec_gcf)))
 
             self.likescores_spec_gcf = likelihood_scores
 
@@ -363,7 +364,8 @@ class LinkFinder():
             id_gcf = link_candidates[1, i]
 
             # find set of strains which contain GCF with id link_candidates[1,i]
-            XG = np.where(data_links.occurrence_gcf_strain.loc[id_gcf, :] == 1)[0]
+            XG = np.where(
+                data_links.occurrence_gcf_strain.loc[id_gcf, :] == 1)[0]
 
             link_candidates[10,
                             i] = pair_prob_approx(P_str, XG,
@@ -372,11 +374,13 @@ class LinkFinder():
             # Calculate the link specific probability
             # Find strains where GCF and spectra/family co-occur
             if type == 'spec-gcf':
-                XGS = np.where((data_links.occurrence_gcf_strain[id_gcf, :] == 1) &
-                               (data_links.occurrence_spec_strain[id_spec, :] == 1))[0]
+                XGS = np.where(
+                    (data_links.occurrence_gcf_strain[id_gcf, :] == 1)
+                    & (data_links.occurrence_spec_strain[id_spec, :] == 1))[0]
             elif type == 'mf-gcf':
-                XGS = np.where((data_links.occurrence_gcf_strain[id_gcf, :] == 1)
-                               & (data_links.occurrence_mf_strain[id_spec, :] == 1))[0]
+                XGS = np.where(
+                    (data_links.occurrence_gcf_strain[id_gcf, :] == 1)
+                    & (data_links.occurrence_mf_strain[id_spec, :] == 1))[0]
             link_candidates[11,
                             i] = link_prob(P_str, XGS, int(Nx_list[id_gcf]),
                                            int(Ny_list[id_spec]), num_strains)
@@ -520,8 +524,7 @@ class LinkFinder():
                         hg_scores[linklevel] >= score_cutoff)
                 else:
                     # should never happen
-                    raise Exception(
-                        f'Unknown scoring type! "{main_score}"')
+                    raise Exception(f'Unknown scoring type! "{main_score}"')
             else:
                 # TODO is this best way to get same output as above code?
                 # to keep the remainder of the method identical in the case of no cutoff
@@ -575,7 +578,8 @@ class LinkFinder():
 
         return links
 
-    @deprecated(version="1.3.3", reason="The unworkable method will be removed")
+    @deprecated(version="1.3.3",
+                reason="The unworkable method will be removed")
     def create_cytoscape_files(self,
                                data_links,
                                network_filename,
