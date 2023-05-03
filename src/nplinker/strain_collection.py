@@ -1,5 +1,4 @@
 import csv
-import os
 from os import PathLike
 from pathlib import Path
 from typing import Iterator
@@ -8,7 +7,6 @@ from .logconfig import LogConfig
 from .strains import Strain
 from .utils import list_dirs
 from .utils import list_files
-
 
 logger = LogConfig.getLogger(__name__)
 
@@ -20,7 +18,6 @@ class StrainCollection():
         self._strains: list[Strain] = []
         # dict of strain name (id and alias) to strain object
         self._strain_dict_name: dict[str, Strain] = {}
-        self._strain_dict_index: dict[int, Strain] = {}
 
     def __repr__(self) -> str:
         return str(self)
@@ -38,7 +35,7 @@ class StrainCollection():
     def __eq__(self, other) -> bool:
         if isinstance(other, StrainCollection):
             return (self._strains == other._strains
-                    and self._strain_dict_index == other._strain_dict_index)
+                    and self._strain_dict_name == other._strain_dict_name)
         return NotImplemented
 
     def __contains__(self, item: str | Strain) -> bool:
@@ -74,7 +71,6 @@ class StrainCollection():
                 existing.add_alias(alias)
                 self._strain_dict_name[alias] = existing
         else:
-            self._strain_dict_index[len(self)] = strain
             self._strains.append(strain)
             self._strain_dict_name[strain.id] = strain
             for alias in strain.aliases:
@@ -88,7 +84,6 @@ class StrainCollection():
         """
         if strain.id in self._strain_dict_name:
             self._strains.remove(strain)
-            # remove from dict id
             del self._strain_dict_name[strain.id]
             for alias in strain.aliases:
                 del self._strain_dict_name[alias]
@@ -101,17 +96,6 @@ class StrainCollection():
         for strain in self._strains.copy():
             if strain not in strain_set:
                 self.remove(strain)
-
-    def lookup_index(self, index: int) -> Strain:
-        """Return the strain from lookup by index.
-
-        Args:
-            index(int): Position index from which to retrieve the strain
-
-        Returns:
-            Strain: Strain identified by the given index.
-        """
-        return self._strain_dict_index[index]
 
     def lookup(self, name: str) -> Strain:
         """Lookup a strain by name (id or alias).
