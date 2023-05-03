@@ -7,6 +7,7 @@ from nplinker.metabolomics.spectrum import Spectrum
 from .data_linking_functions import pair_prob_approx
 from .data_linking_functions import pair_prob_hg
 
+
 # CG: TODO get_links function does not work any more, need to update its logics
 
 # import packages for plotting
@@ -21,6 +22,7 @@ except ImportError:
 
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.molecular_family import MolecularFamily
+
 
 logger = LogConfig.getLogger(__file__)
 
@@ -46,8 +48,8 @@ class LinkFinder():
         """
 
         # metcalf scores
-        self.metcalf_spec_gcf = []
-        self.metcalf_fam_gcf = []
+        self.metcalf_spec_gcf = pd.DataFrame()
+        self.metcalf_fam_gcf = pd.DataFrame()
 
         # likelihood scores
         self.likescores_spec_gcf = []
@@ -138,7 +140,6 @@ class LinkFinder():
         # at expected_metcalf[3,6] and sqrt of the variance in the same position
 
         if type == 'spec-gcf':
-            metcalf_scores = np.zeros(data_links.cooccurrence_spec_gcf.shape)
             metcalf_scores = (
                 data_links.cooccurrence_spec_gcf * both +
                 data_links.cooccurrence_spec_notgcf * type1_not_gcf +
@@ -147,7 +148,6 @@ class LinkFinder():
             self.metcalf_spec_gcf = metcalf_scores
 
         elif type == 'mf-gcf':
-            metcalf_scores = np.zeros(data_links.cooccurrence_mf_gcf.shape)
             metcalf_scores = (
                 data_links.cooccurrence_mf_gcf * both +
                 data_links.cooccurrence_mf_notgcf * type1_not_gcf +
@@ -155,7 +155,6 @@ class LinkFinder():
                 data_links.cooccurrence_notmf_notgcf * not_type1_not_gcf)
 
             self.metcalf_fam_gcf = metcalf_scores
-        return metcalf_scores
 
     def hg_scoring(self, data_links, type='spec-gcf'):
         """
@@ -446,13 +445,9 @@ class LinkFinder():
         # TODO CG: replace integer ids with string ids
         # If GCF:
         if isinstance(input_object[0], GCF):
+            input_ids = [gcf.gcf_id for gcf in input_object]
             input_type = "gcf"
             link_levels = [0, 1]
-
-            # Get necessary ids
-            input_ids = np.array([gcf.gcf_id for gcf in input_object],
-                                 dtype=np.int32)
-
             if main_score == 'likescore':
                 likescores = [
                     # TODO CG: use dataframe instead of numpy array
@@ -461,48 +456,32 @@ class LinkFinder():
                 ]
             elif main_score == 'metcalf':
                 metcalf_scores = [
-                    self.metcalf_spec_gcf[:, input_ids],
-                    self.metcalf_fam_gcf[:, input_ids]
+                    self.metcalf_spec_gcf.loc[:, input_ids],
+                    self.metcalf_fam_gcf.loc[:, input_ids]
                 ]
             elif main_score == 'hg':
                 hg_scores = [
                     self.hg_spec_gcf[:, input_ids], self.hg_fam_gcf[:,
                                                                     input_ids]
                 ]
-
-        # If Spectrum:
         elif isinstance(input_object[0], Spectrum):
-            # Get necessary ids
-            input_ids = np.array([spec.id for spec in input_object],
-                                 dtype=np.int32)
-
+            input_ids = [spec.spectrum_id for spec in input_object]
             input_type = "spec"
             link_levels = [0]
             if main_score == 'likescore':
                 likescores = [self.likescores_spec_gcf[input_ids, :], []]
             elif main_score == 'metcalf':
-                metcalf_scores = [self.metcalf_spec_gcf[input_ids, :], []]
+                metcalf_scores = [self.metcalf_spec_gcf.loc[input_ids, :], []]
             elif main_score == 'hg':
                 hg_scores = [self.hg_spec_gcf[input_ids, :], []]
-        # If MolecularFamily:
         elif isinstance(input_object[0], MolecularFamily):
-
-            # Get necessary ids
-            # TODO: include Singletons, maybe optinal
-            #input_ids = np.zeros(query_size)
-            #mapping_fam_id = data_links.mapping_fam["original family id"]
-            #for i, family in enumerate(input_object):
-            #    input_ids[i] = np.where(mapping_fam_id == int(family.family_id))[0]
-            #input_ids =  input_ids.astype(int)
-            input_ids = np.array([mf.id for mf in input_object],
-                                 dtype=np.int32)
-
+            input_ids = [mf.family_id for mf in input_object]
             input_type = "fam"
             link_levels = [1]
             if main_score == 'likescore':
                 likescores = [[], self.likescores_fam_gcf[input_ids, :]]
             elif main_score == 'metcalf':
-                metcalf_scores = [[], self.metcalf_fam_gcf[input_ids, :]]
+                metcalf_scores = [[], self.metcalf_fam_gcf.loc[input_ids, :]]
             elif main_score == 'hg':
                 hg_scores = [[], self.hg_fam_gcf[input_ids, :]]
         else:
@@ -517,6 +496,8 @@ class LinkFinder():
                     candidate_ids = np.where(
                         likescores[linklevel] >= score_cutoff)
                 elif main_score == 'metcalf':
+                    # get a tuple of arrays of indices where the metcalf score is above the cutoff
+                    # the first array is the row indices, the second is the column indices
                     candidate_ids = np.where(
                         metcalf_scores[linklevel] >= score_cutoff)
                 elif main_score == 'hg':
@@ -532,6 +513,7 @@ class LinkFinder():
                 # currently abusing np.where like this
                 candidate_ids = np.where(metcalf_scores[linklevel] != np.nan)
 
+            # TODO: 230503 continue replace array with dataframe
             link_candidates = np.zeros((3, candidate_ids[0].shape[0]))
 
             # this is supposed to construct a (3, x) array, where:
