@@ -34,7 +34,6 @@ USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 
 GENOME_STATUS_FILENAME = "genome_status.txt"
 
 
-#TODO fix mypy errors
 #TODO add type hints
 class GenomeStatus:
     """Defines the status relative to a certain genome ID.
@@ -82,6 +81,7 @@ def podp_download_and_extract_antismash_data(
 
     for i, genome_record in enumerate(genome_records):
         # get the best available ID from the dict
+        assert isinstance(genome_record['genome_ID'], dict)
         raw_genome_id = _get_best_available_genome_id(
             genome_record['genome_ID'])
         if raw_genome_id is None:
@@ -156,7 +156,7 @@ def podp_download_and_extract_antismash_data(
 
 
 def _get_genome_status_log(
-        genome_status_file: str | PathLike) -> dict[str, GenomeStatus]:
+        genome_status_file: Path) -> dict[str, GenomeStatus]:
     """Get a dict of GenomeStatus objects by reading given genome status file.
     Note that a empty dict is returned if the given file does not exist.
 
@@ -291,7 +291,7 @@ def _resolve_genbank_accession(genbank_id: str) -> str | None:
                 if refseq_id.find(' ') != -1:
                     refseq_id = refseq_id[:refseq_id.find(' ')]
 
-                return refseq_id
+                return str(refseq_id)
 
         if refseq_idx == -1:
             raise Exception('Expected HTML elements not found')
@@ -399,7 +399,7 @@ def _get_antismash_filename(genome_obj: GenomeStatus) -> str | None:
                     f"antiSMASH lookup succeeded! Filename is {link['href']}")
                 # save with the .1 suffix if that worked
                 genome_obj.resolved_refseq_id = accession
-                return link['href']
+                return str(link['href'])
 
     return None
 
@@ -411,7 +411,7 @@ def download_antismash_data(genome_records: list[dict[str,
                             project_download_cache: str | PathLike,
                             project_file_cache: str | PathLike):
 
-    genome_status_file = os.path.join(project_download_cache,
+    genome_status_file = Path(project_download_cache,
                                       GENOME_STATUS_FILENAME)
     genome_status = _get_genome_status_log(genome_status_file)
 
@@ -470,6 +470,7 @@ def download_antismash_data(genome_records: list[dict[str,
             if _download_antismash_zip(genome_obj, project_download_cache):
                 logger.info(
                     f'Genome data successfully downloaded for {raw_genome_id}')
+                assert isinstance(genome_obj.resolved_refseq_id, str)
                 genome_record[
                     'resolved_refseq_id'] = genome_obj.resolved_refseq_id
             else:
