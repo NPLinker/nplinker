@@ -34,7 +34,6 @@ USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 
 GENOME_STATUS_FILENAME = "genome_status.txt"
 
 
-#TODO add type hints
 class GenomeStatus:
     """Defines the status relative to a certain genome ID.
 
@@ -46,10 +45,10 @@ class GenomeStatus:
         """
 
     def __init__(self,
-                 original_id,
-                 resolved_refseq_id,
-                 attempted=False,
-                 filename=""):
+                 original_id: str,
+                 resolved_refseq_id: str,
+                 attempted: str | bool = False,
+                 filename: str = ""):
         self.original_id = ';'.join(original_id.split(','))
         self.resolved_refseq_id = "" if resolved_refseq_id == 'None' else resolved_refseq_id
         if attempted == 'True':
@@ -58,7 +57,7 @@ class GenomeStatus:
             self.attempted = False
         self.filename = filename
 
-    def add_line(self, file):
+    def add_line(self, file: Path):
         """Adds a line to file, containing info for the current genome ID. 
         """
         line = ','.join([
@@ -93,7 +92,7 @@ def podp_download_and_extract_antismash_data(
         # use this to check if the lookup has already been attempted and if
         # so if the file is cached locally
         if raw_genome_id not in genome_status:
-            genome_status[raw_genome_id] = GenomeStatus(raw_genome_id, None)
+            genome_status[raw_genome_id] = GenomeStatus(raw_genome_id, "None")
 
         genome_obj = genome_status[raw_genome_id]
 
@@ -101,7 +100,7 @@ def podp_download_and_extract_antismash_data(
             f'Checking for antismash data {i + 1}/{len(genome_records)}, current genome ID={raw_genome_id}'
         )
         # first check if file is cached locally
-        if Path.exists(genome_obj.filename):
+        if Path.exists(Path(genome_obj.filename)):
             # file already downloaded
             logger.info(
                 f'Genome ID {raw_genome_id} already downloaded to {genome_obj.filename}'
@@ -120,6 +119,7 @@ def podp_download_and_extract_antismash_data(
             logger.info(
                 f'Beginning lookup process for genome ID {raw_genome_id}')
 
+            assert isinstance(_resolve_refseq_id(genome_record['genome_ID']), str)
             genome_obj.resolved_refseq_id = _resolve_refseq_id(
                 genome_record['genome_ID'])
             genome_obj.attempted = True
@@ -236,7 +236,7 @@ def _ncbi_genbank_search(genbank_id: str,
     return None
 
 
-def _resolve_genbank_accession(genbank_id: str) -> str | None:
+def _resolve_genbank_accession(genbank_id: str) -> str:
     """Try to get RefSeq id through given GenBank id. 
 
     Args:
@@ -299,10 +299,10 @@ def _resolve_genbank_accession(genbank_id: str) -> str | None:
         logger.warning(
             f'Failed resolving GenBank accession {genbank_id}, error {e}')
 
-    return None
+    return ""
 
 
-def _resolve_jgi_accession(jgi_id: str) -> str | None:
+def _resolve_jgi_accession(jgi_id: str) -> str:
     """Try to get RefSeq id through given JGI id.
 
     Args:
@@ -323,19 +323,19 @@ def _resolve_jgi_accession(jgi_id: str) -> str | None:
                          follow_redirects=True)
     except httpx.ReadTimeout:
         logger.warning('Timed out waiting for result of JGI_Genome_ID lookup')
-        return None
+        return ""
 
     soup = BeautifulSoup(resp.content, 'html.parser')
     # find the table entry giving the NCBI assembly accession ID
     link = soup.find(
         'a', href=re.compile('https://www.ncbi.nlm.nih.gov/nuccore/.*'))
     if link is None:
-        return None
+        return ""
 
     return _resolve_genbank_accession(link.text)
 
 
-def _resolve_refseq_id(genome_id_data: dict[str, str]) -> str | None:
+def _resolve_refseq_id(genome_id_data: dict[str, str]) -> str:
     """Get the RefSeq ID to which the genome accession is linked.
     Check https://pairedomicsdata.bioinformatics.nl/schema.json.
 
@@ -357,7 +357,7 @@ def _resolve_refseq_id(genome_id_data: dict[str, str]) -> str | None:
         return _resolve_jgi_accession(genome_id_data['JGI_Genome_ID'])
 
     logger.warning(f'Unable to resolve genome_ID: {genome_id_data}')
-    return None
+    return ""
 
 
 #TODO add doc string
@@ -429,7 +429,7 @@ def download_antismash_data(genome_records: list[dict[str,
         # use this to check if the lookup has already been attempted and if
         # so if the file is cached locally
         if raw_genome_id not in genome_status:
-            genome_status[raw_genome_id] = GenomeStatus(raw_genome_id, None)
+            genome_status[raw_genome_id] = GenomeStatus(raw_genome_id, "None")
 
         genome_obj = genome_status[raw_genome_id]
 
