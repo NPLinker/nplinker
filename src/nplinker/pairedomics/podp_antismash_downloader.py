@@ -119,7 +119,8 @@ def podp_download_and_extract_antismash_data(
             logger.info(
                 f'Beginning lookup process for genome ID {raw_genome_id}')
 
-            assert isinstance(_resolve_refseq_id(genome_record['genome_ID']), str)
+            assert isinstance(_resolve_refseq_id(genome_record['genome_ID']),
+                              str)
             genome_obj.resolved_refseq_id = _resolve_refseq_id(
                 genome_record['genome_ID'])
             genome_obj.attempted = True
@@ -360,18 +361,15 @@ def _resolve_refseq_id(genome_id_data: dict[str, str]) -> str:
     return ""
 
 
-#TODO add doc string
 def _get_antismash_filename(genome_obj: GenomeStatus) -> str | None:
-    """_summary_
+    """Get the Antismash filename for genome_obj ID looking it up on ANTISMASH_DB_PAGE_URL
+    and ANTISMASH_DBV2_PAGE_URL. 
 
     Args:
-        genome_obj(GenomeStatus): _description_
+        genome_obj(GenomeStatus): Defines the status relative to a certain genome ID.
 
     Returns:
-        str | None: _description_
-
-    Examples:
-        >>> 
+        str | None: Antismash filename, if it exists. 
         """
     # want to try up to 4 different links here, v1 and v2 databases, each
     # with and without the .1 suffix on the accesssion ID
@@ -411,8 +409,7 @@ def download_antismash_data(genome_records: list[dict[str,
                             project_download_cache: str | PathLike,
                             project_file_cache: str | PathLike):
 
-    genome_status_file = Path(project_download_cache,
-                                      GENOME_STATUS_FILENAME)
+    genome_status_file = Path(project_download_cache, GENOME_STATUS_FILENAME)
     genome_status = _get_genome_status_log(genome_status_file)
 
     for i, genome_record in enumerate(genome_records):
