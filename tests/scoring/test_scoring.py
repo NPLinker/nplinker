@@ -84,8 +84,8 @@ def do_scoring_new(gcfs, spectra, strains, standardised):
                 # (note that spectrum = type 1 object here)
                 met_strains = len(spec.strains)
                 gen_strains = len(gcf.strains)
-                expected = lf.metcalf_expected[met_strains][gen_strains]
-                variance = lf.metcalf_variance[met_strains][gen_strains]
+                expected = lf.metcalf_mean[met_strains][gen_strains]
+                variance = lf.metcalf_std[met_strains][gen_strains]
                 scores[j][i] = (scores[j][i] - expected) / np.sqrt(variance)
     return scores
 

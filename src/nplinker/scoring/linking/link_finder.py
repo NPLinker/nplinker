@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from deprecated import deprecated
 import numpy as np
 import pandas as pd
@@ -24,9 +26,13 @@ from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.molecular_family import MolecularFamily
 
 
+if TYPE_CHECKING:
+    from .data_linking import DataLinks
+
 logger = LogConfig.getLogger(__file__)
 
-SCORING_METHODS = ['metcalf', 'likescore', 'hg']
+SCORE_TYPES = ['metcalf', 'likescore', 'hg']
+LINK_TYPES = ['spec-gcf', 'mf-gcf']
 
 
 class LinkFinder():
@@ -64,15 +70,15 @@ class LinkFinder():
         self.link_candidates_gcf_fam = []
 
         # metcalf caching
-        self.metcalf_expected = None
-        self.metcalf_variance = None
+        self.metcalf_mean = None
+        self.metcalf_std = None
 
-    def get_scores(self, scoring_method: str, link_type: str) -> pd.DataFrame:
-        """Get the scores for a given method and link type.
+    def get_scores(self, score_type: str, link_type: str) -> pd.DataFrame:
+        """Get the scores for given scoring type and link type.
 
         Args:
-            scoring_method (str): The scoring method to use. Available methods
-                are 'metcalf', 'likescore', and 'hg'.
+            score_type (str): The type of scoring method to use. Available
+                scoring methods are 'metcalf', 'likescore', and 'hg'.
             link_type (str): The type of link to get scores for. Available
                 types are 'spec-gcf' and 'mf-gcf'.
 
@@ -80,94 +86,94 @@ class LinkFinder():
             pd.DataFrame: The scores for the given method and link type.
 
         Raises:
-            ValueError: If the scoring method or link type is unknown.
+            ValueError: If an invalid score type or link type is given.
         """
-        if scoring_method == 'metcalf':
+        if score_type not in SCORE_TYPES:
+            raise ValueError(
+                f'Invalid score type "{score_type}". Must be one of "{SCORE_TYPES}"'
+            )
+        if link_type not in LINK_TYPES:
+            raise ValueError(
+                f'Invalid link type "{link_type}". Must be one of "{LINK_TYPES}"'
+            )
+        if score_type == 'metcalf':
             if link_type == 'spec-gcf':
                 return self.metcalf_spec_gcf
             if link_type == 'mf-gcf':
                 return self.metcalf_fam_gcf
-        if scoring_method == 'likescore':
+        if score_type == 'likescore':
             if link_type == 'spec-gcf':
                 return self.likescores_spec_gcf
             if link_type == 'mf-gcf':
                 return self.likescores_fam_gcf
-        if scoring_method == 'hg':
+        if score_type == 'hg':
             if link_type == 'spec-gcf':
                 return self.hg_spec_gcf
             if link_type == 'mf-gcf':
                 return self.hg_fam_gcf
-        raise ValueError(
-            f'Unknown method or type method="{scoring_method}", type="{link_type}"'
-        )
 
-    def metcalf_scoring(self,
-                        data_links,
-                        both=10,
-                        type1_not_gcf=-10,
-                        gcf_not_type1=0,
-                        not_type1_not_gcf=1,
-                        type='spec-gcf'):
-        """
-        Calculate metcalf scores from DataLinks() co-occurence matrices
-        """
+    def metcalf_scoring(
+        self,
+        data_links: DataLinks,
+        link_type: str = 'spec-gcf',
+        scoring_weights: tuple[int, int, int, int] = (10, -10, 0, 1)
+    ) -> None:
+        """Calculate metcalf scores.
 
+        Args:
+            data_links (DataLinks): The DataLinks object to use for scoring.
+            link_type (str, optional): The type of link to score. Available
+                types are 'spec-gcf' and 'mf-gcf'. Defaults to 'spec-gcf'.
+            scoring_weights (tuple[int,int,int,int], optional): The weights to
+                use for Metcalf scoring. The weights are applied to
+                '(met_gcf, met_not_gcf, gcf_not_met, not_met_not_gcf)'.
+                Defaults to (10, -10, 0, 1).
+        """
+        if link_type == 'spec-gcf':
+            self.metcalf_spec_gcf = (
+                data_links.cooccurrence_spec_gcf * scoring_weights[0] +
+                data_links.cooccurrence_spec_notgcf * scoring_weights[1] +
+                data_links.cooccurrence_notspec_gcf * scoring_weights[2] +
+                data_links.cooccurrence_notspec_notgcf * scoring_weights[3])
+        if link_type == 'mf-gcf':
+            self.metcalf_fam_gcf = (
+                data_links.cooccurrence_mf_gcf * scoring_weights[0] +
+                data_links.cooccurrence_mf_notgcf * scoring_weights[1] +
+                data_links.cooccurrence_notmf_gcf * scoring_weights[2] +
+                data_links.cooccurrence_notmf_notgcf * scoring_weights[3])
+
+        if self.metcalf_mean is None or self.metcalf_std is None:
+            self.metcalf_mean, self.metcalf_std = self._cal_mean_std(
+                data_links, scoring_weights)
+
+    def _cal_mean_std(self, data_links, scoring_weights):
         # Compute the expected values for all possible values of spec and gcf strains
         # we need the total number of strains
         _, n_strains = data_links.occurrence_gcf_strain.shape
-        if self.metcalf_expected is None:
-            sz = (n_strains + 1, n_strains + 1)
-            self.metcalf_expected = np.zeros(sz)
-            self.metcalf_variance = np.zeros(sz)
-
-            for n in range(n_strains + 1):
-                for m in range(n_strains + 1):
-                    max_overlap = min(n, m)
-                    min_overlap = max(
-                        0,
-                        n + m - n_strains)  # minimum possible strain overlap
-                    expected_value = 0
-                    expected_sq = 0
-                    for o in range(min_overlap, max_overlap + 1):
-                        o_prob = hypergeom.pmf(o, n_strains, n, m)
-                        # compute metcalf for n strains in type 1 and m in gcf
-                        score = o * both
-                        score += type1_not_gcf * (n - o)
-                        score += gcf_not_type1 * (m - o)
-                        score += not_type1_not_gcf * (n_strains - (n + m - o))
-                        expected_value += o_prob * score
-                        expected_sq += o_prob * (score**2)
-
-                    self.metcalf_expected[n, m] = expected_value
-                    expected_sq = expected_sq - expected_value**2
-                    if expected_sq < 1e-09:
-                        expected_sq = 1
-                    self.metcalf_variance[n, m] = expected_sq
-
-            self.metcalf_variance_sqrt = np.sqrt(self.metcalf_variance)
-
-        # now, we would like an option to take any actual score an subtract the
-        # expected value and then divide by the square root of the variance
-        # e.g. if we have a score computed between a type 1 object that has
-        # 3 strains, and a gcf with 6 strains, we should use the expected value
-        # at expected_metcalf[3,6] and sqrt of the variance in the same position
-
-        if type == 'spec-gcf':
-            metcalf_scores = (
-                data_links.cooccurrence_spec_gcf * both +
-                data_links.cooccurrence_spec_notgcf * type1_not_gcf +
-                data_links.cooccurrence_notspec_gcf * gcf_not_type1 +
-                data_links.cooccurrence_notspec_notgcf * not_type1_not_gcf)
-            self.metcalf_spec_gcf = metcalf_scores
-
-        elif type == 'mf-gcf':
-            metcalf_scores = (
-                data_links.cooccurrence_mf_gcf * both +
-                data_links.cooccurrence_mf_notgcf * type1_not_gcf +
-                data_links.cooccurrence_notmf_gcf * gcf_not_type1 +
-                data_links.cooccurrence_notmf_notgcf * not_type1_not_gcf)
-
-            self.metcalf_fam_gcf = metcalf_scores
+        sz = (n_strains + 1, n_strains + 1)
+        mean = np.zeros(sz)
+        variance = np.zeros(sz)
+        for n in range(n_strains + 1):
+            for m in range(n_strains + 1):
+                max_overlap = min(n, m)
+                min_overlap = max(0, n + m - n_strains)
+                expected_value = 0
+                expected_sq = 0
+                for o in range(min_overlap, max_overlap + 1):
+                    o_prob = hypergeom.pmf(o, n_strains, n, m)
+                    # compute metcalf for n strains in type 1 and m in gcf
+                    score = o * scoring_weights[0]
+                    score += scoring_weights[1] * (n - o)
+                    score += scoring_weights[2] * (m - o)
+                    score += scoring_weights[3] * (n_strains - (n + m - o))
+                    expected_value += o_prob * score
+                    expected_sq += o_prob * (score**2)
+                mean[n, m] = expected_value
+                expected_sq = expected_sq - expected_value**2
+                if expected_sq < 1e-09:
+                    expected_sq = 1
+                variance[n, m] = expected_sq
+        return mean, np.sqrt(variance)
 
     def hg_scoring(self, data_links, type='spec-gcf'):
         """

@@ -81,9 +81,9 @@ class MetcalfScoring(ScoringMethod):
                                                  npl._molfams, npl._strains)
             MetcalfScoring.LINKFINDER = LinkFinder()
             MetcalfScoring.LINKFINDER.metcalf_scoring(MetcalfScoring.DATALINKS,
-                                                      type='spec-gcf')
+                                                      link_type='spec-gcf')
             MetcalfScoring.LINKFINDER.metcalf_scoring(MetcalfScoring.DATALINKS,
-                                                      type='mf-gcf')
+                                                      link_type='mf-gcf')
             logger.debug('MetcalfScoring.setup caching results')
             save_pickled_data((dataset_counts, MetcalfScoring.DATALINKS,
                                MetcalfScoring.LINKFINDER), cache_file)
@@ -117,8 +117,8 @@ class MetcalfScoring(ScoringMethod):
             gen_strains = len(gcf.strains)
 
             # lookup expected + variance values based on strain counts
-            expected = linkfinder.metcalf_expected[met_strains][gen_strains]
-            variance_sqrt = linkfinder.metcalf_variance_sqrt[met_strains][
+            expected = linkfinder.metcalf_mean[met_strains][gen_strains]
+            variance_sqrt = linkfinder.metcalf_std[met_strains][
                 gen_strains]
 
             # calculate the final score based on the basic Metcalf score for these two
@@ -163,9 +163,9 @@ class MetcalfScoring(ScoringMethod):
                 met_strains = len(met_obj.strains)
 
                 # lookup expected + variance values based on strain counts
-                expected = linkfinder.metcalf_expected[met_strains][
+                expected = linkfinder.metcalf_mean[met_strains][
                     gen_strains]
-                variance_sqrt = linkfinder.metcalf_variance_sqrt[met_strains][
+                variance_sqrt = linkfinder.metcalf_std[met_strains][
                     gen_strains]
 
                 # calculate the final score based on the basic Metcalf score for these two
