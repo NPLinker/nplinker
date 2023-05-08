@@ -339,7 +339,7 @@ class LinkFinder():
         else:
             raise Exception(
                 'Wrong scoring type given. Must be one of: {}'.format(
-                    SCORING_METHODS))
+                    SCORE_TYPES))
 
         logger.debug(candidate_ids[0].shape[0], " candidates selected with ",
                      index_names[2], " >= ", P_cutoff, " and a link score >= ",
@@ -429,155 +429,107 @@ class LinkFinder():
             raise Exception("No candidate selection was created.")
         return link_candidates_pd
 
-    def get_links(self,
-                  data_links,
-                  input_object,
-                  main_score='likescore',
-                  score_cutoff=0.5):
+    @staticmethod
+    def _isinstance(*objects, obj_type=GCF) -> bool:
+        return all(isinstance(x, obj_type) for x in objects)
+
+    def get_links(
+        self,
+        *objects: tuple[GCF, ...] | tuple[Spectrum, ...]
+        | tuple[MolecularFamily, ...],
+        score_type: str = 'likescore',
+        score_cutoff: float = 0.5
+    ) -> list[tuple[tuple[str], tuple[str], tuple[float]]]:
+        """Get scores for links between objects.
+
+        Args:
+            objects(tuple): GCF, Spectrum or MolecularFamily objects.
+            score_type(str): Type of score to use for link calculation.
+                Must be one of 'likescore', 'metcalf' and 'hg'.
+            score_cutoff(float): Minimum score to consider a link (≥score_cutoff).
+                Default is 0.5.
+        Returns:
+            list: List of tuples containing the ids of the linked objects and the score.
+                The tuple contains three tuples:
+                - the first tuple contains the ids of the input/source objects,
+                - the second tuple contains the ids of the target objects,
+                - the third tuple contains the scores.
+
+        Raises:
+            TypeError: If input objects are not GCF, Spectrum or MolecularFamily objects.
+            ValueError: If score type is not one of 'likescore', 'metcalf' and 'hg'.
         """
-        Output likely links for 'input_object'
-
-        Parameters
-        ----------
-        input_objects: object()
-            Object or list of objects of either class: spectra, families, or GCFs
-        main_score: str
-            Which main score to use ('metcalf', 'likescore')
-        score_cutoff:
-            Thresholds to conly consider candidates for which:
-            score >= score_cutoff
-        """
-
-        if main_score not in SCORING_METHODS:
-            raise Exception(
-                'Wrong scoring type given. Must be one of: {}'.format(
-                    SCORING_METHODS))
-
-        # Check if input is list:
-        if isinstance(input_object, list):
-            query_size = len(input_object)
+        if self._isinstance(*objects, GCF):
+            obj_type = 'gcf'
+        elif self._isinstance(*objects, Spectrum):
+            obj_type = 'spec'
+        elif self._isinstance(*objects, MolecularFamily):
+            obj_type = 'fam'
         else:
-            input_object = [input_object]
-            query_size = 1
+            raise TypeError(
+                'Input objects must be GCF, Spectrum or MolecularFamily objects.'
+            )
 
-        # Check type of input_object:
-        # TODO CG: replace integer ids with string ids
-        # If GCF:
-        if isinstance(input_object[0], GCF):
-            input_ids = [gcf.gcf_id for gcf in input_object]
-            input_type = "gcf"
-            link_levels = [0, 1]
-            if main_score == 'likescore':
-                likescores = [
-                    # TODO CG: use dataframe instead of numpy array
-                    self.likescores_spec_gcf[:, input_ids],
-                    self.likescores_fam_gcf[:, input_ids]
-                ]
-            elif main_score == 'metcalf':
-                metcalf_scores = [
-                    self.metcalf_spec_gcf.loc[:, input_ids],
-                    self.metcalf_fam_gcf.loc[:, input_ids]
-                ]
-            elif main_score == 'hg':
-                hg_scores = [
-                    self.hg_spec_gcf[:, input_ids], self.hg_fam_gcf[:,
-                                                                    input_ids]
-                ]
-        elif isinstance(input_object[0], Spectrum):
-            input_ids = [spec.spectrum_id for spec in input_object]
-            input_type = "spec"
-            link_levels = [0]
-            if main_score == 'likescore':
-                likescores = [self.likescores_spec_gcf[input_ids, :], []]
-            elif main_score == 'metcalf':
-                metcalf_scores = [self.metcalf_spec_gcf.loc[input_ids, :], []]
-            elif main_score == 'hg':
-                hg_scores = [self.hg_spec_gcf[input_ids, :], []]
-        elif isinstance(input_object[0], MolecularFamily):
-            input_ids = [mf.family_id for mf in input_object]
-            input_type = "fam"
-            link_levels = [1]
-            if main_score == 'likescore':
-                likescores = [[], self.likescores_fam_gcf[input_ids, :]]
-            elif main_score == 'metcalf':
-                metcalf_scores = [[], self.metcalf_fam_gcf.loc[input_ids, :]]
-            elif main_score == 'hg':
-                hg_scores = [[], self.hg_fam_gcf[input_ids, :]]
-        else:
-            raise Exception(
-                "Input_object must be Spectrum, MolecularFamily, or GCF object (single or list)."
+        if score_type not in SCORE_TYPES:
+            raise ValueError(
+                f'Invalid score type "{score_type}". Must be one of "{SCORE_TYPES}"'
             )
 
         links = []
-        for linklevel in link_levels:
-            if score_cutoff is not None:
-                if main_score == 'likescore':
-                    candidate_ids = np.where(
-                        likescores[linklevel] >= score_cutoff)
-                elif main_score == 'metcalf':
-                    # get a tuple of arrays of indices where the metcalf score is above the cutoff
-                    # the first array is the row indices, the second is the column indices
-                    candidate_ids = np.where(
-                        metcalf_scores[linklevel] >= score_cutoff)
-                elif main_score == 'hg':
-                    candidate_ids = np.where(
-                        hg_scores[linklevel] >= score_cutoff)
-                else:
-                    # should never happen
-                    raise Exception(f'Unknown scoring type! "{main_score}"')
-            else:
-                # TODO is this best way to get same output as above code?
-                # to keep the remainder of the method identical in the case of no cutoff
-                # being supplied, while still returning all the candidate links, I'm
-                # currently abusing np.where like this
-                candidate_ids = np.where(metcalf_scores[linklevel] != np.nan)
+        # TODO CG: replace integer ids with string ids for `hg` and `likescore`
+        if obj_type == 'gcf':
+            obj_ids = [gcf.gcf_id for gcf in objects]
+            if score_type == 'likescore':
+                all_scores = (self.likescores_spec_gcf[:, obj_ids],
+                              self.likescores_fam_gcf[:, obj_ids])
+            if score_type == 'metcalf':
+                all_scores = (self.metcalf_spec_gcf.loc[:, obj_ids],
+                              self.metcalf_fam_gcf.loc[:, obj_ids])
+            if score_type == 'hg':
+                all_scores = (self.hg_spec_gcf[:, obj_ids],
+                              self.hg_fam_gcf[:, obj_ids])
+            for scores in all_scores:
+                links.append(self._get_scores_source_gcf(scores, score_cutoff))
 
-            # TODO: 230503 continue replace array with dataframe
-            link_candidates = np.zeros((3, candidate_ids[0].shape[0]))
+        if obj_type == 'spec':
+            obj_ids = [spec.spectrum_id for spec in objects]
+            if score_type == 'likescore':
+                all_scores = self.likescores_spec_gcf[obj_ids, :]
+            if score_type == 'metcalf':
+                all_scores = self.metcalf_spec_gcf.loc[obj_ids, :]
+            if score_type == 'hg':
+                all_scores = self.hg_spec_gcf[obj_ids, :]
+            links.append(self._get_scores_source_met(all_scores, score_cutoff))
 
-            # this is supposed to construct a (3, x) array, where:
-            # - 1st index gives list of source/input object IDs
-            # - 2nd index gives list of destination/link object IDs
-            # - 3rd index gives list of scores for the link between the given pair of objects
-            # - x = number of links found
-
-            # if there is only a single object given as input, things are pretty simple here:
-            if query_size == 1:
-                # first, can set every index of the input object ID array to the
-                # single object ID we've been give
-                link_candidates[0, :] = input_ids
-                # then, based on input type copy the other object IDs from candidate_ids
-                if input_type == 'gcf':
-                    link_candidates[1, :] = candidate_ids[0].astype(int)
-                else:
-                    link_candidates[1, :] = candidate_ids[1].astype(int)
-            else:
-                # if there is a list of input objects, things are slightly more complex
-                # - the "input IDs" element of the output array now needs to be set by
-                #   a lookup into the original input_ids array based on candidate_ids
-                # - the "output IDs" element is taken directly from the other element
-                #   of candidate IDs
-                if input_type == 'gcf':
-                    link_candidates[0, :] = input_ids[candidate_ids[1].astype(
-                        int)]
-                    link_candidates[1, :] = candidate_ids[0].astype(int)
-                else:
-                    link_candidates[0, :] = input_ids[candidate_ids[0].astype(
-                        int)]
-                    link_candidates[1, :] = candidate_ids[1].astype(int)
-
-            # finally, copy in the actual scores too
-            if main_score == 'likescore':
-                link_candidates[2, :] = likescores[linklevel][candidate_ids]
-            elif main_score == 'metcalf':
-                link_candidates[
-                    2, :] = metcalf_scores[linklevel][candidate_ids]
-            elif main_score == 'hg':
-                link_candidates[2, :] = hg_scores[linklevel][candidate_ids]
-
-            links.append(link_candidates)
+        if obj_type == 'fam':
+            obj_ids = [mf.family_id for mf in objects]
+            if score_type == 'likescore':
+                all_scores = self.likescores_fam_gcf[obj_ids, :]
+            if score_type == 'metcalf':
+                all_scores = self.metcalf_fam_gcf.loc[obj_ids, :]
+            if score_type == 'hg':
+                all_scores = self.hg_fam_gcf[obj_ids:]
+            links.append(self._get_scores_source_met(all_scores, score_cutoff))
 
         return links
+
+    def _get_scores_source_gcf(self, scores, score_cutoff):
+        candidate_met_gcf_indexes = np.where(scores >= score_cutoff)
+        src_obj_ids = scores.columns[candidate_met_gcf_indexes[1]].to_list()
+        target_obj_ids = scores.index[candidate_met_gcf_indexes[0]].to_list()
+        scores_candidate = scores.to_numpy()[candidate_met_gcf_indexes].tolist(
+        )
+        return tuple(src_obj_ids), tuple(target_obj_ids), tuple(
+            scores_candidate)
+
+    def _get_scores_source_met(self, scores, score_cutoff):
+        candidate_met_gcf_indexes = np.where(scores >= score_cutoff)
+        src_obj_ids = scores.index[candidate_met_gcf_indexes[0]].to_list()
+        target_obj_ids = scores.columns[candidate_met_gcf_indexes[1]].to_list()
+        scores_candidate = scores.to_numpy()[candidate_met_gcf_indexes].tolist(
+        )
+        return tuple(src_obj_ids), tuple(target_obj_ids), tuple(
+            scores_candidate)
 
     @deprecated(version="1.3.3",
                 reason="The unworkable method will be removed")

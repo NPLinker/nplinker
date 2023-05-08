@@ -203,13 +203,13 @@ class MetcalfScoring(ScoringMethod):
         logger.debug('MetcalfScoring: standardised = {}'.format(
             self.standardised))
         if not self.standardised:
-            results = linkfinder.get_links(datalinks, objects, self.name,
+            results = linkfinder.get_links(objects, self.name,
                                            self.cutoff)
         else:
             # get the basic Metcalf scores BUT ignore the cutoff value here by setting
             # it to None. The actual user-supplied cutoff value is applied further down
             # once the standardised scores for these results have been calculated.
-            results = linkfinder.get_links(datalinks, objects, self.name, None)
+            results = linkfinder.get_links(objects, self.name, None)
 
             # The "results" object varies slightly depending on the input provided
             # to the LinkFinder class:
