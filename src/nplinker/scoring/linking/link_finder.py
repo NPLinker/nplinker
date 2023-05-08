@@ -67,26 +67,39 @@ class LinkFinder():
         self.metcalf_expected = None
         self.metcalf_variance = None
 
-    def get_scores(self, method, type_):
-        if method == 'metcalf':
-            if type_ == 'spec-gcf':
-                return self.metcalf_spec_gcf
-            elif type_ == 'mf-gcf':
-                return self.metcalf_fam_gcf
-        elif method == 'likescore':
-            if type_ == 'spec-gcf':
-                return self.likescores_spec_gcf
-            elif type_ == 'mf-gcf':
-                return self.likescores_fam_gcf
-        elif method == 'hg':
-            if type_ == 'spec-gcf':
-                return self.hg_spec_gcf
-            elif type_ == 'mf-gcf':
-                return self.hg_fam_gcf
+    def get_scores(self, scoring_method: str, link_type: str) -> pd.DataFrame:
+        """Get the scores for a given method and link type.
 
-        raise Exception(
-            'Unknown method or type (method="{}", type="{}")'.format(
-                method, type_))
+        Args:
+            scoring_method (str): The scoring method to use. Available methods
+                are 'metcalf', 'likescore', and 'hg'.
+            link_type (str): The type of link to get scores for. Available
+                types are 'spec-gcf' and 'mf-gcf'.
+
+        Returns:
+            pd.DataFrame: The scores for the given method and link type.
+
+        Raises:
+            ValueError: If the scoring method or link type is unknown.
+        """
+        if scoring_method == 'metcalf':
+            if link_type == 'spec-gcf':
+                return self.metcalf_spec_gcf
+            if link_type == 'mf-gcf':
+                return self.metcalf_fam_gcf
+        if scoring_method == 'likescore':
+            if link_type == 'spec-gcf':
+                return self.likescores_spec_gcf
+            if link_type == 'mf-gcf':
+                return self.likescores_fam_gcf
+        if scoring_method == 'hg':
+            if link_type == 'spec-gcf':
+                return self.hg_spec_gcf
+            if link_type == 'mf-gcf':
+                return self.hg_fam_gcf
+        raise ValueError(
+            f'Unknown method or type method="{scoring_method}", type="{link_type}"'
+        )
 
     def metcalf_scoring(self,
                         data_links,
