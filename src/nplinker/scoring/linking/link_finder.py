@@ -7,6 +7,7 @@ from nplinker.genomics.gcf import GCF
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.molecular_family import MolecularFamily
 from nplinker.metabolomics.spectrum import Spectrum
+from .data_linking import LINK_TYPES
 
 
 if TYPE_CHECKING:
@@ -14,19 +15,8 @@ if TYPE_CHECKING:
 
 logger = LogConfig.getLogger(__file__)
 
-LINK_TYPES = ['spec-gcf', 'mf-gcf']
-
 
 class LinkFinder():
-    """
-    Class to:
-    1) Score potential links based on collected information from:
-        DataLinks, LinkLikelihood (and potentially other resources)
-    Different scores can be used for this!
-
-    2) Rank and output selected candidates
-    3) Create output plots and tables
-    """
 
     def __init__(self):
         """
@@ -58,7 +48,14 @@ class LinkFinder():
                 use for Metcalf scoring. The weights are applied to
                 '(met_gcf, met_not_gcf, gcf_not_met, not_met_not_gcf)'.
                 Defaults to (10, -10, 0, 1).
+
+        Raises:
+            ValueError: If an invalid link type is provided.
         """
+        if link_type not in LINK_TYPES:
+            raise ValueError(
+                f'Invalid link type: {link_type}. Must be one of {LINK_TYPES}')
+
         if link_type == 'spec-gcf':
             self.raw_score_spec_gcf = (
                 data_links.cooccurrence_spec_gcf * scoring_weights[0] +
@@ -105,12 +102,10 @@ class LinkFinder():
                 variance[n, m] = expected_sq
         return mean, np.sqrt(variance)
 
-    def get_links(
-        self,
-        *objects: tuple[GCF, ...] | tuple[Spectrum, ...]
-        | tuple[MolecularFamily, ...],
-        score_cutoff: float = 0.5
-    ) -> list[tuple[tuple[str], tuple[str], tuple[float]]]:
+    def get_links(self,
+                  *objects: tuple[GCF, ...] | tuple[Spectrum, ...]
+                  | tuple[MolecularFamily, ...],
+                  score_cutoff: float = 0.5) -> list[pd.DataFrame]:
         """Get scores for links between objects.
 
         Args:
@@ -118,60 +113,71 @@ class LinkFinder():
             score_cutoff(float): Minimum score to consider a link (≥score_cutoff).
                 Default is 0.5.
         Returns:
-            list: List of tuples containing the ids of the linked objects and the score.
-                The tuple contains three tuples:
-                - the first tuple contains the ids of the input/source objects,
-                - the second tuple contains the ids of the target objects,
-                - the third tuple contains the scores.
+            list: List of data frames containing the ids of the linked objects
+                and the score. The data frame contains three rows:
+                - the first row contains the ids of the input/source objects,
+                - the second row contains the ids of the target objects,
+                - the third row contains the scores.
 
         Raises:
             TypeError: If input objects are not GCF, Spectrum or MolecularFamily objects.
         """
-        if self._isinstance(*objects, GCF):
+        if self._isinstance(GCF, *objects):
             obj_type = 'gcf'
-        elif self._isinstance(*objects, Spectrum):
+        elif self._isinstance(Spectrum, *objects):
             obj_type = 'spec'
-        elif self._isinstance(*objects, MolecularFamily):
-            obj_type = 'fam'
+        elif self._isinstance(MolecularFamily, *objects):
+            obj_type = 'mf'
         else:
+            types = [type(i) for i in objects]
             raise TypeError(
-                'Input objects must be GCF, Spectrum or MolecularFamily objects.'
+                f'Invalid type "{set(types)}". Input objects must be GCF, Spectrum or MolecularFamily objects.'
             )
 
         links = []
         if obj_type == 'gcf':
             obj_ids = [gcf.gcf_id for gcf in objects]
-            all_scores = (self.raw_score_spec_gcf.loc[:, obj_ids],
-                          self.raw_score_fam_gcf.loc[:, obj_ids])
-            for scores in all_scores:
-                links.append(self._get_scores_source_gcf(scores, score_cutoff))
+            # spec-gcf
+            scores = self.raw_score_spec_gcf.loc[:, obj_ids]
+            df = self._get_scores_source_gcf(scores, score_cutoff)
+            df.name = LINK_TYPES[0]
+            links.append(df)
+            # mf-gcf
+            scores = self.raw_score_fam_gcf.loc[:, obj_ids]
+            df = self._get_scores_source_gcf(scores, score_cutoff)
+            df.name = LINK_TYPES[1]
+            links.append(df)
+
         if obj_type == 'spec':
             obj_ids = [spec.spectrum_id for spec in objects]
-            all_scores = self.raw_score_spec_gcf.loc[obj_ids, :]
-            links.append(self._get_scores_source_met(all_scores, score_cutoff))
-        if obj_type == 'fam':
+            scores = self.raw_score_spec_gcf.loc[obj_ids, :]
+            df = self._get_scores_source_met(scores, score_cutoff)
+            df.name = LINK_TYPES[0]
+            links.append(df)
+
+        if obj_type == 'mf':
             obj_ids = [mf.family_id for mf in objects]
-            all_scores = self.raw_score_fam_gcf.loc[obj_ids, :]
-            links.append(self._get_scores_source_met(all_scores, score_cutoff))
+            scores = self.raw_score_fam_gcf.loc[obj_ids, :]
+            df = self._get_scores_source_met(scores, score_cutoff)
+            df.name = LINK_TYPES[1]
+            links.append(df)
         return links
 
-    def _isinstance(self, *objects, obj_type=GCF) -> bool:
-        return all(isinstance(x, obj_type) for x in objects)
+    def _isinstance(self, _type, *objects) -> bool:
+        return all(isinstance(x, _type) for x in objects)
 
-    def _get_scores_source_gcf(self, scores, score_cutoff):
-        candidate_met_gcf_indexes = np.where(scores >= score_cutoff)
-        src_obj_ids = scores.columns[candidate_met_gcf_indexes[1]].to_list()
-        target_obj_ids = scores.index[candidate_met_gcf_indexes[0]].to_list()
-        scores_candidate = scores.to_numpy()[candidate_met_gcf_indexes].tolist(
-        )
-        return tuple(src_obj_ids), tuple(target_obj_ids), tuple(
-            scores_candidate)
+    def _get_scores_source_gcf(self, scores, score_cutoff) -> pd.DataFrame:
+        row_indexes, col_indexes = np.where(scores >= score_cutoff)
+        src_obj_ids = scores.columns[col_indexes].to_list()
+        target_obj_ids = scores.index[row_indexes].to_list()
+        scores_candidate = scores.values[row_indexes, col_indexes].tolist()
+        return pd.DataFrame([src_obj_ids, target_obj_ids, scores_candidate],
+                            index=['source', 'target', 'score'])
 
-    def _get_scores_source_met(self, scores, score_cutoff):
-        candidate_met_gcf_indexes = np.where(scores >= score_cutoff)
-        src_obj_ids = scores.index[candidate_met_gcf_indexes[0]].to_list()
-        target_obj_ids = scores.columns[candidate_met_gcf_indexes[1]].to_list()
-        scores_candidate = scores.to_numpy()[candidate_met_gcf_indexes].tolist(
-        )
-        return tuple(src_obj_ids), tuple(target_obj_ids), tuple(
-            scores_candidate)
+    def _get_scores_source_met(self, scores, score_cutoff) -> pd.DataFrame:
+        row_indexes, col_indexes = np.where(scores >= score_cutoff)
+        src_obj_ids = scores.index[row_indexes].to_list()
+        target_obj_ids = scores.columns[col_indexes].to_list()
+        scores_candidate = scores.values[row_indexes, col_indexes].tolist()
+        return pd.DataFrame([src_obj_ids, target_obj_ids, scores_candidate],
+                            index=['source', 'target', 'score'])
