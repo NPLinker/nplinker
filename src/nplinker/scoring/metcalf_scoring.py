@@ -1,6 +1,8 @@
+from __future__ import annotations
 import os
+from typing import TYPE_CHECKING
 import numpy as np
-from nplinker.genomics import BGC
+import pandas as pd
 from nplinker.genomics import GCF
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.molecular_family import MolecularFamily
@@ -11,7 +13,10 @@ from nplinker.scoring.linking.data_linking import DataLinks
 from nplinker.scoring.linking.link_finder import LinkFinder
 from nplinker.scoring.methods import ScoringMethod
 from nplinker.scoring.object_link import ObjectLink
+from .linking.data_linking import LINK_TYPES
 
+if TYPE_CHECKING:
+    from .link_collection import LinkCollection
 
 logger = LogConfig.getLogger(__name__)
 
@@ -22,17 +27,13 @@ class MetcalfScoring(ScoringMethod):
     LINKFINDER = None
     NAME = 'metcalf'
 
-    # enumeration for accessing results of LinkFinder.get_links, which are (3, num_links) arrays:
-    # - R_SRC_ID: the ID of an object that was supplied as input to get_links
-    # - R_DST_ID: the ID of an object that was discovered to have a link to an input object
-    # - R_SCORE: the score for the link between a pair of objects
-    R_SRC_ID, R_DST_ID, R_SCORE = range(3)
-
     def __init__(self, npl):
         super().__init__(npl)
         self.cutoff = 1.0
         self.standardised = True
 
+    # TODO CG: not sure why using staticmethod here. Check later and refactor if possible
+    # TODO CG: refactor this method and extract code for cache file to a separate method
     @staticmethod
     def setup(npl):
         logger.info(
@@ -46,7 +47,6 @@ class MetcalfScoring(ScoringMethod):
 
         # the metcalf preprocessing can take a long time for large datasets, so it's
         # better to cache as the data won't change unless the number of objects does
-
         dataset_counts = [
             len(npl.bgcs),
             len(npl.gcfs),
@@ -77,246 +77,195 @@ class MetcalfScoring(ScoringMethod):
             logger.info(
                 'MetcalfScoring.setup preprocessing dataset (this may take some time)'
             )
-            MetcalfScoring.DATALINKS = DataLinks(npl._gcfs, npl._spectra,
-                                                 npl._molfams, npl._strains)
+            MetcalfScoring.DATALINKS = DataLinks(npl.gcfs, npl.spectra,
+                                                 npl.molfams, npl.strains)
             MetcalfScoring.LINKFINDER = LinkFinder()
-            MetcalfScoring.LINKFINDER.metcalf_scoring(MetcalfScoring.DATALINKS,
-                                                      link_type='spec-gcf')
-            MetcalfScoring.LINKFINDER.metcalf_scoring(MetcalfScoring.DATALINKS,
-                                                      link_type='mf-gcf')
+            MetcalfScoring.LINKFINDER.cal_score(MetcalfScoring.DATALINKS,
+                                                link_type=LINK_TYPES[0])
+            MetcalfScoring.LINKFINDER.cal_score(MetcalfScoring.DATALINKS,
+                                                link_type=LINK_TYPES[1])
             logger.debug('MetcalfScoring.setup caching results')
             save_pickled_data((dataset_counts, MetcalfScoring.DATALINKS,
                                MetcalfScoring.LINKFINDER), cache_file)
 
         logger.info('MetcalfScoring.setup completed')
 
+    # TODO CG: is it needed? remove it if not
     @property
     def datalinks(self):
         return MetcalfScoring.DATALINKS
 
-    def _metcalf_postprocess_met(self, linkfinder, results, input_type):
-        logger.debug(
-            'Postprocessing results for standardised Metcalf scores (met input)'
-        )
-        # results will be links from EITHER Spectrum OR MolFam => GCF here
-
-        # need to know if the metabolomic objects given as input are Spectrum/MolFam
-        met_objs = self.npl.spectra if input_type == Spectrum else self.npl.molfams
-        new_src, new_dst, new_sco = [], [], []
-
-        # go through each pair of input objects and calculate their standardised scores
-        for i in range(len(results[0][self.R_SRC_ID])):
-            met_obj = met_objs[int(results[0][self.R_SRC_ID][i])]
-            # met_obj will now be either a Spectrum or a MolecularFamily, but
-            # doesn't matter which (in this implementation at least) because they
-            # both have a .strains attribute which is the only thing we need. For
-            # Spectra it's the number of strains, for a MolFam it's the total
-            # number of *unique* strains across all Spectra in that family.
-            met_strains = len(met_obj.strains)
-            gcf = self.npl.gcfs[int(results[0][self.R_DST_ID][i])]
-            gen_strains = len(gcf.strains)
-
-            # lookup expected + variance values based on strain counts
-            expected = linkfinder.metcalf_mean[met_strains][gen_strains]
-            variance_sqrt = linkfinder.metcalf_std[met_strains][
-                gen_strains]
-
-            # calculate the final score based on the basic Metcalf score for these two
-            # particular objects
-            final_score = (results[0][self.R_SCORE][i] -
-                           expected) / variance_sqrt
-
-            # finally apply the scoring cutoff and store the result
-            if self.cutoff is None or (final_score >= self.cutoff):
-                new_src.append(int(results[0][self.R_SRC_ID][i]))
-                new_dst.append(int(results[0][self.R_DST_ID][i]))
-                new_sco.append(final_score)
-
-        # overwrite original "results" with equivalent new data structure
-        return [np.array([new_src, new_dst, new_sco])]
-
-    def _metcalf_postprocess_gen(self, linkfinder, results, input_type):
-        logger.debug(
-            'Postprocessing results for standardised Metcalf scores (gen input)'
-        )
-        # results will be links from GCF to BOTH Spectrum and MolFams here (first
-        # element Spectra, second MolFams)
-
-        new_results = []
-        met_objs_list = [self.npl.spectra, self.npl.molfams]
-
-        # iterate over the Spectrum results and then the MolFam results
-        for m, met_objs in enumerate(met_objs_list):
-            new_src, new_dst, new_sco = [], [], []
-
-            # go through each pair of input objects and calculate their standardised scores
-            for i in range(len(results[m][self.R_SRC_ID])):
-                gcf = self.npl.gcfs[int(results[m][self.R_SRC_ID][i])]
-                gen_strains = len(gcf.strains)
-
-                # met_obj will now be either a Spectrum or a MolecularFamily, but
-                # doesn't matter which (in this implementation at least) because they
-                # both have a .strains attribute which is the only thing we need. For
-                # Spectra it's the number of strains, for a MolFam it's the total
-                # number of *unique* strains across all Spectra in that family.
-                met_obj = met_objs[int(results[m][self.R_DST_ID][i])]
-                met_strains = len(met_obj.strains)
-
-                # lookup expected + variance values based on strain counts
-                expected = linkfinder.metcalf_mean[met_strains][
-                    gen_strains]
-                variance_sqrt = linkfinder.metcalf_std[met_strains][
-                    gen_strains]
-
-                # calculate the final score based on the basic Metcalf score for these two
-                # particular objects
-                final_score = (results[m][self.R_SCORE][i] -
-                               expected) / variance_sqrt
-
-                # finally apply the scoring cutoff and store the result
-                if self.cutoff is None or (final_score >= self.cutoff):
-                    new_src.append(int(results[m][self.R_SRC_ID][i]))
-                    new_dst.append(int(results[m][self.R_DST_ID][i]))
-                    new_sco.append(final_score)
-
-            # overwrite original "results" with equivalent new data structure
-            new_results.append(np.array([new_src, new_dst, new_sco]))
-
-        return new_results
-
-    def get_links(self, objects, link_collection):
-        # enforce constraint that the list must contain a set of identically typed objects
-        if not all(isinstance(x, type(objects[0])) for x in objects):
-            raise Exception(
-                'MetcalfScoring: uniformly-typed list of objects is required')
-
-        # also can't handle BGCs here, must be one of the other 3 types (GCF/Spectrum/MolecularFamily)
-        if isinstance(objects[0], BGC):
-            raise Exception(
-                'MetcalfScoring requires input type GCF/Spectrum/MolecularFamily, not BGC'
+    def get_links(self, *objects, link_collection) -> LinkCollection:
+        if self._isinstance(GCF, *objects):
+            obj_type = 'gcf'
+        elif self._isinstance(Spectrum, *objects):
+            obj_type = 'spec'
+        elif self._isinstance(MolecularFamily, *objects):
+            obj_type = 'mf'
+        else:
+            types = [type(i) for i in objects]
+            raise TypeError(
+                f'Invalid type {set(types)}. Input objects must be GCF, Spectrum or MolecularFamily objects.'
             )
 
-        datalinks = MetcalfScoring.DATALINKS
-        linkfinder = MetcalfScoring.LINKFINDER
-        input_type = type(objects[0])
+        if self.LINKFINDER is None:
+            raise ValueError((
+                'LinkFinder object not found. Have you called `MetcalfScoring.setup(npl)`?'
+            ))
 
-        logger.debug('MetcalfScoring: standardised = {}'.format(
-            self.standardised))
+        logger.debug(f'MetcalfScoring: standardised = {self.standardised}')
         if not self.standardised:
-            results = linkfinder.get_links(objects, self.name,
-                                           self.cutoff)
+            scores_list = self.LINKFINDER.get_links(*objects,
+                                                    score_cutoff=self.cutoff)
+        # TODO CG: verify the logics of standardised score and add unit tests
         else:
-            # get the basic Metcalf scores BUT ignore the cutoff value here by setting
-            # it to None. The actual user-supplied cutoff value is applied further down
-            # once the standardised scores for these results have been calculated.
-            results = linkfinder.get_links(objects, self.name, None)
-
-            # The "results" object varies slightly depending on the input provided
-            # to the LinkFinder class:
-            #  - given Spectra/MolFam input, it will be a single element list containing
-            #   a (3, x) array, where the first row contains source (input) object
-            #   IDs, the second contains destination (linked) object IDs, and the
-            #   third contains regular Metcalf scores for those pairs of objects.
-            #  - however for GCF input, "results" is instead a 2-element list where
-            #   each entry has the same structure as described above, with the first
-            #   entry describing GCF-Spectrum links and the second GCF-MolFam links.
-
-            gcf_input = (input_type == GCF)
-
-            if not gcf_input:
-                results = self._metcalf_postprocess_met(
-                    linkfinder, results, input_type)
+            # use negative infinity as the score cutoff to ensure we get all links
+            # the self.cutoff will be applied later in the postprocessing step
+            scores_list = self.LINKFINDER.get_links(*objects,
+                                                    score_cutoff=np.NINF)
+            if obj_type == 'gcf':
+                scores_list = self._cal_standardised_score_gen(
+                    self.LINKFINDER, scores_list)
             else:
-                results = self._metcalf_postprocess_gen(
-                    linkfinder, results, input_type)
+                scores_list = self._cal_standardised_score_met(
+                    self.LINKFINDER, scores_list)
 
-        scores_found = set()
-        metcalf_results = {}
-
-        if input_type == GCF:
+        link_scores = {}
+        if obj_type == 'gcf':
             logger.debug(
-                'MetcalfScoring: input_type=GCF, result_type=Spec/MolFam, inputs={}, results={}'
-                .format(len(objects), results[0].shape))
-            # for GCF input, results contains two arrays of shape (3, x),
-            # which contain spec-gcf and mf-gcf links respectively
-            result_gcf_spec, result_gcf_fam = results[0], results[1]
-
-            for res, type_ in [(result_gcf_spec, Spectrum),
-                               (result_gcf_fam, MolecularFamily)]:
-                if res.shape[1] == 0:
-                    if type_ != MolecularFamily:
-                        logger.debug(
-                            'Found no links for {} input objects (type {})'.
-                            format(len(objects), type_))
-                    continue  # no results
-
-                # for each entry in the results (each Spectrum or MolecularFamily)
-                for j in range(res.shape[1]):
-                    # extract the ID of the object and get the object itself
-                    obj_id = int(res[self.R_DST_ID, j])
-                    obj = self.npl._spectra[
-                        obj_id] if type_ == Spectrum else self.npl._molfams[
-                            obj_id]
-
-                    # retrieve the GCF object too (can use its internal ID to index
-                    # directly into the .gcfs list)
-                    gcf = self.npl._gcfs[int(res[self.R_SRC_ID][j])]
-
-                    # record that this GCF has at least one link associated with it
-                    scores_found.add(gcf)
-
-                    # save the scores
-                    if gcf not in metcalf_results:
-                        metcalf_results[gcf] = {}
-                    metcalf_results[gcf][obj] = ObjectLink(
-                        gcf, obj, self, res[self.R_SCORE, j])
-
+                f'MetcalfScoring: input_type=GCF, result_type=Spec/MolFam, '
+                f'#inputs={len(objects)}.')
+            for scores in scores_list:
+                # when no links found
+                if scores.shape[1] == 0:
+                    logger.debug(
+                        f'MetcalfScoring: found no "{scores.name}" links')
+                else:
+                    # when links found
+                    for col_index in range(scores.shape[1]):
+                        gcf = self.npl.lookup_gcf(scores.loc['source',
+                                                             col_index])
+                        if scores.name == LINK_TYPES[0]:
+                            met = self.npl.lookup_spectrum(
+                                scores.loc['target', col_index])
+                        else:
+                            met = self.npl.lookup_mf(scores.loc['target',
+                                                                col_index])
+                        if gcf not in link_scores:
+                            link_scores[gcf] = {}
+                        # TODO CG: use id instead of object for gcf, met and self?
+                        link_scores[gcf][met] = ObjectLink(
+                            gcf, met, self, scores.loc['score', col_index])
+                    logger.debug(
+                        f'MetcalfScoring: found {len(link_scores)} {scores.name} links.'
+                    )
         else:
             logger.debug(
-                'MetcalfScoring: input_type=Spec/MolFam, result_type=GCF, inputs={}, results={}'
-                .format(len(objects), results[0].shape))
-            # for non-GCF input, result is a list containing a single array, shape (3, x)
-            # where x is the total number of links found
-            results = results[0]
-            if results.shape[1] == 0:
-                logger.debug('Found no links for {} input objects'.format(
-                    len(objects)))
-                link_collection._add_links_from_method(self, metcalf_results)
-                # can just bail out here in this case
-                logger.debug('MetcalfScoring: completed')
-                return link_collection
+                f'MetcalfScoring: input_type=Spec/MolFam, result_type=GCF, '
+                f'#inputs={len(objects)}.')
+            scores = scores_list[0]
+            # when no links found
+            if scores.shape[1] == 0:
+                logger.debug(
+                    f'MetcalfScoring: found no links "{scores.name}" for input objects'
+                )
+            else:
+                for col_index in range(scores.shape[1]):
+                    gcf = self.npl.lookup_gcf(scores.loc['target', col_index])
+                    if scores.name == LINK_TYPES[0]:
+                        met = self.npl.lookup_spectrum(scores.loc['source',
+                                                                  col_index])
+                    else:
+                        met = self.npl.lookup_mf(scores.loc['source',
+                                                            col_index])
+                    if met not in link_scores:
+                        link_scores[met] = {}
+                    link_scores[met][gcf] = ObjectLink(
+                        met, gcf, self, scores.loc['score', col_index])
+                logger.debug(
+                    f'MetcalfScoring: found {len(link_scores)} {scores.name} links.'
+                )
 
-            # for each entry in the results (each GCF)
-            for j in range(results.shape[1]):
-                # extract the ID of the GCF and use that to get the object itself
-                gcf = self.npl._gcfs[int(results[self.R_DST_ID, j])]
-
-                # retrieve the Spec/MolFam object too (can use its internal ID to index
-                # directly into the appropriate list)
-                obj_id = int(results[self.R_SRC_ID, j])
-                obj = self.npl._spectra[
-                    obj_id] if input_type == Spectrum else self.npl._molfams[
-                        obj_id]
-
-                # record that this Spectrum or MolecularFamily has at least one link associated with it
-                scores_found.add(obj)
-
-                # save the scores
-                if obj not in metcalf_results:
-                    metcalf_results[obj] = {}
-                metcalf_results[obj][gcf] = ObjectLink(
-                    obj, gcf, self, results[self.R_SCORE, j])
-
-        logger.debug('MetcalfScoring found {} results'.format(
-            len(metcalf_results)))
-        link_collection._add_links_from_method(self, metcalf_results)
+        link_collection._add_links_from_method(self, link_scores)
         logger.debug('MetcalfScoring: completed')
         return link_collection
 
+    def _isinstance(self, _type, *objects) -> bool:
+        return all(isinstance(x, _type) for x in objects)
+
+    def _cal_standardised_score_met(self, linkfinder,
+                                    results) -> list[pd.DataFrame]:
+        logger.debug('Calculating standardised Metcalf scores (met input)')
+        raw_score = results[0]
+        z_scores = []
+        for col_index in range(raw_score.shape[1]):
+            gcf = self.npl.lookup_gcf(raw_score.loc['target', col_index])
+            if raw_score.name == LINK_TYPES[0]:
+                met = self.npl.lookup_spectrum(raw_score.at['source',
+                                                            col_index])
+            else:
+                met = self.npl.lookup_mf(raw_score.at['source', col_index])
+
+            num_gcf_strains = len(gcf.strains)
+            num_met_strains = len(met.strains)
+            mean = linkfinder.metcalf_mean[num_met_strains][num_gcf_strains]
+            sqrt = linkfinder.metcalf_std[num_met_strains][num_gcf_strains]
+            z_score = (raw_score.at['score', col_index] - mean) / sqrt
+            z_scores.append(z_score)
+
+        z_scores = np.array(z_scores)
+        mask = z_scores >= self.cutoff
+
+        scores_df = pd.DataFrame([
+            raw_score.loc['source'].values[mask],
+            raw_score.loc['target'].values[mask], z_scores[mask]
+        ],
+                                 index=raw_score.index)
+        scores_df.name = raw_score.name
+
+        return [scores_df]
+
+    def _cal_standardised_score_gen(self, linkfinder,
+                                    results) -> list[pd.DataFrame]:
+        logger.debug('Calculating standardised Metcalf scores (gen input)')
+        postprocessed_scores = []
+        for raw_score in results:
+            z_scores = []
+            for col_index in range(raw_score.shape[1]):
+                gcf = self.npl.lookup_gcf(raw_score.loc['source', col_index])
+                if raw_score.name == LINK_TYPES[0]:
+                    met = self.npl.lookup_spectrum(raw_score.at['target',
+                                                                col_index])
+                else:
+                    met = self.npl.lookup_mf(raw_score.at['target', col_index])
+
+                num_gcf_strains = len(gcf.strains)
+                num_met_strains = len(met.strains)
+                mean = linkfinder.metcalf_mean[num_met_strains][
+                    num_gcf_strains]
+                sqrt = linkfinder.metcalf_std[num_met_strains][num_gcf_strains]
+                z_score = (raw_score.at['score', col_index] - mean) / sqrt
+                z_scores.append(z_score)
+
+            z_scores = np.array(z_scores)
+            mask = z_scores >= self.cutoff
+
+            scores_df = pd.DataFrame([
+                raw_score.loc['source'].values[mask],
+                raw_score.loc['target'].values[mask], z_scores[mask]
+            ],
+                                     index=raw_score.index)
+            scores_df.name = raw_score.name
+            postprocessed_scores.append(scores_df)
+
+        return postprocessed_scores
+
+    # TODO CG: refactor this method
     def format_data(self, data):
         # for metcalf the data will just be a floating point value (i.e. the score)
         return f'{data:.4f}'
 
+    # TODO CG: refactor this method
     def sort(self, objects, reverse=True):
         # sort based on score
         return sorted(objects,
