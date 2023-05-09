@@ -18,6 +18,7 @@ from .scoring.np_class_scoring import NPClassScoring
 from .scoring.rosetta_scoring import RosettaScoring
 from .strain_collection import StrainCollection
 
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from .strains import Strain
@@ -124,6 +125,7 @@ class NPLinker():
         self._bgc_lookup = {}
         self._gcf_lookup = {}
         self._spec_lookup = {}
+        self._mf_lookup = {}
 
         self._scoring_methods = {}
         config_methods = self._config.config.get('scoring_methods', [])
@@ -298,6 +300,7 @@ class NPLinker():
                 spec.spectrum_id: spec
                 for spec in self._spectra
             }
+            self._mf_lookup = {mf.family_id: mf for mf in self._molfams}
 
         logger.debug('load_data: completed')
         return True
@@ -392,8 +395,8 @@ class NPLinker():
             objects_for_method = input_objects[i]
             logger.debug('Calling scoring method {} on {} objects'.format(
                 method.name, len(objects_for_method)))
-            link_collection = method.get_links(objects_for_method,
-                                               link_collection)
+            link_collection = method.get_links(*objects_for_method,
+                                               link_collection=link_collection)
 
         if not self._datalinks:
             logger.debug('Creating internal datalinks object')
@@ -481,6 +484,10 @@ class NPLinker():
     def lookup_spectrum(self, spectrum_id):
         """If Spectrum ``name`` exists, return it. Otherwise return None"""
         return self._spec_lookup.get(spectrum_id, None)
+
+    def lookup_mf(self, mf_id):
+        """If MolecularFamily `family_id` exists, return it. Otherwise return None"""
+        return self._mf_lookup.get(mf_id, None)
 
     @property
     def strains(self):
