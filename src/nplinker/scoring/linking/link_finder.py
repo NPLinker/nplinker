@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 logger = LogConfig.getLogger(__file__)
 
 
+# TODO CG: this class could be merged to MetcalfScoring class
 class LinkFinder():
 
     def __init__(self):
@@ -26,12 +27,13 @@ class LinkFinder():
         """
         # metcalf scores
         self.raw_score_spec_gcf = pd.DataFrame()
-        self.raw_score_fam_gcf = pd.DataFrame()
+        self.raw_score_mf_gcf = pd.DataFrame()
 
         # metcalf caching
         self.metcalf_mean = None
         self.metcalf_std = None
 
+    # TODO CG: cal_score method could be integrated to __init__
     def cal_score(
         self,
         data_links: DataLinks,
@@ -63,20 +65,19 @@ class LinkFinder():
                 data_links.cooccurrence_notspec_gcf * scoring_weights[2] +
                 data_links.cooccurrence_notspec_notgcf * scoring_weights[3])
         if link_type == 'mf-gcf':
-            self.raw_score_fam_gcf = (
+            self.raw_score_mf_gcf = (
                 data_links.cooccurrence_mf_gcf * scoring_weights[0] +
                 data_links.cooccurrence_mf_notgcf * scoring_weights[1] +
                 data_links.cooccurrence_notmf_gcf * scoring_weights[2] +
                 data_links.cooccurrence_notmf_notgcf * scoring_weights[3])
 
+        n_strains = data_links.occurrence_gcf_strain.shape[1]
         if self.metcalf_mean is None or self.metcalf_std is None:
             self.metcalf_mean, self.metcalf_std = self._cal_mean_std(
-                data_links, scoring_weights)
+                n_strains, scoring_weights)
 
-    def _cal_mean_std(self, data_links, scoring_weights):
-        # Compute the expected values for all possible values of spec and gcf strains
-        # we need the total number of strains
-        _, n_strains = data_links.occurrence_gcf_strain.shape
+    # TODO CG: read paper and check the logics of this method
+    def _cal_mean_std(self, n_strains, scoring_weights):
         sz = (n_strains + 1, n_strains + 1)
         mean = np.zeros(sz)
         variance = np.zeros(sz)
@@ -131,7 +132,7 @@ class LinkFinder():
         else:
             types = [type(i) for i in objects]
             raise TypeError(
-                f'Invalid type "{set(types)}". Input objects must be GCF, Spectrum or MolecularFamily objects.'
+                f'Invalid type {set(types)}. Input objects must be GCF, Spectrum or MolecularFamily objects.'
             )
 
         links = []
@@ -143,7 +144,7 @@ class LinkFinder():
             df.name = LINK_TYPES[0]
             links.append(df)
             # mf-gcf
-            scores = self.raw_score_fam_gcf.loc[:, obj_ids]
+            scores = self.raw_score_mf_gcf.loc[:, obj_ids]
             df = self._get_scores_source_gcf(scores, score_cutoff)
             df.name = LINK_TYPES[1]
             links.append(df)
@@ -157,7 +158,7 @@ class LinkFinder():
 
         if obj_type == 'mf':
             obj_ids = [mf.family_id for mf in objects]
-            scores = self.raw_score_fam_gcf.loc[obj_ids, :]
+            scores = self.raw_score_mf_gcf.loc[obj_ids, :]
             df = self._get_scores_source_met(scores, score_cutoff)
             df.name = LINK_TYPES[1]
             links.append(df)
@@ -166,6 +167,8 @@ class LinkFinder():
     def _isinstance(self, _type, *objects) -> bool:
         return all(isinstance(x, _type) for x in objects)
 
+    # TODO CG: the returned data could be changed to dict, like the that in
+    # the get_links method of the MetcalfScoring class
     def _get_scores_source_gcf(self, scores, score_cutoff) -> pd.DataFrame:
         row_indexes, col_indexes = np.where(scores >= score_cutoff)
         src_obj_ids = scores.columns[col_indexes].to_list()
