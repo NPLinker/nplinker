@@ -7,11 +7,11 @@ from nplinker.genomics.gcf import GCF
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.molecular_family import MolecularFamily
 from nplinker.metabolomics.spectrum import Spectrum
-from .data_linking import LINK_TYPES
+from . import LINK_TYPES
 
 
 if TYPE_CHECKING:
-    from .data_linking import DataLinks
+    from . import DataLinks
 
 logger = LogConfig.getLogger(__file__)
 

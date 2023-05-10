@@ -15,7 +15,7 @@
 # test functions
 
 import numpy as np
-from nplinker.scoring.linking.data_linking_functions import calc_correlation_matrix
+from nplinker.scoring.linking import calc_correlation_matrix
 
 
 def test_calc_correlation_matrix():

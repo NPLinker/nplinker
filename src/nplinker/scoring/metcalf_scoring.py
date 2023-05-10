@@ -9,14 +9,14 @@ from nplinker.metabolomics.molecular_family import MolecularFamily
 from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.pickler import load_pickled_data
 from nplinker.pickler import save_pickled_data
-from nplinker.scoring.linking.data_linking import DataLinks
-from nplinker.scoring.linking.link_finder import LinkFinder
-from nplinker.scoring.methods import ScoringMethod
-from nplinker.scoring.object_link import ObjectLink
-from .linking.data_linking import LINK_TYPES
+from .linking import DataLinks
+from .linking import LINK_TYPES
+from .linking import LinkFinder
+from .methods import ScoringMethod
+from .object_link import ObjectLink
 
 if TYPE_CHECKING:
-    from .link_collection import LinkCollection
+    from . import LinkCollection
 
 logger = LogConfig.getLogger(__name__)
 
