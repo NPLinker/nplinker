@@ -157,7 +157,7 @@ class DataLinks():
         """
         df_gcf_strain = pd.DataFrame(np.zeros((len(gcfs), len(strains))),
                                      index=[gcf.gcf_id for gcf in gcfs],
-                                     columns=[strain.id for strain in strains])
+                                     columns=[strain.id for strain in strains], dtype=int)
         for gcf in gcfs:
             for strain in strains:
                 if gcf.has_strain(strain):
@@ -175,7 +175,7 @@ class DataLinks():
         df_spec_strain = pd.DataFrame(
             np.zeros((len(spectra), len(strains))),
             index=[spectrum.spectrum_id for spectrum in spectra],
-            columns=[strain.id for strain in strains])
+            columns=[strain.id for strain in strains], dtype=int)
         for spectrum in spectra:
             for strain in strains:
                 if spectrum.has_strain(strain):
@@ -198,7 +198,7 @@ class DataLinks():
 
         df_mf_strain = pd.DataFrame(np.zeros((len(mfs), len(strains))),
                                     index=[mf.family_id for mf in mfs],
-                                    columns=[strain.id for strain in strains])
+                                    columns=[strain.id for strain in strains], dtype=int)
         for mf in mfs:
             for strain in strains:
                 if mf.has_strain(strain):
@@ -243,15 +243,15 @@ class DataLinks():
                                                  self.occurrence_gcf_strain)
         df_met_gcf = pd.DataFrame(m1,
                                   index=met_strain_occurrence.index,
-                                  columns=self.occurrence_gcf_strain.index)
+                                  columns=self.occurrence_gcf_strain.index, dtype=int)
         df_met_notgcf = pd.DataFrame(m2,
                                      index=met_strain_occurrence.index,
-                                     columns=self.occurrence_gcf_strain.index)
+                                     columns=self.occurrence_gcf_strain.index, dtype=int)
         df_notmet_gcf = pd.DataFrame(m3,
                                      index=met_strain_occurrence.index,
-                                     columns=self.occurrence_gcf_strain.index)
+                                     columns=self.occurrence_gcf_strain.index, dtype=int)
         df_notmet_notgcf = pd.DataFrame(
             m4,
             index=met_strain_occurrence.index,
-            columns=self.occurrence_gcf_strain.index)
+            columns=self.occurrence_gcf_strain.index, dtype=int)
         return df_met_gcf, df_met_notgcf, df_notmet_gcf, df_notmet_notgcf
