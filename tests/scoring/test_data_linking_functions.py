@@ -37,7 +37,7 @@ def test_calc_correlation_matrix():
          [1, 2, 2, 2, 2, 3], [1, 2, 2, 2, 2, 3]]))
 
 
-from nplinker.scoring.linking.data_linking_functions import calc_likelihood_matrix
+from nplinker.scoring.linking.utils import calc_likelihood_matrix
 
 
 def test_calc_likelihood_matrix():
@@ -59,7 +59,7 @@ def test_calc_likelihood_matrix():
     assert LBA.shape == (len(A), len(B))  # must have shape len(A), len(B)
 
 
-from nplinker.scoring.linking.data_linking_functions import pair_prob_hg
+from nplinker.scoring.linking.utils import pair_prob_hg
 
 
 def test_pair_prob_hg():
@@ -70,7 +70,7 @@ def test_pair_prob_hg():
     assert pair_prob_hg(1, 100, 2, 2) == 98 / 100 * 2 / 99 + 2 / 100 * 98 / 99
 
 
-from nplinker.scoring.linking.data_linking_functions import hit_prob_dist
+from nplinker.scoring.linking.utils import hit_prob_dist
 
 
 def test_hit_prob_dist():
@@ -82,7 +82,7 @@ def test_hit_prob_dist():
     assert pks[0][0] == 0.99**100
 
 
-from nplinker.scoring.linking.data_linking_functions import permutation_unique
+from nplinker.scoring.linking.utils import permutation_unique
 
 
 def test_permutation_unique():
@@ -101,7 +101,7 @@ def test_permutation_unique():
         testlist))) == 20  # math.factorial(5)/math.factorial(3)
 
 
-from nplinker.scoring.linking.data_linking_functions import pair_prob
+from nplinker.scoring.linking.utils import pair_prob
 
 
 def test_pair_prob():
@@ -124,7 +124,7 @@ def test_pair_prob():
     assert pair_prob(P_str, XG, Ny, hits) < (2 / 90 + 0.00000001)
 
 
-from nplinker.scoring.linking.data_linking_functions import link_prob
+from nplinker.scoring.linking.utils import link_prob
 
 
 def test_link_prob():

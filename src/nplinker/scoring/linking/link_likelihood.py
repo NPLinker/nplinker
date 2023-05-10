@@ -1,6 +1,6 @@
 from deprecated import deprecated
 from nplinker.logconfig import LogConfig
-from nplinker.scoring.linking.data_linking_functions import \
+from nplinker.scoring.linking.utils import \
     calc_likelihood_matrix
 
 

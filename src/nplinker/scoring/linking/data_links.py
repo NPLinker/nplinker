@@ -7,7 +7,7 @@ from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.molecular_family import MolecularFamily
 from nplinker.metabolomics.singleton_family import SingletonFamily
 from nplinker.metabolomics.spectrum import Spectrum
-from .data_linking_functions import calc_correlation_matrix
+from .utils import calc_correlation_matrix
 
 
 if TYPE_CHECKING:
