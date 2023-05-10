@@ -57,10 +57,6 @@ class DataLinks():
                 of not molecular families<->gcfs.
             cooccurrence_notmf_notgcf(pd.DataFrame): A DataFrame to store co-occurrence
                 of not molecular families<->not gcfs.
-            mapping_gcf(pd.DataFrame): A DataFrame to store mappings for gcfs.
-            mapping_spec(pd.DataFrame): A DataFrame to store mappings for spectra.
-            mapping_mf(pd.DataFrame): A DataFrame to store mappings for molecular families.
-            mapping_strain(pd.DataFrame): A DataFrame to store mappings for strains.
         """
         self._strains = strains
 
@@ -75,14 +71,6 @@ class DataLinks():
             spectra, strains)
         self.occurrence_mf_strain = self._get_occurrence_mf_strain(
             mfs, strains)
-
-        # DataFrame to store mapping tables, check `_get_mappings_from_occurance` for details
-        # TODO: these mappings could be removed when refactoring LinkFinder
-        self.mapping_spec = pd.DataFrame()
-        self.mapping_gcf = pd.DataFrame()
-        self.mapping_fam = pd.DataFrame()
-        self.mapping_strain = pd.DataFrame()
-        self._get_mappings_from_occurrence()
 
         # DataFrame to store co-occurrence of "spectra<->gcf" or "mfs<->gcf"
         logger.debug("Create correlation matrices: spectra<->gcfs.")
@@ -157,7 +145,8 @@ class DataLinks():
         """
         df_gcf_strain = pd.DataFrame(np.zeros((len(gcfs), len(strains))),
                                      index=[gcf.gcf_id for gcf in gcfs],
-                                     columns=[strain.id for strain in strains], dtype=int)
+                                     columns=[strain.id for strain in strains],
+                                     dtype=int)
         for gcf in gcfs:
             for strain in strains:
                 if gcf.has_strain(strain):
@@ -175,7 +164,8 @@ class DataLinks():
         df_spec_strain = pd.DataFrame(
             np.zeros((len(spectra), len(strains))),
             index=[spectrum.spectrum_id for spectrum in spectra],
-            columns=[strain.id for strain in strains], dtype=int)
+            columns=[strain.id for strain in strains],
+            dtype=int)
         for spectrum in spectra:
             for strain in strains:
                 if spectrum.has_strain(strain):
@@ -198,27 +188,13 @@ class DataLinks():
 
         df_mf_strain = pd.DataFrame(np.zeros((len(mfs), len(strains))),
                                     index=[mf.family_id for mf in mfs],
-                                    columns=[strain.id for strain in strains], dtype=int)
+                                    columns=[strain.id for strain in strains],
+                                    dtype=int)
         for mf in mfs:
             for strain in strains:
                 if mf.has_strain(strain):
                     df_mf_strain.loc[mf.family_id, strain.id] = 1
         return df_mf_strain
-
-    def _get_mappings_from_occurrence(self):
-
-        # pd.Series with index = gcf.gcf_id and value = number of strains where gcf occurs
-        self.mapping_gcf["no of strains"] = self.occurrence_gcf_strain.sum(
-            axis=1)
-        # pd.Series with index = spectrum.spectrum_id and value = number of strains where spec occurs
-        self.mapping_spec["no of strains"] = self.occurrence_spec_strain.sum(
-            axis=1)
-        # pd.Series with index = mf.family_id and value = number of strains where mf occurs
-        self.mapping_fam["no of strains"] = self.occurrence_mf_strain.sum(
-            axis=1)
-        # pd.Series with index = strain.id and value = number of spectra in strain
-        self.mapping_strain["no of spectra"] = self.occurrence_spec_strain.sum(
-            axis=0)
 
     def _get_cooccurrence(
         self,
@@ -243,15 +219,19 @@ class DataLinks():
                                                  self.occurrence_gcf_strain)
         df_met_gcf = pd.DataFrame(m1,
                                   index=met_strain_occurrence.index,
-                                  columns=self.occurrence_gcf_strain.index, dtype=int)
+                                  columns=self.occurrence_gcf_strain.index,
+                                  dtype=int)
         df_met_notgcf = pd.DataFrame(m2,
                                      index=met_strain_occurrence.index,
-                                     columns=self.occurrence_gcf_strain.index, dtype=int)
+                                     columns=self.occurrence_gcf_strain.index,
+                                     dtype=int)
         df_notmet_gcf = pd.DataFrame(m3,
                                      index=met_strain_occurrence.index,
-                                     columns=self.occurrence_gcf_strain.index, dtype=int)
+                                     columns=self.occurrence_gcf_strain.index,
+                                     dtype=int)
         df_notmet_notgcf = pd.DataFrame(
             m4,
             index=met_strain_occurrence.index,
-            columns=self.occurrence_gcf_strain.index, dtype=int)
+            columns=self.occurrence_gcf_strain.index,
+            dtype=int)
         return df_met_gcf, df_met_notgcf, df_notmet_gcf, df_notmet_notgcf
