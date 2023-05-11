@@ -18,6 +18,10 @@ import math
 import numpy as np
 
 
+def isinstance_all(*objects, objtype) -> bool:
+    """Check if all objects are of the given type."""
+    return all(isinstance(x, objtype) for x in objects)
+
 def calc_correlation_matrix(M_type1_cond, M_type2_cond):
     """ 
     Calculate correlation matrices from co-occurence matrices
