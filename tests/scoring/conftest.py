@@ -6,12 +6,12 @@ from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 
 
-@fixture
+@fixture(scope='session')
 def strains_list():
     return Strain('strain1'), Strain('strain2'), Strain('strain3')
 
 
-@fixture
+@fixture(scope='session')
 def strains(strains_list):
     strains = StrainCollection()
     for strain in strains_list:
@@ -19,7 +19,7 @@ def strains(strains_list):
     return strains
 
 
-@fixture
+@fixture(scope='session')
 def gcfs(strains_list):
     gcf1 = GCF('gcf1')
     gcf1.strains.add(strains_list[0])
@@ -31,7 +31,7 @@ def gcfs(strains_list):
     return gcf1, gcf2, gcf3
 
 
-@fixture
+@fixture(scope='session')
 def spectra(strains_list):
     spectrum1 = Spectrum(1, [(1, 1)], "spectrum1", None)
     spectrum1.strains.add(strains_list[0])
@@ -43,7 +43,7 @@ def spectra(strains_list):
     return spectrum1, spectrum2, spectrum3
 
 
-@fixture
+@fixture(scope='session')
 def mfs(spectra):
     mf1 = MolecularFamily('mf1')
     mf1.add_spectrum(spectra[0])

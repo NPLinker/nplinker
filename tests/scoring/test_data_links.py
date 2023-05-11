@@ -4,7 +4,7 @@ from pytest import fixture
 from nplinker.scoring.linking import DataLinks
 
 
-@fixture
+@fixture(scope='module')
 def datalinks(gcfs, spectra, mfs, strains):
     return DataLinks(gcfs, spectra, mfs, strains)
 

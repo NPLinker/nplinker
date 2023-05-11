@@ -7,12 +7,12 @@ from nplinker.scoring.linking import DataLinks
 from nplinker.scoring.linking import LinkFinder
 
 
-@fixture
+@fixture(scope='module')
 def linkfinder():
     return LinkFinder()
 
 
-@fixture
+@fixture(scope='module')
 def datalinks(gcfs, spectra, mfs, strains):
     return DataLinks(gcfs, spectra, mfs, strains)
 
