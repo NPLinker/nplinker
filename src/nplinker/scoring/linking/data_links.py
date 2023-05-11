@@ -8,6 +8,7 @@ from nplinker.metabolomics.molecular_family import MolecularFamily
 from nplinker.metabolomics.singleton_family import SingletonFamily
 from nplinker.metabolomics.spectrum import Spectrum
 from .utils import calc_correlation_matrix
+from .utils import isinstance_all
 
 
 if TYPE_CHECKING:
@@ -96,7 +97,8 @@ class DataLinks():
 
         Args:
             spectra_or_mfs(Sequence[Spectrum] | Sequence[MolecularFamily]):
-                A list of Spectrum or MolecularFamily objects.
+                A list of Spectrum or MolecularFamily objects and all objects
+                must be of the same type.
             gcfs(Sequence[GCF]): A list of GCF objects.
             filter_no_shared(bool): If True, the pairs of spectrum/mf and GCF
                 without common strains will be removed from the returned dict;
@@ -104,13 +106,22 @@ class DataLinks():
         Returns:
             dict: A dict where the keys are tuples of (Spectrum/MolecularFamily, GCF)
             and values are a list of shared Strain objects.
+
+        Raises:
+            ValueError: If the first argument is not a list of Spectrum or
+                MolecularFamily objects, or the second argument is not a list of
+                GCF objects.
         """
-        if not isinstance(spectra_or_mfs[0], (Spectrum, MolecularFamily)):
+        # Check input arguments
+        if len(spectra_or_mfs) == 0 or len(gcfs) == 0:
+            raise ValueError('Empty list for first or second argument.')
+        if not isinstance_all(*spectra_or_mfs,
+                              objtype=Spectrum) and not isinstance_all(
+                                  *spectra_or_mfs, objtype=MolecularFamily):
             raise ValueError(
-                'Must provide Spectra or MolecularFamilies as the first argument!'
-            )
-        if not isinstance(gcfs[0], GCF):
-            raise ValueError('Must provide GCFs as the second argument!')
+                'First argument must be Spectrum or MolecularFamily objects.')
+        if not isinstance_all(*gcfs, objtype=GCF):
+            raise ValueError('Second argument must be GCF objects.')
 
         # Assume that 3 occurrence dataframes have same df.columns (strain ids)
         strain_ids = self.occurrence_gcf_strain.columns
