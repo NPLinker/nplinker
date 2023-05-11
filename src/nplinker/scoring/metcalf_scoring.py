@@ -10,6 +10,7 @@ from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.pickler import load_pickled_data
 from nplinker.pickler import save_pickled_data
 from .linking import DataLinks
+from .linking import isinstance_all
 from .linking import LINK_TYPES
 from .linking import LinkFinder
 from .methods import ScoringMethod
@@ -142,11 +143,11 @@ class MetcalfScoring(ScoringMethod):
             ValueError: If LinkFinder instance has not been created
                 (MetcalfScoring object has not been setup).
         """
-        if self._isinstance(GCF, *objects):
+        if isinstance_all(*objects, objtype=GCF):
             obj_type = 'gcf'
-        elif self._isinstance(Spectrum, *objects):
+        elif isinstance_all(*objects, objtype=Spectrum):
             obj_type = 'spec'
-        elif self._isinstance(MolecularFamily, *objects):
+        elif isinstance_all(*objects, objtype=MolecularFamily):
             obj_type = 'mf'
         else:
             types = [type(i) for i in objects]
@@ -235,10 +236,6 @@ class MetcalfScoring(ScoringMethod):
         link_collection._add_links_from_method(self, link_scores)
         logger.debug('MetcalfScoring: completed')
         return link_collection
-
-    def _isinstance(self, _type, *objects) -> bool:
-        """Check if all objects are of the given type."""
-        return all(isinstance(x, _type) for x in objects)
 
     def _cal_standardised_score_met(self, linkfinder: LinkFinder,
                                     results: list) -> list[pd.DataFrame]:

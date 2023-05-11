@@ -8,6 +8,7 @@ from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.molecular_family import MolecularFamily
 from nplinker.metabolomics.spectrum import Spectrum
 from . import LINK_TYPES
+from .utils import isinstance_all
 
 
 if TYPE_CHECKING:
@@ -123,11 +124,11 @@ class LinkFinder():
         Raises:
             TypeError: If input objects are not GCF, Spectrum or MolecularFamily objects.
         """
-        if self._isinstance(GCF, *objects):
+        if isinstance_all(*objects, objtype=GCF):
             obj_type = 'gcf'
-        elif self._isinstance(Spectrum, *objects):
+        elif isinstance_all(*objects, objtype=Spectrum):
             obj_type = 'spec'
-        elif self._isinstance(MolecularFamily, *objects):
+        elif isinstance_all(*objects, objtype=MolecularFamily):
             obj_type = 'mf'
         else:
             types = [type(i) for i in objects]
@@ -163,9 +164,6 @@ class LinkFinder():
             df.name = LINK_TYPES[1]
             links.append(df)
         return links
-
-    def _isinstance(self, _type, *objects) -> bool:
-        return all(isinstance(x, _type) for x in objects)
 
     # TODO CG: the returned data could be changed to dict, like the that in
     # the get_links method of the MetcalfScoring class
