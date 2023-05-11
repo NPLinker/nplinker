@@ -15,19 +15,41 @@ from .linking import LinkFinder
 from .methods import ScoringMethod
 from .object_link import ObjectLink
 
+
 if TYPE_CHECKING:
     from . import LinkCollection
+    from ..nplinker import NPLinker
 
 logger = LogConfig.getLogger(__name__)
 
 
 class MetcalfScoring(ScoringMethod):
+    """Metcalf scoring method.
+
+    Attributes:
+        DATALINKS (DataLinks): The DataLinks object to use for scoring.
+        LINKFINDER (LinkFinder): The LinkFinder object to use for scoring.
+        NAME (str): The name of the scoring method. This is set to 'metcalf'.
+    """
 
     DATALINKS = None
     LINKFINDER = None
     NAME = 'metcalf'
 
-    def __init__(self, npl):
+    def __init__(self, npl: NPLinker) -> None:
+        """Create a MetcalfScoring object.
+
+        Args:
+            npl (NPLinker): The NPLinker object to use for scoring.
+
+        Attributes:
+            cutoff (float): The cutoff value to use for scoring. Scores below
+                this value will be discarded. Defaults to 1.0.
+            standardised (bool): Whether to use standardised scores. Defaults
+                to True.
+            name (str): The name of the scoring method. It's set to a fixed value
+                'metcalf'.
+        """
         super().__init__(npl)
         self.cutoff = 1.0
         self.standardised = True
@@ -35,7 +57,11 @@ class MetcalfScoring(ScoringMethod):
     # TODO CG: not sure why using staticmethod here. Check later and refactor if possible
     # TODO CG: refactor this method and extract code for cache file to a separate method
     @staticmethod
-    def setup(npl):
+    def setup(npl: NPLinker):
+        """Setup the MetcalfScoring object.
+
+        DataLinks and LinkFinder objects are created and cached for later use.
+        """
         logger.info(
             'MetcalfScoring.setup (bgcs={}, gcfs={}, spectra={}, molfams={}, strains={})'
             .format(len(npl.bgcs), len(npl.gcfs), len(npl.spectra),
@@ -92,10 +118,30 @@ class MetcalfScoring(ScoringMethod):
 
     # TODO CG: is it needed? remove it if not
     @property
-    def datalinks(self):
+    def datalinks(self) -> DataLinks:
         return MetcalfScoring.DATALINKS
 
-    def get_links(self, *objects, link_collection) -> LinkCollection:
+    def get_links(self, *objects: tuple[GCF, ...] | tuple[Spectrum, ...]
+                  | tuple[MolecularFamily, ...],
+                  link_collection: LinkCollection) -> LinkCollection:
+        """Get links for the given objects and add them to the given LinkCollection.
+
+        The given objects are treated as input or source objects, which must
+        be GCF, Spectrum or MolecularFamily objects.
+
+        Args:
+            objects(tuple): The objects to get links for. Must be GCF, Spectrum
+                or MolecularFamily objects.
+            link_collection: The LinkCollection object to add the links to.
+
+        Returns:
+            LinkCollection: The LinkCollection object with the new links added.
+
+        Raises:
+            TypeError: If the input objects are not of the correct type.
+            ValueError: If LinkFinder instance has not been created
+                (MetcalfScoring object has not been setup).
+        """
         if self._isinstance(GCF, *objects):
             obj_type = 'gcf'
         elif self._isinstance(Spectrum, *objects):
@@ -191,10 +237,11 @@ class MetcalfScoring(ScoringMethod):
         return link_collection
 
     def _isinstance(self, _type, *objects) -> bool:
+        """Check if all objects are of the given type."""
         return all(isinstance(x, _type) for x in objects)
 
-    def _cal_standardised_score_met(self, linkfinder,
-                                    results) -> list[pd.DataFrame]:
+    def _cal_standardised_score_met(self, linkfinder: LinkFinder,
+                                    results: list) -> list[pd.DataFrame]:
         logger.debug('Calculating standardised Metcalf scores (met input)')
         raw_score = results[0]
         z_scores = []
@@ -225,8 +272,8 @@ class MetcalfScoring(ScoringMethod):
 
         return [scores_df]
 
-    def _cal_standardised_score_gen(self, linkfinder,
-                                    results) -> list[pd.DataFrame]:
+    def _cal_standardised_score_gen(self, linkfinder: LinkFinder,
+                                    results: list) -> list[pd.DataFrame]:
         logger.debug('Calculating standardised Metcalf scores (gen input)')
         postprocessed_scores = []
         for raw_score in results:
