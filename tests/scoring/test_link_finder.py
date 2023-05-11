@@ -8,7 +8,7 @@ from nplinker.scoring.linking import LinkFinder
 
 
 @fixture(scope='module')
-def linkfinder():
+def linkfinder() -> LinkFinder:
     return LinkFinder()
 
 

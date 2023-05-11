@@ -13,13 +13,13 @@ from .. import DATA_DIR
 
 
 @fixture(scope='module')
-def datalinks(gcfs, spectra, mfs, strains):
+def datalinks(gcfs, spectra, mfs, strains) -> DataLinks:
     """DataLinks object. See `test_data_links.py` for its actual values."""
     return DataLinks(gcfs, spectra, mfs, strains)
 
 
 @fixture(scope='module')
-def linkfinder(datalinks):
+def linkfinder(datalinks) -> LinkFinder:
     """LinkFinder object. See `test_link_finder.py` for its actual values."""
     linkfinder = LinkFinder()
     linkfinder.cal_score(datalinks, link_type='spec-gcf')
@@ -28,7 +28,7 @@ def linkfinder(datalinks):
 
 
 @fixture(scope='module')
-def npl(gcfs, spectra, mfs, strains, tmp_path_factory):
+def npl(gcfs, spectra, mfs, strains, tmp_path_factory) -> NPLinker:
     """Constructed NPLinker object.
 
     This NPLinker object does not do loading `npl.load_data()`, instead we
@@ -52,7 +52,7 @@ def npl(gcfs, spectra, mfs, strains, tmp_path_factory):
 
 
 @fixture(scope='module')
-def mc(npl):
+def mc(npl) -> MetcalfScoring:
     """MetcalfScoring object."""
     mc = MetcalfScoring(npl)
     mc.setup(npl)

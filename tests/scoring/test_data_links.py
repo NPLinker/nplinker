@@ -7,7 +7,7 @@ from nplinker.scoring.linking import DataLinks
 
 
 @fixture(scope='module')
-def datalinks(gcfs, spectra, mfs, strains):
+def datalinks(gcfs, spectra, mfs, strains) -> DataLinks:
     return DataLinks(gcfs, spectra, mfs, strains)
 
 

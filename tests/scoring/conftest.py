@@ -7,12 +7,12 @@ from nplinker.strains import Strain
 
 
 @fixture(scope='session')
-def strains_list():
+def strains_list() -> tuple[Strain, Strain, Strain]:
     return Strain('strain1'), Strain('strain2'), Strain('strain3')
 
 
 @fixture(scope='session')
-def strains(strains_list):
+def strains(strains_list) -> StrainCollection:
     strains = StrainCollection()
     for strain in strains_list:
         strains.add(strain)
@@ -20,7 +20,7 @@ def strains(strains_list):
 
 
 @fixture(scope='session')
-def gcfs(strains_list):
+def gcfs(strains_list) -> tuple[GCF, GCF, GCF]:
     gcf1 = GCF('gcf1')
     gcf1.strains.add(strains_list[0])
     gcf2 = GCF('gcf2')
@@ -32,7 +32,7 @@ def gcfs(strains_list):
 
 
 @fixture(scope='session')
-def spectra(strains_list):
+def spectra(strains_list) -> tuple[Spectrum, Spectrum, Spectrum]:
     spectrum1 = Spectrum(1, [(1, 1)], "spectrum1", None)
     spectrum1.strains.add(strains_list[0])
     spectrum2 = Spectrum(2, [(1, 1)], "spectrum2", None)
@@ -44,7 +44,10 @@ def spectra(strains_list):
 
 
 @fixture(scope='session')
-def mfs(spectra):
+def mfs(spectra) -> tuple[MolecularFamily, MolecularFamily, MolecularFamily]:
+    """For simplicity, we just use one Spectrum object for each MolecularFamily
+    object, and notice that they are not SingletonFamily object.
+    """
     mf1 = MolecularFamily('mf1')
     mf1.add_spectrum(spectra[0])
     mf2 = MolecularFamily('mf2')
