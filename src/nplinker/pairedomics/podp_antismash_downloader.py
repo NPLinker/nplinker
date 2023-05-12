@@ -73,23 +73,20 @@ class GenomeStatus:
 # TODO: unit test for covering exceptions/failures, e.g. failed resolving of genome id
 def podp_download_and_extract_antismash_data(
         genome_records: list[dict[str, dict[str, str] | str]],
-        project_download_cache: str | Path, project_file_cache: str | Path):
-    # TODO: fill in doc string
-    """_summary_
+        project_download_root: str | Path, project_extract_root: str | Path):
+    """Download and extract antiSMASH BGC archive for the genomes specified in genome_records
+    for which the original genome ID can be resolved.
 
     Args:
-        genome_records(list[dict[str, dict[str, str]  |  str]]): _description_
-        project_download_cache(str | Path): _description_
-        project_file_cache(str | Path): _description_
-
-    Raises:
-        TypeError: _description_
-
-    Examples:
-        >>> 
+        genome_records(list[dict[str, dict[str, str]  |  str]]): list of dicts representing genomes'
+        records. Each record contains information about the specific genome's ID. 
+        project_download_root(str | Path): Path to the directory to place downloaded archive in.
+        project_extract_root(str | Path): Path to the directory data files will be extracted to.
+            Note that an `antismash` directory will be created in the specified `extract_root` if
+            it doesn't exist. The files will be extracted to `<extract_root>/antismash/<antismash_id>` directory.
     """
 
-    genome_status_file = Path(project_download_cache, GENOME_STATUS_FILENAME)
+    genome_status_file = Path(project_download_root, GENOME_STATUS_FILENAME)
     genome_status = _get_genome_status_log(genome_status_file)
 
     for i, genome_record in enumerate(genome_records):
@@ -151,12 +148,12 @@ def podp_download_and_extract_antismash_data(
 
         # if we got a refseq ID, now try to download and extract the data from antismash
         download_and_extract_antismash_data(genome_obj.resolved_refseq_id,
-                                            project_download_cache,
-                                            project_file_cache)
+                                            project_download_root,
+                                            project_extract_root)
 
         genome_obj.to_csv(genome_status_file)
 
-        output_path = Path(project_file_cache, 'antismash',
+        output_path = Path(project_extract_root, 'antismash',
                            genome_obj.resolved_refseq_id)
         Path.touch (output_path / 'completed', exist_ok = True)
 
