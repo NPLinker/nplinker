@@ -367,7 +367,7 @@ def _get_antismash_filename(genome_obj: GenomeStatus) -> str | None:
 
     Returns:
         str | None: Antismash filename, if it exists. 
-        """
+    """
     # want to try up to 4 different links here, v1 and v2 databases, each
     # with and without the .1 suffix on the accesssion ID
 
