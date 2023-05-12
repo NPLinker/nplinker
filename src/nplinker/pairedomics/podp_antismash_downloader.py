@@ -209,7 +209,7 @@ def _get_best_available_genome_id(
 def _ncbi_genbank_search(genbank_id: str,
                          retry_times: int = 3) -> Tag | NavigableString | None:
 
-    url = NCBI_LOOKUP_URL_NEW.format(genbank_id)
+    url = NCBI_LOOKUP_URL.format(genbank_id)
     retry = 1
     while retry <= retry_times:
         logger.debug(f'Looking up GenBank data for {genbank_id} at {url}')
