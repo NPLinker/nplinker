@@ -174,7 +174,7 @@ def _get_genome_status_log(
 
     # GENOME_STATUS_FILENAME is read, then in the for loop over the genome records it gets updated,
     # and finally it is saved again in GENOME_STATUS_FILENAME which is overwritten
-    if Path.exists(genome_status_file):
+    if genome_status_file.exists():
         with open(genome_status_file) as f:
             for line in csv.reader(f):
                 asobj = GenomeStatus(*line)
