@@ -225,10 +225,6 @@ def _ncbi_genbank_search(genbank_id: str,
             dl_element = soup.find('dl', {'class': 'assembly_summary_new'})
             if dl_element is not None:
                 return dl_element
-        if retry < retry_times:
-            logger.debug(
-                f'NCBI lookup failed, status code {resp.status_code}. Trying again other {retry_times - retry} times.'
-            )
         retry = retry + 1
         time.sleep(5)
 
