@@ -15,6 +15,7 @@ from nplinker.genomics.antismash.antismash_downloader import \
     download_and_extract_antismash_data
 from nplinker.logconfig import LogConfig
 
+
 logger = LogConfig.getLogger(__name__)
 
 # urls to be given to download antismash data
@@ -25,7 +26,7 @@ ANTISMASH_DB_DOWNLOAD_URL = 'https://antismash-db.secondarymetabolites.org/outpu
 ANTISMASH_DBV2_PAGE_URL = 'https://antismash-dbv2.secondarymetabolites.org/output/{}/'
 ANTISMASH_DBV2_DOWNLOAD_URL = 'https://antismash-dbv2.secondarymetabolites.org/output/{}/{}'
 
-NCBI_LOOKUP_URL_NEW = 'https://www.ncbi.nlm.nih.gov/assembly/?term={}'
+NCBI_LOOKUP_URL = 'https://www.ncbi.nlm.nih.gov/assembly/?term={}'
 
 JGI_GENOME_LOOKUP_URL = 'https://img.jgi.doe.gov/cgi-bin/m/main.cgi?section=TaxonDetail&page=taxonDetail&taxon_oid={}'
 
@@ -34,6 +35,7 @@ USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 
 GENOME_STATUS_FILENAME = "genome_status.txt"
 
 
+# TODO: unit test for GenomeStatus
 class GenomeStatus:
     """To represent the data status for a certain genome ID.
 
@@ -47,7 +49,7 @@ class GenomeStatus:
     def __init__(self,
                  original_id: str,
                  resolved_refseq_id: str,
-                 attempted: str = `False`,
+                 attempted: str = 'False',
                  filename: str = ""):
         self.original_id = ';'.join(original_id.split(','))
         self.resolved_refseq_id = "" if resolved_refseq_id == 'None' else resolved_refseq_id
@@ -71,9 +73,26 @@ class GenomeStatus:
             f.write(line + '\n')
 
 
+# TODO: unit tests for 3 different types of input id (genbank id, JGI id, refseq id)
+# TODO: unit test for verifying that the downloaded/extracted antismash file (not only folder) is correct
+# TODO: unit test for covering exceptions/failures, e.g. failed resolving of genome id
 def podp_download_and_extract_antismash_data(
         genome_records: list[dict[str, dict[str, str] | str]],
         project_download_cache: str | Path, project_file_cache: str | Path):
+    # TODO: fill in doc string
+    """_summary_
+
+    Args:
+        genome_records(list[dict[str, dict[str, str]  |  str]]): _description_
+        project_download_cache(str | Path): _description_
+        project_file_cache(str | Path): _description_
+
+    Raises:
+        TypeError: _description_
+
+    Examples:
+        >>> 
+    """
 
     genome_status_file = Path(project_download_cache, GENOME_STATUS_FILENAME)
     genome_status = _get_genome_status_log(genome_status_file)
@@ -119,8 +138,12 @@ def podp_download_and_extract_antismash_data(
             logger.info(
                 f'Beginning lookup process for genome ID {raw_genome_id}')
 
-            assert isinstance(_resolve_refseq_id(genome_record['genome_ID']),
-                              str)
+            if not isinstance(_resolve_refseq_id(genome_record['genome_ID']),
+                              str):
+                raise TypeError(
+                    f"genome_obj.resolved_refseq_id should be a string. Instead got: {type(_resolve_refseq_id(genome_record['genome_ID']))}"
+                )
+
             genome_obj.resolved_refseq_id = _resolve_refseq_id(
                 genome_record['genome_ID'])
             genome_obj.attempted = True
@@ -163,8 +186,8 @@ def _get_genome_status_log(
 
     Args:
         genome_status_file(PathLike): Path to genome status file that records
-			genome IDs and local filenames to avoid repeating time-consuming
-			HTTP requests each time the app is loaded.
+            genome IDs and local filenames to avoid repeating time-consuming
+            HTTP requests each time the app is loaded.
 
     Returns:
         dict: dict keys are genome original id and values are GenomeStatus objects.
@@ -174,7 +197,7 @@ def _get_genome_status_log(
 
     # GENOME_STATUS_FILENAME is read, then in the for loop over the genome records it gets updated,
     # and finally it is saved again in GENOME_STATUS_FILENAME which is overwritten
-    if genome_status_file.exists():
+    if Path(genome_status_file).exists():
         with open(genome_status_file) as f:
             for line in csv.reader(f):
                 asobj = GenomeStatus(*line)
@@ -411,7 +434,10 @@ def download_antismash_data(genome_records: list[dict[str,
 
     for i, genome_record in enumerate(genome_records):
         # get the best available ID from the dict
-        assert isinstance(genome_record['genome_ID'], dict)
+        if not isinstance(genome_record['genome_ID'], dict):
+            raise TypeError(
+                f"_get_best_available_genome_id() expects a dict as input. Instead got: {type(genome_record['genome_ID'])}"
+            )
         raw_genome_id = _get_best_available_genome_id(
             genome_record['genome_ID'])
         if raw_genome_id is None:
