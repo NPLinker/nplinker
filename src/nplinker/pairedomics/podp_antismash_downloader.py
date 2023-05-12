@@ -47,7 +47,7 @@ class GenomeStatus:
     def __init__(self,
                  original_id: str,
                  resolved_refseq_id: str,
-                 attempted: str | bool = False,
+                 attempted: str = `False`,
                  filename: str = ""):
         self.original_id = ';'.join(original_id.split(','))
         self.resolved_refseq_id = "" if resolved_refseq_id == 'None' else resolved_refseq_id
