@@ -17,37 +17,41 @@ if TYPE_CHECKING:
 logger = LogConfig.getLogger(__file__)
 
 
-# TODO CG: this class could be merged to MetcalfScoring class
+# TODO CG: this class could be merged to MetcalfScoring class?
 class LinkFinder():
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """Initialise LinkFinder object.
+
+        Attributes:
+            raw_score_spec_gcf (pd.DataFrame): The raw Metcalf scores for
+                spectrum-GCF links.
+            raw_score_mf_gcf (pd.DataFrame): The raw Metcalf scores for
+                molecular family-GCF links.
+            metcalf_mean (np.ndarray | None): The mean value used for
+                standardising Metcalf scores.
+            metcalf_std (np.ndarray | None): The standard deviation value used
+                for standardising Metcalf scores.
         """
-        Create tables of prospective link candidates.
-        Separate tables will exist for different linking scenarios, such as
-        gcfs <-> spectra OR gcf <-> mol.families
-        """
-        # metcalf scores
         self.raw_score_spec_gcf = pd.DataFrame()
         self.raw_score_mf_gcf = pd.DataFrame()
-
-        # metcalf caching
         self.metcalf_mean = None
         self.metcalf_std = None
 
-    # TODO CG: cal_score method could be integrated to __init__
+    # TODO CG: cal_score method could be integrated to __init__?
     def cal_score(
         self,
         data_links: DataLinks,
         link_type: str = 'spec-gcf',
         scoring_weights: tuple[int, int, int, int] = (10, -10, 0, 1)
     ) -> None:
-        """Calculate metcalf scores.
+        """Calculate Metcalf scores.
 
         Args:
-            data_links (DataLinks): The DataLinks object to use for scoring.
-            link_type (str, optional): The type of link to score. Available
-                types are 'spec-gcf' and 'mf-gcf'. Defaults to 'spec-gcf'.
-            scoring_weights (tuple[int,int,int,int], optional): The weights to
+            data_links(DataLinks): The DataLinks object to use for scoring.
+            link_type(str): The type of link to score. Must be 'spec-gcf' or
+                'mf-gcf'. Defaults to 'spec-gcf'.
+            scoring_weights(tuple[int,int,int,int]): The weights to
                 use for Metcalf scoring. The weights are applied to
                 '(met_gcf, met_not_gcf, gcf_not_met, not_met_not_gcf)'.
                 Defaults to (10, -10, 0, 1).
@@ -72,13 +76,16 @@ class LinkFinder():
                 data_links.cooccurrence_notmf_gcf * scoring_weights[2] +
                 data_links.cooccurrence_notmf_notgcf * scoring_weights[3])
 
+        # TODO CG: this part should be moved outside of this method
         n_strains = data_links.occurrence_gcf_strain.shape[1]
         if self.metcalf_mean is None or self.metcalf_std is None:
             self.metcalf_mean, self.metcalf_std = self._cal_mean_std(
                 n_strains, scoring_weights)
 
     # TODO CG: read paper and check the logics of this method
-    def _cal_mean_std(self, n_strains, scoring_weights):
+    def _cal_mean_std(
+        self, n_strains: int, scoring_weights: tuple[int, int, int, int]
+    ) -> tuple[np.ndarray, np.ndarray]:
         sz = (n_strains + 1, n_strains + 1)
         mean = np.zeros(sz)
         variance = np.zeros(sz)
@@ -104,22 +111,27 @@ class LinkFinder():
                 variance[n, m] = expected_sq
         return mean, np.sqrt(variance)
 
+    # TODO CG: the data type of returned should be improved for faster
+    #  processing. Maybe using dict instead of pd.DataFrame?
+    #  like that in the get_links method of the MetcalfScoring class
     def get_links(self,
                   *objects: tuple[GCF, ...] | tuple[Spectrum, ...]
                   | tuple[MolecularFamily, ...],
                   score_cutoff: float = 0.5) -> list[pd.DataFrame]:
-        """Get scores for links between objects.
+        """Get links and scores for given objects.
 
         Args:
-            objects(tuple): GCF, Spectrum or MolecularFamily objects.
+            objects(tuple): A list of GCF, Spectrum or MolecularFamily objects
+                and all objects must be of the same type.
             score_cutoff(float): Minimum score to consider a link (≥score_cutoff).
                 Default is 0.5.
         Returns:
             list: List of data frames containing the ids of the linked objects
-                and the score. The data frame contains three rows:
-                - the first row contains the ids of the input/source objects,
-                - the second row contains the ids of the target objects,
-                - the third row contains the scores.
+                and the score. The data frame has index names of
+                'source', 'target' and 'score':
+                - the 'source' row contains the ids of the input/source objects,
+                - the 'target' row contains the ids of the target objects,
+                - the 'score' row contains the scores.
 
         Raises:
             ValueError: If input objects are empty.
@@ -169,9 +181,8 @@ class LinkFinder():
             links.append(df)
         return links
 
-    # TODO CG: the returned data could be changed to dict, like the that in
-    # the get_links method of the MetcalfScoring class
-    def _get_scores_source_gcf(self, scores, score_cutoff) -> pd.DataFrame:
+    def _get_scores_source_gcf(self, scores: pd.DataFrame,
+                               score_cutoff: float) -> pd.DataFrame:
         row_indexes, col_indexes = np.where(scores >= score_cutoff)
         src_obj_ids = scores.columns[col_indexes].to_list()
         target_obj_ids = scores.index[row_indexes].to_list()
@@ -179,7 +190,8 @@ class LinkFinder():
         return pd.DataFrame([src_obj_ids, target_obj_ids, scores_candidate],
                             index=['source', 'target', 'score'])
 
-    def _get_scores_source_met(self, scores, score_cutoff) -> pd.DataFrame:
+    def _get_scores_source_met(self, scores: pd.DataFrame,
+                               score_cutoff: float) -> pd.DataFrame:
         row_indexes, col_indexes = np.where(scores >= score_cutoff)
         src_obj_ids = scores.index[row_indexes].to_list()
         target_obj_ids = scores.columns[col_indexes].to_list()
