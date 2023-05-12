@@ -11,7 +11,7 @@ from bs4 import NavigableString
 from bs4 import Tag
 from deprecated import deprecated
 from progress.bar import Bar
-from nplinker.genomics.antismash.antismash_downloader import \
+from nplinker.genomics.antismash import \
     download_and_extract_antismash_data
 from nplinker.logconfig import LogConfig
 
@@ -32,7 +32,7 @@ JGI_GENOME_LOOKUP_URL = 'https://img.jgi.doe.gov/cgi-bin/m/main.cgi?section=Taxo
 
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'
 
-GENOME_STATUS_FILENAME = "genome_status.txt"
+GENOME_STATUS_FILENAME = "genome_status.csv"
 
 
 # TODO: unit test for GenomeStatus
@@ -53,23 +53,19 @@ class GenomeStatus:
                  filename: str = ""):
         self.original_id = ';'.join(original_id.split(','))
         self.resolved_refseq_id = "" if resolved_refseq_id == 'None' else resolved_refseq_id
-        if attempted == 'True':
-            self.attempted = True
-        else:
-            self.attempted = False
+        self.attempted = attempted == 'True'
         self.filename = filename
 
-    def add_line(self, file: Path):
-        """Adds a line to file, containing info for the current genome ID. 
+    def to_csv(self, file: str | PathLike, mode: str = 'a') -> None:
+        """Write object to a csv file.
         """
         line = ','.join([
-            str(self.original_id),
-            str(self.resolved_refseq_id),
+            self.original_id,
+            self.resolved_refseq_id,
             str(self.attempted),
-            str(self.filename)
+            self.filename
         ])
-
-        with open(file, 'a+') as f:
+        with open(file, mode) as f:
             f.write(line + '\n')
 
 
@@ -151,7 +147,7 @@ def podp_download_and_extract_antismash_data(
             if genome_obj.resolved_refseq_id == "":
                 # give up on this one
                 logger.warning(f'Failed lookup for genome ID {raw_genome_id}')
-                genome_obj.add_line(genome_status_file)
+                genome_obj.to_csv(genome_status_file)
                 continue
 
         # if we got a refseq ID, now try to download and extract the data from antismash
@@ -159,13 +155,11 @@ def podp_download_and_extract_antismash_data(
                                             project_download_cache,
                                             project_file_cache)
 
-        genome_obj.add_line(genome_status_file)
+        genome_obj.to_csv(genome_status_file)
 
         output_path = Path(project_file_cache, 'antismash',
                            genome_obj.resolved_refseq_id)
-        if not Path.exists(Path(output_path, 'completed')):
-            with open(Path(output_path, 'completed'), 'w'):
-                pass
+        Path.touch (output_path / 'completed', exist_ok = True)
 
     missing = len([x for x in genome_status.values() if len(x.filename) == 0])
     logger.info(
@@ -173,7 +167,7 @@ def podp_download_and_extract_antismash_data(
     )
 
     for obj in genome_status.values():
-        obj.add_line(genome_status_file)
+        obj.to_csv(genome_status_file)
 
     if missing == len(genome_records):
         logger.warning('Failed to successfully retrieve ANY genome data!')
@@ -483,7 +477,7 @@ def download_antismash_data(genome_records: list[dict[str,
             if genome_obj.resolved_refseq_id == "":
                 # give up on this one
                 logger.warning(f'Failed lookup for genome ID {raw_genome_id}')
-                genome_obj.add_line(genome_status_file)
+                genome_obj.to_csv(genome_status_file)
                 continue
 
             # if we got a refseq ID, now try to download the data from antismash
@@ -498,7 +492,7 @@ def download_antismash_data(genome_records: list[dict[str,
                     f'Failed to download antiSMASH data for genome ID {genome_obj.resolved_refseq_id} ({genome_obj.original_id})'
                 )
 
-            genome_obj.add_line(genome_status_file)
+            genome_obj.to_csv(genome_status_file)
 
         _extract_antismash_zip(genome_obj, project_file_cache)
 
@@ -508,7 +502,7 @@ def download_antismash_data(genome_records: list[dict[str,
     )
 
     for obj in genome_status.values():
-        obj.add_line(genome_status_file)
+        obj.to_csv(genome_status_file)
 
     if missing == len(genome_records):
         logger.warning('Failed to successfully retrieve ANY genome data!')
