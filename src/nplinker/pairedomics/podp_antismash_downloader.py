@@ -157,7 +157,7 @@ def podp_download_and_extract_antismash_data(
 
 
 def _get_genome_status_log(
-        genome_status_file: Path) -> dict[str, GenomeStatus]:
+        genome_status_file: PathLike) -> dict[str, GenomeStatus]:
     """Get a dict of GenomeStatus objects by reading given genome status file.
     Note that a empty dict is returned if the given file does not exist.
 
