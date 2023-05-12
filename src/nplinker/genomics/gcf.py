@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 from nplinker.logconfig import LogConfig
 from nplinker.strain_collection import StrainCollection
 
-
 if TYPE_CHECKING:
     from nplinker.strains import Strain
     from .bgc import BGC
