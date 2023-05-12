@@ -157,32 +157,40 @@ def test_get_common_strains_sf(datalinks, mfs, gcfs, strains_list):
     assert sut == expected
 
 
+def test_get_common_strains_invalid_value(datalinks, spectra, gcfs):
+    """Test get_common_strains method for empty arguments."""
+    with pytest.raises(ValueError) as e:
+        datalinks.get_common_strains([], gcfs)
+    assert "Empty list for first or second argument." in str(e.value)
+    with pytest.raises(ValueError) as e:
+        datalinks.get_common_strains(spectra, [])
+    assert "Empty list for first or second argument." in str(e.value)
+
+
 @pytest.mark.parametrize(
     "first_arg, expected",
-    [([], "Empty list for first or second argument."),
-     ((), "Empty list for first or second argument."),
-     ([1], "First argument must be Spectrum or MolecularFamily objects.")])
-def test_get_common_strains_exception_first_arg(datalinks, spectra, mfs, gcfs,
-                                                first_arg, expected):
+    [([1], "First argument must be Spectrum or MolecularFamily objects."),
+     ([1, 2], "First argument must be Spectrum or MolecularFamily objects."),
+     ("12", "First argument must be Spectrum or MolecularFamily objects.")])
+def test_get_common_strains_invalid_type_first_arg(datalinks, spectra, mfs,
+                                                   gcfs, first_arg, expected):
     """Test get_common_strains method for invalid 1st arugment."""
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(TypeError) as e:
         datalinks.get_common_strains(first_arg, gcfs)
     assert expected in str(e.value)
 
     # mixed input
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(TypeError) as e:
         datalinks.get_common_strains(spectra + mfs, gcfs)
     assert "First argument must be Spectrum or MolecularFamily objects." in str(
         e.value)
 
 
 @pytest.mark.parametrize("second_arg, expected",
-                         [([], "Empty list for first or second argument."),
-                          ((), "Empty list for first or second argument."),
-                          ([1], "Second argument must be GCF objects.")])
-def test_get_common_strains_exception_second_arg(datalinks, spectra,
-                                                 second_arg, expected):
+                         [([1], "Second argument must be GCF objects.")])
+def test_get_common_strains_invalid_type_second_arg(datalinks, spectra,
+                                                    second_arg, expected):
     """Test get_common_strains method for invalid 2nd argument."""
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(TypeError) as e:
         datalinks.get_common_strains(spectra, second_arg)
     assert expected in str(e.value)

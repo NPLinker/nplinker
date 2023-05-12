@@ -108,9 +108,9 @@ class DataLinks():
             and values are a list of shared Strain objects.
 
         Raises:
-            ValueError: If the first argument is not a list of Spectrum or
-                MolecularFamily objects, or the second argument is not a list of
-                GCF objects.
+            ValueError: If given `spectra_or_mfs` or `gcfs` is empty.
+            TypeError: If given `spectra_or_mfs` or `gcfs` is not a list of
+                Spectrum/MolecularFamily or GCF objects, respectively.
         """
         # Check input arguments
         if len(spectra_or_mfs) == 0 or len(gcfs) == 0:
@@ -118,10 +118,10 @@ class DataLinks():
         if not isinstance_all(*spectra_or_mfs,
                               objtype=Spectrum) and not isinstance_all(
                                   *spectra_or_mfs, objtype=MolecularFamily):
-            raise ValueError(
+            raise TypeError(
                 'First argument must be Spectrum or MolecularFamily objects.')
         if not isinstance_all(*gcfs, objtype=GCF):
-            raise ValueError('Second argument must be GCF objects.')
+            raise TypeError('Second argument must be GCF objects.')
 
         # Assume that 3 occurrence dataframes have same df.columns (strain ids)
         strain_ids = self.occurrence_gcf_strain.columns

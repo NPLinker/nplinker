@@ -14,13 +14,13 @@ from .. import DATA_DIR
 
 @fixture(scope='module')
 def datalinks(gcfs, spectra, mfs, strains) -> DataLinks:
-    """DataLinks object. See `test_data_links.py` for its actual values."""
+    """DataLinks object. See `test_data_links.py` for its values."""
     return DataLinks(gcfs, spectra, mfs, strains)
 
 
 @fixture(scope='module')
 def linkfinder(datalinks) -> LinkFinder:
-    """LinkFinder object. See `test_link_finder.py` for its actual values."""
+    """LinkFinder object. See `test_link_finder.py` for its values."""
     linkfinder = LinkFinder()
     linkfinder.cal_score(datalinks, link_type='spec-gcf')
     linkfinder.cal_score(datalinks, link_type='mf-gcf')
@@ -122,7 +122,7 @@ def test_get_links_gcf_standardised_false(mc, gcfs, spectra, mfs):
     assert len(links) == 3
     assert {i.gcf_id for i in links.keys()} == {'gcf1', 'gcf2', 'gcf3'}
     assert isinstance(links[gcfs[0]][spectra[0]], ObjectLink)
-    # check actual values in `test_get_links_gcf` of test_link_finder.py
+    # expected values are from `test_get_links_gcf` of test_link_finder.py
     assert links[gcfs[0]][spectra[0]].data(mc) == 12
     assert links[gcfs[1]][spectra[0]].data(mc) == -9
     assert links[gcfs[2]][spectra[0]].data(mc) == 11
@@ -222,11 +222,31 @@ def test_get_links_mf_standardised_true(mc, gcfs, mfs):
     ...
 
 
-def test_get_links_invalid_input(mc):
-    """Test `get_links` method when input is invalid."""
+@pytest.mark.parametrize("objects, expected", [([], "Empty input objects"),
+                                               ("", "Empty input objects")])
+def test_get_links_invalid_input_value(mc, objects, expected):
+    with pytest.raises(ValueError) as e:
+        mc.get_links(*objects, link_collection=LinkCollection())
+    assert expected in str(e.value)
+
+
+@pytest.mark.parametrize("objects, expected",
+                         [([1], "Invalid type {<class 'int'>}"),
+                          ([1, 2], "Invalid type {<class 'int'>}"),
+                          ("12", "Invalid type {<class 'str'>}")])
+def test_get_links_invalid_input_type(mc, objects, expected):
     with pytest.raises(TypeError) as e:
-        mc.get_links("", link_collection=LinkCollection())
-    assert "Invalid type {<class 'str'>}" in str(e.value)
+        mc.get_links(*objects, link_collection=LinkCollection())
+    assert expected in str(e.value)
+
+
+def test_get_links_invalid_mixed_types(mc, spectra, mfs):
+    objects = (*spectra, *mfs)
+    with pytest.raises(TypeError) as e:
+        mc.get_links(*objects, link_collection=LinkCollection())
+    assert "Invalid type" in str(e.value)
+    assert ".MolecularFamily" in str(e.value)
+    assert ".Spectrum" in str(e.value)
 
 
 def test_get_links_no_linkfinder(npl, gcfs):

@@ -122,8 +122,12 @@ class LinkFinder():
                 - the third row contains the scores.
 
         Raises:
+            ValueError: If input objects are empty.
             TypeError: If input objects are not GCF, Spectrum or MolecularFamily objects.
         """
+        if len(objects) == 0:
+            raise ValueError('Empty input objects.')
+
         if isinstance_all(*objects, objtype=GCF):
             obj_type = 'gcf'
         elif isinstance_all(*objects, objtype=Spectrum):

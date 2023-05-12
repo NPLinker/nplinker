@@ -139,10 +139,14 @@ class MetcalfScoring(ScoringMethod):
             LinkCollection: The LinkCollection object with the new links added.
 
         Raises:
+            ValueError: If the input objects are empty.
             TypeError: If the input objects are not of the correct type.
             ValueError: If LinkFinder instance has not been created
                 (MetcalfScoring object has not been setup).
         """
+        if len(objects) == 0:
+            raise ValueError('Empty input objects.')
+
         if isinstance_all(*objects, objtype=GCF):
             obj_type = 'gcf'
         elif isinstance_all(*objects, objtype=Spectrum):
