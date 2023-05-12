@@ -10,7 +10,6 @@ from nplinker.metabolomics.spectrum import Spectrum
 from .utils import calc_correlation_matrix
 from .utils import isinstance_all
 
-
 if TYPE_CHECKING:
     from nplinker.strain_collection import StrainCollection
     from nplinker.strains import Strain
@@ -87,7 +86,7 @@ class DataLinks():
 
     def get_common_strains(
         self,
-        spectra_or_mfs: Sequence[Spectrum] | Sequence[MolecularFamily],
+        spectra_or_mfs: Sequence[Spectrum | MolecularFamily],
         gcfs: Sequence[GCF],
         filter_no_shared: bool = False
     ) -> dict[tuple[Spectrum | MolecularFamily, GCF], list[Strain]]:
@@ -96,9 +95,8 @@ class DataLinks():
         Note that SingletonFamily objects are excluded from given `spectra_or_mfs`.
 
         Args:
-            spectra_or_mfs(Sequence[Spectrum] | Sequence[MolecularFamily]):
-                A list of Spectrum or MolecularFamily objects and all objects
-                must be of the same type.
+            spectra_or_mfs(Sequence[Spectrum | MolecularFamily]):
+                A list of Spectrum and/or MolecularFamily objects.
             gcfs(Sequence[GCF]): A list of GCF objects.
             filter_no_shared(bool): If True, the pairs of spectrum/mf and GCF
                 without common strains will be removed from the returned dict;
@@ -116,10 +114,10 @@ class DataLinks():
         if len(spectra_or_mfs) == 0 or len(gcfs) == 0:
             raise ValueError('Empty list for first or second argument.')
         if not isinstance_all(*spectra_or_mfs,
-                              objtype=Spectrum) and not isinstance_all(
-                                  *spectra_or_mfs, objtype=MolecularFamily):
+                              objtype=(Spectrum, MolecularFamily)):
             raise TypeError(
-                'First argument must be Spectrum or MolecularFamily objects.')
+                'First argument must be Spectrum and/or MolecularFamily objects.'
+            )
         if not isinstance_all(*gcfs, objtype=GCF):
             raise TypeError('Second argument must be GCF objects.')
 
