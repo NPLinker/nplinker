@@ -305,6 +305,7 @@ class NPLinker():
         logger.debug('load_data: completed')
         return True
 
+    # TODO CG: refactor this method and update its unit tests
     def get_links(self, input_objects, scoring_methods, and_mode=True):
         """Find links for a set of input objects (BGCs/GCFs/Spectra/MolFams)
 
