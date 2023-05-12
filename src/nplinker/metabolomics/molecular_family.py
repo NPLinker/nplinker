@@ -55,7 +55,7 @@ class MolecularFamily():
         return 'MolFam(family_id={}, spectra={})'.format(
             self.family_id, len(self.spectra))
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other) -> bool:
         if isinstance(other, MolecularFamily):
             return (self.id == other.id
                     and self.family_id == other.family_id)

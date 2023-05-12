@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from nplinker.logconfig import LogConfig
 
 
+if TYPE_CHECKING:
+    from . import LinkCollection
 
 logger = LogConfig.getLogger(__name__)
 
@@ -35,7 +39,7 @@ class ScoringMethod():
         """Perform any one-off initialisation required (will only be called once)"""
         pass
 
-    def get_links(self, objects, link_collection):
+    def get_links(self, *objects, link_collection: LinkCollection) -> LinkCollection:
         """Given a set of objects, return link information"""
         return link_collection
 

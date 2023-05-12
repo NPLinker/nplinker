@@ -181,7 +181,9 @@ class MetcalfScoring(ScoringMethod):
                 scores_list = self._cal_standardised_score_met(
                     self.LINKFINDER, scores_list)
 
-        link_scores = {}
+        link_scores: dict[GCF | Spectrum | MolecularFamily,
+                          dict[GCF | Spectrum | MolecularFamily,
+                               ObjectLink]] = {}
         if obj_type == 'gcf':
             logger.debug(
                 f'MetcalfScoring: input_type=GCF, result_type=Spec/MolFam, '
@@ -243,6 +245,10 @@ class MetcalfScoring(ScoringMethod):
 
     def _cal_standardised_score_met(self, linkfinder: LinkFinder,
                                     results: list) -> list[pd.DataFrame]:
+        if linkfinder.metcalf_mean is None or linkfinder.metcalf_std is None:
+            raise ValueError(
+                'Metcalf mean and std not found. Have you called `MetcalfScoring.setup(npl)`?'
+            )
         logger.debug('Calculating standardised Metcalf scores (met input)')
         raw_score = results[0]
         z_scores = []
@@ -275,6 +281,10 @@ class MetcalfScoring(ScoringMethod):
 
     def _cal_standardised_score_gen(self, linkfinder: LinkFinder,
                                     results: list) -> list[pd.DataFrame]:
+        if linkfinder.metcalf_mean is None or linkfinder.metcalf_std is None:
+            raise ValueError(
+                'Metcalf mean and std not found. Have you called `MetcalfScoring.setup(npl)`?'
+            )
         logger.debug('Calculating standardised Metcalf scores (gen input)')
         postprocessed_scores = []
         for raw_score in results:

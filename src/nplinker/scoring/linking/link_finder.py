@@ -154,6 +154,8 @@ class LinkFinder():
 
         links = []
         if obj_type == 'gcf':
+            # TODO CG: the hint and mypy warnings will be gone after renaming all
+            # string ids to `.id`
             obj_ids = [gcf.gcf_id for gcf in objects]
             # spec-gcf
             scores = self.raw_score_spec_gcf.loc[:, obj_ids]
