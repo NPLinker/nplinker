@@ -162,8 +162,9 @@ def _get_genome_status_log(
     Note that a empty dict is returned if the given file does not exist.
 
     Args:
-        genome_status_file(str | PathLike): it records genome IDs and local filenames to avoid having to repeat HTTP requests
-        each time the app is loaded (this can take a lot of time if there are dozens of genomes).
+        genome_status_file(PathLike): Path to genome status file that records
+			genome IDs and local filenames to avoid repeating time-consuming
+			HTTP requests each time the app is loaded.
 
     Returns:
         dict: dict keys are genome original id and values are GenomeStatus objects.
