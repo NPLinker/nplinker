@@ -5,6 +5,11 @@ from nplinker.nplinker import NPLinker
 from . import DATA_DIR
 
 
+# NOTE: This file only contains tests that run locally and are skipped on CI.
+# Basically, only tests related to data loading should be put here.
+# For tests on scoring/links, add them to `scoring/test_nplinker_scoring.py`.
+
+
 @pytest.fixture(scope='module')
 def npl() -> NPLinker:
     npl = NPLinker(str(DATA_DIR / 'nplinker_demo1.toml'))
@@ -23,17 +28,3 @@ def test_load_data(npl: NPLinker):
     assert len(npl.gcfs) == 113
     assert len(npl.spectra) == 25935
     assert len(npl.molfams) == 25769
-
-
-@pytest.mark.skipif(os.environ.get('CI') == 'true',
-                    reason="Skip when running on CI")
-def test_get_links(npl: NPLinker):
-    mc = npl.scoring_method('metcalf')
-    mc.cutoff = 3.5
-    mc.standardised = True
-
-    actual = npl.get_links(npl.gcfs, mc, and_mode=True)
-    assert len(actual) == len(actual.sources) == len(actual.links) == 101
-
-    actual.filter_links(lambda link: link[mc] > 5.0)
-    assert len(actual.links) == 60
