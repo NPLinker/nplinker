@@ -168,7 +168,7 @@ def _get_genome_status_log(
 
     Returns:
         dict: dict keys are genome original id and values are GenomeStatus objects.
-        """
+    """
 
     genome_status = {}
 
