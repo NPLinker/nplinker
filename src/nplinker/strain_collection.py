@@ -17,7 +17,7 @@ class StrainCollection():
     def __init__(self):
         """A collection of Strain objects."""
         self._strains: list[Strain] = []
-        # dict of strain name (id and alias) to strain object
+        # dict of strain name (id and alias) to primary strain object
         self._strain_dict_name: dict[str, Strain] = {}
 
     def __repr__(self) -> str:
@@ -45,14 +45,10 @@ class StrainCollection():
         The given strain could be a Strain object, or a strain id or alias.
         """
         if isinstance(item, str):
-            for strain in self:
-                if item == strain.id or item in strain:
-                    return True
-        elif isinstance(item, Strain):
-            return item in self._strains
-        else:
-            raise TypeError(f"Expected Strain or str, got {type(item)}")
-        return False
+            return item in self._strain_dict_name
+        if isinstance(item, Strain):
+            return item.id in self._strain_dict_name
+        raise TypeError(f"Expected Strain or str, got {type(item)}")
 
     def __iter__(self) -> Iterator[Strain]:
         return iter(self._strains)
@@ -101,10 +97,8 @@ class StrainCollection():
     def lookup(self, name: str) -> Strain:
         """Lookup a strain by name (id or alias).
 
-        If the name is found, return the strain object; Otherwise, raise a
-        KeyError.
-
         Args:
+
             name(str): Strain name (id or alias) to lookup.
 
         Returns:
@@ -113,9 +107,8 @@ class StrainCollection():
         Raises:
             KeyError: If the strain name is not found.
         """
-        for strain in self:
-            if name == strain.id or name in strain:
-                return strain
+        if name in self:
+            return self._strain_dict_name[name]
         raise KeyError(f"Strain {name} not found in strain collection.")
 
     def add_from_file(self, file: str | PathLike) -> None:
