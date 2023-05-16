@@ -11,10 +11,8 @@ from bs4 import NavigableString
 from bs4 import Tag
 from deprecated import deprecated
 from progress.bar import Bar
-from nplinker.genomics.antismash import \
-    download_and_extract_antismash_data
+from nplinker.genomics.antismash import download_and_extract_antismash_data
 from nplinker.logconfig import LogConfig
-
 
 logger = LogConfig.getLogger(__name__)
 
@@ -59,10 +57,8 @@ class GenomeStatus:
         """Write object to a csv file.
         """
         line = ','.join([
-            self.original_id,
-            self.resolved_refseq_id,
-            str(self.attempted),
-            self.filename
+            self.original_id, self.resolved_refseq_id,
+            str(self.attempted), self.filename
         ])
         with open(file, mode) as f:
             f.write(line + '\n')
@@ -82,12 +78,12 @@ def podp_download_and_extract_antismash_data(
             Note that an `antismash` directory will be created in the specified `extract_root` if
             it doesn't exist. The files will be extracted to `<extract_root>/antismash/<antismash_id>` directory.
     """
-    
-    if not project_download_root.exists():
-        # otherwise in case of failed first download, the folder doesn't exist and 
+
+    if not Path(project_download_root).exists():
+        # otherwise in case of failed first download, the folder doesn't exist and
         # genome_status_file can't be written
-        project_download_root.mkdir(parents=True, exist_ok=True)
-    
+        Path(project_download_root).mkdir(parents=True, exist_ok=True)
+
     genome_status_file = Path(project_download_root, GENOME_STATUS_FILENAME)
     genome_status = _get_genome_status_log(genome_status_file)
 
@@ -101,7 +97,7 @@ def podp_download_and_extract_antismash_data(
                 f'Ignoring genome record "{genome_record}" due to missing genome ID field'
             )
             continue
-        
+
         # use this to check if the lookup has already been attempted and if
         # so if the file is cached locally
         if raw_genome_id not in genome_status:
@@ -130,11 +126,9 @@ def podp_download_and_extract_antismash_data(
         # trying to retrieve the data
 
         # lookup the ID
-        logger.info(
-            f'Beginning lookup process for genome ID {raw_genome_id}')
+        logger.info(f'Beginning lookup process for genome ID {raw_genome_id}')
 
-        if not isinstance(_resolve_refseq_id(genome_record['genome_ID']),
-                            str):
+        if not isinstance(_resolve_refseq_id(genome_record['genome_ID']), str):
             raise TypeError(
                 f"genome_obj.resolved_refseq_id should be a string. Instead got: {type(_resolve_refseq_id(genome_record['genome_ID']))}"
             )
@@ -153,11 +147,12 @@ def podp_download_and_extract_antismash_data(
                                             project_download_root,
                                             project_extract_root)
 
-
-        genome_obj.filename = str(Path(project_download_root, genome_obj.resolved_refseq_id + '.zip').absolute())
+        genome_obj.filename = str(
+            Path(project_download_root,
+                 genome_obj.resolved_refseq_id + '.zip').absolute())
         output_path = Path(project_extract_root, 'antismash',
                            genome_obj.resolved_refseq_id)
-        Path.touch (output_path / 'completed', exist_ok = True)
+        Path.touch(output_path / 'completed', exist_ok=True)
 
     missing = len([x for x in genome_status.values() if len(x.filename) == 0])
     logger.info(
