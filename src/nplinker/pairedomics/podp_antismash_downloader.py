@@ -68,7 +68,6 @@ class GenomeStatus:
             f.write(line + '\n')
 
 
-# TODO: unit tests for 3 different types of input id (genbank id, JGI id, refseq id)
 def podp_download_and_extract_antismash_data(
         genome_records: list[dict[str, dict[str, str] | str]],
         project_download_root: str | Path, project_extract_root: str | Path):

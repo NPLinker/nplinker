@@ -5,7 +5,7 @@ from nplinker.pairedomics.podp_antismash_downloader import (
     _get_genome_status_log)
 from nplinker.utils import list_files
 
-def test_GenomeStatus(tmp_path):
+def test_genome_status(tmp_path):
     genome_status_file = Path(tmp_path, "genome_status.csv")
     raw_genome_id1 = "GCF_000515175.1"
     raw_genome_id2 = "GCF_000514635.1"
@@ -140,3 +140,86 @@ def test_failed_lookup(tmp_path):
     assert genome_status["non_existing_ID"].attempted
     assert not (download_root / "non_existing_ID.zip").exists()
     assert not (extract_root / "antismash" / "non_existing_ID.zip").exists()
+
+def test_refseq_id(tmp_path):
+    download_root = tmp_path / "download"
+    extract_root = tmp_path / "extracted"
+    genome_status_file = Path(download_root, "genome_status.csv")
+    genome_records = [
+        {
+            "genome_ID": {
+                "genome_type": "genome",
+                "RefSeq_accession": "GCF_000514875.1"
+                },
+            "genome_label": "Salinispora arenicola CNX508"}
+    ]
+
+    podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
+
+    archive = download_root / "GCF_000514875.1.zip"
+    extracted_folder = extract_root / "antismash" / "GCF_000514875.1"
+    extracted_files = list_files(extracted_folder, keep_parent=False)
+    genome_status = _get_genome_status_log(genome_status_file)
+
+    assert archive.exists()
+    assert archive.is_file()
+    assert extracted_folder.exists()
+    assert all(Path(extracted_folder, extracted_file).is_file() for extracted_file in extracted_files)
+    assert genome_status_file.is_file()
+    assert len(genome_status) == 1
+
+def test_jgi_id(tmp_path):
+    download_root = tmp_path / "download"
+    extract_root = tmp_path / "extracted"
+    genome_status_file = Path(download_root, "genome_status.csv")
+    genome_records = [
+        {
+            "genome_ID": {
+                "genome_type": "genome",
+                "JGI_Genome_ID": "2506783052"
+                },
+            "genome_label": "Halophilic archaeon DL31"}
+    ]
+
+    podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
+
+    genome_status = _get_genome_status_log(genome_status_file)
+    genome_obj = genome_status["2506783052"]
+    archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
+    extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
+    extracted_files = list_files(extracted_folder, keep_parent=False)
+
+    assert archive.exists()
+    assert archive.is_file()
+    assert extracted_folder.exists()
+    assert all(Path(extracted_folder, extracted_file).is_file() for extracted_file in extracted_files)
+    assert genome_status_file.is_file()
+    assert len(genome_status) == 1
+
+def test_genbank_id(tmp_path):
+    download_root = tmp_path / "download"
+    extract_root = tmp_path / "extracted"
+    genome_status_file = Path(download_root, "genome_status.csv")
+    genome_records = [
+        {
+            "genome_ID": {
+                "genome_type": "genome",
+                "GenBank_accession": "GCA_004799605.1"
+                },
+            "genome_label": "Halobacterium salinarum"}
+    ]
+
+    podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
+
+    genome_status = _get_genome_status_log(genome_status_file)
+    genome_obj = genome_status["GCA_004799605.1"]
+    archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
+    extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
+    extracted_files = list_files(extracted_folder, keep_parent=False)
+
+    assert archive.exists()
+    assert archive.is_file()
+    assert extracted_folder.exists()
+    assert all(Path(extracted_folder, extracted_file).is_file() for extracted_file in extracted_files)
+    assert genome_status_file.is_file()
+    assert len(genome_status) == 1
