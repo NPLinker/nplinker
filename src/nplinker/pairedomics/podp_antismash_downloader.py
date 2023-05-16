@@ -69,7 +69,6 @@ class GenomeStatus:
 
 
 # TODO: unit tests for 3 different types of input id (genbank id, JGI id, refseq id)
-# TODO: unit test for covering exceptions/failures, e.g. failed resolving of genome id
 def podp_download_and_extract_antismash_data(
         genome_records: list[dict[str, dict[str, str] | str]],
         project_download_root: str | Path, project_extract_root: str | Path):
@@ -84,7 +83,12 @@ def podp_download_and_extract_antismash_data(
             Note that an `antismash` directory will be created in the specified `extract_root` if
             it doesn't exist. The files will be extracted to `<extract_root>/antismash/<antismash_id>` directory.
     """
-
+    
+    if not project_download_root.exists():
+        # otherwise in case of failed first download, the folder doesn't exist and 
+        # genome_status_file can't be written
+        project_download_root.mkdir(parents=True, exist_ok=True)
+    
     genome_status_file = Path(project_download_root, GENOME_STATUS_FILENAME)
     genome_status = _get_genome_status_log(genome_status_file)
 
@@ -93,12 +97,12 @@ def podp_download_and_extract_antismash_data(
         assert isinstance(genome_record['genome_ID'], dict)
         raw_genome_id = _get_best_available_genome_id(
             genome_record['genome_ID'])
-        if raw_genome_id is None:
+        if raw_genome_id is None or len(raw_genome_id) == 0:
             logger.warning(
                 f'Ignoring genome record "{genome_record}" due to missing genome ID field'
             )
             continue
-
+        
         # use this to check if the lookup has already been attempted and if
         # so if the file is cached locally
         if raw_genome_id not in genome_status:
@@ -116,34 +120,34 @@ def podp_download_and_extract_antismash_data(
                 f'Genome ID {raw_genome_id} already downloaded to {genome_obj.filename}'
             )
             genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
-        elif genome_obj.attempted:
+            continue
+        if genome_obj.attempted:
             # lookup attempted previously but failed
             logger.info(
                 f'Genome ID {raw_genome_id} skipped due to previous failure')
             genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
-        else:
-            # if no existing file and no lookup attempted, can start process of
-            # trying to retrieve the data
+            continue
+        # if no existing file and no lookup attempted, can start process of
+        # trying to retrieve the data
 
-            # lookup the ID
-            logger.info(
-                f'Beginning lookup process for genome ID {raw_genome_id}')
+        # lookup the ID
+        logger.info(
+            f'Beginning lookup process for genome ID {raw_genome_id}')
 
-            if not isinstance(_resolve_refseq_id(genome_record['genome_ID']),
-                              str):
-                raise TypeError(
-                    f"genome_obj.resolved_refseq_id should be a string. Instead got: {type(_resolve_refseq_id(genome_record['genome_ID']))}"
-                )
+        if not isinstance(_resolve_refseq_id(genome_record['genome_ID']),
+                            str):
+            raise TypeError(
+                f"genome_obj.resolved_refseq_id should be a string. Instead got: {type(_resolve_refseq_id(genome_record['genome_ID']))}"
+            )
 
-            genome_obj.resolved_refseq_id = _resolve_refseq_id(
-                genome_record['genome_ID'])
-            genome_obj.attempted = True
+        genome_obj.resolved_refseq_id = _resolve_refseq_id(
+            genome_record['genome_ID'])
+        genome_obj.attempted = True
 
-            if genome_obj.resolved_refseq_id == "":
-                # give up on this one
-                logger.warning(f'Failed lookup for genome ID {raw_genome_id}')
-                genome_obj.to_csv(genome_status_file)
-                continue
+        if genome_obj.resolved_refseq_id == "":
+            # give up on this one
+            logger.warning(f'Failed lookup for genome ID {raw_genome_id}')
+            continue
 
         # if we got a refseq ID, now try to download and extract the data from antismash
         download_and_extract_antismash_data(genome_obj.resolved_refseq_id,
@@ -354,7 +358,7 @@ def _resolve_refseq_id(genome_id_data: dict[str, str]) -> str:
         for each genome record present.
 
     Returns:
-        str | None: Return RefSeq ID if present, otherwise None. 
+        str: Return RefSeq ID if present, otherwise an empty string. 
     """
     if 'RefSeq_accession' in genome_id_data:
         # best case, can use this directly

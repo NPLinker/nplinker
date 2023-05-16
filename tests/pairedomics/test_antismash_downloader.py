@@ -27,6 +27,7 @@ def test_GenomeStatus(tmp_path):
 def test_default(tmp_path):
     download_root = tmp_path / "download"
     extract_root = tmp_path / "extracted"
+    genome_status_file = Path(download_root, "genome_status.csv")
     genome_records = [
         {
             "genome_ID": {
@@ -43,7 +44,6 @@ def test_default(tmp_path):
                 },
             "genome_label": "Salinispora pacifica CNT029"}
     ]
-    genome_status_file = Path(download_root, "genome_status.csv")
 
     podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
 
@@ -62,3 +62,81 @@ def test_default(tmp_path):
     assert all(Path(extracted_folder2, extracted_file).is_file() for extracted_file in extracted_files2)
     assert genome_status_file.is_file()
     assert len(genome_status) == 2
+
+def test_missing_id(tmp_path):
+    download_root = tmp_path / "download"
+    extract_root = tmp_path / "extracted"
+    genome_status_file = Path(download_root, "genome_status.csv")
+    genome_records = [
+        {
+            "genome_ID": {
+                "genome_type": "genome",
+                "JGI_Genome_ID": "",
+                "RefSeq_accession": ""
+                },
+            "genome_label": "Salinispora arenicola CNX508"},
+        {
+            "genome_ID": {
+                "genome_type": "genome",
+                "JGI_Genome_ID": "2515154177",
+                "RefSeq_accession": "GCF_000514515.1"
+                },
+            "genome_label": "Salinispora pacifica CNT029"}
+    ]
+
+    podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
+
+    archive1 = download_root / "GCF_000514875.1.zip"
+    extracted_folder1 = extract_root / "antismash" / "GCF_000514875.1"
+    archive2 = download_root / "GCF_000514515.1.zip"
+    extracted_folder2 = extract_root / "antismash" / "GCF_000514515.1"
+    genome_status = _get_genome_status_log(genome_status_file)
+
+    assert (not archive1.exists() and archive2.exists())
+    assert (not archive1.is_file() and archive2.is_file())
+    assert (not extracted_folder1.exists() and extracted_folder2.exists())
+    assert genome_status_file.is_file()
+    assert len(genome_status) == 1
+
+def test_caching(tmp_path):
+    download_root = tmp_path / "download"
+    extract_root = tmp_path / "extracted"
+    genome_status_file = Path(download_root, "genome_status.csv")
+    genome_records = [
+        {
+            "genome_ID": {
+                "genome_type": "genome",
+                "JGI_Genome_ID": "2515154188",
+                "RefSeq_accession": "GCF_000514875.1"
+                },
+            "genome_label": "Salinispora arenicola CNX508"}
+    ]
+
+    podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
+    genome_status_old = _get_genome_status_log(genome_status_file)
+    genome_obj = genome_status_old["GCF_000514875.1"]
+    assert Path(genome_obj.filename).exists()
+    assert genome_obj.attempted
+    podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
+    genome_status_new = _get_genome_status_log(genome_status_file)
+    assert len(genome_status_old) == len(genome_status_new)
+
+def test_failed_lookup(tmp_path):
+    download_root = tmp_path / "download"
+    extract_root = tmp_path / "extracted"
+    genome_status_file = Path(download_root, "genome_status.csv")
+    genome_records = [
+        {
+            "genome_ID": {
+                "genome_type": "genome",
+                "JGI_Genome_ID": "non_existing_ID"
+                },
+            "genome_label": "Salinispora arenicola CNX508"}
+    ]
+
+    podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
+    genome_status = _get_genome_status_log(genome_status_file)
+    assert len(genome_status["non_existing_ID"].filename) == 0
+    assert genome_status["non_existing_ID"].attempted
+    assert not (download_root / "non_existing_ID.zip").exists()
+    assert not (extract_root / "antismash" / "non_existing_ID.zip").exists()
