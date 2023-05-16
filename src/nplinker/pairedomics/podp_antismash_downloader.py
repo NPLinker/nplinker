@@ -69,7 +69,6 @@ class GenomeStatus:
 
 
 # TODO: unit tests for 3 different types of input id (genbank id, JGI id, refseq id)
-# TODO: unit test for verifying that the downloaded/extracted antismash file (not only folder) is correct
 # TODO: unit test for covering exceptions/failures, e.g. failed resolving of genome id
 def podp_download_and_extract_antismash_data(
         genome_records: list[dict[str, dict[str, str] | str]],
@@ -111,7 +110,7 @@ def podp_download_and_extract_antismash_data(
             f'Checking for antismash data {i + 1}/{len(genome_records)}, current genome ID={raw_genome_id}'
         )
         # first check if file is cached locally
-        if Path.exists(Path(genome_obj.filename)):
+        if (genome_obj.filename and Path(genome_obj.filename).exists()):
             # file already downloaded
             logger.info(
                 f'Genome ID {raw_genome_id} already downloaded to {genome_obj.filename}'
@@ -151,8 +150,8 @@ def podp_download_and_extract_antismash_data(
                                             project_download_root,
                                             project_extract_root)
 
-        genome_obj.to_csv(genome_status_file)
 
+        genome_obj.filename = str(Path(project_download_root, genome_obj.resolved_refseq_id + '.zip').absolute())
         output_path = Path(project_extract_root, 'antismash',
                            genome_obj.resolved_refseq_id)
         Path.touch (output_path / 'completed', exist_ok = True)
