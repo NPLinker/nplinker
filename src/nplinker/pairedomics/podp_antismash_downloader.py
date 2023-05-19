@@ -73,8 +73,8 @@ def podp_download_and_extract_antismash_data(
     Args:
         genome_records(list[dict[str, dict[str, str]  |  str]]): list of dicts representing genomes'
         records. Each record contains information about the specific genome's ID. 
-        project_download_root(str | Path): Path to the directory to place downloaded archive in.
-        project_extract_root(str | Path): Path to the directory data files will be extracted to.
+        project_download_root(str | PathLike): Path to the directory to place downloaded archive in.
+        project_extract_root(str | PathLike): Path to the directory data files will be extracted to.
             Note that an `antismash` directory will be created in the specified `extract_root` if
             it doesn't exist. The files will be extracted to `<extract_root>/antismash/<antismash_id>` directory.
     """
