@@ -65,18 +65,24 @@ class GenomeStatus:
 
 
 def podp_download_and_extract_antismash_data(
-        genome_records: list[dict[str, dict[str, str] | str]],
-        project_download_root: str | PathLike, project_extract_root: str | PathLike):
-    """Download and extract antiSMASH BGC archive for the genomes specified in genome_records
-    for which the original genome ID can be resolved.
-
+        genome_records: list[dict[str, dict[str, str]]],
+        project_download_root: str | PathLike,
+        project_extract_root: str | PathLike):
+    """Download and extract antiSMASH BGC archive for the given genome records.
+	
     Args:
-        genome_records(list[dict[str, dict[str, str]  |  str]]): list of dicts representing genomes'
-        records. Each record contains information about the specific genome's ID. 
-        project_download_root(str | PathLike): Path to the directory to place downloaded archive in.
-        project_extract_root(str | PathLike): Path to the directory data files will be extracted to.
-            Note that an `antismash` directory will be created in the specified `extract_root` if
-            it doesn't exist. The files will be extracted to `<extract_root>/antismash/<antismash_id>` directory.
+        genome_records(list[dict[str, dict[str, str] | str]]): list of dicts 
+			representing genome records. The dict of each genome record contains
+				- key(str): "genome_ID"
+				- value(dict[str, str]): a dict containing information about genome
+                type, label and accession ids (RefSeq, GenBank, and/or JGI).
+        project_download_root(str | PathLike): Path to the directory to place 
+			downloaded archive in.
+        project_extract_root(str | PathLike): Path to the directory downloaded archive 
+			will be extracted to.
+            Note that an `antismash` directory will be created in the specified 
+			`extract_root` if it doesn't exist. The files will be extracted to
+			`<extract_root>/antismash/<antismash_id>` directory.
     """
 
     if not Path(project_download_root).exists():
@@ -89,7 +95,6 @@ def podp_download_and_extract_antismash_data(
 
     for i, genome_record in enumerate(genome_records):
         # get the best available ID from the dict
-        assert isinstance(genome_record['genome_ID'], dict)
         raw_genome_id = _get_best_available_genome_id(
             genome_record['genome_ID'])
         if raw_genome_id is None or len(raw_genome_id) == 0:
@@ -114,13 +119,11 @@ def podp_download_and_extract_antismash_data(
             logger.info(
                 f'Genome ID {raw_genome_id} already downloaded to {genome_obj.filename}'
             )
-            genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
             continue
         if genome_obj.attempted:
             # lookup attempted previously but failed
             logger.info(
                 f'Genome ID {raw_genome_id} skipped due to previous failure')
-            genome_record['resolved_refseq_id'] = genome_obj.resolved_refseq_id
             continue
         # if no existing file and no lookup attempted, can start process of
         # trying to retrieve the data
@@ -128,13 +131,14 @@ def podp_download_and_extract_antismash_data(
         # lookup the ID
         logger.info(f'Beginning lookup process for genome ID {raw_genome_id}')
 
-        if not isinstance(_resolve_refseq_id(genome_record['genome_ID']), str):
-            raise TypeError(
-                f"genome_obj.resolved_refseq_id should be a string. Instead got: {type(_resolve_refseq_id(genome_record['genome_ID']))}"
-            )
-
         genome_obj.resolved_refseq_id = _resolve_refseq_id(
             genome_record['genome_ID'])
+
+        if not isinstance(genome_obj.resolved_refseq_id, str):
+            raise TypeError(
+                f"genome_obj.resolved_refseq_id should be a string. Instead got: {type(genome_obj.resolved_refseq_id)}"
+            )
+
         genome_obj.attempted = True
 
         if genome_obj.resolved_refseq_id == "":
