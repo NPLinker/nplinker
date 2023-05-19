@@ -66,7 +66,7 @@ class GenomeStatus:
 
 def podp_download_and_extract_antismash_data(
         genome_records: list[dict[str, dict[str, str] | str]],
-        project_download_root: str | Path, project_extract_root: str | Path):
+        project_download_root: str | PathLike, project_extract_root: str | PathLike):
     """Download and extract antiSMASH BGC archive for the genomes specified in genome_records
     for which the original genome ID can be resolved.
 
