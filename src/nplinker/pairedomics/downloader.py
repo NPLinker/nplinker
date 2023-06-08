@@ -27,7 +27,7 @@ from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 from . import podp_download_and_extract_antismash_data
-from .runbigscape import run_bigscape
+from .runbigscape import podp_run_bigscape
 
 logger = LogConfig.getLogger(__name__)
 
@@ -143,9 +143,7 @@ class PODPDownloader():
         self.project_json_file = os.path.join(self.local_cache,
                                               f'{self.gnps_massive_id}.json')
 
-
-# CG: download function
-
+    # download function
     def get(self, do_bigscape, extra_bigscape_parameters, use_mibig,
             mibig_version):
         logger.info('Going to download the metabolomics data file')
@@ -167,29 +165,11 @@ class PODPDownloader():
 
         if use_mibig:
             self._download_mibig_json(mibig_version)
-        self._run_bigscape(do_bigscape, extra_bigscape_parameters)
+        podp_run_bigscape(do_bigscape, extra_bigscape_parameters)
 
     def _is_new_gnps_format(self, directory):
         # TODO this should test for existence of quantification table instead
         return os.path.exists(os.path.join(directory, 'qiime2_output'))
-
-    def _run_bigscape(self, do_bigscape, extra_bigscape_parameters):
-        # TODO this currently assumes docker environment, allow customisation?
-        # can check if in container with: https://stackoverflow.com/questions/20010199/how-to-determine-if-a-process-runs-inside-lxc-docker
-        if not do_bigscape:
-            logger.info('BiG-SCAPE disabled by configuration, not running it')
-            return
-
-        logger.info('Running BiG-SCAPE! extra_bigscape_parameters="%s"',
-                    extra_bigscape_parameters)
-        try:
-            run_bigscape('bigscape.py',
-                         os.path.join(self.project_file_cache, 'antismash'),
-                         os.path.join(self.project_file_cache, 'bigscape'),
-                         self.PFAM_PATH, extra_bigscape_parameters)
-        except Exception as e:
-            logger.warning(
-                'Failed to run BiG-SCAPE on antismash data, error was "%s"', e)
 
     def _download_mibig_json(self, version):
         output_path = os.path.join(self.project_file_cache, 'mibig_json')
