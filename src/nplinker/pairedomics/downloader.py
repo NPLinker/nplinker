@@ -165,7 +165,7 @@ class PODPDownloader():
 
         if use_mibig:
             self._download_mibig_json(mibig_version)
-        podp_run_bigscape(do_bigscape, extra_bigscape_parameters)
+        podp_run_bigscape(self.project_file_cache, self.PFAM_PATH, do_bigscape, extra_bigscape_parameters)
 
     def _is_new_gnps_format(self, directory):
         # TODO this should test for existence of quantification table instead
