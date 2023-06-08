@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+from os import PathLike
 import subprocess
 import sys
 from ..logconfig import LogConfig
@@ -23,11 +24,10 @@ logger = LogConfig.getLogger(__name__)
 # called in context of nplinker Docker image, where bigscape should be available
 
 
-def run_bigscape(bigscape_py_path, antismash_path, output_path, pfam_path,
+def run_bigscape(bigscape_py_path: str | PathLike, antismash_path: str | PathLike, output_path: str | PathLike, pfam_path: str | PathLike,
                  extra_params):
     logger.info(
-        'run_bigscape: input="{}", output="{}", extra_params={}"'.format(
-            antismash_path, output_path, extra_params))
+        f'run_bigscape: input="{antismash_path}", output="{output_path}", extra_params={extra_params}"')
 
     if os.path.exists(os.path.join(output_path, 'completed')):
         logger.info('BiG-SCAPE appears to have been run already, skipping!')
@@ -39,8 +39,7 @@ def run_bigscape(bigscape_py_path, antismash_path, output_path, pfam_path,
         subprocess.run([bigscape_py_path, '-h'], capture_output=True)
     except Exception as e:
         raise Exception(
-            'Failed to find/run bigscape.py (path={}, err={})'.format(
-                bigscape_py_path, e))
+            f'Failed to find/run bigscape.py (path={bigscape_py_path}, err={e})')
 
     if not os.path.exists(antismash_path):
         raise Exception(f'antismash_path "{antismash_path}" does not exist!')
@@ -57,8 +56,7 @@ def run_bigscape(bigscape_py_path, antismash_path, output_path, pfam_path,
 
     logger.info(f'BiG-SCAPE command: {args}')
     result = subprocess.run(args, stdout=sys.stdout, stderr=sys.stderr)
-    logger.info('BiG-SCAPE completed with return code {}'.format(
-        result.returncode))
+    logger.info(f'BiG-SCAPE completed with return code {result.returncode}')
     # use subprocess.CompletedProcess.check_returncode() to test if the BiG-SCAPE
     # process exited successfully. This throws an exception for non-zero returncodes
     # which will indicate to the PODPDownloader module that something went wrong.
@@ -69,6 +67,24 @@ def run_bigscape(bigscape_py_path, antismash_path, output_path, pfam_path,
     open(os.path.join(output_path, 'completed'), 'w').close()
 
     return True
+
+def podp_run_bigscape(self, do_bigscape: bool, extra_bigscape_parameters: str):
+    # TODO this currently assumes docker environment, allow customisation?
+    # can check if in container with: https://stackoverflow.com/questions/20010199/how-to-determine-if-a-process-runs-inside-lxc-docker
+    if not do_bigscape:
+        logger.info('BiG-SCAPE disabled by configuration, not running it')
+        return
+
+    logger.info('Running BiG-SCAPE! extra_bigscape_parameters="%s"',
+                extra_bigscape_parameters)
+    try:
+        run_bigscape('bigscape.py',
+                        os.path.join(self.project_file_cache, 'antismash'),
+                        os.path.join(self.project_file_cache, 'bigscape'),
+                        self.PFAM_PATH, extra_bigscape_parameters)
+    except Exception as e:
+        logger.warning(
+            'Failed to run BiG-SCAPE on antismash data, error was "%s"', e)
 
 
 if __name__ == "__main__":
