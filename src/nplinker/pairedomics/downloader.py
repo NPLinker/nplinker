@@ -29,7 +29,6 @@ from nplinker.strains import Strain
 from . import podp_download_and_extract_antismash_data
 from .runbigscape import podp_run_bigscape
 
-
 logger = LogConfig.getLogger(__name__)
 
 PAIREDOMICS_PROJECT_DATA_ENDPOINT = 'https://pairedomicsdata.bioinformatics.nl/api/projects'
@@ -152,8 +151,8 @@ class PODPDownloader():
         self._download_metabolomics_zipfile(self.gnps_task_id)
 
         podp_download_and_extract_antismash_data(self.project_json['genomes'],
-                                self.project_download_cache,
-                                self.project_file_cache)
+                                                 self.project_download_cache,
+                                                 self.project_file_cache)
 
         # CG: it extracts strain names and later will be used for strains
         self._parse_genome_labels(self.project_json['genome_metabolome_links'],
@@ -166,7 +165,8 @@ class PODPDownloader():
 
         if use_mibig:
             self._download_mibig_json(mibig_version)
-        podp_run_bigscape(self.project_file_cache, self.PFAM_PATH, do_bigscape, extra_bigscape_parameters)
+        podp_run_bigscape(self.project_file_cache, self.PFAM_PATH, do_bigscape,
+                          extra_bigscape_parameters)
 
     def _is_new_gnps_format(self, directory):
         # TODO this should test for existence of quantification table instead
