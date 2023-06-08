@@ -13,10 +13,11 @@
 # limitations under the License.
 
 import os
-from os import PathLike
 import subprocess
 import sys
+from os import PathLike
 from ..logconfig import LogConfig
+
 
 logger = LogConfig.getLogger(__name__)
 

@@ -29,6 +29,7 @@ from nplinker.strains import Strain
 from . import podp_download_and_extract_antismash_data
 from .runbigscape import podp_run_bigscape
 
+
 logger = LogConfig.getLogger(__name__)
 
 PAIREDOMICS_PROJECT_DATA_ENDPOINT = 'https://pairedomicsdata.bioinformatics.nl/api/projects'
