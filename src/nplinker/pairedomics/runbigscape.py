@@ -26,7 +26,7 @@ logger = LogConfig.getLogger(__name__)
 
 def run_bigscape(bigscape_py_path: str | PathLike,
                  antismash_path: str | PathLike, output_path: str | PathLike,
-                 pfam_path: str | PathLike, extra_params):
+                 pfam_path: str | PathLike, extra_params: str):
     logger.info(
         f'run_bigscape: input="{antismash_path}", output="{output_path}", extra_params={extra_params}"'
     )
@@ -97,11 +97,3 @@ def podp_run_bigscape(project_file_cache: str | PathLike,
     except Exception as e:
         logger.warning(
             'Failed to run BiG-SCAPE on antismash data, error was "%s"', e)
-
-
-if __name__ == "__main__":
-    run_bigscape(sys.argv[1],
-                 sys.argv[2],
-                 sys.argv[3],
-                 sys.argv[4],
-                 cutoffs=[0.3])
