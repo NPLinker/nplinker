@@ -271,7 +271,7 @@ class NPClassScoring(ScoringMethod):
                     spectra_classes_names_inds
             else:  # molfam
                 fam_id = spec_like.family_id
-                if fam_id == '-1':  # account for singleton families
+                if fam_id.startswith("singleton-"):  # account for singleton families
                     fam_id += f'_{spec_like.spectra[0].spectrum_id}'
                 all_classes = self.npl.chem_classes.canopus.molfam_classes.get(
                     fam_id)
@@ -289,7 +289,7 @@ class NPClassScoring(ScoringMethod):
                     spectra_classes(spec_like.spectrum_id)
             else:  # molfam
                 fam_id = spec_like.family_id
-                if fam_id == '-1':  # account for singleton families
+                if fam_id.startswith("singleton"):  # account for singleton families
                     fam_id += f'_{spec_like.spectra[0].spectrum_id}'
                 spec_like_classes = self.npl.chem_classes.molnetenhancer. \
                     molfam_classes.get(fam_id)

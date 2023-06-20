@@ -401,8 +401,8 @@ class CanopusResults:
         for molfam in molfams:
             fid = molfam.family_id  # the key
             spectra = molfam.spectra
-            # if singleton family, format like '-1_spectrum-id'
-            if fid == '-1':
+            # if singleton family, format like 'fid_spectrum-id'
+            if fid.startswith('singleton-'):
                 spec_id = spectra[0].spectrum_id
                 fid += f'_{spec_id}'
             len_molfam = len(spectra)
@@ -555,6 +555,7 @@ class MolNetEnhancerResults:
                 nr_nodes = line.pop(0)
                 # todo: make it easier to query classes of singleton families
                 # if singleton family, format like '-1_spectrum-id' like canopus results
+                # CG: Note that the singleton families id is "singleton-" + uuid.
                 if nr_nodes == '1':
                     component = f'-1_{cluster}'
                 class_info = []

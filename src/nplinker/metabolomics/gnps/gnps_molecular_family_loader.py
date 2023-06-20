@@ -19,9 +19,9 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
         self._families: list[MolecularFamily | SingletonFamily] = []
 
         for family_id, spectra_ids in _load_molecular_families(file).items():
-            if family_id == '-1':
+            if family_id == '-1': # the "-1" is from GNPS result
                 for spectrum_id in spectra_ids:
-                    family = SingletonFamily()
+                    family = SingletonFamily() ## uuid as family id
                     family.spectra_ids = set([spectrum_id])
                     self._families.append(family)
             else:
