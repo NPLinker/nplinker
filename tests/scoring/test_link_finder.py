@@ -25,21 +25,21 @@ def test_init(linkfinder):
     assert linkfinder.metcalf_std is None
 
 
-def test_cal_score_raw_score(linkfinder, datalinks):
-    """Test `cal_score` method for `raw_score_spec_gcf` and `raw_score_mf_gcf`.
+def test_calc_score_raw_score(linkfinder, datalinks):
+    """Test `calc_score` method for `raw_score_spec_gcf` and `raw_score_mf_gcf`.
 
     The expected values are calculated manually by using values from `test_init`
     of `test_data_links.py` and the default scoring weights.
     """
     # link type = 'spec-gcf'
-    linkfinder.cal_score(datalinks, link_type='spec-gcf')
+    linkfinder.calc_score(datalinks, link_type='spec-gcf')
     assert_frame_equal(
         linkfinder.raw_score_spec_gcf,
         pd.DataFrame([[12, -9, 11], [-9, 12, 11], [1, 1, 21]],
                      index=['spectrum1', 'spectrum2', 'spectrum3'],
                      columns=['gcf1', 'gcf2', 'gcf3']))
     # link type = 'mf-gcf'
-    linkfinder.cal_score(datalinks, link_type='mf-gcf')
+    linkfinder.calc_score(datalinks, link_type='mf-gcf')
     assert_frame_equal(
         linkfinder.raw_score_mf_gcf,
         pd.DataFrame([[12, -9, 11], [-9, 12, 11], [1, 1, 21]],
@@ -47,28 +47,28 @@ def test_cal_score_raw_score(linkfinder, datalinks):
                      columns=['gcf1', 'gcf2', 'gcf3']))
 
 
-def test_cal_score_mean_std(linkfinder, datalinks):
-    """Test `cal_score` method for `metcalf_mean` and `metcalf_std`."""
-    linkfinder.cal_score(datalinks, link_type='spec-gcf')
+def test_calc_score_mean_std(linkfinder, datalinks):
+    """Test `calc_score` method for `metcalf_mean` and `metcalf_std`."""
+    linkfinder.calc_score(datalinks, link_type='spec-gcf')
     assert isinstance(linkfinder.metcalf_mean, np.ndarray)
     assert isinstance(linkfinder.metcalf_std, np.ndarray)
     assert linkfinder.metcalf_mean.shape == (4, 4
                                              )  # (n_strains+1 , n_strains+1)
     assert linkfinder.metcalf_mean.shape == (4, 4)
-    # TODO CG: add tests for values after refactoring _cal_mean_std method
+    # TODO CG: add tests for values after refactoring _calc_mean_std method
     # assert linkfinder.metcalf_mean == expected_array
 
 
 def test_get_links_gcf(linkfinder, datalinks, gcfs):
     """Test `get_links` method for input GCF objects."""
-    linkfinder.cal_score(datalinks, link_type='spec-gcf')
-    linkfinder.cal_score(datalinks, link_type='mf-gcf')
+    linkfinder.calc_score(datalinks, link_type='spec-gcf')
+    linkfinder.calc_score(datalinks, link_type='mf-gcf')
     index_names = ['source', 'target', 'score']
 
     # cutoff = negative infinity (float)
     links = linkfinder.get_links(*gcfs, score_cutoff=np.NINF)
     assert len(links) == 2
-    # expected values got from `test_cal_score_raw_score`
+    # expected values got from `test_calc_score_raw_score`
     assert_frame_equal(
         links[0],
         pd.DataFrame([['gcf1', 'gcf2', 'gcf3'] * 3,
@@ -113,8 +113,8 @@ def test_get_links_gcf(linkfinder, datalinks, gcfs):
 
 def test_get_links_spec(linkfinder, datalinks, spectra):
     """Test `get_links` method for input Spectrum objects."""
-    linkfinder.cal_score(datalinks, link_type='spec-gcf')
-    linkfinder.cal_score(datalinks, link_type='mf-gcf')
+    linkfinder.calc_score(datalinks, link_type='spec-gcf')
+    linkfinder.calc_score(datalinks, link_type='mf-gcf')
     index_names = ['source', 'target', 'score']
     # cutoff = negative infinity (float)
     links = linkfinder.get_links(*spectra, score_cutoff=np.NINF)
@@ -142,8 +142,8 @@ def test_get_links_spec(linkfinder, datalinks, spectra):
 
 def test_get_links_mf(linkfinder, datalinks, mfs):
     """Test `get_links` method for input MolecularFamily objects."""
-    linkfinder.cal_score(datalinks, link_type='spec-gcf')
-    linkfinder.cal_score(datalinks, link_type='mf-gcf')
+    linkfinder.calc_score(datalinks, link_type='spec-gcf')
+    linkfinder.calc_score(datalinks, link_type='mf-gcf')
     index_names = ['source', 'target', 'score']
     # cutoff = negative infinity (float)
     links = linkfinder.get_links(*mfs, score_cutoff=np.NINF)

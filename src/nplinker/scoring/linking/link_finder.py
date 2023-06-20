@@ -38,8 +38,8 @@ class LinkFinder():
         self.metcalf_mean = None
         self.metcalf_std = None
 
-    # TODO CG: cal_score method could be integrated to __init__?
-    def cal_score(
+    # TODO CG: calc_score method could be integrated to __init__?
+    def calc_score(
         self,
         data_links: DataLinks,
         link_type: str = 'spec-gcf',
@@ -79,11 +79,11 @@ class LinkFinder():
         # TODO CG: this part should be moved outside of this method
         n_strains = data_links.occurrence_gcf_strain.shape[1]
         if self.metcalf_mean is None or self.metcalf_std is None:
-            self.metcalf_mean, self.metcalf_std = self._cal_mean_std(
+            self.metcalf_mean, self.metcalf_std = self._calc_mean_std(
                 n_strains, scoring_weights)
 
     # TODO CG: read paper and check the logics of this method
-    def _cal_mean_std(
+    def _calc_mean_std(
         self, n_strains: int, scoring_weights: tuple[int, int, int, int]
     ) -> tuple[np.ndarray, np.ndarray]:
         sz = (n_strains + 1, n_strains + 1)

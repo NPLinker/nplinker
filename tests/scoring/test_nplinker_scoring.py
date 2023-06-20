@@ -20,8 +20,8 @@ def datalinks(gcfs, spectra, mfs, strains) -> DataLinks:
 def linkfinder(datalinks) -> LinkFinder:
     """LinkFinder object. See `test_link_finder.py` for its values."""
     linkfinder = LinkFinder()
-    linkfinder.cal_score(datalinks, link_type='spec-gcf')
-    linkfinder.cal_score(datalinks, link_type='mf-gcf')
+    linkfinder.calc_score(datalinks, link_type='spec-gcf')
+    linkfinder.calc_score(datalinks, link_type='mf-gcf')
     return linkfinder
 
 

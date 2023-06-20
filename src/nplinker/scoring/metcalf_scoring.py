@@ -107,9 +107,9 @@ class MetcalfScoring(ScoringMethod):
             MetcalfScoring.DATALINKS = DataLinks(npl.gcfs, npl.spectra,
                                                  npl.molfams, npl.strains)
             MetcalfScoring.LINKFINDER = LinkFinder()
-            MetcalfScoring.LINKFINDER.cal_score(MetcalfScoring.DATALINKS,
+            MetcalfScoring.LINKFINDER.calc_score(MetcalfScoring.DATALINKS,
                                                 link_type=LINK_TYPES[0])
-            MetcalfScoring.LINKFINDER.cal_score(MetcalfScoring.DATALINKS,
+            MetcalfScoring.LINKFINDER.calc_score(MetcalfScoring.DATALINKS,
                                                 link_type=LINK_TYPES[1])
             logger.debug('MetcalfScoring.setup caching results')
             save_pickled_data((dataset_counts, MetcalfScoring.DATALINKS,
@@ -175,10 +175,10 @@ class MetcalfScoring(ScoringMethod):
             scores_list = self.LINKFINDER.get_links(*objects,
                                                     score_cutoff=np.NINF)
             if obj_type == 'gcf':
-                scores_list = self._cal_standardised_score_gen(
+                scores_list = self._calc_standardised_score_gen(
                     self.LINKFINDER, scores_list)
             else:
-                scores_list = self._cal_standardised_score_met(
+                scores_list = self._calc_standardised_score_met(
                     self.LINKFINDER, scores_list)
 
         link_scores: dict[GCF | Spectrum | MolecularFamily,
@@ -243,7 +243,7 @@ class MetcalfScoring(ScoringMethod):
         logger.debug('MetcalfScoring: completed')
         return link_collection
 
-    def _cal_standardised_score_met(self, linkfinder: LinkFinder,
+    def _calc_standardised_score_met(self, linkfinder: LinkFinder,
                                     results: list) -> list[pd.DataFrame]:
         if linkfinder.metcalf_mean is None or linkfinder.metcalf_std is None:
             raise ValueError(
@@ -279,7 +279,7 @@ class MetcalfScoring(ScoringMethod):
 
         return [scores_df]
 
-    def _cal_standardised_score_gen(self, linkfinder: LinkFinder,
+    def _calc_standardised_score_gen(self, linkfinder: LinkFinder,
                                     results: list) -> list[pd.DataFrame]:
         if linkfinder.metcalf_mean is None or linkfinder.metcalf_std is None:
             raise ValueError(
