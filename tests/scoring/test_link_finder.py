@@ -3,19 +3,12 @@ import pandas as pd
 from pandas.util.testing import assert_frame_equal
 import pytest
 from pytest import fixture
-from nplinker.scoring.linking import DataLinks
 from nplinker.scoring.linking import LinkFinder
 
 
 @fixture(scope='module')
 def linkfinder() -> LinkFinder:
     return LinkFinder()
-
-
-@fixture(scope='module')
-def datalinks(gcfs, spectra, mfs, strains):
-    """DataLinks object. See `test_data_links.py` for its actual values."""
-    return DataLinks(gcfs, spectra, mfs, strains)
 
 
 def test_init(linkfinder):
