@@ -111,9 +111,6 @@ class LinkFinder():
                 variance[n, m] = expected_sq
         return mean, np.sqrt(variance)
 
-    # TODO CG: the data type of returned should be improved for faster
-    #  processing. Maybe using dict instead of pd.DataFrame?
-    #  like that in the get_links method of the MetcalfScoring class
     def get_links(self,
                   *objects: tuple[GCF, ...] | tuple[Spectrum, ...]
                   | tuple[MolecularFamily, ...],
