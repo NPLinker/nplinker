@@ -283,7 +283,7 @@ class NPLinker():
         self._bgcs = self._loader.bgcs
         self._gcfs = self._loader.gcfs
         self._mibig_bgc_dict = self._loader.mibig_bgc_dict
-        self._strains: StrainCollection = self._loader.strains
+        self._strains = self._loader.strains
         self._product_types = self._loader.product_types
         self._chem_classes = self._loader.chem_classes
         self._class_matches = self._loader.class_matches
