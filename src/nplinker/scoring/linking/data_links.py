@@ -10,6 +10,7 @@ from nplinker.metabolomics.spectrum import Spectrum
 from .utils import calc_correlation_matrix
 from .utils import isinstance_all
 
+
 if TYPE_CHECKING:
     from nplinker.strain_collection import StrainCollection
     from nplinker.strains import Strain
@@ -42,21 +43,30 @@ class DataLinks():
             occurrence_mf_strain(pd.DataFrame): A DataFrame to store occurrence of
                 molecular families with respect to strains.
             cooccurrence_spec_gcf(pd.DataFrame): A DataFrame to store co-occurrence
-                of spectra<->gcfs.
+                of the presence of spectra and the presence of gcfs with respect
+                to strains.
             cooccurrence_spec_notgcf(pd.DataFrame): A DataFrame to store co-occurrence
-                of spectra<->not gcfs.
+                of the presence of spectra and the absence of gcfs with respect
+                to strains. "notgcf" means the absence of gcfs.
             cooccurrence_notspec_gcf(pd.DataFrame): A DataFrame to store co-occurrence
-                of not spectra<->gcfs.
+                of the absence of spectra and the presence of gcfs with respect
+                to strains. "notspec" means the absence of spectra.
             cooccurrence_notspec_notgcf(pd.DataFrame): A DataFrame to store co-occurrence
-                of not spectra<->not gcfs.
+                of the absence of spectra and the absence of gcfs with respect
+                to strains.
             cooccurrence_mf_gcf(pd.DataFrame): A DataFrame to store co-occurrence
-                of molecular families<->gcfs.
+                of the presence of molecular families and the presence of gcfs
+                with respect to strains.
             cooccurrence_mf_notgcf(pd.DataFrame): A DataFrame to store co-occurrence
-                of molecular families<->not gcfs.
+                of the presence of molecular families and the absence of gcfs
+                with respect to strains. "notgcf" means the absence of gcfs.
             cooccurrence_notmf_gcf(pd.DataFrame): A DataFrame to store co-occurrence
-                of not molecular families<->gcfs.
+                of the absence of molecular families and the presence of gcfs
+                with respect to strains. "notmf" means the absence of molecular
+                families.
             cooccurrence_notmf_notgcf(pd.DataFrame): A DataFrame to store co-occurrence
-                of not molecular families<->not gcfs.
+                of the absence of molecular families and the absence of gcfs
+                with respect to strains.
         """
         self._strains = strains
 
