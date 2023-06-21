@@ -674,6 +674,7 @@ class DatasetLoader():
 
         return True
 
+    # TODO CG: replace deprecated load_dataset with GPNSLoader
     def _load_metabolomics(self):
         spec_dict, self.spectra, self.molfams, unknown_strains = load_dataset(
             self.strains,
