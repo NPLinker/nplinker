@@ -27,7 +27,7 @@ from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 from . import podp_download_and_extract_antismash_data
-from .runbigscape import podp_run_bigscape
+from .runbigscape import run_bigscape
 
 logger = LogConfig.getLogger(__name__)
 
@@ -151,8 +151,8 @@ class PODPDownloader():
         self._download_metabolomics_zipfile(self.gnps_task_id)
 
         podp_download_and_extract_antismash_data(self.project_json['genomes'],
-                                                 self.project_download_cache,
-                                                 self.project_file_cache)
+                                self.project_download_cache,
+                                self.project_file_cache)
 
         # CG: it extracts strain names and later will be used for strains
         self._parse_genome_labels(self.project_json['genome_metabolome_links'],

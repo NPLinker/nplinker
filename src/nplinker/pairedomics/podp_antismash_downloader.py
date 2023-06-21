@@ -48,7 +48,7 @@ class GenomeStatus:
                  resolved_refseq_id: str,
                  attempted: str = 'False',
                  filename: str = ""):
-        self.original_id = ';'.join(original_id.split(','))
+        self.original_id = original_id
         self.resolved_refseq_id = "" if resolved_refseq_id == 'None' else resolved_refseq_id
         self.attempted = attempted == 'True'
         self.filename = filename

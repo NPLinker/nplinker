@@ -7,14 +7,14 @@ from nplinker.strains import Strain
 
 @pytest.fixture()
 def bgc_with_strain():
-    bgc = BGC("S0001", ["NPR"])
+    bgc = BGC("S0001", "NPR")
     bgc.strain = Strain("strain001")
     yield bgc
 
 
 @pytest.fixture()
 def bgc_without_strain():
-    bgc = BGC("S002", ["NPR"])
+    bgc = BGC("S002", "NPR")
     yield bgc
 
 
@@ -59,8 +59,8 @@ def test_has_strain(bgc_with_strain):
     assert gcf.has_strain("strain002") is False
 
 def test_has_mibig_only():
-    mibig_bgc = BGC("BGC0000001", ["NPR"])
-    nonmibig_bgc = BGC("S0001", ["NPR"])
+    mibig_bgc = BGC("BGC0000001", "NPR")
+    nonmibig_bgc = BGC("S0001", "NPR")
     gcf = GCF("1")
     gcf.add_bgc(mibig_bgc)
     assert gcf.has_mibig_only() is True

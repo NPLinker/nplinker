@@ -26,10 +26,17 @@ class Strain():
         return f'Strain({self.id}) [{len(self._aliases)} aliases]'
 
     def __eq__(self, other) -> bool:
-        return (isinstance(other, Strain) and self.id == other.id
-                and self._aliases == other._aliases)
+        if isinstance(other, Strain):
+            return (self.id == other.id
+                    and self.aliases == other.aliases)
+        return NotImplemented
 
     def __hash__(self) -> int:
+        """Hash function for Strain.
+
+        Note that Strain is a mutable container, so here we hash on only the id
+        to avoid the hash value changes when `self._aliases` is updated.
+        """
         return hash(self.id)
 
     @property

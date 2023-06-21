@@ -51,7 +51,17 @@ class MolecularFamily():
             self.family_id, len(self.spectra))
 
     def __eq__(self, other: Self) -> bool:
-        return bool(self.id == other.id)
+        if isinstance(other, MolecularFamily):
+            return (self.id == other.id
+                    and self.family_id == other.family_id
+                    and set(self.spectra) == set(other.spectra))
+        return NotImplemented
 
     def __hash__(self) -> int:
-        return hash(self.id)
+        """Hash function for MolecularFamily.
+
+        Note that MolecularFamily is a mutable container, so here we hash on
+        the id and family_id only to avoid the hash value changing when
+        `self.spectra` is updated.
+        """
+        return hash((self.id, self.family_id))

@@ -25,12 +25,19 @@ def genome_status_file(download_root):
 
 
 # Test __init__ method of GenomeStatus class
-def test_genome_status_init():
-    raw_genome_id = "GCF_000515175.1"
-    genome_obj = GenomeStatus(raw_genome_id, "None")
-    assert genome_obj.original_id == raw_genome_id
-    assert genome_obj.resolved_refseq_id == ""
-    assert not genome_obj.attempted
+@pytest.mark.parametrize("params, expected",
+                         [(["GCF_000515175.1", "None", "False", ""
+                            ], ["GCF_000515175.1", "", False, ""]),
+                          (["GCF_000515175.1", "None", "True", ""
+                            ], ["GCF_000515175.1", "", True, ""]),
+                          (["GCF_000515175.1", "GCF_000515175.1", "True", ""],
+                           ["GCF_000515175.1", "GCF_000515175.1", True, ""]),
+                          (["GCF_000515175.1", "None", "False", "filename"
+                            ], ["GCF_000515175.1", "", False, "filename"])])
+def test_genome_status_init(params, expected):
+    gs = GenomeStatus(*params)
+    assert [gs.original_id, gs.resolved_refseq_id, gs.attempted,
+            gs.filename] == expected
 
 
 # Test to_csv method of GenomeStatus class
@@ -55,19 +62,22 @@ def test_genome_status_to_csv(tmp_path):
 
 
 # Test `podp_download_and_extract_antismash_data` function
+# with multiple records containing three types of genome IDs
 def test_multiple_records(download_root, extract_root, genome_status_file):
     genome_records = [{
         "genome_ID": {
             "genome_type": "genome",
             "JGI_Genome_ID": "2515154188",
-            "RefSeq_accession": "GCF_000514875.1"
+            "RefSeq_accession": "GCF_000514875.1",
+            "GenBank_accession": "GCA_004799605.1"
         },
         "genome_label": "Salinispora arenicola CNX508"
     }, {
         "genome_ID": {
             "genome_type": "genome",
             "JGI_Genome_ID": "2515154177",
-            "RefSeq_accession": "GCF_000514515.1"
+            "RefSeq_accession": "GCF_000514515.1",
+            "GenBank_accession": "GCA_004799605.1"
         },
         "genome_label": "Salinispora pacifica CNT029"
     }]
