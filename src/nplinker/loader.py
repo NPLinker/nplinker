@@ -323,18 +323,24 @@ class DatasetLoader():
                              self.EXTRA_BIGSCAPE_PARAMS_DEFAULT),
             self._use_mibig, self._mibig_version)
 
-    def _validate_paths(self):
-        for f in self.required_paths():
-            if not os.path.exists(f):
-                raise FileNotFoundError(
-                    'File/directory "{}" does not exist or is not readable!'.
-                    format(f))
 
-        for f in self.optional_paths():
-            if not os.path.exists(f):
+    def _validate_paths(self):
+        """Validates that the required files and directories exist before loading starts.
+        """
+        required_paths = [
+            self.nodes_file, self.edges_file, self.mgf_file, self.antismash_dir]
+        optional_paths = [self.annotations_dir]
+
+        for f in required_paths:
+            if not os.path.exists(str(f)):
+                raise FileNotFoundError(
+                    f'File/directory "{f}" does not exist.')
+
+        for f in optional_paths:
+            if not os.path.exists(str(f)):
                 logger.warning(
-                    'Optional file/directory "{}" does not exist or is not readable!'
-                    .format(f))
+                    'Optional file/directory "%s" does not exist',
+                    f)
 
     def validate(self):
         """Download data and build paths for local data"""
@@ -794,15 +800,6 @@ class DatasetLoader():
         self.strains.add_from_file(global_strain_id_file)
         logger.info('Loaded global strain IDs ({} total)'.format(
             len(self.strains)))
-
-    def required_paths(self):
-        # these are files/paths that *must* exist for loading to begin
-        return [
-            self.nodes_file, self.edges_file, self.mgf_file, self.antismash_dir
-        ]
-
-    def optional_paths(self):
-        return [self.annotations_dir]
 
     def webapp_scoring_cutoff(self):
         return self._config_webapp.get('tables_metcalf_threshold',
