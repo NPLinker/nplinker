@@ -184,10 +184,6 @@ class DatasetLoader():
         self.dataset_id = os.path.split(
             self._root)[-1] if not self._remote_loading else self._platform_id
 
-        if self._remote_loading:
-            self._downloader = PODPDownloader(self._platform_id)
-        else:
-            self._downloader = None
 
         self.bgcs, self.gcfs, self.spectra, self.molfams = [], [], [], []
         self.mibig_bgc_dict = {}
@@ -315,15 +311,15 @@ class DatasetLoader():
             self.OR_MOLNETENHANCER) or os.path.join(self._root,
                                                     'molnetenhancer')
     def _start_downloads(self):
-        self._root = self._downloader.project_file_cache
-        logger.debug('remote loading mode, configuring root={}'.format(
-                self._root))
-            # CG: to download both MET and GEN data
-        self._downloader.get(
-                self._docker.get('run_bigscape', self.RUN_BIGSCAPE_DEFAULT),
-                self._docker.get('extra_bigscape_parameters',
-                                 self.EXTRA_BIGSCAPE_PARAMS_DEFAULT),
-                self._use_mibig, self._mibig_version)
+        downloader = PODPDownloader(self._platform_id)
+        self._root = downloader.project_file_cache
+        logger.debug('remote loading mode, configuring root=%s', self._root)
+        # CG: to download both MET and GEN data
+        downloader.get(
+            self._docker.get('run_bigscape', self.RUN_BIGSCAPE_DEFAULT),
+            self._docker.get('extra_bigscape_parameters',
+                             self.EXTRA_BIGSCAPE_PARAMS_DEFAULT),
+            self._use_mibig, self._mibig_version)
 
     def _validate_paths(self):
         for f in self.required_paths():
