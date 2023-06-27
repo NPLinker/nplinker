@@ -155,45 +155,47 @@ class DatasetLoader():
     PFAM_PATH = os.path.join(sys.prefix, 'nplinker_lib')
 
     def __init__(self, config_data):
-        self._config = config_data
-        self._dataset = config_data['dataset']
-        self._docker = config_data.get('docker', {})
-        self._webapp = config_data.get('webapp', {})
-        self._antismash = config_data.get('antismash', {})
-        self._overrides = self._dataset.get('overrides', {})
-        self._antismash_delimiters = self._antismash.get(
+        # load the config data
+        self._config_dataset = config_data['dataset']
+        self._config_docker = config_data.get('docker', {})
+        self._config_webapp = config_data.get('webapp', {})
+        self._config_antismash = config_data.get('antismash', {})
+        self._config_overrides = self._config_dataset.get('overrides', {})
+        # set private attributes
+        self._antismash_delimiters = self._config_antismash.get(
             'antismash_delimiters', self.ANTISMASH_DELIMITERS_DEFAULT)
-        self._antismash_format = self._antismash.get(
+        self._antismash_format = self._config_antismash.get(
             'antismash_format', self.ANTISMASH_FMT_DEFAULT)
-        self._antismash_ignore_spaces = self._antismash.get(
+        self._antismash_ignore_spaces = self._config_antismash.get(
             'ignore_spaces', self.ANTISMASH_IGNORE_SPACES_DEFAULT)
-        self._bigscape_cutoff = self._dataset.get('bigscape_cutoff',
+        self._bigscape_cutoff = self._config_dataset.get('bigscape_cutoff',
                                                   self.BIGSCAPE_CUTOFF_DEFAULT)
-        self._extended_metadata_table_parsing = self._dataset.get(
+        self._extended_metadata_table_parsing = self._config_dataset.get(
             'extended_metadata_table_parsing',
             self.EXTENDED_METADATA_TABLE_PARSING_DEFAULT)
-        self._use_mibig = self._dataset.get('use_mibig',
+        self._use_mibig = self._config_dataset.get('use_mibig',
                                             self.USE_MIBIG_DEFAULT)
-        self._mibig_version = self._dataset.get('mibig_version',
+        self._mibig_version = self._config_dataset.get('mibig_version',
                                                 self.MIBIG_VERSION_DEFAULT)
-
-        self._root = self._config['dataset']['root']
-        self._platform_id = self._config['dataset']['platform_id']
+        self._root = self._config_dataset['root']
+        self._platform_id = self._config_dataset['platform_id']
         self._remote_loading = len(self._platform_id) > 0
-        self.datadir = files('nplinker').joinpath('data')
+
+        # set public attributes
         self.dataset_id = os.path.split(
             self._root)[-1] if not self._remote_loading else self._platform_id
-
-
+        # TODO CG: move it out of the class and make it a global variable
+        self.datadir = files('nplinker').joinpath('data')
         self.bgcs, self.gcfs, self.spectra, self.molfams = [], [], [], []
         self.mibig_bgc_dict = {}
         self.product_types = []
+
         logger.debug('DatasetLoader({}, {}, {})'.format(
-            self._root, self._platform_id, self._remote_loading))
+            self._root, self.dataset_id, self._remote_loading))
 
     def _init_metabolomics_paths(self):
         # 2. MET: <root>/clusterinfo_summary/<some UID>.tsv (or .clustersummary apparently...) / nodes_file=<override>
-        self.nodes_file = self._overrides.get(
+        self.nodes_file = self._config_overrides.get(
             self.OR_NODES) or find_via_glob_alts([
                 os.path.join(self._root, 'file_mappings.tsv'),
                 os.path.join(self._root, 'clusterinfo*', '*.tsv'),
@@ -201,7 +203,7 @@ class DatasetLoader():
             ], self.OR_NODES)
 
         # 3. MET: <root>/networkedges_selfloop/<some UID>.selfloop (new) or .pairsinfo (old) / edges_file=<override>
-        self.edges_file = self._overrides.get(
+        self.edges_file = self._config_overrides.get(
             self.OR_EDGES) or find_via_glob_alts([
                 os.path.join(self._root, '*.pairsinfo'),
                 os.path.join(self._root, 'networkedges_selfloop', '*.pairsinfo'),
@@ -212,28 +214,28 @@ class DatasetLoader():
         # TODO is the glob input OK?
         # => wait for updated dataset with latest output format
         # NOTE: only optional for Crusemann or Crusemann-like dataset format!
-        self.extra_nodes_file = self._overrides.get(
+        self.extra_nodes_file = self._config_overrides.get(
             self.OR_EXTRA_NODES) or find_via_glob(
                 os.path.join(self._root, 'quantification_table_reformatted', '*.csv'),
                                                   self.OR_EXTRA_NODES,
                                                   optional=True)
 
         # 5. MET: <root>/spectra/*.mgf (or <root>/*.mgf)/ mgf_file=<override>
-        self.mgf_file = self._overrides.get(self.OR_MGF) or find_via_glob_alts(
+        self.mgf_file = self._config_overrides.get(self.OR_MGF) or find_via_glob_alts(
             [
                 os.path.join(self._root, '*.mgf'),
                 os.path.join(self._root, 'spectra', '*.mgf')
             ], self.OR_MGF)
 
         # 6. MET: <root>/metadata_table/metadata_table-<number>.txt / metadata_table_file=<override>
-        self.metadata_table_file = self._overrides.get(
+        self.metadata_table_file = self._config_overrides.get(
             self.OR_METADATA) or find_via_glob(os.path.join(
                 self._root, 'metadata_table', 'metadata_table*.txt'),
                                                self.OR_METADATA,
                                                optional=True)
 
         # 7. MET: <root>/quantification_table/quantification_table-<number>.csv / quantification_table_file=<override>
-        self.quantification_table_file = self._overrides.get(
+        self.quantification_table_file = self._config_overrides.get(
             self.OR_QUANT) or find_via_glob(os.path.join(
                 self._root, 'quantification_table',
                 'quantification_table*.csv'),
@@ -245,7 +247,7 @@ class DatasetLoader():
             self.annotations_dir = str(self._root)
             self.annotations_config_file = os.path.join(self._root, "annotations.tsv")
         else:
-            self.annotations_dir = self._overrides.get(
+            self.annotations_dir = self._config_overrides.get(
                 self.OR_ANNO) or find_via_glob_alts_dir(
                     [
                         os.path.join(self._root, 'DB_result'),
@@ -255,18 +257,18 @@ class DatasetLoader():
                     optional=False
                 )
             if self.annotations_dir is not None:
-                self.annotations_config_file = self._overrides.get(
+                self.annotations_config_file = self._config_overrides.get(
                     self.OR_ANNO_CONFIG) or os.path.join(self.annotations_dir,
                                                          'annotations.tsv')
 
     def _init_genomics_paths(self):
          # 9. GEN: <root>/antismash / antismash_dir=<override>
-        self.antismash_dir = self._overrides.get(
+        self.antismash_dir = self._config_overrides.get(
             self.OR_ANTISMASH) or os.path.join(self._root, 'antismash')
         self.antismash_cache = {}
 
         # 10. GEN: <root>/bigscape / bigscape_dir=<override>
-        self.bigscape_dir = self._overrides.get(
+        self.bigscape_dir = self._config_overrides.get(
             self.OR_BIGSCAPE) or os.path.join(self._root, 'bigscape')
         # what we really want here is the subdirectory containing the network/annotation files,
         # but in case this is the path to the top level bigscape output, try to figure it out automatically
@@ -279,12 +281,12 @@ class DatasetLoader():
                 self.bigscape_dir = new_bigscape_dir
 
         # 11. GEN: <root>/mibig_json / mibig_json_dir=<override>
-        self.mibig_json_dir = self._overrides.get(
+        self.mibig_json_dir = self._config_overrides.get(
             self.OR_MIBIG_JSON) or os.path.join(self._root, 'mibig_json')
 
     def _init_paths(self):
         # 1. strain mapping are used for everything else so
-        self.strain_mappings_file = self._overrides.get(
+        self.strain_mappings_file = self._config_overrides.get(
             self.OR_STRAINS) or os.path.join(self._root, 'strain_mappings.csv')
 
         self._init_metabolomics_paths()
@@ -298,16 +300,16 @@ class DatasetLoader():
         self.description_file = os.path.join(self._root, 'description.txt')
 
         # 14. MISC: <root>/include_strains.csv / include_strains_file=<override>
-        self.include_strains_file = self._overrides.get(
+        self.include_strains_file = self._config_overrides.get(
             self.OR_INCLUDE_STRAINS) or os.path.join(self._root,
                                                      'include_strains.csv')
 
         # 15. CLASS: <root>/canopus / canopus_dir=<override>
-        self.canopus_dir = self._overrides.get(
+        self.canopus_dir = self._config_overrides.get(
             self.OR_CANOPUS) or os.path.join(self._root, 'canopus')
 
         # 15. CLASS: <root>/canopus / canopus_dir=<override>
-        self.molnetenhancer_dir = self._overrides.get(
+        self.molnetenhancer_dir = self._config_overrides.get(
             self.OR_MOLNETENHANCER) or os.path.join(self._root,
                                                     'molnetenhancer')
     def _start_downloads(self):
@@ -315,9 +317,10 @@ class DatasetLoader():
         self._root = downloader.project_file_cache
         logger.debug('remote loading mode, configuring root=%s', self._root)
         # CG: to download both MET and GEN data
+        # CG: Continue to understand how strain_mappings.csv is generated
         downloader.get(
-            self._docker.get('run_bigscape', self.RUN_BIGSCAPE_DEFAULT),
-            self._docker.get('extra_bigscape_parameters',
+            self._config_docker.get('run_bigscape', self.RUN_BIGSCAPE_DEFAULT),
+            self._config_docker.get('extra_bigscape_parameters',
                              self.EXTRA_BIGSCAPE_PARAMS_DEFAULT),
             self._use_mibig, self._mibig_version)
 
@@ -539,9 +542,9 @@ class DatasetLoader():
                 )
 
         if not os.path.exists(self.bigscape_dir):
-            should_run_bigscape = self._docker.get('run_bigscape',
+            should_run_bigscape = self._config_docker.get('run_bigscape',
                                                    self.RUN_BIGSCAPE_DEFAULT)
-            extra_bigscape_parameters = self._docker.get(
+            extra_bigscape_parameters = self._config_docker.get(
                 'extra_bigscape_parameters',
                 self.EXTRA_BIGSCAPE_PARAMS_DEFAULT)
             if should_run_bigscape:
@@ -712,9 +715,9 @@ class DatasetLoader():
         self.class_matches = ClassMatches(mibig_class_file)
 
         # run canopus if canopus_dir does not exist
-        should_run_canopus = self._docker.get('run_canopus',
+        should_run_canopus = self._config_docker.get('run_canopus',
                                               self.RUN_CANOPUS_DEFAULT)
-        extra_canopus_parameters = self._docker.get(
+        extra_canopus_parameters = self._config_docker.get(
             'extra_canopus_parameters', self.EXTRA_CANOPUS_PARAMS_DEFAULT)
         if should_run_canopus:
             # don't run canopus when canopus dir exists already
@@ -803,7 +806,7 @@ class DatasetLoader():
         return [self.annotations_dir]
 
     def webapp_scoring_cutoff(self):
-        return self._webapp.get('tables_metcalf_threshold',
+        return self._config_webapp.get('tables_metcalf_threshold',
                                 self.TABLES_CUTOFF_DEFAULT)
 
     def __repr__(self):
