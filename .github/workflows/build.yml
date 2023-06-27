@@ -21,12 +21,18 @@ on:
       - tests/**
       - setup.py
       - .github/workflows/build.yml
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
 
 jobs:
 
   smoke_test:
     name: Smoke test on ubuntu for python 3.10
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.10
