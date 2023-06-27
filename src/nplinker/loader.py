@@ -38,6 +38,7 @@ except ImportError:
 
 logger = LogConfig.getLogger(__name__)
 
+NPLINKER_APP_DATA_DIR = files('nplinker').joinpath('data')
 
 def find_via_glob(path, file_type, optional=False):
     try:
@@ -184,8 +185,6 @@ class DatasetLoader():
         # set public attributes
         self.dataset_id = os.path.split(
             self._root)[-1] if not self._remote_loading else self._platform_id
-        # TODO CG: move it out of the class and make it a global variable
-        self.datadir = files('nplinker').joinpath('data')
         self.bgcs, self.gcfs, self.spectra, self.molfams = [], [], [], []
         self.mibig_bgc_dict = {}
         self.product_types = []
@@ -710,7 +709,7 @@ class DatasetLoader():
             True if everything completes
         """
         # load Class_matches with mibig info from data
-        mibig_class_file = self.datadir.joinpath(
+        mibig_class_file = NPLINKER_APP_DATA_DIR.joinpath(
             'MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt')
         self.class_matches = ClassMatches(mibig_class_file)
 
@@ -791,7 +790,7 @@ class DatasetLoader():
             See `src/nplinker/strain_id_mapping.csv`
         """
         self.strains = StrainCollection()
-        global_strain_id_file = self.datadir.joinpath('strain_id_mapping.csv')
+        global_strain_id_file = NPLINKER_APP_DATA_DIR.joinpath('strain_id_mapping.csv')
         self.strains.add_from_file(global_strain_id_file)
         logger.info('Loaded global strain IDs ({} total)'.format(
             len(self.strains)))

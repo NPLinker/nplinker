@@ -8,6 +8,7 @@ from .config import Config
 from .genomics import BGC
 from .genomics import GCF
 from .loader import DatasetLoader
+from .loader import NPLINKER_APP_DATA_DIR
 from .logconfig import LogConfig
 from .metabolomics.molecular_family import MolecularFamily
 from .metabolomics.spectrum import Spectrum
@@ -216,7 +217,7 @@ class NPLinker():
     @property
     def data_dir(self):
         """Returns path to nplinker/data directory (files packaged with the app itself)"""
-        return self._loader.datadir
+        return NPLINKER_APP_DATA_DIR
 
     @property
     def gnps_params(self):
