@@ -103,9 +103,6 @@ def find_bigscape_dir(broot):
 
 class DatasetLoader():
 
-    ANTISMASH_FMT_DEFAULT = 'default'
-    ANTISMASH_FMT_FLAT = 'flat'
-    ANTISMASH_FMTS = [ANTISMASH_FMT_DEFAULT, ANTISMASH_FMT_FLAT]
     ANTISMASH_DELIMITERS_DEFAULT = ['.', '_', '-']
     ANTISMASH_IGNORE_SPACES_DEFAULT = False
 
@@ -165,8 +162,6 @@ class DatasetLoader():
         # set private attributes
         self._antismash_delimiters = self._config_antismash.get(
             'antismash_delimiters', self.ANTISMASH_DELIMITERS_DEFAULT)
-        self._antismash_format = self._config_antismash.get(
-            'antismash_format', self.ANTISMASH_FMT_DEFAULT)
         self._antismash_ignore_spaces = self._config_antismash.get(
             'ignore_spaces', self.ANTISMASH_IGNORE_SPACES_DEFAULT)
         self._bigscape_cutoff = self._config_dataset.get('bigscape_cutoff',
@@ -346,10 +341,6 @@ class DatasetLoader():
 
     def validate(self):
         """Download data and build paths for local data"""
-
-        # check antismash format is recognised
-        if self._antismash_format not in self.ANTISMASH_FMTS:
-            raise ValueError(f'Unknown antismash format: {self._antismash_format}')
 
         # if remote loading mode, need to download the data here
         # CG: for PODP workflow, strain_mappings.csv is generated in the download step
