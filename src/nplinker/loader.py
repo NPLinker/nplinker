@@ -343,8 +343,7 @@ class DatasetLoader():
 
         # check antismash format is recognised
         if self._antismash_format not in self.ANTISMASH_FMTS:
-            raise Exception('Unknown antismash format: {}'.format(
-                self._antismash_format))
+            raise ValueError(f'Unknown antismash format: {self._antismash_format}')
 
         # if remote loading mode, need to download the data here
         # CG: for PODP workflow, strain_mappings.csv is generated in the download step
