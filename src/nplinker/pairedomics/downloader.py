@@ -17,8 +17,8 @@ import os
 import shutil
 import sys
 import zipfile
-import httpx
 from deprecated import deprecated
+import httpx
 from progress.spinner import Spinner
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.logconfig import LogConfig
@@ -28,6 +28,7 @@ from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 from . import podp_download_and_extract_antismash_data
 from .runbigscape import podp_run_bigscape
+
 
 logger = LogConfig.getLogger(__name__)
 
@@ -158,7 +159,7 @@ class PODPDownloader():
         self._parse_genome_labels(self.project_json['genome_metabolome_links'],
                                   self.project_json['genomes'])
 
-        # CG: it generates the strain_mapping.csv file
+        # CG: it generates the strain_mappings.csv file
         self.strains.generate_strain_mappings(
             self.strain_mappings_file,
             os.path.join(self.project_file_cache, 'antismash'))

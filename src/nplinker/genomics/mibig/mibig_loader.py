@@ -31,7 +31,7 @@ class MibigBGCLoader:
 
         Note that for MIBiG BGC, same value is used for BGC id and genome id.
         Users don't have to provide genome id for MIBiG BGCs in the
-        `strain_mapping.csv` file.
+        `strain_mappings.csv` file.
 
         Returns:
             dict[str, str]: key is BGC id/accession, value is
