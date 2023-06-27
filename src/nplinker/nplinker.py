@@ -244,7 +244,7 @@ class NPLinker():
         """Returns the current BiGSCAPE clustering cutoff value"""
         return self._loader._bigscape_cutoff
 
-    def load_data(self, new_bigscape_cutoff=None, met_only=False):
+    def load_data(self, new_bigscape_cutoff=None):
         """Loads the basic components of a dataset.
 
         This method is responsible for loading the various pieces of the supplied dataset into
@@ -255,20 +255,14 @@ class NPLinker():
         Returns:
             bool: True if successful, False otherwise
         """
-        # TODO: the met_only is useless, remove it. NPlinker will stop working if met_only=True
-        # typical case where load_data is being called with no params
+        logger.debug('load_data(new_bigscape_cutoff=%s)', new_bigscape_cutoff)
         if new_bigscape_cutoff is None:
-            logger.debug(
-                'load_data (normal case, full load, met_only={})'.format(
-                    met_only))
             self._loader.validate()
-
-            if not self._loader.load(met_only=met_only):
+            if not self._loader.load():
                 return False
         else:
             # CG: only reload genomics data when changing bigscape cutoff
             # TODO: this part should be removed, reload everything if bigscape data changes.
-            logger.debug(f'load_data with new cutoff = {new_bigscape_cutoff}')
             # 1. change the cutoff (which by itself doesn't do anything)
             self._loader._bigscape_cutoff = new_bigscape_cutoff
             # 2. reload the strain mappings (MiBIG filtering may have removed strains

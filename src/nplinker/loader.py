@@ -356,7 +356,7 @@ class DatasetLoader():
         self._init_paths()
         self._validate_paths()
 
-    def load(self, met_only):
+    def load(self):
         # load strain mappings first
         if not self._load_strain_mappings():
             return False
@@ -364,7 +364,7 @@ class DatasetLoader():
         if not self._load_metabolomics():
             return False
 
-        if not met_only and not self._load_genomics():
+        if not self._load_genomics():
             return False
 
         if not self._load_class_info():
@@ -373,14 +373,13 @@ class DatasetLoader():
         self._load_optional()
 
         # Restrict strain list to only relevant strains (those that are present
-        # in both genomic and
-        if not met_only:
-            # TODO add a config file option for this?
-            self._filter_only_common_strains()
+        # in both genomic and metabolomic data)
+        # TODO add a config file option for this?
+        self._filter_only_common_strains()
 
-            # if the user specified a set of strains to be explicitly included, filter
-            # out everything except those strains
-            self._filter_user_strains()
+        # if the user specified a set of strains to be explicitly included, filter
+        # out everything except those strains
+        self._filter_user_strains()
 
         # if we don't have at least *some* strains here it probably means missing mappings
         # or a complete failure to parse things, so bail out
