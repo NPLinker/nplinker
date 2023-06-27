@@ -188,6 +188,8 @@ class DatasetLoader():
         self.bgcs, self.gcfs, self.spectra, self.molfams = [], [], [], []
         self.mibig_bgc_dict = {}
         self.product_types = []
+        self.webapp_scoring_cutoff = self._config_webapp.get('tables_metcalf_threshold',
+                                self.TABLES_CUTOFF_DEFAULT)
 
         logger.debug('DatasetLoader({}, {}, {})'.format(
             self._root, self.dataset_id, self._remote_loading))
@@ -800,10 +802,6 @@ class DatasetLoader():
         self.strains.add_from_file(global_strain_id_file)
         logger.info('Loaded global strain IDs ({} total)'.format(
             len(self.strains)))
-
-    def webapp_scoring_cutoff(self):
-        return self._config_webapp.get('tables_metcalf_threshold',
-                                self.TABLES_CUTOFF_DEFAULT)
 
     def __repr__(self):
         return 'Root={}\n   MGF={}\n   EDGES={}\n   NODES={}\n   BIGSCAPE={}\n   ANTISMASH={}\n'.format(
