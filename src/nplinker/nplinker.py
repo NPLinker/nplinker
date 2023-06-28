@@ -3,7 +3,6 @@ import copy
 import logging
 import sys
 from typing import TYPE_CHECKING
-from .config import Args
 from .config import Config
 from .genomics import BGC
 from .genomics import GCF
@@ -17,7 +16,6 @@ from .scoring.link_collection import LinkCollection
 from .scoring.metcalf_scoring import MetcalfScoring
 from .scoring.np_class_scoring import NPClassScoring
 from .scoring.rosetta_scoring import RosettaScoring
-from .strain_collection import StrainCollection
 
 
 if TYPE_CHECKING:
