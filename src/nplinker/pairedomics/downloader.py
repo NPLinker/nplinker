@@ -38,8 +38,6 @@ GNPS_DATA_DOWNLOAD_URL = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={
 
 MIBIG_METADATA_URL = 'https://dl.secondarymetabolites.org/mibig/mibig_json_{}.tar.gz'
 MIBIG_BGC_METADATA_URL = 'https://mibig.secondarymetabolites.org/repository/{}/annotations.json'
-# MIBIG_BGC_GENBANK_URL = 'https://mibig.secondarymetabolites.org/repository/{}/{}.gbk'
-# MIBIG_BGC_JSON_URL = 'https://mibig.secondarymetabolites.org/repository/{}/{}.json'
 
 
 class PODPDownloader():
