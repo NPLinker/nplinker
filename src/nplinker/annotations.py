@@ -19,7 +19,6 @@ from nplinker.metabolomics.spectrum import GNPS_KEY
 from nplinker.metabolomics.spectrum import Spectrum
 from .logconfig import LogConfig
 
-
 logger = LogConfig.getLogger(__name__)
 
 GNPS_URL_FORMAT = 'https://metabolomics-usi.ucsd.edu/{}/?usi=mzspec:GNPSLIBRARY:{}'
@@ -32,6 +31,7 @@ def _headers_match_gnps(headers: list[str]) -> bool:
         if k not in headers:
             return False
     return True
+
 
 @deprecated(version="1.3.3", reason="Use GNPSAnnotationLoader class instead.")
 def create_gnps_annotation(spec: Spectrum, gnps_anno: dict):
@@ -46,8 +46,8 @@ def create_gnps_annotation(spec: Spectrum, gnps_anno: dict):
     """
     # also insert useful URLs
     for t in ['png', 'json', 'svg', 'spectrum']:
-        gnps_anno[f'{t}_url'] = GNPS_URL_FORMAT.format(
-            t, gnps_anno['SpectrumID'])
+        gnps_anno[f'{t}_url'] = GNPS_URL_FORMAT.format(t,
+                                                       gnps_anno['SpectrumID'])
 
     if GNPS_KEY in spec.annotations:
         # TODO is this actually an error or can it happen normally?
@@ -60,7 +60,9 @@ def create_gnps_annotation(spec: Spectrum, gnps_anno: dict):
 
 
 @deprecated(version="1.3.3", reason="Use GNPSAnnotationLoader class instead.")
-def load_annotations(root: str | os.PathLike, config: str | os.PathLike, spectra: list[Spectrum], spec_dict: dict[str, Spectrum]) -> list[Spectrum]:
+def load_annotations(root: str | os.PathLike, config: str | os.PathLike,
+                     spectra: list[Spectrum],
+                     spec_dict: dict[str, Spectrum]) -> list[Spectrum]:
     """Load the annotations from the GNPS annotation file present in root to the spectra.
 
     Args:
@@ -120,8 +122,7 @@ def load_annotations(root: str | os.PathLike, config: str | os.PathLike, spectra
                     data = {}
                     for dc in data_cols:
                         if dc not in headers:
-                            logger.warning(
-                                f'Column lookup failed for "{dc}"')
+                            logger.warning(f'Column lookup failed for "{dc}"')
                             continue
                         data[dc] = line[headers.index(dc)]
 
@@ -160,8 +161,7 @@ def load_annotations(root: str | os.PathLike, config: str | os.PathLike, spectra
                     data = {}
                     for dc in data_cols:
                         if dc not in headers:
-                            logger.warning(
-                                f'Column lookup failed for "{dc}"')
+                            logger.warning(f'Column lookup failed for "{dc}"')
                             continue
                         data[dc] = line[headers.index(dc)]
                     spec_annotations[spec].append(data)
@@ -172,6 +172,7 @@ def load_annotations(root: str | os.PathLike, config: str | os.PathLike, spectra
                     spec.set_annotations(filename, anno)
 
     return spectra
+
 
 def _find_annotation_files(root: str, config: str) -> list[str]:
     """Detect all annotation files in the root folder or specified in the config file.
@@ -189,6 +190,7 @@ def _find_annotation_files(root: str, config: str) -> list[str]:
             continue
         annotation_files.append(os.path.join(root, f))
     return annotation_files
+
 
 def _read_config(config):
     ac = {}

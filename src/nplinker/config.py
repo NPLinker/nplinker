@@ -1,17 +1,3 @@
-# Copyright 2021 The NPLinker Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import argparse
 from collections.abc import Mapping
 import os
@@ -166,7 +152,8 @@ class Config():
 
         if root.startswith('platform:'):
             config['dataset']['platform_id'] = root.replace('platform:', '')
-            logger.info('Loading from platform project ID %s', config['dataset']['platform_id'])
+            logger.info('Loading from platform project ID %s',
+                        config['dataset']['platform_id'])
         else:
             config['dataset']['platform_id'] = ''
             logger.info('Loading from local data in directory %s', root)
@@ -174,5 +161,7 @@ class Config():
         antismash = config['dataset'].get('antismash')
         allowed_antismash_formats = ["default", "flat"]
         if antismash is not None:
-            if 'format' in antismash and antismash['format'] not in allowed_antismash_formats:
-                raise ValueError(f'Unknown antismash format: {antismash["format"]}')
+            if 'format' in antismash and antismash[
+                    'format'] not in allowed_antismash_formats:
+                raise ValueError(
+                    f'Unknown antismash format: {antismash["format"]}')

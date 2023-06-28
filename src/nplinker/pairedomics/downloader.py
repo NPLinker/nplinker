@@ -1,17 +1,3 @@
-# Copyright 2021 The NPLinker Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import json
 import os
 import shutil
@@ -28,7 +14,6 @@ from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 from . import podp_download_and_extract_antismash_data
 from .runbigscape import podp_run_bigscape
-
 
 logger = LogConfig.getLogger(__name__)
 
@@ -153,8 +138,8 @@ class PODPDownloader():
         # TODO CG: this function will modify the project_json['genomes'],
         # this should be done in a better way
         podp_download_and_extract_antismash_data(self.project_json['genomes'],
-                                self.project_download_cache,
-                                self.project_file_cache)
+                                                 self.project_download_cache,
+                                                 self.project_file_cache)
 
         # CG: it extracts strain names and later will be used for strains
         self._parse_genome_labels(self.project_json['genome_metabolome_links'],
