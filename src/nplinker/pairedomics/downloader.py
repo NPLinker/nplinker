@@ -52,7 +52,6 @@ class PODPDownloader():
         self.gnps_task_id = None
         self.json_data = None
         self.strains = StrainCollection()
-        self.growth_media = {}
 
         if local_cache is None:
             local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data',
@@ -112,6 +111,8 @@ class PODPDownloader():
             f.write(str(self.project_json))
 
     def _init_folder_structure(self, local_cache):
+        """Create local cache folders and set up paths for various files"""
+
         # init local cache root
         self.local_cache = local_cache
         self.local_download_cache = os.path.join(self.local_cache, 'downloads')
@@ -224,11 +225,6 @@ class PODPDownloader():
             else:
                 temp[label] = [filename]
             mc += 1
-
-            if label in self.growth_media:
-                self.growth_media[label].add(rec['sample_preparation_label'])
-            else:
-                self.growth_media[label] = {rec['sample_preparation_label']}
 
         for rec in gen_records:
             label = rec['genome_label']
