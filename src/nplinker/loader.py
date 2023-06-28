@@ -349,6 +349,13 @@ class DatasetLoader():
 
         # construct the paths and filenames required to load everything else and check
         # they all seem to exist (but don't parse anything yet)
+        # TODO CG: the logics of _init_paths and _validate_paths are not clear
+        # 1. after downloading (manual preparation), some files alreay exist, some not
+        # 2. get the default, constructed or real path for each file/dir (need refactoring)
+        #   - self._config_overrides.get()
+        #   - os.path.join(self._root, 'strain_mappings.csv')
+        #   - find_via_glob() --> actually check if the file/dir exists
+        # 3. check if (some) file/dir exists
         self._init_paths()
         self._validate_paths()
 
