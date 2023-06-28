@@ -150,6 +150,8 @@ class PODPDownloader():
 
         self._download_metabolomics_zipfile(self.gnps_task_id)
 
+        # TODO CG: this function will modify the project_json['genomes'],
+        # this should be done in a better way
         podp_download_and_extract_antismash_data(self.project_json['genomes'],
                                 self.project_download_cache,
                                 self.project_file_cache)
@@ -211,10 +213,14 @@ class PODPDownloader():
         # create a set of mappings from one to the other, with the complication that
         # there might be mappings from 2 or more mzXMLs to a single strain.
         # also should record the growth medium using the "sample_preparation_label" field.
+
+        # TODO CG: build mappings from strain id to metabolomics filename (not spectrum id),
+        # when to build spectrum id to metabolomics filename mapping?
         for rec in met_records:
             # this is the global strain identifier we should use
             label = rec['genome_label']
             # only want to record the actual filename of the mzXML URL
+            # TODO CG: is filename always unique?
             filename = os.path.split(rec['metabolomics_file'])[1]
 
             # add the mzXML mapping for this strain
@@ -224,8 +230,11 @@ class PODPDownloader():
                 temp[label] = [filename]
             mc += 1
 
+        # TODO CG: build mappings from strain id to genome id (not BGC id),
+        # when to build BGC id to genome id mapping?
         for rec in gen_records:
             label = rec['genome_label']
+            # TODO CG: change `resolved_id` to `resolved_refseq_id`
             accession = rec.get('resolved_id', None)
             if accession is None:
                 # this will happen for genomes where we couldn't retrieve data or resolve the ID
