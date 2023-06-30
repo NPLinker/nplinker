@@ -1,15 +1,61 @@
 from __future__ import annotations
 import csv
+import json
 from os import PathLike
 from pathlib import Path
 from deprecated import deprecated
 from nplinker.logconfig import LogConfig
 from nplinker.strain_collection import StrainCollection
+from nplinker.utils import list_dirs
+from nplinker.utils import list_files
 from .bgc import BGC
 from .gcf import GCF
 
 
 logger = LogConfig.getLogger(__name__)
+
+GENOME_BGC_MAPPINGS_FILENAME = "genome_bgc_mappings.json"
+
+
+def generate_genome_bgc_mappings_file(bgc_dir: str | PathLike) -> None:
+    """Generate a file that maps genome id to BGC id.
+
+    The output file is named in variable `GENOME_BGC_MAPPINGS_FILENAME` and
+    is placed in the same directory as `bgc_dir`. The file will be overwritten
+    if it already exists.
+
+    Args:
+        bgc_dir(str | PathLike): The directory has one-layer of subfolders and
+            each subfolder contains BGC files in `.gbk` format.
+            It assumes that
+            - the subfolder name is the genome id (e.g. refseq),
+            - the BGC file name is the BGC id.
+    """
+    bgc_dir = Path(bgc_dir)
+    genome_bgc_mappings = {}
+
+    for subdir in list_dirs(bgc_dir):
+        genome_id = Path(subdir).name
+        bgc_files = list_files(subdir, suffix=(".gbk"), keep_parent=False)
+        bgc_ids = [
+            bgc_id for f in bgc_files if (bgc_id := Path(f).stem) != genome_id
+        ]
+        genome_bgc_mappings[genome_id] = bgc_ids
+
+    # sort mappings by genome_id and construct json data
+    genome_bgc_mappings = dict(sorted(genome_bgc_mappings.items()))
+    json_data = [{
+        "genome_ID": k,
+        "BGC_ID": v
+    } for k, v in genome_bgc_mappings.items()]
+    json_data = {
+        "mappings": json_data,
+        "count": len(json_data),
+        "version": "1.0"
+    }
+
+    with open(bgc_dir / GENOME_BGC_MAPPINGS_FILENAME, "w") as f:
+        json.dump(json_data, f)
 
 
 def map_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC],
@@ -36,7 +82,8 @@ def map_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC],
             genome_id = bgc_genome_mapping[bgc.bgc_id]
         except KeyError as e:
             raise KeyError(
-                f"Not found BGC id {bgc.bgc_id} in BGC-genome mappings.") from e
+                f"Not found BGC id {bgc.bgc_id} in BGC-genome mappings."
+            ) from e
         try:
             strain = strains.lookup(genome_id)
         except KeyError as e:
