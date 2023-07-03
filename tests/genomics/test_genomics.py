@@ -1,14 +1,43 @@
 from __future__ import annotations
+import json
 import pytest
 from nplinker.genomics import BGC
 from nplinker.genomics import filter_mibig_only_gcf
 from nplinker.genomics import GCF
+from nplinker.genomics import generate_genome_bgc_mappings_file
+from nplinker.genomics import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.genomics import get_bgcs_from_gcfs
 from nplinker.genomics import get_strains_from_bgcs
 from nplinker.genomics import map_bgc_to_gcf
 from nplinker.genomics import map_strain_to_bgc
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
+from .. import DATA_DIR
+
+
+def test_generate_genome_bgc_mappings_file():
+    bgc_dir = DATA_DIR / "antismash"
+
+    generate_genome_bgc_mappings_file(bgc_dir)
+
+    with open(bgc_dir / GENOME_BGC_MAPPINGS_FILENAME) as f:
+        mappings = json.load(f)
+
+    assert mappings["count"] == 2
+
+    assert mappings["mappings"][0]["genome_ID"] == "GCF_000514515.1"
+    assert len(mappings["mappings"][0]["BGC_ID"]) == 20
+    for bgc_id in ["NZ_AZWB01000005.region001", "NZ_KI911412.1.region001"]:
+        assert bgc_id in mappings["mappings"][0]["BGC_ID"]
+    assert "GCF_000514515.1" not in mappings["mappings"][0]["BGC_ID"]
+
+    assert mappings["mappings"][1]["genome_ID"] == "GCF_000514855.1"
+    assert len(mappings["mappings"][1]["BGC_ID"]) == 24
+    for bgc_id in ["NZ_AZWS01000001.region001", "NZ_KI911483.1.region001"]:
+        assert bgc_id in mappings["mappings"][1]["BGC_ID"]
+    assert "GCF_000514855.1" not in mappings["mappings"][1]["BGC_ID"]
+
+    (bgc_dir / GENOME_BGC_MAPPINGS_FILENAME).unlink()
 
 
 @pytest.fixture
