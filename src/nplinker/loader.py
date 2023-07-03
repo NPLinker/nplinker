@@ -1,20 +1,21 @@
 import glob
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 from nplinker.annotations import load_annotations
 from nplinker.class_info.chem_classes import ChemClassPredictions
 from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
 from nplinker.genomics import load_gcfs
 from nplinker.genomics.antismash import AntismashBGCLoader
-from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.genomics.mibig import MibigBGCLoader
+from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.metabolomics import load_dataset
 from nplinker.pairedomics.downloader import PODPDownloader
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.strain_collection import StrainCollection
+
 
 try:
     from importlib.resources import files

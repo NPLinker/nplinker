@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING
 from .config import Config
 from .genomics import BGC
 from .genomics import GCF
-from .loader import DatasetLoader
 from .loader import NPLINKER_APP_DATA_DIR
+from .loader import DatasetLoader
 from .logconfig import LogConfig
 from .metabolomics.molecular_family import MolecularFamily
 from .metabolomics.spectrum import Spectrum
@@ -16,6 +16,7 @@ from .scoring.link_collection import LinkCollection
 from .scoring.metcalf_scoring import MetcalfScoring
 from .scoring.np_class_scoring import NPClassScoring
 from .scoring.rosetta_scoring import RosettaScoring
+from .strain_collection import StrainCollection
 
 
 if TYPE_CHECKING:

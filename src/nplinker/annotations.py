@@ -19,6 +19,7 @@ from nplinker.metabolomics.spectrum import GNPS_KEY
 from nplinker.metabolomics.spectrum import Spectrum
 from .logconfig import LogConfig
 
+
 logger = LogConfig.getLogger(__name__)
 
 GNPS_URL_FORMAT = 'https://metabolomics-usi.ucsd.edu/{}/?usi=mzspec:GNPSLIBRARY:{}'
