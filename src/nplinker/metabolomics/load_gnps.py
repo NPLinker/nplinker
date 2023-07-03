@@ -4,10 +4,11 @@ import re
 from typing import Any
 from deprecated import deprecated
 from nplinker.logconfig import LogConfig
+from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_file_mapping
+from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
 from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
-from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_file_mapping ,GNPSFormat
 
 
 logger = LogConfig.getLogger(__name__)
@@ -102,7 +103,7 @@ def _parse_mzxml_header(hdr: str, strains: StrainCollection, md_table: dict[str,
         the strain_mappings file. finally it also tries to extract the growth
         medium label as given in the metadata_table file, again using the strain
         label which should match between the two files.
-        >>> 
+        >>>
         """
 
 
@@ -160,14 +161,14 @@ def _parse_mzxml_header(hdr: str, strains: StrainCollection, md_table: dict[str,
     return (strain_name, growth_medium, strain_name not in strains)
 
 
-def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, file: str, spec_dict: dict[int, Spectrum]) -> dict[str, int]:
+def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, file: str, spec_dict: dict[str, Spectrum]) -> dict[str, int]:
     """ Load info about clusters from old style GNPS files.
 
     Args:
         gnps_format(str): Identifier for the GNPS format of the file. Has to be one of [GNPS_FORMAT_OLD_ALLFILES, GNPS_FORMAT_OLD_UNIQUEFILES]
         strains(StrainCollection): StrainCollection in which to search for the detected strains.
         file(str): Path to file from which to load the cluster information.
-        spec_dict(dict[int, Spectrum]): Dictionary with already loaded spectra into which the metadata read from the file will be inserted.
+        spec_dict(dict[str, Spectrum]): Dictionary with already loaded spectra into which the metadata read from the file will be inserted.
 
     Raises:
         Exception: Raises exception if not supported GNPS format was detected.
@@ -194,7 +195,7 @@ def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, file: str
 
         for line in reader:
             # get the values of the important columns
-            clu_index = int(line[clu_index_index])
+            clu_index = line[clu_index_index]
             if gnps_format == GNPSFormat.UniqueFiles:
                 mzxmls = line[mzxml_index].split('|')
             else:
@@ -314,7 +315,7 @@ def _parse_metadata_table(file: str) -> dict[str, dict[str, str|None]]:
 
 
 def _load_clusterinfo_fbmn(strains: StrainCollection, nodes_file: str, extra_nodes_file: str,
-                           md_table_file: str, spec_dict: dict[int, Spectrum], ext_metadata_parsing: bool) -> tuple[dict[int, dict[str, str|None]], dict[str, int]]:
+                           md_table_file: str, spec_dict: dict[str, Spectrum], ext_metadata_parsing: bool) -> tuple[dict[str, dict[str, str|None]], dict[str, str]]:
     """Load the clusterinfo from a feature based molecular networking run output from GNPS.
 
     Args:
@@ -322,11 +323,11 @@ def _load_clusterinfo_fbmn(strains: StrainCollection, nodes_file: str, extra_nod
         nodes_file(str): File from which to load the cluster information.
         extra_nodes_file(str): Unknown.
         md_table_file(str): Path to metadata table. Deprecated.
-        spec_dict(dict[int, Spectrum]): Dictionary with already loaded spectra.
+        spec_dict(dict[str, Spectrum]): Dictionary with already loaded spectra.
         ext_metadata_parsing(bool): Whether to use extended metadata parsing.
 
     Returns:
-        tuple[dict[int, dict], dict[str, int]]: Spectra info mapping from spectrum id to all columns in the nodes file and unknown strain mapping from file identifier to spectrum id.
+        tuple[dict[str, dict], dict[str, str]]: Spectra info mapping from spectrum id to all columns in the nodes file and unknown strain mapping from file identifier to spectrum id.
     """
     spec_info = {}
 
@@ -347,7 +348,7 @@ def _load_clusterinfo_fbmn(strains: StrainCollection, nodes_file: str, extra_nod
             tmp = {}
             for i, v in enumerate(line):
                 tmp[headers[i]] = v
-            spec_info[int(line[ci_index])] = tmp
+            spec_info[line[ci_index]] = tmp
 
     with open(extra_nodes_file) as f:
         reader = csv.reader(f, delimiter=',')
@@ -358,7 +359,7 @@ def _load_clusterinfo_fbmn(strains: StrainCollection, nodes_file: str, extra_nod
         # nodes_file to the "row ID" from this file, and update the per-row dict
         # with the extra columns from this file
         for line in reader:
-            ri = int(line[ri_index])
+            ri = line[ri_index]
             tmp = {}
             for i, v in enumerate(line):
                 tmp[headers[i]] = v
@@ -437,7 +438,7 @@ def _load_clusterinfo_fbmn(strains: StrainCollection, nodes_file: str, extra_nod
 
 @deprecated(version="1.3.3", reason="Use the GNPSFileMappingLoader class instead.")
 def load_gnps(strains: StrainCollection, nodes_file: str, quant_table_file: str, metadata_table_file: str,
-              ext_metadata_parsing: bool, spec_dict: dict[int, Spectrum]) -> dict[str, int]:
+              ext_metadata_parsing: bool, spec_dict: dict[str, Spectrum]) -> dict[str, int]:
     """Wrapper function to load information from GNPS outputs.
 
     Args:
@@ -446,13 +447,13 @@ def load_gnps(strains: StrainCollection, nodes_file: str, quant_table_file: str,
         quant_table_file(str): Path to the quantification table.
         metadata_table_file(str): Path to the metadata table.
         ext_metadata_parsing(bool): Whether to use extended metadata parsing.
-        spec_dict(dict[int, Spectrum]): Mapping from int to spectra loaded from file.
+        spec_dict(dict[str, Spectrum]): Mapping from int to spectra loaded from file.
 
     Raises:
         Exception: Raises exception if an unknown GNPS format is encountered.
 
     Returns:
-        dict[str, int]: Returns a mapping from unknown strains which are found to spectra ids which occur in these unknown strains. 
+        dict[str, int]: Returns a mapping from unknown strains which are found to spectra ids which occur in these unknown strains.
         """
     gnps_format = gnps_format_from_file_mapping(nodes_file, quant_table_file
                                         is not None)

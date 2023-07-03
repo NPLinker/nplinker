@@ -1,30 +1,23 @@
 from typing_extensions import Self
-
 from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 
+
 class MolecularFamily():
 
-    def __init__(self, family_id: int):
+    def __init__(self, family_id: str):
         """Class to model molecular families.
 
         Args:
-            family_id(int): Id for the molecular family.
+            family_id(str): Id for the molecular family.
         """
         self.id: int = -1
-        self.family_id: int = family_id
+        self.family_id: str = family_id
         self.spectra: list[Spectrum] = []
-        self.family = None
-        self.spectra_ids: set[int] = set()
+        self.spectra_ids: set[str] = set()
 
-    # def has_strain(self, strain):
-    #     for spectrum in self.spectra:
-    #         if spectrum.has_strain(strain):
-    #             return True
-
-    #     return False
-
+    # TODO: change property to attibute
     @property
     def strains(self) -> StrainCollection:
         """Get strains of spectra in the molecular family.
@@ -38,6 +31,18 @@ class MolecularFamily():
                 strains.add(strain)
         return strains
 
+    def has_strain(self, strain: str | Strain) -> bool:
+        """Check if the given strain exists.
+
+        Args:
+            strain(str | Strain): strain id or `Strain` object.
+
+        Returns:
+            bool: True when the given strain exist.
+        """
+        return strain in self.strains
+
+    # TODO: update the logics, mf should also be added to the spectrum object
     def add_spectrum(self, spectrum: Spectrum):
         """Add a spectrum to the spectra list.
 
@@ -50,11 +55,10 @@ class MolecularFamily():
         return 'MolFam(family_id={}, spectra={})'.format(
             self.family_id, len(self.spectra))
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other) -> bool:
         if isinstance(other, MolecularFamily):
             return (self.id == other.id
-                    and self.family_id == other.family_id
-                    and set(self.spectra) == set(other.spectra))
+                    and self.family_id == other.family_id)
         return NotImplemented
 
     def __hash__(self) -> int:

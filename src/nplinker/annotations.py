@@ -14,10 +14,9 @@
 
 import csv
 import os
-
 from deprecated import deprecated
-
-from nplinker.metabolomics.spectrum import Spectrum, GNPS_KEY
+from nplinker.metabolomics.spectrum import GNPS_KEY
+from nplinker.metabolomics.spectrum import Spectrum
 from .logconfig import LogConfig
 
 
@@ -61,14 +60,14 @@ def create_gnps_annotation(spec: Spectrum, gnps_anno: dict):
 
 
 @deprecated(version="1.3.3", reason="Use GNPSAnnotationLoader class instead.")
-def load_annotations(root: str | os.PathLike, config: str | os.PathLike, spectra: list[Spectrum], spec_dict: dict[int, Spectrum]) -> list[Spectrum]:
+def load_annotations(root: str | os.PathLike, config: str | os.PathLike, spectra: list[Spectrum], spec_dict: dict[str, Spectrum]) -> list[Spectrum]:
     """Load the annotations from the GNPS annotation file present in root to the spectra.
 
     Args:
         root(str | os.PathLike): Path to the downloaded and extracted GNPS results.
         config(str | os.PathLike): Path to config file for custom file locations.
         spectra(list[Spectrum]): List of spectra to annotate.
-        spec_dict(dict[int, Spectrum]): Dictionary mapping to spectra passed in `spectra` variable.
+        spec_dict(dict[str, Spectrum]): Dictionary mapping to spectra passed in `spectra` variable.
 
     Raises:
         Exception: Raises exception if custom annotation config file has invalid content.
@@ -76,7 +75,7 @@ def load_annotations(root: str | os.PathLike, config: str | os.PathLike, spectra
     Returns:
         list[Spectrum]: List of annotated spectra.
     """
-    
+
     if not os.path.exists(root):
         logger.debug(f'Annotation directory not found ({root})')
         return spectra
@@ -89,7 +88,7 @@ def load_annotations(root: str | os.PathLike, config: str | os.PathLike, spectra
 
     logger.debug('Found {} annotations .tsv files in {}'.format(
         len(annotation_files), root))
-    
+
     for af in annotation_files:
         with open(af) as f:
             rdr = csv.reader(f, delimiter='\t')
@@ -105,7 +104,7 @@ def load_annotations(root: str | os.PathLike, config: str | os.PathLike, spectra
                 # each line should be a different spec ID here
                 for line in rdr:
                     # read the scan ID column and get the corresponding Spectrum object
-                    scan_id = int(line[scans_index])
+                    scan_id = line[scans_index]
                     if scan_id not in spec_dict:
                         logger.warning(
                             'Unknown spectrum ID found in GNPS annotation file (ID={})'
@@ -147,7 +146,7 @@ def load_annotations(root: str | os.PathLike, config: str | os.PathLike, spectra
                 # note that might have multiple lines for the same spec ID!
                 spec_annotations = {}
                 for line in rdr:
-                    scan_id = int(line[spec_id_index])
+                    scan_id = line[spec_id_index]
                     if scan_id not in spec_dict:
                         logger.warning(
                             'Unknown spectrum ID found in annotation file "{}", ID is "{}"'

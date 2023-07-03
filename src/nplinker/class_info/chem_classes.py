@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import Counter
 import glob
 import os
-from collections import Counter
 from canopus import Canopus
 from canopus.classifications_to_gnps import analyse_canopus
 from ..logconfig import LogConfig
@@ -399,17 +399,17 @@ class CanopusResults:
         molfam_classes = {}
 
         for molfam in molfams:
-            fid = str(molfam.family_id)  # the key
+            fid = molfam.family_id  # the key
             spectra = molfam.spectra
-            # if singleton family, format like '-1_spectrum-id'
-            if fid == '-1':
+            # if singleton family, format like 'fid_spectrum-id'
+            if fid.startswith('singleton-'):
                 spec_id = spectra[0].spectrum_id
                 fid += f'_{spec_id}'
             len_molfam = len(spectra)
 
             classes_per_spectra = []
             for spec in spectra:
-                spec_classes = self.spectra_classes.get(str(spec.spectrum_id))
+                spec_classes = self.spectra_classes.get(spec.spectrum_id)
                 if spec_classes:  # account for spectra without prediction
                     classes_per_spectra.append(spec_classes)
 
@@ -555,6 +555,7 @@ class MolNetEnhancerResults:
                 nr_nodes = line.pop(0)
                 # todo: make it easier to query classes of singleton families
                 # if singleton family, format like '-1_spectrum-id' like canopus results
+                # CG: Note that the singleton families id is "singleton-" + uuid.
                 if nr_nodes == '1':
                     component = f'-1_{cluster}'
                 class_info = []

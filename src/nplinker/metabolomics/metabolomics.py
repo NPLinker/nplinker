@@ -35,7 +35,7 @@ def _mols_to_spectra(ms2, metadata):
 
     spectra = []
     for i, m in enumerate(ms2_dict.keys()):
-        new_spectrum = Spectrum(i, ms2_dict[m], int(m.name),
+        new_spectrum = Spectrum(i, ms2_dict[m], m.name,
                                 metadata[m.name]['precursormass'],
                                 metadata[m.name]['parentmass'])
         new_spectrum.metadata = metadata[m.name]
@@ -53,15 +53,15 @@ def _mols_to_spectra(ms2, metadata):
     return spectra
 
 @deprecated(version="1.3.3", reason="Use the GNPSMolecularFamilyLoader class instead.")
-def load_edges(edges_file: str, spec_dict: dict[int, Spectrum]):
+def load_edges(edges_file: str | PathLike, spec_dict: dict[str, Spectrum]):
     """Insert information about the molecular family into the spectra.
 
     Args:
         edges_file(str): File containing the molecular families.
-        spec_dict(dict[int, Spectrum]): Dictionary with mapping from spectra_id to Spectrum.
+        spec_dict(dict[str, Spectrum]): Dictionary with mapping from spectra_id to Spectrum.
 
     Raises:
-        Exception: Raises exception if the edges file doesn't contain the correct columns. 
+        Exception: Raises exception if the edges file doesn't contain the correct columns.
     """
     logger.debug('loading edges file: {} [{} spectra from MGF]'.format(
         edges_file, len(spec_dict)))
@@ -79,16 +79,16 @@ def load_edges(edges_file: str, spec_dict: dict[int, Spectrum]):
                     edges_file))
 
         for line in reader:
-            spec1_id = int(line[cid1_index])
-            spec2_id = int(line[cid2_index])
+            spec1_id = line[cid1_index]
+            spec2_id = line[cid2_index]
             cosine = float(line[cos_index])
-            family = int(line[fam_index])
+            family = line[fam_index]
 
             if spec1_id in spec_dict and spec2_id in spec_dict:
                 spec1 = spec_dict[spec1_id]
                 spec2 = spec_dict[spec2_id]
 
-                if family != -1:  # singletons
+                if family != '-1':  # singletons
                     spec1.family_id = family
                     spec2.family_id = family
 
@@ -134,7 +134,7 @@ def load_dataset(strains,
     # spec_dict = {spec.spectrum_id: spec for spec in spectra}
 
     # add edges info to the spectra
-    molfams = make_families(spec_dict.values())
+    molfams = make_families(list(spec_dict.values()))
     # molfams = GNPSMolecularFamilyLoader(edges_file).families()
 
     unknown_strains = load_gnps(strains, nodes_file, quant_table_file,
@@ -145,7 +145,7 @@ def load_dataset(strains,
 
 
 @deprecated(version="1.3.3", reason="Use the GNPSSpectrumLoader class instead.")
-def load_spectra(mgf_file: str | PathLike, edges_file: str | PathLike) -> dict[int, Spectrum]:
+def load_spectra(mgf_file: str | PathLike, edges_file: str | PathLike) -> dict[str, Spectrum]:
     """Wrapper function to load spectra and init the molecular family links.
 
     Args:
@@ -153,14 +153,14 @@ def load_spectra(mgf_file: str | PathLike, edges_file: str | PathLike) -> dict[i
         edges_file(str | PathLike): File storing the molecular family information in .selfloop or .pairsinfo format.
 
     Returns:
-        dict[int, Spectrum]: Indexed dict of mass spectra.
+        dict[str, Spectrum]: Indexed dict of mass spectra.
     """
 
     ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([str(mgf_file)])
     logger.info('%d molecules parsed from MGF file', len(ms1))
     spectra = _mols_to_spectra(ms2, metadata)    # above returns a list, create a dict indexed by spectrum_id to make
     # the rest of the parsing a bit simpler
-    spec_dict: dict[int, Spectrum] = {spec.spectrum_id: spec for spec in spectra}
+    spec_dict: dict[str, Spectrum] = {spec.spectrum_id: spec for spec in spectra}
     load_edges(edges_file, spec_dict)
     return spec_dict
 
@@ -181,7 +181,7 @@ def make_families(spectra: list[Spectrum]) -> list[MolecularFamily]:
     fams, singles = 0, 0
     for spectrum in spectra:
         family_id = spectrum.family_id
-        if family_id == -1:  # singleton
+        if family_id == '-1':  # singleton
             new_family = SingletonFamily()
             new_family.id = family_index
             family_index += 1

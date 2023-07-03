@@ -1,20 +1,8 @@
-# Copyright 2021 The NPLinker Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+from __future__ import annotations
 import copy
 import logging
 import sys
+from typing import TYPE_CHECKING
 from .config import Args
 from .config import Config
 from .genomics import BGC
@@ -28,7 +16,12 @@ from .scoring.link_collection import LinkCollection
 from .scoring.metcalf_scoring import MetcalfScoring
 from .scoring.np_class_scoring import NPClassScoring
 from .scoring.rosetta_scoring import RosettaScoring
+from .strain_collection import StrainCollection
 
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from .strains import Strain
 
 logger = LogConfig.getLogger(__name__)
 
@@ -130,7 +123,9 @@ class NPLinker():
         self._class_matches = None
 
         self._bgc_lookup = {}
+        self._gcf_lookup = {}
         self._spec_lookup = {}
+        self._mf_lookup = {}
 
         self._scoring_methods = {}
         config_methods = self._config.config.get('scoring_methods', [])
@@ -260,6 +255,7 @@ class NPLinker():
         Returns:
             bool: True if successful, False otherwise
         """
+        # TODO: the met_only is useless, remove it. NPlinker will stop working if met_only=True
         # typical case where load_data is being called with no params
         if new_bigscape_cutoff is None:
             logger.debug(
@@ -272,8 +268,7 @@ class NPLinker():
         else:
             # CG: only reload genomics data when changing bigscape cutoff
             # TODO: this part should be removed, reload everything if bigscape data changes.
-            logger.debug(
-                f'load_data with new cutoff = {new_bigscape_cutoff}')
+            logger.debug(f'load_data with new cutoff = {new_bigscape_cutoff}')
             # 1. change the cutoff (which by itself doesn't do anything)
             self._loader._bigscape_cutoff = new_bigscape_cutoff
             # 2. reload the strain mappings (MiBIG filtering may have removed strains
@@ -294,29 +289,23 @@ class NPLinker():
         self._class_matches = self._loader.class_matches
 
         logger.debug('Generating lookup tables: genomics')
-        self._bgc_lookup = {}
-        for i, bgc in enumerate(self._bgcs):
-            self._bgc_lookup[bgc.bgc_id] = i
-
-        self._gcf_lookup = {}
-        for i, gcf in enumerate(self._gcfs):
-            self._gcf_lookup[gcf.gcf_id] = i
+        self._bgc_lookup = {bgc.bgc_id: bgc for bgc in self._bgcs}
+        self._gcf_lookup = {gcf.gcf_id: gcf for gcf in self._gcfs}
 
         # don't need to do these two if cutoff changed (indicating genomics data
         # was reloaded but not metabolomics)
         if new_bigscape_cutoff is None:
             logger.debug('Generating lookup tables: metabolomics')
-            self._spec_lookup = {}
-            for i, spec in enumerate(self._spectra):
-                self._spec_lookup[spec.spectrum_id] = i
-
-            self._molfam_lookup = {}
-            for i, molfam in enumerate(self._molfams):
-                self._molfam_lookup[molfam.id] = i
+            self._spec_lookup = {
+                spec.spectrum_id: spec
+                for spec in self._spectra
+            }
+            self._mf_lookup = {mf.family_id: mf for mf in self._molfams}
 
         logger.debug('load_data: completed')
         return True
 
+    # TODO CG: refactor this method and update its unit tests
     def get_links(self, input_objects, scoring_methods, and_mode=True):
         """Find links for a set of input objects (BGCs/GCFs/Spectra/MolFams)
 
@@ -407,8 +396,8 @@ class NPLinker():
             objects_for_method = input_objects[i]
             logger.debug('Calling scoring method {} on {} objects'.format(
                 method.name, len(objects_for_method)))
-            link_collection = method.get_links(objects_for_method,
-                                               link_collection)
+            link_collection = method.get_links(*objects_for_method,
+                                               link_collection=link_collection)
 
         if not self._datalinks:
             logger.debug('Creating internal datalinks object')
@@ -432,20 +421,16 @@ class NPLinker():
             targets = list(
                 filter(lambda x: not isinstance(x, BGC), link_data.keys()))
             if len(targets) > 0:
-                shared_strains = self._datalinks.common_strains([source],
-                                                                targets, True)
-                for objpair in shared_strains.keys():
-                    shared_strains[objpair] = [
-                        self._strains.lookup_index(x)
-                        for x in shared_strains[objpair]
-                    ]
-
                 if isinstance(source, GCF):
+                    shared_strains = self._datalinks.get_common_strains(
+                        targets, [source], True)
                     for target, link in link_data.items():
                         if (target, source) in shared_strains:
                             link.shared_strains = shared_strains[(target,
                                                                   source)]
                 else:
+                    shared_strains = self._datalinks.get_common_strains(
+                        [source], targets, True)
                     for target, link in link_data.items():
                         if (source, target) in shared_strains:
                             link.shared_strains = shared_strains[(source,
@@ -457,51 +442,32 @@ class NPLinker():
             len(link_collection)))
         return link_collection
 
-    def get_common_strains(self, objects_a, objects_b, filter_no_shared=True):
-        """Retrive strains shared by arbitrary pairs of objects.
+    def get_common_strains(
+        self,
+        met: Sequence[Spectrum] | Sequence[MolecularFamily],
+        gcfs: Sequence[GCF],
+        filter_no_shared: bool = True
+    ) -> dict[tuple[Spectrum | MolecularFamily, GCF], list[Strain]]:
+        """Get common strains between given spectra/molecular families and GCFs.
 
-        Two lists of objects are required as input. Typically one list will be
-        MolecularFamily or Spectrum objects and the other GCF (which list is which
-        doesn't matter).
-
-        The return value is a dict mapping pairs of objects to lists of Strain objects
-        shared by that pair. This list may be empty if ``filter_no_shared`` is False,
-        indicating no shared strains were found.
-
-        If ``filter_no_shared`` is True, every entry in the dict with no shared strains
-        will be removed before it is returned, so the only entries will be those for
-        which shared strains exist.
+        Note that SingletonFamily objects are excluded from given molecular families.
 
         Args:
-            objects_a (list): a list of Spectrum/MolecularFamily/GCF objects
-            objects_b (list): a list of Spectrum/MolecularFamily/GCF objects
-            filter_no_shared (bool): if True, remove result entries for which no shared strains exist
+            met(Sequence[Spectrum] | Sequence[MolecularFamily]):
+                A list of Spectrum or MolecularFamily objects.
+            gcfs(Sequence[GCF]): A list of GCF objects.
+            filter_no_shared(bool): If True, the pairs of spectrum/mf and GCF
+                without common strains will be removed from the returned dict;
 
         Returns:
-            A dict mapping pairs of objects (obj1, obj2) to lists of Strain objects.
-
-            NOTE: The ordering of the pairs is *fixed* to be (metabolomic, genomic). In
-            other words, if objects_a = [GCF1, GC2, ...] and objects_b = [Spectrum1,
-            Spectrum2, ...], the object pairs will be (Spectrum1, GCF1), (Spectrum2,
-            GCF2), and so on. The same applies if objects_a and objects_b are swapped,
-            the metabolomic objects (Spectrum or MolecularFamily) will be the obj1
-            entry in each pair.
+            dict: A dict where the keys are tuples of (Spectrum/MolecularFamily, GCF)
+            and values are a list of shared Strain objects.
         """
         if not self._datalinks:
             self._datalinks = self.scoring_method(
                 MetcalfScoring.NAME).datalinks
-
-        # this is a dict with structure:
-        #   (Spectrum/MolecularFamily, GCF) => list of strain indices
-        common_strains = self._datalinks.common_strains(
-            objects_a, objects_b, filter_no_shared)
-
-        # replace the lists of strain indices with actual strain objects
-        for objpair in common_strains.keys():
-            common_strains[objpair] = [
-                self._strains.lookup_index(x) for x in common_strains[objpair]
-            ]
-
+        common_strains = self._datalinks.get_common_strains(
+            met, gcfs, filter_no_shared)
         return common_strains
 
     def has_bgc(self, bgc_id):
@@ -510,15 +476,19 @@ class NPLinker():
 
     def lookup_bgc(self, bgc_id):
         """If BGC ``bgc_id`` exists, return it. Otherwise return None"""
-        return self._bgcs[self._bgc_lookup[bgc_id]] if self.has_bgc(bgc_id) else None
+        return self._bgc_lookup.get(bgc_id, None)
 
     def lookup_gcf(self, gcf_id):
         """If GCF ``gcf_id`` exists, return it. Otherwise return None"""
-        return self._gcfs[self._gcf_lookup[gcf_id]] if gcf_id in self._gcf_lookup else None
+        return self._gcf_lookup.get(gcf_id, None)
 
-    def lookup_spectrum(self, name):
+    def lookup_spectrum(self, spectrum_id):
         """If Spectrum ``name`` exists, return it. Otherwise return None"""
-        return self._spectra[self._spec_lookup[name]] if name in self._spec_lookup else None
+        return self._spec_lookup.get(spectrum_id, None)
+
+    def lookup_mf(self, mf_id):
+        """If MolecularFamily `family_id` exists, return it. Otherwise return None"""
+        return self._mf_lookup.get(mf_id, None)
 
     @property
     def strains(self):
@@ -596,55 +566,3 @@ class NPLinker():
             self._scoring_methods_setup_complete[name] = True
 
         return self._scoring_methods.get(name, None)(self)
-
-
-if __name__ == "__main__":
-    # can set default logging configuration this way...
-    LogConfig.setLogLevel(logging.DEBUG)
-
-    # initialise NPLinker from the command-line arguments
-    npl = NPLinker(Args().get_args())
-
-    # load the dataset
-    if not npl.load_data():
-        print('Failed to load the dataset!')
-        sys.exit(-1)
-
-    # create a metcalf scoring object
-    mc = npl.scoring_method('metcalf')
-    if mc is not None:
-        # set a scoring cutoff threshold
-        mc.cutoff = 0.5
-
-        # pick some GCFs to get links for
-        test_gcfs = npl.gcfs[:10]
-
-        # tell nplinker to find links for this set of GCFs using metcalf
-        # scoring
-        results = npl.get_links(test_gcfs, mc)
-
-        # check if any links were found
-        if len(results) == 0:
-            print('No links found!')
-            sys.exit(0)
-
-        # the "result" object will be a LinkCollection, holding all the information
-        # returned by the scoring method(s) used
-        print(f'{len(results)} total links found')
-
-        # display some information about each object and its links
-        for obj, result in results.links.items():
-            print('Results for object: {}, {} total links, {} methods used'.
-                  format(obj, len(result), results.method_count))
-
-            # get links for this object, sorted by metcalf score
-            sorted_links = results.get_sorted_links(mc, obj)
-            for link_data in sorted_links:
-                print('  --> [{}] {} | {} | # shared_strains = {}'.format(
-                    ','.join(method.name for method in link_data.methods),
-                    link_data.target, link_data[mc],
-                    len(link_data.shared_strains)))
-
-    rs = npl.scoring_method('rosetta')
-    if rs is not None:
-        print('OK')

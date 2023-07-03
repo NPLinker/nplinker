@@ -27,8 +27,7 @@ class Strain():
 
     def __eq__(self, other) -> bool:
         if isinstance(other, Strain):
-            return (self.id == other.id
-                    and self.aliases == other.aliases)
+            return self.id == other.id
         return NotImplemented
 
     def __hash__(self) -> int:
@@ -38,6 +37,11 @@ class Strain():
         to avoid the hash value changes when `self._aliases` is updated.
         """
         return hash(self.id)
+
+    def __contains__(self, alias: str) -> bool:
+        if not isinstance(alias, str):
+            raise TypeError(f'Expected str, got {type(alias)}')
+        return alias in self._aliases
 
     @property
     def aliases(self) -> set[str]:
@@ -54,6 +58,8 @@ class Strain():
         Args:
             alias(str): The alias to add to the list of known aliases.
         """
+        if not isinstance(alias, str):
+            raise TypeError(f'Expected str, got {type(alias)}')
         if len(alias) == 0:
             logger.warning(
                 'Refusing to add an empty-string alias to strain {%s}', self)

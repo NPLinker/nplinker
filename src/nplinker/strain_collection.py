@@ -1,5 +1,4 @@
 import csv
-import os
 from os import PathLike
 from pathlib import Path
 from typing import Iterator
@@ -18,8 +17,8 @@ class StrainCollection():
     def __init__(self):
         """A collection of Strain objects."""
         self._strains: list[Strain] = []
-        self._strain_dict_id: dict[str, Strain] = {}
-        self._strain_dict_index: dict[int, Strain] = {}
+        # dict of strain name (id and alias) to primary strain object
+        self._strain_dict_name: dict[str, Strain] = {}
 
     def __repr__(self) -> str:
         return str(self)
@@ -37,18 +36,19 @@ class StrainCollection():
     def __eq__(self, other) -> bool:
         if isinstance(other, StrainCollection):
             return (self._strains == other._strains
-                    and self._strain_dict_id == other._strain_dict_id
-                    and self._strain_dict_index == other._strain_dict_index)
+                    and self._strain_dict_name == other._strain_dict_name)
         return NotImplemented
 
-    def __contains__(self, strain: str | Strain) -> bool:
-        if isinstance(strain, str):
-            value = strain in self._strain_dict_id
-        elif isinstance(strain, Strain):
-            value = strain.id in self._strain_dict_id
-        else:
-            raise TypeError(f"Expected Strain or str, got {type(strain)}")
-        return value
+    def __contains__(self, item: str | Strain) -> bool:
+        """Check if the strain collection contains the given strain.
+
+        The given strain could be a Strain object, or a strain id or alias.
+        """
+        if isinstance(item, str):
+            return item in self._strain_dict_name
+        if isinstance(item, Strain):
+            return item.id in self._strain_dict_name
+        raise TypeError(f"Expected Strain or str, got {type(item)}")
 
     def __iter__(self) -> Iterator[Strain]:
         return iter(self._strains)
@@ -62,17 +62,16 @@ class StrainCollection():
             strain(Strain): The strain to add.
         """
         # if the strain exists, merge the aliases
-        if strain.id in self._strain_dict_id:
+        if strain.id in self._strain_dict_name:
             existing: Strain = self.lookup(strain.id)
             for alias in strain.aliases:
                 existing.add_alias(alias)
-                self._strain_dict_id[alias] = existing
+                self._strain_dict_name[alias] = existing
         else:
-            self._strain_dict_index[len(self)] = strain
             self._strains.append(strain)
-            self._strain_dict_id[strain.id] = strain
+            self._strain_dict_name[strain.id] = strain
             for alias in strain.aliases:
-                self._strain_dict_id[alias] = strain
+                self._strain_dict_name[alias] = strain
 
     def remove(self, strain: Strain):
         """Remove a strain from the collection.
@@ -80,12 +79,11 @@ class StrainCollection():
         Args:
             strain(Strain): The strain to remove.
         """
-        if strain.id in self._strain_dict_id:
+        if strain.id in self._strain_dict_name:
             self._strains.remove(strain)
-            # remove from dict id
-            del self._strain_dict_id[strain.id]
+            del self._strain_dict_name[strain.id]
             for alias in strain.aliases:
-                del self._strain_dict_id[alias]
+                del self._strain_dict_name[alias]
 
     def filter(self, strain_set: set[Strain]):
         """
@@ -96,24 +94,11 @@ class StrainCollection():
             if strain not in strain_set:
                 self.remove(strain)
 
-    def lookup_index(self, index: int) -> Strain:
-        """Return the strain from lookup by index.
-
-        Args:
-            index(int): Position index from which to retrieve the strain
-
-        Returns:
-            Strain: Strain identified by the given index.
-        """
-        return self._strain_dict_index[index]
-
     def lookup(self, name: str) -> Strain:
         """Lookup a strain by name (id or alias).
 
-        If the name is found, return the strain object; Otherwise, raise a
-        KeyError.
-
         Args:
+
             name(str): Strain name (id or alias) to lookup.
 
         Returns:
@@ -122,9 +107,9 @@ class StrainCollection():
         Raises:
             KeyError: If the strain name is not found.
         """
-        if name not in self._strain_dict_id:
-            raise KeyError(f"Strain {name} not found in strain collection.")
-        return self._strain_dict_id[name]
+        if name in self:
+            return self._strain_dict_name[name]
+        raise KeyError(f"Strain {name} not found in strain collection.")
 
     def add_from_file(self, file: str | PathLike) -> None:
         """Add strains from a strain mapping file.

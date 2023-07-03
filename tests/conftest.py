@@ -36,7 +36,7 @@ def prepare_data():
 
 
 @pytest.fixture
-def spec_dict() -> dict[int, Spectrum]:
+def spec_dict() -> dict[str, Spectrum]:
     mgf_file = DATA_DIR / "spectra.mgf"
     edges_file = DATA_DIR / "edges.pairsinfo"
     return load_spectra(mgf_file, edges_file)

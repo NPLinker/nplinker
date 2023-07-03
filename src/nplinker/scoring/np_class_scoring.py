@@ -261,7 +261,7 @@ class NPClassScoring(ScoringMethod):
                 # list of list of tuples/None - todo: add to spectrum object?
                 # take only 'best' (first) classification per ontology level
                 all_classes = self.npl.chem_classes.canopus. \
-                    spectra_classes.get(str(spec_like.spectrum_id))
+                    spectra_classes.get(spec_like.spectrum_id)
                 if all_classes:
                     spec_like_classes = [
                         cls_per_lvl for lvl in all_classes
@@ -270,8 +270,8 @@ class NPClassScoring(ScoringMethod):
                 spec_like_classes_names_inds = self.npl.chem_classes.canopus. \
                     spectra_classes_names_inds
             else:  # molfam
-                fam_id = str(spec_like.family_id)
-                if fam_id == '-1':  # account for singleton families
+                fam_id = spec_like.family_id
+                if fam_id.startswith("singleton-"):  # account for singleton families
                     fam_id += f'_{spec_like.spectra[0].spectrum_id}'
                 all_classes = self.npl.chem_classes.canopus.molfam_classes.get(
                     fam_id)
@@ -288,8 +288,8 @@ class NPClassScoring(ScoringMethod):
                 spec_like_classes = self.npl.chem_classes.molnetenhancer. \
                     spectra_classes(spec_like.spectrum_id)
             else:  # molfam
-                fam_id = str(spec_like.family_id)
-                if fam_id == '-1':  # account for singleton families
+                fam_id = spec_like.family_id
+                if fam_id.startswith("singleton"):  # account for singleton families
                     fam_id += f'_{spec_like.spectra[0].spectrum_id}'
                 spec_like_classes = self.npl.chem_classes.molnetenhancer. \
                     molfam_classes.get(fam_id)
@@ -337,10 +337,12 @@ class NPClassScoring(ScoringMethod):
         if not self.npl._datalinks:
             self.npl._datalinks = self.npl.scoring_method(
                 MetcalfScoring.NAME).datalinks
-        # this is a dict with structure:
-        #   tup(Spectrum/MolecularFamily, GCF) => array of strain indices
-        common_strains = self.npl._datalinks.common_strains(
-            objects, targets, True)
+        if obj_is_gen:
+            common_strains = self.npl.get_common_strains(
+                targets, objects)
+        else:
+            common_strains = self.npl.get_common_strains(
+                objects, targets)
         logger.info(f"Calculating NPClassScore for {len(objects)} objects to "
                     f"{len(targets)} targets ({len(common_strains)} pairwise "
                     f"interactions that share at least 1 strain). This might "

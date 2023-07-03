@@ -245,7 +245,8 @@ def _filter_gcfs(
 
     for bgc in bgcs_to_remove:
         bgcs.remove(bgc)
-        strains.remove(bgc.strain)
+        if bgc.strain is not None:
+            strains.remove(bgc.strain)
 
     logger.info(
         'Remove GCFs that has only MIBiG BGCs: removing {} GCFs and {} BGCs'.

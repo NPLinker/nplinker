@@ -659,12 +659,6 @@ class DatasetLoader():
             antismash_bgc_loader.get_files(),
             self._bigscape_cutoff)
 
-        # CG TODO: remove the gcf.id, see issue 103
-        #    https://github.com/NPLinker/nplinker/issues/103
-        # This is only place to set gcf.id value.
-        for i, gcf in enumerate(self.gcfs):
-            gcf.id = i
-
         #----------------------------------------------------------------------
         # CG: write unknown strains in genomics to file
         #----------------------------------------------------------------------
@@ -680,6 +674,7 @@ class DatasetLoader():
 
         return True
 
+    # TODO CG: replace deprecated load_dataset with GPNSLoader
     def _load_metabolomics(self):
         spec_dict, self.spectra, self.molfams, unknown_strains = load_dataset(
             self.strains,

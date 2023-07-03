@@ -32,7 +32,7 @@ def test_reads_all_annotations(file, expected):
     assert len(sut.get_annotations()) == expected
 
 
-def test_annotations_are_equal(spec_dict: dict[int, Spectrum]):
+def test_annotations_are_equal(spec_dict: dict[str, Spectrum]):
     annotations_dir = DATA_DIR / "annotations"
     annotations_file = annotations_dir / "gnps_annotations.tsv"
 
@@ -44,7 +44,7 @@ def test_annotations_are_equal(spec_dict: dict[int, Spectrum]):
         spectra,
         spec_dict
     )
-    expected: dict[int, dict] = {}
+    expected = {}
     for x in sut:
         if x.has_annotations():
             expected[x.spectrum_id] = x.gnps_annotations

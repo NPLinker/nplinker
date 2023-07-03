@@ -4,6 +4,7 @@ from deprecated import deprecated
 from nplinker.logconfig import LogConfig
 from .aa_pred import predict_aa
 
+
 if TYPE_CHECKING:
     from ..strains import Strain
     from .gcf import GCF
@@ -121,7 +122,7 @@ class BGC():
         self._strain = strain
 
     @property
-    def bigscape_classes(self) -> set[str]:
+    def bigscape_classes(self) -> set[str | None]:
         """Get BiG-SCAPE's BGC classes.
 
         BiG-SCAPE's BGC classes are similar to those defined in MiBIG but have
