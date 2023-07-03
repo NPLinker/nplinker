@@ -160,6 +160,4 @@ def test_get_strains_from_bgcs(strain_collection, bgc_list,
     map_strain_to_bgc(strain_collection, bgc_list, bgc_genome_mapping)
     strains = get_strains_from_bgcs(bgc_list)
     assert isinstance(strains, StrainCollection)
-    for strain in strain_collection:
-        assert strain in strains
-    # assert strains == strain_collection # use it when issue #113 is solved
+    assert strains == strain_collection
