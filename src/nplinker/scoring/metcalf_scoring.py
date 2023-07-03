@@ -122,8 +122,7 @@ class MetcalfScoring(ScoringMethod):
     def datalinks(self) -> DataLinks:
         return MetcalfScoring.DATALINKS
 
-    def get_links(self, *objects: tuple[GCF, ...] | tuple[Spectrum, ...]
-                  | tuple[MolecularFamily, ...],
+    def get_links(self, *objects: GCF | Spectrum | MolecularFamily,
                   link_collection: LinkCollection) -> LinkCollection:
         """Get links for the given objects and add them to the given LinkCollection.
 
@@ -131,7 +130,7 @@ class MetcalfScoring(ScoringMethod):
         be GCF, Spectrum or MolecularFamily objects.
 
         Args:
-            objects(tuple): The objects to get links for. Must be GCF, Spectrum
+            objects: The objects to get links for. Must be GCF, Spectrum
                 or MolecularFamily objects.
             link_collection: The LinkCollection object to add the links to.
 
