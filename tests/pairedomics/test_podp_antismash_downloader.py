@@ -1,6 +1,6 @@
-import csv
 import json
 from pathlib import Path
+import tempfile
 import pytest
 from nplinker.pairedomics import GENOME_STATUS_FILENAME
 from nplinker.pairedomics import GenomeStatus
@@ -23,20 +23,71 @@ def genome_status_file(download_root):
     return Path(download_root, GENOME_STATUS_FILENAME)
 
 
-# Test __init__ method of GenomeStatus class
-@pytest.mark.parametrize("params, expected",
-                         [(["GCF_000515175.1", "None", "False", ""
-                            ], ["GCF_000515175.1", "", False, ""]),
-                          (["GCF_000515175.1", "None", "True", ""
-                            ], ["GCF_000515175.1", "", True, ""]),
-                          (["GCF_000515175.1", "GCF_000515175.1", "True", ""],
-                           ["GCF_000515175.1", "GCF_000515175.1", True, ""]),
-                          (["GCF_000515175.1", "None", "False", "filename"
-                            ], ["GCF_000515175.1", "", False, "filename"])])
+# Test `GenomeStatus` class
+@pytest.mark.parametrize("params, expected", [
+    (["genome1"], ["genome1", "", False, ""]),
+    (["genome1", "refseq1", True, "/path/to/file"
+      ], ["genome1", "refseq1", True, "/path/to/file"]),
+])
 def test_genome_status_init(params, expected):
     gs = GenomeStatus(*params)
-    assert [gs.original_id, gs.resolved_refseq_id, gs.resolve_attempted,
-            gs.bgc_path] == expected
+    assert [
+        gs.original_id, gs.resolved_refseq_id, gs.resolve_attempted,
+        gs.bgc_path
+    ] == expected
+
+
+def test_genome_status_load_from_json(tmp_path):
+    data = {
+        "genome_status": [{
+            "original_id": "genome1",
+            "resolved_refseq_id": "refseq1",
+            "resolve_attempted": True,
+            "bgc_path": "/path/to/bgc1"
+        }, {
+            "original_id": "genome2",
+            "resolved_refseq_id": "",
+            "resolve_attempted": False,
+            "bgc_path": ""
+        }],
+        "version":
+        "1.0"
+    }
+    file_path = tmp_path / GENOME_STATUS_FILENAME
+    with open(file_path, "w") as f:
+        json.dump(data, f)
+    genome_status_dict = GenomeStatus.load_from_json(file_path)
+
+    assert len(genome_status_dict) == 2
+    assert genome_status_dict["genome1"].original_id == "genome1"
+    assert genome_status_dict["genome1"].resolved_refseq_id == "refseq1"
+    assert genome_status_dict["genome1"].resolve_attempted is True
+    assert genome_status_dict["genome1"].bgc_path == "/path/to/bgc1"
+    assert genome_status_dict["genome2"].original_id == "genome2"
+    assert genome_status_dict["genome2"].resolved_refseq_id == ""
+    assert genome_status_dict["genome2"].resolve_attempted is False
+    assert genome_status_dict["genome2"].bgc_path == ""
+
+
+def test_genome_status_save_to_json(tmp_path):
+    genome_status_dict = {
+        "genome1": GenomeStatus("genome1", "refseq1", True, "/path/to/bgc1"),
+        "genome2": GenomeStatus("genome2", "", False, "")
+    }
+    GenomeStatus.save_to_json(genome_status_dict, tmp_path)
+    with open(tmp_path / GENOME_STATUS_FILENAME, "r") as f:
+        loaded_data = json.load(f)
+
+    assert loaded_data["version"] == "1.0"
+    assert len(loaded_data["genome_status"]) == 2
+    assert loaded_data["genome_status"][0]["original_id"] == "genome1"
+    assert loaded_data["genome_status"][0]["resolved_refseq_id"] == "refseq1"
+    assert loaded_data["genome_status"][0]["resolve_attempted"] is True
+    assert loaded_data["genome_status"][0]["bgc_path"] == "/path/to/bgc1"
+    assert loaded_data["genome_status"][1]["original_id"] == "genome2"
+    assert loaded_data["genome_status"][1]["resolved_refseq_id"] == ""
+    assert loaded_data["genome_status"][1]["resolve_attempted"] is False
+    assert loaded_data["genome_status"][1]["bgc_path"] == ""
 
 
 # Test `podp_download_and_extract_antismash_data` function
