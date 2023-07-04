@@ -1,16 +1,12 @@
-import os
 import json
 from os import PathLike
 from pathlib import Path
 import re
 import time
-import zipfile
 from bs4 import BeautifulSoup
 from bs4 import NavigableString
 from bs4 import Tag
-from deprecated import deprecated
 import httpx
-from progress.bar import Bar
 from nplinker.genomics.antismash import download_and_extract_antismash_data
 from nplinker.logconfig import LogConfig
 
@@ -132,81 +128,70 @@ def podp_download_and_extract_antismash_data(
         # genome_status_file can't be written
         Path(project_download_root).mkdir(parents=True, exist_ok=True)
 
-    genome_status_file = Path(project_download_root, GENOME_STATUS_FILENAME)
-    genome_status = _get_genome_status_log(genome_status_file)
+    gs_file = Path(project_download_root, GENOME_STATUS_FILENAME)
+    gs_dict = GenomeStatus.load_from_json(gs_file)
 
     for i, genome_record in enumerate(genome_records):
         # get the best available ID from the dict
-        raw_genome_id = _get_best_available_genome_id(
-            genome_record['genome_ID'])
+        genome_id_data = genome_record['genome_ID']
+        raw_genome_id = _get_best_available_genome_id(genome_id_data)
         if raw_genome_id is None or len(raw_genome_id) == 0:
             logger.warning(
                 f'Ignoring genome record "{genome_record}" due to missing genome ID field'
             )
             continue
 
-        # use this to check if the lookup has already been attempted and if
-        # so if the file is cached locally
-        if raw_genome_id not in genome_status:
-            genome_status[raw_genome_id] = GenomeStatus(raw_genome_id, "None")
+        # check if genome ID exist in the genome status file
+        if raw_genome_id not in gs_dict:
+            gs_dict[raw_genome_id] = GenomeStatus(raw_genome_id)
 
-        genome_obj = genome_status[raw_genome_id]
+        gs_obj = gs_dict[raw_genome_id]
 
         logger.info(
-            f'Checking for antismash data {i + 1}/{len(genome_records)}, current genome ID={raw_genome_id}'
-        )
-        # first check if file is cached locally
-        if (genome_obj.filename and Path(genome_obj.filename).exists()):
-            # file already downloaded
+            f'Checking for antismash data {i + 1}/{len(genome_records)}, '
+            f'current genome ID={raw_genome_id}')
+        # first, check if BGC data is downloaded
+        if (gs_obj.bgc_path and Path(gs_obj.bgc_path).exists()):
             logger.info(
-                f'Genome ID {raw_genome_id} already downloaded to {genome_obj.filename}'
+                f'Genome ID {raw_genome_id} already downloaded to {gs_obj.bgc_path}'
             )
             continue
-        if genome_obj.attempted:
-            # lookup attempted previously but failed
+        # second, check if lookup attempted previously
+        if gs_obj.resolve_attempted:
             logger.info(
                 f'Genome ID {raw_genome_id} skipped due to previous failure')
             continue
-        # if no existing file and no lookup attempted, can start process of
-        # trying to retrieve the data
 
-        # lookup the ID
+        # if not downloaded or lookup attempted, then try to resolve the ID
+        # and download
         logger.info(f'Beginning lookup process for genome ID {raw_genome_id}')
+        gs_obj.resolved_refseq_id = _resolve_refseq_id(genome_id_data)
+        gs_obj.resolve_attempted = True
 
-        genome_obj.resolved_refseq_id = _resolve_refseq_id(
-            genome_record['genome_ID'])
-
-        if not isinstance(genome_obj.resolved_refseq_id, str):
-            raise TypeError(
-                f"genome_obj.resolved_refseq_id should be a string. Instead got: {type(genome_obj.resolved_refseq_id)}"
-            )
-
-        genome_obj.attempted = True
-
-        if genome_obj.resolved_refseq_id == "":
+        if gs_obj.resolved_refseq_id == "":
             # give up on this one
             logger.warning(f'Failed lookup for genome ID {raw_genome_id}')
             continue
 
-        # if we got a refseq ID, now try to download and extract the data from antismash
-        download_and_extract_antismash_data(genome_obj.resolved_refseq_id,
+        # if resolved id is valid, try to download and extract antismash data
+        download_and_extract_antismash_data(gs_obj.resolved_refseq_id,
                                             project_download_root,
                                             project_extract_root)
 
-        genome_obj.filename = str(
+        gs_obj.bgc_path = str(
             Path(project_download_root,
-                 genome_obj.resolved_refseq_id + '.zip').absolute())
+                 gs_obj.resolved_refseq_id + '.zip').absolute())
+
         output_path = Path(project_extract_root, 'antismash',
-                           genome_obj.resolved_refseq_id)
+                           gs_obj.resolved_refseq_id)
         Path.touch(output_path / 'completed', exist_ok=True)
 
-    missing = len([x for x in genome_status.values() if len(x.filename) == 0])
-    logger.info(
-        f'Dataset has {missing} missing sets of antiSMASH data (from a total of {len(genome_records)})'
-    )
+    missing = len([gs for gs in gs_dict.values() if not gs.bgc_path])
+    logger.info(f'Dataset has {missing} missing sets of antiSMASH data '
+                f' (from a total of {len(genome_records)}).')
 
-    for obj in genome_status.values():
-        obj.to_csv(genome_status_file)
+    # save updated genome status to json file
+    GenomeStatus.save_to_json(gs_dict, project_download_root)
 
     if missing == len(genome_records):
         logger.warning('Failed to successfully retrieve ANY genome data!')
