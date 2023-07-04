@@ -212,33 +212,6 @@ def podp_download_and_extract_antismash_data(
         logger.warning('Failed to successfully retrieve ANY genome data!')
 
 
-def _get_genome_status_log(
-        genome_status_file: PathLike) -> dict[str, GenomeStatus]:
-    """Get a dict of GenomeStatus objects by reading given genome status file.
-    Note that a empty dict is returned if the given file does not exist.
-
-    Args:
-        genome_status_file(PathLike): Path to genome status file that records
-            genome IDs and local filenames to avoid repeating time-consuming
-            HTTP requests each time the app is loaded.
-
-    Returns:
-        dict: dict keys are genome original id and values are GenomeStatus objects.
-    """
-
-    genome_status = {}
-
-    # GENOME_STATUS_FILENAME is read, then in the for loop over the genome records it gets updated,
-    # and finally it is saved again in GENOME_STATUS_FILENAME which is overwritten
-    if Path(genome_status_file).exists():
-        with open(genome_status_file) as f:
-            for line in csv.reader(f):
-                asobj = GenomeStatus(*line)
-                genome_status[asobj.original_id] = asobj
-
-    return genome_status
-
-
 def _get_best_available_genome_id(
         genome_id_data: dict[str, str]) -> str | None:
     """Get the best available ID from genome_id_data dict.
