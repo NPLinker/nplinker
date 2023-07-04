@@ -1,20 +1,6 @@
-# Copyright 2021 The NPLinker Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import argparse
-import os
 from collections.abc import Mapping
+import os
 from shutil import copyfile
 import toml
 from xdg import XDG_CONFIG_HOME
@@ -143,24 +129,39 @@ class Config():
             return d
 
         config = update(config, config_dict)
+        self._validate(config)
+        self.config = config
 
+    def _validate(self, config: dict) -> None:
+        """Validates the configuration dictionary to ensure that all required
+            fields are present and have valid values.
+
+        Args:
+            config (dict): The configuration dictionary to validate.
+
+        Raises:
+            ValueError: If the configuration dictionary is missing required
+                fields or contains invalid values.
+        """
         if 'dataset' not in config:
-            raise Exception('No dataset defined in configuration!')
+            raise ValueError('Not found config for "dataset".')
 
-        root = config['dataset']['root']
-        config['dataset']['platform_id'] = ''  # placeholder
+        root = config['dataset'].get('root')
+        if root is None:
+            raise ValueError('Not found config for "root".')
 
-        # check if the root has the special 'platform:' prefix and extract the
-        # ID if so. otherwise treat as a path
         if root.startswith('platform:'):
             config['dataset']['platform_id'] = root.replace('platform:', '')
-            logger.info('Selected platform project ID {}'.format(
-                config['dataset']['platform_id']))
+            logger.info('Loading from platform project ID %s',
+                        config['dataset']['platform_id'])
         else:
-            if root is None or not os.path.exists(root):
-                raise Exception(
-                    'Dataset path "{}" not found or not accessible'.format(
-                        root))
-            logger.info(f'Loading from local data in directory {root}')
+            config['dataset']['platform_id'] = ''
+            logger.info('Loading from local data in directory %s', root)
 
-        self.config = config
+        antismash = config['dataset'].get('antismash')
+        allowed_antismash_formats = ["default", "flat"]
+        if antismash is not None:
+            if 'format' in antismash and antismash[
+                    'format'] not in allowed_antismash_formats:
+                raise ValueError(
+                    f'Unknown antismash format: {antismash["format"]}')

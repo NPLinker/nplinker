@@ -1,24 +1,10 @@
-# Copyright 2021 The NPLinker Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import json
 import os
 import shutil
 import sys
 import zipfile
-import httpx
 from deprecated import deprecated
+import httpx
 from progress.spinner import Spinner
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.logconfig import LogConfig
@@ -37,8 +23,6 @@ GNPS_DATA_DOWNLOAD_URL = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={
 
 MIBIG_METADATA_URL = 'https://dl.secondarymetabolites.org/mibig/mibig_json_{}.tar.gz'
 MIBIG_BGC_METADATA_URL = 'https://mibig.secondarymetabolites.org/repository/{}/annotations.json'
-# MIBIG_BGC_GENBANK_URL = 'https://mibig.secondarymetabolites.org/repository/{}/{}.gbk'
-# MIBIG_BGC_JSON_URL = 'https://mibig.secondarymetabolites.org/repository/{}/{}.json'
 
 
 class PODPDownloader():
@@ -51,7 +35,6 @@ class PODPDownloader():
         self.gnps_task_id = None
         self.json_data = None
         self.strains = StrainCollection()
-        self.growth_media = {}
 
         if local_cache is None:
             local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data',
@@ -111,6 +94,8 @@ class PODPDownloader():
             f.write(str(self.project_json))
 
     def _init_folder_structure(self, local_cache):
+        """Create local cache folders and set up paths for various files"""
+
         # init local cache root
         self.local_cache = local_cache
         self.local_download_cache = os.path.join(self.local_cache, 'downloads')
@@ -150,15 +135,17 @@ class PODPDownloader():
 
         self._download_metabolomics_zipfile(self.gnps_task_id)
 
+        # TODO CG: this function will modify the project_json['genomes'],
+        # this should be done in a better way
         podp_download_and_extract_antismash_data(self.project_json['genomes'],
-                                self.project_download_cache,
-                                self.project_file_cache)
+                                                 self.project_download_cache,
+                                                 self.project_file_cache)
 
         # CG: it extracts strain names and later will be used for strains
         self._parse_genome_labels(self.project_json['genome_metabolome_links'],
                                   self.project_json['genomes'])
 
-        # CG: it generates the strain_mapping.csv file
+        # CG: it generates the strain_mappings.csv file
         self.strains.generate_strain_mappings(
             self.strain_mappings_file,
             os.path.join(self.project_file_cache, 'antismash'))
@@ -211,10 +198,14 @@ class PODPDownloader():
         # create a set of mappings from one to the other, with the complication that
         # there might be mappings from 2 or more mzXMLs to a single strain.
         # also should record the growth medium using the "sample_preparation_label" field.
+
+        # TODO CG: build mappings from strain id to metabolomics filename (not spectrum id),
+        # when to build spectrum id to metabolomics filename mapping?
         for rec in met_records:
             # this is the global strain identifier we should use
             label = rec['genome_label']
             # only want to record the actual filename of the mzXML URL
+            # TODO CG: is filename always unique?
             filename = os.path.split(rec['metabolomics_file'])[1]
 
             # add the mzXML mapping for this strain
@@ -224,13 +215,11 @@ class PODPDownloader():
                 temp[label] = [filename]
             mc += 1
 
-            if label in self.growth_media:
-                self.growth_media[label].add(rec['sample_preparation_label'])
-            else:
-                self.growth_media[label] = {rec['sample_preparation_label']}
-
+        # TODO CG: build mappings from strain id to genome id (not BGC id),
+        # when to build BGC id to genome id mapping?
         for rec in gen_records:
             label = rec['genome_label']
+            # TODO CG: change `resolved_id` to `resolved_refseq_id`
             accession = rec.get('resolved_id', None)
             if accession is None:
                 # this will happen for genomes where we couldn't retrieve data or resolve the ID
