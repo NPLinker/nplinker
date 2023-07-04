@@ -36,8 +36,8 @@ def genome_status_file(download_root):
                             ], ["GCF_000515175.1", "", False, "filename"])])
 def test_genome_status_init(params, expected):
     gs = GenomeStatus(*params)
-    assert [gs.original_id, gs.resolved_refseq_id, gs.attempted,
-            gs.filename] == expected
+    assert [gs.original_id, gs.resolved_refseq_id, gs.resolve_attempted,
+            gs.bgc_path] == expected
 
 
 # Test to_csv method of GenomeStatus class
@@ -158,11 +158,11 @@ def test_caching(download_root, extract_root, genome_status_file, caplog):
                                              extract_root)
     genome_status_old = _get_genome_status_log(genome_status_file)
     genome_obj = genome_status_old["GCF_000514875.1"]
-    assert Path(genome_obj.filename).exists()
-    assert genome_obj.attempted
+    assert Path(genome_obj.bgc_path).exists()
+    assert genome_obj.resolve_attempted
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
-    assert f'Genome ID {genome_obj.original_id} already downloaded to {genome_obj.filename}' in caplog.text
+    assert f'Genome ID {genome_obj.original_id} already downloaded to {genome_obj.bgc_path}' in caplog.text
     assert f'Genome ID {genome_obj.original_id} skipped due to previous failure' not in caplog.text
     genome_status_new = _get_genome_status_log(genome_status_file)
     assert len(genome_status_old) == len(genome_status_new)
@@ -182,8 +182,8 @@ def test_failed_lookup(download_root, extract_root, genome_status_file):
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
     genome_status = _get_genome_status_log(genome_status_file)
-    assert len(genome_status["non_existing_ID"].filename) == 0
-    assert genome_status["non_existing_ID"].attempted
+    assert len(genome_status["non_existing_ID"].bgc_path) == 0
+    assert genome_status["non_existing_ID"].resolve_attempted
     assert not (download_root / "non_existing_ID.zip").exists()
     assert not (extract_root / "antismash" / "non_existing_ID.zip").exists()
 
