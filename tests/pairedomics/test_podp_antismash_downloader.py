@@ -40,27 +40,6 @@ def test_genome_status_init(params, expected):
             gs.bgc_path] == expected
 
 
-# Test to_csv method of GenomeStatus class
-def test_genome_status_to_csv(tmp_path):
-    genome_status_file = Path(tmp_path, "genome_status.csv")
-    raw_genome_id1 = "GCF_000515175.1"
-    raw_genome_id2 = "GCF_000514635.1"
-    genome_obj1 = GenomeStatus(raw_genome_id1, "None")
-    genome_obj2 = GenomeStatus(raw_genome_id2, "None")
-    genome_obj1.to_csv(genome_status_file)
-    genome_obj2.to_csv(genome_status_file)
-    assert Path(genome_status_file).exists()
-    genome_status = {}
-    with open(genome_status_file) as f:
-        for line in csv.reader(f):
-            asobj = GenomeStatus(*line)
-            genome_status[asobj.original_id] = asobj
-    assert isinstance(genome_status[raw_genome_id1], GenomeStatus)
-    assert isinstance(genome_status[raw_genome_id2], GenomeStatus)
-    assert genome_status[raw_genome_id1].original_id == raw_genome_id1
-    assert genome_status[raw_genome_id2].original_id == raw_genome_id2
-
-
 # Test `podp_download_and_extract_antismash_data` function
 # with multiple records containing three types of genome IDs
 def test_multiple_records(download_root, extract_root, genome_status_file):
@@ -369,22 +348,3 @@ def test_genbank_jgi_id(download_root, extract_root, genome_status_file):
         for extracted_file in extracted_files)
     assert genome_status_file.is_file()
     assert len(genome_status) == 1
-
-
-# Test `_get_genome_status_log` function
-def test_get_genome_status_log(tmp_path):
-    genome_status_file = Path(tmp_path, "genome_status.csv")
-    raw_genome_id1 = "GCF_000515175.1"
-    raw_genome_id2 = "GCF_000514635.1"
-    genome_obj1 = GenomeStatus(raw_genome_id1, "None")
-    genome_obj2 = GenomeStatus(raw_genome_id2, "None")
-    genome_status = _get_genome_status_log(genome_status_file)
-    assert isinstance(genome_status, dict)
-    assert len(genome_status) == 0
-    genome_obj1.to_csv(genome_status_file)
-    genome_obj2.to_csv(genome_status_file)
-    genome_status = _get_genome_status_log(genome_status_file)
-    assert isinstance(genome_status[raw_genome_id1], GenomeStatus)
-    assert isinstance(genome_status[raw_genome_id2], GenomeStatus)
-    assert genome_status[raw_genome_id1].original_id == raw_genome_id1
-    assert genome_status[raw_genome_id2].original_id == raw_genome_id2
