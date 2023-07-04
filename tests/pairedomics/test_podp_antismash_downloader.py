@@ -1,11 +1,10 @@
 import csv
+import json
 from pathlib import Path
 import pytest
-from nplinker.pairedomics.podp_antismash_downloader import GenomeStatus
-from nplinker.pairedomics.podp_antismash_downloader import \
-    _get_genome_status_log
-from nplinker.pairedomics.podp_antismash_downloader import \
-    podp_download_and_extract_antismash_data
+from nplinker.pairedomics import GENOME_STATUS_FILENAME
+from nplinker.pairedomics import GenomeStatus
+from nplinker.pairedomics import podp_download_and_extract_antismash_data
 from nplinker.utils import list_files
 
 
@@ -21,7 +20,7 @@ def extract_root(tmp_path):
 
 @pytest.fixture
 def genome_status_file(download_root):
-    return Path(download_root, "genome_status.csv")
+    return Path(download_root, GENOME_STATUS_FILENAME)
 
 
 # Test __init__ method of GenomeStatus class
@@ -70,7 +69,7 @@ def test_multiple_records(download_root, extract_root, genome_status_file):
     archive2 = download_root / "GCF_000514515.1.zip"
     extracted_folder2 = extract_root / "antismash" / "GCF_000514515.1"
     extracted_files2 = list_files(extracted_folder2, keep_parent=True)
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.load_from_json(genome_status_file)
 
     assert archive1.exists()
     assert archive2.exists()
@@ -112,7 +111,7 @@ def test_missing_id(download_root, extract_root, genome_status_file):
     extracted_folder1 = extract_root / "antismash" / "GCF_000514875.1"
     archive2 = download_root / "GCF_000514515.1.zip"
     extracted_folder2 = extract_root / "antismash" / "GCF_000514515.1"
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.load_from_json(genome_status_file)
 
     assert (not archive1.exists() and archive2.exists())
     assert (not archive1.is_file() and archive2.is_file())
@@ -135,7 +134,7 @@ def test_caching(download_root, extract_root, genome_status_file, caplog):
 
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
-    genome_status_old = _get_genome_status_log(genome_status_file)
+    genome_status_old = GenomeStatus.load_from_json(genome_status_file)
     genome_obj = genome_status_old["GCF_000514875.1"]
     assert Path(genome_obj.bgc_path).exists()
     assert genome_obj.resolve_attempted
@@ -143,7 +142,7 @@ def test_caching(download_root, extract_root, genome_status_file, caplog):
                                              extract_root)
     assert f'Genome ID {genome_obj.original_id} already downloaded to {genome_obj.bgc_path}' in caplog.text
     assert f'Genome ID {genome_obj.original_id} skipped due to previous failure' not in caplog.text
-    genome_status_new = _get_genome_status_log(genome_status_file)
+    genome_status_new = GenomeStatus.load_from_json(genome_status_file)
     assert len(genome_status_old) == len(genome_status_new)
 
 
@@ -160,7 +159,7 @@ def test_failed_lookup(download_root, extract_root, genome_status_file):
 
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.load_from_json(genome_status_file)
     assert len(genome_status["non_existing_ID"].bgc_path) == 0
     assert genome_status["non_existing_ID"].resolve_attempted
     assert not (download_root / "non_existing_ID.zip").exists()
@@ -181,7 +180,7 @@ def test_refseq_id(download_root, extract_root, genome_status_file):
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.load_from_json(genome_status_file)
     genome_obj = genome_status["GCF_000514875.1"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
@@ -211,7 +210,7 @@ def test_genbank_id(download_root, extract_root, genome_status_file):
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.load_from_json(genome_status_file)
     genome_obj = genome_status["GCA_004799605.1"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
@@ -241,7 +240,7 @@ def test_jgi_id(download_root, extract_root, genome_status_file):
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.load_from_json(genome_status_file)
     genome_obj = genome_status["2506783052"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
@@ -272,7 +271,7 @@ def test_refseq_jgi_id(download_root, extract_root, genome_status_file):
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.load_from_json(genome_status_file)
     genome_obj = genome_status["GCF_000514875.1"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
@@ -303,7 +302,7 @@ def test_refseq_genbank_id(download_root, extract_root, genome_status_file):
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.load_from_json(genome_status_file)
     genome_obj = genome_status["GCF_000514875.1"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
@@ -334,7 +333,7 @@ def test_genbank_jgi_id(download_root, extract_root, genome_status_file):
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.load_from_json(genome_status_file)
     genome_obj = genome_status["GCA_004799605.1"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
