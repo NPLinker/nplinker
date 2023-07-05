@@ -10,6 +10,7 @@ import httpx
 from nplinker.genomics.antismash import download_and_extract_antismash_data
 from nplinker.logconfig import LogConfig
 
+
 logger = LogConfig.getLogger(__name__)
 
 NCBI_LOOKUP_URL = 'https://www.ncbi.nlm.nih.gov/assembly/?term={}'
@@ -47,7 +48,7 @@ class GenomeStatus:
         self.bgc_path = bgc_path
 
     @staticmethod
-    def load_from_json(file: str | PathLike) -> dict[str, 'GenomeStatus']:
+    def read_json(file: str | PathLike) -> dict[str, 'GenomeStatus']:
         """Get a dict of GenomeStatus objects by loading given genome status file.
 
         Note that an empty dict is returned if the given file doesn't exist.
@@ -129,7 +130,7 @@ def podp_download_and_extract_antismash_data(
         Path(project_download_root).mkdir(parents=True, exist_ok=True)
 
     gs_file = Path(project_download_root, GENOME_STATUS_FILENAME)
-    gs_dict = GenomeStatus.load_from_json(gs_file)
+    gs_dict = GenomeStatus.read_json(gs_file)
 
     for i, genome_record in enumerate(genome_records):
         # get the best available ID from the dict
