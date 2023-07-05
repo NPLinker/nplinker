@@ -74,7 +74,7 @@ def test_genome_status_to_json(tmp_path):
         "genome1": GenomeStatus("genome1", "refseq1", True, "/path/to/bgc1"),
         "genome2": GenomeStatus("genome2", "", False, "")
     }
-    GenomeStatus.to_json(genome_status_dict, tmp_path)
+    GenomeStatus.to_json(genome_status_dict, tmp_path / GENOME_STATUS_FILENAME)
     with open(tmp_path / GENOME_STATUS_FILENAME, "r") as f:
         loaded_data = json.load(f)
 

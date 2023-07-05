@@ -72,7 +72,7 @@ class GenomeStatus:
 
     @staticmethod
     def to_json(genome_status_dict: dict[str, 'GenomeStatus'],
-                     output_dir: str | PathLike) -> None:
+                file: str | PathLike) -> None:
         """Save the given genome status dictionary to a JSON file.
 
         The JSON file will be saved to the given output directory with the name
@@ -82,15 +82,14 @@ class GenomeStatus:
         Args:
             genome_status_dict (dict[str, 'GenomeStatus']): A dictionary of genome
                 status objects to be saved to a JSON file.
-            output_dir(str | PathLike): The path to the directory where the JSON
-                file will be saved.
+            file(str | PathLike): The path to the output JSON file.
         """
         json_data = {
             "genome_status":
             [gs._to_dict() for gs in genome_status_dict.values()],
             "version": "1.0"
         }
-        with open(Path(output_dir) / GENOME_STATUS_FILENAME, "w") as f:
+        with open(file, "w") as f:
             json.dump(json_data, f)
 
     def _to_dict(self) -> dict:
@@ -192,7 +191,7 @@ def podp_download_and_extract_antismash_data(
                 f' (from a total of {len(genome_records)}).')
 
     # save updated genome status to json file
-    GenomeStatus.to_json(gs_dict, project_download_root)
+    GenomeStatus.to_json(gs_dict, gs_file)
 
     if missing == len(genome_records):
         logger.warning('Failed to successfully retrieve ANY genome data!')
