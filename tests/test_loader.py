@@ -83,7 +83,6 @@ def test_load_strain_mappings(config):
     sut._load_strain_mappings()
 
     actual = sut.strains
-    expected = StrainCollection()
-    expected.add_from_file(sut.strain_mappings_file)
+    expected = StrainCollection().read_json(sut.strain_mappings_file)
 
     assert actual == expected

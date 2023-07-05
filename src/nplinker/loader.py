@@ -110,6 +110,7 @@ class DatasetLoader():
         self.bgcs, self.gcfs, self.spectra, self.molfams = [], [], [], []
         self.mibig_bgc_dict = {}
         self.product_types = []
+        self.strains = StrainCollection()
         self.webapp_scoring_cutoff = self._config_webapp.get(
             'tables_metcalf_threshold', self.TABLES_CUTOFF_DEFAULT)
 
@@ -337,9 +338,10 @@ class DatasetLoader():
                 'No strain_mappings.json file found! Attempting to create one')
             self.strains.generate_strain_mappings(self.strain_mappings_file,
                                                   self.antismash_dir)
-            # raise Exception('Unable to load strain_mappings file: {}'.format(self.strain_mappings_file))
         else:
-            self.strains.add_from_file(self.strain_mappings_file)
+            sc = StrainCollection().read_json(self.strain_mappings_file)
+            for strain in sc:
+                self.strains.add(strain)
             logger.info('Loaded dataset strain IDs ({} total)'.format(
                 len(self.strains)))
 
