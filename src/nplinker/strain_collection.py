@@ -110,6 +110,29 @@ class StrainCollection():
             return self._strain_dict_name[name]
         raise KeyError(f"Strain {name} not found in strain collection.")
 
+    def to_json(self, file: str | PathLike | None = None) -> str | None:
+        """Convert the StrainCollection object to a JSON string.
+
+        Args:
+            file(str | PathLike | None): Path to output JSON file. If None,
+                return the JSON string instead.
+
+        Returns:
+            str | None: If `file` is None, return the JSON string. Otherwise,
+                write the JSON string to the given file.
+        """
+        data_list = [{
+            "strain_id": strain.id,
+            "strain_alias": list(strain.aliases)
+        } for strain in self]
+        json_data = {"strain_mappings": data_list, "version": "1.0"}
+
+        if file is not None:
+            with open(file, 'w') as f:
+                json.dump(json_data, f)
+            return None
+        return json.dumps(json_data)
+
     # TODO to move this method to a separate class
     @deprecated(version="1.3.3", reason="This method will be removed")
     def generate_strain_mappings(self, strain_mappings_file: str | PathLike,
