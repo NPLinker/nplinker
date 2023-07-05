@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-import tempfile
 import pytest
 from nplinker.pairedomics import GENOME_STATUS_FILENAME
 from nplinker.pairedomics import GenomeStatus
@@ -74,10 +73,12 @@ def test_genome_status_to_json(tmp_path):
         "genome1": GenomeStatus("genome1", "refseq1", True, "/path/to/bgc1"),
         "genome2": GenomeStatus("genome2", "", False, "")
     }
-    GenomeStatus.to_json(genome_status_dict, tmp_path / GENOME_STATUS_FILENAME)
+    result = GenomeStatus.to_json(genome_status_dict,
+                                  tmp_path / GENOME_STATUS_FILENAME)
     with open(tmp_path / GENOME_STATUS_FILENAME, "r") as f:
         loaded_data = json.load(f)
 
+    assert result is None
     assert loaded_data["version"] == "1.0"
     assert len(loaded_data["genome_status"]) == 2
     assert loaded_data["genome_status"][0]["original_id"] == "genome1"
@@ -88,6 +89,21 @@ def test_genome_status_to_json(tmp_path):
     assert loaded_data["genome_status"][1]["resolved_refseq_id"] == ""
     assert loaded_data["genome_status"][1]["resolve_attempted"] is False
     assert loaded_data["genome_status"][1]["bgc_path"] == ""
+
+
+def test_genome_status_to_json_nofile():
+    genome_status_dict = {
+        "genome1": GenomeStatus("genome1", "refseq1", True, "/path/to/bgc1"),
+        "genome2": GenomeStatus("genome2", "", False, "")
+    }
+    result = GenomeStatus.to_json(genome_status_dict)
+
+    assert isinstance(result, str)
+    assert result == '{"genome_status": ' \
+        '[{"original_id": "genome1", "resolved_refseq_id": "refseq1", ' \
+        '"resolve_attempted": true, "bgc_path": "/path/to/bgc1"}, ' \
+        '{"original_id": "genome2", "resolved_refseq_id": "", ' \
+        '"resolve_attempted": false, "bgc_path": ""}], "version": "1.0"}'
 
 
 # Test `podp_download_and_extract_antismash_data` function

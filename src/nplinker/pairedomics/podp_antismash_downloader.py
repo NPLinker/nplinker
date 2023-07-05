@@ -72,25 +72,29 @@ class GenomeStatus:
 
     @staticmethod
     def to_json(genome_status_dict: dict[str, 'GenomeStatus'],
-                file: str | PathLike) -> None:
-        """Save the given genome status dictionary to a JSON file.
+                file: str | PathLike | None = None) -> str | None:
+        """Convert the genome status dictionary to a JSON string.
 
-        The JSON file will be saved to the given output directory with the name
-        defined in variable `GENOME_STATUS_FILENAME`. The file will be overwritten
-        if it already exists.
+        If a file path is provided, the JSON string is written to the file. If
+        the file already exists, it is overwritten.
 
         Args:
             genome_status_dict (dict[str, 'GenomeStatus']): A dictionary of genome
-                status objects to be saved to a JSON file.
-            file(str | PathLike): The path to the output JSON file.
+                status objects. The keys are the original genome IDs and the values
+                are GenomeStatus objects.
+            file(str | PathLike | None): The path to the output JSON file.
+                If None, the JSON string is returned but not written to a file.
+
+        Returns:
+            str | None: The JSON string if `file` is None, otherwise None.
         """
-        json_data = {
-            "genome_status":
-            [gs._to_dict() for gs in genome_status_dict.values()],
-            "version": "1.0"
-        }
-        with open(file, "w") as f:
-            json.dump(json_data, f)
+        gs_list = [gs._to_dict() for gs in genome_status_dict.values()]
+        json_data = {"genome_status": gs_list, "version": "1.0"}
+        if file is not None:
+            with open(file, "w") as f:
+                json.dump(json_data, f)
+            return None
+        return json.dumps(json_data)
 
     def _to_dict(self) -> dict:
         """Convert the GenomeStatus object to a dict."""
