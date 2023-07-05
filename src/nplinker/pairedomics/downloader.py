@@ -24,6 +24,8 @@ GNPS_DATA_DOWNLOAD_URL = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={
 MIBIG_METADATA_URL = 'https://dl.secondarymetabolites.org/mibig/mibig_json_{}.tar.gz'
 MIBIG_BGC_METADATA_URL = 'https://mibig.secondarymetabolites.org/repository/{}/annotations.json'
 
+STRAIN_MAPPINGS_FILENAME = 'strain_mappings.json'
+
 
 class PODPDownloader():
     # TODO: move to independent config file  ---C.Geng
@@ -120,7 +122,7 @@ class PODPDownloader():
 
         # init strain mapping filepath
         self.strain_mappings_file = os.path.join(self.project_file_cache,
-                                                 'strain_mappings.csv')
+                                                 STRAIN_MAPPINGS_FILENAME)
 
         # init project paths
         self.all_project_json_file = os.path.join(self.local_cache,
@@ -145,7 +147,7 @@ class PODPDownloader():
         self._parse_genome_labels(self.project_json['genome_metabolome_links'],
                                   self.project_json['genomes'])
 
-        # CG: it generates the strain_mappings.csv file
+        # CG: it generates the strain_mappings.json file
         self.strains.generate_strain_mappings(
             self.strain_mappings_file,
             os.path.join(self.project_file_cache, 'antismash'))
