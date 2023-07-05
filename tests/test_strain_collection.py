@@ -73,21 +73,3 @@ def test_lookup(collection: StrainCollection, strain: Strain):
         assert collection.lookup(alias) == strain
     with pytest.raises(KeyError):
         collection.lookup("strain_not_exist")
-
-
-def test_add_from_file():
-    sut = StrainCollection()
-    sut.add_from_file(DATA_DIR / "strain_mappings.csv")
-    assert len(sut) == 27
-
-
-def test_save_to_file(collection: StrainCollection, tmp_path):
-    collection.add(Strain("strain_2"))
-    path = tmp_path / "test.csv"
-    collection.save_to_file(path)
-    assert path.exists()
-    with open(path) as f:
-        lines = f.readlines()
-        assert len(lines) == 2
-        assert lines[0].strip() == "strain_1,strain_1_a"
-        assert lines[1].strip() == "strain_2"

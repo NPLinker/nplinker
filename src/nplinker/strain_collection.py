@@ -1,4 +1,4 @@
-import csv
+import json
 from os import PathLike
 from pathlib import Path
 from typing import Iterator
@@ -109,37 +109,6 @@ class StrainCollection():
         if name in self:
             return self._strain_dict_name[name]
         raise KeyError(f"Strain {name} not found in strain collection.")
-
-    def add_from_file(self, file: str | PathLike) -> None:
-        """Add strains from a strain mapping file.
-
-        A strain mapping file is a csv file with the first column being the
-        id of the strain, and the remaining columns being aliases for the
-        strain.
-
-        Args:
-            file(str | PathLike): Path to strain mapping file (.csv).
-        """
-        with open(file) as f:
-            reader = csv.reader(f)
-            for names in reader:
-                if len(names) == 0:
-                    continue
-                strain = Strain(names[0])
-                for alias in names[1:]:
-                    strain.add_alias(alias)
-                self.add(strain)
-
-    def save_to_file(self, file: str | PathLike) -> None:
-        """Save strains to a strain mapping file (.csv).
-
-        Args:
-            file(str | PathLike): Path to strain mapping file (.csv).
-        """
-        with open(file, 'w') as f:
-            for strain in self:
-                ids = [strain.id] + list(strain.aliases)
-                f.write(','.join(ids) + '\n')
 
     # TODO to move this method to a separate class
     @deprecated(version="1.3.3", reason="This method will be removed")
