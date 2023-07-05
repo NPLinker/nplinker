@@ -326,13 +326,6 @@ class DatasetLoader():
 
     # TODO: this function should be refactored to Loader class
     def _load_strain_mappings(self):
-        # this file should be a csv file, one line per strain, containing a list
-        # of possible alternative IDs (the first one being the preferred ID).
-        #
-        # this is a per-dataset mapping, and is then merged with the global mapping file
-        # packaged with nplinker itself
-        self._init_global_strain_id_mapping()
-
         # now load the dataset mapping in the same way
         # TODO: what happens in case of clashes (differing primary IDs?)
         # CG: the `if` never happens for PODP pipeline; for non-PODP pipeline,
@@ -351,18 +344,6 @@ class DatasetLoader():
                 len(self.strains)))
 
         return True
-
-    def _init_global_strain_id_mapping(self):
-        """The global strain mapping is predefined by the NPLinker package.
-
-            See `src/nplinker/strain_id_mapping.csv`
-        """
-        self.strains = StrainCollection()
-        global_strain_id_file = NPLINKER_APP_DATA_DIR.joinpath(
-            'strain_id_mapping.csv')
-        self.strains.add_from_file(global_strain_id_file)
-        logger.info('Loaded global strain IDs ({} total)'.format(
-            len(self.strains)))
 
     # TODO CG: replace deprecated load_dataset with GPNSLoader
     def _load_metabolomics(self):
