@@ -69,12 +69,12 @@ def test_genome_status_read_json(tmp_path):
     assert genome_status_dict["genome2"].bgc_path == ""
 
 
-def test_genome_status_save_to_json(tmp_path):
+def test_genome_status_to_json(tmp_path):
     genome_status_dict = {
         "genome1": GenomeStatus("genome1", "refseq1", True, "/path/to/bgc1"),
         "genome2": GenomeStatus("genome2", "", False, "")
     }
-    GenomeStatus.save_to_json(genome_status_dict, tmp_path)
+    GenomeStatus.to_json(genome_status_dict, tmp_path)
     with open(tmp_path / GENOME_STATUS_FILENAME, "r") as f:
         loaded_data = json.load(f)
 

@@ -71,7 +71,7 @@ class GenomeStatus:
         return genome_status_dict
 
     @staticmethod
-    def save_to_json(genome_status_dict: dict[str, 'GenomeStatus'],
+    def to_json(genome_status_dict: dict[str, 'GenomeStatus'],
                      output_dir: str | PathLike) -> None:
         """Save the given genome status dictionary to a JSON file.
 
@@ -192,7 +192,7 @@ def podp_download_and_extract_antismash_data(
                 f' (from a total of {len(genome_records)}).')
 
     # save updated genome status to json file
-    GenomeStatus.save_to_json(gs_dict, project_download_root)
+    GenomeStatus.to_json(gs_dict, project_download_root)
 
     if missing == len(genome_records):
         logger.warning('Failed to successfully retrieve ANY genome data!')
