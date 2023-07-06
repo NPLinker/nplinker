@@ -4,6 +4,7 @@ import pytest
 from nplinker.metabolomics.metabolomics import load_spectra
 from nplinker.metabolomics.metabolomics import make_families
 from nplinker.metabolomics.spectrum import Spectrum
+from nplinker.pairedomics.downloader import STRAIN_MAPPINGS_FILENAME
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 from nplinker.utils import extract_archive
@@ -44,9 +45,8 @@ def spec_dict() -> dict[str, Spectrum]:
 
 @pytest.fixture
 def collection_from_file() -> StrainCollection:
-    filename = DATA_DIR / "strain_mappings.csv"
-    sut = StrainCollection()
-    sut.add_from_file(filename)
+    filename = DATA_DIR / STRAIN_MAPPINGS_FILENAME
+    sut = StrainCollection().read_json(filename)
     return sut
 
 

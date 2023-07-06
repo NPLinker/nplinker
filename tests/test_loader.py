@@ -2,10 +2,12 @@ from pathlib import Path
 import shutil
 import pytest
 from nplinker.loader import DatasetLoader
+from nplinker.loader import STRAIN_MAPPINGS_FILENAME
 from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
 from nplinker.metabolomics.gnps.gnps_spectrum_loader import GNPSSpectrumLoader
 from nplinker.strain_collection import StrainCollection
 from . import DATA_DIR
+
 
 @pytest.fixture
 def config():
@@ -14,7 +16,7 @@ def config():
             "root": DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra",
             "platform_id": "",
             "overrides": {
-                "strain_mappings_file": str(DATA_DIR / "strain_mappings.csv")
+                "strain_mappings_file": str(DATA_DIR / STRAIN_MAPPINGS_FILENAME)
             }
         }
     }
@@ -27,7 +29,7 @@ def config_with_new_gnps_extractor():
             "root": DATA_DIR / "extracted",
             "platform_id": "",
             "overrides": {
-                "strain_mappings_file": str(DATA_DIR / "strain_mappings.csv")
+                "strain_mappings_file": str(DATA_DIR / STRAIN_MAPPINGS_FILENAME)
             }
         }
     }
@@ -72,7 +74,7 @@ def test_load_metabolomics(config):
 def test_has_strain_mappings(config):
     sut = DatasetLoader(config)
     sut._init_paths()
-    assert sut.strain_mappings_file == str(DATA_DIR / "strain_mappings.csv")
+    assert sut.strain_mappings_file == str(DATA_DIR / STRAIN_MAPPINGS_FILENAME)
 
 
 def test_load_strain_mappings(config):
@@ -81,7 +83,6 @@ def test_load_strain_mappings(config):
     sut._load_strain_mappings()
 
     actual = sut.strains
-    expected = StrainCollection()
-    expected.add_from_file(sut.strain_mappings_file)
+    expected = StrainCollection().read_json(sut.strain_mappings_file)
 
     assert actual == expected

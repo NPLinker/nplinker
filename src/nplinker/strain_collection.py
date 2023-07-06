@@ -1,4 +1,4 @@
-import csv
+import json
 from os import PathLike
 from pathlib import Path
 from typing import Iterator
@@ -110,36 +110,49 @@ class StrainCollection():
             return self._strain_dict_name[name]
         raise KeyError(f"Strain {name} not found in strain collection.")
 
-    def add_from_file(self, file: str | PathLike) -> None:
-        """Add strains from a strain mapping file.
-
-        A strain mapping file is a csv file with the first column being the
-        id of the strain, and the remaining columns being aliases for the
-        strain.
+    @classmethod
+    def read_json(cls, file: str | PathLike) -> 'StrainCollection':
+        """Read a strain mappings JSON file and return a StrainCollection object.
 
         Args:
-            file(str | PathLike): Path to strain mapping file (.csv).
-        """
-        with open(file) as f:
-            reader = csv.reader(f)
-            for names in reader:
-                if len(names) == 0:
-                    continue
-                strain = Strain(names[0])
-                for alias in names[1:]:
-                    strain.add_alias(alias)
-                self.add(strain)
+            file(str | PathLike): Path to the strain mappings JSON file.
 
-    def save_to_file(self, file: str | PathLike) -> None:
-        """Save strains to a strain mapping file (.csv).
+        Returns:
+            StrainCollection: StrainCollection object.
+        """
+        with open(file, 'r') as f:
+            json_data = json.load(f)
+
+        strain_collection = cls()
+        for data in json_data['strain_mappings']:
+            strain = Strain(data['strain_id'])
+            for alias in data['strain_alias']:
+                strain.add_alias(alias)
+            strain_collection.add(strain)
+        return strain_collection
+
+    def to_json(self, file: str | PathLike | None = None) -> str | None:
+        """Convert the StrainCollection object to a JSON string.
 
         Args:
-            file(str | PathLike): Path to strain mapping file (.csv).
+            file(str | PathLike | None): Path to output JSON file. If None,
+                return the JSON string instead.
+
+        Returns:
+            str | None: If `file` is None, return the JSON string. Otherwise,
+                write the JSON string to the given file.
         """
-        with open(file, 'w') as f:
-            for strain in self:
-                ids = [strain.id] + list(strain.aliases)
-                f.write(','.join(ids) + '\n')
+        data_list = [{
+            "strain_id": strain.id,
+            "strain_alias": list(strain.aliases)
+        } for strain in self]
+        json_data = {"strain_mappings": data_list, "version": "1.0"}
+
+        if file is not None:
+            with open(file, 'w') as f:
+                json.dump(json_data, f)
+            return None
+        return json.dumps(json_data)
 
     # TODO to move this method to a separate class
     @deprecated(version="1.3.3", reason="This method will be removed")

@@ -6,10 +6,10 @@ import numpy
 import pytest
 from pytest_lazyfixture import lazy_fixture
 from nplinker import utils
-
-from nplinker.pairedomics.downloader import PODPDownloader
-from nplinker.pairedomics.downloader import _generate_gnps_download_url
 from nplinker.pairedomics.downloader import _execute_download
+from nplinker.pairedomics.downloader import _generate_gnps_download_url
+from nplinker.pairedomics.downloader import PODPDownloader
+from nplinker.pairedomics.downloader import STRAIN_MAPPINGS_FILENAME
 from .. import DATA_DIR
 
 
@@ -34,7 +34,7 @@ def test_default(expected: Path):
 
     assert sut.local_file_cache == str(expected / 'extracted')
     assert sut.project_file_cache == str(expected / 'extracted'/ gnps_id)
-    assert sut.strain_mappings_file == str(expected / 'extracted'/ gnps_id / 'strain_mappings.csv')
+    assert sut.strain_mappings_file == str(expected / 'extracted'/ gnps_id / STRAIN_MAPPINGS_FILENAME)
     assert os.path.exists(str(expected / 'extracted'/ gnps_id / 'antismash'))
     assert os.path.exists(str(expected / 'extracted'/ gnps_id / 'bigscape'))
 
