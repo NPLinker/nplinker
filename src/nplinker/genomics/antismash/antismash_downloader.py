@@ -7,14 +7,12 @@ from nplinker.utils import download_and_extract_archive
 from nplinker.utils import list_dirs
 from nplinker.utils import list_files
 
+
 logger = LogConfig.getLogger(__name__)
 
 # urls to be given to download antismash data
-ANTISMASH_DB_PAGE_URL = 'https://antismash-db.secondarymetabolites.org/output/{}/'
 ANTISMASH_DB_DOWNLOAD_URL = 'https://antismash-db.secondarymetabolites.org/output/{}/{}'
-
 # The antiSMASH DBV2 is for the availability of the old version, better to keep it.
-ANTISMASH_DBV2_PAGE_URL = 'https://antismash-dbv2.secondarymetabolites.org/output/{}/'
 ANTISMASH_DBV2_DOWNLOAD_URL = 'https://antismash-dbv2.secondarymetabolites.org/output/{}/{}'
 
 
@@ -29,8 +27,8 @@ def download_and_extract_antismash_data(antismash_id: str,
 
     Args:
         antismash_id(str): The id used to download BGC archive from antiSMASH database.
-            If the id is versioned (e.g., "GCF_004339725.1") please be sure to 
-            specify the version as well. 
+            If the id is versioned (e.g., "GCF_004339725.1") please be sure to
+            specify the version as well.
         download_root(str | PathLike): Path to the directory to place downloaded archive in.
         extract_root(str | PathLike): Path to the directory data files will be extracted to.
             Note that an `antismash` directory will be created in the specified `extract_root` if

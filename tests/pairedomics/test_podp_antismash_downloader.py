@@ -1,11 +1,9 @@
-import csv
+import json
 from pathlib import Path
 import pytest
-from nplinker.pairedomics.podp_antismash_downloader import GenomeStatus
-from nplinker.pairedomics.podp_antismash_downloader import \
-    _get_genome_status_log
-from nplinker.pairedomics.podp_antismash_downloader import \
-    podp_download_and_extract_antismash_data
+from nplinker.pairedomics import GENOME_STATUS_FILENAME
+from nplinker.pairedomics import GenomeStatus
+from nplinker.pairedomics import podp_download_and_extract_antismash_data
 from nplinker.utils import list_files
 
 
@@ -21,44 +19,91 @@ def extract_root(tmp_path):
 
 @pytest.fixture
 def genome_status_file(download_root):
-    return Path(download_root, "genome_status.csv")
+    return Path(download_root, GENOME_STATUS_FILENAME)
 
 
-# Test __init__ method of GenomeStatus class
-@pytest.mark.parametrize("params, expected",
-                         [(["GCF_000515175.1", "None", "False", ""
-                            ], ["GCF_000515175.1", "", False, ""]),
-                          (["GCF_000515175.1", "None", "True", ""
-                            ], ["GCF_000515175.1", "", True, ""]),
-                          (["GCF_000515175.1", "GCF_000515175.1", "True", ""],
-                           ["GCF_000515175.1", "GCF_000515175.1", True, ""]),
-                          (["GCF_000515175.1", "None", "False", "filename"
-                            ], ["GCF_000515175.1", "", False, "filename"])])
+# Test `GenomeStatus` class
+@pytest.mark.parametrize("params, expected", [
+    (["genome1"], ["genome1", "", False, ""]),
+    (["genome1", "refseq1", True, "/path/to/file"
+      ], ["genome1", "refseq1", True, "/path/to/file"]),
+])
 def test_genome_status_init(params, expected):
     gs = GenomeStatus(*params)
-    assert [gs.original_id, gs.resolved_refseq_id, gs.attempted,
-            gs.filename] == expected
+    assert [
+        gs.original_id, gs.resolved_refseq_id, gs.resolve_attempted,
+        gs.bgc_path
+    ] == expected
 
 
-# Test to_csv method of GenomeStatus class
-def test_genome_status_to_csv(tmp_path):
-    genome_status_file = Path(tmp_path, "genome_status.csv")
-    raw_genome_id1 = "GCF_000515175.1"
-    raw_genome_id2 = "GCF_000514635.1"
-    genome_obj1 = GenomeStatus(raw_genome_id1, "None")
-    genome_obj2 = GenomeStatus(raw_genome_id2, "None")
-    genome_obj1.to_csv(genome_status_file)
-    genome_obj2.to_csv(genome_status_file)
-    assert Path(genome_status_file).exists()
-    genome_status = {}
-    with open(genome_status_file) as f:
-        for line in csv.reader(f):
-            asobj = GenomeStatus(*line)
-            genome_status[asobj.original_id] = asobj
-    assert isinstance(genome_status[raw_genome_id1], GenomeStatus)
-    assert isinstance(genome_status[raw_genome_id2], GenomeStatus)
-    assert genome_status[raw_genome_id1].original_id == raw_genome_id1
-    assert genome_status[raw_genome_id2].original_id == raw_genome_id2
+def test_genome_status_read_json(tmp_path):
+    data = {
+        "genome_status": [{
+            "original_id": "genome1",
+            "resolved_refseq_id": "refseq1",
+            "resolve_attempted": True,
+            "bgc_path": "/path/to/bgc1"
+        }, {
+            "original_id": "genome2",
+            "resolved_refseq_id": "",
+            "resolve_attempted": False,
+            "bgc_path": ""
+        }],
+        "version":
+        "1.0"
+    }
+    file_path = tmp_path / GENOME_STATUS_FILENAME
+    with open(file_path, "w") as f:
+        json.dump(data, f)
+    genome_status_dict = GenomeStatus.read_json(file_path)
+
+    assert len(genome_status_dict) == 2
+    assert genome_status_dict["genome1"].original_id == "genome1"
+    assert genome_status_dict["genome1"].resolved_refseq_id == "refseq1"
+    assert genome_status_dict["genome1"].resolve_attempted is True
+    assert genome_status_dict["genome1"].bgc_path == "/path/to/bgc1"
+    assert genome_status_dict["genome2"].original_id == "genome2"
+    assert genome_status_dict["genome2"].resolved_refseq_id == ""
+    assert genome_status_dict["genome2"].resolve_attempted is False
+    assert genome_status_dict["genome2"].bgc_path == ""
+
+
+def test_genome_status_to_json(tmp_path):
+    genome_status_dict = {
+        "genome1": GenomeStatus("genome1", "refseq1", True, "/path/to/bgc1"),
+        "genome2": GenomeStatus("genome2", "", False, "")
+    }
+    result = GenomeStatus.to_json(genome_status_dict,
+                                  tmp_path / GENOME_STATUS_FILENAME)
+    with open(tmp_path / GENOME_STATUS_FILENAME, "r") as f:
+        loaded_data = json.load(f)
+
+    assert result is None
+    assert loaded_data["version"] == "1.0"
+    assert len(loaded_data["genome_status"]) == 2
+    assert loaded_data["genome_status"][0]["original_id"] == "genome1"
+    assert loaded_data["genome_status"][0]["resolved_refseq_id"] == "refseq1"
+    assert loaded_data["genome_status"][0]["resolve_attempted"] is True
+    assert loaded_data["genome_status"][0]["bgc_path"] == "/path/to/bgc1"
+    assert loaded_data["genome_status"][1]["original_id"] == "genome2"
+    assert loaded_data["genome_status"][1]["resolved_refseq_id"] == ""
+    assert loaded_data["genome_status"][1]["resolve_attempted"] is False
+    assert loaded_data["genome_status"][1]["bgc_path"] == ""
+
+
+def test_genome_status_to_json_nofile():
+    genome_status_dict = {
+        "genome1": GenomeStatus("genome1", "refseq1", True, "/path/to/bgc1"),
+        "genome2": GenomeStatus("genome2", "", False, "")
+    }
+    result = GenomeStatus.to_json(genome_status_dict)
+
+    assert isinstance(result, str)
+    assert result == '{"genome_status": ' \
+        '[{"original_id": "genome1", "resolved_refseq_id": "refseq1", ' \
+        '"resolve_attempted": true, "bgc_path": "/path/to/bgc1"}, ' \
+        '{"original_id": "genome2", "resolved_refseq_id": "", ' \
+        '"resolve_attempted": false, "bgc_path": ""}], "version": "1.0"}'
 
 
 # Test `podp_download_and_extract_antismash_data` function
@@ -91,7 +136,7 @@ def test_multiple_records(download_root, extract_root, genome_status_file):
     archive2 = download_root / "GCF_000514515.1.zip"
     extracted_folder2 = extract_root / "antismash" / "GCF_000514515.1"
     extracted_files2 = list_files(extracted_folder2, keep_parent=True)
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.read_json(genome_status_file)
 
     assert archive1.exists()
     assert archive2.exists()
@@ -133,7 +178,7 @@ def test_missing_id(download_root, extract_root, genome_status_file):
     extracted_folder1 = extract_root / "antismash" / "GCF_000514875.1"
     archive2 = download_root / "GCF_000514515.1.zip"
     extracted_folder2 = extract_root / "antismash" / "GCF_000514515.1"
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.read_json(genome_status_file)
 
     assert (not archive1.exists() and archive2.exists())
     assert (not archive1.is_file() and archive2.is_file())
@@ -156,15 +201,15 @@ def test_caching(download_root, extract_root, genome_status_file, caplog):
 
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
-    genome_status_old = _get_genome_status_log(genome_status_file)
+    genome_status_old = GenomeStatus.read_json(genome_status_file)
     genome_obj = genome_status_old["GCF_000514875.1"]
-    assert Path(genome_obj.filename).exists()
-    assert genome_obj.attempted
+    assert Path(genome_obj.bgc_path).exists()
+    assert genome_obj.resolve_attempted
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
-    assert f'Genome ID {genome_obj.original_id} already downloaded to {genome_obj.filename}' in caplog.text
+    assert f'Genome ID {genome_obj.original_id} already downloaded to {genome_obj.bgc_path}' in caplog.text
     assert f'Genome ID {genome_obj.original_id} skipped due to previous failure' not in caplog.text
-    genome_status_new = _get_genome_status_log(genome_status_file)
+    genome_status_new = GenomeStatus.read_json(genome_status_file)
     assert len(genome_status_old) == len(genome_status_new)
 
 
@@ -181,9 +226,9 @@ def test_failed_lookup(download_root, extract_root, genome_status_file):
 
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
-    genome_status = _get_genome_status_log(genome_status_file)
-    assert len(genome_status["non_existing_ID"].filename) == 0
-    assert genome_status["non_existing_ID"].attempted
+    genome_status = GenomeStatus.read_json(genome_status_file)
+    assert len(genome_status["non_existing_ID"].bgc_path) == 0
+    assert genome_status["non_existing_ID"].resolve_attempted
     assert not (download_root / "non_existing_ID.zip").exists()
     assert not (extract_root / "antismash" / "non_existing_ID.zip").exists()
 
@@ -202,7 +247,7 @@ def test_refseq_id(download_root, extract_root, genome_status_file):
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.read_json(genome_status_file)
     genome_obj = genome_status["GCF_000514875.1"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
@@ -232,7 +277,7 @@ def test_genbank_id(download_root, extract_root, genome_status_file):
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.read_json(genome_status_file)
     genome_obj = genome_status["GCA_004799605.1"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
@@ -262,7 +307,7 @@ def test_jgi_id(download_root, extract_root, genome_status_file):
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.read_json(genome_status_file)
     genome_obj = genome_status["2506783052"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
@@ -293,7 +338,7 @@ def test_refseq_jgi_id(download_root, extract_root, genome_status_file):
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.read_json(genome_status_file)
     genome_obj = genome_status["GCF_000514875.1"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
@@ -324,7 +369,7 @@ def test_refseq_genbank_id(download_root, extract_root, genome_status_file):
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.read_json(genome_status_file)
     genome_obj = genome_status["GCF_000514875.1"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
@@ -355,7 +400,7 @@ def test_genbank_jgi_id(download_root, extract_root, genome_status_file):
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
-    genome_status = _get_genome_status_log(genome_status_file)
+    genome_status = GenomeStatus.read_json(genome_status_file)
     genome_obj = genome_status["GCA_004799605.1"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
@@ -369,22 +414,3 @@ def test_genbank_jgi_id(download_root, extract_root, genome_status_file):
         for extracted_file in extracted_files)
     assert genome_status_file.is_file()
     assert len(genome_status) == 1
-
-
-# Test `_get_genome_status_log` function
-def test_get_genome_status_log(tmp_path):
-    genome_status_file = Path(tmp_path, "genome_status.csv")
-    raw_genome_id1 = "GCF_000515175.1"
-    raw_genome_id2 = "GCF_000514635.1"
-    genome_obj1 = GenomeStatus(raw_genome_id1, "None")
-    genome_obj2 = GenomeStatus(raw_genome_id2, "None")
-    genome_status = _get_genome_status_log(genome_status_file)
-    assert isinstance(genome_status, dict)
-    assert len(genome_status) == 0
-    genome_obj1.to_csv(genome_status_file)
-    genome_obj2.to_csv(genome_status_file)
-    genome_status = _get_genome_status_log(genome_status_file)
-    assert isinstance(genome_status[raw_genome_id1], GenomeStatus)
-    assert isinstance(genome_status[raw_genome_id2], GenomeStatus)
-    assert genome_status[raw_genome_id1].original_id == raw_genome_id1
-    assert genome_status[raw_genome_id2].original_id == raw_genome_id2
