@@ -43,7 +43,7 @@ class GenomeStatus:
                 the genome. Defaults to "".
         """
         self.original_id = original_id
-        self.resolved_refseq_id = resolved_refseq_id
+        self.resolved_refseq_id = "" if resolved_refseq_id == 'None' else resolved_refseq_id
         self.resolve_attempted = resolve_attempted
         self.bgc_path = bgc_path
 
