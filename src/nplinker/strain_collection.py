@@ -110,8 +110,8 @@ class StrainCollection():
             return self._strain_dict_name[name]
         raise KeyError(f"Strain {name} not found in strain collection.")
 
-    @classmethod
-    def read_json(cls, file: str | PathLike) -> 'StrainCollection':
+    @staticmethod
+    def read_json(file: str | PathLike) -> 'StrainCollection':
         """Read a strain mappings JSON file and return a StrainCollection object.
 
         Args:
@@ -123,7 +123,7 @@ class StrainCollection():
         with open(file, 'r') as f:
             json_data = json.load(f)
 
-        strain_collection = cls()
+        strain_collection = StrainCollection()
         for data in json_data['strain_mappings']:
             strain = Strain(data['strain_id'])
             for alias in data['strain_alias']:
