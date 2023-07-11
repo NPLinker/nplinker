@@ -6,16 +6,10 @@ import numpy
 import pytest
 from pytest_lazyfixture import lazy_fixture
 from nplinker import utils
-from nplinker.pairedomics.downloader import _execute_download
-from nplinker.pairedomics.downloader import _generate_gnps_download_url
 from nplinker.pairedomics.downloader import PODPDownloader
 from nplinker.pairedomics.downloader import STRAIN_MAPPINGS_FILENAME
 from .. import DATA_DIR
 
-
-@pytest.fixture
-def gnps_url():
-    return _generate_gnps_download_url("c22f44b14a3d450eb836d607cb9521bb")
 
 @pytest.mark.parametrize("expected", [
     Path(os.getenv('HOME'), 'nplinker_data', 'pairedomics'),
@@ -61,43 +55,3 @@ def test_download_metabolomics_zipfile(tmp_path):
     assert (Path(sut.project_file_cache) / "molecular_families.pairsinfo").is_file()
     assert (Path(sut.project_file_cache) / "file_mappings.tsv").is_file()
     assert (Path(sut.project_file_cache) / "spectra.mgf").is_file()
-
-
-def test_generate_gnps_download_url():
-    gnps_task_id = "c22f44b14a3d450eb836d607cb9521bb"
-    expected = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task=c22f44b14a3d450eb836d607cb9521bb&view=download_clustered_spectra'
-    actual = _generate_gnps_download_url(gnps_task_id)
-    assert actual == expected
-
-
-def test_execute_download(gnps_url: str, tmp_path: Path):
-    outpath = tmp_path / 'metabolomics_data.zip'
-    _execute_download(gnps_url, outpath)
-    assert os.path.exists(outpath)
-
-
-def test_download_gnps_data(tmp_path):
-    gnps_task_id = "c22f44b14a3d450eb836d607cb9521bb"
-    sut = PODPDownloader("MSV000079284", local_cache=tmp_path / 'actual')
-    actual = sut._load_gnps_data(gnps_task_id)
-
-    expected = zipfile.ZipFile(DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip")
-
-    actual.extract("networkedges_selfloop/6da5be36f5b14e878860167fa07004d6.pairsinfo", tmp_path / "actual")
-    expected.extract("networkedges_selfloop/6da5be36f5b14e878860167fa07004d6.pairsinfo", tmp_path / "expected")
-
-    assert filecmp.cmp(
-        tmp_path / "actual/networkedges_selfloop" / "6da5be36f5b14e878860167fa07004d6.pairsinfo",
-        tmp_path / "expected/networkedges_selfloop" / "6da5be36f5b14e878860167fa07004d6.pairsinfo",
-        shallow=False
-    )
-
-
-def test_extract_metabolomics_data(tmp_path):
-    sut = PODPDownloader("MSV000079284", local_cache=tmp_path)
-    archive = zipfile.ZipFile(DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip")
-    sut._extract_metabolomics_data(archive)
-
-    assert (Path(sut.project_file_cache) / "networkedges_selfloop/6da5be36f5b14e878860167fa07004d6.pairsinfo").is_file()
-    assert (Path(sut.project_file_cache) / "clusterinfosummarygroup_attributes_withIDs_withcomponentID/d69356c8e5044c2a9fef3dd2a2f991e1.tsv").is_file()
-    assert (Path(sut.project_file_cache) / "spectra/METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra-main.mgf").is_file()

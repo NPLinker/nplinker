@@ -2,10 +2,7 @@ import json
 import os
 import shutil
 import sys
-import zipfile
-from deprecated import deprecated
 import httpx
-from progress.spinner import Spinner
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
@@ -14,6 +11,7 @@ from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 from . import podp_download_and_extract_antismash_data
 from .runbigscape import podp_run_bigscape
+
 
 logger = LogConfig.getLogger(__name__)
 
@@ -250,66 +248,6 @@ class PODPDownloader():
             self.project_download_cache).download().get_download_path()
         GNPSExtractor(archive, self.project_file_cache).extract()
 
-    @deprecated
-    def _extract_metabolomics_data(self, mbzip):
-        logger.info('Extracting files to %s', self.project_file_cache)
-        # extract the contents to the file cache folder. only want some of the files
-        # so pick them out and only extract those:
-        # - root/spectra/*.mgf
-        # - root/clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.tsv
-        # - root/networkedges_selfloop/*.pairsinfo
-        # - root/quantification_table*
-        # - root/metadata_table*
-        # - root/DB_result*
-
-        prefixes = [
-            'clusterinfosummarygroup_attributes_withIDs_withcomponentID',
-            'networkedges_selfloop', 'quantification_table', 'metadata_table',
-            'DB_result', 'result_specnets_DB'
-        ]
-
-        for member in mbzip.namelist():
-            if any(member.startswith(prefix) for prefix in prefixes):
-                mbzip.extract(member, path=self.project_file_cache)
-            # move the MGF file to a /spectra subdirectory to better fit expected structure
-            elif member.endswith('.mgf'):
-                os.makedirs(os.path.join(self.project_file_cache, 'spectra'),
-                            exist_ok=True)
-                mbzip.extract(member,
-                              path=os.path.join(self.project_file_cache,
-                                                'spectra'))
-
-    @deprecated
-    def _log_gnps_format(self):
-        if self._is_new_gnps_format(self.project_file_cache):
-            logger.info('Found NEW GNPS structure')
-        else:
-            logger.info('Found OLD GNPS structure')
-
-    @deprecated
-    def _load_gnps_data(self, gnps_task_id) -> zipfile.ZipFile:
-
-        self.metabolomics_zip = os.path.join(self.project_download_cache,
-                                             'metabolomics_data.zip')
-
-        # Try read from cache
-        if os.path.exists(self.metabolomics_zip):
-            logger.info('Found existing metabolomics_zip at %s',
-                        self.metabolomics_zip)
-            try:
-                mbzip = zipfile.ZipFile(self.metabolomics_zip)  # pylint: disable=consider-using-with
-                return mbzip
-            except zipfile.BadZipFile:
-                logger.info(
-                    'Invalid metabolomics zipfile found, will download again!')
-                os.unlink(self.metabolomics_zip)
-        url = _generate_gnps_download_url(gnps_task_id)
-        _execute_download(url, self.metabolomics_zip)
-
-        # this should throw an exception if zip is malformed etc
-        mbzip = zipfile.ZipFile(self.metabolomics_zip)  # pylint: disable=consider-using-with
-        return mbzip
-
     def _download_and_load_json(self, url, local_path):
         resp = httpx.get(url, follow_redirects=True)
         if not resp.status_code == 200:
@@ -323,25 +261,3 @@ class PODPDownloader():
         logger.debug('Downloaded %s to %s', url, local_path)
 
         return content
-
-
-@deprecated
-def _generate_gnps_download_url(gnps_task_id):
-    url = GNPS_DATA_DOWNLOAD_URL.format(gnps_task_id)
-    return url
-
-
-@deprecated
-def _execute_download(url, metabolomics_zip):
-    logger.info('Downloading metabolomics data from %s', url)
-    with open(metabolomics_zip, 'wb') as f:
-        # note that this requires a POST, not a GET
-        total_bytes = 0
-        spinner = Spinner('Downloading metabolomics data... ')
-        with httpx.stream('POST', url) as r:
-            for data in r.iter_bytes():
-                f.write(data)
-                total_bytes += len(data)
-                spinner.next()
-        spinner.finish()
-    logger.info('Downloaded metabolomics data!')
