@@ -1,10 +1,10 @@
 import filecmp
+from pathlib import Path
 from tempfile import gettempdir
 import zipfile
-from pathlib import Path
-from typing_extensions import Self
-
 import pytest
+from requests.exceptions import ReadTimeout
+from typing_extensions import Self
 from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
 from .. import DATA_DIR
 
@@ -33,8 +33,11 @@ def test_has_gnps_task_id():
 
 
 def test_has_url():
-    sut = GNPSDownloaderBuilder().with_task_id("c22f44b14a3d450eb836d607cb9521bb").build()
-    assert sut.get_url() == 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task=c22f44b14a3d450eb836d607cb9521bb&view=download_clustered_spectra'
+    try:
+        sut = GNPSDownloaderBuilder().with_task_id("c22f44b14a3d450eb836d607cb9521bb").build()
+        assert sut.get_url() == 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task=c22f44b14a3d450eb836d607cb9521bb&view=download_clustered_spectra'
+    except ReadTimeout:
+        pytest.skip("GNPS is down")
 
 
 @pytest.mark.parametrize("task_id, filename_expected", [
@@ -44,11 +47,14 @@ def test_has_url():
 def test_downloads_file(tmp_path: Path, task_id, filename_expected):
     outpath = tmp_path.joinpath(task_id + ".zip")
     sut = GNPSDownloader(task_id, tmp_path)
-    sut.download()
-    actual = zipfile.ZipFile(outpath)
+    try:
+        sut.download()
+        actual = zipfile.ZipFile(outpath)
 
-    expected = zipfile.ZipFile(DATA_DIR / filename_expected)
+        expected = zipfile.ZipFile(DATA_DIR / filename_expected)
 
-    actual_names = actual.namelist()
-    expected_names = [x.filename for x in expected.filelist if x.compress_size > 0]
-    assert all(item in actual_names for item in expected_names)
+        actual_names = actual.namelist()
+        expected_names = [x.filename for x in expected.filelist if x.compress_size > 0]
+        assert all(item in actual_names for item in expected_names)
+    except ReadTimeout:
+        pytest.skip("GNPS is down")
