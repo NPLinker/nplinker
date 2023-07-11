@@ -1,6 +1,7 @@
 import json
 from os import PathLike
 from pathlib import Path
+import urllib
 import re
 import time
 from bs4 import BeautifulSoup
@@ -176,19 +177,24 @@ def podp_download_and_extract_antismash_data(
             # give up on this one
             logger.warning(f'Failed lookup for genome ID {raw_genome_id}')
             continue
-
+        
         # if resolved id is valid, try to download and extract antismash data
-        download_and_extract_antismash_data(gs_obj.resolved_refseq_id,
-                                            project_download_root,
-                                            project_extract_root)
+        try:
+            download_and_extract_antismash_data(gs_obj.resolved_refseq_id,
+                                                project_download_root,
+                                                project_extract_root)
 
-        gs_obj.bgc_path = str(
-            Path(project_download_root,
-                 gs_obj.resolved_refseq_id + '.zip').absolute())
+            gs_obj.bgc_path = str(
+                Path(project_download_root,
+                    gs_obj.resolved_refseq_id + '.zip').absolute())
 
-        output_path = Path(project_extract_root, 'antismash',
-                           gs_obj.resolved_refseq_id)
-        Path.touch(output_path / 'completed', exist_ok=True)
+            output_path = Path(project_extract_root, 'antismash',
+                            gs_obj.resolved_refseq_id)
+            if output_path.exists():
+                Path.touch(output_path / 'completed', exist_ok=True)
+
+        except urllib.error.HTTPError:
+            gs_obj.bgc_path = ""
 
     missing = len([gs for gs in gs_dict.values() if not gs.bgc_path])
     logger.info(f'Dataset has {missing} missing sets of antiSMASH data '
