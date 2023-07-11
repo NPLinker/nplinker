@@ -176,12 +176,12 @@ class DatasetLoader():
         return True
 
     def _start_downloads(self):
-        downloader = PODPDownloader(self._platform_id)
-        self._root = downloader.project_file_cache
+        self._downloader = PODPDownloader(self._platform_id)
+        self._root = self._downloader.project_file_cache
         logger.debug('remote loading mode, configuring root=%s', self._root)
         # CG: to download both MET and GEN data
         # CG: Continue to understand how strain_mappings.json is generated
-        downloader.get(
+        self._downloader.get(
             self._config_docker.get('run_bigscape', self.RUN_BIGSCAPE_DEFAULT),
             self._config_docker.get('extra_bigscape_parameters',
                                     self.EXTRA_BIGSCAPE_PARAMS_DEFAULT),
