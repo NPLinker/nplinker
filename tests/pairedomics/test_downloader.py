@@ -46,7 +46,7 @@ def test_download_metabolomics_zipfile(tmp_path):
     assert (Path(sut.project_file_cache) / "spectra/METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra-main.mgf").is_file()
 
 
-def test_download_metabolomics_zipfile(tmp_path):
+def test_download_metabolomics_zipfile_scenario2(tmp_path):
     sut = PODPDownloader("MSV000079284", local_cache=tmp_path)
     sut._download_metabolomics_zipfile("c22f44b14a3d450eb836d607cb9521bb")
     expected_path = os.path.join(sut.project_download_cache, 'c22f44b14a3d450eb836d607cb9521bb.zip')
