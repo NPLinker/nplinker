@@ -1,6 +1,7 @@
 import os
 from os import PathLike
 from pathlib import Path
+import urllib
 import shutil
 from nplinker.logconfig import LogConfig
 from nplinker.utils import download_and_extract_archive
@@ -45,29 +46,37 @@ def download_and_extract_antismash_data(antismash_id: str,
     extract_root = Path(extract_root)
     extract_path = extract_root / "antismash" / antismash_id
     _check_roots(download_root, extract_root)
-    if extract_path.exists():
-        _check_extract_path(extract_path)
-    else:
-        extract_path.mkdir(parents=True, exist_ok=True)
 
-    for base_url in [ANTISMASH_DB_DOWNLOAD_URL, ANTISMASH_DBV2_DOWNLOAD_URL]:
-        url = base_url.format(antismash_id, antismash_id + '.zip')
-        download_and_extract_archive(url, download_root, extract_path,
-                                     antismash_id + '.zip')
-        break
+    try:
+        if extract_path.exists():
+            _check_extract_path(extract_path)
+        else:
+            extract_path.mkdir(parents=True, exist_ok=True)
 
-    # delete subdirs
-    for subdir_path in list_dirs(extract_path):
-        shutil.rmtree(subdir_path)
+        for base_url in [ANTISMASH_DB_DOWNLOAD_URL, ANTISMASH_DBV2_DOWNLOAD_URL]:
+            url = base_url.format(antismash_id, antismash_id + '.zip')
+            download_and_extract_archive(url, download_root, extract_path,
+                                        antismash_id + '.zip')
+            break
 
-    # delete unnecessary files
-    files_to_keep = list_files(extract_path, suffix=(".json", ".gbk"))
-    for file in list_files(extract_path):
-        if file not in files_to_keep:
-            os.remove(file)
 
-    logger.info('antiSMASH BGC data of %s is downloaded and extracted.',
-                antismash_id)
+        # delete subdirs
+        for subdir_path in list_dirs(extract_path):
+            shutil.rmtree(subdir_path)
+
+        # delete unnecessary files
+        files_to_keep = list_files(extract_path, suffix=(".json", ".gbk"))
+        for file in list_files(extract_path):
+            if file not in files_to_keep:
+                os.remove(file)
+
+        logger.info('antiSMASH BGC data of %s is downloaded and extracted.',
+                    antismash_id)
+        
+    except urllib.error.HTTPError as e:
+        shutil.rmtree(extract_path)
+        logger.warning(e)
+        raise urllib.error.HTTPError(e.url, e.code, f"Could not find a valid url for {antismash_id}", e.hdrs, e.fp)
 
 
 def _check_roots(download_root: PathLike, extract_root: PathLike):
