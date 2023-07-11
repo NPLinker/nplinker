@@ -63,7 +63,11 @@ def gnps_format_from_file_mapping(file: str | PathLike, has_quant_table: bool) -
 
 
 def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
-    """Detect the GNPS format for the given task id
+    """Detect the GNPS format for the given task id.
+
+    The http request has a timeout of 5 seconds. If the request fails,
+    an ReadTimeout exception is raised. This is to prevent the program
+    from hanging indefinitely when the GNPS server is down.
 
     Args:
         task_id(str): GNPS task id.
@@ -71,11 +75,11 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
     Returns:
         GNPSFormat: the format used in the GNPS workflow invocation.
 
-    Examples: 
+    Examples:
         >>> gnps_format_from_task_id("92036537c21b44c29e509291e53f6382")
     """
-    task_html = requests.get(GNPS_TASK_URL.format(task_id))        
-    soup = BeautifulSoup(task_html.text)
+    task_html = requests.get(GNPS_TASK_URL.format(task_id), timeout=5)
+    soup = BeautifulSoup(task_html.text, features="html.parser")
     tags = soup.find_all('th')
     workflow_tag: Tag = list(filter(lambda x: x.contents == ['Workflow'], tags))[0]
     workflow_format_tag: Tag = workflow_tag.parent.contents[3]
@@ -83,11 +87,10 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
 
     if workflow_format == "FEATURE-BASED-MOLECULAR-NETWORKING":
         return GNPSFormat.FBMN
-    elif workflow_format == "METABOLOMICS-SNETS":
+    if workflow_format == "METABOLOMICS-SNETS":
         return GNPSFormat.AllFiles
-    else:
-        return GNPSFormat.Unknown
-    
+    return GNPSFormat.Unknown
+
 
 def gnps_format_from_archive(archive: zipfile.ZipFile) -> GNPSFormat:
     """Detect GNPS format from a downloaded archive.
