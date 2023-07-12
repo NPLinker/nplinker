@@ -82,6 +82,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             for row in reader:
                 spectrum_id = row["row ID"]
 
+                # TODO: issue https://github.com/NPLinker/nplinker/issues/162
                 if self._mapping.get(spectrum_id) is not None:
                     logger.warning("Found duplicated row ID: %{spectrum_id}")
 
