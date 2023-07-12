@@ -54,8 +54,5 @@ class TestDownloadAndExtractAntismashData():
         with pytest.raises(urllib.error.HTTPError):
             download_and_extract_antismash_data(broken_antismash_id, download_root,
                                                 extract_root)
-            archive = download_root / broken_antismash_id / ".zip"
-            extracted_folder = extract_root / "antismash" / broken_antismash_id
-            assert not archive.exists()
-            assert not archive.is_file()
-            assert not extracted_folder.exists()
+        extracted_folder = extract_root / "antismash" / broken_antismash_id
+        assert not extracted_folder.exists()
