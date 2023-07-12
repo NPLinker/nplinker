@@ -46,7 +46,7 @@ def spec_dict() -> dict[str, Spectrum]:
 @pytest.fixture
 def collection_from_file() -> StrainCollection:
     filename = DATA_DIR / STRAIN_MAPPINGS_FILENAME
-    sut = StrainCollection().read_json(filename)
+    sut = StrainCollection.read_json(filename)
     return sut
 
 

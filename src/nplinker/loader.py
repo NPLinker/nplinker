@@ -339,7 +339,7 @@ class DatasetLoader():
             self.strains.generate_strain_mappings(self.strain_mappings_file,
                                                   self.antismash_dir)
         else:
-            sc = StrainCollection().read_json(self.strain_mappings_file)
+            sc = StrainCollection.read_json(self.strain_mappings_file)
             for strain in sc:
                 self.strains.add(strain)
             logger.info('Loaded dataset strain IDs ({} total)'.format(
