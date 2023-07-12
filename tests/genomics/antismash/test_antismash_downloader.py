@@ -45,8 +45,20 @@ class TestDownloadAndExtractAntismashData():
                                                 tmp_path / "extracted")
         assert "Nonempty directory" in e.value.args[0]
 
-    def test_broken_url(self, tmp_path):
-        broken_antismash_id = 'broken_id'
+    def test_nonexisting_id(self, tmp_path):
+        nonexisting_antismash_id = 'nonexisting_id'
+        download_root = tmp_path / "download"
+        download_root.mkdir()
+        extract_root = tmp_path / "extracted"
+        extract_root.mkdir()
+        with pytest.raises(urllib.error.HTTPError):
+            download_and_extract_antismash_data(nonexisting_antismash_id, download_root,
+                                                extract_root)
+        extracted_folder = extract_root / "antismash" / nonexisting_antismash_id
+        assert not extracted_folder.exists()
+
+    def test_broken_id(self, tmp_path):
+        broken_antismash_id = 'GCF_000702345.1'
         download_root = tmp_path / "download"
         download_root.mkdir()
         extract_root = tmp_path / "extracted"
