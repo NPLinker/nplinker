@@ -25,7 +25,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             NotImplementedError: Raises NotImplementedError if the GNPS format is not recognized.
         """
         self._file: Path = Path(file)
-        self._mapping: dict[int, list[str]] = {}
+        self._mapping: dict[str, list[str]] = {}
         self._gnps_format = gnps_format_from_file_mapping(file, False)
 
         if self._gnps_format is GNPSFormat.AllFiles:
@@ -36,11 +36,11 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             raise NotImplementedError(
                 "%{gnps_format} reading not implemented.")
 
-    def mapping(self) -> dict[int, list[str]]:
+    def mapping(self) -> dict[str, list[str]]:
         """Return mapping from spectrum id to files in which this spectrum occurs.
 
         Returns:
-            dict[int, list[str]]: Mapping from spectrum id to names of all files in which this spectrum occurs.
+            dict[str, list[str]]: Mapping from spectrum id to names of all files in which this spectrum occurs.
         """
         return self._mapping
 
@@ -50,7 +50,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             reader = self._get_dict_reader(file)
 
             for row in reader:
-                spectrum_id = int(row["cluster index"])
+                spectrum_id = row["cluster index"]
 
                 occurrences = row["AllFiles"].split("###")  # split by '###'
                 occurrences.pop()  # remove last empty entry
@@ -80,7 +80,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             reader = self._get_dict_reader(file)
 
             for row in reader:
-                spectrum_id = int(row["row ID"])
+                spectrum_id = row["row ID"]
 
                 if self._mapping.get(spectrum_id) is not None:
                     logger.warning("Found duplicated row ID: %{spectrum_id}")
