@@ -11,7 +11,7 @@ from . import DATA_DIR
 # For tests on scoring/links, add them to `scoring/test_nplinker_scoring.py`.
 
 
-def get_digest(file_path):
+def get_file_hash(file_path):
     h = hashlib.sha256()
     with open(file_path, 'rb') as file:
         while True:
