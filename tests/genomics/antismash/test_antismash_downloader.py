@@ -1,7 +1,8 @@
-import pytest
 import urllib
+import pytest
 from nplinker.genomics.antismash import download_and_extract_antismash_data
-from nplinker.utils import list_files, extract_archive
+from nplinker.utils import extract_archive
+from nplinker.utils import list_files
 
 
 class TestDownloadAndExtractAntismashData():

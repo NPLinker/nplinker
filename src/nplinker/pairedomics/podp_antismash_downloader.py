@@ -1,13 +1,13 @@
 import json
-from os import PathLike
-from pathlib import Path
-import urllib
 import re
 import time
+import urllib
+from os import PathLike
+from pathlib import Path
+import httpx
 from bs4 import BeautifulSoup
 from bs4 import NavigableString
 from bs4 import Tag
-import httpx
 from nplinker.genomics.antismash import download_and_extract_antismash_data
 from nplinker.logconfig import LogConfig
 

@@ -1,6 +1,6 @@
+import hashlib
 import os
 from pathlib import Path
-import hashlib
 import pytest
 from nplinker.nplinker import NPLinker
 from . import DATA_DIR
