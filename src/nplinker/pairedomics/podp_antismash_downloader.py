@@ -138,7 +138,7 @@ def podp_download_and_extract_antismash_data(
     for i, genome_record in enumerate(genome_records):
         # get the best available ID from the dict
         genome_id_data = genome_record['genome_ID']
-        raw_genome_id = _get_best_available_genome_id(genome_id_data)
+        raw_genome_id = get_best_available_genome_id(genome_id_data)
         if raw_genome_id is None or len(raw_genome_id) == 0:
             logger.warning(
                 f'Ignoring genome record "{genome_record}" due to missing genome ID field'
@@ -206,7 +206,7 @@ def podp_download_and_extract_antismash_data(
         logger.warning('Failed to successfully retrieve ANY genome data!')
 
 
-def _get_best_available_genome_id(
+def get_best_available_genome_id(
         genome_id_data: dict[str, str]) -> str | None:
     """Get the best available ID from genome_id_data dict.
 
