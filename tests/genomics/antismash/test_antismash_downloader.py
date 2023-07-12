@@ -1,4 +1,5 @@
 import pytest
+import urllib
 from nplinker.genomics.antismash import download_and_extract_antismash_data
 from nplinker.utils import list_files, extract_archive
 
@@ -43,3 +44,18 @@ class TestDownloadAndExtractAntismashData():
             download_and_extract_antismash_data(self.antismash_id, tmp_path,
                                                 tmp_path / "extracted")
         assert "Nonempty directory" in e.value.args[0]
+
+    def test_broken_url(self, tmp_path):
+        broken_antismash_id = 'broken_id'
+        download_root = tmp_path / "download"
+        download_root.mkdir()
+        extract_root = tmp_path / "extracted"
+        extract_root.mkdir()
+        with pytest.raises(urllib.error.HTTPError):
+            download_and_extract_antismash_data(broken_antismash_id, download_root,
+                                                extract_root)
+            archive = download_root / broken_antismash_id / ".zip"
+            extracted_folder = extract_root / "antismash" / broken_antismash_id
+            assert not archive.exists()
+            assert not archive.is_file()
+            assert not extracted_folder.exists()
