@@ -230,7 +230,29 @@ def test_failed_lookup(download_root, extract_root, genome_status_file):
     assert len(genome_status["non_existing_ID"].bgc_path) == 0
     assert genome_status["non_existing_ID"].resolve_attempted
     assert not (download_root / "non_existing_ID.zip").exists()
-    assert not (extract_root / "antismash" / "non_existing_ID.zip").exists()
+    assert not (extract_root / "antismash" / "non_existing_ID").exists()
+
+
+# Test `podp_download_and_extract_antismash_data` function
+# when a genome record has an existing accession ID, but the antismash link is broken
+# 404 error
+def test_broken_lookup(download_root, extract_root, genome_status_file):
+    broken_id = "GCF_000702345.1"
+    genome_records = [{
+        "genome_ID": {
+            "genome_type": "genome",
+            "RefSeq_accession": broken_id
+        },
+        "genome_label": "Salinispora arenicola CNX508"
+    }]
+
+    podp_download_and_extract_antismash_data(genome_records, download_root,
+                                             extract_root)
+    genome_status = GenomeStatus.read_json(genome_status_file)
+    assert len(genome_status[broken_id].bgc_path) == 0
+    assert genome_status[broken_id].resolve_attempted
+    assert not (download_root / broken_id / ".zip").exists()
+    assert not (extract_root / "antismash" / broken_id).exists()
 
 
 # Test `podp_download_and_extract_antismash_data` function
