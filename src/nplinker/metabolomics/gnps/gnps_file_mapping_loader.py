@@ -4,9 +4,10 @@ from pathlib import Path
 from typing import TextIO
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.abc import FileMappingLoaderBase
-from .gnps_format import GNPSFormat
-from .gnps_format import gnps_format_from_file_mapping
 from nplinker.utils import find_delimiter
+from .gnps_format import gnps_format_from_file_mapping
+from .gnps_format import GNPSFormat
+
 
 logger = LogConfig.getLogger(__file__)
 
@@ -43,6 +44,22 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             dict[str, list[str]]: Mapping from spectrum id to names of all files in which this spectrum occurs.
         """
         return self._mapping
+
+    def mapping_reversed(self) -> dict[str, set[str]]:
+        """Return mapping from file name to all spectra ids that occur in this file.
+
+        Returns:
+            dict[str, set[str]]: Mapping from file name to all spectra ids that occur in this file.
+        """
+        mapping_reversed = {}
+        for spectrum_id, ms_filenames in self._mapping.items():
+            for filename in ms_filenames:
+                if filename in mapping_reversed:
+                    mapping_reversed[filename].add(spectrum_id)
+                else:
+                    mapping_reversed[filename] = {spectrum_id}
+
+        return mapping_reversed
 
     def _load_mapping_allfiles(self):
         """ Load mapping for GNPS 'AllFiles' style files. """
