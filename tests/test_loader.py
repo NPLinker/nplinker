@@ -1,8 +1,8 @@
 from pathlib import Path
 import shutil
 import pytest
+from nplinker.globals import STRAIN_MAPPINGS_FILENAME
 from nplinker.loader import DatasetLoader
-from nplinker.loader import STRAIN_MAPPINGS_FILENAME
 from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
 from nplinker.metabolomics.gnps.gnps_spectrum_loader import GNPSSpectrumLoader
 from nplinker.strain_collection import StrainCollection

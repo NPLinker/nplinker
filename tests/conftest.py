@@ -1,10 +1,10 @@
 from pathlib import Path
 import shutil
 import pytest
+from nplinker.globals import STRAIN_MAPPINGS_FILENAME
 from nplinker.metabolomics.metabolomics import load_spectra
 from nplinker.metabolomics.metabolomics import make_families
 from nplinker.metabolomics.spectrum import Spectrum
-from nplinker.pairedomics.downloader import STRAIN_MAPPINGS_FILENAME
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 from nplinker.utils import extract_archive

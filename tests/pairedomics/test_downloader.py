@@ -3,8 +3,8 @@ from pathlib import Path
 import pytest
 from pytest_lazyfixture import lazy_fixture
 from requests.exceptions import ReadTimeout
+from nplinker.globals import STRAIN_MAPPINGS_FILENAME
 from nplinker.pairedomics.downloader import PODPDownloader
-from nplinker.pairedomics.downloader import STRAIN_MAPPINGS_FILENAME
 
 
 @pytest.mark.parametrize("expected", [

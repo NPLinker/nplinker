@@ -10,10 +10,10 @@ from nplinker.genomics import load_gcfs
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.genomics.mibig import MibigBGCLoader
+from nplinker.globals import STRAIN_MAPPINGS_FILENAME
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.metabolomics import load_dataset
 from nplinker.pairedomics.downloader import PODPDownloader
-from nplinker.pairedomics.downloader import STRAIN_MAPPINGS_FILENAME
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.strain_collection import StrainCollection
 

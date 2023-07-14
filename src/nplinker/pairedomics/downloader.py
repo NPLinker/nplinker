@@ -20,8 +20,6 @@ GNPS_DATA_DOWNLOAD_URL = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={
 MIBIG_METADATA_URL = 'https://dl.secondarymetabolites.org/mibig/mibig_json_{}.tar.gz'
 MIBIG_BGC_METADATA_URL = 'https://mibig.secondarymetabolites.org/repository/{}/annotations.json'
 
-STRAIN_MAPPINGS_FILENAME = 'strain_mappings.json'
-
 
 class PODPDownloader():
     # TODO: move to independent config file  ---C.Geng
