@@ -141,11 +141,6 @@ class PODPDownloader():
                                                  self.project_download_cache,
                                                  self.project_file_cache)
 
-        # CG: it extracts strain names and later will be used for strains
-        # TODO CG: remove this function and move it to strain mappings generator
-        self._parse_genome_labels(self.project_json['genome_metabolome_links'],
-                                  self.project_json['genomes'])
-
         if use_mibig:
             self._download_mibig_json(mibig_version)
         podp_run_bigscape(self.project_file_cache, self.PFAM_PATH, do_bigscape,
@@ -174,65 +169,6 @@ class PODPDownloader():
                   encoding='utf-8'):
             pass
 
-    def _parse_genome_labels(self, met_records, gen_records):
-        temp = {}
-        mc, gc = 0, 0
-
-        # this method is supposed to extract the fields from the JSON data
-        # which map strain names to mzXML files on the metabolomics side,
-        # and to BGCs on the genomics side, and use that data to build a set
-        # of NPLinker Strain objects for the current dataset
-
-        # metabolomics: each of the JSON records should contain a field named
-        # "genome_label", which is the one that should be used as the canonical
-        # name for this strain by nplinker. Another field is called "metabolomics_file",
-        # and this contains a URL to the corresponding mzXML file. so we want to
-        # create a set of mappings from one to the other, with the complication that
-        # there might be mappings from 2 or more mzXMLs to a single strain.
-        # also should record the growth medium using the "sample_preparation_label" field.
-
-        # TODO CG: build mappings from strain id to metabolomics filename (not spectrum id),
-        # when to build spectrum id to metabolomics filename mapping?
-        for rec in met_records:
-            # this is the global strain identifier we should use
-            label = rec['genome_label']
-            # only want to record the actual filename of the mzXML URL
-            # TODO CG: is filename always unique?
-            filename = os.path.split(rec['metabolomics_file'])[1]
-
-            # add the mzXML mapping for this strain
-            if label in temp:
-                temp[label].append(filename)
-            else:
-                temp[label] = [filename]
-            mc += 1
-
-        # TODO CG: build mappings from strain id to genome id (not BGC id),
-        # when to build BGC id to genome id mapping?
-        for rec in gen_records:
-            label = rec['genome_label']
-            # TODO CG: change `resolved_id` to `resolved_refseq_id`
-            accession = rec.get('resolved_id', None)
-            if accession is None:
-                # this will happen for genomes where we couldn't retrieve data or resolve the ID
-                logger.warning(
-                    'Failed to extract accession from genome with label %s',
-                    label)
-                continue
-
-            if label in temp:
-                temp[label].append(accession)
-            else:
-                temp[label] = [accession]
-                gc += 1
-
-        logger.info('Extracted %s strains from JSON (met=%s, gen=%s)',
-                    len(temp), mc, gc)
-        for strain_label, strain_aliases in temp.items():
-            strain = Strain(strain_label)
-            for alias in strain_aliases:
-                strain.add_alias(alias)
-            self.strains.add(strain)
 
     def _download_metabolomics_zipfile(self, gnps_task_id):
         archive = GNPSDownloader(
