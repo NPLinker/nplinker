@@ -19,7 +19,7 @@ def test_default(expected: Path):
     assert sut.gnps_massive_id == gnps_id
     assert sut.working_dir == str(expected)
 
-    assert sut.local_download_cache == str(expected / 'downloads')
+    assert sut.downloads_dir == str(expected / 'downloads')
     assert sut.project_download_cache == str(expected / 'downloads' / gnps_id)
 
     assert sut.local_file_cache == str(expected / 'extracted')
