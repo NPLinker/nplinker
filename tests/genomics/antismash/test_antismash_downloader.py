@@ -46,26 +46,17 @@ class TestDownloadAndExtractAntismashData():
                                                 tmp_path / "extracted")
         assert "Nonempty directory" in e.value.args[0]
 
+    # test a non-existent ID, which can be either a fake ID, non-existent in NCBI
+    # or a "broken" antismash ID, which does not exist anymore in the antismash database
     def test_nonexisting_id(self, tmp_path):
-        nonexisting_antismash_id = 'nonexisting_id'
+        nonexisting_ids = ['non_existent_ID', 'GCF_000702345.1']
         download_root = tmp_path / "download"
         download_root.mkdir()
         extract_root = tmp_path / "extracted"
         extract_root.mkdir()
-        with pytest.raises(urllib.error.HTTPError):
-            download_and_extract_antismash_data(nonexisting_antismash_id, download_root,
-                                                extract_root)
-        extracted_folder = extract_root / "antismash" / nonexisting_antismash_id
-        assert not extracted_folder.exists()
-
-    def test_broken_id(self, tmp_path):
-        broken_antismash_id = 'GCF_000702345.1'
-        download_root = tmp_path / "download"
-        download_root.mkdir()
-        extract_root = tmp_path / "extracted"
-        extract_root.mkdir()
-        with pytest.raises(urllib.error.HTTPError):
-            download_and_extract_antismash_data(broken_antismash_id, download_root,
-                                                extract_root)
-        extracted_folder = extract_root / "antismash" / broken_antismash_id
-        assert not extracted_folder.exists()
+        for test_id in nonexisting_ids:
+            with pytest.raises(urllib.error.HTTPError):
+                download_and_extract_antismash_data(test_id, download_root,
+                                                    extract_root)
+            extracted_folder = extract_root / "antismash" / test_id
+            assert not extracted_folder.exists()
