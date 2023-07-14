@@ -39,15 +39,15 @@ class PODPDownloader():
         self._init_folder_structure(working_dir)
 
         # init project json files
-        self.all_project_json = None
+        self.all_projects_json_data = None
         if not os.path.exists(self.project_json_file) or force_download:
             logger.info('Downloading new copy of platform project data...')
-            self.all_project_json = self._download_and_load_json(
+            self.all_projects_json_data = self._download_and_load_json(
                 PAIREDOMICS_PROJECT_DATA_ENDPOINT, self.all_projects_json_file)
         else:
             logger.info('Using existing copy of platform project data')
             with open(self.all_projects_json_file, encoding="utf-8") as f:
-                self.all_project_json = json.load(f)
+                self.all_projects_json_data = json.load(f)
 
         # query the pairedomics webservice with the project ID to retrieve the data. unfortunately
         # this is not the MSV... ID, but an internal GUID string. To get that, first need to get the
@@ -55,7 +55,7 @@ class PODPDownloader():
         # then extract its '_id' value to get the GUID
 
         # find the specified project and store its ID
-        for project in self.all_project_json['data']:
+        for project in self.all_projects_json_data['data']:
             pairedomics_id = project['_id']
             gnps_massive_id = project['metabolite_id']
 
