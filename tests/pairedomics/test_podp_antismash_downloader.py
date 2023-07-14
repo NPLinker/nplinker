@@ -214,8 +214,8 @@ def test_caching(download_root, extract_root, genome_status_file, caplog):
 
 
 # Test `podp_download_and_extract_antismash_data` function
-# when a genome record has a non existing accession ID
-def test_failed_lookup(download_root, extract_root, genome_status_file):
+# when a genome record has an which does not exists in NCBI
+def test_failed_lookup_ncbi(download_root, extract_root, genome_status_file):
     genome_records = [{
         "genome_ID": {
             "genome_type": "genome",
@@ -234,9 +234,9 @@ def test_failed_lookup(download_root, extract_root, genome_status_file):
 
 
 # Test `podp_download_and_extract_antismash_data` function
-# when a genome record has an existing accession ID, but the antismash link is broken
-# 404 error
-def test_broken_lookup(download_root, extract_root, genome_status_file):
+# when a genome record has an existing accession ID in NCBI,
+# but not in the antismash databased
+def test_failed_lookup_antismash(download_root, extract_root, genome_status_file):
     broken_id = "GCF_000702345.1"
     genome_records = [{
         "genome_ID": {
