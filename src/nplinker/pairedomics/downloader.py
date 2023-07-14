@@ -4,6 +4,7 @@ import shutil
 import sys
 import httpx
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
+from nplinker.globals import PFAM_PATH
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
 from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
@@ -22,8 +23,6 @@ MIBIG_BGC_METADATA_URL = 'https://mibig.secondarymetabolites.org/repository/{}/a
 
 
 class PODPDownloader():
-    # TODO: move to independent config file  ---C.Geng
-    PFAM_PATH = os.path.join(sys.prefix, 'nplinker_lib')
 
     def __init__(self, platform_id, force_download=False, local_cache=None):
         self.gnps_massive_id = platform_id
@@ -134,7 +133,7 @@ class PODPDownloader():
 
         if use_mibig:
             self._download_mibig_json(mibig_version)
-        podp_run_bigscape(self.project_file_cache, self.PFAM_PATH, do_bigscape,
+        podp_run_bigscape(self.project_file_cache, PFAM_PATH, do_bigscape,
                           extra_bigscape_parameters)
 
     def _download_mibig_json(self, version):
@@ -159,7 +158,6 @@ class PODPDownloader():
                   'w',
                   encoding='utf-8'):
             pass
-
 
     def _download_metabolomics_zipfile(self, gnps_task_id):
         archive = GNPSDownloader(

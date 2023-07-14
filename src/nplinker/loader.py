@@ -10,6 +10,7 @@ from nplinker.genomics import load_gcfs
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.genomics.mibig import MibigBGCLoader
+from nplinker.globals import PFAM_PATH
 from nplinker.globals import STRAIN_MAPPINGS_FILENAME
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.metabolomics import load_dataset
@@ -75,9 +76,6 @@ class DatasetLoader():
         'NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs',
         'Saccharides', 'Terpene'
     ]
-
-    # TODO: move to a config file, used by multiple modules
-    PFAM_PATH = os.path.join(sys.prefix, 'nplinker_lib')
 
     def __init__(self, config_data):
         # load the config data
@@ -491,7 +489,7 @@ class DatasetLoader():
                     run_bigscape('bigscape.py',
                                  os.path.join(self._root, 'antismash'),
                                  os.path.join(self._root, 'bigscape'),
-                                 self.PFAM_PATH,
+                                 PFAM_PATH,
                                  extra_params=extra_bigscape_parameters)
                 except Exception as e:
                     logger.warning(
