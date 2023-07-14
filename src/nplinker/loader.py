@@ -327,23 +327,11 @@ class DatasetLoader():
 
     # TODO: this function should be refactored to Loader class
     def _load_strain_mappings(self):
-        # now load the dataset mapping in the same way
-        # TODO: what happens in case of clashes (differing primary IDs?)
-        # CG: the `if` never happens for PODP pipeline; for non-PODP pipeline,
-        # self.strains is empty and will cause error.
-        # TODO: remove the `if` condition
-        if not os.path.exists(self.strain_mappings_file):
-            # create an empty placeholder file and show a warning
-            logger.warn(
-                'No strain_mappings.json file found! Attempting to create one')
-            self.strains.generate_strain_mappings(self.strain_mappings_file,
-                                                  self.antismash_dir)
-        else:
-            sc = StrainCollection.read_json(self.strain_mappings_file)
-            for strain in sc:
-                self.strains.add(strain)
-            logger.info('Loaded dataset strain IDs ({} total)'.format(
-                len(self.strains)))
+        sc = StrainCollection.read_json(self.strain_mappings_file)
+        for strain in sc:
+            self.strains.add(strain)
+        logger.info('Loaded dataset strain IDs ({} total)'.format(
+            len(self.strains)))
 
         return True
 

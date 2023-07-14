@@ -142,13 +142,9 @@ class PODPDownloader():
                                                  self.project_file_cache)
 
         # CG: it extracts strain names and later will be used for strains
+        # TODO CG: remove this function and move it to strain mappings generator
         self._parse_genome_labels(self.project_json['genome_metabolome_links'],
                                   self.project_json['genomes'])
-
-        # CG: it generates the strain_mappings.json file
-        self.strains.generate_strain_mappings(
-            self.strain_mappings_file,
-            os.path.join(self.project_file_cache, 'antismash'))
 
         if use_mibig:
             self._download_mibig_json(mibig_version)
