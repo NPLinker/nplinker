@@ -29,7 +29,6 @@ class PODPDownloader():
         self.gnps_massive_id = platform_id
         self.pairedomics_id = None
         self.gnps_task_id = None
-        self.json_data = None
 
         if working_dir is None:
             working_dir = os.path.join(os.getenv('HOME'), 'nplinker_data',
