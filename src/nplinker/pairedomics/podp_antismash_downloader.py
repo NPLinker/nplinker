@@ -11,7 +11,6 @@ from bs4 import Tag
 from nplinker.genomics.antismash import download_and_extract_antismash_data
 from nplinker.logconfig import LogConfig
 
-
 logger = LogConfig.getLogger(__name__)
 
 NCBI_LOOKUP_URL = 'https://www.ncbi.nlm.nih.gov/assembly/?term={}'
@@ -177,7 +176,7 @@ def podp_download_and_extract_antismash_data(
             # give up on this one
             logger.warning(f'Failed lookup for genome ID {raw_genome_id}')
             continue
-        
+
         # if resolved id is valid, try to download and extract antismash data
         try:
             download_and_extract_antismash_data(gs_obj.resolved_refseq_id,
@@ -186,10 +185,10 @@ def podp_download_and_extract_antismash_data(
 
             gs_obj.bgc_path = str(
                 Path(project_download_root,
-                    gs_obj.resolved_refseq_id + '.zip').absolute())
+                     gs_obj.resolved_refseq_id + '.zip').absolute())
 
             output_path = Path(project_extract_root, 'antismash',
-                            gs_obj.resolved_refseq_id)
+                               gs_obj.resolved_refseq_id)
             if output_path.exists():
                 Path.touch(output_path / 'completed', exist_ok=True)
 

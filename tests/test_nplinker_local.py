@@ -5,7 +5,6 @@ import pytest
 from nplinker.nplinker import NPLinker
 from . import DATA_DIR
 
-
 # NOTE: This file only contains tests that run locally and are skipped on CI.
 # Basically, only tests related to data loading should be put here.
 # For tests on scoring/links, add them to `scoring/test_nplinker_scoring.py`.
@@ -29,10 +28,12 @@ def npl() -> NPLinker:
     npl = NPLinker(str(DATA_DIR / 'nplinker_demo1.toml'))
     npl.load_data()
     hash_proj_file = get_file_hash(
-        os.path.join(
-        npl._downloader.local_cache, npl._loader._platform_id + '.json'))
+        os.path.join(npl._downloader.local_cache,
+                     npl._loader._platform_id + '.json'))
     if hash_proj_file != '22e4f20d6f8aa425b2040479d0b6c00e7d3deb03f8fc4a277b3b91eb07c9ad72':
-        pytest.exit('PoDP project file has changed, please clean your local cache folder and rerun the tests.')
+        pytest.exit(
+            'PoDP project file has changed, please clean your local cache folder and rerun the tests.'
+        )
     # remove cached score results before running tests
     root_dir = Path(npl.root_dir)
     score_cache = root_dir / 'metcalf' / 'metcalf_scores.pckl'

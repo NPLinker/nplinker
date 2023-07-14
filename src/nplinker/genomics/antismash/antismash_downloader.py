@@ -8,7 +8,6 @@ from nplinker.utils import download_and_extract_archive
 from nplinker.utils import list_dirs
 from nplinker.utils import list_files
 
-
 logger = LogConfig.getLogger(__name__)
 
 # urls to be given to download antismash data
@@ -53,12 +52,13 @@ def download_and_extract_antismash_data(antismash_id: str,
         else:
             extract_path.mkdir(parents=True, exist_ok=True)
 
-        for base_url in [ANTISMASH_DB_DOWNLOAD_URL, ANTISMASH_DBV2_DOWNLOAD_URL]:
+        for base_url in [
+                ANTISMASH_DB_DOWNLOAD_URL, ANTISMASH_DBV2_DOWNLOAD_URL
+        ]:
             url = base_url.format(antismash_id, antismash_id + '.zip')
             download_and_extract_archive(url, download_root, extract_path,
-                                        antismash_id + '.zip')
+                                         antismash_id + '.zip')
             break
-
 
         # delete subdirs
         for subdir_path in list_dirs(extract_path):
@@ -72,11 +72,13 @@ def download_and_extract_antismash_data(antismash_id: str,
 
         logger.info('antiSMASH BGC data of %s is downloaded and extracted.',
                     antismash_id)
-        
+
     except urllib.error.HTTPError as e:
         shutil.rmtree(extract_path)
         logger.warning(e)
-        raise urllib.error.HTTPError(e.url, e.code, f"Could not find a valid url for {antismash_id}", e.hdrs, e.fp) from e
+        raise urllib.error.HTTPError(
+            e.url, e.code, f"Could not find a valid url for {antismash_id}",
+            e.hdrs, e.fp) from e
 
 
 def _check_roots(download_root: PathLike, extract_root: PathLike):
