@@ -4,6 +4,7 @@ import json
 from os import PathLike
 from pathlib import Path
 from deprecated import deprecated
+from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.logconfig import LogConfig
 from nplinker.strain_collection import StrainCollection
 from nplinker.utils import list_dirs
@@ -13,8 +14,6 @@ from .gcf import GCF
 
 
 logger = LogConfig.getLogger(__name__)
-
-GENOME_BGC_MAPPINGS_FILENAME = "genome_bgc_mappings.json"
 
 
 def generate_genome_bgc_mappings_file(bgc_dir: str | PathLike) -> None:

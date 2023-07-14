@@ -5,11 +5,11 @@ from nplinker.genomics import BGC
 from nplinker.genomics import filter_mibig_only_gcf
 from nplinker.genomics import GCF
 from nplinker.genomics import generate_genome_bgc_mappings_file
-from nplinker.genomics import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.genomics import get_bgcs_from_gcfs
 from nplinker.genomics import get_strains_from_bgcs
 from nplinker.genomics import map_bgc_to_gcf
 from nplinker.genomics import map_strain_to_bgc
+from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 from .. import DATA_DIR
