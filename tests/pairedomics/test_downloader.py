@@ -20,7 +20,7 @@ def test_default(expected: Path):
     assert sut.working_dir == str(expected)
 
     assert sut.downloads_dir == str(expected / 'downloads')
-    assert sut.project_download_cache == str(expected / 'downloads' / gnps_id)
+    assert sut.project_downloads_dir == str(expected / 'downloads' / gnps_id)
 
     assert sut.results_dir == str(expected / 'extracted')
     assert sut.project_file_cache == str(expected / 'extracted'/ gnps_id)
@@ -35,7 +35,7 @@ def test_download_metabolomics_zipfile(tmp_path):
     sut = PODPDownloader("MSV000079284", working_dir=tmp_path)
     try:
         sut._download_metabolomics_zipfile("c22f44b14a3d450eb836d607cb9521bb")
-        expected_path = os.path.join(sut.project_download_cache, 'metabolomics_data.zip')
+        expected_path = os.path.join(sut.project_downloads_dir, 'metabolomics_data.zip')
 
         assert os.path.exists(expected_path)
         assert (Path(sut.project_file_cache) / "networkedges_selfloop/6da5be36f5b14e878860167fa07004d6.pairsinfo").is_file()
@@ -49,7 +49,7 @@ def test_download_metabolomics_zipfile_scenario2(tmp_path):
     sut = PODPDownloader("MSV000079284", working_dir=tmp_path)
     try:
         sut._download_metabolomics_zipfile("c22f44b14a3d450eb836d607cb9521bb")
-        expected_path = os.path.join(sut.project_download_cache, 'c22f44b14a3d450eb836d607cb9521bb.zip')
+        expected_path = os.path.join(sut.project_downloads_dir, 'c22f44b14a3d450eb836d607cb9521bb.zip')
 
         assert os.path.exists(expected_path)
         assert (Path(sut.project_file_cache) / "molecular_families.pairsinfo").is_file()

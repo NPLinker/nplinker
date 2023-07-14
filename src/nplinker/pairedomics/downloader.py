@@ -101,9 +101,9 @@ class PODPDownloader():
                     self.gnps_massive_id, self.working_dir)
 
         # create local cache folders for this dataset
-        self.project_download_cache = os.path.join(self.downloads_dir,
+        self.project_downloads_dir = os.path.join(self.downloads_dir,
                                                    self.gnps_massive_id)
-        os.makedirs(self.project_download_cache, exist_ok=True)
+        os.makedirs(self.project_downloads_dir, exist_ok=True)
 
         self.project_file_cache = os.path.join(self.results_dir,
                                                self.gnps_massive_id)
@@ -130,7 +130,7 @@ class PODPDownloader():
         # TODO CG: this function will modify the project_json['genomes'],
         # this should be done in a better way
         podp_download_and_extract_antismash_data(self.project_json['genomes'],
-                                                 self.project_download_cache,
+                                                 self.project_downloads_dir,
                                                  self.project_file_cache)
 
         if use_mibig:
@@ -147,7 +147,7 @@ class PODPDownloader():
 
         os.makedirs(output_path)
 
-        download_and_extract_mibig_metadata(self.project_download_cache,
+        download_and_extract_mibig_metadata(self.project_downloads_dir,
                                             output_path, version)
 
         self._create_completed_file(output_path)
@@ -164,7 +164,7 @@ class PODPDownloader():
     def _download_metabolomics_zipfile(self, gnps_task_id):
         archive = GNPSDownloader(
             gnps_task_id,
-            self.project_download_cache).download().get_download_path()
+            self.project_downloads_dir).download().get_download_path()
         GNPSExtractor(archive, self.project_file_cache).extract()
 
     def _download_and_load_json(self, url, local_path):
