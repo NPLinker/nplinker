@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 from bs4 import NavigableString
 from bs4 import Tag
 from nplinker.genomics.antismash import download_and_extract_antismash_data
+from nplinker.globals import GENOME_STATUS_FILENAME
 from nplinker.logconfig import LogConfig
 
 logger = LogConfig.getLogger(__name__)
@@ -16,7 +17,6 @@ logger = LogConfig.getLogger(__name__)
 NCBI_LOOKUP_URL = 'https://www.ncbi.nlm.nih.gov/assembly/?term={}'
 JGI_GENOME_LOOKUP_URL = 'https://img.jgi.doe.gov/cgi-bin/m/main.cgi?section=TaxonDetail&page=taxonDetail&taxon_oid={}'
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'
-GENOME_STATUS_FILENAME = "genome_status.json"
 
 
 class GenomeStatus:
