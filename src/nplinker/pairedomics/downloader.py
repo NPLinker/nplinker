@@ -151,10 +151,6 @@ class PODPDownloader():
         podp_run_bigscape(self.project_file_cache, self.PFAM_PATH, do_bigscape,
                           extra_bigscape_parameters)
 
-    def _is_new_gnps_format(self, directory):
-        # TODO this should test for existence of quantification table instead
-        return os.path.exists(os.path.join(directory, 'qiime2_output'))
-
     def _download_mibig_json(self, version):
         output_path = os.path.join(self.project_file_cache, 'mibig_json')
 
