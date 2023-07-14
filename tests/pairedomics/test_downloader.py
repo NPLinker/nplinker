@@ -28,7 +28,7 @@ def test_default(expected: Path):
     assert os.path.exists(str(expected / 'extracted'/ gnps_id / 'antismash'))
     assert os.path.exists(str(expected / 'extracted'/ gnps_id / 'bigscape'))
 
-    assert sut.all_project_json_file == str(expected / 'all_projects.json')
+    assert sut.all_projects_json_file == str(expected / 'all_projects.json')
     assert sut.project_json_file == str(expected / f"{gnps_id}.json")
 
 def test_download_metabolomics_zipfile(tmp_path):

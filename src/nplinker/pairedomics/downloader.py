@@ -43,10 +43,10 @@ class PODPDownloader():
         if not os.path.exists(self.project_json_file) or force_download:
             logger.info('Downloading new copy of platform project data...')
             self.all_project_json = self._download_and_load_json(
-                PAIREDOMICS_PROJECT_DATA_ENDPOINT, self.all_project_json_file)
+                PAIREDOMICS_PROJECT_DATA_ENDPOINT, self.all_projects_json_file)
         else:
             logger.info('Using existing copy of platform project data')
-            with open(self.all_project_json_file, encoding="utf-8") as f:
+            with open(self.all_projects_json_file, encoding="utf-8") as f:
                 self.all_project_json = json.load(f)
 
         # query the pairedomics webservice with the project ID to retrieve the data. unfortunately
@@ -115,7 +115,7 @@ class PODPDownloader():
                         exist_ok=True)
 
         # init project paths
-        self.all_project_json_file = os.path.join(self.working_dir,
+        self.all_projects_json_file = os.path.join(self.working_dir,
                                                   'all_projects.json')
         self.project_json_file = os.path.join(self.working_dir,
                                               f'{self.gnps_massive_id}.json')
