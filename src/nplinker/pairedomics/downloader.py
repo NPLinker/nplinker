@@ -71,23 +71,23 @@ class PODPDownloader():
             )
 
         # now get the project JSON data
-        self.project_json = None
+        self.project_json_data = None
         logger.info('Found project, retrieving JSON data...')
-        self.project_json = self._download_and_load_json(
+        self.project_json_data = self._download_and_load_json(
             PAIREDOMICS_PROJECT_URL.format(self.pairedomics_id),
             self.project_json_file)
 
-        if 'molecular_network' not in self.project_json['metabolomics'][
+        if 'molecular_network' not in self.project_json_data['metabolomics'][
                 'project']:
             raise Exception('Dataset has no GNPS data URL!')
 
-        self.gnps_task_id = self.project_json['metabolomics']['project'][
+        self.gnps_task_id = self.project_json_data['metabolomics']['project'][
             'molecular_network']
 
         with open(os.path.join(self.project_results_dir, 'platform_data.json'),
                   'w',
                   encoding='utf-8') as f:
-            f.write(str(self.project_json))
+            f.write(str(self.project_json_data))
 
     def _init_folder_structure(self, working_dir):
         """Create local cache folders and set up paths for various files"""
@@ -129,7 +129,7 @@ class PODPDownloader():
 
         # TODO CG: this function will modify the project_json['genomes'],
         # this should be done in a better way
-        podp_download_and_extract_antismash_data(self.project_json['genomes'],
+        podp_download_and_extract_antismash_data(self.project_json_data['genomes'],
                                                  self.project_downloads_dir,
                                                  self.project_results_dir)
 
