@@ -76,7 +76,7 @@ def download_and_extract_antismash_data(antismash_id: str,
     except urllib.error.HTTPError as e:
         shutil.rmtree(extract_path)
         logger.warning(e)
-        raise urllib.error.HTTPError(e.url, e.code, f"Could not find a valid url for {antismash_id}", e.hdrs, e.fp)
+        raise urllib.error.HTTPError(e.url, e.code, f"Could not find a valid url for {antismash_id}", e.hdrs, e.fp) from e
 
 
 def _check_roots(download_root: PathLike, extract_root: PathLike):
