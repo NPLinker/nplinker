@@ -95,7 +95,7 @@ class PODPDownloader():
         # init local cache root
         self.working_dir = working_dir
         self.downloads_dir = os.path.join(self.working_dir, 'downloads')
-        self.local_file_cache = os.path.join(self.working_dir, 'extracted')
+        self.results_dir = os.path.join(self.working_dir, 'extracted')
         os.makedirs(self.working_dir, exist_ok=True)
         logger.info('PODPDownloader for %s, caching to %s',
                     self.gnps_massive_id, self.working_dir)
@@ -105,7 +105,7 @@ class PODPDownloader():
                                                    self.gnps_massive_id)
         os.makedirs(self.project_download_cache, exist_ok=True)
 
-        self.project_file_cache = os.path.join(self.local_file_cache,
+        self.project_file_cache = os.path.join(self.results_dir,
                                                self.gnps_massive_id)
         os.makedirs(self.project_file_cache, exist_ok=True)
 

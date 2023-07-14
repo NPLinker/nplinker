@@ -22,7 +22,7 @@ def test_default(expected: Path):
     assert sut.downloads_dir == str(expected / 'downloads')
     assert sut.project_download_cache == str(expected / 'downloads' / gnps_id)
 
-    assert sut.local_file_cache == str(expected / 'extracted')
+    assert sut.results_dir == str(expected / 'extracted')
     assert sut.project_file_cache == str(expected / 'extracted'/ gnps_id)
     assert sut.strain_mappings_file == str(expected / 'extracted'/ gnps_id / STRAIN_MAPPINGS_FILENAME)
     assert os.path.exists(str(expected / 'extracted'/ gnps_id / 'antismash'))
