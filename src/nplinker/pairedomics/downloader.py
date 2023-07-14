@@ -84,7 +84,7 @@ class PODPDownloader():
         self.gnps_task_id = self.project_json['metabolomics']['project'][
             'molecular_network']
 
-        with open(os.path.join(self.project_file_cache, 'platform_data.json'),
+        with open(os.path.join(self.project_results_dir, 'platform_data.json'),
                   'w',
                   encoding='utf-8') as f:
             f.write(str(self.project_json))
@@ -105,13 +105,13 @@ class PODPDownloader():
                                                    self.gnps_massive_id)
         os.makedirs(self.project_downloads_dir, exist_ok=True)
 
-        self.project_file_cache = os.path.join(self.results_dir,
+        self.project_results_dir = os.path.join(self.results_dir,
                                                self.gnps_massive_id)
-        os.makedirs(self.project_file_cache, exist_ok=True)
+        os.makedirs(self.project_results_dir, exist_ok=True)
 
         # placeholder directories
         for d in ['antismash', 'bigscape']:
-            os.makedirs(os.path.join(self.project_file_cache, d),
+            os.makedirs(os.path.join(self.project_results_dir, d),
                         exist_ok=True)
 
         # init project paths
@@ -131,15 +131,15 @@ class PODPDownloader():
         # this should be done in a better way
         podp_download_and_extract_antismash_data(self.project_json['genomes'],
                                                  self.project_downloads_dir,
-                                                 self.project_file_cache)
+                                                 self.project_results_dir)
 
         if use_mibig:
             self._download_mibig_json(mibig_version)
-        podp_run_bigscape(self.project_file_cache, PFAM_PATH, do_bigscape,
+        podp_run_bigscape(self.project_results_dir, PFAM_PATH, do_bigscape,
                           extra_bigscape_parameters)
 
     def _download_mibig_json(self, version):
-        output_path = os.path.join(self.project_file_cache, 'mibig_json')
+        output_path = os.path.join(self.project_results_dir, 'mibig_json')
 
         # Override existing mibig json files
         if os.path.exists(output_path):
@@ -165,7 +165,7 @@ class PODPDownloader():
         archive = GNPSDownloader(
             gnps_task_id,
             self.project_downloads_dir).download().get_download_path()
-        GNPSExtractor(archive, self.project_file_cache).extract()
+        GNPSExtractor(archive, self.project_results_dir).extract()
 
     def _download_and_load_json(self, url, local_path):
         resp = httpx.get(url, follow_redirects=True)

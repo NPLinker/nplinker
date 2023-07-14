@@ -23,7 +23,7 @@ def test_default(expected: Path):
     assert sut.project_downloads_dir == str(expected / 'downloads' / gnps_id)
 
     assert sut.results_dir == str(expected / 'extracted')
-    assert sut.project_file_cache == str(expected / 'extracted'/ gnps_id)
+    assert sut.project_results_dir == str(expected / 'extracted'/ gnps_id)
     assert sut.strain_mappings_file == str(expected / 'extracted'/ gnps_id / STRAIN_MAPPINGS_FILENAME)
     assert os.path.exists(str(expected / 'extracted'/ gnps_id / 'antismash'))
     assert os.path.exists(str(expected / 'extracted'/ gnps_id / 'bigscape'))
@@ -38,9 +38,9 @@ def test_download_metabolomics_zipfile(tmp_path):
         expected_path = os.path.join(sut.project_downloads_dir, 'metabolomics_data.zip')
 
         assert os.path.exists(expected_path)
-        assert (Path(sut.project_file_cache) / "networkedges_selfloop/6da5be36f5b14e878860167fa07004d6.pairsinfo").is_file()
-        assert (Path(sut.project_file_cache) / "clusterinfosummarygroup_attributes_withIDs_withcomponentID/d69356c8e5044c2a9fef3dd2a2f991e1.tsv").is_file()
-        assert (Path(sut.project_file_cache) / "spectra/METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra-main.mgf").is_file()
+        assert (Path(sut.project_results_dir) / "networkedges_selfloop/6da5be36f5b14e878860167fa07004d6.pairsinfo").is_file()
+        assert (Path(sut.project_results_dir) / "clusterinfosummarygroup_attributes_withIDs_withcomponentID/d69356c8e5044c2a9fef3dd2a2f991e1.tsv").is_file()
+        assert (Path(sut.project_results_dir) / "spectra/METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra-main.mgf").is_file()
     except ReadTimeout:
         pytest.skip("GNPS is down")
 
@@ -52,8 +52,8 @@ def test_download_metabolomics_zipfile_scenario2(tmp_path):
         expected_path = os.path.join(sut.project_downloads_dir, 'c22f44b14a3d450eb836d607cb9521bb.zip')
 
         assert os.path.exists(expected_path)
-        assert (Path(sut.project_file_cache) / "molecular_families.pairsinfo").is_file()
-        assert (Path(sut.project_file_cache) / "file_mappings.tsv").is_file()
-        assert (Path(sut.project_file_cache) / "spectra.mgf").is_file()
+        assert (Path(sut.project_results_dir) / "molecular_families.pairsinfo").is_file()
+        assert (Path(sut.project_results_dir) / "file_mappings.tsv").is_file()
+        assert (Path(sut.project_results_dir) / "spectra.mgf").is_file()
     except ReadTimeout:
         pytest.skip("GNPS is down")
