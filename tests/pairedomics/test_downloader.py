@@ -14,10 +14,10 @@ from nplinker.pairedomics.downloader import PODPDownloader
 def test_default(expected: Path):
     gnps_id = "MSV000079284"
 
-    sut = PODPDownloader(gnps_id, local_cache=str(expected))
+    sut = PODPDownloader(gnps_id, working_dir=str(expected))
 
     assert sut.gnps_massive_id == gnps_id
-    assert sut.local_cache == str(expected)
+    assert sut.working_dir == str(expected)
 
     assert sut.local_download_cache == str(expected / 'downloads')
     assert sut.project_download_cache == str(expected / 'downloads' / gnps_id)
@@ -32,7 +32,7 @@ def test_default(expected: Path):
     assert sut.project_json_file == str(expected / f"{gnps_id}.json")
 
 def test_download_metabolomics_zipfile(tmp_path):
-    sut = PODPDownloader("MSV000079284", local_cache=tmp_path)
+    sut = PODPDownloader("MSV000079284", working_dir=tmp_path)
     try:
         sut._download_metabolomics_zipfile("c22f44b14a3d450eb836d607cb9521bb")
         expected_path = os.path.join(sut.project_download_cache, 'metabolomics_data.zip')
@@ -46,7 +46,7 @@ def test_download_metabolomics_zipfile(tmp_path):
 
 
 def test_download_metabolomics_zipfile_scenario2(tmp_path):
-    sut = PODPDownloader("MSV000079284", local_cache=tmp_path)
+    sut = PODPDownloader("MSV000079284", working_dir=tmp_path)
     try:
         sut._download_metabolomics_zipfile("c22f44b14a3d450eb836d607cb9521bb")
         expected_path = os.path.join(sut.project_download_cache, 'c22f44b14a3d450eb836d607cb9521bb.zip')

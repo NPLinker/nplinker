@@ -24,18 +24,19 @@ MIBIG_BGC_METADATA_URL = 'https://mibig.secondarymetabolites.org/repository/{}/a
 
 class PODPDownloader():
 
-    def __init__(self, platform_id, force_download=False, local_cache=None):
+    def __init__(self, platform_id, force_download=False, working_dir=None):
         # platform_id must be gnps_massive_id, it should be validated
         self.gnps_massive_id = platform_id
         self.pairedomics_id = None
         self.gnps_task_id = None
         self.json_data = None
 
-        if local_cache is None:
-            local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data',
+        if working_dir is None:
+            working_dir = os.path.join(os.getenv('HOME'), 'nplinker_data',
                                        'pairedomics')
 
-        self._init_folder_structure(local_cache)
+        # TODO CG: init folder structure should be moved out of PODPDownloader
+        self._init_folder_structure(working_dir)
 
         # init project json files
         self.all_project_json = None
@@ -88,16 +89,16 @@ class PODPDownloader():
                   encoding='utf-8') as f:
             f.write(str(self.project_json))
 
-    def _init_folder_structure(self, local_cache):
+    def _init_folder_structure(self, working_dir):
         """Create local cache folders and set up paths for various files"""
 
         # init local cache root
-        self.local_cache = local_cache
-        self.local_download_cache = os.path.join(self.local_cache, 'downloads')
-        self.local_file_cache = os.path.join(self.local_cache, 'extracted')
-        os.makedirs(self.local_cache, exist_ok=True)
+        self.working_dir = working_dir
+        self.local_download_cache = os.path.join(self.working_dir, 'downloads')
+        self.local_file_cache = os.path.join(self.working_dir, 'extracted')
+        os.makedirs(self.working_dir, exist_ok=True)
         logger.info('PODPDownloader for %s, caching to %s',
-                    self.gnps_massive_id, self.local_cache)
+                    self.gnps_massive_id, self.working_dir)
 
         # create local cache folders for this dataset
         self.project_download_cache = os.path.join(self.local_download_cache,
@@ -114,9 +115,9 @@ class PODPDownloader():
                         exist_ok=True)
 
         # init project paths
-        self.all_project_json_file = os.path.join(self.local_cache,
+        self.all_project_json_file = os.path.join(self.working_dir,
                                                   'all_projects.json')
-        self.project_json_file = os.path.join(self.local_cache,
+        self.project_json_file = os.path.join(self.working_dir,
                                               f'{self.gnps_massive_id}.json')
 
     # download function
