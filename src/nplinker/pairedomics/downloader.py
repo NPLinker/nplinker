@@ -7,8 +7,6 @@ from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
 from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
-from nplinker.strain_collection import StrainCollection
-from nplinker.strains import Strain
 from . import podp_download_and_extract_antismash_data
 from .runbigscape import podp_run_bigscape
 
@@ -34,7 +32,6 @@ class PODPDownloader():
         self.pairedomics_id = None
         self.gnps_task_id = None
         self.json_data = None
-        self.strains = StrainCollection()
 
         if local_cache is None:
             local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data',
@@ -117,10 +114,6 @@ class PODPDownloader():
         for d in ['antismash', 'bigscape']:
             os.makedirs(os.path.join(self.project_file_cache, d),
                         exist_ok=True)
-
-        # init strain mapping filepath
-        self.strain_mappings_file = os.path.join(self.project_file_cache,
-                                                 STRAIN_MAPPINGS_FILENAME)
 
         # init project paths
         self.all_project_json_file = os.path.join(self.local_cache,
