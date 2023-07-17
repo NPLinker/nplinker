@@ -27,7 +27,7 @@ class PODPDownloader():
     def __init__(self, podp_platform_id, force_download=False, working_dir=None):
         # TODO CG: platform_id must be gnps_massive_id, it should be validated
         self.gnps_massive_id = podp_platform_id
-        self.pairedomics_id = None
+        self.podp_id = None
         self.gnps_task_id = None
 
         if working_dir is None:
@@ -59,12 +59,12 @@ class PODPDownloader():
             gnps_massive_id = project['metabolite_id']
 
             if gnps_massive_id == podp_platform_id:
-                self.pairedomics_id = pairedomics_id
+                self.podp_id = pairedomics_id
                 logger.debug('platform_id %s matched to pairedomics_id %s',
-                             self.gnps_massive_id, self.pairedomics_id)
+                             self.gnps_massive_id, self.podp_id)
                 break
 
-        if self.pairedomics_id is None:
+        if self.podp_id is None:
             raise Exception(
                 f'Failed to find a pairedomics project with ID {self.gnps_massive_id}'
             )
@@ -73,7 +73,7 @@ class PODPDownloader():
         self.project_json_data = None
         logger.info('Found project, retrieving JSON data...')
         self.project_json_data = self._download_and_load_json(
-            PAIREDOMICS_PROJECT_URL.format(self.pairedomics_id),
+            PAIREDOMICS_PROJECT_URL.format(self.podp_id),
             self.project_json_file)
 
         if 'molecular_network' not in self.project_json_data['metabolomics'][
