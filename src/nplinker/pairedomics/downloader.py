@@ -25,7 +25,28 @@ MIBIG_BGC_METADATA_URL = 'https://mibig.secondarymetabolites.org/repository/{}/a
 
 class PODPDownloader():
 
-    def __init__(self, podp_platform_id, force_download=False, root_dir=None):
+    def __init__(self, podp_platform_id: str, force_download: bool = False, root_dir: str | PathLike | None = None):
+        """Downloader for PODP pipeline.
+
+        The downloader will download the following data:
+            - GNPS Molecular Network task results
+            - AntiSMASH results
+            - MIBiG metadata
+
+        Args:
+            podp_platform_id(str): The metabolomics project ID of PODP platform,
+                e.g. GNPS MassIVE ID.
+            force_download (bool): Re-download data even if it already exists
+                locally. Defaults to False.
+            working_dir (str | PathLike | None): The root directory to use for
+                the project. Defaults to None, in which case the default location
+                is used.
+
+        Raises:
+            ValueError: If the given ID does not have a corresponding PODP ID,
+                or if the GNPS Molecular Network task URL does not exist for
+                the given ID.
+        """
         self.gnps_massive_id = podp_platform_id
 
         if root_dir is None:
