@@ -25,15 +25,15 @@ MIBIG_BGC_METADATA_URL = 'https://mibig.secondarymetabolites.org/repository/{}/a
 
 class PODPDownloader():
 
-    def __init__(self, podp_platform_id, force_download=False, working_dir=None):
+    def __init__(self, podp_platform_id, force_download=False, root_dir=None):
         self.gnps_massive_id = podp_platform_id
 
-        if working_dir is None:
-            working_dir = os.path.join(os.getenv('HOME'), 'nplinker_data',
+        if root_dir is None:
+            root_dir = os.path.join(os.getenv('HOME'), 'nplinker_data',
                                        'pairedomics')
 
         # TODO CG: init folder structure should be moved out of PODPDownloader
-        self._init_folder_structure(working_dir)
+        self._init_folder_structure(root_dir)
 
         # init project json files
         if not os.path.exists(self.project_json_file) or force_download:

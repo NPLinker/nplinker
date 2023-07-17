@@ -13,7 +13,7 @@ from nplinker.pairedomics.downloader import PODPDownloader
 def test_default(expected: Path):
     gnps_id = "MSV000079284"
 
-    sut = PODPDownloader(gnps_id, working_dir=str(expected))
+    sut = PODPDownloader(gnps_id, root_dir=str(expected))
 
     assert sut.gnps_massive_id == gnps_id
     assert sut.working_dir == str(expected)
@@ -31,7 +31,7 @@ def test_default(expected: Path):
 
 
 def test_download_metabolomics_zipfile(tmp_path):
-    sut = PODPDownloader("MSV000079284", working_dir=tmp_path)
+    sut = PODPDownloader("MSV000079284", root_dir=tmp_path)
     try:
         sut._download_metabolomics_zipfile("c22f44b14a3d450eb836d607cb9521bb")
         expected_path = os.path.join(sut.project_downloads_dir, 'c22f44b14a3d450eb836d607cb9521bb.zip')
