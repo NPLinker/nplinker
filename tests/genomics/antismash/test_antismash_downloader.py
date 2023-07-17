@@ -1,4 +1,4 @@
-import urllib
+from urllib.error import HTTPError
 import pytest
 from nplinker.genomics.antismash import download_and_extract_antismash_data
 from nplinker.utils import extract_archive
@@ -55,7 +55,7 @@ class TestDownloadAndExtractAntismashData():
         extract_root = tmp_path / "extracted"
         extract_root.mkdir()
         for test_id in nonexisting_ids:
-            with pytest.raises(urllib.error.HTTPError):
+            with pytest.raises(HTTPError):
                 download_and_extract_antismash_data(test_id, download_root,
                                                     extract_root)
             extracted_folder = extract_root / "antismash" / test_id

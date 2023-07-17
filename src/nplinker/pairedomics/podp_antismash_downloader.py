@@ -1,7 +1,7 @@
 import json
 import re
 import time
-import urllib
+from urllib.error import HTTPError
 from os import PathLike
 from pathlib import Path
 import httpx
@@ -192,7 +192,7 @@ def podp_download_and_extract_antismash_data(
             if output_path.exists():
                 Path.touch(output_path / 'completed', exist_ok=True)
 
-        except urllib.error.HTTPError:
+        except HTTPError:
             gs_obj.bgc_path = ""
 
     missing = len([gs for gs in gs_dict.values() if not gs.bgc_path])
