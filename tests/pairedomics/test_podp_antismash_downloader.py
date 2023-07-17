@@ -235,7 +235,7 @@ def test_failed_lookup_ncbi(download_root, extract_root, genome_status_file):
 
 # Test `podp_download_and_extract_antismash_data` function
 # when a genome record has an existing accession ID in NCBI,
-# but not in the antismash databased
+# but not in the antismash database
 def test_failed_lookup_antismash(download_root, extract_root, genome_status_file):
     broken_id = "GCF_000702345.1"
     genome_records = [{
