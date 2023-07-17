@@ -1,22 +1,28 @@
 import glob
 import os
 from pathlib import Path
-import sys
 from nplinker.annotations import load_annotations
 from nplinker.class_info.chem_classes import ChemClassPredictions
 from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
+from nplinker.genomics import generate_genome_bgc_mappings_file
 from nplinker.genomics import load_gcfs
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.genomics.mibig import MibigBGCLoader
+from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
+from nplinker.globals import GENOME_STATUS_FILENAME
+from nplinker.globals import GNPS_FILE_MAPPINGS_FILENAME
 from nplinker.globals import PFAM_PATH
 from nplinker.globals import STRAIN_MAPPINGS_FILENAME
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.metabolomics import load_dataset
 from nplinker.pairedomics.downloader import PODPDownloader
 from nplinker.pairedomics.runbigscape import run_bigscape
+from nplinker.pairedomics.strain_mappings_generator import \
+    podp_generate_strain_mappings
 from nplinker.strain_collection import StrainCollection
+
 
 try:
     from importlib.resources import files
@@ -97,7 +103,7 @@ class DatasetLoader():
                                                    self.USE_MIBIG_DEFAULT)
         self._mibig_version = self._config_dataset.get(
             'mibig_version', self.MIBIG_VERSION_DEFAULT)
-        self._root = self._config_dataset['root']
+        self._root = Path(self._config_dataset['root'])
         self._platform_id = self._config_dataset['platform_id']
         self._remote_loading = len(self._platform_id) > 0
 
@@ -139,6 +145,21 @@ class DatasetLoader():
         self._init_paths()
         self._validate_paths()
 
+    def generate_strain_mappings(self):
+
+        generate_genome_bgc_mappings_file(self._root / "antismash")
+
+        podp_project_json_file = self._root.parent.parent / (self._platform_id + ".json")
+        genome_status_json_file = self._root.parent.parent / "downloads" / self._platform_id / GENOME_STATUS_FILENAME
+        genome_bgc_mappings_file = self._root / "antismash" / GENOME_BGC_MAPPINGS_FILENAME
+        gnps_file_mapping_tsv_file = self._root / GNPS_FILE_MAPPINGS_FILENAME
+
+        podp_generate_strain_mappings(podp_project_json_file,
+                                      genome_status_json_file,
+                                      genome_bgc_mappings_file,
+                                      gnps_file_mapping_tsv_file,
+                                      self.strain_mappings_file)
+
     def load(self):
         # load strain mappings first
         if not self._load_strain_mappings():
@@ -175,7 +196,7 @@ class DatasetLoader():
 
     def _start_downloads(self):
         downloader = PODPDownloader(self._platform_id)
-        self._root = downloader.project_results_dir
+        self._root = Path(downloader.project_results_dir)
         logger.debug('remote loading mode, configuring root=%s', self._root)
         # CG: to download both MET and GEN data
         # CG: Continue to understand how strain_mappings.json is generated
