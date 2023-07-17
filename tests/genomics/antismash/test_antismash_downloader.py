@@ -47,7 +47,7 @@ class TestDownloadAndExtractAntismashData():
         assert "Nonempty directory" in e.value.args[0]
 
     # test a non-existent ID, which can be either a fake ID, non-existent in NCBI
-    # or a "broken" antismash ID, which does not exist anymore in the antismash database
+    # or a valid NCBI genome ID but it does not have BGC data in antismash database
     def test_nonexisting_id(self, tmp_path):
         nonexisting_ids = ['non_existent_ID', 'GCF_000702345.1']
         download_root = tmp_path / "download"
