@@ -1,13 +1,14 @@
 import json
 import os
+from os import PathLike
+from pathlib import Path
 import shutil
-import sys
-import httpx
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.globals import PFAM_PATH
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
 from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
+from nplinker.utils import download_url
 from . import podp_download_and_extract_antismash_data
 from .runbigscape import podp_run_bigscape
 
@@ -148,16 +149,13 @@ class PODPDownloader():
             self.project_downloads_dir).download().get_download_path()
         GNPSExtractor(archive, self.project_results_dir).extract()
 
-    def _download_and_load_json(self, url, local_path):
-        resp = httpx.get(url, follow_redirects=True)
-        if not resp.status_code == 200:
-            raise Exception(
-                f'Failed to download {url} (status code {resp.status_code})')
+    def _download_and_load_json(self, url: str, output_file: str | PathLike) -> dict:
+        """Download a JSON file from a URL and return the parsed JSON data"""
+        fpath = Path(output_file)
+        download_url(url, fpath.parent, fpath.name)
+        logger.debug('Downloaded %s to %s', url, output_file)
 
-        content = json.loads(resp.content)
-        with open(local_path, 'w', encoding='utf-8') as f:
-            json.dump(content, f)
+        with open(output_file, 'r') as f:
+            data = json.load(f)
 
-        logger.debug('Downloaded %s to %s', url, local_path)
-
-        return content
+        return data
