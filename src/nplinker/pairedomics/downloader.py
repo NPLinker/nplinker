@@ -24,9 +24,9 @@ MIBIG_BGC_METADATA_URL = 'https://mibig.secondarymetabolites.org/repository/{}/a
 
 class PODPDownloader():
 
-    def __init__(self, platform_id, force_download=False, working_dir=None):
+    def __init__(self, podp_platform_id, force_download=False, working_dir=None):
         # TODO CG: platform_id must be gnps_massive_id, it should be validated
-        self.gnps_massive_id = platform_id
+        self.gnps_massive_id = podp_platform_id
         self.pairedomics_id = None
         self.gnps_task_id = None
 
@@ -58,7 +58,7 @@ class PODPDownloader():
             pairedomics_id = project['_id']
             gnps_massive_id = project['metabolite_id']
 
-            if gnps_massive_id == platform_id:
+            if gnps_massive_id == podp_platform_id:
                 self.pairedomics_id = pairedomics_id
                 logger.debug('platform_id %s matched to pairedomics_id %s',
                              self.gnps_massive_id, self.pairedomics_id)
