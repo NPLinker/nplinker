@@ -27,7 +27,6 @@ class PODPDownloader():
     def __init__(self, podp_platform_id, force_download=False, working_dir=None):
         # TODO CG: platform_id must be gnps_massive_id, it should be validated
         self.gnps_massive_id = podp_platform_id
-        self.podp_id = None
 
         if working_dir is None:
             working_dir = os.path.join(os.getenv('HOME'), 'nplinker_data',
@@ -47,25 +46,17 @@ class PODPDownloader():
             with open(self.all_projects_json_file, encoding="utf-8") as f:
                 self.all_projects_json_data = json.load(f)
 
-        # query the pairedomics webservice with the project ID to retrieve the data. unfortunately
-        # this is not the MSV... ID, but an internal GUID string. To get that, first need to get the
-        # list of all projects, find the one with a 'metabolite_id' value matching the MSV... ID, and
-        # then extract its '_id' value to get the GUID
-
-        # find the specified project and store its ID
+        # Verify that the given ID has a corresponding PODP ID
+        self.podp_id = None
         for project in self.all_projects_json_data['data']:
-            pairedomics_id = project['_id']
-            gnps_massive_id = project['metabolite_id']
-
-            if gnps_massive_id == podp_platform_id:
-                self.podp_id = pairedomics_id
-                logger.debug('platform_id %s matched to pairedomics_id %s',
+            if self.gnps_massive_id == project['metabolite_id']:
+                self.podp_id = project['_id']
+                logger.debug('Given ID %s matched to PODP ID %s',
                              self.gnps_massive_id, self.podp_id)
                 break
-
         if self.podp_id is None:
-            raise Exception(
-                f'Failed to find a pairedomics project with ID {self.gnps_massive_id}'
+            raise ValueError(
+                f'Failed to find PODP ID for given ID {self.gnps_massive_id}'
             )
 
         # now get the project JSON data
