@@ -55,6 +55,7 @@ def generate_genome_bgc_mappings_file(bgc_dir: str | PathLike) -> None:
 
     with open(bgc_dir / GENOME_BGC_MAPPINGS_FILENAME, "w") as f:
         json.dump(json_data, f)
+    logger.info("Generated genome-BGC mappings file: %s", bgc_dir / GENOME_BGC_MAPPINGS_FILENAME)
 
 
 def map_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC],
