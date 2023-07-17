@@ -1,6 +1,6 @@
 import os
 import shutil
-import urllib
+from urllib.error import HTTPError
 from os import PathLike
 from pathlib import Path
 from nplinker.logconfig import LogConfig
