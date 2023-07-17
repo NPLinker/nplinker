@@ -72,11 +72,6 @@ class PODPDownloader():
                              f'given ID {self.gnps_massive_id}. Please check and'
                              f'run GNPS Molecular Network task first.')
 
-        with open(os.path.join(self.project_results_dir, 'platform_data.json'),
-                  'w',
-                  encoding='utf-8') as f:
-            f.write(str(self.project_json_data))
-
     def _init_folder_structure(self, working_dir):
         """Create local cache folders and set up paths for various files"""
 
