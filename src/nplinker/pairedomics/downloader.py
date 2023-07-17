@@ -25,7 +25,6 @@ MIBIG_BGC_METADATA_URL = 'https://mibig.secondarymetabolites.org/repository/{}/a
 class PODPDownloader():
 
     def __init__(self, podp_platform_id, force_download=False, working_dir=None):
-        # TODO CG: platform_id must be gnps_massive_id, it should be validated
         self.gnps_massive_id = podp_platform_id
 
         if working_dir is None:
