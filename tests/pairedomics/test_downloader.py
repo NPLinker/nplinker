@@ -22,9 +22,9 @@ def test_default(expected: Path):
     assert sut.project_downloads_dir == str(expected / 'downloads' / gnps_id)
 
     assert sut.results_dir == str(expected / 'extracted')
-    assert sut.project_results_dir == str(expected / 'extracted'/ gnps_id)
-    assert os.path.exists(str(expected / 'extracted'/ gnps_id / 'antismash'))
-    assert os.path.exists(str(expected / 'extracted'/ gnps_id / 'bigscape'))
+    assert sut.project_results_dir == str(expected / 'extracted' / gnps_id)
+    assert os.path.exists(str(expected / 'extracted' / gnps_id / 'antismash'))
+    assert os.path.exists(str(expected / 'extracted' / gnps_id / 'bigscape'))
 
     assert sut.all_projects_json_file == str(expected / 'all_projects.json')
     assert sut.project_json_file == str(expected / f"{gnps_id}.json")
@@ -34,10 +34,12 @@ def test_download_metabolomics_zipfile(tmp_path):
     sut = PODPDownloader("MSV000079284", root_dir=tmp_path)
     try:
         sut._download_metabolomics_zipfile("c22f44b14a3d450eb836d607cb9521bb")
-        expected_path = os.path.join(sut.project_downloads_dir, 'c22f44b14a3d450eb836d607cb9521bb.zip')
+        expected_path = os.path.join(sut.project_downloads_dir,
+                                     'c22f44b14a3d450eb836d607cb9521bb.zip')
 
         assert os.path.exists(expected_path)
-        assert (Path(sut.project_results_dir) / "molecular_families.pairsinfo").is_file()
+        assert (Path(sut.project_results_dir) /
+                "molecular_families.pairsinfo").is_file()
         assert (Path(sut.project_results_dir) / "file_mappings.tsv").is_file()
         assert (Path(sut.project_results_dir) / "spectra.mgf").is_file()
     except ReadTimeout:

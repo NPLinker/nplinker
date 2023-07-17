@@ -1,12 +1,13 @@
 import os
-import shutil
-from urllib.error import HTTPError
 from os import PathLike
 from pathlib import Path
+import shutil
+from urllib.error import HTTPError
 from nplinker.logconfig import LogConfig
 from nplinker.utils import download_and_extract_archive
 from nplinker.utils import list_dirs
 from nplinker.utils import list_files
+
 
 logger = LogConfig.getLogger(__name__)
 
@@ -76,9 +77,9 @@ def download_and_extract_antismash_data(antismash_id: str,
     except HTTPError as e:
         shutil.rmtree(extract_path)
         logger.warning(e)
-        raise HTTPError(
-            e.url, e.code, f"Could not find a valid url for {antismash_id}",
-            e.headers, e.fp) from e
+        raise HTTPError(e.url, e.code,
+                        f"Could not find a valid url for {antismash_id}",
+                        e.headers, e.fp) from e
 
 
 def _check_roots(download_root: PathLike, extract_root: PathLike):

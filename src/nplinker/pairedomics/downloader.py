@@ -25,7 +25,10 @@ MIBIG_BGC_METADATA_URL = 'https://mibig.secondarymetabolites.org/repository/{}/a
 
 class PODPDownloader():
 
-    def __init__(self, podp_platform_id: str, force_download: bool = False, root_dir: str | PathLike | None = None):
+    def __init__(self,
+                 podp_platform_id: str,
+                 force_download: bool = False,
+                 root_dir: str | PathLike | None = None):
         """Downloader for PODP pipeline.
 
         The downloader will download the following data:
@@ -51,7 +54,7 @@ class PODPDownloader():
 
         if root_dir is None:
             root_dir = os.path.join(os.getenv('HOME'), 'nplinker_data',
-                                       'pairedomics')
+                                    'pairedomics')
 
         # TODO CG: init folder structure should be moved out of PODPDownloader
         self._init_folder_structure(root_dir)
@@ -76,8 +79,7 @@ class PODPDownloader():
                 break
         if self.podp_id is None:
             raise ValueError(
-                f'Failed to find PODP ID for given ID {self.gnps_massive_id}'
-            )
+                f'Failed to find PODP ID for given ID {self.gnps_massive_id}')
 
         # now get the project JSON data
         logger.info('Found project, retrieving JSON data...')
@@ -85,12 +87,13 @@ class PODPDownloader():
             PAIREDOMICS_PROJECT_URL.format(self.podp_id),
             self.project_json_file)
 
-        self.gnps_task_id = self.project_json_data['metabolomics']['project'].get(
-            'molecular_network')
+        self.gnps_task_id = self.project_json_data['metabolomics'][
+            'project'].get('molecular_network')
         if self.gnps_task_id is None:
-            raise ValueError(f'GNPS Molecular Network task URL not exist for '
-                             f'given ID {self.gnps_massive_id}. Please check and'
-                             f'run GNPS Molecular Network task first.')
+            raise ValueError(
+                f'GNPS Molecular Network task URL not exist for '
+                f'given ID {self.gnps_massive_id}. Please check and'
+                f'run GNPS Molecular Network task first.')
 
     def _init_folder_structure(self, working_dir):
         """Create local cache folders and set up paths for various files"""
@@ -105,11 +108,11 @@ class PODPDownloader():
 
         # create local cache folders for this dataset
         self.project_downloads_dir = os.path.join(self.downloads_dir,
-                                                   self.gnps_massive_id)
+                                                  self.gnps_massive_id)
         os.makedirs(self.project_downloads_dir, exist_ok=True)
 
         self.project_results_dir = os.path.join(self.results_dir,
-                                               self.gnps_massive_id)
+                                                self.gnps_massive_id)
         os.makedirs(self.project_results_dir, exist_ok=True)
 
         # placeholder directories
@@ -119,7 +122,7 @@ class PODPDownloader():
 
         # init project paths
         self.all_projects_json_file = os.path.join(self.working_dir,
-                                                  'all_projects.json')
+                                                   'all_projects.json')
         self.project_json_file = os.path.join(self.working_dir,
                                               f'{self.gnps_massive_id}.json')
 
@@ -132,9 +135,9 @@ class PODPDownloader():
 
         # TODO CG: this function will modify the project_json['genomes'],
         # this should be done in a better way
-        podp_download_and_extract_antismash_data(self.project_json_data['genomes'],
-                                                 self.project_downloads_dir,
-                                                 self.project_results_dir)
+        podp_download_and_extract_antismash_data(
+            self.project_json_data['genomes'], self.project_downloads_dir,
+            self.project_results_dir)
 
         if use_mibig:
             self._download_mibig_json(mibig_version)
@@ -170,7 +173,8 @@ class PODPDownloader():
             self.project_downloads_dir).download().get_download_path()
         GNPSExtractor(archive, self.project_results_dir).extract()
 
-    def _download_and_load_json(self, url: str, output_file: str | PathLike) -> dict:
+    def _download_and_load_json(self, url: str,
+                                output_file: str | PathLike) -> dict:
         """Download a JSON file from a URL and return the parsed JSON data"""
         fpath = Path(output_file)
         download_url(url, fpath.parent, fpath.name)

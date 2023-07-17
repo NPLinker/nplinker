@@ -18,7 +18,6 @@ from nplinker.pairedomics.downloader import PODPDownloader
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.strain_collection import StrainCollection
 
-
 try:
     from importlib.resources import files
 except ImportError:
@@ -169,7 +168,8 @@ class DatasetLoader():
         # or a complete failure to parse things, so bail out
         if len(self.strains) == 0:
             raise Exception(
-                f'Failed to find *ANY* strains, missing {STRAIN_MAPPINGS_FILENAME}?')
+                f'Failed to find *ANY* strains, missing {STRAIN_MAPPINGS_FILENAME}?'
+            )
 
         return True
 
@@ -188,7 +188,8 @@ class DatasetLoader():
     def _init_paths(self):
         # 1. strain mapping are used for everything else so
         self.strain_mappings_file = self._config_overrides.get(
-            self.OR_STRAINS) or os.path.join(self._root, STRAIN_MAPPINGS_FILENAME)
+            self.OR_STRAINS) or os.path.join(self._root,
+                                             STRAIN_MAPPINGS_FILENAME)
 
         self._init_metabolomics_paths()
 
