@@ -35,7 +35,6 @@ class PODPDownloader():
         self._init_folder_structure(working_dir)
 
         # init project json files
-        self.all_projects_json_data = None
         if not os.path.exists(self.project_json_file) or force_download:
             logger.info('Downloading new copy of platform project data...')
             self.all_projects_json_data = self._download_and_load_json(
@@ -59,7 +58,6 @@ class PODPDownloader():
             )
 
         # now get the project JSON data
-        self.project_json_data = None
         logger.info('Found project, retrieving JSON data...')
         self.project_json_data = self._download_and_load_json(
             PAIREDOMICS_PROJECT_URL.format(self.podp_id),
