@@ -214,8 +214,8 @@ def test_caching(download_root, extract_root, genome_status_file, caplog):
 
 
 # Test `podp_download_and_extract_antismash_data` function
-# when a genome record has a non existing accession ID
-def test_failed_lookup(download_root, extract_root, genome_status_file):
+# when a genome record has an which does not exists in NCBI
+def test_failed_lookup_ncbi(download_root, extract_root, genome_status_file):
     genome_records = [{
         "genome_ID": {
             "genome_type": "genome",
@@ -230,7 +230,29 @@ def test_failed_lookup(download_root, extract_root, genome_status_file):
     assert len(genome_status["non_existing_ID"].bgc_path) == 0
     assert genome_status["non_existing_ID"].resolve_attempted
     assert not (download_root / "non_existing_ID.zip").exists()
-    assert not (extract_root / "antismash" / "non_existing_ID.zip").exists()
+    assert not (extract_root / "antismash" / "non_existing_ID").exists()
+
+
+# Test `podp_download_and_extract_antismash_data` function
+# when a genome record has an existing accession ID in NCBI,
+# but not in the antismash database
+def test_failed_lookup_antismash(download_root, extract_root, genome_status_file):
+    broken_id = "GCF_000702345.1"
+    genome_records = [{
+        "genome_ID": {
+            "genome_type": "genome",
+            "RefSeq_accession": broken_id
+        },
+        "genome_label": "Salinispora arenicola CNX508"
+    }]
+
+    podp_download_and_extract_antismash_data(genome_records, download_root,
+                                             extract_root)
+    genome_status = GenomeStatus.read_json(genome_status_file)
+    assert len(genome_status[broken_id].bgc_path) == 0
+    assert genome_status[broken_id].resolve_attempted
+    assert not (download_root / broken_id / ".zip").exists()
+    assert not (extract_root / "antismash" / broken_id).exists()
 
 
 # Test `podp_download_and_extract_antismash_data` function

@@ -194,4 +194,4 @@ class StrainCollection():
                 strain.add_alias(gbk_filename)
 
         logger.info(f'Saving strains to {strain_mappings_file}')
-        self.save_to_file(strain_mappings_file)
+        self.to_json(strain_mappings_file)
