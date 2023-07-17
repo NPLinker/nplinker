@@ -28,7 +28,6 @@ class PODPDownloader():
         # TODO CG: platform_id must be gnps_massive_id, it should be validated
         self.gnps_massive_id = podp_platform_id
         self.podp_id = None
-        self.gnps_task_id = None
 
         if working_dir is None:
             working_dir = os.path.join(os.getenv('HOME'), 'nplinker_data',
@@ -76,12 +75,12 @@ class PODPDownloader():
             PAIREDOMICS_PROJECT_URL.format(self.podp_id),
             self.project_json_file)
 
-        if 'molecular_network' not in self.project_json_data['metabolomics'][
-                'project']:
-            raise Exception('Dataset has no GNPS data URL!')
-
-        self.gnps_task_id = self.project_json_data['metabolomics']['project'][
-            'molecular_network']
+        self.gnps_task_id = self.project_json_data['metabolomics']['project'].get(
+            'molecular_network')
+        if self.gnps_task_id is None:
+            raise ValueError(f'GNPS Molecular Network task URL not exist for '
+                             f'given ID {self.gnps_massive_id}. Please check and'
+                             f'run GNPS Molecular Network task first.')
 
         with open(os.path.join(self.project_results_dir, 'platform_data.json'),
                   'w',
