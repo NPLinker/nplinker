@@ -73,12 +73,12 @@ def download_and_extract_antismash_data(antismash_id: str,
         logger.info('antiSMASH BGC data of %s is downloaded and extracted.',
                     antismash_id)
 
-    except urllib.error.HTTPError as e:
+    except HTTPError as e:
         shutil.rmtree(extract_path)
         logger.warning(e)
-        raise urllib.error.HTTPError(
+        raise HTTPError(
             e.url, e.code, f"Could not find a valid url for {antismash_id}",
-            e.hdrs, e.fp) from e
+            e.headers, e.fp) from e
 
 
 def _check_roots(download_root: PathLike, extract_root: PathLike):
