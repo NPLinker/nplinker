@@ -16,12 +16,12 @@ from .gcf import GCF
 logger = LogConfig.getLogger(__name__)
 
 
-def generate_mappings_genome_id_bgc_id(bgc_dir: str | PathLike) -> None:
+def generate_mappings_genome_id_bgc_id(
+        bgc_dir: str | PathLike,
+        output_file: str | PathLike | None = None) -> None:
     """Generate a file that maps genome id to BGC id.
 
-    The output file is named in variable `GENOME_BGC_MAPPINGS_FILENAME` and
-    is placed in the same directory as `bgc_dir`. The file will be overwritten
-    if it already exists.
+    Note that the `output_file` will be overwritten if it already exists.
 
     Args:
         bgc_dir(str | PathLike): The directory has one-layer of subfolders and
@@ -29,6 +29,11 @@ def generate_mappings_genome_id_bgc_id(bgc_dir: str | PathLike) -> None:
             It assumes that
             - the subfolder name is the genome id (e.g. refseq),
             - the BGC file name is the BGC id.
+        output_file(str | PathLike | None): The path to the output file. Note
+            that the file will be overwritten if it already exists.
+            Defaults to None, in which case the output file will be placed in
+            the directory `bgc_dir` with a file name defined in global variable
+            `GENOME_BGC_MAPPINGS_FILENAME`.
     """
     bgc_dir = Path(bgc_dir)
     genome_bgc_mappings = {}
@@ -53,9 +58,11 @@ def generate_mappings_genome_id_bgc_id(bgc_dir: str | PathLike) -> None:
         "version": "1.0"
     }
 
-    with open(bgc_dir / GENOME_BGC_MAPPINGS_FILENAME, "w") as f:
+    if output_file is None:
+        output_file = bgc_dir / GENOME_BGC_MAPPINGS_FILENAME
+    with open(output_file, "w") as f:
         json.dump(json_data, f)
-    logger.info("Generated genome-BGC mappings file: %s", bgc_dir / GENOME_BGC_MAPPINGS_FILENAME)
+    logger.info("Generated genome-BGC mappings file: %s", output_file)
 
 
 def map_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC],

@@ -15,14 +15,25 @@ from nplinker.strains import Strain
 from .. import DATA_DIR
 
 
-def test_generate_genome_bgc_mappings_file():
+def test_generate_mappings_genome_id_bgc_id(tmp_path):
     bgc_dir = DATA_DIR / "antismash"
 
+    # using default output file path
     generate_mappings_genome_id_bgc_id(bgc_dir)
+    # using custom output file path
+    generate_mappings_genome_id_bgc_id(bgc_dir,
+                                       tmp_path / GENOME_BGC_MAPPINGS_FILENAME)
 
+    # read both files
     with open(bgc_dir / GENOME_BGC_MAPPINGS_FILENAME) as f:
         mappings = json.load(f)
+    with open(tmp_path / GENOME_BGC_MAPPINGS_FILENAME) as f:
+        mappings_with_outfile = json.load(f)
 
+    # check if both files are the same
+    assert mappings == mappings_with_outfile
+
+    # then check the content
     assert mappings["count"] == 2
 
     assert mappings["mappings"][0]["genome_ID"] == "GCF_000514515.1"
