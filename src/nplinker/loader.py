@@ -5,7 +5,7 @@ from nplinker.annotations import load_annotations
 from nplinker.class_info.chem_classes import ChemClassPredictions
 from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
-from nplinker.genomics import generate_genome_bgc_mappings_file
+from nplinker.genomics import generate_mappings_genome_id_bgc_id
 from nplinker.genomics import load_gcfs
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
@@ -147,7 +147,7 @@ class DatasetLoader():
 
     def generate_strain_mappings(self):
 
-        generate_genome_bgc_mappings_file(self._root / "antismash")
+        generate_mappings_genome_id_bgc_id(self._root / "antismash")
 
         podp_project_json_file = self._root.parent.parent / (self._platform_id + ".json")
         genome_status_json_file = self._root.parent.parent / "downloads" / self._platform_id / GENOME_STATUS_FILENAME

@@ -16,7 +16,7 @@ from .gcf import GCF
 logger = LogConfig.getLogger(__name__)
 
 
-def generate_genome_bgc_mappings_file(bgc_dir: str | PathLike) -> None:
+def generate_mappings_genome_id_bgc_id(bgc_dir: str | PathLike) -> None:
     """Generate a file that maps genome id to BGC id.
 
     The output file is named in variable `GENOME_BGC_MAPPINGS_FILENAME` and
