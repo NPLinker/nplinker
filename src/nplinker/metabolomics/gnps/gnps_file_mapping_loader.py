@@ -4,9 +4,10 @@ from pathlib import Path
 from typing import TextIO
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.abc import FileMappingLoaderBase
-from .gnps_format import GNPSFormat
-from .gnps_format import gnps_format_from_file_mapping
 from nplinker.utils import find_delimiter
+from .gnps_format import gnps_format_from_file_mapping
+from .gnps_format import GNPSFormat
+
 
 logger = LogConfig.getLogger(__file__)
 
@@ -25,7 +26,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             NotImplementedError: Raises NotImplementedError if the GNPS format is not recognized.
         """
         self._file: Path = Path(file)
-        self._mapping: dict[int, list[str]] = {}
+        self._mapping: dict[str, list[str]] = {}
         self._gnps_format = gnps_format_from_file_mapping(file, False)
 
         if self._gnps_format is GNPSFormat.AllFiles:
@@ -36,13 +37,29 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             raise NotImplementedError(
                 "%{gnps_format} reading not implemented.")
 
-    def mapping(self) -> dict[int, list[str]]:
+    def mapping(self) -> dict[str, list[str]]:
         """Return mapping from spectrum id to files in which this spectrum occurs.
 
         Returns:
-            dict[int, list[str]]: Mapping from spectrum id to names of all files in which this spectrum occurs.
+            dict[str, list[str]]: Mapping from spectrum id to names of all files in which this spectrum occurs.
         """
         return self._mapping
+
+    def mapping_reversed(self) -> dict[str, set[str]]:
+        """Return mapping from file name to all spectra ids that occur in this file.
+
+        Returns:
+            dict[str, set[str]]: Mapping from file name to all spectra ids that occur in this file.
+        """
+        mapping_reversed = {}
+        for spectrum_id, ms_filenames in self._mapping.items():
+            for filename in ms_filenames:
+                if filename in mapping_reversed:
+                    mapping_reversed[filename].add(spectrum_id)
+                else:
+                    mapping_reversed[filename] = {spectrum_id}
+
+        return mapping_reversed
 
     def _load_mapping_allfiles(self):
         """ Load mapping for GNPS 'AllFiles' style files. """
@@ -50,7 +67,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             reader = self._get_dict_reader(file)
 
             for row in reader:
-                spectrum_id = int(row["cluster index"])
+                spectrum_id = row["cluster index"]
 
                 occurrences = row["AllFiles"].split("###")  # split by '###'
                 occurrences.pop()  # remove last empty entry
@@ -80,8 +97,9 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             reader = self._get_dict_reader(file)
 
             for row in reader:
-                spectrum_id = int(row["row ID"])
+                spectrum_id = row["row ID"]
 
+                # TODO: issue https://github.com/NPLinker/nplinker/issues/162
                 if self._mapping.get(spectrum_id) is not None:
                     logger.warning("Found duplicated row ID: %{spectrum_id}")
 

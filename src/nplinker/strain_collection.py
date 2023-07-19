@@ -8,6 +8,7 @@ from .strains import Strain
 from .utils import list_dirs
 from .utils import list_files
 
+
 logger = LogConfig.getLogger(__name__)
 
 
@@ -153,45 +154,3 @@ class StrainCollection():
                 json.dump(json_data, f)
             return None
         return json.dumps(json_data)
-
-    # TODO to move this method to a separate class
-    @deprecated(version="1.3.3", reason="This method will be removed")
-    def generate_strain_mappings(self, strain_mappings_file: str | PathLike,
-                                 antismash_dir: str | PathLike) -> None:
-        """Add AntiSMASH BGC file names as strain alias to strain mappings file.
-
-            Note that if AntiSMASH ID (e.g. GCF_000016425.1) is not found in
-            existing self.strains, its corresponding BGC file names will not be
-            added.
-
-        Args:
-            strain_mappings_file(str | PathLike): Path to strain mappings file.
-            antismash_dir(str | PathLike): Path to AntiSMASH output directory.
-        """
-        if Path(strain_mappings_file).exists():
-            logger.info('Strain mappings file exist')
-            return
-
-        # if not exist, generate strain mapping file with antismash BGC names
-        logger.info('Generating strain mappings file')
-        subdirs = list_dirs(antismash_dir)
-        for d in subdirs:
-            antismash_id = Path(d).name
-
-            # use antismash_id (e.g. GCF_000016425.1) as strain name to query
-            # TODO: self is empty at the moment, why lookup here?
-            try:
-                strain = self.lookup(antismash_id)
-            except KeyError:
-                logger.warning(
-                    f'Failed to lookup AntiSMASH strain name: {antismash_id}')
-                continue
-
-            # if strain `antismash_id` exist, add all gbk file names as strain alias
-            gbk_files = list_files(d, suffix=".gbk", keep_parent=False)
-            for f in gbk_files:
-                gbk_filename = Path(f).stem
-                strain.add_alias(gbk_filename)
-
-        logger.info(f'Saving strains to {strain_mappings_file}')
-        self.to_json(strain_mappings_file)

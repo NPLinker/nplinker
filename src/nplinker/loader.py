@@ -10,13 +10,13 @@ from nplinker.genomics import load_gcfs
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.genomics.mibig import MibigBGCLoader
+from nplinker.globals import PFAM_PATH
+from nplinker.globals import STRAIN_MAPPINGS_FILENAME
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.metabolomics import load_dataset
 from nplinker.pairedomics.downloader import PODPDownloader
-from nplinker.pairedomics.downloader import STRAIN_MAPPINGS_FILENAME
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.strain_collection import StrainCollection
-
 
 try:
     from importlib.resources import files
@@ -75,9 +75,6 @@ class DatasetLoader():
         'NRPS', 'Others', 'PKSI', 'PKS-NRP_Hybrids', 'PKSother', 'RiPPs',
         'Saccharides', 'Terpene'
     ]
-
-    # TODO: move to a config file, used by multiple modules
-    PFAM_PATH = os.path.join(sys.prefix, 'nplinker_lib')
 
     def __init__(self, config_data):
         # load the config data
@@ -171,17 +168,18 @@ class DatasetLoader():
         # or a complete failure to parse things, so bail out
         if len(self.strains) == 0:
             raise Exception(
-                f'Failed to find *ANY* strains, missing {STRAIN_MAPPINGS_FILENAME}?')
+                f'Failed to find *ANY* strains, missing {STRAIN_MAPPINGS_FILENAME}?'
+            )
 
         return True
 
     def _start_downloads(self):
-        self._downloader = PODPDownloader(self._platform_id)
-        self._root = self._downloader.project_file_cache
+        downloader = PODPDownloader(self._platform_id)
+        self._root = downloader.project_results_dir
         logger.debug('remote loading mode, configuring root=%s', self._root)
         # CG: to download both MET and GEN data
         # CG: Continue to understand how strain_mappings.json is generated
-        self._downloader.get(
+        downloader.get(
             self._config_docker.get('run_bigscape', self.RUN_BIGSCAPE_DEFAULT),
             self._config_docker.get('extra_bigscape_parameters',
                                     self.EXTRA_BIGSCAPE_PARAMS_DEFAULT),
@@ -190,7 +188,8 @@ class DatasetLoader():
     def _init_paths(self):
         # 1. strain mapping are used for everything else so
         self.strain_mappings_file = self._config_overrides.get(
-            self.OR_STRAINS) or os.path.join(self._root, STRAIN_MAPPINGS_FILENAME)
+            self.OR_STRAINS) or os.path.join(self._root,
+                                             STRAIN_MAPPINGS_FILENAME)
 
         self._init_metabolomics_paths()
 
@@ -327,23 +326,11 @@ class DatasetLoader():
 
     # TODO: this function should be refactored to Loader class
     def _load_strain_mappings(self):
-        # now load the dataset mapping in the same way
-        # TODO: what happens in case of clashes (differing primary IDs?)
-        # CG: the `if` never happens for PODP pipeline; for non-PODP pipeline,
-        # self.strains is empty and will cause error.
-        # TODO: remove the `if` condition
-        if not os.path.exists(self.strain_mappings_file):
-            # create an empty placeholder file and show a warning
-            logger.warn(
-                'No strain_mappings.json file found! Attempting to create one')
-            self.strains.generate_strain_mappings(self.strain_mappings_file,
-                                                  self.antismash_dir)
-        else:
-            sc = StrainCollection.read_json(self.strain_mappings_file)
-            for strain in sc:
-                self.strains.add(strain)
-            logger.info('Loaded dataset strain IDs ({} total)'.format(
-                len(self.strains)))
+        sc = StrainCollection.read_json(self.strain_mappings_file)
+        for strain in sc:
+            self.strains.add(strain)
+        logger.info('Loaded dataset strain IDs ({} total)'.format(
+            len(self.strains)))
 
         return True
 
@@ -503,7 +490,7 @@ class DatasetLoader():
                     run_bigscape('bigscape.py',
                                  os.path.join(self._root, 'antismash'),
                                  os.path.join(self._root, 'bigscape'),
-                                 self.PFAM_PATH,
+                                 PFAM_PATH,
                                  extra_params=extra_bigscape_parameters)
                 except Exception as e:
                     logger.warning(

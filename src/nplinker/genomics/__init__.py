@@ -4,7 +4,6 @@ from .bgc import BGC
 from .gcf import GCF
 from .genomics import filter_mibig_only_gcf
 from .genomics import generate_genome_bgc_mappings_file
-from .genomics import GENOME_BGC_MAPPINGS_FILENAME
 from .genomics import get_bgcs_from_gcfs
 from .genomics import get_strains_from_bgcs
 from .genomics import load_gcfs
@@ -20,7 +19,6 @@ __all__ = [
     "GCF",
     "filter_mibig_only_gcf",
     "generate_genome_bgc_mappings_file",
-    "GENOME_BGC_MAPPINGS_FILENAME",
     "get_bgcs_from_gcfs",
     "get_strains_from_bgcs",
     "load_gcfs",

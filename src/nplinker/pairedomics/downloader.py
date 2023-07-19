@@ -1,14 +1,14 @@
 import json
 import os
+from os import PathLike
+from pathlib import Path
 import shutil
-import sys
-import httpx
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
+from nplinker.globals import PFAM_PATH
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
 from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
-from nplinker.strain_collection import StrainCollection
-from nplinker.strains import Strain
+from nplinker.utils import download_url
 from . import podp_download_and_extract_antismash_data
 from .runbigscape import podp_run_bigscape
 
@@ -22,110 +22,108 @@ GNPS_DATA_DOWNLOAD_URL = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={
 MIBIG_METADATA_URL = 'https://dl.secondarymetabolites.org/mibig/mibig_json_{}.tar.gz'
 MIBIG_BGC_METADATA_URL = 'https://mibig.secondarymetabolites.org/repository/{}/annotations.json'
 
-STRAIN_MAPPINGS_FILENAME = 'strain_mappings.json'
-
 
 class PODPDownloader():
-    # TODO: move to independent config file  ---C.Geng
-    PFAM_PATH = os.path.join(sys.prefix, 'nplinker_lib')
 
-    def __init__(self, platform_id, force_download=False, local_cache=None):
-        self.gnps_massive_id = platform_id
-        self.pairedomics_id = None
-        self.gnps_task_id = None
-        self.json_data = None
-        self.strains = StrainCollection()
+    def __init__(self,
+                 podp_platform_id: str,
+                 force_download: bool = False,
+                 root_dir: str | PathLike | None = None):
+        """Downloader for PODP pipeline.
 
-        if local_cache is None:
-            local_cache = os.path.join(os.getenv('HOME'), 'nplinker_data',
-                                       'pairedomics')
+        The downloader will download the following data:
+            - GNPS Molecular Network task results
+            - AntiSMASH results
+            - MIBiG metadata
 
-        self._init_folder_structure(local_cache)
+        Args:
+            podp_platform_id(str): The metabolomics project ID of PODP platform,
+                e.g. GNPS MassIVE ID.
+            force_download (bool): Re-download data even if it already exists
+                locally. Defaults to False.
+            working_dir (str | PathLike | None): The root directory to use for
+                the project. Defaults to None, in which case the default location
+                is used.
+
+        Raises:
+            ValueError: If the given ID does not have a corresponding PODP ID,
+                or if the GNPS Molecular Network task URL does not exist for
+                the given ID.
+        """
+        self.gnps_massive_id = podp_platform_id
+
+        if root_dir is None:
+            root_dir = os.path.join(os.getenv('HOME'), 'nplinker_data',
+                                    'pairedomics')
+
+        # TODO CG: init folder structure should be moved out of PODPDownloader
+        self._init_folder_structure(root_dir)
 
         # init project json files
-        self.all_project_json = None
         if not os.path.exists(self.project_json_file) or force_download:
             logger.info('Downloading new copy of platform project data...')
-            self.all_project_json = self._download_and_load_json(
-                PAIREDOMICS_PROJECT_DATA_ENDPOINT, self.all_project_json_file)
+            self.all_projects_json_data = self._download_and_load_json(
+                PAIREDOMICS_PROJECT_DATA_ENDPOINT, self.all_projects_json_file)
         else:
             logger.info('Using existing copy of platform project data')
-            with open(self.all_project_json_file, encoding="utf-8") as f:
-                self.all_project_json = json.load(f)
+            with open(self.all_projects_json_file, encoding="utf-8") as f:
+                self.all_projects_json_data = json.load(f)
 
-        # query the pairedomics webservice with the project ID to retrieve the data. unfortunately
-        # this is not the MSV... ID, but an internal GUID string. To get that, first need to get the
-        # list of all projects, find the one with a 'metabolite_id' value matching the MSV... ID, and
-        # then extract its '_id' value to get the GUID
-
-        # find the specified project and store its ID
-        for project in self.all_project_json['data']:
-            pairedomics_id = project['_id']
-            gnps_massive_id = project['metabolite_id']
-
-            if gnps_massive_id == platform_id:
-                self.pairedomics_id = pairedomics_id
-                logger.debug('platform_id %s matched to pairedomics_id %s',
-                             self.gnps_massive_id, self.pairedomics_id)
+        # Verify that the given ID has a corresponding PODP ID
+        self.podp_id = None
+        for project in self.all_projects_json_data['data']:
+            if self.gnps_massive_id == project['metabolite_id']:
+                self.podp_id = project['_id']
+                logger.debug('Given ID %s matched to PODP ID %s',
+                             self.gnps_massive_id, self.podp_id)
                 break
-
-        if self.pairedomics_id is None:
-            raise Exception(
-                f'Failed to find a pairedomics project with ID {self.gnps_massive_id}'
-            )
+        if self.podp_id is None:
+            raise ValueError(
+                f'Failed to find PODP ID for given ID {self.gnps_massive_id}')
 
         # now get the project JSON data
-        self.project_json = None
         logger.info('Found project, retrieving JSON data...')
-        self.project_json = self._download_and_load_json(
-            PAIREDOMICS_PROJECT_URL.format(self.pairedomics_id),
+        self.project_json_data = self._download_and_load_json(
+            PAIREDOMICS_PROJECT_URL.format(self.podp_id),
             self.project_json_file)
 
-        if 'molecular_network' not in self.project_json['metabolomics'][
-                'project']:
-            raise Exception('Dataset has no GNPS data URL!')
+        self.gnps_task_id = self.project_json_data['metabolomics'][
+            'project'].get('molecular_network')
+        if self.gnps_task_id is None:
+            raise ValueError(
+                f'GNPS Molecular Network task URL not exist for '
+                f'given ID {self.gnps_massive_id}. Please check and'
+                f'run GNPS Molecular Network task first.')
 
-        self.gnps_task_id = self.project_json['metabolomics']['project'][
-            'molecular_network']
-
-        with open(os.path.join(self.project_file_cache, 'platform_data.json'),
-                  'w',
-                  encoding='utf-8') as f:
-            f.write(str(self.project_json))
-
-    def _init_folder_structure(self, local_cache):
+    def _init_folder_structure(self, working_dir):
         """Create local cache folders and set up paths for various files"""
 
         # init local cache root
-        self.local_cache = local_cache
-        self.local_download_cache = os.path.join(self.local_cache, 'downloads')
-        self.local_file_cache = os.path.join(self.local_cache, 'extracted')
-        os.makedirs(self.local_cache, exist_ok=True)
+        self.working_dir = working_dir
+        self.downloads_dir = os.path.join(self.working_dir, 'downloads')
+        self.results_dir = os.path.join(self.working_dir, 'extracted')
+        os.makedirs(self.working_dir, exist_ok=True)
         logger.info('PODPDownloader for %s, caching to %s',
-                    self.gnps_massive_id, self.local_cache)
+                    self.gnps_massive_id, self.working_dir)
 
         # create local cache folders for this dataset
-        self.project_download_cache = os.path.join(self.local_download_cache,
-                                                   self.gnps_massive_id)
-        os.makedirs(self.project_download_cache, exist_ok=True)
+        self.project_downloads_dir = os.path.join(self.downloads_dir,
+                                                  self.gnps_massive_id)
+        os.makedirs(self.project_downloads_dir, exist_ok=True)
 
-        self.project_file_cache = os.path.join(self.local_file_cache,
-                                               self.gnps_massive_id)
-        os.makedirs(self.project_file_cache, exist_ok=True)
+        self.project_results_dir = os.path.join(self.results_dir,
+                                                self.gnps_massive_id)
+        os.makedirs(self.project_results_dir, exist_ok=True)
 
         # placeholder directories
         for d in ['antismash', 'bigscape']:
-            os.makedirs(os.path.join(self.project_file_cache, d),
+            os.makedirs(os.path.join(self.project_results_dir, d),
                         exist_ok=True)
 
-        # init strain mapping filepath
-        self.strain_mappings_file = os.path.join(self.project_file_cache,
-                                                 STRAIN_MAPPINGS_FILENAME)
-
         # init project paths
-        self.all_project_json_file = os.path.join(self.local_cache,
-                                                  'all_projects.json')
-        self.project_json_file = os.path.join(self.local_cache,
+        self.all_projects_json_file = os.path.join(self.working_dir,
+                                                   'all_projects.json')
+        self.project_json_file = os.path.join(self.working_dir,
                                               f'{self.gnps_massive_id}.json')
 
     # download function
@@ -137,30 +135,17 @@ class PODPDownloader():
 
         # TODO CG: this function will modify the project_json['genomes'],
         # this should be done in a better way
-        podp_download_and_extract_antismash_data(self.project_json['genomes'],
-                                                 self.project_download_cache,
-                                                 self.project_file_cache)
-
-        # CG: it extracts strain names and later will be used for strains
-        self._parse_genome_labels(self.project_json['genome_metabolome_links'],
-                                  self.project_json['genomes'])
-
-        # CG: it generates the strain_mappings.json file
-        self.strains.generate_strain_mappings(
-            self.strain_mappings_file,
-            os.path.join(self.project_file_cache, 'antismash'))
+        podp_download_and_extract_antismash_data(
+            self.project_json_data['genomes'], self.project_downloads_dir,
+            self.project_results_dir)
 
         if use_mibig:
             self._download_mibig_json(mibig_version)
-        podp_run_bigscape(self.project_file_cache, self.PFAM_PATH, do_bigscape,
+        podp_run_bigscape(self.project_results_dir, PFAM_PATH, do_bigscape,
                           extra_bigscape_parameters)
 
-    def _is_new_gnps_format(self, directory):
-        # TODO this should test for existence of quantification table instead
-        return os.path.exists(os.path.join(directory, 'qiime2_output'))
-
     def _download_mibig_json(self, version):
-        output_path = os.path.join(self.project_file_cache, 'mibig_json')
+        output_path = os.path.join(self.project_results_dir, 'mibig_json')
 
         # Override existing mibig json files
         if os.path.exists(output_path):
@@ -168,7 +153,7 @@ class PODPDownloader():
 
         os.makedirs(output_path)
 
-        download_and_extract_mibig_metadata(self.project_download_cache,
+        download_and_extract_mibig_metadata(self.project_downloads_dir,
                                             output_path, version)
 
         self._create_completed_file(output_path)
@@ -182,82 +167,20 @@ class PODPDownloader():
                   encoding='utf-8'):
             pass
 
-    def _parse_genome_labels(self, met_records, gen_records):
-        temp = {}
-        mc, gc = 0, 0
-
-        # this method is supposed to extract the fields from the JSON data
-        # which map strain names to mzXML files on the metabolomics side,
-        # and to BGCs on the genomics side, and use that data to build a set
-        # of NPLinker Strain objects for the current dataset
-
-        # metabolomics: each of the JSON records should contain a field named
-        # "genome_label", which is the one that should be used as the canonical
-        # name for this strain by nplinker. Another field is called "metabolomics_file",
-        # and this contains a URL to the corresponding mzXML file. so we want to
-        # create a set of mappings from one to the other, with the complication that
-        # there might be mappings from 2 or more mzXMLs to a single strain.
-        # also should record the growth medium using the "sample_preparation_label" field.
-
-        # TODO CG: build mappings from strain id to metabolomics filename (not spectrum id),
-        # when to build spectrum id to metabolomics filename mapping?
-        for rec in met_records:
-            # this is the global strain identifier we should use
-            label = rec['genome_label']
-            # only want to record the actual filename of the mzXML URL
-            # TODO CG: is filename always unique?
-            filename = os.path.split(rec['metabolomics_file'])[1]
-
-            # add the mzXML mapping for this strain
-            if label in temp:
-                temp[label].append(filename)
-            else:
-                temp[label] = [filename]
-            mc += 1
-
-        # TODO CG: build mappings from strain id to genome id (not BGC id),
-        # when to build BGC id to genome id mapping?
-        for rec in gen_records:
-            label = rec['genome_label']
-            # TODO CG: change `resolved_id` to `resolved_refseq_id`
-            accession = rec.get('resolved_id', None)
-            if accession is None:
-                # this will happen for genomes where we couldn't retrieve data or resolve the ID
-                logger.warning(
-                    'Failed to extract accession from genome with label %s',
-                    label)
-                continue
-
-            if label in temp:
-                temp[label].append(accession)
-            else:
-                temp[label] = [accession]
-                gc += 1
-
-        logger.info('Extracted %s strains from JSON (met=%s, gen=%s)',
-                    len(temp), mc, gc)
-        for strain_label, strain_aliases in temp.items():
-            strain = Strain(strain_label)
-            for alias in strain_aliases:
-                strain.add_alias(alias)
-            self.strains.add(strain)
-
     def _download_metabolomics_zipfile(self, gnps_task_id):
         archive = GNPSDownloader(
             gnps_task_id,
-            self.project_download_cache).download().get_download_path()
-        GNPSExtractor(archive, self.project_file_cache).extract()
+            self.project_downloads_dir).download().get_download_path()
+        GNPSExtractor(archive, self.project_results_dir).extract()
 
-    def _download_and_load_json(self, url, local_path):
-        resp = httpx.get(url, follow_redirects=True)
-        if not resp.status_code == 200:
-            raise Exception(
-                f'Failed to download {url} (status code {resp.status_code})')
+    def _download_and_load_json(self, url: str,
+                                output_file: str | PathLike) -> dict:
+        """Download a JSON file from a URL and return the parsed JSON data"""
+        fpath = Path(output_file)
+        download_url(url, fpath.parent, fpath.name)
+        logger.debug('Downloaded %s to %s', url, output_file)
 
-        content = json.loads(resp.content)
-        with open(local_path, 'w', encoding='utf-8') as f:
-            json.dump(content, f)
+        with open(output_file, 'r') as f:
+            data = json.load(f)
 
-        logger.debug('Downloaded %s to %s', url, local_path)
-
-        return content
+        return data
