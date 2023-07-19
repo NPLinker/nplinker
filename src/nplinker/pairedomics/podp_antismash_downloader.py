@@ -218,16 +218,19 @@ def get_best_available_genome_id(
         str | None: ID for the genome, if present, otherwise None.
     """
 
+    best_id = None
     if 'RefSeq_accession' in genome_id_data:
-        return genome_id_data['RefSeq_accession']
+        best_id = genome_id_data['RefSeq_accession']
     if 'GenBank_accession' in genome_id_data:
-        return genome_id_data['GenBank_accession']
+        best_id = genome_id_data['GenBank_accession']
     if 'JGI_Genome_ID' in genome_id_data:
-        return genome_id_data['JGI_Genome_ID']
+        best_id = genome_id_data['JGI_Genome_ID']
 
-    logger.warning(
-        f'No known genome ID field in genome data: {genome_id_data}')
-    return None
+    if best_id is None or len(best_id) == 0:
+        logger.warning(
+            f'Failed to get valid genome ID in genome data: {genome_id_data}')
+        return None
+    return best_id
 
 
 def _ncbi_genbank_search(genbank_id: str,
