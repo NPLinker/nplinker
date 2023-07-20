@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.testing import assert_array_equal
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 import pytest
 from nplinker.scoring import LinkCollection
 from nplinker.scoring import MetcalfScoring
