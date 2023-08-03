@@ -217,14 +217,14 @@ def get_best_available_genome_id(
     Returns:
         str | None: ID for the genome, if present, otherwise None.
     """
-
-    best_id = None
     if 'RefSeq_accession' in genome_id_data:
         best_id = genome_id_data['RefSeq_accession']
-    if 'GenBank_accession' in genome_id_data:
+    elif 'GenBank_accession' in genome_id_data:
         best_id = genome_id_data['GenBank_accession']
-    if 'JGI_Genome_ID' in genome_id_data:
+    elif 'JGI_Genome_ID' in genome_id_data:
         best_id = genome_id_data['JGI_Genome_ID']
+    else:
+        best_id = None
 
     if best_id is None or len(best_id) == 0:
         logger.warning(
