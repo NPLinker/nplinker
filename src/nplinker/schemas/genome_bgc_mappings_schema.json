@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/NPLinker/nplinker/main/src/nplinker/schemas/genome_bgc_mappings_schema.json",
+  "title": "Mappings from genome ID to BGC IDs",
+  "description": "A list of mappings from genome ID to BGC (biosynthetic gene cluster) IDs",
+  "type": "object",
+  "required": [
+    "mappings",
+    "version"
+  ],
+  "properties": {
+    "mappings": {
+      "type": "array",
+      "title": "Mappings from genome ID to BGC IDs",
+      "description": "A list of mappings from genome ID to BGC IDs",
+      "items": {
+        "type": "object",
+        "required": [
+          "genome_ID",
+          "BGC_ID"
+        ],
+        "properties": {
+          "genome_ID": {
+            "type": "string",
+            "title": "Genome ID",
+            "description": "The genome ID used in BGC database such as antiSMASH",
+            "minLength": 1
+          },
+          "BGC_ID": {
+            "type": "array",
+            "title": "BGC ID",
+            "description": "A list of BGC IDs",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        }
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "version": {
+      "type": "string",
+      "enum": [
+        "1.0"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

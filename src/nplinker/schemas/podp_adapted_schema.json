@@ -1,0 +1,149 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/NPLinker/nplinker/main/src/nplinker/schemas/podp_adapted_schema.json",
+  "title": "Adapted Paired Omics Data Platform Schema for NPLinker",
+  "description": "This schema is adapted from PODP schema (https://pairedomicsdata.bioinformatics.nl/schema.json) for NPLinker. It's used to validate the input data for NPLinker. Thus, only required fields for NPLinker are kept in this schema, and some fields are modified to fit NPLinker's requirements.",
+  "type": "object",
+  "required": [
+    "version",
+    "metabolomics",
+    "genomes",
+    "genome_metabolome_links"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "readOnly": true,
+      "default": "3",
+      "enum": [
+        "3"
+      ]
+    },
+    "metabolomics": {
+      "type": "object",
+      "title": "2. Metabolomics Information",
+      "description": "Please provide basic information on the publicly available metabolomics project from which paired data is available. Currently, we allow for links to mass spectrometry data deposited in GNPS-MaSSIVE or MetaboLights.",
+      "properties": {
+        "project": {
+          "type": "object",
+          "required": [
+            "molecular_network"
+          ],
+          "title": "GNPS-MassIVE",
+          "properties": {
+            "GNPSMassIVE_ID": {
+              "type": "string",
+              "title": "GNPS-MassIVE identifier",
+              "description": "Please provide the GNPS-MassIVE identifier of your metabolomics data set, e.g., MSV000078839.",
+              "pattern": "^MSV[0-9]{9}$"
+            },
+            "MaSSIVE_URL": {
+              "type": "string",
+              "title": "Link to MassIVE upload",
+              "description": "Please provide the link to the MassIVE upload, e.g., <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://gnps.ucsd.edu/ProteoSAFe/result.jsp?task=a507232a787243a5afd69a6c6fa1e508&view=advanced_view\">https://gnps.ucsd.edu/ProteoSAFe/result.jsp?task=a507232a787243a5afd69a6c6fa1e508&view=advanced_view</a>. Warning, there cannot be spaces in the URI.",
+              "format": "uri"
+            },
+            "molecular_network": {
+              "type": "string",
+              "pattern": "^[0-9a-z]{32}$",
+              "title": "Molecular Network Task ID",
+              "description": "If you have run a Molecular Network on GNPS, please provide the task ID of the Molecular Network job. It can be found in the URL of the Molecular Networking job, e.g., in <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://gnps.ucsd.edu/ProteoSAFe/status.jsp?task=c36f90ba29fe44c18e96db802de0c6b9\">https://gnps.ucsd.edu/ProteoSAFe/status.jsp?task=c36f90ba29fe44c18e96db802de0c6b9</a> the task ID is c36f90ba29fe44c18e96db802de0c6b9."
+            }
+          }
+        }
+      },
+      "required": [
+        "project"
+      ],
+      "additionalProperties": true
+    },
+    "genomes": {
+      "type": "array",
+      "title": "3. (Meta)genomics Information",
+      "description": "Please add all genomes and/or metagenomes for which paired data is available as separate entries.",
+      "items": {
+        "type": "object",
+        "required": [
+          "genome_ID",
+          "genome_label"
+        ],
+        "properties": {
+          "genome_ID": {
+            "type": "object",
+            "title": "Genome accession",
+            "description": "At least one of the three identifiers is required.",
+            "anyOf": [
+              {
+                "required": [
+                  "GenBank_accession"
+                ]
+              },
+              {
+                "required": [
+                  "RefSeq_accession"
+                ]
+              },
+              {
+                "required": [
+                  "JGI_Genome_ID"
+                ]
+              }
+            ],
+            "properties": {
+              "GenBank_accession": {
+                "type": "string",
+                "title": "GenBank accession number",
+                "description": "If the publicly available genome got a GenBank accession number assigned, e.g., <a href=\"https://www.ncbi.nlm.nih.gov/nuccore/AL645882\" target=\"_blank\" rel=\"noopener noreferrer\">AL645882</a>, please provide it here. The genome sequence must be submitted to GenBank/ENA/DDBJ (and an accession number must be received) before this form can be filled out. In case of a whole genome sequence, please use master records. At least one identifier must be entered."
+              },
+              "RefSeq_accession": {
+                "type": "string",
+                "title": "RefSeq accession number",
+                "description": "For example: <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://www.ncbi.nlm.nih.gov/nuccore/NC_003888.3\">NC_003888.3</a>"
+              },
+              "JGI_Genome_ID": {
+                "type": "string",
+                "title": "JGI IMG genome ID",
+                "description": "For example: <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://img.jgi.doe.gov/cgi-bin/m/main.cgi?section=TaxonDetail&page=taxonDetail&taxon_oid=641228474\">641228474</a>"
+              }
+            }
+          },
+          "genome_label": {
+            "type": "string",
+            "title": "Genome label",
+            "description": "Please assign a unique Genome Label for this genome or metagenome to help you recall it during the linking step. For example 'Streptomyces sp. CNB091'",
+            "minLength": 1
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "genome_metabolome_links": {
+      "type": "array",
+      "title": "6. Genome - Proteome - Metabolome Links",
+      "description": "Create a linked pair by selecting the Genome Label and optional Proteome label as provided earlier. Subsequently links to the metabolomics data file belonging to that genome/proteome with appropriate experimental methods.",
+      "items": {
+        "type": "object",
+        "required": [
+          "genome_label",
+          "metabolomics_file"
+        ],
+        "properties": {
+          "genome_label": {
+            "type": "string",
+            "title": "Genome/Metagenome",
+            "description": "Please select the Genome Label to be linked to a metabolomics data file."
+          },
+          "metabolomics_file": {
+            "type": "string",
+            "title": "Location of metabolomics data file",
+            "description": "Please provide a direct link to the metabolomics data file location, e.g. <a href=\"ftp://massive.ucsd.edu/MSV000078839/spectrum/R5/CNB091_R5_M.mzXML\" target=\"_blank\" rel=\"noopener noreferrer\">ftp://massive.ucsd.edu/MSV000078839/spectrum/R5/CNB091_R5_M.mzXML</a> found in the FTP download of a MassIVE dataset or <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://www.ebi.ac.uk/metabolights/MTBLS307/files/Urine_44_fullscan1_pos.mzXML\">https://www.ebi.ac.uk/metabolights/MTBLS307/files/Urine_44_fullscan1_pos.mzXML</a> found in the Files section of a MetaboLights study. Warning, there cannot be spaces in the URI.",
+            "format": "uri"
+          }
+        },
+        "additionalProperties": true
+      },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/NPLinker/nplinker/main/src/nplinker/schemas/genome_status_schema.json",
+  "title": "Status of genomes",
+  "description": "A list of genome status objects, each of which contains information about a single genome",
+  "type": "object",
+  "required": [
+    "genome_status",
+    "version"
+  ],
+  "properties": {
+    "genome_status": {
+      "type": "array",
+      "title": "Genome status",
+      "description": "A list of genome status objects",
+      "items": {
+        "type": "object",
+        "required": [
+          "original_id",
+          "resolved_refseq_id",
+          "resolve_attempted",
+          "bgc_path"
+        ],
+        "properties": {
+          "original_id": {
+            "type": "string",
+            "title": "Original ID",
+            "description": "The original ID of the genome",
+            "minLength": 1
+          },
+          "resolved_refseq_id": {
+            "type": "string",
+            "title": "Resolved RefSeq ID",
+            "description": "The RefSeq ID that was resolved for this genome"
+          },
+          "resolve_attempted": {
+            "type": "boolean",
+            "title": "Resolve Attempted",
+            "description": "Whether or not an attempt was made to resolve this genome"
+          },
+          "bgc_path": {
+            "type": "string",
+            "title": "BGC Path",
+            "description": "The path to the downloaded BGC file for this genome"
+          }
+        }
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "version": {
+      "type": "string",
+      "enum": [
+        "1.0"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/NPLinker/nplinker/main/src/nplinker/schemas/strain_mappings_schema.json",
+  "title": "Strain mappings",
+  "description": "A list of mappings from strain ID to strain aliases",
+  "type": "object",
+  "required": [
+    "strain_mappings",
+    "version"
+  ],
+  "properties": {
+    "strain_mappings": {
+      "type": "array",
+      "title": "Strain mappings",
+      "description": "A list of strain mappings",
+      "items": {
+        "type": "object",
+        "required": [
+          "strain_id",
+          "strain_alias"
+        ],
+        "properties": {
+          "strain_id": {
+            "type": "string",
+            "title": "Strain ID",
+            "description": "Strain ID, which could be any strain name or accession number",
+            "minLength": 1
+          },
+          "strain_alias": {
+            "type": "array",
+            "title": "Strain aliases",
+            "description": "A list of strain aliases, which could be any names that refer to the same strain",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        }
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "version": {
+      "type": "string",
+      "enum": [
+        "1.0"
+      ]
+    }
+  },
+  "additionalProperties": false
+}
