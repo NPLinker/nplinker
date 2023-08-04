@@ -43,6 +43,7 @@ namespaces = true  # enable data directory to be identified
 
 [tool.setuptools.package-data]
 "nplinker.data" = [ "*" ]
+"nplinker.schemas" = [ "*" ]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
