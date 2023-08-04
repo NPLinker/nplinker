@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING
 from .config import Config
 from .genomics import BGC
 from .genomics import GCF
-from .loader import NPLINKER_APP_DATA_DIR
 from .loader import DatasetLoader
+from .loader import NPLINKER_APP_DATA_DIR
 from .logconfig import LogConfig
 from .metabolomics.molecular_family import MolecularFamily
 from .metabolomics.spectrum import Spectrum
@@ -258,6 +258,7 @@ class NPLinker():
         logger.debug('load_data(new_bigscape_cutoff=%s)', new_bigscape_cutoff)
         if new_bigscape_cutoff is None:
             self._loader.validate()
+            self._loader.generate_strain_mappings()
             if not self._loader.load():
                 return False
         else:

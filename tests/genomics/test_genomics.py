@@ -4,7 +4,7 @@ import pytest
 from nplinker.genomics import BGC
 from nplinker.genomics import filter_mibig_only_gcf
 from nplinker.genomics import GCF
-from nplinker.genomics import generate_genome_bgc_mappings_file
+from nplinker.genomics import generate_mappings_genome_id_bgc_id
 from nplinker.genomics import get_bgcs_from_gcfs
 from nplinker.genomics import get_strains_from_bgcs
 from nplinker.genomics import map_bgc_to_gcf
@@ -15,14 +15,25 @@ from nplinker.strains import Strain
 from .. import DATA_DIR
 
 
-def test_generate_genome_bgc_mappings_file():
+def test_generate_mappings_genome_id_bgc_id(tmp_path):
     bgc_dir = DATA_DIR / "antismash"
 
-    generate_genome_bgc_mappings_file(bgc_dir)
+    # using default output file path
+    generate_mappings_genome_id_bgc_id(bgc_dir)
+    # using custom output file path
+    generate_mappings_genome_id_bgc_id(bgc_dir,
+                                       tmp_path / GENOME_BGC_MAPPINGS_FILENAME)
 
+    # read both files
     with open(bgc_dir / GENOME_BGC_MAPPINGS_FILENAME) as f:
         mappings = json.load(f)
+    with open(tmp_path / GENOME_BGC_MAPPINGS_FILENAME) as f:
+        mappings_with_outfile = json.load(f)
 
+    # check if both files are the same
+    assert mappings == mappings_with_outfile
+
+    # then check the content
     assert mappings["count"] == 2
 
     assert mappings["mappings"][0]["genome_ID"] == "GCF_000514515.1"
