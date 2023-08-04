@@ -1,16 +1,19 @@
 import json
+from os import PathLike
+from pathlib import Path
 import re
 import time
 from urllib.error import HTTPError
-from os import PathLike
-from pathlib import Path
-import httpx
 from bs4 import BeautifulSoup
 from bs4 import NavigableString
 from bs4 import Tag
+import httpx
+from jsonschema import validate
 from nplinker.genomics.antismash import download_and_extract_antismash_data
 from nplinker.globals import GENOME_STATUS_FILENAME
 from nplinker.logconfig import LogConfig
+from nplinker.schemas import GENOME_STATUS_SCHEMA
+
 
 logger = LogConfig.getLogger(__name__)
 
@@ -64,6 +67,10 @@ class GenomeStatus:
         if Path(file).exists():
             with open(file, "r") as f:
                 data = json.load(f)
+
+            # validate json data before using it
+            validate(data, schema=GENOME_STATUS_SCHEMA)
+
             genome_status_dict = {
                 gs["original_id"]: GenomeStatus(**gs)
                 for gs in data["genome_status"]
@@ -90,6 +97,10 @@ class GenomeStatus:
         """
         gs_list = [gs._to_dict() for gs in genome_status_dict.values()]
         json_data = {"genome_status": gs_list, "version": "1.0"}
+
+        # validate json object before dumping
+        validate(json_data, schema=GENOME_STATUS_SCHEMA)
+
         if file is not None:
             with open(file, "w") as f:
                 json.dump(json_data, f)
@@ -206,8 +217,7 @@ def podp_download_and_extract_antismash_data(
         logger.warning('Failed to successfully retrieve ANY genome data!')
 
 
-def get_best_available_genome_id(
-        genome_id_data: dict[str, str]) -> str | None:
+def get_best_available_genome_id(genome_id_data: dict[str, str]) -> str | None:
     """Get the best available ID from genome_id_data dict.
 
     Args:
