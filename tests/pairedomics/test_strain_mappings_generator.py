@@ -151,20 +151,17 @@ def test_extract_mappings_resolved_genome_id_bgc_id(tmp_path):
             {
                 "genome_ID": "id2",
                 "BGC_ID": ["bgc3"]
-            },
-            {
-                "genome_ID": "id3",
-                "BGC_ID": []
-            },
-        ]
+            }
+        ],
+        "version":
+        "1.0"
     }
     test_file = tmp_path / "test_data.json"
     with open(test_file, "w") as f:
         json.dump(test_data, f)
     expected_result = {
         "id1": {"bgc1", "bgc2"},
-        "id2": {"bgc3"},
-        "id3": set(),
+        "id2": {"bgc3"}
     }
     assert extract_mappings_resolved_genome_id_bgc_id(
         test_file) == expected_result

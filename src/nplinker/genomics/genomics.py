@@ -14,6 +14,7 @@ from nplinker.utils import list_files
 from .bgc import BGC
 from .gcf import GCF
 
+
 logger = LogConfig.getLogger(__name__)
 
 
@@ -45,7 +46,10 @@ def generate_mappings_genome_id_bgc_id(
         bgc_ids = [
             bgc_id for f in bgc_files if (bgc_id := Path(f).stem) != genome_id
         ]
-        genome_bgc_mappings[genome_id] = bgc_ids
+        if bgc_ids:
+            genome_bgc_mappings[genome_id] = bgc_ids
+        else:
+            logger.warning("No BGC files found in %s", subdir)
 
     # sort mappings by genome_id and construct json data
     genome_bgc_mappings = dict(sorted(genome_bgc_mappings.items()))
