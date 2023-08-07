@@ -129,7 +129,9 @@ def test_extract_mappings_original_genome_id_resolved_genome_id(tmp_path):
                 "resolve_attempted": True,
                 "bgc_path": ""
             },
-        ]
+        ],
+        "version":
+        "1.0"
     }
     test_file = tmp_path / "test_data.json"
     with open(test_file, "w") as f:
