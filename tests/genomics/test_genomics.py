@@ -34,7 +34,7 @@ def test_generate_mappings_genome_id_bgc_id(tmp_path):
     assert mappings == mappings_with_outfile
 
     # then check the content
-    assert mappings["count"] == 2
+    assert len(mappings["mappings"]) == 2
 
     assert mappings["mappings"][0]["genome_ID"] == "GCF_000514515.1"
     assert len(mappings["mappings"][0]["BGC_ID"]) == 20

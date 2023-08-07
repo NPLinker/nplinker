@@ -54,7 +54,6 @@ def generate_mappings_genome_id_bgc_id(
     } for k, v in genome_bgc_mappings.items()]
     json_data = {
         "mappings": json_data,
-        "count": len(json_data),
         "version": "1.0"
     }
 
