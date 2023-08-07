@@ -3,6 +3,8 @@ from os import PathLike
 from pathlib import Path
 from typing import Iterator
 from deprecated import deprecated
+from jsonschema import validate
+from nplinker.schemas import STRAIN_MAPPINGS_SCHEMA
 from .logconfig import LogConfig
 from .strains import Strain
 from .utils import list_dirs
@@ -124,6 +126,9 @@ class StrainCollection():
         with open(file, 'r') as f:
             json_data = json.load(f)
 
+        # validate json data
+        validate(instance=json_data, schema=STRAIN_MAPPINGS_SCHEMA)
+
         strain_collection = StrainCollection()
         for data in json_data['strain_mappings']:
             strain = Strain(data['strain_id'])
@@ -148,6 +153,9 @@ class StrainCollection():
             "strain_alias": list(strain.aliases)
         } for strain in self]
         json_data = {"strain_mappings": data_list, "version": "1.0"}
+
+        # validate json data
+        validate(instance=json_data, schema=STRAIN_MAPPINGS_SCHEMA)
 
         if file is not None:
             with open(file, 'w') as f:
