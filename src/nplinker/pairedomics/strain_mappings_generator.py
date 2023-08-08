@@ -6,6 +6,7 @@ from jsonschema import validate
 from nplinker.metabolomics.gnps.gnps_file_mapping_loader import \
     GNPSFileMappingLoader
 from nplinker.schemas import GENOME_BGC_MAPPINGS_SCHEMA
+from nplinker.schemas import validate_podp_json
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 from .podp_antismash_downloader import GenomeStatus
@@ -136,6 +137,8 @@ def extract_mappings_strain_id_original_genome_id(
     mappings_dict = {}
     with open(podp_project_json_file, 'r') as f:
         json_data = json.load(f)
+
+    validate_podp_json(json_data)
 
     for record in json_data['genomes']:
         strain_id = record['genome_label']
@@ -268,6 +271,8 @@ def extract_mappings_strain_id_ms_filename(
     mappings_dict = {}
     with open(podp_project_json_file, 'r') as f:
         json_data = json.load(f)
+
+    validate_podp_json(json_data)
 
     # Extract mappings strain id <-> metabolomics filename
     for record in json_data['genome_metabolome_links']:
