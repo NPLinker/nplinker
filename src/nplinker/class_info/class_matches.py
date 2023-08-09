@@ -245,7 +245,7 @@ class ClassMatches:
                     class_matching_tables[chem_key] = {}
                     class_matching_counts[chem_key] = {}
                 # add matching tables as DataFrames
-                counts_df = pd.DataFrame.from_dict(counts, dtype=int)
+                counts_df = pd.DataFrame.from_dict(counts)
                 class_matching_tables[bgc_key][chem_key] = (
                     counts_df / counts_df.sum(axis=0)).fillna(0)
                 class_matching_counts[bgc_key][chem_key] = counts_df.fillna(0)

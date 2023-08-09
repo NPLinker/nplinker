@@ -94,7 +94,20 @@ def test_extract_mappings_strain_id_original_genome_id(tmp_path):
                     "RefSeq_accession": "id3"
                 }
             },
-        ]
+        ],
+        "metabolomics": {
+            "project": {
+                "molecular_network": "01234567890123456789012345678901"
+            }
+        },
+        "genome_metabolome_links": [
+            {
+                "metabolomics_file": "ftp://example.org/001.mzXML",
+                "genome_label": "strain1"
+            },
+        ],
+        "version":
+        "3"
     }
     test_file = tmp_path / "test_data.json"
     with open(test_file, "w") as f:
@@ -129,7 +142,9 @@ def test_extract_mappings_original_genome_id_resolved_genome_id(tmp_path):
                 "resolve_attempted": True,
                 "bgc_path": ""
             },
-        ]
+        ],
+        "version":
+        "1.0"
     }
     test_file = tmp_path / "test_data.json"
     with open(test_file, "w") as f:
@@ -143,29 +158,20 @@ def test_extract_mappings_original_genome_id_resolved_genome_id(tmp_path):
 
 def test_extract_mappings_resolved_genome_id_bgc_id(tmp_path):
     test_data = {
-        "mappings": [
-            {
-                "genome_ID": "id1",
-                "BGC_ID": ["bgc1", "bgc2"]
-            },
-            {
-                "genome_ID": "id2",
-                "BGC_ID": ["bgc3"]
-            },
-            {
-                "genome_ID": "id3",
-                "BGC_ID": []
-            },
-        ]
+        "mappings": [{
+            "genome_ID": "id1",
+            "BGC_ID": ["bgc1", "bgc2"]
+        }, {
+            "genome_ID": "id2",
+            "BGC_ID": ["bgc3"]
+        }],
+        "version":
+        "1.0"
     }
     test_file = tmp_path / "test_data.json"
     with open(test_file, "w") as f:
         json.dump(test_data, f)
-    expected_result = {
-        "id1": {"bgc1", "bgc2"},
-        "id2": {"bgc3"},
-        "id3": set(),
-    }
+    expected_result = {"id1": {"bgc1", "bgc2"}, "id2": {"bgc3"}}
     assert extract_mappings_resolved_genome_id_bgc_id(
         test_file) == expected_result
 
@@ -237,7 +243,22 @@ def test_extract_mappings_strain_id_ms_filename(tmp_path):
                 "genome_label": "strain3",
                 "metabolomics_file": "http://example.com/file4.mzXML"
             },
-        ]
+        ],
+        "genomes": [
+            {
+                "genome_label": "strain1",
+                "genome_ID": {
+                    "RefSeq_accession": "id1"
+                }
+            },
+        ],
+        "metabolomics": {
+            "project": {
+                "molecular_network": "01234567890123456789012345678901"
+            }
+        },
+        "version":
+        "3"
     }
     test_file = tmp_path / "test_data.json"
     with open(test_file, "w") as f:

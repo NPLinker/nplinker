@@ -4,8 +4,10 @@ import json
 from os import PathLike
 from pathlib import Path
 from deprecated import deprecated
+from jsonschema import validate
 from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.logconfig import LogConfig
+from nplinker.schemas import GENOME_BGC_MAPPINGS_SCHEMA
 from nplinker.strain_collection import StrainCollection
 from nplinker.utils import list_dirs
 from nplinker.utils import list_files
@@ -44,7 +46,10 @@ def generate_mappings_genome_id_bgc_id(
         bgc_ids = [
             bgc_id for f in bgc_files if (bgc_id := Path(f).stem) != genome_id
         ]
-        genome_bgc_mappings[genome_id] = bgc_ids
+        if bgc_ids:
+            genome_bgc_mappings[genome_id] = bgc_ids
+        else:
+            logger.warning("No BGC files found in %s", subdir)
 
     # sort mappings by genome_id and construct json data
     genome_bgc_mappings = dict(sorted(genome_bgc_mappings.items()))
@@ -52,11 +57,10 @@ def generate_mappings_genome_id_bgc_id(
         "genome_ID": k,
         "BGC_ID": v
     } for k, v in genome_bgc_mappings.items()]
-    json_data = {
-        "mappings": json_data,
-        "count": len(json_data),
-        "version": "1.0"
-    }
+    json_data = {"mappings": json_data, "version": "1.0"}
+
+    # validate json data
+    validate(instance=json_data, schema=GENOME_BGC_MAPPINGS_SCHEMA)
 
     if output_file is None:
         output_file = bgc_dir / GENOME_BGC_MAPPINGS_FILENAME

@@ -121,19 +121,14 @@ pip install -q -U pip setuptools
 #------------------------------------------------------------------------------
 
 #--- Install BigScape
-## Note: DO NOT pip install bigscape until its modular version
 echo "🔥 Start installing BigScape ..."
-    # TODO: use original repo when multiprocessing bug fixed
     [[ -d BiG-SCAPE ]] || git clone https://github.com/medema-group/BiG-SCAPE.git
-    # [[ -d BiG-SCAPE ]] || git clone https://github.com/CunliangGeng/BiG-SCAPE.git
     cd BiG-SCAPE
     git config --add advice.detachedHead false  # disable advice
     git config pull.ff only
     git checkout master
     git pull
-    git checkout de55e9c0cecae9648320308f98d3897f9aef3a0a # tag v1.1.5
-    # git checkout dev
-    # git pull
+    git checkout 99d07e57882fc5fa6780f8254823fd3d1abf3bc6 # Commits on Jul 21, 2023
     pip install -q -U -r requirements.txt
     chmod 754 bigscape.py
     chmod 664 domains_color_file.tsv

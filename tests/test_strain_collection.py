@@ -84,7 +84,8 @@ def json_file(tmp_path):
         }, {
             "strain_id": "strain_2",
             "strain_alias": ["alias_3", "alias_4"]
-        }]
+        }],
+        "version": "1.0"
     }
     file_path = tmp_path / "test.json"
     with open(file_path, "w") as f:

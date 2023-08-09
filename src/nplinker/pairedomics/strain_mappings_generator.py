@@ -2,8 +2,11 @@ import json
 import logging
 from os import PathLike
 from pathlib import Path
+from jsonschema import validate
 from nplinker.metabolomics.gnps.gnps_file_mapping_loader import \
     GNPSFileMappingLoader
+from nplinker.schemas import GENOME_BGC_MAPPINGS_SCHEMA
+from nplinker.schemas import validate_podp_json
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 from .podp_antismash_downloader import GenomeStatus
@@ -135,6 +138,8 @@ def extract_mappings_strain_id_original_genome_id(
     with open(podp_project_json_file, 'r') as f:
         json_data = json.load(f)
 
+    validate_podp_json(json_data)
+
     for record in json_data['genomes']:
         strain_id = record['genome_label']
         genome_id = get_best_available_genome_id(record['genome_ID'])
@@ -191,6 +196,10 @@ def extract_mappings_resolved_genome_id_bgc_id(
     """
     with open(genome_bgc_mappings_file, 'r') as f:
         json_data = json.load(f)
+
+    # validate the JSON data
+    validate(json_data, GENOME_BGC_MAPPINGS_SCHEMA)
+
     return {
         mapping["genome_ID"]: set(mapping["BGC_ID"])
         for mapping in json_data['mappings']
@@ -262,6 +271,8 @@ def extract_mappings_strain_id_ms_filename(
     mappings_dict = {}
     with open(podp_project_json_file, 'r') as f:
         json_data = json.load(f)
+
+    validate_podp_json(json_data)
 
     # Extract mappings strain id <-> metabolomics filename
     for record in json_data['genome_metabolome_links']:

@@ -34,7 +34,7 @@ def test_generate_mappings_genome_id_bgc_id(tmp_path):
     assert mappings == mappings_with_outfile
 
     # then check the content
-    assert mappings["count"] == 2
+    assert len(mappings["mappings"]) == 2
 
     assert mappings["mappings"][0]["genome_ID"] == "GCF_000514515.1"
     assert len(mappings["mappings"][0]["BGC_ID"]) == 20
@@ -49,6 +49,25 @@ def test_generate_mappings_genome_id_bgc_id(tmp_path):
     assert "GCF_000514855.1" not in mappings["mappings"][1]["BGC_ID"]
 
     (bgc_dir / GENOME_BGC_MAPPINGS_FILENAME).unlink()
+
+
+def test_generate_mappings_genome_id_bgc_id_empty_dir(tmp_path, caplog):
+    # prepare dir and file
+    bgc_dir = tmp_path / "GCF_1"
+    bgc_file = bgc_dir / "BGC_1.gbk"
+    bgc_dir.mkdir()
+    bgc_file.touch()
+    empty_dir = tmp_path / "empty_dir"
+    empty_dir.mkdir()
+
+    generate_mappings_genome_id_bgc_id(tmp_path)
+    assert "No BGC files found" in caplog.text
+
+    with open(tmp_path / GENOME_BGC_MAPPINGS_FILENAME) as f:
+        mappings = json.load(f)
+    assert len(mappings["mappings"]) == 1
+    assert mappings["mappings"][0]["genome_ID"] == "GCF_1"
+    assert mappings["mappings"][0]["BGC_ID"] == ["BGC_1"]
 
 
 @pytest.fixture
