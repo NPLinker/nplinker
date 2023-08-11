@@ -26,10 +26,16 @@ def test_hash(strain: Strain):
     assert hash(strain) == hash("strain_1")
 
 
+def test_names(strain: Strain):
+    assert strain.names == {"strain_1", "strain_1_a"}
+
+
 def test_alias(strain: Strain):
     assert len(strain.aliases) == 1
+    assert "strain_1_a" in strain.aliases
 
 
 def test_add_alias(strain: Strain):
     strain.add_alias("strain_1_b")
     assert len(strain.aliases) == 2
+    assert "strain_1_b" in strain.aliases
