@@ -69,38 +69,25 @@ def generate_mappings_genome_id_bgc_id(
     logger.info("Generated genome-BGC mappings file: %s", output_file)
 
 
-def map_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC],
-                      bgc_genome_mapping: dict[str, str]):
+def map_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]):
     """To set BGC object's strain with representative strain object.
 
     This method changes the list `bgcs` in place.
 
-    It's assumed that BGC's genome id is used as strain's name or alias, and
-    the genome id is used to lookup the representative strain.
-
     Args:
         strains(StrainCollection): A collection of all strain objects.
         bgcs(list[BGC]): A list of BGC objects.
-        bgc_genome_mapping(dict[str, str]): The mappings from BGC id (key) to
-            genome id (value).
 
     Raises:
-        KeyError: BGC id not found in the `bgc_genome_mapping` dict.
         KeyError: Strain id not found in the strain collection.
     """
     for bgc in bgcs:
         try:
-            genome_id = bgc_genome_mapping[bgc.bgc_id]
+            strain = strains.lookup(bgc.bgc_id)
         except KeyError as e:
             raise KeyError(
-                f"Not found BGC id {bgc.bgc_id} in BGC-genome mappings."
-            ) from e
-        try:
-            strain = strains.lookup(genome_id)
-        except KeyError as e:
-            raise KeyError(
-                f"Strain id {genome_id} from BGC object {bgc.bgc_id} "
-                "not found in the StrainCollection object.") from e
+                f"Strain id '{bgc.bgc_id}' from BGC object '{bgc.bgc_id}' "
+                "not found in the strain collection.") from e
         bgc.strain = strain
 
 
@@ -122,8 +109,9 @@ def map_bgc_to_gcf(bgcs: list[BGC], gcfs: list[GCF]):
             try:
                 bgc = bgc_dict[bgc_id]
             except KeyError as e:
-                raise KeyError(f"BGC id {bgc_id} from GCF object {gcf.gcf_id} "
-                               "not found in the list of BGC objects.") from e
+                raise KeyError(
+                    f"BGC id '{bgc_id}' from GCF object '{gcf.gcf_id}' "
+                    "not found in the list of BGC objects.") from e
             gcf.add_bgc(bgc)
 
 
@@ -153,6 +141,7 @@ def get_strains_from_bgcs(bgcs: list[BGC]) -> StrainCollection:
         else:
             logger.warning("Strain is None for BGC %s", bgc.bgc_id)
     return sc
+
 
 
 @deprecated(version="1.3.3", reason="It is split to separate functions: " \
