@@ -263,14 +263,8 @@ class NPLinker():
                 return False
         else:
             # CG: only reload genomics data when changing bigscape cutoff
-            # TODO: this part should be removed, reload everything if bigscape data changes.
-            # 1. change the cutoff (which by itself doesn't do anything)
             self._loader._bigscape_cutoff = new_bigscape_cutoff
-            # 2. reload the strain mappings (MiBIG filtering may have removed strains
-            # that were originally present, need to restore them all so the filtering
-            # won't break when it runs again in next stage)
-            self._loader._load_strain_mappings()
-            # 3. reload the genomics data with the new cutoff applied
+            # TODO: only need to reload gcfs using load_gcfs()
             self._loader._load_genomics()
 
         self._spectra = self._loader.spectra
