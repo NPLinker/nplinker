@@ -10,7 +10,7 @@ from .mibig_metadata import MibigMetadata
 logger = LogConfig.getLogger(__name__)
 
 
-class MibigBGCLoader:
+class MibigLoader:
 
     def __init__(self, data_dir: str):
         """Parse MIBiG metadata files and return BGC objects
@@ -129,4 +129,4 @@ def parse_bgc_metadata_json(file: str) -> BGC:
 
 
 # register as virtual class to prevent metaclass conflicts
-BGCLoaderBase.register(MibigBGCLoader)
+BGCLoaderBase.register(MibigLoader)

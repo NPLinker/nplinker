@@ -3,7 +3,7 @@ import pytest
 from nplinker.genomics import BGC
 from nplinker.genomics import BGCLoaderBase
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
-from nplinker.genomics.mibig import MibigBGCLoader
+from nplinker.genomics.mibig import MibigLoader
 from nplinker.genomics.mibig import parse_bgc_metadata_json
 from nplinker.genomics.mibig.mibig_metadata import MibigMetadata
 from .. import DATA_DIR
@@ -22,11 +22,11 @@ class TestMibigBGCLoader:
 
     @pytest.fixture
     def loader(self, data_dir):
-        loader = MibigBGCLoader(data_dir)
+        loader = MibigLoader(data_dir)
         yield loader
 
     def test_abc(self, loader):
-        assert issubclass(MibigBGCLoader, BGCLoaderBase)
+        assert issubclass(MibigLoader, BGCLoaderBase)
         assert isinstance(loader, BGCLoaderBase)
 
     def test_init(self, loader, data_dir):
@@ -49,7 +49,7 @@ class TestMibigBGCLoader:
         assert os.path.exists(files["BGC0000001"])
 
     def test_parse_data_dir(self, data_dir):
-        files = MibigBGCLoader.parse_data_dir(data_dir)
+        files = MibigLoader.parse_data_dir(data_dir)
         assert isinstance(files, dict)
         assert len(files) == 2502  # MIBiG v3.1 has 2502 BGCs
         assert "BGC0000001" in files

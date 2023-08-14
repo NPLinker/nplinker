@@ -9,7 +9,7 @@ from nplinker.genomics import generate_mappings_genome_id_bgc_id
 from nplinker.genomics import load_gcfs
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
-from nplinker.genomics.mibig import MibigBGCLoader
+from nplinker.genomics.mibig import MibigLoader
 from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.globals import GENOME_STATUS_FILENAME
 from nplinker.globals import GNPS_FILE_MAPPINGS_FILENAME
@@ -426,7 +426,7 @@ class DatasetLoader():
         # and update self.strains with mibig strains
         #----------------------------------------------------------------------
         logger.debug(f'MibigBGCLoader({self.mibig_json_dir})')
-        mibig_bgc_loader = MibigBGCLoader(self.mibig_json_dir)
+        mibig_bgc_loader = MibigLoader(self.mibig_json_dir)
         self.mibig_bgc_dict = mibig_bgc_loader.get_bgcs()
 
         # add mibig bgc strains
