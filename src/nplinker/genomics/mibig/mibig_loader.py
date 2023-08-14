@@ -26,16 +26,13 @@ class MibigLoader:
         self._metadata_dict = self._parse_metadatas()
         self._bgc_dict = self._parse_bgcs()
 
-    def get_bgc_genome_mapping(self) -> dict[str, str]:
-        """Get the mapping from BGC to genome.
+    def get_strain_bgc_mapping(self) -> dict[str, str]:
+        """Get the mapping from strain to BGC.
 
-        Note that for MIBiG BGC, same value is used for BGC id and genome id.
-        Users don't have to provide genome id for MIBiG BGCs in the
-        `strain_mappings.json` file.
+        Note that for MIBiG BGC, same value is used for strain name and BGC id.
 
         Returns:
-            dict[str, str]: key is BGC id/accession, value is
-                genome id that uses the value of BGC accession.
+            dict[str, str]: key is strain name, value is BGC id.
         """
         return {bid: bid for bid in self._file_dict}
 
