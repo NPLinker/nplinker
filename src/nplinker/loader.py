@@ -484,19 +484,6 @@ class DatasetLoader():
         return True
 
     def _load_genomics_extra(self):
-        if not os.path.exists(self.mibig_json_dir):
-            if self._use_mibig:
-                logger.info(
-                    'Attempting to download MiBIG JSON database (v{})...'.
-                    format(self._mibig_version))
-                download_and_extract_mibig_metadata(self._root,
-                                                    self.mibig_json_dir,
-                                                    self._mibig_version)
-            else:
-                logger.warning(
-                    'Not downloading MiBIG database automatically, use_mibig = false'
-                )
-
         if not os.path.exists(self.bigscape_dir):
             should_run_bigscape = self._config_docker.get(
                 'run_bigscape', self.RUN_BIGSCAPE_DEFAULT)
