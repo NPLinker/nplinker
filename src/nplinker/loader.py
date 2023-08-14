@@ -22,6 +22,7 @@ from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.pairedomics.strain_mappings_generator import \
     podp_generate_strain_mappings
 from nplinker.strain_collection import StrainCollection
+from nplinker.strains import Strain
 
 
 try:
@@ -112,6 +113,7 @@ class DatasetLoader():
             self._root)[-1] if not self._remote_loading else self._platform_id
         self.bgcs, self.gcfs, self.spectra, self.molfams = [], [], [], []
         self.mibig_bgc_dict = {}
+        self._mibig_strain_bgc_mapping = {}
         self.product_types = []
         self.strains = StrainCollection()
         self.webapp_scoring_cutoff = self._config_webapp.get(
@@ -149,7 +151,8 @@ class DatasetLoader():
 
         generate_mappings_genome_id_bgc_id(self._root / "antismash")
 
-        podp_project_json_file = self._root.parent.parent / (self._platform_id + ".json")
+        podp_project_json_file = self._root.parent.parent / (
+            self._platform_id + ".json")
         genome_status_json_file = self._root.parent.parent / "downloads" / self._platform_id / GENOME_STATUS_FILENAME
         genome_bgc_mappings_file = self._root / "antismash" / GENOME_BGC_MAPPINGS_FILENAME
         gnps_file_mapping_tsv_file = self._root / GNPS_FILE_MAPPINGS_FILENAME
@@ -161,7 +164,10 @@ class DatasetLoader():
                                       self.strain_mappings_file)
 
     def load(self):
-        # load strain mappings first
+        if self._use_mibig:
+            if not self._load_mibig():
+                return False
+
         if not self._load_strain_mappings():
             return False
 
@@ -345,12 +351,28 @@ class DatasetLoader():
                 logger.warning('Optional file/directory "%s" does not exist',
                                f)
 
-    # TODO: this function should be refactored to Loader class
+    def _load_mibig(self):
+        mibig_bgc_loader = MibigLoader(self.mibig_json_dir)
+        self.mibig_bgc_dict = mibig_bgc_loader.get_bgcs()
+        self._mibig_strain_bgc_mapping = mibig_bgc_loader.get_strain_bgc_mapping(
+        )
+        return True
+
     def _load_strain_mappings(self):
+        # First load user's strain mappings
         sc = StrainCollection.read_json(self.strain_mappings_file)
         for strain in sc:
             self.strains.add(strain)
-        logger.info('Loaded dataset strain IDs ({} total)'.format(
+        logger.info('Loaded {} non-MiBIG Strain objects'.format(
+            len(self.strains)))
+
+        # Then load MiBIG strain mappings
+        if self._mibig_strain_bgc_mapping:
+            for k, v in self._mibig_strain_bgc_mapping.items():
+                strain = Strain(k)
+                strain.add_alias(v)
+                self.strains.add(strain)
+        logger.info('Loaded {} Strain objects in total'.format(
             len(self.strains)))
 
         return True
@@ -412,34 +434,13 @@ class DatasetLoader():
                             .format(d, d.replace(' ', '_')))
 
         #----------------------------------------------------------------------
-        # CG: download mibig metadata and run bigscape
+        # CG: run bigscape
         #----------------------------------------------------------------------
         # both the bigscape and mibig_json dirs expected by nplinker may not exist at this point. in some
         # cases this will cause an error later in the process, but this can also potentially be
         # resolved automatically:
-        #   mibig_json => download and extract the JSON database
         #   bigscape => run BiG-SCAPE before continuing (if using the Docker image)
         self._load_genomics_extra()
-
-        #----------------------------------------------------------------------
-        # CG: load mibig metadata to BGC object
-        # and update self.strains with mibig strains
-        #----------------------------------------------------------------------
-        logger.debug(f'MibigBGCLoader({self.mibig_json_dir})')
-        mibig_bgc_loader = MibigLoader(self.mibig_json_dir)
-        self.mibig_bgc_dict = mibig_bgc_loader.get_bgcs()
-
-        # add mibig bgc strains
-        # CG TODO: update strain assignment logics,
-        #    see issue 104 https://github.com/NPLinker/nplinker/issues/104
-        for bgc in self.mibig_bgc_dict.values():
-            if bgc.strain is not None:
-                self.strains.add(bgc.strain)
-            else:
-                logger.warning("No strain specified for BGC %s", bgc.bgc_id)
-
-        logger.debug('mibig_bgc_dict has {} entries'.format(
-            len(self.mibig_bgc_dict)))
 
         #----------------------------------------------------------------------
         # CG: Parse AntiSMASH dir
@@ -684,8 +685,8 @@ class DatasetLoader():
         # get the list of spectra which have at least one strain in the set
         spectra_to_retain = {
             spec
-            for spec in self.spectra for sstrain in spec.strains
-            if sstrain in self.include_only_strains
+            for spec in self.spectra
+            for sstrain in spec.strains if sstrain in self.include_only_strains
         }
 
         logger.info('Current / filtered BGC counts: {} / {}'.format(
