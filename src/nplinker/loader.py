@@ -6,9 +6,13 @@ from nplinker.class_info.chem_classes import ChemClassPredictions
 from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
 from nplinker.genomics import generate_mappings_genome_id_bgc_id
-from nplinker.genomics import load_gcfs
 from nplinker.genomics.antismash import AntismashBGCLoader
-from nplinker.genomics.mibig import download_and_extract_mibig_metadata
+from nplinker.genomics.bigscape import BigscapeGCFLoader
+from nplinker.genomics.genomics import filter_mibig_only_gcf
+from nplinker.genomics.genomics import get_bgcs_from_gcfs
+from nplinker.genomics.genomics import get_strains_from_bgcs
+from nplinker.genomics.genomics import map_bgc_to_gcf
+from nplinker.genomics.genomics import map_strain_to_bgc
 from nplinker.genomics.mibig import MibigLoader
 from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.globals import GENOME_STATUS_FILENAME
@@ -23,7 +27,6 @@ from nplinker.pairedomics.strain_mappings_generator import \
     podp_generate_strain_mappings
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
-
 
 try:
     from importlib.resources import files
@@ -401,42 +404,37 @@ class DatasetLoader():
                                         self.spectra, spec_dict)
         return True
 
-    # CG: load gemonics data into memory
+    # TODO CG: self.strains will be overwritten by this method, rename it?
     def _load_genomics(self):
-        logger.debug("\nLoading genomics starts...")
+        """Loads all genomics data (BGCs and GCFs) into the object.
+        """
+        logger.debug("\nLoading genomics data starts...")
 
+        # Step 1: load all BGC objects
         logger.debug('Parsing AntiSMASH directory...')
-        antismash_bgc_loader = AntismashBGCLoader(self.antismash_dir)
+        antismash_bgc_dict = AntismashBGCLoader(self.antismash_dir).get_bgcs()
+        raw_bgcs = list(antismash_bgc_dict.values()) + list(
+            self.mibig_bgc_dict.values())
 
-        logger.debug('Loading GCFs...')
-        # TODO: refactor load_gcfs to independent steps
-        # Step 1: load all strains
-        # Step 2: load all bgcs
-        # Step 3: load all gcfs
-        # Step 4: connect bgc to strain with `map_strain_to_bgc`
-        # Step 5: connect gcf to bgcs with `map_bgc_to_gcf`
-        # Step 6: `filter_mibig_only_gcf`
-        # Step 7: get clean gcfs, bgcs and strains with `get_bgcs_from_gcfs`
-        #   and `get_strains_from_bgcs`
+        # Step 2: load all GCF objects
+        bigscape_cluster_file = Path(
+            self.bigscape_dir
+        ) / "mix" / f"mix_clustering_c0.{self._bigscape_cutoff:02d}.tsv"
+        bigscape_gcf_list = BigscapeGCFLoader(bigscape_cluster_file).get_gcfs()
+        raw_gcfs = bigscape_gcf_list
 
-        self.gcfs, self.bgcs, self.strains, unknown_strains = load_gcfs(
-            self.bigscape_dir, self.strains, self.mibig_bgc_dict,
-            antismash_bgc_loader.get_bgcs(), antismash_bgc_loader.get_files(),
-            self._bigscape_cutoff)
+        # Step 3: assign Strain object to BGC.strain
+        map_strain_to_bgc(self.strains, raw_bgcs)
 
-        #----------------------------------------------------------------------
-        # CG: write unknown strains in genomics to file
-        #----------------------------------------------------------------------
-        us_path = os.path.join(self._root, 'unknown_strains_gen.csv')
-        logger.warning(
-            f'Writing unknown strains from GENOMICS data to {us_path}')
-        with open(us_path, 'w') as us:
-            us.write('# unknown strain label, filename\n')
-            for strain, filename in unknown_strains.items():
-                us.write(f'{strain}, {filename}\n')
+        # Step 4: assign BGC objects to GCF.bgcs
+        map_bgc_to_gcf(raw_bgcs, raw_gcfs)
 
-        logger.debug("Loading genomics completed\n")
+        # Step 5: get clean GCF objects, BGC objects and Strain objects
+        self.gcfs = filter_mibig_only_gcf(raw_gcfs)
+        self.bgcs = get_bgcs_from_gcfs(self.gcfs)
+        self.strains = get_strains_from_bgcs(self.bgcs)
 
+        logger.debug("Loading genomics data completed\n")
         return True
 
     # TODO CG: run bigscape before loading and after downloading
