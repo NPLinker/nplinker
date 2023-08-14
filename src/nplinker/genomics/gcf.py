@@ -82,11 +82,11 @@ class GCF():
                     return
             self.strains.remove(bgc.strain)
 
-    def has_strain(self, strain: str | Strain) -> bool:
+    def has_strain(self, strain: Strain) -> bool:
         """Check if the given strain exists.
 
         Args:
-            strain(str | Strain): strain id or `Strain` object.
+            strain(Strain): `Strain` object.
 
         Returns:
             bool: True when the given strain exist.
