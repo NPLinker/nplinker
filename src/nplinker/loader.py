@@ -403,56 +403,12 @@ class DatasetLoader():
 
     # CG: load gemonics data into memory
     def _load_genomics(self):
-        # TODO split this method up a bit
-
-        # hmmscan apparently can't cope with filenames that have spaces in them, and so if you try
-        # to run bigscape on a dataset like that it will just refuse. so, to try and avoid anyone
-        # having to manually fix this stupid problem, we will attempt to rename every .gbk file here
-        # TODO is this something nplinker should do, or dataset authors??
         logger.debug("\nLoading genomics starts...")
 
-        #----------------------------------------------------------------------
-        # CG: replace space with underscore for antismash folder and file names
-        # TODO:
-        # 1.[] move this part to antismash downloader as post-download process
-        # 2.[x] separete listing gbk files and renaming
-        #----------------------------------------------------------------------
-        logger.debug('Collecting .gbk files (and possibly renaming)')
-
-        # if the option is enabled, check for spaces in the folder names under
-        # <dataset>/antismash and rename them, replacing spaces with underscores
-        ignore_spaces = self._antismash_ignore_spaces
-        if not ignore_spaces:
-            logger.debug('Checking for spaces in antiSMASH folder names...')
-            for root, dirs, files in os.walk(self.antismash_dir):
-                for d in dirs:
-                    if d.find(' ') != -1:
-                        os.rename(os.path.join(root, d),
-                                  os.path.join(root, d.replace(' ', '_')))
-                        logger.warn(
-                            'Renaming antiSMASH folder "{}" to "{}" to remove spaces! (suppress with ignore_spaces = true in config file)'
-                            .format(d, d.replace(' ', '_')))
-
-        #----------------------------------------------------------------------
-        # CG: run bigscape
-        #----------------------------------------------------------------------
-        # both the bigscape and mibig_json dirs expected by nplinker may not exist at this point. in some
-        # cases this will cause an error later in the process, but this can also potentially be
-        # resolved automatically:
-        #   bigscape => run BiG-SCAPE before continuing (if using the Docker image)
-        self._load_genomics_extra()
-
-        #----------------------------------------------------------------------
-        # CG: Parse AntiSMASH dir
-        #----------------------------------------------------------------------
         logger.debug('Parsing AntiSMASH directory...')
         antismash_bgc_loader = AntismashBGCLoader(self.antismash_dir)
 
-        #----------------------------------------------------------------------
-        # CG: load all bgcs and gcfs
-        #----------------------------------------------------------------------
         logger.debug('Loading GCFs...')
-
         # TODO: refactor load_gcfs to independent steps
         # Step 1: load all strains
         # Step 2: load all bgcs
@@ -483,7 +439,21 @@ class DatasetLoader():
 
         return True
 
-    def _load_genomics_extra(self):
+    # TODO CG: run bigscape before loading and after downloading
+    def _run_bigscape(self):
+        # Check for spaces in the folder names under <dataset>/antismash and
+        # rename them by replacing spaces with underscores
+        if not self._antismash_ignore_spaces:
+            logger.debug('Checking for spaces in antiSMASH folder names...')
+            for root, dirs, _ in os.walk(self.antismash_dir):
+                for d in dirs:
+                    if d.find(' ') != -1:
+                        os.rename(os.path.join(root, d),
+                                  os.path.join(root, d.replace(' ', '_')))
+                        logger.warn(
+                            'Renaming antiSMASH folder "{}" to "{}" to remove spaces! (suppress with ignore_spaces = true in config file)'
+                            .format(d, d.replace(' ', '_')))
+
         if not os.path.exists(self.bigscape_dir):
             should_run_bigscape = self._config_docker.get(
                 'run_bigscape', self.RUN_BIGSCAPE_DEFAULT)
@@ -491,7 +461,6 @@ class DatasetLoader():
                 'extra_bigscape_parameters',
                 self.EXTRA_BIGSCAPE_PARAMS_DEFAULT)
             if should_run_bigscape:
-                # TODO this should not be attempted if not in Docker env
                 logger.info(
                     'Running BiG-SCAPE! extra_bigscape_parameters="{}"'.format(
                         extra_bigscape_parameters))
