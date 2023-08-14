@@ -60,6 +60,12 @@ def test_filter(collection: StrainCollection, strain: Strain):
     assert len(collection) == 1
 
 
+def test_has_name(collection: StrainCollection):
+    assert collection.has_name("strain_1")
+    assert collection.has_name("strain_1_a")
+    assert not collection.has_name("strain_2")
+
+
 def test_lookup(collection: StrainCollection, strain: Strain):
     for name in strain.names:
         assert collection.lookup(name) == strain

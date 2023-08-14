@@ -87,6 +87,17 @@ class StrainCollection():
             if strain not in strain_set:
                 self.remove(strain)
 
+    def has_name(self, name: str) -> bool:
+        """Check if the strain collection contains the given strain name (id or alias).
+
+        Args:
+            name(str): Strain name (id or alias) to check.
+
+        Returns:
+            bool: True if the strain name is in the collection, False otherwise.
+        """
+        return name in self._strain_dict_name
+
     def lookup(self, name: str) -> Strain:
         """Lookup a strain by name (id or alias).
 

@@ -97,7 +97,7 @@ def podp_generate_strain_mappings(
     # Create StrainCollection
     sc = StrainCollection()
     for strain_id, bgc_ids in mappings.items():
-        if strain_id not in sc:
+        if not sc.has_name(strain_id):
             strain = Strain(strain_id)
             for bgc_id in bgc_ids:
                 strain.add_alias(bgc_id)
