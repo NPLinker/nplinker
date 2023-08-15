@@ -31,10 +31,8 @@ def test_eq(collection: StrainCollection, strain: Strain):
 
 def test_contains(collection: StrainCollection, strain: Strain):
     assert strain in collection
-    assert strain.id in collection
-    for alias in strain.aliases:
-        assert alias in collection
-    assert "strain_not_exist" not in collection
+    strain2 = Strain("strain_2")
+    assert strain2 not in collection
 
 
 def test_iter(collection: StrainCollection, strain: Strain):
@@ -46,31 +44,25 @@ def test_add(strain: Strain):
     sut = StrainCollection()
     sut.add(strain)
     assert strain in sut
-    for alias in strain.aliases:
-        assert alias in sut
+    for name in strain.names:
+        assert name in sut._strain_dict_name
 
 
 def test_remove(collection: StrainCollection, strain: Strain):
-    assert strain in collection
     collection.remove(strain)
-    with pytest.raises(KeyError):
-        _ = collection._strain_dict_name[strain.id]
     assert strain not in collection
 
 
 def test_filter(collection: StrainCollection, strain: Strain):
-    assert strain in collection
     collection.add(Strain("strain_2"))
     collection.filter({strain})
-    assert strain in collection
-    assert "strain_2" not in collection
+    assert "strain_2" not in collection._strain_dict_name
     assert len(collection) == 1
 
 
 def test_lookup(collection: StrainCollection, strain: Strain):
-    assert collection.lookup(strain.id) == strain
-    for alias in strain.aliases:
-        assert collection.lookup(alias) == strain
+    for name in strain.names:
+        assert collection.lookup(name) == strain
     with pytest.raises(KeyError):
         collection.lookup("strain_not_exist")
 
@@ -85,7 +77,8 @@ def json_file(tmp_path):
             "strain_id": "strain_2",
             "strain_alias": ["alias_3", "alias_4"]
         }],
-        "version": "1.0"
+        "version":
+        "1.0"
     }
     file_path = tmp_path / "test.json"
     with open(file_path, "w") as f:

@@ -1,14 +1,10 @@
 import json
 from os import PathLike
-from pathlib import Path
 from typing import Iterator
-from deprecated import deprecated
 from jsonschema import validate
 from nplinker.schemas import STRAIN_MAPPINGS_SCHEMA
 from .logconfig import LogConfig
 from .strains import Strain
-from .utils import list_dirs
-from .utils import list_files
 
 
 logger = LogConfig.getLogger(__name__)
@@ -41,16 +37,12 @@ class StrainCollection():
                     and self._strain_dict_name == other._strain_dict_name)
         return NotImplemented
 
-    def __contains__(self, item: str | Strain) -> bool:
-        """Check if the strain collection contains the given strain.
-
-        The given strain could be a Strain object, or a strain id or alias.
+    def __contains__(self, item: Strain) -> bool:
+        """Check if the strain collection contains the given Strain object.
         """
-        if isinstance(item, str):
-            return item in self._strain_dict_name
         if isinstance(item, Strain):
             return item.id in self._strain_dict_name
-        raise TypeError(f"Expected Strain or str, got {type(item)}")
+        raise TypeError(f"Expected Strain, got {type(item)}")
 
     def __iter__(self) -> Iterator[Strain]:
         return iter(self._strains)
@@ -83,9 +75,8 @@ class StrainCollection():
         """
         if strain.id in self._strain_dict_name:
             self._strains.remove(strain)
-            del self._strain_dict_name[strain.id]
-            for alias in strain.aliases:
-                del self._strain_dict_name[alias]
+            for name in strain.names:
+                del self._strain_dict_name[name]
 
     def filter(self, strain_set: set[Strain]):
         """
@@ -109,7 +100,7 @@ class StrainCollection():
         Raises:
             KeyError: If the strain name is not found.
         """
-        if name in self:
+        if name in self._strain_dict_name:
             return self._strain_dict_name[name]
         raise KeyError(f"Strain {name} not found in strain collection.")
 
