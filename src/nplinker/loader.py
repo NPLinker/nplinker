@@ -205,6 +205,9 @@ class DatasetLoader():
 
     def _start_downloads(self):
         downloader = PODPDownloader(self._platform_id)
+        # TODO CG: this step generates the real path for _root. Should generate
+        # it before loading process starts. Otherwise, npl.root_dir will get
+        # wrong value if loading from local data or not using download.
         self._root = Path(downloader.project_results_dir)
         logger.debug('remote loading mode, configuring root=%s', self._root)
         # CG: to download both MET and GEN data
