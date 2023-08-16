@@ -20,7 +20,7 @@ class GNPSExtractor:
         """
         self._file: Path = Path(file)
         self._extract_path: Path = Path(extract_path)
-        self._is_fbmn = gnps_format_from_archive(self.get_data()) == GNPSFormat.FBMN
+        self._is_fbmn = gnps_format_from_archive(self._file) == GNPSFormat.FBMN
 
 
     def get_data(self) -> zipfile.ZipFile:

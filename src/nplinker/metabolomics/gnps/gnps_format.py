@@ -1,11 +1,11 @@
 from enum import Enum
-from os import PathLike
 import os
+from os import PathLike
+from pathlib import Path
 import zipfile
-
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup
+from bs4 import Tag
 import requests
-
 from nplinker.utils import get_headers
 
 
@@ -92,11 +92,14 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
     return GNPSFormat.Unknown
 
 
-def gnps_format_from_archive(archive: zipfile.ZipFile) -> GNPSFormat:
-    """Detect GNPS format from a downloaded archive.
+def gnps_format_from_archive(zip_file: str | PathLike) -> GNPSFormat:
+    """Detect GNPS format from a downloaded zip archive.
+
+    The detection is based on the filename of the zip file and the names of the
+    files contained in the zip file.
 
     Args:
-        archive(zipfile.ZipFile): Data downloaded from GNPS workflow.
+        zip_file: Path to the downloaded zip file.
 
     Returns:
         GNPSFormat: the format used in the GNPS workflow invocation.
@@ -104,9 +107,23 @@ def gnps_format_from_archive(archive: zipfile.ZipFile) -> GNPSFormat:
     Examples:
         >>> gnps_format_from_archive("tests/data/ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip")
      """
-    filenames = archive.namelist()
-    if any(["FEATURE-BASED-MOLECULAR-NETWORKING" in x for x in filenames]):
+    file = Path(zip_file)
+    # Guess the format from the filename of the zip file
+    if "FEATURE-BASED-MOLECULAR-NETWORKING" in file.name:
         return GNPSFormat.FBMN
-    elif any(["METABOLOMICS-SNETS" in x for x in filenames]):
+    if "METABOLOMICS-SNETS-V2" in file.name:
+        return GNPSFormat.UniqueFiles
+    if "METABOLOMICS-SNETS" in file.name:
         return GNPSFormat.AllFiles
+
+    # Guess the format from the names of the files in the zip file
+    with zipfile.ZipFile(file) as archive:
+        filenames = archive.namelist()
+    if any("FEATURE-BASED-MOLECULAR-NETWORKING" in x for x in filenames):
+        return GNPSFormat.FBMN
+    if any("METABOLOMICS-SNETS-V2" in x for x in filenames):
+        return GNPSFormat.UniqueFiles
+    if any("METABOLOMICS-SNETS" in x for x in filenames):
+        return GNPSFormat.AllFiles
+
     return GNPSFormat.Unknown

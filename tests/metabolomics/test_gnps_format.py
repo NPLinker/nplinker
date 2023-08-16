@@ -35,7 +35,5 @@ def test_gnps_format_from_task_id(task_id: str, expected: GNPSFormat):
     ["ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip", GNPSFormat.AllFiles]
 ])
 def test_gnps_format_from_archive(archive_path: str, expected: GNPSFormat):
-    archive = zipfile.ZipFile(DATA_DIR / archive_path)
-
-    actual = gnps_format_from_archive(archive)
+    actual = gnps_format_from_archive(archive_path)
     assert actual is expected
