@@ -83,12 +83,17 @@ def map_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]):
     """
     for bgc in bgcs:
         try:
-            strain = strains.lookup(bgc.bgc_id)
+            strain_list = strains.lookup(bgc.bgc_id)
+            if len(strain_list) > 1:
+                raise KeyError(
+                    f"Multiple strain objects found for BGC id '{bgc.bgc_id}'."
+                    f"BGC object accept only one strain."
+                )
         except KeyError as e:
             raise KeyError(
                 f"Strain id '{bgc.bgc_id}' from BGC object '{bgc.bgc_id}' "
                 "not found in the strain collection.") from e
-        bgc.strain = strain
+        bgc.strain = strain_list[0]
 
 
 def map_bgc_to_gcf(bgcs: list[BGC], gcfs: list[GCF]):
