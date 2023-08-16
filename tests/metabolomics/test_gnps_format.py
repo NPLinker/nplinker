@@ -19,10 +19,12 @@ def test_identify_gnps_format(filename, expected):
     assert actual is expected
 
 
-@pytest.mark.parametrize("task_id, expected", [
-    ["92036537c21b44c29e509291e53f6382", GNPSFormat.FBMN],
-    ["c22f44b14a3d450eb836d607cb9521bb", GNPSFormat.AllFiles]
-])
+@pytest.mark.parametrize(
+    "task_id, expected",
+    [["92036537c21b44c29e509291e53f6382", GNPSFormat.FBMN],
+     ["c22f44b14a3d450eb836d607cb9521bb", GNPSFormat.AllFiles],
+     ["189e8bf16af145758b0a900f1c44ff4a", GNPSFormat.UniqueFiles],
+     ["0ad6535e34d449788f297e712f43068a", GNPSFormat.Unknown]])
 def test_gnps_format_from_task_id(task_id: str, expected: GNPSFormat):
     try:
         actual = gnps_format_from_task_id(task_id)
