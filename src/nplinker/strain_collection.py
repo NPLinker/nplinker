@@ -14,9 +14,9 @@ class StrainCollection():
 
     def __init__(self):
         """A collection of Strain objects."""
+        # the order of strains is needed for scoring part, so use a list
         self._strains: list[Strain] = []
-        # dict of strain name (id and alias) to primary strain object
-        self._strain_dict_name: dict[str, Strain] = {}
+        self._strain_dict_name: dict[str, list[Strain]] = {}
 
     def __repr__(self) -> str:
         return str(self)
@@ -55,28 +55,46 @@ class StrainCollection():
         Args:
             strain(Strain): The strain to add.
         """
-        # if the strain exists, merge the aliases
-        if strain.id in self._strain_dict_name:
-            existing: Strain = self.lookup(strain.id)
-            for alias in strain.aliases:
-                existing.add_alias(alias)
-                self._strain_dict_name[alias] = existing
+        if strain in self._strains:
+            # only one strain object per id
+            strain_ref = self._strain_dict_name[strain.id][0]
+            new_aliases = [alias for alias in strain.aliases if alias not in strain_ref.aliases]
+            for alias in new_aliases:
+                strain_ref.add_alias(alias)
+                if alias not in self._strain_dict_name:
+                    self._strain_dict_name[alias] = [strain_ref]
+                else:
+                    self._strain_dict_name[alias].append(strain_ref)
         else:
             self._strains.append(strain)
-            self._strain_dict_name[strain.id] = strain
-            for alias in strain.aliases:
-                self._strain_dict_name[alias] = strain
+            for name in strain.names:
+                if name not in self._strain_dict_name:
+                    self._strain_dict_name[name] = [strain]
+                else:
+                    self._strain_dict_name[name].append(strain)
 
     def remove(self, strain: Strain):
         """Remove a strain from the collection.
 
+        It removes the given strain object from the collection by strain id.
+        If the strain id is not found, it does nothing.
+
         Args:
             strain(Strain): The strain to remove.
         """
-        if strain.id in self._strain_dict_name:
+        if strain in self._strains:
             self._strains.remove(strain)
-            for name in strain.names:
-                del self._strain_dict_name[name]
+            # only one strain object per id
+            strain_ref = self._strain_dict_name[strain.id][0]
+            for name in strain_ref.names:
+                if name in self._strain_dict_name:
+                    new_strain_list = [
+                        s for s in self._strain_dict_name[name] if s.id != strain.id
+                    ]
+                    if not new_strain_list:
+                        del self._strain_dict_name[name]
+                    else:
+                        self._strain_dict_name[name] = new_strain_list
 
     def filter(self, strain_set: set[Strain]):
         """
@@ -98,7 +116,7 @@ class StrainCollection():
         """
         return name in self._strain_dict_name
 
-    def lookup(self, name: str) -> Strain:
+    def lookup(self, name: str) -> list[Strain]:
         """Lookup a strain by name (id or alias).
 
         Args:
@@ -106,7 +124,7 @@ class StrainCollection():
             name(str): Strain name (id or alias) to lookup.
 
         Returns:
-            Strain: Strain identified by the given name.
+            list[Strain]: List of Strain objects with the given name.
 
         Raises:
             KeyError: If the strain name is not found.

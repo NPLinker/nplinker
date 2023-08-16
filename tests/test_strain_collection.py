@@ -43,14 +43,84 @@ def test_iter(collection: StrainCollection, strain: Strain):
 def test_add(strain: Strain):
     sut = StrainCollection()
     sut.add(strain)
+    assert len(sut) == 1
     assert strain in sut
     for name in strain.names:
         assert name in sut._strain_dict_name
 
 
-def test_remove(collection: StrainCollection, strain: Strain):
+def test_add_same_id_same_alias(strain: Strain, collection: StrainCollection):
+    collection.add(strain)
+    assert strain in collection
+    assert len(collection) == 1
+    assert len(collection._strain_dict_name) == 2
+
+
+def test_add_same_id_different_alias(collection: StrainCollection):
+    strain = Strain("strain_1")
+    strain.add_alias("strain_1_b")
+    collection.add(strain)
+    assert len(collection) == 1
+    assert strain in collection
+    assert len(collection._strain_dict_name) == 3
+    assert collection._strain_dict_name["strain_1"] == [strain]
+    assert collection._strain_dict_name["strain_1_b"] == [strain]
+
+
+def test_add_different_id_same_alias(strain: Strain,
+                                     collection: StrainCollection):
+    strain2 = Strain("strain_2")
+    strain2.add_alias("strain_1_a")
+    collection.add(strain2)
+    assert len(collection) == 2
+    assert strain2 in collection
+    assert len(collection._strain_dict_name) == 3
+    assert collection._strain_dict_name["strain_1"] == [strain]
+    assert collection._strain_dict_name["strain_2"] == [strain2]
+    assert collection._strain_dict_name["strain_1_a"] == [strain, strain2]
+
+
+def test_add_different_id_different_alias(strain: Strain,
+                                          collection: StrainCollection):
+    strain2 = Strain("strain_2")
+    strain2.add_alias("strain_2_a")
+    collection.add(strain2)
+    assert len(collection) == 2
+    assert strain2 in collection
+    assert len(collection._strain_dict_name) == 4
+    assert collection._strain_dict_name["strain_1"] == [strain]
+    assert collection._strain_dict_name["strain_1_a"] == [strain]
+    assert collection._strain_dict_name["strain_2"] == [strain2]
+    assert collection._strain_dict_name["strain_2_a"] == [strain2]
+
+
+def test_remove(strain: Strain):
+    sc = StrainCollection()
+    sc.remove(strain)
+    assert strain not in sc
+
+
+def test_remove_same_id_same_alias(collection: StrainCollection,
+                                   strain: Strain):
     collection.remove(strain)
     assert strain not in collection
+
+
+def test_remove_same_id_different_alias(collection: StrainCollection):
+    strain = Strain("strain_1")
+    strain.add_alias("strain_1_b")
+    collection.remove(strain)
+    assert len(collection) == 0
+    assert strain not in collection
+    assert len(collection._strain_dict_name) == 0
+
+
+def test_remove_different_id(collection: StrainCollection):
+    strain = Strain("strain_2")
+    collection.remove(strain)
+    assert len(collection) == 1
+    assert strain not in collection
+    assert len(collection._strain_dict_name) == 2
 
 
 def test_filter(collection: StrainCollection, strain: Strain):
@@ -68,7 +138,7 @@ def test_has_name(collection: StrainCollection):
 
 def test_lookup(collection: StrainCollection, strain: Strain):
     for name in strain.names:
-        assert collection.lookup(name) == strain
+        assert collection.lookup(name) == [strain]
     with pytest.raises(KeyError):
         collection.lookup("strain_not_exist")
 
