@@ -20,6 +20,7 @@ RE_MZML_MZXML = re.compile('.mzXML|.mzML')
 # methods for parsing metabolomics data files
 #
 
+@deprecated(version="1.3.3", reason="Use the GNPSFileMappingLoader class instead.")
 def _messy_strain_naming_lookup(mzxml: str, strains: StrainCollection) -> Strain|None:
     """Wrapper around StrainCollection::lookup which is more permissive and handles often occuring cases of non perfect aliasing.
 
@@ -61,6 +62,7 @@ def _messy_strain_naming_lookup(mzxml: str, strains: StrainCollection) -> Strain
     return None
 
 
+@deprecated(version="1.3.3", reason="Use the GNPSFileMappingLoader class instead.")
 def _md_convert(val: Any) -> int|float|None|Any:
     """Try to convert raw metadata values from text to integer, then float if that fails.
 
@@ -81,6 +83,7 @@ def _md_convert(val: Any) -> int|float|None|Any:
     return val
 
 
+@deprecated(version="1.3.3", reason="Use the GNPSFileMappingLoader class instead.")
 def _parse_mzxml_header(hdr: str, strains: StrainCollection, md_table: dict[str, dict[str, str]], ext_metadata_parsing: bool) -> tuple[str|None, str|None, bool]:
     """Return the file identifier component from the column name.
 
@@ -161,6 +164,7 @@ def _parse_mzxml_header(hdr: str, strains: StrainCollection, md_table: dict[str,
     return (strain_name, growth_medium, not strains.has_name(strain_name))
 
 
+@deprecated(version="1.3.3", reason="Use the GNPSFileMappingLoader class instead.")
 def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, file: str, spec_dict: dict[str, Spectrum]) -> dict[str, int]:
     """ Load info about clusters from old style GNPS files.
 
@@ -246,6 +250,7 @@ def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, file: str
     return unknown_strains
 
 
+@deprecated(version="1.3.3", reason="Use the GNPSFileMappingLoader class instead.")
 def _parse_metadata_table(file: str) -> dict[str, dict[str, str|None]]:
     """Parses the metadata table file from GNPS.
 
@@ -314,6 +319,7 @@ def _parse_metadata_table(file: str) -> dict[str, dict[str, str|None]]:
     return table
 
 
+@deprecated(version="1.3.3", reason="Use the GNPSFileMappingLoader class instead.")
 def _load_clusterinfo_fbmn(strains: StrainCollection, nodes_file: str, extra_nodes_file: str,
                            md_table_file: str, spec_dict: dict[str, Spectrum], ext_metadata_parsing: bool) -> tuple[dict[str, dict[str, str|None]], dict[str, str]]:
     """Load the clusterinfo from a feature based molecular networking run output from GNPS.
