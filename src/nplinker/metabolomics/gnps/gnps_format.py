@@ -62,10 +62,13 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
         task_id(str): GNPS task id.
 
     Returns:
-        GNPSFormat: the format used in the GNPS workflow invocation.
+        GNPSFormat: the format identified in the GNPS task.
 
     Examples:
-        >>> gnps_format_from_task_id("92036537c21b44c29e509291e53f6382")
+        >>> gnps_format_from_task_id("c22f44b14a3d450eb836d607cb9521bb") == GNPSFormat.SNETS
+        >>> gnps_format_from_task_id("189e8bf16af145758b0a900f1c44ff4a") == GNPSFormat.SNETSV2
+        >>> gnps_format_from_task_id("92036537c21b44c29e509291e53f6382") == GNPSFormat.FBMN
+        >>> gnps_format_from_task_id("0ad6535e34d449788f297e712f43068a") == GNPSFormat.Unknown
     """
     task_html = requests.get(GNPS_TASK_URL.format(task_id), timeout=5)
     soup = BeautifulSoup(task_html.text, features="html.parser")
@@ -75,11 +78,11 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
     workflow_format_tag: Tag = workflow_tag.parent.contents[3]
     workflow_format = workflow_format_tag.contents[0].strip()
 
-    if workflow_format == "FEATURE-BASED-MOLECULAR-NETWORKING":
+    if workflow_format == GNPSFormat.FBMN.value:
         return GNPSFormat.FBMN
-    if workflow_format == "METABOLOMICS-SNETS-V2":
+    if workflow_format == GNPSFormat.SNETSV2.value:
         return GNPSFormat.SNETSV2
-    if workflow_format == "METABOLOMICS-SNETS":
+    if workflow_format == GNPSFormat.SNETS.value:
         return GNPSFormat.SNETS
     return GNPSFormat.Unknown
 
