@@ -88,37 +88,41 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
 
 
 def gnps_format_from_archive(zip_file: str | PathLike) -> GNPSFormat:
-    """Detect GNPS format from a downloaded zip archive.
+    """Detect GNPS format from a downloaded GNPS zip archive.
 
     The detection is based on the filename of the zip file and the names of the
     files contained in the zip file.
 
     Args:
-        zip_file: Path to the downloaded zip file.
+        zip_file: Path to the downloaded GNPS zip file.
 
     Returns:
-        GNPSFormat: the format used in the GNPS workflow invocation.
+        GNPSFormat: the format identified in the GNPS zip file.
 
     Examples:
-        >>> gnps_format_from_archive("tests/data/ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip")
+        >>> gnps_format_from_archive("downloads/ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip") == GNPSFormat.SNETS
+        >>> gnps_format_from_archive("downloads/ProteoSAFe-METABOLOMICS-SNETS-V2-189e8bf1-download_clustered_spectra.zip") == GNPSFormat.SNETSV2
+        >>> gnps_format_from_archive("downloads/ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-672d0a53-download_cytoscape_data.zip") == GNPSFormat.FBMN
      """
     file = Path(zip_file)
     # Guess the format from the filename of the zip file
-    if "FEATURE-BASED-MOLECULAR-NETWORKING" in file.name:
+    if GNPSFormat.FBMN.value in file.name:
         return GNPSFormat.FBMN
-    if "METABOLOMICS-SNETS-V2" in file.name:
+    # the order of the if statements matters for the following two
+    if GNPSFormat.SNETSV2.value in file.name:
         return GNPSFormat.SNETSV2
-    if "METABOLOMICS-SNETS" in file.name:
+    if GNPSFormat.SNETS.value in file.name:
         return GNPSFormat.SNETS
 
     # Guess the format from the names of the files in the zip file
     with zipfile.ZipFile(file) as archive:
         filenames = archive.namelist()
-    if any("FEATURE-BASED-MOLECULAR-NETWORKING" in x for x in filenames):
+    if any(GNPSFormat.FBMN.value in x for x in filenames):
         return GNPSFormat.FBMN
-    if any("METABOLOMICS-SNETS-V2" in x for x in filenames):
+    # the order of the if statements matters for the following two
+    if any(GNPSFormat.SNETSV2.value in x for x in filenames):
         return GNPSFormat.SNETSV2
-    if any("METABOLOMICS-SNETS" in x for x in filenames):
+    if any(GNPSFormat.SNETS.value in x for x in filenames):
         return GNPSFormat.SNETS
 
     return GNPSFormat.Unknown
