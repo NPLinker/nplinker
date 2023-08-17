@@ -1,6 +1,5 @@
 from itertools import chain
 import pytest
-from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_file_mapping
 from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
 from nplinker.metabolomics.load_gnps import _load_clusterinfo_old
 from nplinker.metabolomics.load_gnps import _messy_strain_naming_lookup

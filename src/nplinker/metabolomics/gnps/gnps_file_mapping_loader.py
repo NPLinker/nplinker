@@ -26,9 +26,8 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             NotImplementedError: Raises NotImplementedError if the GNPS format is not recognized.
         """
         self._file: Path = Path(file)
-        # TODO CG: change list to set to avoid duplicates of spectra
         self._mapping: dict[str, list[str]] = {}
-        self._gnps_format = gnps_format_from_file_mapping(file, False)
+        self._gnps_format = gnps_format_from_file_mapping(file)
 
         if self._gnps_format is GNPSFormat.AllFiles:
             self._load_mapping_allfiles()

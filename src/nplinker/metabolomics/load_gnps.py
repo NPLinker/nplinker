@@ -461,8 +461,7 @@ def load_gnps(strains: StrainCollection, nodes_file: str, quant_table_file: str,
     Returns:
         dict[str, int]: Returns a mapping from unknown strains which are found to spectra ids which occur in these unknown strains.
         """
-    gnps_format = gnps_format_from_file_mapping(nodes_file, quant_table_file
-                                        is not None)
+    gnps_format = gnps_format_from_file_mapping(nodes_file)
     logger.debug('Nodes_file: {}, quant_table_exists?: {}'.format(
         nodes_file, quant_table_file is None))
     if gnps_format == GNPSFormat.Unknown:

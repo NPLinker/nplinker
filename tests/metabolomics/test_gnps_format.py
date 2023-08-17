@@ -14,7 +14,7 @@ from .. import DATA_DIR
     [DATA_DIR / "nodes_fbmn.csv", GNPSFormat.FBMN]
 ])
 def test_identify_gnps_format(filename, expected):
-    actual = gnps_format_from_file_mapping(filename, False)
+    actual = gnps_format_from_file_mapping(filename)
 
     assert actual is expected
 
