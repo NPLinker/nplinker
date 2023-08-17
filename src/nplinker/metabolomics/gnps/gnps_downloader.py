@@ -1,10 +1,9 @@
 from os import PathLike
 from pathlib import Path
 import httpx
-
-from .gnps_format import GNPSFormat
-from .gnps_format import gnps_format_from_task_id
 from typing_extensions import Self
+from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_task_id
+from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
 
 
 class GNPSDownloader:
@@ -24,7 +23,6 @@ class GNPSDownloader:
         self._task_id = task_id
         self._download_root: Path = Path(download_root)
 
-
     def download(self) -> Self:
         """Execute the downloading process. """
         with open(self.get_download_path(), 'wb') as f:
@@ -32,7 +30,7 @@ class GNPSDownloader:
                 for data in r.iter_bytes():
                     f.write(data)
         return self
-   
+
     def get_download_path(self) -> str:
         """Get the path where to store the downloaded file.
 
@@ -40,7 +38,7 @@ class GNPSDownloader:
             str: Download path as string
         """
         return str(self._download_root.joinpath(self._task_id + ".zip"))
-    
+
     def get_task_id(self) -> str:
         """Get the GNPS task id.
 
@@ -48,20 +46,24 @@ class GNPSDownloader:
             str: Task id as string.
         """
         return self._task_id
-    
+
     def get_url(self) -> str:
         """Get the full URL linking to GNPS data to be dowloaded.
 
         Returns:
             str: URL pointing to the GNPS data to be downloaded.
         """
-        
         gnps_format = gnps_format_from_task_id(self._task_id)
 
+        if gnps_format == GNPSFormat.Unknown:
+            raise ValueError(
+                f"Unknown workflow type for GNPS task '{self._task_id}'."
+                f"Supported GNPS workflows are: 'METABOLOMICS-SNETS', "
+                f"'METABOLOMICS-SNETS-V2', 'FEATURE-BASED-MOLECULAR-NETWORKING'"
+            )
+
         if gnps_format == GNPSFormat.FBMN:
-            return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL_FBMN.format(self._task_id)
-                
+            return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL_FBMN.format(
+                self._task_id)
+
         return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL.format(self._task_id)
-
-
-    
