@@ -8,7 +8,6 @@ from bs4 import Tag
 import requests
 from nplinker.utils import get_headers
 
-
 GNPS_TASK_URL = 'https://gnps.ucsd.edu/ProteoSAFe/status.jsp?task={}'
 
 
@@ -25,30 +24,6 @@ class GNPSFormat(Enum):
     SNETSV2 = "METABOLOMICS-SNETS-V2"
     FBMN = "FEATURE-BASED-MOLECULAR-NETWORKING"
     Unknown = "Unknown-GNPS-Workflow"
-
-
-def gnps_format_from_file_mapping(file: str | PathLike) -> GNPSFormat:
-    """Detect GNPS format from the given file mapping file.
-
-    Different GNPS workflows has different GNSP file mapping file:
-    - METABOLOMICS-SNETS workflow: the .tsv file under folder "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
-    - METABOLOMICS-SNETS-V2 workflow: the .clustersummary file (tsv) under folder "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
-    - FEATURE-BASED-MOLECULAR-NETWORKING workflow: the .csv file under folder "quantification_table"
-
-    Args:
-        file(str | PathLike): Path to the file to peek the format for.
-
-    Returns:
-        GNPSFormat: GNPS format identified in the file.
-    """
-    headers = get_headers(file)
-    if 'AllFiles' in headers:
-        return GNPSFormat.SNETS
-    if 'UniqueFileSources' in headers:
-        return GNPSFormat.SNETSV2
-    if 'row ID' in headers:
-        return GNPSFormat.FBMN
-    return GNPSFormat.Unknown
 
 
 def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
@@ -125,4 +100,29 @@ def gnps_format_from_archive(zip_file: str | PathLike) -> GNPSFormat:
     if any(GNPSFormat.SNETS.value in x for x in filenames):
         return GNPSFormat.SNETS
 
+    return GNPSFormat.Unknown
+
+
+def gnps_format_from_file_mapping(file: str | PathLike) -> GNPSFormat:
+    """Detect GNPS format from the given file mapping file.
+
+    The GNSP file mapping file is located in different folders depending on the
+    GNPS workflow. Here are the locations in corresponding GNPS zip archives:
+    - METABOLOMICS-SNETS workflow: the .tsv file under folder "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
+    - METABOLOMICS-SNETS-V2 workflow: the .clustersummary file (tsv) under folder "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
+    - FEATURE-BASED-MOLECULAR-NETWORKING workflow: the .csv file under folder "quantification_table"
+
+    Args:
+        file(str | PathLike): Path to the file to peek the format for.
+
+    Returns:
+        GNPSFormat: GNPS format identified in the file.
+    """
+    headers = get_headers(file)
+    if 'AllFiles' in headers:
+        return GNPSFormat.SNETS
+    if 'UniqueFileSources' in headers:
+        return GNPSFormat.SNETSV2
+    if 'row ID' in headers:
+        return GNPSFormat.FBMN
     return GNPSFormat.Unknown
