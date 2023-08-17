@@ -13,25 +13,23 @@
 # limitations under the License.
 
 from __future__ import annotations
-import csv
-import os
-from os import PathLike
-import os.path
 import bz2
+import csv
 import gzip
 import hashlib
 import lzma
 import math
+import os
+from os import PathLike
+import os.path
+from pathlib import Path
 import sys
 import tarfile
+from typing import Callable, IO, Iterator
 import urllib
 import urllib.error
 import urllib.request
 import zipfile
-from pathlib import Path
-from typing import IO
-from typing import Callable
-from typing import Iterator
 from tqdm import tqdm
 
 
@@ -67,6 +65,7 @@ def find_delimiter(file: str | PathLike) -> str:
         delimiter = sniffer.sniff(fp.read(5000)).delimiter
     return delimiter
 
+
 def get_headers(file: str | PathLike) -> list[str]:
     """Read headers from the given tabular file.
 
@@ -76,10 +75,11 @@ def get_headers(file: str | PathLike) -> list[str]:
     Returns:
         list[str]: list of column names from the header.
     """
-    with open(os.fspath(file)) as f:
-        headers: str = f.readline().strip()
-        dl: str = find_delimiter(file)
+    with open(file) as f:
+        headers = f.readline().strip()
+        dl = find_delimiter(file)
         return headers.split(dl)
+
 
 # Functions below are adapted from torchvision library,
 # see: https://github.com/pytorch/vision/blob/main/torchvision/datasets/utils.py.
@@ -205,11 +205,11 @@ def download_url(url: str,
 
     # check integrity of downloaded file
     if not check_integrity(fpath, md5):
-        raise RuntimeError("File not found or corrupted, or md5 validation failed.")
+        raise RuntimeError(
+            "File not found or corrupted, or md5 validation failed.")
 
 
-def list_dirs(root: str | PathLike,
-              keep_parent: bool = True) -> list[str]:
+def list_dirs(root: str | PathLike, keep_parent: bool = True) -> list[str]:
     """List all directories at a given root
 
     Args:
@@ -416,7 +416,12 @@ def extract_archive(from_path: str | PathLike,
 
     return str(to_path)
 
-def extract_file_matching_pattern(archive: zipfile.ZipFile, prefix: str, suffix: str, extract_dir: Path, out_filename: str|None = None):
+
+def extract_file_matching_pattern(archive: zipfile.ZipFile,
+                                  prefix: str,
+                                  suffix: str,
+                                  extract_dir: Path,
+                                  out_filename: str | None = None):
     """Extract a file matching a pattern from an archive and place it in the extraction directory under the given filename.
 
     Args:
@@ -430,7 +435,9 @@ def extract_file_matching_pattern(archive: zipfile.ZipFile, prefix: str, suffix:
         >>> extract_file_matching_pattern(zipfile.ZipFile("archive.zip"), "", ".txt", ".", "results.txt")
     """
     files: list[str] = [x.filename for x in archive.filelist]
-    file_to_extract = list(filter(lambda x: x.startswith(prefix) and x.endswith(suffix), files)).pop()
+    file_to_extract = list(
+        filter(lambda x: x.startswith(prefix) and x.endswith(suffix),
+               files)).pop()
     archive.extract(file_to_extract, extract_dir)
     if out_filename is not None:
         os.rename(extract_dir / file_to_extract, extract_dir / out_filename)
