@@ -29,7 +29,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         self._mapping: dict[str, list[str]] = {}
         self._gnps_format = gnps_format_from_file_mapping(file)
 
-        if self._gnps_format is GNPSFormat.AllFiles:
+        if self._gnps_format is GNPSFormat.SNETS:
             self._load_mapping_allfiles()
         elif self._gnps_format is GNPSFormat.FBMN:
             self._load_mapping_fbmn()

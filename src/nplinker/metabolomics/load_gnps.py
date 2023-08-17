@@ -190,9 +190,9 @@ def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, file: str
         reader = csv.reader(f, delimiter='\t')
         headers = next(reader)
         clu_index_index = headers.index('cluster index')
-        if gnps_format == GNPSFormat.AllFiles:
+        if gnps_format == GNPSFormat.SNETS:
             mzxml_index = headers.index('AllFiles')
-        elif gnps_format == GNPSFormat.UniqueFiles:
+        elif gnps_format == GNPSFormat.SNETSV2:
             mzxml_index = headers.index('UniqueFileSources')
         else:
             raise Exception(f'Unexpected GNPS format {gnps_format}')
@@ -200,7 +200,7 @@ def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, file: str
         for line in reader:
             # get the values of the important columns
             clu_index = line[clu_index_index]
-            if gnps_format == GNPSFormat.UniqueFiles:
+            if gnps_format == GNPSFormat.SNETSV2:
                 mzxmls = line[mzxml_index].split('|')
             else:
                 mzxmls = line[mzxml_index].split('###')
@@ -210,7 +210,7 @@ def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, file: str
 
             for data in mzxmls:
                 # TODO ok to ignore scan number if available?
-                mzxml = data if gnps_format == GNPSFormat.UniqueFiles else data.split(
+                mzxml = data if gnps_format == GNPSFormat.SNETSV2 else data.split(
                     ':')[0]
 
                 # TODO is this OK/sensible?

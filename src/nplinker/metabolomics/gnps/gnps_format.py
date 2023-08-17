@@ -1,5 +1,5 @@
 from enum import Enum
-import os
+from enum import unique
 from os import PathLike
 from pathlib import Path
 import zipfile
@@ -9,14 +9,22 @@ import requests
 from nplinker.utils import get_headers
 
 
-# TODO: add description
-class GNPSFormat(Enum):
-    Unknown = 0
-    AllFiles = 1
-    UniqueFiles = 2
-    FBMN = 3
-
 GNPS_TASK_URL = 'https://gnps.ucsd.edu/ProteoSAFe/status.jsp?task={}'
+
+
+@unique
+class GNPSFormat(Enum):
+    """Enum class for GNPS format (workflow).
+
+    The GNPS format refers to the GNPS workflow. The name of the enum is a
+    simple short name for the workflow, and the value of the enum is the actual
+    name of the workflow in the GNPS website.
+    """
+    # Format: ShortName = "GNPSWorkflowName"
+    SNETS = "METABOLOMICS-SNETS"
+    SNETSV2 = "METABOLOMICS-SNETS-V2"
+    FBMN = "FEATURE-BASED-MOLECULAR-NETWORKING"
+    Unknown = "Unknown-GNPS-Workflow"
 
 
 def gnps_format_from_file_mapping(file: str | PathLike) -> GNPSFormat:
@@ -35,9 +43,9 @@ def gnps_format_from_file_mapping(file: str | PathLike) -> GNPSFormat:
     """
     headers = get_headers(file)
     if 'AllFiles' in headers:
-        return GNPSFormat.AllFiles
+        return GNPSFormat.SNETS
     if 'UniqueFileSources' in headers:
-        return GNPSFormat.UniqueFiles
+        return GNPSFormat.SNETSV2
     if 'row ID' in headers:
         return GNPSFormat.FBMN
     return GNPSFormat.Unknown
@@ -70,9 +78,9 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
     if workflow_format == "FEATURE-BASED-MOLECULAR-NETWORKING":
         return GNPSFormat.FBMN
     if workflow_format == "METABOLOMICS-SNETS-V2":
-        return GNPSFormat.UniqueFiles
+        return GNPSFormat.SNETSV2
     if workflow_format == "METABOLOMICS-SNETS":
-        return GNPSFormat.AllFiles
+        return GNPSFormat.SNETS
     return GNPSFormat.Unknown
 
 
@@ -96,9 +104,9 @@ def gnps_format_from_archive(zip_file: str | PathLike) -> GNPSFormat:
     if "FEATURE-BASED-MOLECULAR-NETWORKING" in file.name:
         return GNPSFormat.FBMN
     if "METABOLOMICS-SNETS-V2" in file.name:
-        return GNPSFormat.UniqueFiles
+        return GNPSFormat.SNETSV2
     if "METABOLOMICS-SNETS" in file.name:
-        return GNPSFormat.AllFiles
+        return GNPSFormat.SNETS
 
     # Guess the format from the names of the files in the zip file
     with zipfile.ZipFile(file) as archive:
@@ -106,8 +114,8 @@ def gnps_format_from_archive(zip_file: str | PathLike) -> GNPSFormat:
     if any("FEATURE-BASED-MOLECULAR-NETWORKING" in x for x in filenames):
         return GNPSFormat.FBMN
     if any("METABOLOMICS-SNETS-V2" in x for x in filenames):
-        return GNPSFormat.UniqueFiles
+        return GNPSFormat.SNETSV2
     if any("METABOLOMICS-SNETS" in x for x in filenames):
-        return GNPSFormat.AllFiles
+        return GNPSFormat.SNETS
 
     return GNPSFormat.Unknown

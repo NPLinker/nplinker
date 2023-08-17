@@ -35,7 +35,7 @@ def test_load_clusterinfo_old(spec_dict):
 
 
     sut = _load_clusterinfo_old(
-        GNPSFormat.AllFiles,
+        GNPSFormat.SNETS,
         strains,
         nodes_file,
         spec_dict
