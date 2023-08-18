@@ -1,9 +1,9 @@
 from os import PathLike
 from pathlib import Path
-import httpx
 from typing_extensions import Self
 from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_task_id
 from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
+from nplinker.utils import download_url
 
 
 class GNPSDownloader:
@@ -40,11 +40,14 @@ class GNPSDownloader:
         self._file_name = gnps_format.value + "-" + self._task_id + ".zip"
 
     def download(self) -> Self:
-        """Execute the downloading process. """
-        with open(self.get_download_path(), 'wb') as f:
-            with httpx.stream('POST', self.get_url()) as r:
-                for data in r.iter_bytes():
-                    f.write(data)
+        """Execute the downloading process.
+
+        Note: GNPS data is downloaded using the POST method (empty payload is OK).
+        """
+        download_url(self.get_url(),
+                     self._download_root,
+                     filename=self._file_name,
+                     http_method="POST")
         return self
 
     def get_download_file(self) -> str:
