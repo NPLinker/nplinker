@@ -71,7 +71,7 @@ class TestExtractArchive:
 
     def test_optional_args(self, archive):
         to_path = mkdtemp()
-        utils.extract_archive(archive, to_path=to_path, remove_finished=True)
+        utils.extract_archive(archive, extract_root=to_path, remove_finished=True)
         dir = Path(to_path) / "mibig_json_3.1"
         assert dir.exists()
         assert dir.is_dir()

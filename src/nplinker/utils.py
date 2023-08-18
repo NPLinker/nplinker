@@ -25,10 +25,7 @@ import os.path
 from pathlib import Path
 import sys
 import tarfile
-from typing import Callable, IO, Iterator
-import urllib
-import urllib.error
-import urllib.request
+from typing import Callable, IO
 import zipfile
 import httpx
 from tqdm import tqdm
@@ -214,10 +211,11 @@ def list_files(root: str | PathLike,
 
 
 def _extract_tar(from_path: str | PathLike, to_path: str | PathLike,
+                 members: list[tarfile.TarInfo] | None,
                  compression: str | None) -> None:
     with tarfile.open(from_path,
                       f"r:{compression[1:]}" if compression else "r") as tar:
-        tar.extractall(to_path)
+        tar.extractall(to_path, members)
 
 
 _ZIP_COMPRESSION_MAP: dict[str, int] = {
@@ -227,18 +225,20 @@ _ZIP_COMPRESSION_MAP: dict[str, int] = {
 
 
 def _extract_zip(from_path: str | PathLike, to_path: str | PathLike,
+                 members: list[str | zipfile.ZipInfo] | None,
                  compression: str | None) -> None:
     with zipfile.ZipFile(from_path,
                          "r",
                          compression=_ZIP_COMPRESSION_MAP[compression]
-                         if compression else zipfile.ZIP_STORED) as zip:
-        zip.extractall(to_path)
+                         if compression else zipfile.ZIP_STORED) as zf:
+        zf.extractall(to_path, members)
 
 
-_ARCHIVE_EXTRACTORS: dict[str, Callable[[str, str, str | None], None]] = {
-    ".tar": _extract_tar,
-    ".zip": _extract_zip,
-}
+_ARCHIVE_EXTRACTORS: dict[str, Callable[[str, str, list | None, str | None],
+                                        None]] = {
+                                            ".tar": _extract_tar,
+                                            ".zip": _extract_zip,
+                                        }
 _COMPRESSED_FILE_OPENERS: dict[str, Callable[..., IO]] = {
     ".bz2": bz2.open,
     ".gz": gzip.open,
@@ -336,7 +336,8 @@ def _decompress(from_path: Path | str,
 
 
 def extract_archive(from_path: str | PathLike,
-                    to_path: str | Path | None = None,
+                    extract_root: str | PathLike | None = None,
+                    members: list | None = None,
                     remove_finished: bool = False) -> str:
     """Extract an archive.
 
@@ -345,36 +346,41 @@ def extract_archive(from_path: str | PathLike,
     dispatched to :func:`decompress`.
 
     Args:
-        from_path (str, Path): Path to the file to be extracted.
-        to_path (str, Path): Path to the directory the file will be extracted to.
+        from_path: Path to the file to be extracted.
+        extract_root: Path to the directory the file will be extracted to.
             If omitted, the directory of the archive file is used.
-        remove_finished (bool): If ``True``, remove the file after the extraction.
+        members: Optional selection of members to extract. If not specified,
+            all members are extracted.
+            Memers must be a subset of the list returned by
+            - ``zipfile.ZipFile.namelist()`` or a list of strings for zip file
+            - ``tarfile.TarFile.getmembers()`` for tar file
+        remove_finished: If ``True``, remove the file after the extraction.
 
     Returns:
         (str): Path to the directory the file was extracted to.
     """
     from_path = Path(from_path)
 
-    if to_path is None:
-        to_path = from_path.parent
+    if extract_root is None:
+        extract_root = from_path.parent
     else:
-        to_path = Path(to_path)
+        extract_root = Path(extract_root)
 
     suffix, archive_type, compression = _detect_file_type(from_path)
     if not archive_type:
         return _decompress(
             from_path,
-            to_path / from_path.name.replace(suffix, ""),
+            extract_root / from_path.name.replace(suffix, ""),
             remove_finished=remove_finished,
         )
 
     extractor = _ARCHIVE_EXTRACTORS[archive_type]
 
-    extractor(str(from_path), str(to_path), compression)
+    extractor(str(from_path), str(extract_root), members, compression)
     if remove_finished:
         from_path.unlink()
 
-    return str(to_path)
+    return str(extract_root)
 
 
 def download_and_extract_archive(
@@ -414,4 +420,4 @@ def download_and_extract_archive(
 
     archive = download_root / filename
     print(f"Extracting {archive} to {extract_root}")
-    extract_archive(archive, extract_root, remove_finished)
+    extract_archive(archive, extract_root, remove_finished=remove_finished)
