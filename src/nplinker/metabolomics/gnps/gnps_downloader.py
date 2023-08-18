@@ -11,17 +11,33 @@ class GNPSDownloader:
     GNPS_DATA_DOWNLOAD_URL_FBMN = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_cytoscape_data'
 
     def __init__(self, task_id: str, download_root: str | PathLike):
-        """Class to download GNPS output archive for the given task id.
+        """Download GNPS zip archive for the given task id.
+
+        Note that only GNPS workflows listed in the GNPSFormat enum are supported.
 
         Args:
             task_id(str): GNPS task id, identifying the data to be downloaded.
             download_root(Path): Path where to store the downloaded archive.
 
+        Raises:
+            ValueError: If the given task id does not correspond to a supported
+                GNPS workflow.
+
         Examples:
             >>> GNPSDownloader("c22f44b14a3d450eb836d607cb9521bb", "~/downloads")
-            """
+        """
+        gnps_format = gnps_format_from_task_id(task_id)
+        if gnps_format == GNPSFormat.Unknown:
+            raise ValueError(
+                f"Unknown workflow type for GNPS task '{task_id}'."
+                f"Supported GNPS workflows are described in the GNPSFormat enum, "
+                f"including such as 'METABOLOMICS-SNETS', 'METABOLOMICS-SNETS-V2' "
+                f"and 'FEATURE-BASED-MOLECULAR-NETWORKING'.")
+
         self._task_id = task_id
         self._download_root: Path = Path(download_root)
+        self.gnps_format = gnps_format
+        self._file_name = gnps_format.value + "-" + self._task_id + ".zip"
 
     def download(self) -> Self:
         """Execute the downloading process. """
