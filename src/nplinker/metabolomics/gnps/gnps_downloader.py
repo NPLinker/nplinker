@@ -69,17 +69,7 @@ class GNPSDownloader:
         Returns:
             str: URL pointing to the GNPS data to be downloaded.
         """
-        gnps_format = gnps_format_from_task_id(self._task_id)
-
-        if gnps_format == GNPSFormat.Unknown:
-            raise ValueError(
-                f"Unknown workflow type for GNPS task '{self._task_id}'."
-                f"Supported GNPS workflows are: 'METABOLOMICS-SNETS', "
-                f"'METABOLOMICS-SNETS-V2', 'FEATURE-BASED-MOLECULAR-NETWORKING'"
-            )
-
-        if gnps_format == GNPSFormat.FBMN:
+        if self.gnps_format == GNPSFormat.FBMN:
             return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL_FBMN.format(
                 self._task_id)
-
         return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL.format(self._task_id)
