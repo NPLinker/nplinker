@@ -1,6 +1,5 @@
 import zipfile
 import pytest
-from requests.exceptions import ReadTimeout
 from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_archive
 from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_file_mapping
 from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_task_id
@@ -25,12 +24,11 @@ def test_identify_gnps_format(filename, expected):
      ["c22f44b14a3d450eb836d607cb9521bb", GNPSFormat.SNETS],
      ["189e8bf16af145758b0a900f1c44ff4a", GNPSFormat.SNETSV2],
      ["0ad6535e34d449788f297e712f43068a", GNPSFormat.Unknown]])
-def test_gnps_format_from_task_id(task_id: str, expected: GNPSFormat):
-    try:
-        actual = gnps_format_from_task_id(task_id)
-        assert actual is expected
-    except ReadTimeout:
-        pytest.skip("GNPS is down")
+def test_gnps_format_from_task_id(task_id: str, expected: GNPSFormat, gnps_website_is_down):
+    if gnps_website_is_down:
+        pytest.skip("GNPS website is down")
+    actual = gnps_format_from_task_id(task_id)
+    assert actual is expected
 
 @pytest.mark.parametrize("archive_path, expected", [
     ["ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip", GNPSFormat.FBMN],

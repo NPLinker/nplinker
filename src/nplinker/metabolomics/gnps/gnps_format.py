@@ -5,8 +5,9 @@ from pathlib import Path
 import zipfile
 from bs4 import BeautifulSoup
 from bs4 import Tag
-import requests
+import httpx
 from nplinker.utils import get_headers
+
 
 GNPS_TASK_URL = 'https://gnps.ucsd.edu/ProteoSAFe/status.jsp?task={}'
 
@@ -29,10 +30,6 @@ class GNPSFormat(Enum):
 def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
     """Detect GNPS format for the given task id.
 
-    The http request has a timeout of 5 seconds. If the request fails,
-    an ReadTimeout exception is raised. This is to prevent the program
-    from hanging indefinitely when the GNPS server is down.
-
     Args:
         task_id(str): GNPS task id.
 
@@ -45,7 +42,7 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
         >>> gnps_format_from_task_id("92036537c21b44c29e509291e53f6382") == GNPSFormat.FBMN
         >>> gnps_format_from_task_id("0ad6535e34d449788f297e712f43068a") == GNPSFormat.Unknown
     """
-    task_html = requests.get(GNPS_TASK_URL.format(task_id), timeout=5)
+    task_html = httpx.get(GNPS_TASK_URL.format(task_id))
     soup = BeautifulSoup(task_html.text, features="html.parser")
     tags = soup.find_all('th')
     workflow_tag: Tag = list(filter(lambda x: x.contents == ['Workflow'],
