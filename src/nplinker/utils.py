@@ -30,6 +30,7 @@ import urllib
 import urllib.error
 import urllib.request
 import zipfile
+import httpx
 from tqdm import tqdm
 
 
@@ -89,39 +90,8 @@ def get_headers(file: str | PathLike) -> list[str]:
 # You may obtain a copy of the License at
 #    https://github.com/pytorch/vision/blob/main/LICENSE
 
-USER_AGENT = "NPLinker"
-# USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'
-
-
-def _save_response_content(content: Iterator[bytes],
-                           destination: str | PathLike,
-                           length: int | None = None) -> None:
-    with open(destination, "wb") as fh, tqdm(total=length) as pbar:
-        for chunk in content:
-            # filter out keep-alive new chunks
-            if not chunk:
-                continue
-
-            fh.write(chunk)
-            pbar.update(len(chunk))
-
-
-def _urlretrieve(url: str,
-                 filename: str | PathLike,
-                 chunk_size: int = 1024 * 32) -> None:
-    with urllib.request.urlopen(
-            urllib.request.Request(url, headers={"User-Agent":
-                                                 USER_AGENT})) as response:
-        _save_response_content(iter(lambda: bytes(response.read(chunk_size)),
-                                    b""),
-                               filename,
-                               length=response.length)
-
 
 def calculate_md5(fpath: str | PathLike, chunk_size: int = 1024 * 1024) -> str:
-    # Setting the `usedforsecurity` flag does not change anything about the functionality, but indicates that we are
-    # not using the MD5 checksum for cryptography. This enables its usage in restricted environments like FIPS. Without
-    # it torchvision.datasets is unusable in these environments since we perform a MD5 check everywhere.
     if sys.version_info >= (3, 9):
         md5 = hashlib.md5(usedforsecurity=False)
     else:
@@ -144,35 +114,24 @@ def check_integrity(fpath: str | PathLike, md5: str | None = None) -> bool:
     return check_md5(fpath, md5)
 
 
-def _get_redirect_url(url: str, max_hops: int = 3) -> str:
-    initial_url = url
-    headers = {"Method": "HEAD", "User-Agent": USER_AGENT}
-
-    for _ in range(max_hops + 1):
-        with urllib.request.urlopen(
-                urllib.request.Request(url, headers=headers)) as response:
-            if response.url == url or response.url is None:
-                return url
-            url = response.url
-
-    raise RecursionError(
-        f"Request to {initial_url} exceeded {max_hops} redirects. The last redirect points to {url}."
-    )
-
-
 def download_url(url: str,
                  root: str | PathLike,
                  filename: str | None = None,
                  md5: str | None = None,
-                 max_redirect_hops: int = 3) -> None:
+                 http_method: str = "GET",
+                 allow_http_redirect: bool = True) -> None:
     """Download a file from a url and place it in root.
 
     Args:
         url (str): URL to download file from
         root (str): Directory to place downloaded file in
-        filename (str, optional): Name to save the file under. If None, use the basename of the URL
-        md5 (str, optional): MD5 checksum of the download. If None, do not check
-        max_redirect_hops (int, optional): Maximum number of redirect hops allowed
+        filename (str, optional): Name to save the file under. If None, use the
+            basename of the URL.
+        md5 (str, optional): MD5 checksum of the download. If None, do not check.
+        http_method (str, optional): HTTP request method, e.g. "GET", "POST".
+            Defaults to "GET".
+        allow_http_redirect (bool, optional): If true, enable following redirects
+         for all HTTP ("http:") methods.
     """
     root = Path(root).expanduser()
     if not filename:
@@ -186,22 +145,23 @@ def download_url(url: str,
         print("Using downloaded and verified file: " + str(fpath))
         return
 
-    # expand redirect chain if needed
-    url = _get_redirect_url(url, max_hops=max_redirect_hops)
-
     # download the file
-    try:
-        print("Downloading " + url + " to " + str(fpath))
-        _urlretrieve(url, fpath)
-    except (urllib.error.URLError, OSError) as e:  # type: ignore[attr-defined]
-        if url[:5] == "https":
-            url = url.replace("https:", "http:")
-            print(
-                "Failed download. Trying https -> http instead. Downloading " +
-                url + " to " + str(fpath))
-            _urlretrieve(url, fpath)
-        else:
-            raise e
+    with open(fpath, "wb") as fh:
+        with httpx.stream(http_method,
+                          url,
+                          follow_redirects=allow_http_redirect) as response:
+            total = int(response.headers.get("Content-Length", 0))
+
+            with tqdm(total=total,
+                      unit_scale=True,
+                      unit_divisor=1024,
+                      unit="B") as progress:
+                num_bytes_downloaded = response.num_bytes_downloaded
+                for chunk in response.iter_raw():
+                    fh.write(chunk)
+                    progress.update(response.num_bytes_downloaded -
+                                    num_bytes_downloaded)
+                    num_bytes_downloaded = response.num_bytes_downloaded
 
     # check integrity of downloaded file
     if not check_integrity(fpath, md5):
