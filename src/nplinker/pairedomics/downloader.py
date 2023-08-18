@@ -170,7 +170,7 @@ class PODPDownloader():
     def _download_metabolomics_zipfile(self, gnps_task_id):
         archive = GNPSDownloader(
             gnps_task_id,
-            self.project_downloads_dir).download().get_download_path()
+            self.project_downloads_dir).download().get_download_file()
         GNPSExtractor(archive, self.project_results_dir).extract()
 
     def _download_and_load_json(self, url: str,

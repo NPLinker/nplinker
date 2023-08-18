@@ -47,13 +47,13 @@ class GNPSDownloader:
                     f.write(data)
         return self
 
-    def get_download_path(self) -> str:
-        """Get the path where to store the downloaded file.
+    def get_download_file(self) -> str:
+        """Get the path to the zip file.
 
         Returns:
             str: Download path as string
         """
-        return str(self._download_root.joinpath(self._task_id + ".zip"))
+        return str(Path(self._download_root) / self._file_name)
 
     def get_task_id(self) -> str:
         """Get the GNPS task id.
