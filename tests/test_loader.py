@@ -23,7 +23,7 @@ def config():
 
 @pytest.fixture
 def config_with_new_gnps_extractor():
-    GNPSExtractor(DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip", DATA_DIR / "extracted").extract()
+    GNPSExtractor(DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip", DATA_DIR / "extracted")
     yield {
         "dataset" : {
             "root": DATA_DIR / "extracted",

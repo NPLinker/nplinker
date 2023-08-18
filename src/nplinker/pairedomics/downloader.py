@@ -171,7 +171,7 @@ class PODPDownloader():
         archive = GNPSDownloader(
             gnps_task_id,
             self.project_downloads_dir).download().get_download_file()
-        GNPSExtractor(archive, self.project_results_dir).extract()
+        GNPSExtractor(archive, self.project_results_dir)
 
     def _download_and_load_json(self, url: str,
                                 output_file: str | PathLike) -> dict:

@@ -1,7 +1,6 @@
 import os
 from os import PathLike
 from pathlib import Path
-import shutil
 import zipfile
 from nplinker import utils
 from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_archive
@@ -10,28 +9,77 @@ from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
 
 class GNPSExtractor:
 
-    def __init__(self, file: str | PathLike, extract_path: str | PathLike):
-        """Class to extract files from a GNPS output archive.
+    def __init__(self, file: str | PathLike, extract_dir: str | PathLike):
+        """Class to extract files from a GNPS molecular networking archive(.zip).
 
-        The GNPS output archive contains files for spectra, molecular families and file mappings.
+        Four files are extracted and renamed to the following names:
+        - file_mappings(.tsv/.csv)
+        - spectra.mgf
+        - molecular_families.tsv
+        - annotations.tsv
+
+        The files to be extracted are selected based on the GNPS workflow type,
+        as desribed below (in the order of the files above):
+        1. METABOLOMICS-SNETS
+            - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.tsv
+            - METABOLOMICS-SNETS*.mgf
+            - networkedges_selfloop/*.pairsinfo
+            - result_specnets_DB/*.tsv
+        2. METABOLOMICS-SNETS-V2
+            - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.clustersummary
+            - METABOLOMICS-SNETS-V2*.mgf
+            - networkedges_selfloop/*.selfloop
+            - result_specnets_DB/.tsv
+        3. FEATURE-BASED-MOLECULAR-NETWORKING
+            - quantification_table*/*.csv
+            - spectra/*.mgf
+            - networkedges_selfloop/*.selfloop
+            - DB_result/*.tsv
 
         Args:
-            file(str | PathLike): str or PathLike object pointing to the GNPS archive.
-            extract_path(str | PathLike): str or PathLike object pointing to where to extract the files to.
-        """
-        self._file: Path = Path(file)
-        self._extract_path: Path = Path(extract_path)
-        self._is_fbmn = gnps_format_from_archive(self._file) == GNPSFormat.FBMN
+            file(str | PathLike): The path to the GNPS zip file.
+            extract_path(str | PathLike): path to the directory where to extract the files to.
 
-    def get_data(self) -> zipfile.ZipFile:
-        """Get the file object of the archive.
+        Raises:
+            ValueError: If the given file is an invalid GNPS archive.
+
+        Examples:
+            >>> gnps_extractor = GNPSExtractor("path/to/gnps_archive.zip", "path/to/extract_dir")
+            >>> gnps_extractor.gnps_format
+            <GNPSFormat.SNETS: 'METABOLOMICS-SNETS'>
+            >>> gnps_extractor.extract_dir
+            'path/to/extract_dir'
+        """
+        gnps_format = gnps_format_from_archive(file)
+        if gnps_format == GNPSFormat.Unknown:
+            raise ValueError(
+                f"Unknown workflow type for GNPS archive '{file}'."
+                f"Supported GNPS workflows are described in the GNPSFormat enum, "
+                f"including such as 'METABOLOMICS-SNETS', 'METABOLOMICS-SNETS-V2' "
+                f"and 'FEATURE-BASED-MOLECULAR-NETWORKING'.")
+
+        self._file = Path(file)
+        self._extract_path = Path(extract_dir)
+        self._gnps_format = gnps_format
+        # the order of filenames matters
+        self._target_files = [
+            "file_mappings", "spectra.mgf", "molecular_families.tsv",
+            "annotations.tsv"
+        ]
+
+        self._extract()
+
+    @property
+    def gnps_format(self) -> GNPSFormat:
+        """Get the GNPS workflow type.
 
         Returns:
-            zipfile.ZipFile: the file object where to extract data.
+            GNPSFormat: GNPS workflow type.
         """
-        return zipfile.ZipFile(self._file)
+        return self._gnps_format
 
-    def get_extract_path(self) -> str:
+    @property
+    def extract_dir(self) -> str:
         """Get the path where to extract the files to.
 
         Returns:
@@ -39,44 +87,74 @@ class GNPSExtractor:
         """
         return str(self._extract_path)
 
-    def extract(self):
-        """Extract the spectra, molecular family and file mappings files from the handled archive."""
-        self._extract_spectra()
-        self._extract_molecular_families()
-        self._extract_file_mappings()
-        self._extract_annotations()
+    def _extract(self):
+        """Extract required files from archive.
+        """
+        if self._gnps_format == GNPSFormat.SNETS:
+            self._extract_snets()
+        elif self._gnps_format == GNPSFormat.SNETSV2:
+            self._extract_snetsv2()
+        elif self._gnps_format == GNPSFormat.FBMN:
+            self._extract_fbmn()
 
-    def _extract_spectra(self):
-        """Helper function to extract the spectra file from the archive."""
-        prefix = "spectra" if self._is_fbmn else ""
-        utils.extract_file_matching_pattern(self.get_data(), prefix, ".mgf",
-                                            self._extract_path, "spectra.mgf")
-        if self._is_fbmn:
-            os.rmdir(self._extract_path / prefix)
+    def _extract_snets(self):
+        # the order of members matters
+        members = [
+            self._select_member(
+                "clusterinfosummarygroup_attributes_withIDs_withcomponentID",
+                ".tsv"),
+            self._select_member("METABOLOMICS-SNETS", ".mgf"),
+            self._select_member("networkedges_selfloop", ".pairsinfo"),
+            self._select_member("result_specnets_DB", ".tsv")
+        ]
+        utils.extract_archive(self._file, self._extract_path, members)
+        # rename the files to the expected names
+        # os.renames automatically remove empty directories after renaming
+        os.renames(self._extract_path / members[0],
+                   self._extract_path / (self._target_files[0] + ".tsv"))
+        for member, fname in zip(members[1:], self._target_files[1:]):
+            os.renames(self._extract_path / member, self._extract_path / fname)
 
-    def _extract_molecular_families(self):
-        """Helper function to extract the molecular families file from the archive."""
-        prefix = "networkedges_selfloop"
-        suffix = ".selfloop" if self._is_fbmn else ".pairsinfo"
-        utils.extract_file_matching_pattern(self.get_data(), prefix, suffix,
-                                            self._extract_path,
-                                            "molecular_families.pairsinfo")
-        os.rmdir(self._extract_path / prefix)
+    def _extract_snetsv2(self):
+        # the order of members matters
+        members = [
+            self._select_member(
+                "clusterinfosummarygroup_attributes_withIDs_withcomponentID",
+                ".clustersummary"),
+            self._select_member("METABOLOMICS-SNETS-V2", ".mgf"),
+            self._select_member("networkedges_selfloop", ".selfloop"),
+            self._select_member("result_specnets_DB", ".tsv")
+        ]
+        utils.extract_archive(self._file, self._extract_path, members)
+        os.renames(self._extract_path / members[0],
+                   self._extract_path / (self._target_files[0] + ".tsv"))
+        for member, fname in zip(members[1:], self._target_files[1:]):
+            os.renames(self._extract_path / member, self._extract_path / fname)
 
-    def _extract_file_mappings(self):
-        """Helper function to extract the file mappings file from the archive."""
-        prefix = "quantification_table_reformatted" if self._is_fbmn else "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
-        suffix = ".csv" if self._is_fbmn else ".tsv"
-        utils.extract_file_matching_pattern(self.get_data(), prefix, suffix,
-                                            self._extract_path,
-                                            "file_mappings" + suffix)
-        os.rmdir(self._extract_path / prefix)
+    def _extract_fbmn(self):
+        # the order of members matters
+        members = [
+            self._select_member("quantification_table", ".csv"),
+            self._select_member("spectra", ".mgf"),
+            self._select_member("networkedges_selfloop", ".selfloop"),
+            self._select_member("DB_result", ".tsv")
+        ]
+        utils.extract_archive(self._file, self._extract_path, members)
+        os.renames(self._extract_path / members[0],
+                   self._extract_path / (self._target_files[0] + ".csv"))
+        for member, fname in zip(members[1:], self._target_files[1:]):
+            os.renames(self._extract_path / member, self._extract_path / fname)
 
-    def _extract_annotations(self):
-        """Helper function to extract the annotations file from the archive."""
-        prefix = "DB_result" if self._is_fbmn else "result_specnets_DB"
-        utils.extract_file_matching_pattern(self.get_data(), prefix, ".tsv",
-                                            self._extract_path,
-                                            "annotations.tsv")
-
-        shutil.rmtree(self._extract_path / prefix)
+    def _select_member(self, prefix: str, suffix: str) -> str:
+        """Helper function to extract files matching a prefix and suffix from the archive."""
+        with zipfile.ZipFile(self._file) as zf:
+            member_list = [
+                member for member in zf.namelist()
+                if member.startswith(prefix) and member.endswith(suffix)
+            ]
+            if len(member_list) != 1:
+                raise ValueError(
+                    f"Expected exactly one file matching pattern '{prefix}*{suffix}'"
+                    f"in archive '{self._file}', but found {len(member_list)}."
+                )
+        return member_list[0]
