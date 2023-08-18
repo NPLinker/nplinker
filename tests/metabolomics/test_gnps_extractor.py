@@ -1,11 +1,10 @@
 import filecmp
+from pathlib import Path
 from tempfile import gettempdir
 import zipfile
-from pathlib import Path
 import numpy
-from typing_extensions import Self
-
 import pytest
+from typing_extensions import Self
 from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
 from nplinker.utils import extract_archive
 from .. import DATA_DIR
@@ -85,7 +84,7 @@ def test_creates_molecular_families(archive: Path, filename: str, tmp_path: Path
 
     sut = GNPSExtractorBuilder().with_file(file).with_extract_path(tmp_path).build()
     sut._extract_molecular_families()
-    actual = Path(sut.get_extract_path()) / "molecular_families.pairsinfo"
+    actual = Path(sut.get_extract_path()) / "molecular_families.tsv"
 
     assert_extraction_success(filename, outdir, actual)
 
