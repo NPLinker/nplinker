@@ -1,60 +1,93 @@
-import filecmp
-from pathlib import Path
-from tempfile import gettempdir
 import zipfile
 import pytest
-from requests.exceptions import ReadTimeout
-from typing_extensions import Self
 from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
-from .. import DATA_DIR
+from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
 
 
-class GNPSDownloaderBuilder:
-    def __init__(self):
-        self._task_id = None
-        self._download_root = gettempdir()
-
-    def with_task_id(self, task_id: str) -> Self:
-        self._task_id = task_id
-        return self
-
-    def with_download_root(self, download_root: Path) -> Self:
-        self._download_root = download_root
-        return self
-
-    def build(self) -> GNPSDownloader:
-        return GNPSDownloader(self._task_id, self._download_root)
+@pytest.fixture(scope="module", autouse=True)
+def setup_with_fixture(gnps_website_is_down):
+    if gnps_website_is_down:
+        pytest.skip("GNPS website is down, skipping all tests in this module!",
+                    allow_module_level=True)
 
 
-
-def test_has_gnps_task_id():
-    sut = GNPSDownloaderBuilder().with_task_id("c22f44b14a3d450eb836d607cb9521bb").build()
-    assert sut.get_task_id() == "c22f44b14a3d450eb836d607cb9521bb"
-
-
-def test_has_url():
-    try:
-        sut = GNPSDownloaderBuilder().with_task_id("c22f44b14a3d450eb836d607cb9521bb").build()
-        assert sut.get_url() == 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task=c22f44b14a3d450eb836d607cb9521bb&view=download_clustered_spectra'
-    except ReadTimeout:
-        pytest.skip("GNPS is down")
+def test_unknown_workflow(tmpdir):
+    with pytest.raises(ValueError) as e:
+        GNPSDownloader("0ad6535e34d449788f297e712f43068a", tmpdir)
+    assert "Unknown workflow type for GNPS task" in str(e.value)
 
 
-@pytest.mark.parametrize("task_id, filename_expected", [
-    ["92036537c21b44c29e509291e53f6382", "ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip"],
-    ["c22f44b14a3d450eb836d607cb9521bb", "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip"]
+@pytest.mark.parametrize("task_id, expected", [
+    ["92036537c21b44c29e509291e53f6382", GNPSFormat.FBMN],
+    ["c22f44b14a3d450eb836d607cb9521bb", GNPSFormat.SNETS],
+    ["189e8bf16af145758b0a900f1c44ff4a", GNPSFormat.SNETSV2],
 ])
-def test_downloads_file(tmp_path: Path, task_id, filename_expected):
-    outpath = tmp_path.joinpath(task_id + ".zip")
-    sut = GNPSDownloader(task_id, tmp_path)
-    try:
-        sut.download()
-        actual = zipfile.ZipFile(outpath)
+def test_supported_workflows(task_id, expected, tmpdir):
+    downloader = GNPSDownloader(task_id, tmpdir)
+    assert downloader.gnps_format == expected
 
-        expected = zipfile.ZipFile(DATA_DIR / filename_expected)
 
-        actual_names = actual.namelist()
-        expected_names = [x.filename for x in expected.filelist if x.compress_size > 0]
-        assert all(item in actual_names for item in expected_names)
-    except ReadTimeout:
-        pytest.skip("GNPS is down")
+@pytest.mark.parametrize(
+    "task_id, filename",
+    [[
+        "92036537c21b44c29e509291e53f6382",
+        GNPSFormat.FBMN.value + "-92036537c21b44c29e509291e53f6382.zip"
+    ],
+     [
+         "c22f44b14a3d450eb836d607cb9521bb",
+         GNPSFormat.SNETS.value + "-c22f44b14a3d450eb836d607cb9521bb.zip"
+     ],
+     [
+         "189e8bf16af145758b0a900f1c44ff4a",
+         GNPSFormat.SNETSV2.value + "-189e8bf16af145758b0a900f1c44ff4a.zip"
+     ]])
+def test_get_download_file(task_id, filename, tmpdir):
+    downloader = GNPSDownloader(task_id, tmpdir)
+    assert downloader.get_download_file() == tmpdir / filename
+
+
+@pytest.mark.parametrize("task_id", [
+    "92036537c21b44c29e509291e53f6382", "c22f44b14a3d450eb836d607cb9521bb",
+    "189e8bf16af145758b0a900f1c44ff4a"
+])
+def test_get_task_id(task_id, tmpdir):
+    downloader = GNPSDownloader(task_id, tmpdir)
+    assert downloader.get_task_id() == task_id
+
+
+@pytest.mark.parametrize("task_id, url",
+                         [[
+                             "92036537c21b44c29e509291e53f6382",
+                             GNPSDownloader.GNPS_DATA_DOWNLOAD_URL_FBMN.format(
+                                 "92036537c21b44c29e509291e53f6382")
+                         ],
+                          [
+                              "c22f44b14a3d450eb836d607cb9521bb",
+                              GNPSDownloader.GNPS_DATA_DOWNLOAD_URL.format(
+                                  "c22f44b14a3d450eb836d607cb9521bb")
+                          ],
+                          [
+                              "189e8bf16af145758b0a900f1c44ff4a",
+                              GNPSDownloader.GNPS_DATA_DOWNLOAD_URL.format(
+                                  "189e8bf16af145758b0a900f1c44ff4a")
+                          ]])
+def test_get_url(task_id, url, tmpdir):
+    downloader = GNPSDownloader(task_id, tmpdir)
+    assert downloader.get_url() == url
+
+
+@pytest.mark.parametrize(
+    "task_id, workflow",
+    [["92036537c21b44c29e509291e53f6382", GNPSFormat.FBMN],
+     ["c22f44b14a3d450eb836d607cb9521bb", GNPSFormat.SNETS],
+     ["189e8bf16af145758b0a900f1c44ff4a", GNPSFormat.SNETSV2]])
+def test_downloads_file(task_id, workflow, tmpdir, gnps_zip_files):
+    downloader = GNPSDownloader(task_id, tmpdir)
+    downloader.download()
+    actual = zipfile.ZipFile(downloader.get_download_file())
+    actual_names = actual.namelist()
+    expected = zipfile.ZipFile(gnps_zip_files[workflow])
+    expected_names = [
+        x.filename for x in expected.filelist if x.compress_size > 0
+    ]
+    assert all(item in actual_names for item in expected_names)
