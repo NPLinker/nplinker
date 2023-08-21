@@ -78,6 +78,29 @@ def get_headers(file: str | PathLike) -> list[str]:
         dl = find_delimiter(file)
         return headers.split(dl)
 
+def is_file_format(file: str | PathLike, format: str = "tsv") -> bool:
+    """Check if the file is in the given format.
+
+    Args:
+        file(str): Path to the file to check.
+        format(str): The format to check for, either "tsv" or "csv".
+
+    Returns:
+        bool: True if the file is in the given format, False otherwise.
+    """
+    try:
+        with open(file, 'rt') as f:
+            if format == "tsv":
+                reader = csv.reader(f, delimiter='\t')
+            elif format == "csv":
+                reader = csv.reader(f, delimiter=',')
+            else:
+                raise ValueError(f"Unknown format '{format}'.")
+            for _ in reader:
+                pass
+        return True
+    except csv.Error:
+        return False
 
 # Functions below are adapted from torchvision library,
 # see: https://github.com/pytorch/vision/blob/main/torchvision/datasets/utils.py.
