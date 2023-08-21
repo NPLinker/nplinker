@@ -20,8 +20,9 @@ class MolecularFamilyLoaderBase(ABC):
 
 class FileMappingLoaderBase(ABC):
 
+    @property
     @abstractmethod
-    def mapping(self) -> dict[int, list[str]]:
+    def mappings(self) -> dict[str, list[str]]:
         ...
 
 
