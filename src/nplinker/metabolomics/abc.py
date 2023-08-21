@@ -1,18 +1,18 @@
-from abc import ABC, abstractmethod
-
-from nplinker.metabolomics.molecular_family import MolecularFamily
+from abc import ABC
+from abc import abstractmethod
 from collections.abc import Sequence
+from nplinker.metabolomics.molecular_family import MolecularFamily
 from nplinker.metabolomics.spectrum import Spectrum
 
 
 class SpectrumLoaderBase(ABC):
-    
+
     @abstractmethod
     def spectra(self) -> Sequence[Spectrum]:
         ...
 
 class MolecularFamilyLoaderBase(ABC):
-    
+
     @abstractmethod
     def families(self) -> Sequence[MolecularFamily]:
         ...
@@ -27,6 +27,7 @@ class FileMappingLoaderBase(ABC):
 
 class AnnotationLoaderBase(ABC):
 
+    @property
     @abstractmethod
-    def get_annotations(self) -> dict[int, dict]:
+    def annotations(self) -> dict[str, dict]:
         ...
