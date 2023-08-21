@@ -36,8 +36,18 @@ class GNPSDownloader:
 
         self._task_id = task_id
         self._download_root: Path = Path(download_root)
-        self.gnps_format = gnps_format
+        self._gnps_format = gnps_format
         self._file_name = gnps_format.value + "-" + self._task_id + ".zip"
+
+    @property
+    def gnps_format(self) -> GNPSFormat:
+        """Get the GNPS workflow type.
+
+        Returns:
+            GNPSFormat: GNPS workflow type.
+        """
+        return self._gnps_format
+
 
     def download(self) -> Self:
         """Execute the downloading process.
