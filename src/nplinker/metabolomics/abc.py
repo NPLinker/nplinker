@@ -13,6 +13,7 @@ class SpectrumLoaderBase(ABC):
 
 class MolecularFamilyLoaderBase(ABC):
 
+    @property
     @abstractmethod
     def families(self) -> Sequence[MolecularFamily]:
         ...
