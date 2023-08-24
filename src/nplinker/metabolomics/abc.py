@@ -7,6 +7,7 @@ from nplinker.metabolomics.spectrum import Spectrum
 
 class SpectrumLoaderBase(ABC):
 
+    @property
     @abstractmethod
     def spectra(self) -> Sequence[Spectrum]:
         ...
