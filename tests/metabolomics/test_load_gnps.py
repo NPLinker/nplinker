@@ -7,10 +7,10 @@ from nplinker.metabolomics.load_gnps import _parse_mzxml_header
 from nplinker.metabolomics.load_gnps import load_gnps
 from nplinker.strain_collection import StrainCollection
 from nplinker.utils import get_headers
-from .. import DATA_DIR
+from .. import GNPS_DATA_DIR
 
 
-nodes_file = DATA_DIR / "nodes.tsv"
+nodes_file = GNPS_DATA_DIR / "nodes.tsv"
 strains = StrainCollection()
 
 
@@ -71,7 +71,7 @@ def test_messy_strain_naming_lookup(collection_from_file: StrainCollection, mess
 
 
 def test_parse_mzxml_header():
-    headers = get_headers(str(DATA_DIR / "nodes_fbmn.csv"))
+    headers = get_headers(str(GNPS_DATA_DIR / "nodes_fbmn.csv"))
     hdr = headers[10]
     actual = _parse_mzxml_header(hdr, StrainCollection(), None, None)
     assert actual is not None
