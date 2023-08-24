@@ -55,7 +55,7 @@ class TestDownloadAndExtractAntismashData():
         extract_root = tmp_path / "extracted"
         extract_root.mkdir()
         for test_id in nonexisting_ids:
-            with pytest.raises(HTTPError):
+            with pytest.raises(RuntimeError):
                 download_and_extract_antismash_data(test_id, download_root,
                                                     extract_root)
             extracted_folder = extract_root / "antismash" / test_id
