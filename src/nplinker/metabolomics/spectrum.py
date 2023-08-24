@@ -38,6 +38,8 @@ class Spectrum():
             intensity for mz, intensity in self.peaks)
         self.spectrum_id = spectrum_id  # MS1.name
         self.rt = rt
+        # TODO CG: should include precursor mass and charge to calculate precursor_mz
+        # parent_mz can be calculate from precursor_mass and charge mass
         self.precursor_mz = precursor_mz
         self.parent_mz = parent_mz
         self.gnps_id = None  # CCMSLIB...
