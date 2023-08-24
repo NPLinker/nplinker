@@ -149,8 +149,8 @@ class DataLinks():
                 if filter_no_shared and len(shared_strains) == 0:
                     continue
                 results[(obj, gcf)] = [
-                    self._strains.lookup(strain_id)
-                    for strain_id in shared_strains
+                    strain for strain_id in shared_strains
+                    for strain in self._strains.lookup(strain_id)
                 ]
         return results
 

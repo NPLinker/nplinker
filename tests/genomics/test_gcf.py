@@ -55,8 +55,8 @@ def test_add_bgc_wo_strain(bgc_without_strain, caplog):
 def test_has_strain(bgc_with_strain):
     gcf = GCF("1")
     gcf.add_bgc(bgc_with_strain)
-    assert gcf.has_strain("strain001") is True
-    assert gcf.has_strain("strain002") is False
+    assert gcf.has_strain(Strain("strain001")) is True
+    assert gcf.has_strain(Strain("strain002")) is False
 
 def test_has_mibig_only():
     mibig_bgc = BGC("BGC0000001", "NPR")

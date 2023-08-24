@@ -30,14 +30,14 @@ def _messy_strain_naming_lookup(mzxml: str, strains: StrainCollection) -> Strain
     Returns:
         Strain or None: The strain identified to be matching or None.
     """
-    if mzxml in strains:
+    if strains.has_name(mzxml):
         # life is simple!
         return strains.lookup(mzxml)
 
     # 1. knock off the .mzXML and try again (using splitext should also handle
     # other extensions like .mzML here)
     mzxml_no_ext = os.path.splitext(mzxml)[0]
-    if mzxml_no_ext in strains:
+    if strains.has_name(mzxml_no_ext):
         return strains.lookup(mzxml_no_ext)
 
     # 2. if that doesn't work, try using everything up to the first -/_
@@ -46,15 +46,15 @@ def _messy_strain_naming_lookup(mzxml: str, strains: StrainCollection) -> Strain
     mzxml_trunc_underscore = mzxml_no_ext if underscore_index == -1 else mzxml_no_ext[:underscore_index]
     mzxml_trunc_hyphen = mzxml_no_ext if hyphen_index == -1 else mzxml_no_ext[:hyphen_index]
 
-    if underscore_index != -1 and mzxml_trunc_underscore in strains:
+    if underscore_index != -1 and strains.has_name(mzxml_trunc_underscore):
         return strains.lookup(mzxml_trunc_underscore)
-    if hyphen_index != -1 and mzxml_trunc_hyphen in strains:
+    if hyphen_index != -1 and strains.has_name(mzxml_trunc_hyphen):
         return strains.lookup(mzxml_trunc_hyphen)
 
     # 3. in the case of original Crusemann dataset, many of the filenames seem to
     # match up to real strains with the initial "CN" missing ???
     for mzxml_trunc in [mzxml_trunc_hyphen, mzxml_trunc_underscore]:
-        if 'CN' + mzxml_trunc in strains:
+        if strains.has_name('CN' + mzxml_trunc):
             return strains.lookup('CN' + mzxml_trunc)
 
     # give up
@@ -113,7 +113,7 @@ def _parse_mzxml_header(hdr: str, strains: StrainCollection, md_table: dict[str,
 
     # check if the strain label exists in the set of strain mappings the user
     # has provided
-    if strain_name not in strains:
+    if not strains.has_name(strain_name):
         # if this check fails, it could mean a missing strain ID mapping. this isn't
         # fatal but will produce a warning and an entry added to the file
         # unknown_strains_met.csv in the dataset folder.
@@ -139,7 +139,7 @@ def _parse_mzxml_header(hdr: str, strains: StrainCollection, md_table: dict[str,
             growth_medium = md_table[strain_name]['growthmedium']
             strain_col_content = md_table[strain_name]['strain']
 
-            if strain_col_content in strains:
+            if strains.has_name(strain_col_content):
                 strain = strains.lookup(strain_col_content)
                 strain.add_alias(strain_name)
                 # this merges the set of aliases back into the internal
@@ -158,7 +158,7 @@ def _parse_mzxml_header(hdr: str, strains: StrainCollection, md_table: dict[str,
                 'Unknown strain identifier: {} (parsed from {})'.format(
                     strain_name, hdr))
 
-    return (strain_name, growth_medium, strain_name not in strains)
+    return (strain_name, growth_medium, not strains.has_name(strain_name))
 
 
 def _load_clusterinfo_old(gnps_format: str, strains: StrainCollection, file: str, spec_dict: dict[str, Spectrum]) -> dict[str, int]:
@@ -422,7 +422,7 @@ def _load_clusterinfo_fbmn(strains: StrainCollection, nodes_file: str, extra_nod
 
             # create a new strain object if the intensity value is a float > 0
             v = _md_convert(v)
-            if strain_name in strains and isinstance(v, float) and float(v) > 0:
+            if strains.has_name(strain_name) and isinstance(v, float) and float(v) > 0:
                 # find the strain object, and add the growth medium + intensity to it. the
                 # growth medium will only be set if extended_metadata_table_parsing is
                 # enabled in the config file and the metadata table file contains that info

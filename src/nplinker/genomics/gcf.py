@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from nplinker.logconfig import LogConfig
 from nplinker.strain_collection import StrainCollection
 
+
 if TYPE_CHECKING:
     from nplinker.strains import Strain
     from .bgc import BGC
@@ -33,8 +34,6 @@ class GCF():
         self.gcf_id = gcf_id
         self._bgcs: set[BGC] = set()
         self.bigscape_class: str | None = None
-        # CG TODO: remove attribute id, see issue 103
-        #    https://github.com/NPLinker/nplinker/issues/103
         self.bgc_ids: set[str] = set()
         self.strains: StrainCollection = StrainCollection()
 
@@ -83,11 +82,11 @@ class GCF():
                     return
             self.strains.remove(bgc.strain)
 
-    def has_strain(self, strain: str | Strain) -> bool:
+    def has_strain(self, strain: Strain) -> bool:
         """Check if the given strain exists.
 
         Args:
-            strain(str | Strain): strain id or `Strain` object.
+            strain(Strain): `Strain` object.
 
         Returns:
             bool: True when the given strain exist.

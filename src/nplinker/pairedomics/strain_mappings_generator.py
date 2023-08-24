@@ -97,15 +97,16 @@ def podp_generate_strain_mappings(
     # Create StrainCollection
     sc = StrainCollection()
     for strain_id, bgc_ids in mappings.items():
-        if strain_id not in sc:
+        if not sc.has_name(strain_id):
             strain = Strain(strain_id)
             for bgc_id in bgc_ids:
                 strain.add_alias(bgc_id)
             sc.add(strain)
         else:
-            strain = sc.lookup(strain_id)
+            # strain_list has only one element
+            strain_list = sc.lookup(strain_id)
             for bgc_id in bgc_ids:
-                strain.add_alias(bgc_id)
+                strain_list[0].add_alias(bgc_id)
 
     # Write strain mappings JSON file
     sc.to_json(output_json_file)

@@ -44,6 +44,15 @@ class Strain():
         return alias in self._aliases
 
     @property
+    def names(self) -> set[str]:
+        """Get the set of strain names including id and aliases.
+
+        Returns:
+            set[str]: A set of names associated with the strain.
+        """
+        return self._aliases | {self.id}
+
+    @property
     def aliases(self) -> set[str]:
         """Get the set of known aliases.
 

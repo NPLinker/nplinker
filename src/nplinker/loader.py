@@ -6,10 +6,14 @@ from nplinker.class_info.chem_classes import ChemClassPredictions
 from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
 from nplinker.genomics import generate_mappings_genome_id_bgc_id
-from nplinker.genomics import load_gcfs
 from nplinker.genomics.antismash import AntismashBGCLoader
-from nplinker.genomics.mibig import download_and_extract_mibig_metadata
-from nplinker.genomics.mibig import MibigBGCLoader
+from nplinker.genomics.bigscape import BigscapeGCFLoader
+from nplinker.genomics.genomics import filter_mibig_only_gcf
+from nplinker.genomics.genomics import get_bgcs_from_gcfs
+from nplinker.genomics.genomics import get_strains_from_bgcs
+from nplinker.genomics.genomics import map_bgc_to_gcf
+from nplinker.genomics.genomics import map_strain_to_bgc
+from nplinker.genomics.mibig import MibigLoader
 from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.globals import GENOME_STATUS_FILENAME
 from nplinker.globals import GNPS_FILE_MAPPINGS_FILENAME
@@ -22,6 +26,7 @@ from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.pairedomics.strain_mappings_generator import \
     podp_generate_strain_mappings
 from nplinker.strain_collection import StrainCollection
+from nplinker.strains import Strain
 
 
 try:
@@ -112,6 +117,7 @@ class DatasetLoader():
             self._root)[-1] if not self._remote_loading else self._platform_id
         self.bgcs, self.gcfs, self.spectra, self.molfams = [], [], [], []
         self.mibig_bgc_dict = {}
+        self._mibig_strain_bgc_mapping = {}
         self.product_types = []
         self.strains = StrainCollection()
         self.webapp_scoring_cutoff = self._config_webapp.get(
@@ -149,7 +155,8 @@ class DatasetLoader():
 
         generate_mappings_genome_id_bgc_id(self._root / "antismash")
 
-        podp_project_json_file = self._root.parent.parent / (self._platform_id + ".json")
+        podp_project_json_file = self._root.parent.parent / (
+            self._platform_id + ".json")
         genome_status_json_file = self._root.parent.parent / "downloads" / self._platform_id / GENOME_STATUS_FILENAME
         genome_bgc_mappings_file = self._root / "antismash" / GENOME_BGC_MAPPINGS_FILENAME
         gnps_file_mapping_tsv_file = self._root / GNPS_FILE_MAPPINGS_FILENAME
@@ -161,7 +168,10 @@ class DatasetLoader():
                                       self.strain_mappings_file)
 
     def load(self):
-        # load strain mappings first
+        if self._use_mibig:
+            if not self._load_mibig():
+                return False
+
         if not self._load_strain_mappings():
             return False
 
@@ -196,6 +206,9 @@ class DatasetLoader():
 
     def _start_downloads(self):
         downloader = PODPDownloader(self._platform_id)
+        # TODO CG: this step generates the real path for _root. Should generate
+        # it before loading process starts. Otherwise, npl.root_dir will get
+        # wrong value if loading from local data or not using download.
         self._root = Path(downloader.project_results_dir)
         logger.debug('remote loading mode, configuring root=%s', self._root)
         # CG: to download both MET and GEN data
@@ -345,12 +358,28 @@ class DatasetLoader():
                 logger.warning('Optional file/directory "%s" does not exist',
                                f)
 
-    # TODO: this function should be refactored to Loader class
+    def _load_mibig(self):
+        mibig_bgc_loader = MibigLoader(self.mibig_json_dir)
+        self.mibig_bgc_dict = mibig_bgc_loader.get_bgcs()
+        self._mibig_strain_bgc_mapping = mibig_bgc_loader.get_strain_bgc_mapping(
+        )
+        return True
+
     def _load_strain_mappings(self):
+        # First load user's strain mappings
         sc = StrainCollection.read_json(self.strain_mappings_file)
         for strain in sc:
             self.strains.add(strain)
-        logger.info('Loaded dataset strain IDs ({} total)'.format(
+        logger.info('Loaded {} non-MiBIG Strain objects'.format(
+            len(self.strains)))
+
+        # Then load MiBIG strain mappings
+        if self._mibig_strain_bgc_mapping:
+            for k, v in self._mibig_strain_bgc_mapping.items():
+                strain = Strain(k)
+                strain.add_alias(v)
+                self.strains.add(strain)
+        logger.info('Loaded {} Strain objects in total'.format(
             len(self.strains)))
 
         return True
@@ -379,30 +408,46 @@ class DatasetLoader():
                                         self.spectra, spec_dict)
         return True
 
-    # CG: load gemonics data into memory
+    # TODO CG: self.strains will be overwritten by this method, rename it?
     def _load_genomics(self):
-        # TODO split this method up a bit
+        """Loads all genomics data (BGCs and GCFs) into the object.
+        """
+        logger.debug("\nLoading genomics data starts...")
 
-        # hmmscan apparently can't cope with filenames that have spaces in them, and so if you try
-        # to run bigscape on a dataset like that it will just refuse. so, to try and avoid anyone
-        # having to manually fix this stupid problem, we will attempt to rename every .gbk file here
-        # TODO is this something nplinker should do, or dataset authors??
-        logger.debug("\nLoading genomics starts...")
+        # Step 1: load all BGC objects
+        logger.debug('Parsing AntiSMASH directory...')
+        antismash_bgc_dict = AntismashBGCLoader(self.antismash_dir).get_bgcs()
+        raw_bgcs = list(antismash_bgc_dict.values()) + list(
+            self.mibig_bgc_dict.values())
 
-        #----------------------------------------------------------------------
-        # CG: replace space with underscore for antismash folder and file names
-        # TODO:
-        # 1.[] move this part to antismash downloader as post-download process
-        # 2.[x] separete listing gbk files and renaming
-        #----------------------------------------------------------------------
-        logger.debug('Collecting .gbk files (and possibly renaming)')
+        # Step 2: load all GCF objects
+        bigscape_cluster_file = Path(
+            self.bigscape_dir
+        ) / "mix" / f"mix_clustering_c0.{self._bigscape_cutoff:02d}.tsv"
+        bigscape_gcf_list = BigscapeGCFLoader(bigscape_cluster_file).get_gcfs()
+        raw_gcfs = bigscape_gcf_list
 
-        # if the option is enabled, check for spaces in the folder names under
-        # <dataset>/antismash and rename them, replacing spaces with underscores
-        ignore_spaces = self._antismash_ignore_spaces
-        if not ignore_spaces:
+        # Step 3: assign Strain object to BGC.strain
+        map_strain_to_bgc(self.strains, raw_bgcs)
+
+        # Step 4: assign BGC objects to GCF.bgcs
+        map_bgc_to_gcf(raw_bgcs, raw_gcfs)
+
+        # Step 5: get clean GCF objects, BGC objects and Strain objects
+        self.gcfs = filter_mibig_only_gcf(raw_gcfs)
+        self.bgcs = get_bgcs_from_gcfs(self.gcfs)
+        self.strains = get_strains_from_bgcs(self.bgcs)
+
+        logger.debug("Loading genomics data completed\n")
+        return True
+
+    # TODO CG: run bigscape before loading and after downloading
+    def _run_bigscape(self):
+        # Check for spaces in the folder names under <dataset>/antismash and
+        # rename them by replacing spaces with underscores
+        if not self._antismash_ignore_spaces:
             logger.debug('Checking for spaces in antiSMASH folder names...')
-            for root, dirs, files in os.walk(self.antismash_dir):
+            for root, dirs, _ in os.walk(self.antismash_dir):
                 for d in dirs:
                     if d.find(' ') != -1:
                         os.rename(os.path.join(root, d),
@@ -411,91 +456,6 @@ class DatasetLoader():
                             'Renaming antiSMASH folder "{}" to "{}" to remove spaces! (suppress with ignore_spaces = true in config file)'
                             .format(d, d.replace(' ', '_')))
 
-        #----------------------------------------------------------------------
-        # CG: download mibig metadata and run bigscape
-        #----------------------------------------------------------------------
-        # both the bigscape and mibig_json dirs expected by nplinker may not exist at this point. in some
-        # cases this will cause an error later in the process, but this can also potentially be
-        # resolved automatically:
-        #   mibig_json => download and extract the JSON database
-        #   bigscape => run BiG-SCAPE before continuing (if using the Docker image)
-        self._load_genomics_extra()
-
-        #----------------------------------------------------------------------
-        # CG: load mibig metadata to BGC object
-        # and update self.strains with mibig strains
-        #----------------------------------------------------------------------
-        logger.debug(f'MibigBGCLoader({self.mibig_json_dir})')
-        mibig_bgc_loader = MibigBGCLoader(self.mibig_json_dir)
-        self.mibig_bgc_dict = mibig_bgc_loader.get_bgcs()
-
-        # add mibig bgc strains
-        # CG TODO: update strain assignment logics,
-        #    see issue 104 https://github.com/NPLinker/nplinker/issues/104
-        for bgc in self.mibig_bgc_dict.values():
-            if bgc.strain is not None:
-                self.strains.add(bgc.strain)
-            else:
-                logger.warning("No strain specified for BGC %s", bgc.bgc_id)
-
-        logger.debug('mibig_bgc_dict has {} entries'.format(
-            len(self.mibig_bgc_dict)))
-
-        #----------------------------------------------------------------------
-        # CG: Parse AntiSMASH dir
-        #----------------------------------------------------------------------
-        logger.debug('Parsing AntiSMASH directory...')
-        antismash_bgc_loader = AntismashBGCLoader(self.antismash_dir)
-
-        #----------------------------------------------------------------------
-        # CG: load all bgcs and gcfs
-        #----------------------------------------------------------------------
-        logger.debug('Loading GCFs...')
-
-        # TODO: refactor load_gcfs to independent steps
-        # Step 1: load all strains
-        # Step 2: load all bgcs
-        # Step 3: load all gcfs
-        # Step 4: connect bgc to strain with `map_strain_to_bgc`
-        # Step 5: connect gcf to bgcs with `map_bgc_to_gcf`
-        # Step 6: `filter_mibig_only_gcf`
-        # Step 7: get clean gcfs, bgcs and strains with `get_bgcs_from_gcfs`
-        #   and `get_strains_from_bgcs`
-
-        self.gcfs, self.bgcs, self.strains, unknown_strains = load_gcfs(
-            self.bigscape_dir, self.strains, self.mibig_bgc_dict,
-            antismash_bgc_loader.get_bgcs(), antismash_bgc_loader.get_files(),
-            self._bigscape_cutoff)
-
-        #----------------------------------------------------------------------
-        # CG: write unknown strains in genomics to file
-        #----------------------------------------------------------------------
-        us_path = os.path.join(self._root, 'unknown_strains_gen.csv')
-        logger.warning(
-            f'Writing unknown strains from GENOMICS data to {us_path}')
-        with open(us_path, 'w') as us:
-            us.write('# unknown strain label, filename\n')
-            for strain, filename in unknown_strains.items():
-                us.write(f'{strain}, {filename}\n')
-
-        logger.debug("Loading genomics completed\n")
-
-        return True
-
-    def _load_genomics_extra(self):
-        if not os.path.exists(self.mibig_json_dir):
-            if self._use_mibig:
-                logger.info(
-                    'Attempting to download MiBIG JSON database (v{})...'.
-                    format(self._mibig_version))
-                download_and_extract_mibig_metadata(self._root,
-                                                    self.mibig_json_dir,
-                                                    self._mibig_version)
-            else:
-                logger.warning(
-                    'Not downloading MiBIG database automatically, use_mibig = false'
-                )
-
         if not os.path.exists(self.bigscape_dir):
             should_run_bigscape = self._config_docker.get(
                 'run_bigscape', self.RUN_BIGSCAPE_DEFAULT)
@@ -503,7 +463,6 @@ class DatasetLoader():
                 'extra_bigscape_parameters',
                 self.EXTRA_BIGSCAPE_PARAMS_DEFAULT)
             if should_run_bigscape:
-                # TODO this should not be attempted if not in Docker env
                 logger.info(
                     'Running BiG-SCAPE! extra_bigscape_parameters="{}"'.format(
                         extra_bigscape_parameters))
@@ -606,13 +565,14 @@ class DatasetLoader():
             for line_num, sid in enumerate(strain_list):
                 sid = sid.strip()  # get rid of newline
                 try:
-                    strain_obj = self.strains.lookup(sid)
+                    strain_ref_list = self.strains.lookup(sid)
                 except KeyError:
                     logger.warning(
                         'Line {} of {}: invalid/unknown strain ID "{}"'.format(
                             line_num + 1, self.include_strains_file, sid))
                     continue
-                self.include_only_strains.add(strain_obj)
+                for strain in strain_ref_list:
+                    self.include_only_strains.add(strain)
             logger.debug('Found {} strain IDs in include_strains'.format(
                 len(self.include_only_strains)))
 
@@ -684,8 +644,8 @@ class DatasetLoader():
         # get the list of spectra which have at least one strain in the set
         spectra_to_retain = {
             spec
-            for spec in self.spectra for sstrain in spec.strains
-            if sstrain in self.include_only_strains
+            for spec in self.spectra
+            for sstrain in spec.strains if sstrain in self.include_only_strains
         }
 
         logger.info('Current / filtered BGC counts: {} / {}'.format(

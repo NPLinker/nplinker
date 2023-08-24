@@ -1,5 +1,6 @@
 
 from nplinker.strain_collection import StrainCollection
+from nplinker.strains import Strain
 from nplinker.utils import sqrt_normalise
 
 
@@ -97,7 +98,7 @@ class Spectrum():
         val = self.metadata.get(key, None)
         return val
 
-    def has_strain(self, strain):
+    def has_strain(self, strain: Strain):
         return strain in self.strains
 
     def get_growth_medium(self, strain):
