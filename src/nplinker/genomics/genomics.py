@@ -79,7 +79,8 @@ def map_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]):
         bgcs(list[BGC]): A list of BGC objects.
 
     Raises:
-        KeyError: Strain id not found in the strain collection.
+        ValueError: Strain id not found in the strain collection.
+        ValueError: Multiple strain objects found for a BGC id.
     """
     for bgc in bgcs:
         try:
