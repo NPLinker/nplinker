@@ -127,11 +127,11 @@ class StrainCollection():
             list[Strain]: List of Strain objects with the given name.
 
         Raises:
-            KeyError: If the strain name is not found.
+            ValueError: If the strain name is not found.
         """
         if name in self._strain_dict_name:
             return self._strain_dict_name[name]
-        raise KeyError(f"Strain {name} not found in strain collection.")
+        raise ValueError(f"Strain {name} not found in the strain collection.")
 
     @staticmethod
     def read_json(file: str | PathLike) -> 'StrainCollection':

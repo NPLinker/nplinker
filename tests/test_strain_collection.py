@@ -139,7 +139,7 @@ def test_has_name(collection: StrainCollection):
 def test_lookup(collection: StrainCollection, strain: Strain):
     for name in strain.names:
         assert collection.lookup(name) == [strain]
-    with pytest.raises(KeyError):
+    with pytest.raises(ValueError):
         collection.lookup("strain_not_exist")
 
 
