@@ -78,6 +78,7 @@ def get_headers(file: str | PathLike) -> list[str]:
         dl = find_delimiter(file)
         return headers.split(dl)
 
+
 def is_file_format(file: str | PathLike, format: str = "tsv") -> bool:
     """Check if the file is in the given format.
 
@@ -101,6 +102,7 @@ def is_file_format(file: str | PathLike, format: str = "tsv") -> bool:
         return True
     except csv.Error:
         return False
+
 
 # Functions below are adapted from torchvision library,
 # see: https://github.com/pytorch/vision/blob/main/torchvision/datasets/utils.py.
@@ -170,8 +172,11 @@ def download_url(url: str,
         with httpx.stream(http_method,
                           url,
                           follow_redirects=allow_http_redirect) as response:
+            if not response.is_success:
+                raise RuntimeError(
+                    f"Failed to download url {url} with status code {response.status_code}"
+                )
             total = int(response.headers.get("Content-Length", 0))
-
             with tqdm(total=total,
                       unit_scale=True,
                       unit_divisor=1024,
