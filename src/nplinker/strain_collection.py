@@ -77,10 +77,13 @@ class StrainCollection():
         """Remove a strain from the collection.
 
         It removes the given strain object from the collection by strain id.
-        If the strain id is not found, it does nothing.
+        If the strain id is not found, raise ValueError.
 
         Args:
             strain(Strain): The strain to remove.
+
+        Raises:
+            ValueError: If the strain is not found in the collection.
         """
         if strain in self._strains:
             self._strains.remove(strain)
@@ -95,6 +98,8 @@ class StrainCollection():
                         del self._strain_dict_name[name]
                     else:
                         self._strain_dict_name[name] = new_strain_list
+        else:
+            raise ValueError(f"Strain {strain} not found in strain collection.")
 
     def filter(self, strain_set: set[Strain]):
         """

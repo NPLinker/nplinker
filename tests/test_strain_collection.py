@@ -96,7 +96,8 @@ def test_add_different_id_different_alias(strain: Strain,
 
 def test_remove(strain: Strain):
     sc = StrainCollection()
-    sc.remove(strain)
+    with pytest.raises(ValueError):
+        sc.remove(strain)
     assert strain not in sc
 
 
@@ -117,7 +118,8 @@ def test_remove_same_id_different_alias(collection: StrainCollection):
 
 def test_remove_different_id(collection: StrainCollection):
     strain = Strain("strain_2")
-    collection.remove(strain)
+    with pytest.raises(ValueError):
+        collection.remove(strain)
     assert len(collection) == 1
     assert strain not in collection
     assert len(collection._strain_dict_name) == 2
