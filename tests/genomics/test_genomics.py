@@ -127,7 +127,7 @@ def test_map_strain_to_bgc(strain_collection, bgc_list):
 
 def test_map_strain_to_bgc_error(strain_collection):
     bgcs = [BGC("BGC_04", "NPR")]
-    with pytest.raises(KeyError) as e:
+    with pytest.raises(ValueError) as e:
         map_strain_to_bgc(strain_collection, bgcs)
     assert "Strain id 'BGC_04' from BGC object 'BGC_04' not found" in e.value.args[
         0]
