@@ -5,6 +5,7 @@ httpx
 numpy
 pandas
 progress
+pyteomics
 pytest-lazy-fixture
 scipy
 sortedcontainers
