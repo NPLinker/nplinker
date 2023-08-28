@@ -173,6 +173,7 @@ def download_url(url: str,
                           url,
                           follow_redirects=allow_http_redirect) as response:
             if not response.is_success:
+                fpath.unlink(missing_ok=True)
                 raise RuntimeError(
                     f"Failed to download url {url} with status code {response.status_code}"
                 )
@@ -182,7 +183,7 @@ def download_url(url: str,
                       unit_divisor=1024,
                       unit="B") as progress:
                 num_bytes_downloaded = response.num_bytes_downloaded
-                for chunk in response.iter_raw():
+                for chunk in response.iter_bytes():
                     fh.write(chunk)
                     progress.update(response.num_bytes_downloaded -
                                     num_bytes_downloaded)
