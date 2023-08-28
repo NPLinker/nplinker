@@ -5,8 +5,8 @@ import pandas as pd
 from scipy.stats import hypergeom
 from nplinker.genomics.gcf import GCF
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics.molecular_family import MolecularFamily
-from nplinker.metabolomics.spectrum import Spectrum
+from nplinker.metabolomics import MolecularFamily
+from nplinker.metabolomics import Spectrum
 from . import LINK_TYPES
 from .utils import isinstance_all
 

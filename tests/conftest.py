@@ -2,8 +2,8 @@ from pathlib import Path
 import shutil
 import pytest
 from nplinker.globals import STRAIN_MAPPINGS_FILENAME
+from nplinker.metabolomics import Spectrum
 from nplinker.metabolomics.metabolomics import load_spectra
-from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 from . import DATA_DIR

@@ -5,21 +5,21 @@ import numpy as np
 import pandas as pd
 from nplinker.genomics import GCF
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics.molecular_family import MolecularFamily
-from nplinker.metabolomics.spectrum import Spectrum
+from nplinker.metabolomics import MolecularFamily
+from nplinker.metabolomics import Spectrum
 from nplinker.pickler import load_pickled_data
 from nplinker.pickler import save_pickled_data
-from .linking import LINK_TYPES
 from .linking import DataLinks
-from .linking import LinkFinder
 from .linking import isinstance_all
+from .linking import LINK_TYPES
+from .linking import LinkFinder
 from .methods import ScoringMethod
 from .object_link import ObjectLink
 
 
 if TYPE_CHECKING:
-    from ..nplinker import NPLinker
     from . import LinkCollection
+    from ..nplinker import NPLinker
 
 logger = LogConfig.getLogger(__name__)
 

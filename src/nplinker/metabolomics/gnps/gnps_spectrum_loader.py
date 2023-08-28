@@ -1,8 +1,8 @@
 from os import PathLike
 from pyteomics import mgf
 from nplinker.logconfig import LogConfig
+from nplinker.metabolomics import Spectrum
 from nplinker.metabolomics.abc import SpectrumLoaderBase
-from nplinker.metabolomics.spectrum import Spectrum
 
 
 logger = LogConfig.getLogger(__name__)

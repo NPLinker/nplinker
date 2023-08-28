@@ -1,9 +1,9 @@
 from os import PathLike
 from pathlib import Path
 from typing_extensions import Self
-from nplinker.metabolomics.gnps import gnps_format_from_task_id
-from nplinker.metabolomics.gnps import GNPSFormat
 from nplinker.utils import download_url
+from .gnps_format import gnps_format_from_task_id
+from .gnps_format import GNPSFormat
 
 
 class GNPSDownloader:

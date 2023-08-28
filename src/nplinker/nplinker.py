@@ -9,8 +9,8 @@ from .genomics import GCF
 from .loader import DatasetLoader
 from .loader import NPLINKER_APP_DATA_DIR
 from .logconfig import LogConfig
-from .metabolomics.molecular_family import MolecularFamily
-from .metabolomics.spectrum import Spectrum
+from .metabolomics import MolecularFamily
+from .metabolomics import Spectrum
 from .pickler import save_pickled_data
 from .scoring.link_collection import LinkCollection
 from .scoring.metcalf_scoring import MetcalfScoring

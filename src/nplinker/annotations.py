@@ -15,8 +15,8 @@
 import csv
 import os
 from deprecated import deprecated
-from nplinker.metabolomics.spectrum import GNPS_KEY
-from nplinker.metabolomics.spectrum import Spectrum
+from nplinker.metabolomics import GNPS_KEY
+from nplinker.metabolomics import Spectrum
 from .logconfig import LogConfig
 
 
