@@ -1,8 +1,8 @@
 import filecmp
 from pathlib import Path
 import pytest
-from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
-from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
+from nplinker.metabolomics.gnps import GNPSExtractor
+from nplinker.metabolomics.gnps import GNPSFormat
 
 
 def test_unknown_workflow(gnps_zip_files, tmpdir):

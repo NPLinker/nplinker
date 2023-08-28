@@ -1,7 +1,6 @@
 import pytest
-from nplinker.metabolomics.gnps.gnps_annotation_loader import \
-    GNPSAnnotationLoader
-from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
+from nplinker.metabolomics.gnps import GNPSAnnotationLoader
+from nplinker.metabolomics.gnps import GNPSFormat
 
 
 @pytest.mark.parametrize("workflow, expected",

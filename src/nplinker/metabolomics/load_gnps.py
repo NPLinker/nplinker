@@ -4,8 +4,8 @@ import re
 from typing import Any
 from deprecated import deprecated
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_file_mapping
-from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
+from nplinker.metabolomics.gnps import gnps_format_from_file_mapping
+from nplinker.metabolomics.gnps import GNPSFormat
 from nplinker.metabolomics.spectrum import Spectrum
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain

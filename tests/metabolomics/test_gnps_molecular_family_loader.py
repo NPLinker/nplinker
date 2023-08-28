@@ -1,7 +1,6 @@
 import pytest
-from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
-from nplinker.metabolomics.gnps.gnps_molecular_family_loader import \
-    GNPSMolecularFamilyLoader
+from nplinker.metabolomics.gnps import GNPSFormat
+from nplinker.metabolomics.gnps import GNPSMolecularFamilyLoader
 
 
 @pytest.mark.parametrize("workflow, num_families, num_spectra",

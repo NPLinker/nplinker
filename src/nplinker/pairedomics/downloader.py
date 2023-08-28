@@ -6,8 +6,8 @@ import shutil
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.globals import PFAM_PATH
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
-from nplinker.metabolomics.gnps.gnps_extractor import GNPSExtractor
+from nplinker.metabolomics.gnps import GNPSDownloader
+from nplinker.metabolomics.gnps import GNPSExtractor
 from nplinker.utils import download_url
 from . import podp_download_and_extract_antismash_data
 from .runbigscape import podp_run_bigscape
