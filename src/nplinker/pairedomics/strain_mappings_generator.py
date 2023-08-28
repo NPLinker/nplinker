@@ -306,7 +306,7 @@ def extract_mappings_ms_filename_spectrum_id(
         `GNPSFileMappingLoader`: A class to load GNPS file mapping TSV file.
     """
     loader = GNPSFileMappingLoader(tsv_file)
-    return loader.mapping_reversed()
+    return loader.mapping_reversed
 
 
 def get_mappings_strain_id_spectrum_id(
