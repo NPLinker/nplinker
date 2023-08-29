@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
+import httpx
 import pytest
 from pytest_lazyfixture import lazy_fixture
-from requests.exceptions import ReadTimeout
 from nplinker.pairedomics.downloader import PODPDownloader
 
 
@@ -39,8 +39,8 @@ def test_download_metabolomics_zipfile(tmp_path):
 
         assert os.path.exists(expected_path)
         assert (Path(sut.project_results_dir) /
-                "molecular_families.pairsinfo").is_file()
+                "molecular_families.tsv").is_file()
         assert (Path(sut.project_results_dir) / "file_mappings.tsv").is_file()
         assert (Path(sut.project_results_dir) / "spectra.mgf").is_file()
-    except ReadTimeout:
+    except httpx.TimeoutException:
         pytest.skip("GNPS is down")

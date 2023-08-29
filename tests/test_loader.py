@@ -23,7 +23,7 @@ def config():
 
 @pytest.fixture
 def config_with_new_gnps_extractor():
-    GNPSExtractor(DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip", DATA_DIR / "extracted").extract()
+    GNPSExtractor(DATA_DIR / "ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip", DATA_DIR / "extracted")
     yield {
         "dataset" : {
             "root": DATA_DIR / "extracted",
@@ -53,7 +53,7 @@ def test_has_metabolomics_paths_new_gnps(config_with_new_gnps_extractor):
     sut = DatasetLoader(config_with_new_gnps_extractor)
     sut._init_metabolomics_paths()
     assert sut.mgf_file == str(config_with_new_gnps_extractor["dataset"]["root"] / "spectra.mgf")
-    assert sut.edges_file == str(config_with_new_gnps_extractor["dataset"]["root"] / "molecular_families.pairsinfo")
+    assert sut.edges_file == str(config_with_new_gnps_extractor["dataset"]["root"] / "molecular_families.tsv")
     assert sut.nodes_file == str(config_with_new_gnps_extractor["dataset"]["root"] / "file_mappings.tsv")
     assert sut.annotations_dir == str(config_with_new_gnps_extractor["dataset"]["root"])
     assert sut.annotations_config_file == str(config_with_new_gnps_extractor["dataset"]["root"] / "annotations.tsv")

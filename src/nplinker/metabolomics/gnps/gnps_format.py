@@ -1,112 +1,125 @@
 from enum import Enum
+from enum import unique
 from os import PathLike
-import os
+from pathlib import Path
 import zipfile
-
-from bs4 import BeautifulSoup, Tag
-import requests
-
+from bs4 import BeautifulSoup
+from bs4 import Tag
+import httpx
 from nplinker.utils import get_headers
 
-
-class GNPSFormat(Enum):
-    Unknown = 0
-    AllFiles = 1
-    UniqueFiles = 2
-    FBMN = 3
 
 GNPS_TASK_URL = 'https://gnps.ucsd.edu/ProteoSAFe/status.jsp?task={}'
 
 
-def gnps_format_from_file_mapping(file: str | PathLike, has_quant_table: bool) -> GNPSFormat:
-    """Peek GNPS file format for given file.
+@unique
+class GNPSFormat(Enum):
+    """Enum class for GNPS format (workflow).
 
-    TODO: #89 This should be rewritten to actually return the format always based on only the file and not include the quant table in it.
-
-     Args:
-        file(str | PathLike): Path to the file to peek the format for.
-        has_quant_table (bool): If a quant table is present, do return GNPS_FORMAT_NEW_FBMN.
-
-    Returns:
-        GNPSFormat: GNPS format identified in the file.
+    The GNPS format refers to the GNPS workflow. The name of the enum is a
+    simple short name for the workflow, and the value of the enum is the actual
+    name of the workflow in the GNPS website.
     """
-
-    headers: list[str] = get_headers(os.fspath(file))
-
-    if headers is None:
-        return GNPSFormat.Unknown
-
-    # first, check for AllFiles
-    if 'AllFiles' in headers:
-        # this should be an old-style dataset like Crusemann, with a single .tsv file
-        # containing all the necessary info. The AllFiles column should contain pairs
-        # of mzXML filenames and scan numbers in this format:
-        #   filename1:scannumber1###filename2:scannumber2###...
-        return GNPSFormat.AllFiles
-    elif 'UniqueFileSources' in headers:
-        # this is a slightly newer-style dataset, e.g. MSV000084771 on the platform
-        # it still just has a single .tsv file, but AllFiles is apparently replaced
-        # with a UniqueFileSources column. There is also a UniqueFileSourcesCount
-        # column which just indicates the number of entries in the UniqueFileSources
-        # column. If there are multiple entries the delimiter is a | character
-        return GNPSFormat.UniqueFiles
-    elif has_quant_table:
-        # if there is no AllFiles/UniqueFileSources, but we DO have a quantification
-        # table file, that should indicate a new-style dataset like Carnegie
-        # TODO check for the required header columns here too
-        return GNPSFormat.FBMN
-    elif len(list(filter(lambda x: "Peak area" in x, headers))) > 1:
-        return GNPSFormat.FBMN
-    else:
-        # if we don't match any of the above cases then it's not a recognised format
-        return GNPSFormat.Unknown
+    # Format: ShortName = "GNPSWorkflowName"
+    SNETS = "METABOLOMICS-SNETS"
+    SNETSV2 = "METABOLOMICS-SNETS-V2"
+    FBMN = "FEATURE-BASED-MOLECULAR-NETWORKING"
+    Unknown = "Unknown-GNPS-Workflow"
 
 
 def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
-    """Detect the GNPS format for the given task id.
-
-    The http request has a timeout of 5 seconds. If the request fails,
-    an ReadTimeout exception is raised. This is to prevent the program
-    from hanging indefinitely when the GNPS server is down.
+    """Detect GNPS format for the given task id.
 
     Args:
         task_id(str): GNPS task id.
 
     Returns:
-        GNPSFormat: the format used in the GNPS workflow invocation.
+        GNPSFormat: the format identified in the GNPS task.
 
     Examples:
-        >>> gnps_format_from_task_id("92036537c21b44c29e509291e53f6382")
+        >>> gnps_format_from_task_id("c22f44b14a3d450eb836d607cb9521bb") == GNPSFormat.SNETS
+        >>> gnps_format_from_task_id("189e8bf16af145758b0a900f1c44ff4a") == GNPSFormat.SNETSV2
+        >>> gnps_format_from_task_id("92036537c21b44c29e509291e53f6382") == GNPSFormat.FBMN
+        >>> gnps_format_from_task_id("0ad6535e34d449788f297e712f43068a") == GNPSFormat.Unknown
     """
-    task_html = requests.get(GNPS_TASK_URL.format(task_id), timeout=5)
+    task_html = httpx.get(GNPS_TASK_URL.format(task_id))
     soup = BeautifulSoup(task_html.text, features="html.parser")
     tags = soup.find_all('th')
-    workflow_tag: Tag = list(filter(lambda x: x.contents == ['Workflow'], tags))[0]
+    workflow_tag: Tag = list(filter(lambda x: x.contents == ['Workflow'],
+                                    tags))[0]
     workflow_format_tag: Tag = workflow_tag.parent.contents[3]
     workflow_format = workflow_format_tag.contents[0].strip()
 
-    if workflow_format == "FEATURE-BASED-MOLECULAR-NETWORKING":
+    if workflow_format == GNPSFormat.FBMN.value:
         return GNPSFormat.FBMN
-    if workflow_format == "METABOLOMICS-SNETS":
-        return GNPSFormat.AllFiles
+    if workflow_format == GNPSFormat.SNETSV2.value:
+        return GNPSFormat.SNETSV2
+    if workflow_format == GNPSFormat.SNETS.value:
+        return GNPSFormat.SNETS
     return GNPSFormat.Unknown
 
 
-def gnps_format_from_archive(archive: zipfile.ZipFile) -> GNPSFormat:
-    """Detect GNPS format from a downloaded archive.
+def gnps_format_from_archive(zip_file: str | PathLike) -> GNPSFormat:
+    """Detect GNPS format from a downloaded GNPS zip archive.
+
+    The detection is based on the filename of the zip file and the names of the
+    files contained in the zip file.
 
     Args:
-        archive(zipfile.ZipFile): Data downloaded from GNPS workflow.
+        zip_file: Path to the downloaded GNPS zip file.
 
     Returns:
-        GNPSFormat: the format used in the GNPS workflow invocation.
+        GNPSFormat: the format identified in the GNPS zip file.
 
     Examples:
-        >>> gnps_format_from_archive("tests/data/ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip")
+        >>> gnps_format_from_archive("downloads/ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip") == GNPSFormat.SNETS
+        >>> gnps_format_from_archive("downloads/ProteoSAFe-METABOLOMICS-SNETS-V2-189e8bf1-download_clustered_spectra.zip") == GNPSFormat.SNETSV2
+        >>> gnps_format_from_archive("downloads/ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-672d0a53-download_cytoscape_data.zip") == GNPSFormat.FBMN
      """
-    filenames = archive.namelist()
-    if any(["FEATURE-BASED-MOLECULAR-NETWORKING" in x for x in filenames]):
+    file = Path(zip_file)
+    # Guess the format from the filename of the zip file
+    if GNPSFormat.FBMN.value in file.name:
         return GNPSFormat.FBMN
-    elif any(["METABOLOMICS-SNETS" in x for x in filenames]):
-        return GNPSFormat.AllFiles
+    # the order of the if statements matters for the following two
+    if GNPSFormat.SNETSV2.value in file.name:
+        return GNPSFormat.SNETSV2
+    if GNPSFormat.SNETS.value in file.name:
+        return GNPSFormat.SNETS
+
+    # Guess the format from the names of the files in the zip file
+    with zipfile.ZipFile(file) as archive:
+        filenames = archive.namelist()
+    if any(GNPSFormat.FBMN.value in x for x in filenames):
+        return GNPSFormat.FBMN
+    # the order of the if statements matters for the following two
+    if any(GNPSFormat.SNETSV2.value in x for x in filenames):
+        return GNPSFormat.SNETSV2
+    if any(GNPSFormat.SNETS.value in x for x in filenames):
+        return GNPSFormat.SNETS
+
+    return GNPSFormat.Unknown
+
+
+def gnps_format_from_file_mapping(file: str | PathLike) -> GNPSFormat:
+    """Detect GNPS format from the given file mapping file.
+
+    The GNSP file mapping file is located in different folders depending on the
+    GNPS workflow. Here are the locations in corresponding GNPS zip archives:
+    - METABOLOMICS-SNETS workflow: the .tsv file under folder "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
+    - METABOLOMICS-SNETS-V2 workflow: the .clustersummary file (tsv) under folder "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
+    - FEATURE-BASED-MOLECULAR-NETWORKING workflow: the .csv file under folder "quantification_table"
+
+    Args:
+        file(str | PathLike): Path to the file to peek the format for.
+
+    Returns:
+        GNPSFormat: GNPS format identified in the file.
+    """
+    headers = get_headers(file)
+    if 'AllFiles' in headers:
+        return GNPSFormat.SNETS
+    if 'UniqueFileSources' in headers:
+        return GNPSFormat.SNETSV2
+    if 'row ID' in headers:
+        return GNPSFormat.FBMN
     return GNPSFormat.Unknown

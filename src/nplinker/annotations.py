@@ -22,7 +22,7 @@ from .logconfig import LogConfig
 
 logger = LogConfig.getLogger(__name__)
 
-GNPS_URL_FORMAT = 'https://metabolomics-usi.ucsd.edu/{}/?usi=mzspec:GNPSLIBRARY:{}'
+GNPS_URL_FORMAT = "https://metabolomics-usi.gnps2.org/{}/?usi1=mzspec:GNPS:GNPS-LIBRARY:accession:{}"
 GNPS_INDEX_COLUMN = '#Scan#'
 GNPS_DATA_COLUMNS = ['Compound_Name', 'Organism', 'MQScore', 'SpectrumID']
 

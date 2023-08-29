@@ -1,57 +1,114 @@
 from os import PathLike
+from pyteomics import mgf
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.abc import SpectrumLoaderBase
 from nplinker.metabolomics.spectrum import Spectrum
-from nplinker.parsers.mgf import LoadMGF
 
 
-logger = LogConfig.getLogger(__file__)
+logger = LogConfig.getLogger(__name__)
+
 
 class GNPSSpectrumLoader(SpectrumLoaderBase):
 
     def __init__(self, file: str | PathLike):
         """Class to load mass spectra from the given GNPS MGF file.
 
-        Args:
-            file(str | PathLike): path to the MGF file to load.
-        """
-        ms1, ms2, metadata = LoadMGF(name_field='scans').load_spectra([str(file)])
-        logger.info('%d molecules parsed from MGF file', len(ms1))
-        self._spectra = _mols_to_spectra(ms2, metadata)
+        The file mappings file is from GNPS output archive, as described below
+        for each GNPS workflow type:
+        1. METABOLOMICS-SNETS
+            - METABOLOMICS-SNETS*.mgf
+        2. METABOLOMICS-SNETS-V2
+            - METABOLOMICS-SNETS-V2*.mgf
+        3. FEATURE-BASED-MOLECULAR-NETWORKING
+            - spectra/*.mgf
 
+        Args:
+            file(str | PathLike): path to the MGF file.
+
+        Raises:
+            ValueError: Raises ValueError if the file is not valid.
+
+        Example:
+            >>> loader = GNPSSpectrumLoader("gnps_spectra.mgf")
+            >>> print(loader.spectra[0])
+        """
+        self._file = str(file)
+        self._spectra: list[Spectrum] = []
+
+        self._validate()
+        self._load()
+
+    @property
     def spectra(self) -> list[Spectrum]:
-        """Get the spectra loaded from the file.
+        """Get the list of Spectrum objects.
 
         Returns:
             list[Spectrum]: the loaded spectra as a list of `Spectrum` objects.
         """
         return self._spectra
 
+    def _validate(self):
+        """Validate GNPS MGF file.
 
-def _mols_to_spectra(ms2: list, metadata: dict[str, dict[str, str]]) -> list[Spectrum]:
-    """Function to convert ms2 object and metadata to `Spectrum` objects.
+        Raises:
+            ValueError: Raises ValueError if the file is not valid.
+        """
+        # check the local scope of a single MS/MS query (spectrum) has the
+        # required parameters. Note that this is not the header of the MGF
+        # file, but the local scope of each spectrum.
+        required_params = ['scans', 'pepmass', 'charge']
+        for spec in mgf.MGF(self._file):
+            for param in required_params:
+                if param not in spec['params']:
+                    raise ValueError(
+                        f"Invalid MGF file '{self._file}'. "
+                        f"Expected parameter '{param}' not found, "
+                        f"but got '{spec['params']}'.")
 
-    Args:
-        ms2(list): list of ms2 intensity.
-        metadata(dict[str, dict[str, str]]): Dictionary holding the metadata which was loaded from the original file.
+    def _load(self):
+        """Load the MGF file into Spectrum objects."""
+        i = 0
+        for spec in mgf.MGF(self._file):
+            # Skip if m/z array is empty, as this is an invalid spectrum.
+            # The invalid spectrum does not exist in other GNPS files, e.g.
+            # file mappings file and molecular families file. So we can safely
+            # skip it.
+            if len(spec['m/z array']) == 0:
+                continue
 
-    Returns:
-        list[Spectrum]: List of mass spectra obtained from ms2 and metadata.
-    """
-    ms2_dict = {}
-    # an example of m:
-    # (118.487999, 0.0, 18.753, <nplinker.parsers.mg...105f2c970>, 'spectra.mgf', 0.0)
-    for m in ms2:
-        if not m[3] in ms2_dict: # m[3] is `nplinker.parsers.mgf.MS1` object
-            ms2_dict[m[3]] = []
-        ms2_dict[m[3]].append((m[0], m[2]))
+            # Load the spectrum
+            peaks: list[tuple[float, float]] = list(
+                zip(spec['m/z array'], spec['intensity array']))
+            spectrum_id: str = spec['params']['scans']
+            # calculate precursor m/z from precursor mass and charge
+            precursor_mass = spec['params']['pepmass'][0]
+            precursor_charge = self._get_precursor_charge(
+                spec['params']['charge'])
+            precursor_mz: float = precursor_mass / abs(precursor_charge)
+            rt: float | None = spec['params'].get('rtinseconds', None)
 
-    spectra = []
-    for i, m in enumerate(ms2_dict.keys()): # m is `nplinker.parsers.mgf.MS1` object
-        new_spectrum = Spectrum(i, ms2_dict[m], m.name,
-                                metadata[m.name]['precursormass'],
-                                metadata[m.name]['parentmass'])
-        new_spectrum.metadata = metadata[m.name]
-        spectra.append(new_spectrum)
+            spectrum = Spectrum(id=i,
+                                peaks=peaks,
+                                spectrum_id=spectrum_id,
+                                precursor_mz=precursor_mz,
+                                rt=rt)
+            spectrum.metadata = spec['params']
+            self._spectra.append(spectrum)
+            i += 1
 
-    return spectra
+    def _get_precursor_charge(self, charges: list) -> int:
+        """Get the precursor charge from the charge list.
+
+        Args:
+            charge(list): list of charge values.
+
+        Returns:
+            int: the precursor charge.
+        """
+        charge = charges[0]
+        if charge == 0:
+            logger.warning(
+                f"Invalid precursor charge value 0. "
+                f"Assuming charge is 1 for spectrum '{self._file}'.")
+            charge = 1
+        return charge

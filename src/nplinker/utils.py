@@ -13,25 +13,21 @@
 # limitations under the License.
 
 from __future__ import annotations
-import csv
-import os
-from os import PathLike
-import os.path
 import bz2
+import csv
 import gzip
 import hashlib
 import lzma
 import math
+import os
+from os import PathLike
+import os.path
+from pathlib import Path
 import sys
 import tarfile
-import urllib
-import urllib.error
-import urllib.request
+from typing import Callable, IO
 import zipfile
-from pathlib import Path
-from typing import IO
-from typing import Callable
-from typing import Iterator
+import httpx
 from tqdm import tqdm
 
 
@@ -67,6 +63,7 @@ def find_delimiter(file: str | PathLike) -> str:
         delimiter = sniffer.sniff(fp.read(5000)).delimiter
     return delimiter
 
+
 def get_headers(file: str | PathLike) -> list[str]:
     """Read headers from the given tabular file.
 
@@ -76,10 +73,36 @@ def get_headers(file: str | PathLike) -> list[str]:
     Returns:
         list[str]: list of column names from the header.
     """
-    with open(os.fspath(file)) as f:
-        headers: str = f.readline().strip()
-        dl: str = find_delimiter(file)
+    with open(file) as f:
+        headers = f.readline().strip()
+        dl = find_delimiter(file)
         return headers.split(dl)
+
+
+def is_file_format(file: str | PathLike, format: str = "tsv") -> bool:
+    """Check if the file is in the given format.
+
+    Args:
+        file(str): Path to the file to check.
+        format(str): The format to check for, either "tsv" or "csv".
+
+    Returns:
+        bool: True if the file is in the given format, False otherwise.
+    """
+    try:
+        with open(file, 'rt') as f:
+            if format == "tsv":
+                reader = csv.reader(f, delimiter='\t')
+            elif format == "csv":
+                reader = csv.reader(f, delimiter=',')
+            else:
+                raise ValueError(f"Unknown format '{format}'.")
+            for _ in reader:
+                pass
+        return True
+    except csv.Error:
+        return False
+
 
 # Functions below are adapted from torchvision library,
 # see: https://github.com/pytorch/vision/blob/main/torchvision/datasets/utils.py.
@@ -89,39 +112,8 @@ def get_headers(file: str | PathLike) -> list[str]:
 # You may obtain a copy of the License at
 #    https://github.com/pytorch/vision/blob/main/LICENSE
 
-USER_AGENT = "NPLinker"
-# USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'
-
-
-def _save_response_content(content: Iterator[bytes],
-                           destination: str | PathLike,
-                           length: int | None = None) -> None:
-    with open(destination, "wb") as fh, tqdm(total=length) as pbar:
-        for chunk in content:
-            # filter out keep-alive new chunks
-            if not chunk:
-                continue
-
-            fh.write(chunk)
-            pbar.update(len(chunk))
-
-
-def _urlretrieve(url: str,
-                 filename: str | PathLike,
-                 chunk_size: int = 1024 * 32) -> None:
-    with urllib.request.urlopen(
-            urllib.request.Request(url, headers={"User-Agent":
-                                                 USER_AGENT})) as response:
-        _save_response_content(iter(lambda: bytes(response.read(chunk_size)),
-                                    b""),
-                               filename,
-                               length=response.length)
-
 
 def calculate_md5(fpath: str | PathLike, chunk_size: int = 1024 * 1024) -> str:
-    # Setting the `usedforsecurity` flag does not change anything about the functionality, but indicates that we are
-    # not using the MD5 checksum for cryptography. This enables its usage in restricted environments like FIPS. Without
-    # it torchvision.datasets is unusable in these environments since we perform a MD5 check everywhere.
     if sys.version_info >= (3, 9):
         md5 = hashlib.md5(usedforsecurity=False)
     else:
@@ -144,35 +136,24 @@ def check_integrity(fpath: str | PathLike, md5: str | None = None) -> bool:
     return check_md5(fpath, md5)
 
 
-def _get_redirect_url(url: str, max_hops: int = 3) -> str:
-    initial_url = url
-    headers = {"Method": "HEAD", "User-Agent": USER_AGENT}
-
-    for _ in range(max_hops + 1):
-        with urllib.request.urlopen(
-                urllib.request.Request(url, headers=headers)) as response:
-            if response.url == url or response.url is None:
-                return url
-            url = response.url
-
-    raise RecursionError(
-        f"Request to {initial_url} exceeded {max_hops} redirects. The last redirect points to {url}."
-    )
-
-
 def download_url(url: str,
                  root: str | PathLike,
                  filename: str | None = None,
                  md5: str | None = None,
-                 max_redirect_hops: int = 3) -> None:
+                 http_method: str = "GET",
+                 allow_http_redirect: bool = True) -> None:
     """Download a file from a url and place it in root.
 
     Args:
         url (str): URL to download file from
         root (str): Directory to place downloaded file in
-        filename (str, optional): Name to save the file under. If None, use the basename of the URL
-        md5 (str, optional): MD5 checksum of the download. If None, do not check
-        max_redirect_hops (int, optional): Maximum number of redirect hops allowed
+        filename (str, optional): Name to save the file under. If None, use the
+            basename of the URL.
+        md5 (str, optional): MD5 checksum of the download. If None, do not check.
+        http_method (str, optional): HTTP request method, e.g. "GET", "POST".
+            Defaults to "GET".
+        allow_http_redirect (bool, optional): If true, enable following redirects
+         for all HTTP ("http:") methods.
     """
     root = Path(root).expanduser()
     if not filename:
@@ -186,30 +167,34 @@ def download_url(url: str,
         print("Using downloaded and verified file: " + str(fpath))
         return
 
-    # expand redirect chain if needed
-    url = _get_redirect_url(url, max_hops=max_redirect_hops)
-
     # download the file
-    try:
-        print("Downloading " + url + " to " + str(fpath))
-        _urlretrieve(url, fpath)
-    except (urllib.error.URLError, OSError) as e:  # type: ignore[attr-defined]
-        if url[:5] == "https":
-            url = url.replace("https:", "http:")
-            print(
-                "Failed download. Trying https -> http instead. Downloading " +
-                url + " to " + str(fpath))
-            _urlretrieve(url, fpath)
-        else:
-            raise e
+    with open(fpath, "wb") as fh:
+        with httpx.stream(http_method,
+                          url,
+                          follow_redirects=allow_http_redirect) as response:
+            if not response.is_success:
+                raise RuntimeError(
+                    f"Failed to download url {url} with status code {response.status_code}"
+                )
+            total = int(response.headers.get("Content-Length", 0))
+            with tqdm(total=total,
+                      unit_scale=True,
+                      unit_divisor=1024,
+                      unit="B") as progress:
+                num_bytes_downloaded = response.num_bytes_downloaded
+                for chunk in response.iter_raw():
+                    fh.write(chunk)
+                    progress.update(response.num_bytes_downloaded -
+                                    num_bytes_downloaded)
+                    num_bytes_downloaded = response.num_bytes_downloaded
 
     # check integrity of downloaded file
     if not check_integrity(fpath, md5):
-        raise RuntimeError("File not found or corrupted, or md5 validation failed.")
+        raise RuntimeError(
+            "File not found or corrupted, or md5 validation failed.")
 
 
-def list_dirs(root: str | PathLike,
-              keep_parent: bool = True) -> list[str]:
+def list_dirs(root: str | PathLike, keep_parent: bool = True) -> list[str]:
     """List all directories at a given root
 
     Args:
@@ -254,10 +239,11 @@ def list_files(root: str | PathLike,
 
 
 def _extract_tar(from_path: str | PathLike, to_path: str | PathLike,
+                 members: list[tarfile.TarInfo] | None,
                  compression: str | None) -> None:
     with tarfile.open(from_path,
                       f"r:{compression[1:]}" if compression else "r") as tar:
-        tar.extractall(to_path)
+        tar.extractall(to_path, members)
 
 
 _ZIP_COMPRESSION_MAP: dict[str, int] = {
@@ -267,18 +253,20 @@ _ZIP_COMPRESSION_MAP: dict[str, int] = {
 
 
 def _extract_zip(from_path: str | PathLike, to_path: str | PathLike,
+                 members: list[str | zipfile.ZipInfo] | None,
                  compression: str | None) -> None:
     with zipfile.ZipFile(from_path,
                          "r",
                          compression=_ZIP_COMPRESSION_MAP[compression]
-                         if compression else zipfile.ZIP_STORED) as zip:
-        zip.extractall(to_path)
+                         if compression else zipfile.ZIP_STORED) as zf:
+        zf.extractall(to_path, members)
 
 
-_ARCHIVE_EXTRACTORS: dict[str, Callable[[str, str, str | None], None]] = {
-    ".tar": _extract_tar,
-    ".zip": _extract_zip,
-}
+_ARCHIVE_EXTRACTORS: dict[str, Callable[[str, str, list | None, str | None],
+                                        None]] = {
+                                            ".tar": _extract_tar,
+                                            ".zip": _extract_zip,
+                                        }
 _COMPRESSED_FILE_OPENERS: dict[str, Callable[..., IO]] = {
     ".bz2": bz2.open,
     ".gz": gzip.open,
@@ -348,8 +336,8 @@ def _decompress(from_path: Path | str,
 
     Args:
         from_path (str or Path): Path to the file to be decompressed.
-        to_path (str Path): Path to the decompressed file. If omitted, ``from_path`` without compression extension is used.
-        remove_finished (bool): If ``True``, remove the file after the extraction.
+        to_path (str Path): Path to the decompressed file. If omitted, `from_path` without compression extension is used.
+        remove_finished (bool): If `True`, remove the file after the extraction.
 
     Returns:
         (str): Path to the decompressed file.
@@ -376,7 +364,8 @@ def _decompress(from_path: Path | str,
 
 
 def extract_archive(from_path: str | PathLike,
-                    to_path: str | Path | None = None,
+                    extract_root: str | PathLike | None = None,
+                    members: list | None = None,
                     remove_finished: bool = False) -> str:
     """Extract an archive.
 
@@ -385,55 +374,41 @@ def extract_archive(from_path: str | PathLike,
     dispatched to :func:`decompress`.
 
     Args:
-        from_path (str, Path): Path to the file to be extracted.
-        to_path (str, Path): Path to the directory the file will be extracted to.
+        from_path: Path to the file to be extracted.
+        extract_root: Path to the directory the file will be extracted to.
             If omitted, the directory of the archive file is used.
-        remove_finished (bool): If ``True``, remove the file after the extraction.
+        members: Optional selection of members to extract. If not specified,
+            all members are extracted.
+            Memers must be a subset of the list returned by
+            - `zipfile.ZipFile.namelist()` or a list of strings for zip file
+            - `tarfile.TarFile.getmembers()` for tar file
+        remove_finished: If `True`, remove the file after the extraction.
 
     Returns:
         (str): Path to the directory the file was extracted to.
     """
     from_path = Path(from_path)
 
-    if to_path is None:
-        to_path = from_path.parent
+    if extract_root is None:
+        extract_root = from_path.parent
     else:
-        to_path = Path(to_path)
+        extract_root = Path(extract_root)
 
     suffix, archive_type, compression = _detect_file_type(from_path)
     if not archive_type:
         return _decompress(
             from_path,
-            to_path / from_path.name.replace(suffix, ""),
+            extract_root / from_path.name.replace(suffix, ""),
             remove_finished=remove_finished,
         )
 
     extractor = _ARCHIVE_EXTRACTORS[archive_type]
 
-    extractor(str(from_path), str(to_path), compression)
+    extractor(str(from_path), str(extract_root), members, compression)
     if remove_finished:
         from_path.unlink()
 
-    return str(to_path)
-
-def extract_file_matching_pattern(archive: zipfile.ZipFile, prefix: str, suffix: str, extract_dir: Path, out_filename: str|None = None):
-    """Extract a file matching a pattern from an archive and place it in the extraction directory under the given filename.
-
-    Args:
-        archive(zipfile.ZipFile): Archive from which to extract the file
-        prefix(str): Prefix to match in the filename. Pass empty string for no prefix.
-        suffix(str): Suffix to match in the filename. Pass empty string for no suffix.
-        extract_dir(Path): Path to the folder where to store the extracted file
-        out_filename(str): Name to assign to the extracted file.
-
-    Examples:
-        >>> extract_file_matching_pattern(zipfile.ZipFile("archive.zip"), "", ".txt", ".", "results.txt")
-    """
-    files: list[str] = [x.filename for x in archive.filelist]
-    file_to_extract = list(filter(lambda x: x.startswith(prefix) and x.endswith(suffix), files)).pop()
-    archive.extract(file_to_extract, extract_dir)
-    if out_filename is not None:
-        os.rename(extract_dir / file_to_extract, extract_dir / out_filename)
+    return str(extract_root)
 
 
 def download_and_extract_archive(
@@ -473,4 +448,4 @@ def download_and_extract_archive(
 
     archive = download_root / filename
     print(f"Extracting {archive} to {extract_root}")
-    extract_archive(archive, extract_root, remove_finished)
+    extract_archive(archive, extract_root, remove_finished=remove_finished)

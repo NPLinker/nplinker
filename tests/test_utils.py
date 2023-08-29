@@ -6,11 +6,12 @@ import pytest
 from nplinker import utils
 from nplinker.utils import find_delimiter
 from tests import DATA_DIR
+from tests import GNPS_DATA_DIR
 
 
 @pytest.mark.parametrize(
     "filename, expected",
-    [[DATA_DIR / "nodes.tsv", '\t'], [DATA_DIR / "nodes_mwe.csv", ',']])
+    [[GNPS_DATA_DIR / "nodes.tsv", '\t'], [GNPS_DATA_DIR / "nodes_mwe.csv", ',']])
 def test_find_delimiter(filename, expected):
     actual = find_delimiter(filename)
     assert actual == expected
@@ -71,7 +72,7 @@ class TestExtractArchive:
 
     def test_optional_args(self, archive):
         to_path = mkdtemp()
-        utils.extract_archive(archive, to_path=to_path, remove_finished=True)
+        utils.extract_archive(archive, extract_root=to_path, remove_finished=True)
         dir = Path(to_path) / "mibig_json_3.1"
         assert dir.exists()
         assert dir.is_dir()
@@ -185,19 +186,3 @@ class TestListFiles:
         assert len(files) == 1
         assert "test_utils.py" not in files
         assert str(ROOT / "test_utils.py") in files
-
-
-def test_extract_file_matching_pattern(tmp_path):
-    archive = zipfile.ZipFile(DATA_DIR / "ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip")
-    utils.extract_file_matching_pattern(
-        archive,
-        "quantification_table_reformatted",
-        ".csv" ,
-        tmp_path,
-        "test.csv"
-    )
-    expected: Path = tmp_path / "test.csv"
-    
-    assert expected.exists()
-    assert expected.is_file()
-
