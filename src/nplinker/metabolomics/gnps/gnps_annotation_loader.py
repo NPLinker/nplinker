@@ -110,15 +110,13 @@ class GNPSAnnotationLoader(AnnotationLoaderBase):
         # validate that "#Scan#" must be unique
         with open(self._file, mode='rt') as f:
             reader = csv.DictReader(f, delimiter='\t')
-            ids = []
-            for row in reader:
-                _id = row["#Scan#"]
-                if _id in ids:
-                    raise ValueError(
-                        f"Invalid GNPS annotation file '{self._file}'. "
-                        f"Expected unique '#Scan#', but found duplicate '{_id}'."
-                    )
-                ids.append(_id)
+            scans = [row["#Scan#"] for row in reader]
+        duplicates = {x for x in scans if scans.count(x) > 1}
+        if len(duplicates) > 0:
+            raise ValueError(
+                f"Invalid GNPS annotation file '{self._file}'. "
+                f"Expected unique '#Scan#', but found duplicates '{duplicates}'."
+            )
 
     def _load(self) -> None:
         """Load the annotations from the file."""

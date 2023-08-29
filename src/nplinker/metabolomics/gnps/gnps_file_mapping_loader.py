@@ -113,20 +113,16 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         with open(self._file, mode='rt') as f:
             if self._gnps_format is GNPSFormat.FBMN:
                 reader = csv.DictReader(f, delimiter=',')
+                ids = [row["row ID"] for row in reader]
             else:
                 reader = csv.DictReader(f, delimiter='\t')
-            ids = []
-            for row in reader:
-                if self._gnps_format is GNPSFormat.FBMN:
-                    _id = row["row ID"]
-                else:
-                    _id = row["cluster index"]
-                if _id in ids:
-                    raise ValueError(
-                        f"Invalid GNPS file mappings file '{self._file}'. "
-                        f"Expected unique 'cluster index' or 'row ID', "
-                        f"but found duplicate '{_id}'.")
-                ids.append(_id)
+                ids = [row["cluster index"] for row in reader]
+        duplicates = {x for x in ids if ids.count(x) > 1}
+        if len(duplicates) > 0:
+            raise ValueError(
+                f"Invalid GNPS file mappings file '{self._file}'. "
+                f"Expected unique 'cluster index' or 'row ID', "
+                f"but found duplicates '{duplicates}'.")
 
     def _load(self) -> None:
         """Load file mapping from the file based on the GNPS workflow type.
