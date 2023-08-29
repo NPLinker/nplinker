@@ -336,8 +336,8 @@ def _decompress(from_path: Path | str,
 
     Args:
         from_path (str or Path): Path to the file to be decompressed.
-        to_path (str Path): Path to the decompressed file. If omitted, ``from_path`` without compression extension is used.
-        remove_finished (bool): If ``True``, remove the file after the extraction.
+        to_path (str Path): Path to the decompressed file. If omitted, `from_path` without compression extension is used.
+        remove_finished (bool): If `True`, remove the file after the extraction.
 
     Returns:
         (str): Path to the decompressed file.
@@ -380,9 +380,9 @@ def extract_archive(from_path: str | PathLike,
         members: Optional selection of members to extract. If not specified,
             all members are extracted.
             Memers must be a subset of the list returned by
-            - ``zipfile.ZipFile.namelist()`` or a list of strings for zip file
-            - ``tarfile.TarFile.getmembers()`` for tar file
-        remove_finished: If ``True``, remove the file after the extraction.
+            - `zipfile.ZipFile.namelist()` or a list of strings for zip file
+            - `tarfile.TarFile.getmembers()` for tar file
+        remove_finished: If `True`, remove the file after the extraction.
 
     Returns:
         (str): Path to the directory the file was extracted to.
