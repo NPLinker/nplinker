@@ -25,8 +25,18 @@ class BigscapeGCFLoader():
         self._gcf_dict = self._parse_gcf(self.cluster_file)
         self._gcf_list = list(self._gcf_dict.values())
 
-    def get_gcfs(self) -> list[GCF]:
-        """Get all GCF objects."""
+    def get_gcfs(self, keep_mibig_only=False) -> list[GCF]:
+        """Get all GCF objects.
+
+        Args:
+            keep_mibig_only(bool): True to keep GCFs that contain only MIBiG
+                BGCs.
+
+        Returns:
+            list[GCF]: a list of GCF objects.
+        """
+        if not keep_mibig_only:
+            return [gcf for gcf in self._gcf_list if not gcf.has_mibig_only()]
         return self._gcf_list
 
     @staticmethod
