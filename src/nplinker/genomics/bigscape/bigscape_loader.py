@@ -22,8 +22,7 @@ class BigscapeGCFLoader():
             cluster_file(str): path to the BiG-SCAPE cluster file.
         """
         self.cluster_file = str(cluster_file)
-        self._gcf_dict = self._parse_gcf(self.cluster_file)
-        self._gcf_list = list(self._gcf_dict.values())
+        self._gcf_list = self._parse_gcf(self.cluster_file)
 
     def get_gcfs(self, keep_mibig_only=False) -> list[GCF]:
         """Get all GCF objects.
@@ -40,9 +39,9 @@ class BigscapeGCFLoader():
         return self._gcf_list
 
     @staticmethod
-    def _parse_gcf(cluster_file: str) -> dict[str, GCF]:
+    def _parse_gcf(cluster_file: str) -> list[GCF]:
         """Parse BiG-SCAPE cluster file to return GCF objects."""
-        gcf_dict = {}
+        gcf_dict: dict[str, GCF] = {}
         with open(cluster_file, "rt", encoding="utf-8") as f:
             reader = csv.reader(f, delimiter='\t')
             next(reader)  # skip headers
@@ -51,7 +50,7 @@ class BigscapeGCFLoader():
                 if family_id not in gcf_dict:
                     gcf_dict[family_id] = GCF(family_id)
                 gcf_dict[family_id].bgc_ids.add(bgc_id)
-        return gcf_dict
+        return list(gcf_dict.values())
 
 
 # register as virtual class to prevent metaclass conflicts
