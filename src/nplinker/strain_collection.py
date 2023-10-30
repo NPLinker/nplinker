@@ -58,7 +58,10 @@ class StrainCollection():
         if strain in self._strains:
             # only one strain object per id
             strain_ref = self._strain_dict_name[strain.id][0]
-            new_aliases = [alias for alias in strain.aliases if alias not in strain_ref.aliases]
+            new_aliases = [
+                alias for alias in strain.aliases
+                if alias not in strain_ref.aliases
+            ]
             for alias in new_aliases:
                 strain_ref.add_alias(alias)
                 if alias not in self._strain_dict_name:
@@ -92,14 +95,16 @@ class StrainCollection():
             for name in strain_ref.names:
                 if name in self._strain_dict_name:
                     new_strain_list = [
-                        s for s in self._strain_dict_name[name] if s.id != strain.id
+                        s for s in self._strain_dict_name[name]
+                        if s.id != strain.id
                     ]
                     if not new_strain_list:
                         del self._strain_dict_name[name]
                     else:
                         self._strain_dict_name[name] = new_strain_list
         else:
-            raise ValueError(f"Strain {strain} not found in strain collection.")
+            raise ValueError(
+                f"Strain {strain} not found in strain collection.")
 
     def filter(self, strain_set: set[Strain]):
         """
