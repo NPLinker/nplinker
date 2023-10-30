@@ -106,35 +106,41 @@ def test_genome_status_to_json_nofile():
         '"resolve_attempted": false, "bgc_path": ""}], "version": "1.0"}'
 
 
+#------------------------------------------------------------------------------
+# Note that some examples of genomme ID are used in following tests.
+# But it's not guaranteed that these IDs will be valid in the future.
+# Updates in NCBI and antiSMASH databases may cause the tests to fail, in
+# which case the IDs should be replaced with valid ones.
+#------------------------------------------------------------------------------
+
+
 # Test `podp_download_and_extract_antismash_data` function
 # with multiple records containing three types of genome IDs
 def test_multiple_records(download_root, extract_root, genome_status_file):
     genome_records = [{
         "genome_ID": {
             "genome_type": "genome",
-            "JGI_Genome_ID": "2515154188",
-            "RefSeq_accession": "GCF_000514875.1",
-            "GenBank_accession": "GCA_004799605.1"
+            "JGI_Genome_ID": "2515154178",
+            "RefSeq_accession": "GCF_000514775.1",
+            "GenBank_accession": "GCA_000514775.1"
         },
-        "genome_label": "Salinispora arenicola CNX508"
     }, {
         "genome_ID": {
             "genome_type": "genome",
-            "JGI_Genome_ID": "2515154177",
-            "RefSeq_accession": "GCF_000514515.1",
-            "GenBank_accession": "GCA_004799605.1"
+            "JGI_Genome_ID": "640427140",
+            "RefSeq_accession": "GCF_000016425.1",
+            "GenBank_accession": "GCA_000016425.1"
         },
-        "genome_label": "Salinispora pacifica CNT029"
     }]
 
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
-    archive1 = download_root / "GCF_000514875.1.zip"
-    extracted_folder1 = extract_root / "antismash" / "GCF_000514875.1"
+    archive1 = download_root / "GCF_000514775.1.zip"
+    extracted_folder1 = extract_root / "antismash" / "GCF_000514775.1"
     extracted_files1 = list_files(extracted_folder1, keep_parent=True)
-    archive2 = download_root / "GCF_000514515.1.zip"
-    extracted_folder2 = extract_root / "antismash" / "GCF_000514515.1"
+    archive2 = download_root / "GCF_000016425.1.zip"
+    extracted_folder2 = extract_root / "antismash" / "GCF_000016425.1"
     extracted_files2 = list_files(extracted_folder2, keep_parent=True)
     genome_status = GenomeStatus.read_json(genome_status_file)
 
@@ -158,17 +164,16 @@ def test_missing_id(download_root, extract_root, genome_status_file):
     genome_records = [{
         "genome_ID": {
             "genome_type": "genome",
-            "JGI_Genome_ID": "",
-            "RefSeq_accession": ""
+            "JGI_Genome_ID": "2515154188",
+            "RefSeq_accession": "GCF_000514875.1"
         },
-        "genome_label": "Salinispora arenicola CNX508"
     }, {
         "genome_ID": {
             "genome_type": "genome",
-            "JGI_Genome_ID": "2515154177",
-            "RefSeq_accession": "GCF_000514515.1"
+            "JGI_Genome_ID": "640427140",
+            "RefSeq_accession": "GCF_000016425.1",
+            "GenBank_accession": "GCA_000016425.1"
         },
-        "genome_label": "Salinispora pacifica CNT029"
     }]
 
     podp_download_and_extract_antismash_data(genome_records, download_root,
@@ -176,15 +181,15 @@ def test_missing_id(download_root, extract_root, genome_status_file):
 
     archive1 = download_root / "GCF_000514875.1.zip"
     extracted_folder1 = extract_root / "antismash" / "GCF_000514875.1"
-    archive2 = download_root / "GCF_000514515.1.zip"
-    extracted_folder2 = extract_root / "antismash" / "GCF_000514515.1"
+    archive2 = download_root / "GCF_000016425.1.zip"
+    extracted_folder2 = extract_root / "antismash" / "GCF_000016425.1"
     genome_status = GenomeStatus.read_json(genome_status_file)
 
     assert (not archive1.exists() and archive2.exists())
     assert (not archive1.is_file() and archive2.is_file())
     assert (not extracted_folder1.exists() and extracted_folder2.exists())
     assert genome_status_file.is_file()
-    assert len(genome_status) == 1
+    assert len(genome_status) == 2
 
 
 # Test `podp_download_and_extract_antismash_data` function
@@ -193,16 +198,16 @@ def test_caching(download_root, extract_root, genome_status_file, caplog):
     genome_records = [{
         "genome_ID": {
             "genome_type": "genome",
-            "JGI_Genome_ID": "2515154188",
-            "RefSeq_accession": "GCF_000514875.1"
+            "JGI_Genome_ID": "640427140",
+            "RefSeq_accession": "GCF_000016425.1",
+            "GenBank_accession": "GCA_000016425.1"
         },
-        "genome_label": "Salinispora arenicola CNX508"
     }]
 
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
     genome_status_old = GenomeStatus.read_json(genome_status_file)
-    genome_obj = genome_status_old["GCF_000514875.1"]
+    genome_obj = genome_status_old["GCF_000016425.1"]
     assert Path(genome_obj.bgc_path).exists()
     assert genome_obj.resolve_attempted
     podp_download_and_extract_antismash_data(genome_records, download_root,
@@ -214,45 +219,36 @@ def test_caching(download_root, extract_root, genome_status_file, caplog):
 
 
 # Test `podp_download_and_extract_antismash_data` function
-# when a genome record has an which does not exists in NCBI
-def test_failed_lookup_ncbi(download_root, extract_root, genome_status_file):
+# when a genome record does not exists in NCBI
+def test_failed_lookup_ncbi(download_root, extract_root):
     genome_records = [{
         "genome_ID": {
             "genome_type": "genome",
             "JGI_Genome_ID": "non_existing_ID"
         },
-        "genome_label": "Salinispora arenicola CNX508"
     }]
-
-    podp_download_and_extract_antismash_data(genome_records, download_root,
-                                             extract_root)
-    genome_status = GenomeStatus.read_json(genome_status_file)
-    assert len(genome_status["non_existing_ID"].bgc_path) == 0
-    assert genome_status["non_existing_ID"].resolve_attempted
-    assert not (download_root / "non_existing_ID.zip").exists()
-    assert not (extract_root / "antismash" / "non_existing_ID").exists()
+    with pytest.raises(ValueError) as e:
+        podp_download_and_extract_antismash_data(genome_records, download_root,
+                                                 extract_root)
+    assert str(e.value) == "No antiSMASH data found for any genome"
 
 
 # Test `podp_download_and_extract_antismash_data` function
 # when a genome record has an existing accession ID in NCBI,
 # but not in the antismash database
-def test_failed_lookup_antismash(download_root, extract_root, genome_status_file):
+def test_failed_lookup_antismash(download_root, extract_root):
     broken_id = "GCF_000702345.1"
     genome_records = [{
         "genome_ID": {
             "genome_type": "genome",
             "RefSeq_accession": broken_id
         },
-        "genome_label": "Salinispora arenicola CNX508"
     }]
-
-    podp_download_and_extract_antismash_data(genome_records, download_root,
-                                             extract_root)
-    genome_status = GenomeStatus.read_json(genome_status_file)
-    assert len(genome_status[broken_id].bgc_path) == 0
-    assert genome_status[broken_id].resolve_attempted
-    assert not (download_root / broken_id / ".zip").exists()
-    assert not (extract_root / "antismash" / broken_id).exists()
+    with pytest.raises(ValueError) as e:
+        podp_download_and_extract_antismash_data(genome_records, download_root,
+                                                 extract_root)
+    assert "No antiSMASH data found for any genome" == str(e.value)
+    assert str(e.value) == "No antiSMASH data found for any genome"
 
 
 # Test `podp_download_and_extract_antismash_data` function
@@ -261,16 +257,15 @@ def test_refseq_id(download_root, extract_root, genome_status_file):
     genome_records = [{
         "genome_ID": {
             "genome_type": "genome",
-            "RefSeq_accession": "GCF_000514875.1"
+            "RefSeq_accession": "GCF_000016425.1"
         },
-        "genome_label": "Salinispora arenicola CNX508"
     }]
 
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
     genome_status = GenomeStatus.read_json(genome_status_file)
-    genome_obj = genome_status["GCF_000514875.1"]
+    genome_obj = genome_status["GCF_000016425.1"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
     extracted_files = list_files(extracted_folder, keep_parent=False)
@@ -291,16 +286,15 @@ def test_genbank_id(download_root, extract_root, genome_status_file):
     genome_records = [{
         "genome_ID": {
             "genome_type": "genome",
-            "GenBank_accession": "GCA_004799605.1"
+            "GenBank_accession": "GCA_000016425.1"
         },
-        "genome_label": "Halobacterium salinarum"
     }]
 
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
     genome_status = GenomeStatus.read_json(genome_status_file)
-    genome_obj = genome_status["GCA_004799605.1"]
+    genome_obj = genome_status["GCA_000016425.1"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
     extracted_files = list_files(extracted_folder, keep_parent=False)
@@ -321,16 +315,15 @@ def test_jgi_id(download_root, extract_root, genome_status_file):
     genome_records = [{
         "genome_ID": {
             "genome_type": "genome",
-            "JGI_Genome_ID": "2506783052"
+            "JGI_Genome_ID": "640427140"
         },
-        "genome_label": "Halophilic archaeon DL31"
     }]
 
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
     genome_status = GenomeStatus.read_json(genome_status_file)
-    genome_obj = genome_status["2506783052"]
+    genome_obj = genome_status["640427140"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
     extracted_files = list_files(extracted_folder, keep_parent=False)
@@ -352,16 +345,16 @@ def test_refseq_jgi_id(download_root, extract_root, genome_status_file):
     genome_records = [{
         "genome_ID": {
             "genome_type": "genome",
-            "RefSeq_accession": "GCF_000514875.1",
-            "JGI_Genome_ID": "2506783052"
-        }
+            "JGI_Genome_ID": "640427140",
+            "RefSeq_accession": "GCF_000016425.1",
+        },
     }]
 
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
     genome_status = GenomeStatus.read_json(genome_status_file)
-    genome_obj = genome_status["GCF_000514875.1"]
+    genome_obj = genome_status["GCF_000016425.1"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
     extracted_files = list_files(extracted_folder, keep_parent=False)
@@ -383,8 +376,8 @@ def test_refseq_genbank_id(download_root, extract_root, genome_status_file):
     genome_records = [{
         "genome_ID": {
             "genome_type": "genome",
-            "RefSeq_accession": "GCF_000514875.1",
-            "GenBank_accession": "GCA_004799605.1"
+            "RefSeq_accession": "GCF_000016425.1",
+            "GenBank_accession": "GCA_000016425.1"
         }
     }]
 
@@ -392,7 +385,7 @@ def test_refseq_genbank_id(download_root, extract_root, genome_status_file):
                                              extract_root)
 
     genome_status = GenomeStatus.read_json(genome_status_file)
-    genome_obj = genome_status["GCF_000514875.1"]
+    genome_obj = genome_status["GCF_000016425.1"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
     extracted_files = list_files(extracted_folder, keep_parent=False)
@@ -414,8 +407,8 @@ def test_genbank_jgi_id(download_root, extract_root, genome_status_file):
     genome_records = [{
         "genome_ID": {
             "genome_type": "genome",
-            "GenBank_accession": "GCA_004799605.1",
-            "JGI_Genome_ID": "2506783052"
+            "GenBank_accession": "GCA_000016425.1",
+            "JGI_Genome_ID": "640427140"
         }
     }]
 
@@ -423,7 +416,7 @@ def test_genbank_jgi_id(download_root, extract_root, genome_status_file):
                                              extract_root)
 
     genome_status = GenomeStatus.read_json(genome_status_file)
-    genome_obj = genome_status["GCA_004799605.1"]
+    genome_obj = genome_status["GCA_000016425.1"]
     archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
     extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
     extracted_files = list_files(extracted_folder, keep_parent=False)
