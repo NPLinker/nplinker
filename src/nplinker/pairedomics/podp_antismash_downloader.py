@@ -213,7 +213,7 @@ def podp_download_and_extract_antismash_data(
     GenomeStatus.to_json(gs_dict, gs_file)
 
     if missing == len(genome_records):
-        logger.warning('Failed to successfully retrieve ANY genome data!')
+        raise ValueError("No antiSMASH data found for any genome")
 
 
 def get_best_available_genome_id(genome_id_data: dict[str, str]) -> str | None:
