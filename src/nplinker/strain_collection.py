@@ -37,6 +37,16 @@ class StrainCollection():
                     and self._strain_dict_name == other._strain_dict_name)
         return NotImplemented
 
+    def __add__(self, other) -> 'StrainCollection':
+        if isinstance(other, StrainCollection):
+            sc = StrainCollection()
+            for strain in self._strains:
+                sc.add(strain)
+            for strain in other._strains:
+                sc.add(strain)
+            return sc
+        return NotImplemented
+
     def __contains__(self, item: Strain) -> bool:
         """Check if the strain collection contains the given Strain object.
         """
