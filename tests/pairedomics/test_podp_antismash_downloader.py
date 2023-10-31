@@ -159,13 +159,12 @@ def test_multiple_records(download_root, extract_root, genome_status_file):
 
 
 # Test `podp_download_and_extract_antismash_data` function
-# when a genome record has no accession IDs
-def test_missing_id(download_root, extract_root, genome_status_file):
+# when a genome record has empty genome ID (empty string).
+def test_empty_id(download_root, extract_root, genome_status_file):
     genome_records = [{
         "genome_ID": {
             "genome_type": "genome",
-            "JGI_Genome_ID": "2515154188",
-            "RefSeq_accession": "GCF_000514875.1"
+            "RefSeq_accession": ""
         },
     }, {
         "genome_ID": {
@@ -179,17 +178,15 @@ def test_missing_id(download_root, extract_root, genome_status_file):
     podp_download_and_extract_antismash_data(genome_records, download_root,
                                              extract_root)
 
-    archive1 = download_root / "GCF_000514875.1.zip"
-    extracted_folder1 = extract_root / "antismash" / "GCF_000514875.1"
-    archive2 = download_root / "GCF_000016425.1.zip"
-    extracted_folder2 = extract_root / "antismash" / "GCF_000016425.1"
+    archive = download_root / "GCF_000016425.1.zip"
+    extracted_folder = extract_root / "antismash" / "GCF_000016425.1"
     genome_status = GenomeStatus.read_json(genome_status_file)
 
-    assert (not archive1.exists() and archive2.exists())
-    assert (not archive1.is_file() and archive2.is_file())
-    assert (not extracted_folder1.exists() and extracted_folder2.exists())
+    assert archive.exists()
+    assert archive.is_file()
+    assert extracted_folder.exists()
     assert genome_status_file.is_file()
-    assert len(genome_status) == 2
+    assert len(genome_status) == 1
 
 
 # Test `podp_download_and_extract_antismash_data` function
