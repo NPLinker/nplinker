@@ -3,8 +3,8 @@ from os import PathLike
 from pathlib import Path
 import zipfile
 from nplinker import utils
-from nplinker.metabolomics.gnps.gnps_format import gnps_format_from_archive
-from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
+from .gnps_format import gnps_format_from_archive
+from .gnps_format import GNPSFormat
 
 
 class GNPSExtractor:

@@ -2,7 +2,7 @@ from os import PathLike
 import shutil
 import httpx
 import pytest
-from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
+from nplinker.metabolomics.gnps import GNPSFormat
 from nplinker.utils import extract_archive
 from .. import GNPS_DATA_DIR
 

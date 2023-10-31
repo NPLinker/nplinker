@@ -3,8 +3,7 @@ import logging
 from os import PathLike
 from pathlib import Path
 from jsonschema import validate
-from nplinker.metabolomics.gnps.gnps_file_mapping_loader import \
-    GNPSFileMappingLoader
+from nplinker.metabolomics.gnps import GNPSFileMappingLoader
 from nplinker.schemas import GENOME_BGC_MAPPINGS_SCHEMA
 from nplinker.schemas import validate_podp_json
 from nplinker.strain_collection import StrainCollection

@@ -1,5 +1,5 @@
 import pytest
-from nplinker.metabolomics.spectrum import Spectrum
+from nplinker.metabolomics import Spectrum
 
 
 @pytest.fixture

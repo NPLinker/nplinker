@@ -4,9 +4,9 @@ import numpy as np
 import pandas as pd
 from nplinker.genomics.gcf import GCF
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics.molecular_family import MolecularFamily
-from nplinker.metabolomics.singleton_family import SingletonFamily
-from nplinker.metabolomics.spectrum import Spectrum
+from nplinker.metabolomics import MolecularFamily
+from nplinker.metabolomics import SingletonFamily
+from nplinker.metabolomics import Spectrum
 from .utils import calc_correlation_matrix
 from .utils import isinstance_all
 

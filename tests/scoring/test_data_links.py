@@ -1,7 +1,7 @@
 import pandas as pd
 from pandas.testing import assert_frame_equal
 import pytest
-from nplinker.metabolomics.singleton_family import SingletonFamily
+from nplinker.metabolomics import SingletonFamily
 
 
 def test_init(datalinks):

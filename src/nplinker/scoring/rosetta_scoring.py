@@ -2,7 +2,7 @@ import itertools
 from nplinker.genomics.bgc import BGC
 from nplinker.genomics.gcf import GCF
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics.molecular_family import MolecularFamily
+from nplinker.metabolomics import MolecularFamily
 from nplinker.scoring.methods import ScoringMethod
 from nplinker.scoring.object_link import ObjectLink
 from nplinker.scoring.rosetta.rosetta import Rosetta

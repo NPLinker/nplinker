@@ -1,7 +1,7 @@
 import zipfile
 import pytest
-from nplinker.metabolomics.gnps.gnps_downloader import GNPSDownloader
-from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
+from nplinker.metabolomics.gnps import GNPSDownloader
+from nplinker.metabolomics.gnps import GNPSFormat
 
 
 @pytest.fixture(scope="module", autouse=True)

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from sortedcontainers import SortedList
-from nplinker.metabolomics.gnps.gnps_spectrum_loader import GNPSSpectrumLoader
+from nplinker.metabolomics.gnps import GNPSSpectrumLoader
 from ...logconfig import LogConfig
 from .rosetta_functions import fast_cosine
 

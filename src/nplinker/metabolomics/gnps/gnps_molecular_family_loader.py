@@ -1,8 +1,8 @@
 import csv
 from os import PathLike
+from nplinker.metabolomics import MolecularFamily
+from nplinker.metabolomics import SingletonFamily
 from nplinker.metabolomics.abc import MolecularFamilyLoaderBase
-from nplinker.metabolomics.molecular_family import MolecularFamily
-from nplinker.metabolomics.singleton_family import SingletonFamily
 from nplinker.utils import is_file_format
 
 

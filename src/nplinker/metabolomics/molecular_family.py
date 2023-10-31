@@ -1,8 +1,11 @@
-from typing_extensions import Self
-from nplinker.metabolomics.spectrum import Spectrum
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 
+
+if TYPE_CHECKING:
+    from .spectrum import Spectrum
 
 class MolecularFamily():
 

@@ -1,8 +1,8 @@
 from abc import ABC
 from abc import abstractmethod
 from collections.abc import Sequence
-from nplinker.metabolomics.molecular_family import MolecularFamily
-from nplinker.metabolomics.spectrum import Spectrum
+from nplinker.metabolomics import MolecularFamily
+from nplinker.metabolomics import Spectrum
 
 
 class SpectrumLoaderBase(ABC):

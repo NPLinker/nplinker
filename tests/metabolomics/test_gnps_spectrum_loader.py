@@ -1,6 +1,6 @@
 import pytest
-from nplinker.metabolomics.gnps.gnps_format import GNPSFormat
-from nplinker.metabolomics.gnps.gnps_spectrum_loader import GNPSSpectrumLoader
+from nplinker.metabolomics.gnps import GNPSFormat
+from nplinker.metabolomics.gnps import GNPSSpectrumLoader
 
 
 @pytest.mark.parametrize("workflow, num_spectra",
