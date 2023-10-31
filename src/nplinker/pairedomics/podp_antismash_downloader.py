@@ -3,7 +3,6 @@ from os import PathLike
 from pathlib import Path
 import re
 import time
-from urllib.error import HTTPError
 from bs4 import BeautifulSoup
 from bs4 import NavigableString
 from bs4 import Tag
@@ -203,7 +202,7 @@ def podp_download_and_extract_antismash_data(
             if output_path.exists():
                 Path.touch(output_path / 'completed', exist_ok=True)
 
-        except HTTPError:
+        except Exception:
             gs_obj.bgc_path = ""
 
     missing = len([gs for gs in gs_dict.values() if not gs.bgc_path])
@@ -214,7 +213,7 @@ def podp_download_and_extract_antismash_data(
     GenomeStatus.to_json(gs_dict, gs_file)
 
     if missing == len(genome_records):
-        logger.warning('Failed to successfully retrieve ANY genome data!')
+        raise ValueError("No antiSMASH data found for any genome")
 
 
 def get_best_available_genome_id(genome_id_data: dict[str, str]) -> str | None:

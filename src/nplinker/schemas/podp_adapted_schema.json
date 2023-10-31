@@ -93,17 +93,20 @@
               "GenBank_accession": {
                 "type": "string",
                 "title": "GenBank accession number",
-                "description": "If the publicly available genome got a GenBank accession number assigned, e.g., <a href=\"https://www.ncbi.nlm.nih.gov/nuccore/AL645882\" target=\"_blank\" rel=\"noopener noreferrer\">AL645882</a>, please provide it here. The genome sequence must be submitted to GenBank/ENA/DDBJ (and an accession number must be received) before this form can be filled out. In case of a whole genome sequence, please use master records. At least one identifier must be entered."
+                "description": "If the publicly available genome got a GenBank accession number assigned, e.g., <a href=\"https://www.ncbi.nlm.nih.gov/nuccore/AL645882\" target=\"_blank\" rel=\"noopener noreferrer\">AL645882</a>, please provide it here. The genome sequence must be submitted to GenBank/ENA/DDBJ (and an accession number must be received) before this form can be filled out. In case of a whole genome sequence, please use master records. At least one identifier must be entered.",
+                "minLength": 1
               },
               "RefSeq_accession": {
                 "type": "string",
                 "title": "RefSeq accession number",
-                "description": "For example: <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://www.ncbi.nlm.nih.gov/nuccore/NC_003888.3\">NC_003888.3</a>"
+                "description": "For example: <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://www.ncbi.nlm.nih.gov/nuccore/NC_003888.3\">NC_003888.3</a>",
+                "minLength": 1
               },
               "JGI_Genome_ID": {
                 "type": "string",
                 "title": "JGI IMG genome ID",
-                "description": "For example: <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://img.jgi.doe.gov/cgi-bin/m/main.cgi?section=TaxonDetail&page=taxonDetail&taxon_oid=641228474\">641228474</a>"
+                "description": "For example: <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://img.jgi.doe.gov/cgi-bin/m/main.cgi?section=TaxonDetail&page=taxonDetail&taxon_oid=641228474\">641228474</a>",
+                "minLength": 1
               }
             }
           },

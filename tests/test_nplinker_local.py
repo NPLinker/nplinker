@@ -31,7 +31,7 @@ def npl() -> NPLinker:
     hash_proj_file = get_file_hash(
         os.path.join(npl._loader._root.parent.parent,
                      npl._loader._platform_id + '.json'))
-    if hash_proj_file != '22e4f20d6f8aa425b2040479d0b6c00e7d3deb03f8fc4a277b3b91eb07c9ad72':
+    if hash_proj_file != '97f31f13f7a4c87c0b7648e2a2bad5ab2f96c38f92c304a5dc17299b44e698c7':
         pytest.exit(
             'PoDP project file has changed, please clean your local cache folder and rerun the tests.'
         )

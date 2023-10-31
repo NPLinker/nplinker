@@ -35,7 +35,7 @@ def test_download_metabolomics_zipfile(tmp_path):
     try:
         sut._download_metabolomics_zipfile("c22f44b14a3d450eb836d607cb9521bb")
         expected_path = os.path.join(sut.project_downloads_dir,
-                                     'c22f44b14a3d450eb836d607cb9521bb.zip')
+                                     'METABOLOMICS-SNETS-c22f44b14a3d450eb836d607cb9521bb.zip')
 
         assert os.path.exists(expected_path)
         assert (Path(sut.project_results_dir) /
