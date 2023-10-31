@@ -29,6 +29,34 @@ def test_eq(collection: StrainCollection, strain: Strain):
     assert collection == other
 
 
+def test_magic_add(collection: StrainCollection, strain: Strain):
+    other = StrainCollection()
+    # same id, same alias
+    other.add(strain)
+    # same id, different alias
+    strain1 = Strain("strain_1")
+    strain1.add_alias("strain_1_b")
+    other.add(strain1)
+    # different id, same alias
+    strain2 = Strain("strain_2")
+    strain2.add_alias("strain_2_a")
+    other.add(strain2)
+
+    assert collection + other == other + collection
+
+    actual = collection + other
+    assert len(actual) == 2
+    assert strain in actual
+    assert strain1 in actual
+    assert strain2 in actual
+    assert len(actual._strain_dict_name) == 5
+    assert actual._strain_dict_name["strain_1"] == [strain]
+    assert actual._strain_dict_name["strain_1_a"] == [strain]
+    assert actual._strain_dict_name["strain_1_b"] == [strain]
+    assert actual._strain_dict_name["strain_2"] == [strain2]
+    assert actual._strain_dict_name["strain_2_a"] == [strain2]
+
+
 def test_contains(collection: StrainCollection, strain: Strain):
     assert strain in collection
     strain2 = Strain("strain_2")
