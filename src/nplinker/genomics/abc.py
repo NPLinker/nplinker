@@ -34,12 +34,15 @@ class BGCLoaderBase(ABC):
         """
 
 
-
 class GCFLoaderBase(ABC):
 
     @abstractmethod
-    def get_gcfs(self) -> Sequence[GCF]:
+    def get_gcfs(self, keep_mibig_only) -> Sequence[GCF]:
         """Get GCF objects
+
+        Args:
+            keep_mibig_only(bool): True to keep GCFs that contain only MIBiG
+                BGCs.
 
         Returns:
             Sequence[GCF]: a list of :class:`~nplinker.genomic.GCF` objects

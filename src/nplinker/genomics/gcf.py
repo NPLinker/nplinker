@@ -94,9 +94,9 @@ class GCF():
         return strain in self.strains
 
     def has_mibig_only(self) -> bool:
-        """Check if the GCF's children are only BGC objects from MIBiG.
+        """Check if the GCF's children are only MIBiG BGCs.
 
         Returns:
-            bool: True if `GCF.bgcs` are only MIBiG BGC objects
+            bool: True if `GCF.bgc_ids` are only MIBiG BGC ids.
         """
-        return all(map(lambda bgc: bgc.is_mibig(), self.bgcs))
+        return all(map(lambda id: id.startswith("BGC"), self.bgc_ids))

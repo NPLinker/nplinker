@@ -22,13 +22,19 @@ class TestBigscapelGCFLoader:
                                           "mix_clustering_c0.30.tsv")
 
     def test_get_gcfs(self, loader):
-        gcfs = loader.get_gcfs()
+        gcfs = loader.get_gcfs(keep_mibig_only=True)
         assert isinstance(gcfs, list)
         assert len(gcfs) == 114
         assert isinstance(gcfs[0], GCF)
 
+    def test_get_gcfs_without_mibig_only(self, loader):
+        gcfs = loader.get_gcfs(keep_mibig_only=False)
+        assert isinstance(gcfs, list)
+        assert len(gcfs) == 113
+        assert isinstance(gcfs[0], GCF)
+
     def test_parse_gcf(self, loader):
-        gcf_dict = BigscapeGCFLoader._parse_gcf(loader.cluster_file) # noqa
+        gcf_dict = BigscapeGCFLoader._parse_gcf(loader.cluster_file)  # noqa
         assert isinstance(gcf_dict, dict)
         assert len(gcf_dict) == 114
         gcf = gcf_dict["135"]
