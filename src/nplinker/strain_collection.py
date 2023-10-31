@@ -1,3 +1,4 @@
+from __future__ import annotations
 import json
 from os import PathLike
 from typing import Iterator
@@ -37,7 +38,7 @@ class StrainCollection():
                     and self._strain_dict_name == other._strain_dict_name)
         return NotImplemented
 
-    def __add__(self, other) -> 'StrainCollection':
+    def __add__(self, other) -> StrainCollection:
         if isinstance(other, StrainCollection):
             sc = StrainCollection()
             for strain in self._strains:
