@@ -134,7 +134,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             self._load_fbmn()
 
     def _load_snets(self) -> None:
-        """Load file mapping from output of GNPS SNETS workflow
+        """Load file mapping from output of GNPS SNETS workflow.
 
         The following columns are loaded:
         - "cluster index": loaded as spectrum id
@@ -154,7 +154,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
                 self._mapping[spectrum_id] = samples
 
     def _load_snetsv2(self) -> None:
-        """Load file mapping from output of GNPS SNETS-V2 workflow
+        """Load file mapping from output of GNPS SNETS-V2 workflow.
 
         The following columns are loaded:
         - "cluster index": loaded as spectrum id
@@ -171,7 +171,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
                 self._mapping[spectrum_id] = samples
 
     def _load_fbmn(self):
-        """Load file mapping from output of GNPS FBMN workflow
+        """Load file mapping from output of GNPS FBMN workflow.
 
         The column "row ID" is loaded as spectrum id.
         The column names containing " Peak area" are used to extract the file

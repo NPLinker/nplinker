@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""Initial testing for NPClassScore integration into NPLinker
-"""
+"""Initial testing for NPClassScore integration into NPLinker."""
 
 from class_linking import NPLinker_classes
 

@@ -22,7 +22,7 @@ logger = LogConfig.getLogger(__name__)
 
 
 def run_canopus(mgf_file, output_path, extra_params="--maxmz 600 formula zodiac structure canopus"):
-    """Runs canopus from the sirius workflow
+    """Runs canopus from the sirius workflow.
 
     Args:
         mgf_file: str, path to the mgf file with spectra info

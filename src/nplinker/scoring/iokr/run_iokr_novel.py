@@ -66,7 +66,7 @@ def run_iokr(data):
         # match the sample to the candidate set
         correct_indices = data.spectra_to_bgc_indices[i]
         candidate_fingerprints = numpy.array([x[1] for x in candidate_set]).copy()
-        candidate_ids = [x[0] for x in candidate_set]
+        [x[0] for x in candidate_set]
 
         args = (0, candidate_fingerprints, latent, sample_kernel_vector, latent_basis, gamma)
         with open("secondary.bin", "wb") as f:

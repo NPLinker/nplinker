@@ -29,8 +29,7 @@ logger = LogConfig.getLogger(__name__)
 
 
 class NPLinkerIOKR:
-    """Rank the potential links in a NPLinker object using IOKR, and wrap the results
-    """
+    """Rank the potential links in a NPLinker object using IOKR, and wrap the results."""
 
     def __init__(self, npl):
         self.npl = npl
@@ -41,7 +40,7 @@ class NPLinkerIOKR:
             bgc_smiles_lookup[bgc] = []
             if bgc.smiles is not None:
                 try:
-                    fp = fingerprint.fingerprint_from_smiles(bgc.smiles)
+                    fingerprint.fingerprint_from_smiles(bgc.smiles)
                     bgc_smiles_lookup[bgc].append(bgc.smiles)
                 except ValueError:
                     print(f"Filtered out smiles {bgc.smiles}")
@@ -112,13 +111,11 @@ class IOKRWrapper:
         self.iokr_server = None
 
     def _fingerprint(self, smiles):
-        """Calculate molecular fingerprint for a SMILES string
-        """
+        """Calculate molecular fingerprint for a SMILES string."""
         return fingerprint.fingerprint_from_smiles(smiles, self.fingerprint_type)
 
     def score_smiles(self, ms_list, candidate_smiles):
-        """Score a set of spectra against a candidate set of SMILES strings
-        """
+        """Score a set of spectra against a candidate set of SMILES strings."""
         spectrum_filters.datapath = get_datapath()
 
         logger.debug("cache miss")
@@ -159,8 +156,7 @@ class IOKRWrapper:
         return projection_matrix
 
     def rank_smiles(self, ms, candidate_smiles):
-        """Rank a spectrum against a candidate set of SMILES strings
-        """
+        """Rank a spectrum against a candidate set of SMILES strings."""
         # TODO hacky
         spectrum_filters.datapath = get_datapath()
         ms.filter = spectrum_filters.filter_by_frozen_dag

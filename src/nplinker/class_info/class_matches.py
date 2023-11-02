@@ -23,10 +23,10 @@ logger = LogConfig.getLogger(__name__)
 
 
 class ClassMatches:
-    """Holds all info concerning class matches (based on known bgc-structure links in MIBiG)"""
+    """Holds all info concerning class matches (based on known bgc-structure links in MIBiG)."""
 
     def __init__(self, mibig_classes_file):
-        """Read mibig classes file and convert into count and scoring tables
+        """Read mibig classes file and convert into count and scoring tables.
 
         Args:
             mibig_classes_file: str, filepath of the MIBiG data as made by
@@ -93,7 +93,7 @@ class ClassMatches:
         }
 
     def get_gcf_as_classes(self, gcf, cutoff=0.5):
-        """Get antismash classes for a gcf if antismash class occurs in more than <cutoff> of gcf
+        """Get antismash classes for a gcf if antismash class occurs in more than <cutoff> of gcf.
 
         Args:
             - gcf: GCF NPLinker object
@@ -117,7 +117,7 @@ class ClassMatches:
         return filtered_as_classes
 
     def convert_as_classes(self, init_as_classes: list):
-        """Convert AS classes to class names that are in scoring table
+        """Convert AS classes to class names that are in scoring table.
 
         Args:
             - init_as_classes: list of str, the initial antismash class names
@@ -134,7 +134,7 @@ class ClassMatches:
         return as_classes
 
     def _read_mibig_classes(self):
-        """Read mibig file to dict of list {chem_id: [bgc_classes, chem_classes]}
+        """Read mibig file to dict of list {chem_id: [bgc_classes, chem_classes]}.
 
         Returns:
             dict(str, list(list(str))) - {chem_id: [bgc_classes, chem_classes]}
@@ -163,14 +163,14 @@ class ClassMatches:
         return self._mibig_classes
 
     def _get_class_counts(self):
-        """Aggregate pairwise class matrices for all compounds
+        """Aggregate pairwise class matrices for all compounds.
 
         Returns:
             Recurring defaultdict of {bgc_cat: chem_cat: bgc_c: chem_c: int}
         """
 
         def _rec_dd():
-            """Initialises a recurring defaultdict"""
+            """Initialises a recurring defaultdict."""
             return defaultdict(_rec_dd)
 
         result = _rec_dd()
@@ -230,7 +230,7 @@ class ClassMatches:
         return result
 
     def _get_scoring_tables(self):
-        """Makes dicts linked to pd.DataFrame that stores counts/scores
+        """Makes dicts linked to pd.DataFrame that stores counts/scores.
 
         The resulting dataframes (tables) are stored in _class_matches and
         _class_matches_counts.

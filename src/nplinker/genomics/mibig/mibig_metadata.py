@@ -25,7 +25,7 @@ class MibigMetadata:
 
     @property
     def mibig_accession(self) -> str:
-        """Get the value of metadata item 'mibig_accession'"""
+        """Get the value of metadata item 'mibig_accession'."""
         return self._mibig_accession
 
     @property

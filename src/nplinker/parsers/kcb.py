@@ -30,7 +30,7 @@ CLUSTER_REGION_REGEX = re.compile("(.+?)\\.(cluster|region)(\\d+).gbk$")
 
 
 class KCBJSONParser:
-    """Parser for the large .json files antiSMASH generates as part of its output
+    """Parser for the large .json files antiSMASH generates as part of its output.
 
     This is supposed to do the same job as the KCBTextParser class without relying
     on parsing the legacy-format text files.
@@ -146,7 +146,7 @@ class KCBJSONParser:
         return self.collected_hits
 
     def _parse(self, record):
-        """Parses the knownclusterblast data for a single 'record' entry"""
+        """Parses the knownclusterblast data for a single 'record' entry."""
         modules = record.get("modules", None)
         if modules is None or "antismash.modules.clusterblast" not in modules:
             # this probably isn't an error, the JSON often seems to contain entries
@@ -229,8 +229,7 @@ class KCBJSONParser:
 
 
 class KCBTextParser:
-    """Parser for antismash knownclusterblast text output files
-    """
+    """Parser for antismash knownclusterblast text output files."""
 
     def __init__(self, filename):
         if not os.path.exists(filename):

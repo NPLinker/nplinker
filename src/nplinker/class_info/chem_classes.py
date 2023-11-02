@@ -27,13 +27,13 @@ logger = LogConfig.getLogger(__name__)
 # for canopus, check if results can be converted with canopus_treemap
 # otherwise use the pre-existing output of canopus
 class ChemClassPredictions:
-    """Class for storing results for chemical class predictions of spectra
+    """Class for storing results for chemical class predictions of spectra.
 
     Currently, CANOPUS and MolNetEnhancer results are loaded
     """
 
     def __init__(self, canopus_dir, mne_dir, gnps_dir):
-        """Load classes with CanopusResults, MolNetEnhancerResults
+        """Load classes with CanopusResults, MolNetEnhancerResults.
 
         Args:
             canopus_dir: str, canopus_dir found in root_dir of nplinker project
@@ -62,12 +62,12 @@ class ChemClassPredictions:
 
     @property
     def class_predict_options(self):
-        """The available class predictions"""
+        """The available class predictions."""
         return self._class_predict_options
 
 
 class CanopusResults:
-    """Class for storing canopus results
+    """Class for storing canopus results.
 
     The results from the canopus dir are read and combined with the MN from GNPS
     using canopus_treemap: github.com/louwenjjr/canopus_treemap/tree/master/canopus
@@ -80,7 +80,7 @@ class CanopusResults:
     """
 
     def __init__(self, canopus_dir, gnps_dir):
-        """Read the class info from root_dir/canopus
+        """Read the class info from root_dir/canopus.
 
         Args:
             canopus_dir: str, canopus_dir found in root_dir of nplinker project
@@ -111,7 +111,7 @@ class CanopusResults:
             )
 
     def _read_all_classes(self):
-        """Wrapper to read all canopus output and store them in the object"""
+        """Wrapper to read all canopus output and store them in the object."""
         ci_file = False  # find cluster_index_classifications in canopus_dir
         compi_file = False  # same for component_index_classifications
         canopus_files = glob.glob(os.path.join(self._canopus_dir, "*"))
@@ -185,7 +185,7 @@ class CanopusResults:
         self._spectra_classes_names_inds = {elem: i for i, elem in enumerate(spectra_classes_names)}
 
     def _read_spectra_classes(self, input_file):
-        """Read canopus classes for spectra, return classes_names, classes
+        """Read canopus classes for spectra, return classes_names, classes.
 
         Args:
             input_file: str, cluster_index_classifications.txt
@@ -231,7 +231,7 @@ class CanopusResults:
         return ci_classes_names, ci_classes
 
     def _read_spectra_classes_directly(self):
-        """Read canopus classes directly from canopus output and save output
+        """Read canopus classes directly from canopus output and save output.
 
         Returns:
             Tuple of:
@@ -333,7 +333,7 @@ class CanopusResults:
         return can_classes_names, can_classes
 
     def _read_molfam_classes(self, input_file):
-        """Read canopus classes for molfams, return classes_names, classes
+        """Read canopus classes for molfams, return classes_names, classes.
 
         Args:
             input_file: str, component_index_classifications.txt
@@ -378,7 +378,7 @@ class CanopusResults:
         return compi_classes_names, compi_classes
 
     def transfer_spec_classes_to_molfams(self, molfams, fraction_cutoff=0.0):
-        """Set _molfam_classes(_names) from spectra_classes and return classes
+        """Set _molfam_classes(_names) from spectra_classes and return classes.
 
         This can be used in the _loader to get molfam classes when the GNPS MN
         version is too old and canopus_treemap fails to work directly.
@@ -450,7 +450,7 @@ class CanopusResults:
         return molfam_classes
 
     def show(self, objects):
-        """Show a table of predicted chemical compound classes for spectrum/MF
+        """Show a table of predicted chemical compound classes for spectrum/MF.
 
         Args:
               objects: list of Spectrum or MolecularFamily objects
@@ -485,14 +485,14 @@ class CanopusResults:
 
 
 class MolNetEnhancerResults:
-    """Class for storing MolNetEnhancer results
+    """Class for storing MolNetEnhancer results.
 
     The input file for ClassyFire results is read from the molnetenhancer directory:
         - ClassyFireResults_Network.txt
     """
 
     def __init__(self, mne_dir):
-        """Read the class info from file in root_dir/molnetenhancer/
+        """Read the class info from file in root_dir/molnetenhancer/.
 
         Args:
             mne_dir: str, mne_dir found in root_dir of nplinker project
@@ -504,7 +504,7 @@ class MolNetEnhancerResults:
         self._spectra_classes_names_inds = {elem: i for i, elem in enumerate(cf_classes_names)}
 
     def _read_cf_classes(self, mne_dir):
-        r"""Read ClassyFireResults_Network.txt in molnetenhancer dir
+        r"""Read ClassyFireResults_Network.txt in molnetenhancer dir.
 
         Args:
             mne_dir: str, mne_dir found in root_dir of nplinker project
@@ -580,7 +580,7 @@ class MolNetEnhancerResults:
         return columns, mne_component_dict, mne_cluster2component
 
     def spectra_classes(self, spectrum_id):
-        """Return classes by relating spectrum_id in the molfam_classes
+        """Return classes by relating spectrum_id in the molfam_classes.
 
         Args:
             spectrum_id: int/str, spectrum_id - ints will be converted to str

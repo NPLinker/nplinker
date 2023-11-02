@@ -29,7 +29,7 @@ class NPClassScoring(ScoringMethod):
         self._target_no_scores = set()
 
     def _npclass_score(self, obj, target, method="mix", obj_classes=None, target_classes=None):
-        """Return sorted class link scores for scoring obj and target
+        """Return sorted class link scores for scoring obj and target.
 
         The input objects can be any mix of the following NPLinker types:
             - BGC
@@ -153,7 +153,7 @@ class NPClassScoring(ScoringMethod):
         return sorted(scores, reverse=True)
 
     def _get_targets(self, test_id):
-        """Get the targets based upon instance of test_id, returns list of targets
+        """Get the targets based upon instance of test_id, returns list of targets.
 
         Args:
             test_id: one of the NPLinker objects: BGC, GCF, Spectrum, Molfam
@@ -196,7 +196,7 @@ class NPClassScoring(ScoringMethod):
         return targets
 
     def _get_gen_classes(self, bgc_like, gcf_as_cutoff=0.5):
-        """Get classes for genomics objects
+        """Get classes for genomics objects.
 
         Args:
             bgc_like: BGC or GCF object from NPLinker input objects
@@ -235,7 +235,7 @@ class NPClassScoring(ScoringMethod):
         return bgc_like_classes_dict
 
     def _get_met_classes(self, spec_like, method="mix"):
-        """Get chemical classes for a Spectrum or MolFam based on method
+        """Get chemical classes for a Spectrum or MolFam based on method.
 
         Args:
             spec_like: Spectrum or MolFam, one of the NPLinker input types
@@ -315,7 +315,7 @@ class NPClassScoring(ScoringMethod):
 
     @staticmethod
     def setup(npl):
-        """Perform any one-off initialisation required (will only be called once)"""
+        """Perform any one-off initialisation required (will only be called once)."""
         logger.info("Set up NPClassScore scoring")
         met_options = npl.chem_classes.class_predict_options
         logger.info(f"Please choose one of the methods from {met_options}")
@@ -330,7 +330,7 @@ class NPClassScoring(ScoringMethod):
         # todo: give info about parameters
 
     def get_links(self, objects, link_collection):
-        """Given a set of objects, return link information"""
+        """Given a set of objects, return link information."""
         # todo: pickle results
         logger.info("Running NPClassScore...")
         begin = time.time()
@@ -414,7 +414,7 @@ class NPClassScoring(ScoringMethod):
                     results[obj][target] = ObjectLink(obj, target, self, full_score)
 
     def format_data(self, data):
-        """Given whatever output data the method produces, return a readable string version"""
+        """Given whatever output data the method produces, return a readable string version."""
         # data or full_score is a list of tuples, here return just NPClassScore
         formatted_data = None  # default when there is no score (missing class)
         if data:
@@ -423,5 +423,5 @@ class NPClassScoring(ScoringMethod):
         return formatted_data
 
     def sort(self, objects, reverse=True):
-        """Given a list of objects, return them sorted by link score"""
+        """Given a list of objects, return them sorted by link score."""
         return sorted(objects, key=lambda objlink: objlink[self], reverse=reverse)

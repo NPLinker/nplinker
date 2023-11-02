@@ -77,13 +77,13 @@ class AntiSmashFile:
                     self.raw_data.append(AntiSmash4Record(record))
 
     def get_spec(self):
-        """Get specificity (predicted monomer)"""
+        """Get specificity (predicted monomer)."""
         for r in self.raw_data:
             yield from r.get_spec()
 
     @property
     def products(self):
-        """Get list of products"""
+        """Get list of products."""
         return [x.products for x in self.raw_data]
 
     def build_prob(self):
@@ -336,8 +336,7 @@ def predict_aa(filename):
 
 
 def read_aa_losses(filename):
-    """Read AA losses from data file. (assume fixed structure...)
-    """
+    """Read AA losses from data file. (assume fixed structure...)."""
     aa_losses = {}
     with open(filename) as f:
         reader = csv.reader(f, delimiter=",")

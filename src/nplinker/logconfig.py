@@ -44,14 +44,14 @@ class LogConfig:
 
     @staticmethod
     def setLogLevel(level):
-        """Apply a new log level value to all loggers created by getLogger"""
+        """Apply a new log level value to all loggers created by getLogger."""
         LogConfig.default_loglevel = level
         for logger in LogConfig.active_loggers.values():
             logger.setLevel(level)
 
     @staticmethod
     def setLogLevelStr(level):
-        """Apply a new log level value to all loggers created by getLogger
+        """Apply a new log level value to all loggers created by getLogger.
 
         Identical to setLogLevel but parameter is a string instead of a
         constant from the logging module (e.g. "INFO", "DEBUG")

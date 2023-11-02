@@ -38,7 +38,7 @@ def test_check_integrity(file, md5, expected):
 
 
 class TestDownloadUrl:
-    """Test utils.download_url"""
+    """Test utils.download_url."""
 
     @pytest.fixture
     def temppath1(self):
@@ -58,7 +58,7 @@ class TestDownloadUrl:
 
 
 class TestExtractArchive:
-    """Test utils.extract_archive"""
+    """Test utils.extract_archive."""
 
     @pytest.fixture
     def archive(self):
@@ -83,7 +83,7 @@ class TestExtractArchive:
 
 
 class TestDownloadAndExtractArchive:
-    """Test utils.download_and_extract_archive"""
+    """Test utils.download_and_extract_archive."""
 
     @pytest.fixture
     def temppath1(self):
@@ -147,7 +147,7 @@ def test_prefix(keep_parent, expected, not_expected):
 
 
 class TestListFiles:
-    """Test utils.list_files"""
+    """Test utils.list_files."""
 
     def test_default(self):
         files = utils.list_files(ROOT)

@@ -16,7 +16,7 @@ logger = LogConfig.getLogger(__name__)
 
 class AntismashBGCLoader:
     def __init__(self, data_dir: str) -> None:
-        """Build a loader for AntiSMASH BGC genbank (.gbk) files
+        """Build a loader for AntiSMASH BGC genbank (.gbk) files.
 
         Note:
             AntiSMASH BGC directory must follow the structure below:
@@ -51,7 +51,7 @@ class AntismashBGCLoader:
         }
 
     def get_files(self) -> dict[str, str]:
-        """Get BGC gbk files
+        """Get BGC gbk files.
 
         Returns:
             dict[str, str]: key is BGC name (gbk file name) and value is path to
@@ -86,7 +86,7 @@ class AntismashBGCLoader:
         return bgc_files
 
     def get_bgcs(self) -> dict[str, BGC]:
-        """Get all BGC objects
+        """Get all BGC objects.
 
         Returns:
             dict[str, BGC]: key is BGC name and value is
@@ -96,7 +96,7 @@ class AntismashBGCLoader:
 
     @staticmethod
     def _parse_bgcs(bgc_files: dict[str, str]) -> dict[str, BGC]:
-        """Load given BGC files as BGC objects
+        """Load given BGC files as BGC objects.
 
         Args:
             bgc_files(dict[str, str]): key is BGC name and value is path to the

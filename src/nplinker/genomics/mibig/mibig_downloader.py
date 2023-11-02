@@ -27,7 +27,7 @@ def download_and_extract_mibig_metadata(
     extract_path: str,
     version: str = "3.1",
 ):
-    """Download and extract MIBiG metadata json files
+    """Download and extract MIBiG metadata json files.
 
     Args:
         download_root(str): Path to the directory to place downloaded archive in

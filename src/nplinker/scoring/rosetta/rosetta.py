@@ -133,8 +133,6 @@ class Rosetta:
 
     def _generate_bgc_hits(self, bgcs):
         self._bgc_hits = {}
-        kcb_found = 0
-        mibigs = 0
         errors = 0
 
         # this method is a bit messy because it tries to handle a couple of different
@@ -364,7 +362,7 @@ class Rosetta:
         return processed
 
     def run(self, spectra, bgcs, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
-        """Function which actually computes the rosetta score somehow"""
+        """Function which actually computes the rosetta score somehow."""
         params_ok = self._load_cached_params(ms1_tol, ms2_tol, score_thresh, min_match_peaks)
 
         # if any parameters have been changed or version mismatch found, delete all cached files
@@ -430,7 +428,7 @@ class Rosetta:
     def _init_bgc_hits(self, bgcs):
         """Collect BGC hits. this is done first because the SpecLib generation below can take
         several minutes and is a waste of time if the knownclusterblast files required for
-        the genomics data aren't available in the current dataset
+        the genomics data aren't available in the current dataset.
         """
         cached_bgc_hits = load_pickled_data(self._nplinker, self._bgchits_pickle_path)
         if cached_bgc_hits is not None and not self._ignore_genomic_cache:
@@ -481,7 +479,7 @@ class Rosetta:
 
     def _load_cached_params(self, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
         """Check if cached parameters exist, and if so check they match the
-        supplied ones. if not, need to regenerate any pickled data files
+        supplied ones. if not, need to regenerate any pickled data files.
         """
         params = load_pickled_data(self._nplinker, self._params_pickle_path)
         params_ok = False

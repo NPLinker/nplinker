@@ -86,7 +86,7 @@ class Args:
 
 
 class Config:
-    """Wrapper for all NPLinker configuration options"""
+    """Wrapper for all NPLinker configuration options."""
 
     DEFAULT_CONFIG = "nplinker.toml"
 

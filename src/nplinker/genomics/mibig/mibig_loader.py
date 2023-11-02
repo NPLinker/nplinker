@@ -12,7 +12,7 @@ logger = LogConfig.getLogger(__name__)
 
 class MibigLoader:
     def __init__(self, data_dir: str):
-        """Parse MIBiG metadata files and return BGC objects
+        """Parse MIBiG metadata files and return BGC objects.
 
         MIBiG metadata file (json) contains annotations/metadata information
         for each BGC. See https://mibig.secondarymetabolites.org/download.
@@ -95,7 +95,7 @@ class MibigLoader:
         return self._bgc_dict
 
     def _parse_bgcs(self) -> dict[str, BGC]:
-        """Parse all metadata files as BGC objects
+        """Parse all metadata files as BGC objects.
 
         Returns:
             dict[str, BGC]: key is BGC accession (file name) and value is
@@ -109,7 +109,7 @@ class MibigLoader:
 
 
 def parse_bgc_metadata_json(file: str) -> BGC:
-    """Parse MIBiG metadata file and return BGC object
+    """Parse MIBiG metadata file and return BGC object.
 
     Args:
         file(str): Path to the MIBiG metadata json file

@@ -42,7 +42,7 @@ class RosettaScoring(ScoringMethod):
 
     @staticmethod
     def _init_from_config(config):
-        """Allow overridding params via config file"""
+        """Allow overridding params via config file."""
         if "scoring" in config and "rosetta" in config["scoring"]:
             rc = config["scoring"]["rosetta"]
             ms1_tol = rc.get("ms1_tol", Rosetta.DEF_MS1_TOL)
@@ -149,7 +149,7 @@ class RosettaScoring(ScoringMethod):
         return results
 
     def _validate_inputs(self, objects):
-        """Enforce constraint that the list must contain a set of identically typed objects"""
+        """Enforce constraint that the list must contain a set of identically typed objects."""
         if not all(isinstance(x, type(objects[0])) for x in objects):
             raise Exception("RosettaScoring: uniformly-typed list of objects is required")
 

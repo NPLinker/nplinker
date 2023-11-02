@@ -178,7 +178,7 @@ class NPLinker:
 
     @property
     def config(self):
-        """Returns a copy of the data parsed from the configuration file as a dict
+        """Returns a copy of the data parsed from the configuration file as a dict.
 
         Returns:
                 dict: configuration file parameters as a nested dict
@@ -187,7 +187,7 @@ class NPLinker:
 
     @property
     def root_dir(self):
-        """Returns path to the current dataset root directory
+        """Returns path to the current dataset root directory.
 
         Returns:
                 str: the path to the dataset root directory currently in use
@@ -211,7 +211,7 @@ class NPLinker:
 
     @property
     def data_dir(self):
-        """Returns path to nplinker/data directory (files packaged with the app itself)"""
+        """Returns path to nplinker/data directory (files packaged with the app itself)."""
         return NPLINKER_APP_DATA_DIR
 
     @property
@@ -237,7 +237,7 @@ class NPLinker:
 
     @property
     def bigscape_cutoff(self):
-        """Returns the current BiGSCAPE clustering cutoff value"""
+        """Returns the current BiGSCAPE clustering cutoff value."""
         return self._loader._bigscape_cutoff
 
     def load_data(self, new_bigscape_cutoff=None):
@@ -289,7 +289,7 @@ class NPLinker:
 
     # TODO CG: refactor this method and update its unit tests
     def get_links(self, input_objects, scoring_methods, and_mode=True):
-        """Find links for a set of input objects (BGCs/GCFs/Spectra/MolFams)
+        """Find links for a set of input objects (BGCs/GCFs/Spectra/MolFams).
 
         The input objects can be any mix of the following NPLinker types:
 
@@ -446,48 +446,48 @@ class NPLinker:
         return common_strains
 
     def has_bgc(self, bgc_id):
-        """Returns True if BGC ``bgc_id`` exists in the dataset"""
+        """Returns True if BGC ``bgc_id`` exists in the dataset."""
         return bgc_id in self._bgc_lookup
 
     def lookup_bgc(self, bgc_id):
-        """If BGC ``bgc_id`` exists, return it. Otherwise return None"""
+        """If BGC ``bgc_id`` exists, return it. Otherwise return None."""
         return self._bgc_lookup.get(bgc_id, None)
 
     def lookup_gcf(self, gcf_id):
-        """If GCF ``gcf_id`` exists, return it. Otherwise return None"""
+        """If GCF ``gcf_id`` exists, return it. Otherwise return None."""
         return self._gcf_lookup.get(gcf_id, None)
 
     def lookup_spectrum(self, spectrum_id):
-        """If Spectrum ``name`` exists, return it. Otherwise return None"""
+        """If Spectrum ``name`` exists, return it. Otherwise return None."""
         return self._spec_lookup.get(spectrum_id, None)
 
     def lookup_mf(self, mf_id):
-        """If MolecularFamily `family_id` exists, return it. Otherwise return None"""
+        """If MolecularFamily `family_id` exists, return it. Otherwise return None."""
         return self._mf_lookup.get(mf_id, None)
 
     @property
     def strains(self):
-        """Returns a list of all the strains in the dataset"""
+        """Returns a list of all the strains in the dataset."""
         return self._strains
 
     @property
     def bgcs(self):
-        """Returns a list of all the BGCs in the dataset"""
+        """Returns a list of all the BGCs in the dataset."""
         return self._bgcs
 
     @property
     def gcfs(self):
-        """Returns a list of all the GCFs in the dataset"""
+        """Returns a list of all the GCFs in the dataset."""
         return self._gcfs
 
     @property
     def spectra(self):
-        """Returns a list of all the Spectra in the dataset"""
+        """Returns a list of all the Spectra in the dataset."""
         return self._spectra
 
     @property
     def molfams(self):
-        """Returns a list of all the MolecularFamilies in the dataset"""
+        """Returns a list of all the MolecularFamilies in the dataset."""
         return self._molfams
 
     @property
@@ -500,27 +500,27 @@ class NPLinker:
 
     @property
     def product_types(self):
-        """Returns a list of the available BiGSCAPE product types in current dataset"""
+        """Returns a list of the available BiGSCAPE product types in current dataset."""
         return self._product_types
 
     @property
     def repro_data(self):
-        """Returns the dict containing reproducibility data"""
+        """Returns the dict containing reproducibility data."""
         return self._repro_data
 
     @property
     def scoring_methods(self):
-        """Returns a list of available scoring method names"""
+        """Returns a list of available scoring method names."""
         return list(self._scoring_methods.keys())
 
     @property
     def chem_classes(self):
-        """Returns loaded ChemClassPredictions with the class predictions"""
+        """Returns loaded ChemClassPredictions with the class predictions."""
         return self._chem_classes
 
     @property
     def class_matches(self):
-        """ClassMatches with the matched classes and scoring tables from MIBiG"""
+        """ClassMatches with the matched classes and scoring tables from MIBiG."""
         return self._class_matches
 
     def scoring_method(self, name):

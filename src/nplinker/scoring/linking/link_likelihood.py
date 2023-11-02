@@ -10,14 +10,14 @@ logger = LogConfig.getLogger(__file__)
 class LinkLikelihood:
     """Class to:
     1) create ansd store likelihood matrices (from co-occurences)
-    2) select potential calculates for links
+    2) select potential calculates for links.
     """
 
     def __init__(self):
         """Matrices that store likelihoods of empirically found co-occurence
         Example:
             P_spec_givengcf contains likelihoods P(spec_x|gcf_y),
-            which is the probability of finding spec_x given there is a gcf_y
+            which is the probability of finding spec_x given there is a gcf_y.
         """
         # Probabilities reflecting co-occurences spectra <-> GCFs
         self.P_spec_given_gcf = []
@@ -31,7 +31,7 @@ class LinkLikelihood:
         self.P_gcf_not_fam = []
 
     def calculate_likelihoods(self, data_links, type="spec-gcf"):
-        """Calulate likelihoods from empirically found co-occurences in data
+        """Calulate likelihoods from empirically found co-occurences in data.
 
         IF type='spec-gcf':
         P(GCF_x | spec_y), P(spec_y | GCF_x),

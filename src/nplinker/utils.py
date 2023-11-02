@@ -192,7 +192,7 @@ def download_url(
 
 
 def list_dirs(root: str | PathLike, keep_parent: bool = True) -> list[str]:
-    """List all directories at a given root
+    """List all directories at a given root.
 
     Args:
         root (str or Path): Path to directory whose folders need to be listed
@@ -212,7 +212,7 @@ def list_files(
     suffix: str | tuple[str, ...] = "",
     keep_parent: bool = True,
 ) -> list[str]:
-    """List all files at a given root
+    """List all files at a given root.
 
     Args:
         root (str or Path): Path to directory whose files need to be listed
@@ -422,7 +422,7 @@ def download_and_extract_archive(
     md5: str | None = None,
     remove_finished: bool = False,
 ) -> None:
-    """Download a file from url and extract it
+    """Download a file from url and extract it.
 
        This method is a wrapper of `download_url` and `extract_archive` methods.
 

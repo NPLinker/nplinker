@@ -145,7 +145,7 @@ class DatasetLoader:
         )
 
     def validate(self):
-        """Download data and build paths for local data"""
+        """Download data and build paths for local data."""
         # if remote loading mode, need to download the data here
         # CG: for PODP workflow, strain_mappings.json is generated in the download step
         if self._remote_loading:
@@ -498,7 +498,7 @@ class DatasetLoader:
                 self.bigscape_dir = find_bigscape_dir(self.bigscape_dir)
 
     def _load_class_info(self):
-        """Load class match info (based on mibig) and chemical class predictions
+        """Load class match info (based on mibig) and chemical class predictions.
 
         Run CANOPUS if asked for. First sirius is run through docker, if this
         fails, it is run with a version present on the path.
@@ -596,8 +596,7 @@ class DatasetLoader:
             )
 
     def _filter_only_common_strains(self):
-        """Filter strain population to only strains present in both genomic and molecular data
-        """
+        """Filter strain population to only strains present in both genomic and molecular data."""
         # TODO: Maybe there should be an option to specify which strains are used, both so we can
         #    selectively exclude strains, and include strains that are missing from either side.
         bgc_strains = {x.strain for x in self.bgcs}

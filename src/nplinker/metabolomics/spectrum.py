@@ -173,8 +173,7 @@ class Spectrum:
 
     @property
     def losses(self):
-        """All mass shifts in the spectrum, and the indices of the peaks
-        """
+        """All mass shifts in the spectrum, and the indices of the peaks."""
         if self._losses is None:
             # populate loss table
             losses = []
@@ -194,8 +193,7 @@ class Spectrum:
         return self._losses
 
     def has_loss(self, mass, tol):
-        """Check if the scan has the specified loss (within tolerance)
-        """
+        """Check if the scan has the specified loss (within tolerance)."""
         matched_losses = []
 
         idx = 0

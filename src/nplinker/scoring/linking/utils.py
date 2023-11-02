@@ -27,7 +27,7 @@ def calc_correlation_matrix(M_type1_cond, M_type2_cond):
     """Calculate correlation matrices from co-occurence matrices
     Input:
     M_type1_cond(x,y) is 1 if type1_x IS observed under condition_y
-    M_type1_cond(x,y) is 0 if type1_x IS NOT observed under condition_y
+    M_type1_cond(x,y) is 0 if type1_x IS NOT observed under condition_y.
 
     Outputs three correlation matrices:
     M_type1_type2(x,y) --- number of conditions where type1_x and type2_y co-occur
@@ -61,7 +61,7 @@ def calc_likelihood_matrix(
     M_type1_cond(x,y) is 0 if type1_x IS NOT observed under condition_y
     M_type1_type2(x,y) --- number of conditions where type1_x and type2_y co-occur
     M_type1_nottype2(x,y) --- number of conditions where type1_x and NOT-type2_y co-occur
-    M_nottype1_type2(x,y) --- number of conditions where NOT-type1_x and type2_y co-occur
+    M_nottype1_type2(x,y) --- number of conditions where NOT-type1_x and type2_y co-occur.
 
     Output:
     Four likelihood matrices of size len(type1) x len(type2):
@@ -149,7 +149,7 @@ def pair_prob_approx(P_str, XG, Ny, hits):
 
 def link_prob(P_str, XGS, Nx, Ny, Nstr):
     """Calculate probability of finding a set of *specific* hits between Gx and Sy.
-    This means: the probability to find hits only in all the strains that form the set XGS
+    This means: the probability to find hits only in all the strains that form the set XGS.
 
     Parameters
     ----------
@@ -185,7 +185,7 @@ def link_prob(P_str, XGS, Nx, Ny, Nstr):
 def pair_prob_hg(k, N, Nx, Ny):
     """Calculate the probability to draw k times type(Ny) out of N elements (whereof Ny type(Ny)s),
     when drawing Nx times in total.
-    Same as hypergemoetric distribution
+    Same as hypergemoetric distribution.
     """
     if (k > Nx) or (k > Ny):
         print("Given 'k' must be <= Nx and <= Ny.")
@@ -274,8 +274,7 @@ class unique_element:
 
 
 def permutation_unique(elements):
-    """Derive unique permutations of elements (list)
-    """
+    """Derive unique permutations of elements (list)."""
     eset = set(elements)
     listunique = [unique_element(i, elements.count(i)) for i in eset]
     num_elements = len(elements)
@@ -283,8 +282,7 @@ def permutation_unique(elements):
 
 
 def permutation_unique_helper(listunique, result_list, d):
-    """Helper function to derive unique permutations of elements (list)
-    """
+    """Helper function to derive unique permutations of elements (list)."""
     if d < 0:
         yield tuple(result_list)
     else:

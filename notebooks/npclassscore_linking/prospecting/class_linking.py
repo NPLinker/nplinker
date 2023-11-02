@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""Initial code for NPClassScore
-"""
+"""Initial code for NPClassScore."""
 import glob
 import os
 import sys
@@ -17,7 +16,7 @@ from nplinker.nplinker import Spectrum
 
 
 class Class_links:
-    """Holds all info concerning class links (based on known bgc-compound links in MIBiG)"""
+    """Holds all info concerning class links (based on known bgc-compound links in MIBiG)."""
 
     def __init__(self, mibig_classes_file):
         self._mibig_classes_file = mibig_classes_file
@@ -69,7 +68,7 @@ class Class_links:
         }
 
     def get_gcf_as_classes(self, gcf, cutoff=0.5):
-        """Get antismash classes for a gcf if antismash class occurs in more than <cutoff> of gcf
+        """Get antismash classes for a gcf if antismash class occurs in more than <cutoff> of gcf.
 
         Args:
             - gcf: GCF NPLinker object
@@ -93,7 +92,7 @@ class Class_links:
         return filtered_as_classes
 
     def convert_as_classes(self, init_as_classes: list):
-        """Convert AS classes to class names that are in scoring table
+        """Convert AS classes to class names that are in scoring table.
 
         Args:
             - init_as_classes: list of str, the initial antismash class names
@@ -138,7 +137,7 @@ class Class_links:
         # aggregate pairwise class matrices for all compounds
 
         def _rec_dd():
-            """Initialises a recurring defaultdict"""
+            """Initialises a recurring defaultdict."""
             return defaultdict(_rec_dd)
 
         result = _rec_dd()
@@ -254,7 +253,7 @@ class Class_links:
 
 
 class Canopus_results:
-    """Class for storing canopus results
+    """Class for storing canopus results.
 
     The two input files from input_dir are read for the spectra and molfams, respectively:
         -cluster_index_classifications.txt
@@ -262,7 +261,7 @@ class Canopus_results:
     """
 
     def __init__(self, root_dir):
-        """Read the class info from root_dir/canopus
+        """Read the class info from root_dir/canopus.
 
         Args:
             root_dir: str, root_dir of nplinker project
@@ -278,7 +277,7 @@ class Canopus_results:
         self._molfam_classes_names_inds = {elem: i for i, elem in enumerate(molfam_classes_names)}
 
     def _read_spectra_classes(self, root_dir):
-        """Read canopus classes for spectra, return classes_names, classes
+        """Read canopus classes for spectra, return classes_names, classes.
 
         Args:
             root_dir: str, root_dir of nplinker project
@@ -320,7 +319,7 @@ class Canopus_results:
         return ci_classes_names, ci_classes
 
     def _read_molfam_classes(self, root_dir):
-        """Read canopus classes for molfams, return classes_names, classes
+        """Read canopus classes for molfams, return classes_names, classes.
 
         Args:
             root_dir: str, root_dir of nplinker project
@@ -387,14 +386,14 @@ class Canopus_results:
 
 
 class MolNetEnhancer_results:
-    """Class for storing MolNetEnhancer results
+    """Class for storing MolNetEnhancer results.
 
     The input file for ClassyFire results is read from the molnetenhancer directory:
         - ClassyFireResults_Network.txt
     """
 
     def __init__(self, root_dir):
-        """Read the class info from file in root_dir/molnetenhancer/
+        """Read the class info from file in root_dir/molnetenhancer/.
 
         Args:
             root_dir: str, root_dir of nplinker project
@@ -406,7 +405,7 @@ class MolNetEnhancer_results:
         self._spectra_classes_names_inds = {elem: i for i, elem in enumerate(cf_classes_names)}
 
     def _read_cf_classes(self, root_dir):
-        r"""Read ClassyFireResults_Network.txt in molnetenhancer dir
+        r"""Read ClassyFireResults_Network.txt in molnetenhancer dir.
 
         Args:
             root_dir: str, root_dir of nplinker project
@@ -435,7 +434,7 @@ class MolNetEnhancer_results:
                 line = line.strip("\n").split("\t")
                 cluster = line.pop(0)
                 component = line.pop(0)
-                nr_nodes = line.pop(0)
+                line.pop(0)
                 class_info = []
                 for i in range(0, len(line), 2):
                     class_tup = (line[i], float(line[i + 1]))
@@ -447,7 +446,7 @@ class MolNetEnhancer_results:
         return columns, mne_component_dict, mne_cluster2component
 
     def spectra_classes(self, spectrum_id):
-        """Return classes by relating spectrum_id in the molfam_classes
+        """Return classes by relating spectrum_id in the molfam_classes.
 
         Args:
             spectrum_id: int/str, spectrum_id - ints will be converted to str
@@ -483,7 +482,7 @@ class NPLinker_classes(NPLinker):
         super().__init__(userconfig)
 
     def read_class_info(self):
-        """Should include this in load_data/loader()
+        """Should include this in load_data/loader().
 
         returns a Canopus and MNE object with info about classes, and the Class links object
         """
@@ -506,7 +505,7 @@ class NPLinker_classes(NPLinker):
         self._class_predict_options = class_predict_options
 
     def class_linking_score(self, obj, target):
-        """Return sorted class link scores for scoring obj and target
+        """Return sorted class link scores for scoring obj and target.
 
         The input objects can be any mix of the following NPLinker types:
             - BGC
@@ -543,11 +542,9 @@ class NPLinker_classes(NPLinker):
         if is_spectrum:
             # list of list of tuples/None - todo: add to spectrum object
             spec_like_classes = self.canopus.spectra_classes.get(str(spec_like.spectrum_id))
-            spec_like_classes_names = self.canopus.spectra_classes_names
             spec_like_classes_names_inds = self.canopus.spectra_classes_names_inds
         else:  # molfam
             spec_like_classes = self.canopus.molfam_classes.get(str(spec_like.family_id))
-            spec_like_classes_names = self.canopus.molfam_classes_names
             spec_like_classes_names_inds = self.canopus.molfam_classes_names_inds
 
         scores = []
@@ -591,7 +588,7 @@ class NPLinker_classes(NPLinker):
         return sorted(scores, reverse=True)
 
     def npclass_score(self, obj, target, method="main"):
-        """Return sorted class link scores for scoring obj and target
+        """Return sorted class link scores for scoring obj and target.
 
         The input objects can be any mix of the following NPLinker types:
             - BGC
@@ -665,7 +662,6 @@ class NPLinker_classes(NPLinker):
                         for i, cls_per_lvl in enumerate(lvl)
                         if i == 0
                     ]
-                spec_like_classes_names = self.canopus.spectra_classes_names
                 spec_like_classes_names_inds = self.canopus.spectra_classes_names_inds
             else:  # molfam
                 all_classes = self.canopus.molfam_classes.get(str(spec_like.family_id))
@@ -676,7 +672,6 @@ class NPLinker_classes(NPLinker):
                         for i, cls_per_lvl in enumerate(lvl)
                         if i == 0
                     ]
-                spec_like_classes_names = self.canopus.molfam_classes_names
                 spec_like_classes_names_inds = self.canopus.molfam_classes_names_inds
         if use_mne and not spec_like_classes:  # if mne or when main/canopus does not get classes
             if is_spectrum:
@@ -684,7 +679,6 @@ class NPLinker_classes(NPLinker):
             else:  # molfam
                 spec_like_classes = self.molnetenhancer.molfam_classes.get(str(spec_like.family_id))
             # classes are same for molfam and spectrum so names are irrespective of is_spectrum
-            spec_like_classes_names = self.molnetenhancer.spectra_classes_names
             spec_like_classes_names_inds = self.molnetenhancer.spectra_classes_names_inds
 
         scores = []  # this will be returned if one of the class sides is absent

@@ -101,7 +101,7 @@ class PODPDownloader:
             )
 
     def _init_folder_structure(self, working_dir):
-        """Create local cache folders and set up paths for various files"""
+        """Create local cache folders and set up paths for various files."""
         # init local cache root
         self.working_dir = working_dir
         self.downloads_dir = os.path.join(self.working_dir, "downloads")
@@ -169,7 +169,7 @@ class PODPDownloader:
         GNPSExtractor(archive, self.project_results_dir)
 
     def _download_and_load_json(self, url: str, output_file: str | PathLike) -> dict:
-        """Download a JSON file from a URL and return the parsed JSON data"""
+        """Download a JSON file from a URL and return the parsed JSON data."""
         fpath = Path(output_file)
         download_url(url, fpath.parent, fpath.name)
         logger.debug("Downloaded %s to %s", url, output_file)

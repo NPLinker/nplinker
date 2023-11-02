@@ -52,7 +52,7 @@ class Formula:
         # Do some regex matching to find the numbers of the important atoms
         ex = atom_name + "(?![a-z])" + r"\d*"
         m = re.search(ex, self.formula)
-        if m == None:
+        if m is None:
             return 0
         else:
             ex = atom_name + "(?![a-z])" + r"(\d*)"
