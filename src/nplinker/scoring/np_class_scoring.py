@@ -153,8 +153,7 @@ class NPClassScoring(ScoringMethod):
         return sorted(scores, reverse=True)
 
     def _get_targets(self, test_id):
-        """
-        Get the targets based upon instance of test_id, returns list of targets
+        """Get the targets based upon instance of test_id, returns list of targets
 
         Args:
             test_id: one of the NPLinker objects: BGC, GCF, Spectrum, Molfam
@@ -322,9 +321,9 @@ class NPClassScoring(ScoringMethod):
         logger.info(f"Please choose one of the methods from {met_options}")
         if not met_options:
             logger.warn(
-                f"There are no methods available! This is probably "
-                f"because no class predictions (canopus, etc.) were "
-                f"present or they are not loaded correctly"
+                "There are no methods available! This is probably "
+                "because no class predictions (canopus, etc.) were "
+                "present or they are not loaded correctly"
             )
         else:
             logger.info(f"Currently the method '{met_options[0]}' is selected")

@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING
+from typing import Sequence
 import numpy as np
 import pandas as pd
 from nplinker.genomics.gcf import GCF

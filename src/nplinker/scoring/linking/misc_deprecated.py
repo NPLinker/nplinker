@@ -95,8 +95,7 @@ def metcalf_scoring(
     neither=1,
     standardised=False,
 ):
-    """
-    Calculate the Metcalf score for the provided objects
+    """Calculate the Metcalf score for the provided objects
     strains should be a list of strain names
     """
     N = len(strains)
@@ -180,8 +179,7 @@ def match(spectral_annotation, mibig_name):
 
 
 def aa_scoring(spectrum, gcf_like, tol=0.01):
-    """
-    Check for the prescence of AA mass shifts in the spectrum
+    """Check for the prescence of AA mass shifts in the spectrum
     """
     from nplinker.metabolomics import read_aa_losses
 

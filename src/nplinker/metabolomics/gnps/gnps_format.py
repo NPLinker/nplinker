@@ -1,11 +1,11 @@
+import zipfile
 from enum import Enum
 from enum import unique
 from os import PathLike
 from pathlib import Path
-import zipfile
+import httpx
 from bs4 import BeautifulSoup
 from bs4 import Tag
-import httpx
 from nplinker.utils import get_headers
 
 

@@ -1,4 +1,3 @@
-from pathlib import Path
 import shutil
 import pytest
 from nplinker.globals import STRAIN_MAPPINGS_FILENAME

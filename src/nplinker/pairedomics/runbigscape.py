@@ -18,6 +18,7 @@ import sys
 from os import PathLike
 from ..logconfig import LogConfig
 
+
 logger = LogConfig.getLogger(__name__)
 
 # NOTE: for simplicity this is currently written with assumption it will only be

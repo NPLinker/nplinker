@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Initial code for NPClassScore
+"""Initial code for NPClassScore
 """
 import glob
 import os
@@ -209,10 +208,10 @@ class Class_links:
         for bgc_key, bgc_chem_counts in self._class_count_dict.items():
             for chem_key, counts in bgc_chem_counts.items():
                 # init entries in dict
-                if not bgc_key in class_linking_tables:
+                if bgc_key not in class_linking_tables:
                     class_linking_tables[bgc_key] = {}
                     class_linking_counts[bgc_key] = {}
-                if not chem_key in class_linking_tables:
+                if chem_key not in class_linking_tables:
                     class_linking_tables[chem_key] = {}
                     class_linking_counts[chem_key] = {}
                 # add linking tables as DataFrames
@@ -441,7 +440,7 @@ class MolNetEnhancer_results:
                 for i in range(0, len(line), 2):
                     class_tup = (line[i], float(line[i + 1]))
                     class_info.append(class_tup)
-                if not component in mne_component_dict:
+                if component not in mne_component_dict:
                     mne_component_dict[component] = class_info
                 mne_cluster2component[cluster] = component
 

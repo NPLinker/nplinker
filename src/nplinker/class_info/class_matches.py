@@ -245,10 +245,10 @@ class ClassMatches:
         for bgc_key, bgc_chem_counts in self._class_count_dict.items():
             for chem_key, counts in bgc_chem_counts.items():
                 # init entries in dict
-                if not bgc_key in class_matching_tables:
+                if bgc_key not in class_matching_tables:
                     class_matching_tables[bgc_key] = {}
                     class_matching_counts[bgc_key] = {}
-                if not chem_key in class_matching_tables:
+                if chem_key not in class_matching_tables:
                     class_matching_tables[chem_key] = {}
                     class_matching_counts[chem_key] = {}
                 # add matching tables as DataFrames

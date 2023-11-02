@@ -1,6 +1,5 @@
 class ObjectLink:
-    """
-    Class which stores information about a single link between two objects.
+    """Class which stores information about a single link between two objects.
 
     There will be at most one instance of an ObjectLink for a given pair of
     objects (source, target) after running 1 or more scoring methods. Some

@@ -1,10 +1,10 @@
 import os
+import zipfile
 from os import PathLike
 from pathlib import Path
-import zipfile
 from nplinker import utils
-from .gnps_format import gnps_format_from_archive
 from .gnps_format import GNPSFormat
+from .gnps_format import gnps_format_from_archive
 
 
 class GNPSExtractor:

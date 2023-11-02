@@ -1,6 +1,7 @@
 import pytest
 from Bio import SeqIO
-from nplinker.genomics.aa_pred import AntiSmash5Record, predict_aa
+from nplinker.genomics.aa_pred import AntiSmash5Record
+from nplinker.genomics.aa_pred import predict_aa
 from .. import DATA_DIR
 
 

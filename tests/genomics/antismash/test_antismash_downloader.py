@@ -1,4 +1,3 @@
-from urllib.error import HTTPError
 import pytest
 from nplinker.genomics.antismash import download_and_extract_antismash_data
 from nplinker.utils import extract_archive

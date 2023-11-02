@@ -1,8 +1,8 @@
 import pytest
+from nplinker.metabolomics.gnps import GNPSFormat
 from nplinker.metabolomics.gnps import gnps_format_from_archive
 from nplinker.metabolomics.gnps import gnps_format_from_file_mapping
 from nplinker.metabolomics.gnps import gnps_format_from_task_id
-from nplinker.metabolomics.gnps import GNPSFormat
 
 
 @pytest.mark.parametrize(

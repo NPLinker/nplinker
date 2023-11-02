@@ -2,8 +2,8 @@ from __future__ import annotations
 import json
 import pytest
 from nplinker.genomics import BGC
-from nplinker.genomics import filter_mibig_only_gcf
 from nplinker.genomics import GCF
+from nplinker.genomics import filter_mibig_only_gcf
 from nplinker.genomics import generate_mappings_genome_id_bgc_id
 from nplinker.genomics import get_bgcs_from_gcfs
 from nplinker.genomics import get_strains_from_bgcs

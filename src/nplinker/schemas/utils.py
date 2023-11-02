@@ -8,8 +8,7 @@ with open(Path(__file__).parent / "podp_adapted_schema.json", "r") as f:
 
 
 def validate_podp_json(json_data: dict) -> None:
-    """
-    Validate a dictionary of JSON data against the PODP JSON schema.
+    """Validate a dictionary of JSON data against the PODP JSON schema.
 
     All validation error messages are collected and raised as a single
     ValueError.

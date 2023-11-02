@@ -35,7 +35,7 @@ def fast_cosine_shift(spectrum1, spectrum2, tol, min_match):
     score = 0.0
     used_matches = []
     for m in matching_pairs:
-        if not m[0] in used1 and not m[1] in used2:
+        if m[0] not in used1 and m[1] not in used2:
             score += m[2]
             used1.add(m[0])
             used2.add(m[1])
@@ -81,7 +81,7 @@ def fast_cosine(spectrum1, spectrum2, tol, min_match):
     score = 0.0
     used_matches = []
     for m in matching_pairs:
-        if not m[0] in used1 and not m[1] in used2:
+        if m[0] not in used1 and m[1] not in used2:
             score += m[2]
             used1.add(m[0])
             used2.add(m[1])

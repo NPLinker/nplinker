@@ -2,8 +2,8 @@ from os import PathLike
 from pathlib import Path
 from typing_extensions import Self
 from nplinker.utils import download_url
-from .gnps_format import gnps_format_from_task_id
 from .gnps_format import GNPSFormat
+from .gnps_format import gnps_format_from_task_id
 
 
 class GNPSDownloader:

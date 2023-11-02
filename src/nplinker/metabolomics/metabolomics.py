@@ -30,7 +30,7 @@ logger = LogConfig.getLogger(__name__)
 def _mols_to_spectra(ms2, metadata):
     ms2_dict = {}
     for m in ms2:
-        if not m[3] in ms2_dict:
+        if m[3] not in ms2_dict:
             ms2_dict[m[3]] = []
         ms2_dict[m[3]].append((m[0], m[2]))
 
@@ -80,7 +80,7 @@ def load_edges(edges_file: str | PathLike, spec_dict: dict[str, Spectrum]):
             cid2_index = headers.index("CLUSTERID2")
             cos_index = headers.index("Cosine")
             fam_index = headers.index("ComponentIndex")
-        except ValueError as ve:
+        except ValueError:
             raise Exception("Unknown or missing column(s) in edges file: {}".format(edges_file))
 
         for line in reader:
@@ -162,7 +162,6 @@ def load_spectra(mgf_file: str | PathLike, edges_file: str | PathLike) -> dict[s
     Returns:
         dict[str, Spectrum]: Indexed dict of mass spectra.
     """
-
     ms1, ms2, metadata = LoadMGF(name_field="scans").load_spectra([str(mgf_file)])
     logger.info("%d molecules parsed from MGF file", len(ms1))
     spectra = _mols_to_spectra(

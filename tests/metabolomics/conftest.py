@@ -1,5 +1,5 @@
-from os import PathLike
 import shutil
+from os import PathLike
 import httpx
 import pytest
 from nplinker.metabolomics.gnps import GNPSFormat

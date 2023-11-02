@@ -1,7 +1,5 @@
 import unittest
-from pathlib import Path
 from nplinker.class_info.chem_classes import MolNetEnhancerResults
-
 from .. import DATA_DIR
 
 
@@ -43,7 +41,7 @@ class TestMolNetEnhancerResults(unittest.TestCase):
             self.assertTrue(len(elem) != 0, f"Element {i} failed to load")
 
         test_spec_classes = self._mr.spectra_classes("130522")
-        self.assertTrue(len(test_spec_classes) != 0, f"func spectra_classes() not working")
+        self.assertTrue(len(test_spec_classes) != 0, "func spectra_classes() not working")
         self.assertTrue(
             self._mr.spectra_classes("31") is None,
             "handling 'no matches' goes wrong, MFs/spectra without"

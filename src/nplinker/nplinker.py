@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING
 from .config import Config
 from .genomics import BGC
 from .genomics import GCF
-from .loader import DatasetLoader
 from .loader import NPLINKER_APP_DATA_DIR
+from .loader import DatasetLoader
 from .logconfig import LogConfig
 from .metabolomics import MolecularFamily
 from .metabolomics import Spectrum
@@ -16,7 +16,6 @@ from .scoring.link_collection import LinkCollection
 from .scoring.metcalf_scoring import MetcalfScoring
 from .scoring.np_class_scoring import NPClassScoring
 from .scoring.rosetta_scoring import RosettaScoring
-from .strain_collection import StrainCollection
 
 
 if TYPE_CHECKING:
@@ -81,7 +80,6 @@ class NPLinker:
                 - dict: contents will be used to override values in the dict generated
                         from loading the configuration file(s)
         """
-
         # if userconfig is a string => create a dict with 'config' key and string as filename
         # if userconfig is a dict => pass it to Config() directly
         if isinstance(userconfig, str):
@@ -157,7 +155,6 @@ class NPLinker:
         Returns:
             A dict containing the information described above
         """
-
         self._repro_data = {}
         # TODO best way to embed latest git commit hash? probably with a packaging script...
         # TODO versions of all Python dependencies used (just rely on

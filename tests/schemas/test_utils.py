@@ -1,5 +1,5 @@
-from jsonschema import Draft7Validator
 import pytest
+from jsonschema import Draft7Validator
 from nplinker.schemas import PODP_ADAPTED_SCHEMA
 from nplinker.schemas import validate_podp_json
 

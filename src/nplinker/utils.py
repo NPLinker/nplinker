@@ -20,13 +20,14 @@ import hashlib
 import lzma
 import math
 import os
-from os import PathLike
 import os.path
-from pathlib import Path
 import sys
 import tarfile
-from typing import Callable, IO
 import zipfile
+from os import PathLike
+from pathlib import Path
+from typing import IO
+from typing import Callable
 import httpx
 from tqdm import tqdm
 
@@ -437,7 +438,6 @@ def download_and_extract_archive(
         remove_finished (bool, optional): If `True`, remove the downloaded file
              after the extraction. Defaults to False.
     """
-
     download_root = Path(download_root).expanduser()
     if extract_root is None:
         extract_root = download_root

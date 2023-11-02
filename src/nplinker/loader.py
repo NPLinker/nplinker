@@ -146,7 +146,6 @@ class DatasetLoader:
 
     def validate(self):
         """Download data and build paths for local data"""
-
         # if remote loading mode, need to download the data here
         # CG: for PODP workflow, strain_mappings.json is generated in the download step
         if self._remote_loading:
@@ -597,8 +596,7 @@ class DatasetLoader:
             )
 
     def _filter_only_common_strains(self):
-        """
-        Filter strain population to only strains present in both genomic and molecular data
+        """Filter strain population to only strains present in both genomic and molecular data
         """
         # TODO: Maybe there should be an option to specify which strains are used, both so we can
         #    selectively exclude strains, and include strains that are missing from either side.
@@ -631,8 +629,7 @@ class DatasetLoader:
         logger.info("Strains filtered down to total of {}".format(len(self.strains)))
 
     def _filter_user_strains(self):
-        """
-        If the user has supplied a list of strains to be explicitly included, go through the
+        """If the user has supplied a list of strains to be explicitly included, go through the
         existing sets of objects we have and remove any that only include other strains. This
         involves an initial round of removing BGC and Spectrum objects, then a further round
         of removing now-empty GCF and MolFam objects.
@@ -705,7 +702,7 @@ def find_via_glob(path, file_type, optional=False):
     try:
         filename = glob.glob(path)[0]
         return filename
-    except (OSError, IndexError) as e:
+    except (OSError, IndexError):
         if not optional:
             # "from None" suppresses the traceback for the original exception, which isn't really needed
             raise Exception(
@@ -741,7 +738,7 @@ def find_via_glob_alts(paths, file_type, optional=False):
         try:
             filename = glob.glob(path)[0]
             break
-        except (OSError, IndexError) as e:
+        except (OSError, IndexError):
             continue
 
     if filename is None and not optional:

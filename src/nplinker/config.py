@@ -1,6 +1,6 @@
 import argparse
-from collections.abc import Mapping
 import os
+from collections.abc import Mapping
 from shutil import copyfile
 import toml
 from xdg import XDG_CONFIG_HOME

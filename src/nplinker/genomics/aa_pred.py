@@ -336,8 +336,7 @@ def predict_aa(filename):
 
 
 def read_aa_losses(filename):
-    """
-    Read AA losses from data file. (assume fixed structure...)
+    """Read AA losses from data file. (assume fixed structure...)
     """
     aa_losses = {}
     with open(filename) as f:

@@ -3,8 +3,8 @@ from os import PathLike
 from pathlib import Path
 from nplinker.metabolomics.abc import FileMappingLoaderBase
 from nplinker.utils import is_file_format
-from .gnps_format import gnps_format_from_file_mapping
 from .gnps_format import GNPSFormat
+from .gnps_format import gnps_format_from_file_mapping
 
 
 class GNPSFileMappingLoader(FileMappingLoaderBase):

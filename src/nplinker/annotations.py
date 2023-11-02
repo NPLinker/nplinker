@@ -81,7 +81,6 @@ def load_annotations(
     Returns:
         list[Spectrum]: List of annotated spectra.
     """
-
     if not os.path.exists(root):
         logger.debug(f"Annotation directory not found ({root})")
         return spectra

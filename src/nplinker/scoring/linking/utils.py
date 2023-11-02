@@ -24,8 +24,7 @@ def isinstance_all(*objects, objtype) -> bool:
 
 
 def calc_correlation_matrix(M_type1_cond, M_type2_cond):
-    """
-    Calculate correlation matrices from co-occurence matrices
+    """Calculate correlation matrices from co-occurence matrices
     Input:
     M_type1_cond(x,y) is 1 if type1_x IS observed under condition_y
     M_type1_cond(x,y) is 0 if type1_x IS NOT observed under condition_y
@@ -35,7 +34,6 @@ def calc_correlation_matrix(M_type1_cond, M_type2_cond):
     M_type1_nottype2(x,y) --- number of conditions where type1_x and NOT-type2_y co-occur
     M_nottype1_type2(x,y) --- number of conditions where NOT-type1_x and type2_y co-occur
     """
-
     # Quick computation of sum both present
     testA = np.dot(M_type1_cond, M_type2_cond.T)
     # Present in type1 and not in type 2
@@ -57,8 +55,7 @@ def calc_correlation_matrix(M_type1_cond, M_type2_cond):
 def calc_likelihood_matrix(
     M_type1_cond, M_type2_cond, M_type1_type2, M_type1_nottype2, M_nottype1_type2
 ):
-    """
-    Calculate correlation matrices from co-occurence matrices
+    """Calculate correlation matrices from co-occurence matrices
     Input:
     M_type1_cond(x,y) is 1 if type1_x IS observed under condition_y
     M_type1_cond(x,y) is 0 if type1_x IS NOT observed under condition_y
@@ -70,7 +67,6 @@ def calc_likelihood_matrix(
     Four likelihood matrices of size len(type1) x len(type2):
     P_type2_given_type1, P_type2_not_type1, P_type1_given_type2, P_type1_not_type2
     """
-
     dim1, dim2 = M_type1_type2.shape
     num_conditions = M_type2_cond.shape[1]
 
@@ -101,8 +97,7 @@ def calc_likelihood_matrix(
 
 
 def pair_prob_approx(P_str, XG, Ny, hits):
-    """
-    Calculate probability of finding 'k' hits between Gx and Sy.
+    """Calculate probability of finding 'k' hits between Gx and Sy.
 
     Parameters
     ----------
@@ -116,7 +111,6 @@ def pair_prob_approx(P_str, XG, Ny, hits):
     hits: int
         number of hits
     """
-
     Nx = len(XG)
     Nstr = len(P_str)
 
@@ -154,8 +148,7 @@ def pair_prob_approx(P_str, XG, Ny, hits):
 
 
 def link_prob(P_str, XGS, Nx, Ny, Nstr):
-    """
-    Calculate probability of finding a set of *specific* hits between Gx and Sy.
+    """Calculate probability of finding a set of *specific* hits between Gx and Sy.
     This means: the probability to find hits only in all the strains that form the set XGS
 
     Parameters
@@ -190,8 +183,7 @@ def link_prob(P_str, XGS, Nx, Ny, Nstr):
 
 
 def pair_prob_hg(k, N, Nx, Ny):
-    """
-    Calculate the probability to draw k times type(Ny) out of N elements (whereof Ny type(Ny)s),
+    """Calculate the probability to draw k times type(Ny) out of N elements (whereof Ny type(Ny)s),
     when drawing Nx times in total.
     Same as hypergemoetric distribution
     """
@@ -225,8 +217,7 @@ def hit_prob_dist(N, Nx, Ny, nys):
 
 
 def pair_prob(P_str, XG, Ny, hits):
-    """
-    Calculate probability of finding 'k' hits between Gx and Sy.
+    """Calculate probability of finding 'k' hits between Gx and Sy.
 
     CAREFUL: for larger Nx, Ny, Nstr this quickly becomes *VERY* slow (many, many permutations...)
     --> better use pair_prob_approx instead
@@ -243,7 +234,6 @@ def pair_prob(P_str, XG, Ny, hits):
     hits: int
         number of hits
     """
-
     Nx = len(XG)
     Nstr = len(P_str)
 
@@ -284,8 +274,7 @@ class unique_element:
 
 
 def permutation_unique(elements):
-    """
-    Derive unique permutations of elements (list)
+    """Derive unique permutations of elements (list)
     """
     eset = set(elements)
     listunique = [unique_element(i, elements.count(i)) for i in eset]
@@ -294,8 +283,7 @@ def permutation_unique(elements):
 
 
 def permutation_unique_helper(listunique, result_list, d):
-    """
-    Helper function to derive unique permutations of elements (list)
+    """Helper function to derive unique permutations of elements (list)
     """
     if d < 0:
         yield tuple(result_list)

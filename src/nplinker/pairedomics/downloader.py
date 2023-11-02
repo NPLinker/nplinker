@@ -1,8 +1,8 @@
 import json
 import os
+import shutil
 from os import PathLike
 from pathlib import Path
-import shutil
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.globals import PFAM_PATH
 from nplinker.logconfig import LogConfig
@@ -102,7 +102,6 @@ class PODPDownloader:
 
     def _init_folder_structure(self, working_dir):
         """Create local cache folders and set up paths for various files"""
-
         # init local cache root
         self.working_dir = working_dir
         self.downloads_dir = os.path.join(self.working_dir, "downloads")

@@ -14,7 +14,6 @@
 
 import logging
 import sys
-from typing_extensions import Self
 
 
 class LogConfig:

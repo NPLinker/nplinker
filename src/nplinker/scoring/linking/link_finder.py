@@ -122,6 +122,7 @@ class LinkFinder:
                 and all objects must be of the same type.
             score_cutoff(float): Minimum score to consider a link (≥score_cutoff).
                 Default is 0.5.
+
         Returns:
             list: List of data frames containing the ids of the linked objects
                 and the score. The data frame has index names of

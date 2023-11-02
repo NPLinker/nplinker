@@ -1,12 +1,12 @@
 import json
-from os import PathLike
-from pathlib import Path
 import re
 import time
+from os import PathLike
+from pathlib import Path
+import httpx
 from bs4 import BeautifulSoup
 from bs4 import NavigableString
 from bs4 import Tag
-import httpx
 from jsonschema import validate
 from nplinker.genomics.antismash import download_and_extract_antismash_data
 from nplinker.globals import GENOME_STATUS_FILENAME
@@ -141,7 +141,6 @@ def podp_download_and_extract_antismash_data(
             `extract_root` if it doesn't exist. The files will be extracted to
             `<extract_root>/antismash/<antismash_id>` directory.
     """
-
     if not Path(project_download_root).exists():
         # otherwise in case of failed first download, the folder doesn't exist and
         # genome_status_file can't be written

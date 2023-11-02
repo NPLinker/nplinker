@@ -102,7 +102,7 @@ def load_pickled_data(nplinker, path, delete_on_error=True):
         )
         try:
             os.unlink(path)
-        except OSError as oe:
+        except OSError:
             pass
 
     return data

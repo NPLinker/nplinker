@@ -111,11 +111,10 @@ def run_iokr(data):
     print("")
     print("IOKR test run done!")
     print(f"#samples: {len(collected_rankings)}")
-    print("top-1 acc: {}".format(float([x[1] for x in collected_rankings].count(0)) / total, total))
+    print("top-1 acc: {}".format(float([x[1] for x in collected_rankings].count(0)) / total, ))
     print(
         "top-1 base: {}".format(
-            float([x[1] for x in collected_baseline_rankings].count(0)) / total, total
-        )
+            float([x[1] for x in collected_baseline_rankings].count(0)) / total, )
     )
 
     return collected_rankings, collected_baseline_rankings

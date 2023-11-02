@@ -5,8 +5,8 @@ from typing import Any
 from deprecated import deprecated
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import Spectrum
-from nplinker.metabolomics.gnps import gnps_format_from_file_mapping
 from nplinker.metabolomics.gnps import GNPSFormat
+from nplinker.metabolomics.gnps import gnps_format_from_file_mapping
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 
@@ -116,7 +116,6 @@ def _parse_mzxml_header(
         label which should match between the two files.
         >>>
     """
-
     # assume everything up to '.mz' is the identifier/label of this strain
     strain_name = hdr[: hdr.index(".mz")]
     growth_medium = None

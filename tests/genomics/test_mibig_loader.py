@@ -2,8 +2,8 @@ import os.path
 import pytest
 from nplinker.genomics import BGC
 from nplinker.genomics import BGCLoaderBase
-from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.genomics.mibig import MibigLoader
+from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.genomics.mibig import parse_bgc_metadata_json
 from nplinker.genomics.mibig.mibig_metadata import MibigMetadata
 from .. import DATA_DIR

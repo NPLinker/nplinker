@@ -1,7 +1,6 @@
 from pathlib import Path
 from shutil import rmtree
 from tempfile import mkdtemp
-import zipfile
 import pytest
 from nplinker import utils
 from nplinker.utils import find_delimiter

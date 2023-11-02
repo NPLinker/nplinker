@@ -9,17 +9,17 @@ from nplinker.metabolomics import MolecularFamily
 from nplinker.metabolomics import Spectrum
 from nplinker.pickler import load_pickled_data
 from nplinker.pickler import save_pickled_data
-from .linking import DataLinks
-from .linking import isinstance_all
 from .linking import LINK_TYPES
+from .linking import DataLinks
 from .linking import LinkFinder
+from .linking import isinstance_all
 from .methods import ScoringMethod
 from .object_link import ObjectLink
 
 
 if TYPE_CHECKING:
-    from . import LinkCollection
     from ..nplinker import NPLinker
+    from . import LinkCollection
 
 logger = LogConfig.getLogger(__name__)
 

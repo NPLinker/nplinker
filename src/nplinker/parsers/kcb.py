@@ -30,8 +30,7 @@ CLUSTER_REGION_REGEX = re.compile("(.+?)\\.(cluster|region)(\\d+).gbk$")
 
 
 class KCBJSONParser:
-    """
-    Parser for the large .json files antiSMASH generates as part of its output
+    """Parser for the large .json files antiSMASH generates as part of its output
 
     This is supposed to do the same job as the KCBTextParser class without relying
     on parsing the legacy-format text files.
@@ -148,7 +147,6 @@ class KCBJSONParser:
 
     def _parse(self, record):
         """Parses the knownclusterblast data for a single 'record' entry"""
-
         modules = record.get("modules", None)
         if modules is None or "antismash.modules.clusterblast" not in modules:
             # this probably isn't an error, the JSON often seems to contain entries
@@ -231,8 +229,7 @@ class KCBJSONParser:
 
 
 class KCBTextParser:
-    """
-    Parser for antismash knownclusterblast text output files
+    """Parser for antismash knownclusterblast text output files
     """
 
     def __init__(self, filename):
@@ -297,7 +294,7 @@ class KCBTextParser:
                     line = next(f)
                     if line.startswith(">>"):
                         break
-                except Exception as e:
+                except Exception:
                     # EOF
                     return
 
@@ -315,7 +312,7 @@ class KCBTextParser:
                         else:
                             if len(line) > 1:
                                 temp_list.append(line.rstrip())
-                    except Exception as e:
+                    except Exception:
                         details.append(temp_list)
                         finished = True
                         break
@@ -398,7 +395,6 @@ class KCBTextParser:
     @staticmethod
     def get_kcb_filename_from_bgc(bgc):
         """Given a BGC object, return the filename of the corresponding knownclusterblast .txt file (if any).
-
 
         This method attempts to derive the name of the knownclusterblast output file for the
         supplied BGC object, using the original path + filename of the .gbk that the BGC was

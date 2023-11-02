@@ -61,7 +61,7 @@ def plot_families(bgc_dict, family_dict, min_size=0):
     plt.figure(figsize=(10, 10))
     fam_data = {}
     for b, fam in family_dict.items():
-        if not fam in fam_data:
+        if fam not in fam_data:
             fam_data[fam] = []
         fam_data[fam].append(bgc_dict[b])
     for f, dat in fam_data.items():

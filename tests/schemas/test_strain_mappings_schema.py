@@ -1,6 +1,6 @@
+import pytest
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
-import pytest
 from nplinker.schemas import STRAIN_MAPPINGS_SCHEMA
 
 

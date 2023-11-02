@@ -24,20 +24,13 @@
 # In[1]:
 
 
+import csv
 from cdk_pywrapper.cdk_pywrapper import Compound
 
-
 # In[ ]:
-
-
 # In[ ]:
-
-
 # In[2]:
-
-
 from pyteomics import mgf
-import csv
 
 
 # In[3]:

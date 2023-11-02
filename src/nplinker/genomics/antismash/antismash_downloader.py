@@ -1,7 +1,7 @@
 import os
+import shutil
 from os import PathLike
 from pathlib import Path
-import shutil
 from nplinker.logconfig import LogConfig
 from nplinker.utils import download_and_extract_archive
 from nplinker.utils import list_dirs

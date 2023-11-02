@@ -29,8 +29,7 @@ logger = LogConfig.getLogger(__name__)
 
 
 class NPLinkerIOKR:
-    """
-    Rank the potential links in a NPLinker object using IOKR, and wrap the results
+    """Rank the potential links in a NPLinker object using IOKR, and wrap the results
     """
 
     def __init__(self, npl):
@@ -100,8 +99,7 @@ class NPLinkerIOKR:
 
 
 class IOKRWrapper:
-    """
-    Wrapper around the IOKR server.
+    """Wrapper around the IOKR server.
     Takes care of format conversion, fingerprint calculations, etc.
     Should also eventually take over the hardcoded stuff curently in get_iokr_server.
     """
@@ -114,14 +112,12 @@ class IOKRWrapper:
         self.iokr_server = None
 
     def _fingerprint(self, smiles):
-        """
-        Calculate molecular fingerprint for a SMILES string
+        """Calculate molecular fingerprint for a SMILES string
         """
         return fingerprint.fingerprint_from_smiles(smiles, self.fingerprint_type)
 
     def score_smiles(self, ms_list, candidate_smiles):
-        """
-        Score a set of spectra against a candidate set of SMILES strings
+        """Score a set of spectra against a candidate set of SMILES strings
         """
         spectrum_filters.datapath = get_datapath()
 
@@ -163,8 +159,7 @@ class IOKRWrapper:
         return projection_matrix
 
     def rank_smiles(self, ms, candidate_smiles):
-        """
-        Rank a spectrum against a candidate set of SMILES strings
+        """Rank a spectrum against a candidate set of SMILES strings
         """
         # TODO hacky
         spectrum_filters.datapath = get_datapath()

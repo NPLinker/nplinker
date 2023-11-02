@@ -1,7 +1,7 @@
 import numpy as np
+import pytest
 from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
-import pytest
 from nplinker.scoring import LinkCollection
 from nplinker.scoring import MetcalfScoring
 from nplinker.scoring import ObjectLink

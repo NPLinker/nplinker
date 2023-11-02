@@ -100,8 +100,7 @@ class Loader:
         raise NotImplementedError("load spectra method must be implemented")
 
     def _ion_masses(self, precursormass, int_charge):
-        """
-        Compute the parent masses. Single charge version is used for
+        """Compute the parent masses. Single charge version is used for
         loss computation.
         """
         mul = abs(int_charge)
@@ -119,8 +118,7 @@ class Loader:
         return parent_mass, single_charge_precursor_mass
 
     def _interpret_charge(self, charge):
-        """
-        Method to interpret the ever variable charge field in the different
+        """Method to interpret the ever variable charge field in the different
         formats. Should never fail now.
         """
         if not charge:  # if it is none
@@ -148,8 +146,7 @@ class Loader:
         return int_charge
 
     def _load_peak_list(self):
-        """
-        Modify peaklist function. Try to detect "featureid", store it in ms1_peaks
+        """Modify peaklist function. Try to detect "featureid", store it in ms1_peaks
         used for mgf ms1 analysis.
         ms1_peaks: [featid, mz, rt, intensity], featid will be None if "FeatureId"
             does not exist.
@@ -214,8 +211,7 @@ class Loader:
         print("Loaded {} ms1 peaks from {}".format(len(self.ms1_peaks), self.peaklist))
 
     def process_peaklist(self, ms1, ms2, metadata):
-        """
-        Read in peaklist .csv file.
+        """Read in peaklist .csv file.
         ("..., mass, RT, samplename_1, samplename_2, ..."), delimiter: '.
         Find the most suitable ms1 hit, then update ms1, ms2 metadata.
         """

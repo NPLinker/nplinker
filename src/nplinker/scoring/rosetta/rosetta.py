@@ -14,7 +14,6 @@
 
 import csv
 import os
-
 from nplinker.scoring.rosetta.rosetta_hit import RosettaHit
 from ...genomics import BGC
 from ...logconfig import LogConfig
@@ -366,7 +365,6 @@ class Rosetta:
 
     def run(self, spectra, bgcs, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
         """Function which actually computes the rosetta score somehow"""
-
         params_ok = self._load_cached_params(ms1_tol, ms2_tol, score_thresh, min_match_peaks)
 
         # if any parameters have been changed or version mismatch found, delete all cached files
@@ -430,12 +428,10 @@ class Rosetta:
         return self._rosetta_hits
 
     def _init_bgc_hits(self, bgcs):
-        """
-        collect BGC hits. this is done first because the SpecLib generation below can take
+        """Collect BGC hits. this is done first because the SpecLib generation below can take
         several minutes and is a waste of time if the knownclusterblast files required for
         the genomics data aren't available in the current dataset
         """
-
         cached_bgc_hits = load_pickled_data(self._nplinker, self._bgchits_pickle_path)
         if cached_bgc_hits is not None and not self._ignore_genomic_cache:
             logger.info("Found pickled bgc_hits for dataset {}!".format(self._dataset_id))
@@ -468,7 +464,7 @@ class Rosetta:
         )
 
     def _init_speclib(self, spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
-        """next is the metabolomic part. check if we have a pickled SpecLib object..."""
+        """Next is the metabolomic part. check if we have a pickled SpecLib object..."""
         speclib = load_pickled_data(self._nplinker, self._speclib_pickle_path)
         if speclib is not None:
             logger.info(
@@ -484,11 +480,9 @@ class Rosetta:
             self._generate_speclib(spectra)
 
     def _load_cached_params(self, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
-        """
-        check if cached parameters exist, and if so check they match the
+        """Check if cached parameters exist, and if so check they match the
         supplied ones. if not, need to regenerate any pickled data files
         """
-
         params = load_pickled_data(self._nplinker, self._params_pickle_path)
         params_ok = False
 

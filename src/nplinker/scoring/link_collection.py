@@ -6,8 +6,7 @@ logger = LogConfig.getLogger(__name__)
 
 
 class LinkCollection:
-    """
-    Class which stores the results of running one or more scoring methods.
+    """Class which stores the results of running one or more scoring methods.
 
     It provides access to the set of objects which were found to have links,
     the set of objects linked to each of those objects, and the information
