@@ -2,10 +2,9 @@ autoflake
 build
 bump2version
 coverage[toml]
-isort
-prospector[with_pyroma]
 pytest
 pytest-cov
+ruff
 sphinx
 sphinx_rtd_theme
 sphinx-autoapi
@@ -13,4 +12,3 @@ types-toml
 types-Deprecated
 myst_parser
 wheel
-yapf

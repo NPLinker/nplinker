@@ -71,35 +71,26 @@ coverage report
 
 ## Linting and formatting
 
-We use [prospector](https://pypi.org/project/prospector/) for linting, [isort](https://pycqa.github.io/isort/) to sort imports, [unimport](https://github.com/hakancelikdev/unimport) to remove unused imports, and [yapf](https://github.com/google/yapf) for formatting, i.e. fixing readability of your code style.
+We use [ruff](https://docs.astral.sh/ruff/) for linting, sorting imports and formatting code. The configurations of `ruff` are set in [pyproject.toml](pyproject.toml) file.
 
 Running the linters and formatters requires an activated virtual environment with the development tools installed.
 
 ```shell
-# linting
-prospector --profile .prospector.yml
+# Lint all files in the current directory.
+ruff check .
 
-# check import style for the project
-isort --check .
+# Lint all files in the current directory, and fix any fixable errors.
+ruff check . --fix
 
-# check import style and show any proposed changes as a diff
-isort --check --diff .
+# Format all files in the current directory
+ruff format .
 
-# sort imports for the project
-isort .
-
-# remove unused imports for the project
-unimport --requirements --ignore-init --include-star-import --gitignore --remove
-
-# format python style for the project
-yapf -r -i .
-
-# format python styple for specific python file
-yapf -i filename.py
+# Format a single python file
+ruff format filename.py
 ```
 
-**Note:** We have set linter and formatter in VS Code [settings](.vscode),
-so if you're using VS Code, you can also use its shortcut to do linting, sorting and formatting.
+**Note:** We have set `ruff` as linter and formatter in VS Code [settings](vscode/settings.json),
+so if you're using VS Code, you can install VScode extension [ruff](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) and use its shortcut to do sorting and formatting.
 Besides, docstring style is also set, you can use [autoDocString](https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring) to automatically generate docstrings.
 
 ## Static typing
