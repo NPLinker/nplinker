@@ -15,12 +15,9 @@
 import re
 
 
-class Formula():
-
+class Formula:
     def __init__(self, formula):
-        self.atom_names = [
-            'C', 'H', 'N', 'O', 'P', 'S', 'Cl', 'I', 'Br', 'Si', 'F', 'D'
-        ]
+        self.atom_names = ["C", "H", "N", "O", "P", "S", "Cl", "I", "Br", "Si", "F", "D"]
         self.formula = formula
         self.atoms = {}
         for atom in self.atom_names:
@@ -35,11 +32,11 @@ class Formula():
         return is_equal
 
     def correct_gcms_derivatives(self):
-        n_silicons = self.atoms['Si']
-        self.atoms['Si'] = 0
-        self.atoms['C'] -= n_silicons
-        self.atoms['H'] -= 3 * n_silicons
-        self.atoms['H'] += n_silicons
+        n_silicons = self.atoms["Si"]
+        self.atoms["Si"] = 0
+        self.atoms["C"] -= n_silicons
+        self.atoms["H"] -= 3 * n_silicons
+        self.atoms["H"] += n_silicons
         self.make_string()
 
     def make_string(self):
@@ -53,12 +50,12 @@ class Formula():
 
     def get_atoms(self, atom_name):
         # Do some regex matching to find the numbers of the important atoms
-        ex = atom_name + '(?![a-z])' + r'\d*'
+        ex = atom_name + "(?![a-z])" + r"\d*"
         m = re.search(ex, self.formula)
         if m == None:
             return 0
         else:
-            ex = atom_name + '(?![a-z])' + r'(\d*)'
+            ex = atom_name + "(?![a-z])" + r"(\d*)"
             m2 = re.findall(ex, self.formula)
             total = 0
             for a in m2:
@@ -70,18 +67,18 @@ class Formula():
 
     def compute_exact_mass(self):
         masses = {
-            'C': 12.00000000000,
-            'H': 1.00782503214,
-            'O': 15.99491462210,
-            'N': 14.00307400524,
-            'P': 30.97376151200,
-            'S': 31.97207069000,
-            'Cl': 34.96885271000,
-            'I': 126.904468,
-            'Br': 78.9183376,
-            'Si': 27.9769265327,
-            'F': 18.99840320500,
-            'D': 2.01410177800
+            "C": 12.00000000000,
+            "H": 1.00782503214,
+            "O": 15.99491462210,
+            "N": 14.00307400524,
+            "P": 30.97376151200,
+            "S": 31.97207069000,
+            "Cl": 34.96885271000,
+            "I": 126.904468,
+            "Br": 78.9183376,
+            "Si": 27.9769265327,
+            "F": 18.99840320500,
+            "D": 2.01410177800,
         }
         exact_mass = 0.0
         for a in self.atoms:

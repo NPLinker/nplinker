@@ -5,11 +5,12 @@ from nplinker.metabolomics.abc import AnnotationLoaderBase
 from nplinker.utils import is_file_format
 
 
-GNPS_UNIVERSAL_SPECTRUM_IDENTIFIER_URL = "https://metabolomics-usi.gnps2.org/{}/?usi1=mzspec:GNPS:GNPS-LIBRARY:accession:{}"
+GNPS_UNIVERSAL_SPECTRUM_IDENTIFIER_URL = (
+    "https://metabolomics-usi.gnps2.org/{}/?usi1=mzspec:GNPS:GNPS-LIBRARY:accession:{}"
+)
 
 
 class GNPSAnnotationLoader(AnnotationLoaderBase):
-
     def __init__(self, file: str | PathLike):
         """Load annotations from GNPS output file.
 
@@ -90,26 +91,26 @@ class GNPSAnnotationLoader(AnnotationLoaderBase):
             ValueError: Raises ValueError if the file is not valid.
         """
         # validate file format
-        if not is_file_format(self._file, 'tsv'):
-            raise ValueError(f"Invalid GNPS annotation file '{self._file}'. "
-                             f"Expected a .tsv file.")
+        if not is_file_format(self._file, "tsv"):
+            raise ValueError(
+                f"Invalid GNPS annotation file '{self._file}'. " f"Expected a .tsv file."
+            )
 
         # validate required columns against the header
-        required_columns = [
-            '#Scan#', 'Compound_Name', 'Organism', 'MQScore', 'SpectrumID'
-        ]
-        with open(self._file, mode='rt') as f:
+        required_columns = ["#Scan#", "Compound_Name", "Organism", "MQScore", "SpectrumID"]
+        with open(self._file, mode="rt") as f:
             header = f.readline()
             for k in required_columns:
                 if k not in header:
                     raise ValueError(
                         f"Invalid GNPS annotation file '{self._file}'. "
                         f"Expected a header line with '{k}' column, "
-                        f"but got '{header}'.")
+                        f"but got '{header}'."
+                    )
 
         # validate that "#Scan#" must be unique
-        with open(self._file, mode='rt') as f:
-            reader = csv.DictReader(f, delimiter='\t')
+        with open(self._file, mode="rt") as f:
+            reader = csv.DictReader(f, delimiter="\t")
             scans = [row["#Scan#"] for row in reader]
         duplicates = {x for x in scans if scans.count(x) > 1}
         if len(duplicates) > 0:
@@ -120,13 +121,13 @@ class GNPSAnnotationLoader(AnnotationLoaderBase):
 
     def _load(self) -> None:
         """Load the annotations from the file."""
-        with open(self._file, mode='rt') as f:
-            dict_reader = csv.DictReader(f, delimiter='\t')
+        with open(self._file, mode="rt") as f:
+            dict_reader = csv.DictReader(f, delimiter="\t")
             for row in dict_reader:
-                scan_id = row['#Scan#']
+                scan_id = row["#Scan#"]
                 self._annotations[scan_id] = row
                 # insert useful URLs
-                for t in ['png', 'json', 'svg', 'spectrum']:
+                for t in ["png", "json", "svg", "spectrum"]:
                     self._annotations[scan_id][
-                        f'{t}_url'] = GNPS_UNIVERSAL_SPECTRUM_IDENTIFIER_URL.format(
-                            t, row['SpectrumID'])
+                        f"{t}_url"
+                    ] = GNPS_UNIVERSAL_SPECTRUM_IDENTIFIER_URL.format(t, row["SpectrumID"])

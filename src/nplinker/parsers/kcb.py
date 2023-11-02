@@ -22,14 +22,14 @@ logger = LogConfig.getLogger(__name__)
 
 # this will match strings like '...cluster001.gbk' or '...region022.gbk',
 # and allow the number to be extracted easily
-CLUSTER_REGION_REGEX = re.compile('(.+?)\\.(cluster|region)(\\d+).gbk$')
+CLUSTER_REGION_REGEX = re.compile("(.+?)\\.(cluster|region)(\\d+).gbk$")
 
 # This module contains a couple of parsers for antiSMASH knownclusterblast output
 # files: one for the newer per-directory .JSON blob and one for the legacy
 # format with one text file per gbk.
 
 
-class KCBJSONParser():
+class KCBJSONParser:
     """
     Parser for the large .json files antiSMASH generates as part of its output
 
@@ -44,30 +44,24 @@ class KCBJSONParser():
         # check all the linked files exist
         for bgc in bgcs:
             if not os.path.exists(bgc.antismash_file):
-                raise Exception(
-                    'KCBJSONParser failed to find file "{}"'.format(
-                        bgc.antismash_file))
+                raise Exception('KCBJSONParser failed to find file "{}"'.format(bgc.antismash_file))
 
-        logger.debug(f'KCBJSONParser({len(bgcs)} BGCs)')
+        logger.debug(f"KCBJSONParser({len(bgcs)} BGCs)")
 
         # find the JSON file: TODO is the assumption of there only being a single .json
         # file always going to work? otherwise have to try guessing the name based on
         # genome IDs
         prefix = os.path.dirname(bgcs[0].antismash_file)
-        json_files = list(
-            filter(lambda f: f.endswith('.json'), os.listdir(prefix)))
-        logger.debug('Found {} JSON files in {}'.format(
-            len(json_files), prefix))
+        json_files = list(filter(lambda f: f.endswith(".json"), os.listdir(prefix)))
+        logger.debug("Found {} JSON files in {}".format(len(json_files), prefix))
 
         if len(json_files) == 0:
-            logger.warning(
-                'Unable to find an antiSMASH JSON output file in {}'.format(
-                    prefix))
+            logger.warning("Unable to find an antiSMASH JSON output file in {}".format(prefix))
             self.json_filename = None
             return
 
         self.json_filename = os.path.join(prefix, json_files[0])
-        logger.debug(f'Using JSON file {self.json_filename}')
+        logger.debug(f"Using JSON file {self.json_filename}")
 
     def parse_hits(self):
         if self.json_filename is None:
@@ -79,8 +73,7 @@ class KCBJSONParser():
         # it can cause OOM errors (with the stdlib json module and a couple of other
         # 3rd party ones). Best way to avoid this is by using 64-bit Python.
         # TODO: catch exception and print message recommending 64-bit
-        logger.info('Loading antiSMASH JSON data from {}'.format(
-            self.json_filename))
+        logger.info("Loading antiSMASH JSON data from {}".format(self.json_filename))
         data = json.load(open(self.json_filename))
 
         # JSON data structure: depending on the gbks in the source folder, the
@@ -142,47 +135,49 @@ class KCBJSONParser():
         #  for each one that has clusterblast results iterate over those, matching
         #  things up to the BGC objects created by nplinker as we go along.
 
-        for i, rec in enumerate(data['records']):
+        for i, rec in enumerate(data["records"]):
             hits = self._parse(rec)
             if hits is not None:
                 self.collected_hits.update(hits)
 
-        logger.debug('KCBJSONParser: collected {} total hit entries'.format(
-            len(self.collected_hits)))
+        logger.debug(
+            "KCBJSONParser: collected {} total hit entries".format(len(self.collected_hits))
+        )
 
         return self.collected_hits
 
     def _parse(self, record):
         """Parses the knownclusterblast data for a single 'record' entry"""
 
-        modules = record.get('modules', None)
-        if modules is None or 'antismash.modules.clusterblast' not in modules:
+        modules = record.get("modules", None)
+        if modules is None or "antismash.modules.clusterblast" not in modules:
             # this probably isn't an error, the JSON often seems to contain entries
             # for gbks that don't exist in the source folder (??)
             return None
 
-        kcb = modules['antismash.modules.clusterblast']['knowncluster']
-        record_id = kcb['record_id']
+        kcb = modules["antismash.modules.clusterblast"]["knowncluster"]
+        record_id = kcb["record_id"]
 
         # each 'record' may contain multiple results, and each 'result' may be
         # linked to a different BGC and region number, so need to keep track of
         # all this to match them to NPLinker BGC objects later
         record_hits = {}
 
-        for i, result in enumerate(kcb['results']):
+        for i, result in enumerate(kcb["results"]):
             # check number of rankings, can ignore if zero
-            if len(result['ranking']) == 0:
+            if len(result["ranking"]) == 0:
                 continue
 
             # step 1: extract the keys of the 'mibig_entries' dict for the current region number (there should be
             # the same number of 'results' as 'mibig_entries'). There appear to be fewer entries in these lists than
             # appear in the text files where both exist, but I can't find another source for them and the extras
             # don't appear to matter much as they aren't referenced later in the text files or by the original parser
-            gene_ids = list(kcb['mibig_entries'][str(i + 1)].keys())
+            gene_ids = list(kcb["mibig_entries"][str(i + 1)].keys())
 
             # step 2: extract the MiBIG BGC IDs + product names (=parsing the Significant hits table in text file)
-            sig_hits = [(entry[0]['accession'], entry[0]['description'])
-                        for entry in result['ranking']]
+            sig_hits = [
+                (entry[0]["accession"], entry[0]["description"]) for entry in result["ranking"]
+            ]
 
             # give up if there aren't any of these
             if len(sig_hits) == 0:
@@ -190,13 +185,11 @@ class KCBJSONParser():
 
             # step 3: extract BGC IDs (=parsing of "... subject cluster" tables in text file)
             # (this is a list of lists)
-            all_mibig_genes = [
-                entry[0]['proteins'] for entry in result['ranking']
-            ]
+            all_mibig_genes = [entry[0]["proteins"] for entry in result["ranking"]]
 
-            region_number = int(result['region_number'])
+            region_number = int(result["region_number"])
             # should never have two identical region numbers for the same ID
-            assert (region_number not in record_hits)
+            assert region_number not in record_hits
 
             # want to construct the same data structure as the original parser
             # should contain:
@@ -204,31 +197,29 @@ class KCBJSONParser():
             #   - all_mibig_genes => all_mibig_genes
             #   - invididual_hits => list populated based on blast_hits
             hit = {}
-            assert (len(all_mibig_genes) == len(result['ranking']))
+            assert len(all_mibig_genes) == len(result["ranking"])
 
             # step 4: extract the blast hit information from the 'rankings' and
             # 'pairings' lists (=parsing of "Table of Blast hits" in text file)
 
             # each "hit" shares these
-            hit = {'all_bgc_genes': gene_ids}
+            hit = {"all_bgc_genes": gene_ids}
             individual_hits = []
-            for j, ranking in enumerate(result['ranking']):
-                hit['all_mibig_genes'] = all_mibig_genes[j]
-                hit['mibig_id'] = sig_hits[j][0]
-                for pairing in ranking[1]['pairings']:
-                    tc1 = pairing[0].split('|')[4]
-                    individual_hits.append({
-                        'source_bgc_gene':
-                        tc1,
-                        'mibig_bgc_gene':
-                        pairing[2]['name'],
-                        'identity_percent':
-                        int(pairing[2]['perc_ident']),
-                        'blast_score':
-                        int(pairing[2]['blastscore'])
-                    })
+            for j, ranking in enumerate(result["ranking"]):
+                hit["all_mibig_genes"] = all_mibig_genes[j]
+                hit["mibig_id"] = sig_hits[j][0]
+                for pairing in ranking[1]["pairings"]:
+                    tc1 = pairing[0].split("|")[4]
+                    individual_hits.append(
+                        {
+                            "source_bgc_gene": tc1,
+                            "mibig_bgc_gene": pairing[2]["name"],
+                            "identity_percent": int(pairing[2]["perc_ident"]),
+                            "blast_score": int(pairing[2]["blastscore"]),
+                        }
+                    )
 
-            hit['individual_hits'] = individual_hits
+            hit["individual_hits"] = individual_hits
             record_hits[region_number] = hit
             # logger.debug('\tSig hit {}/{} for {}: found {} individual hits'.format(j+1, len(sig_hits), sig_hits[j][0], len(individual_hits)))
 
@@ -239,15 +230,14 @@ class KCBJSONParser():
         return {record_id: record_hits}
 
 
-class KCBTextParser():
+class KCBTextParser:
     """
     Parser for antismash knownclusterblast text output files
     """
 
     def __init__(self, filename):
         if not os.path.exists(filename):
-            raise Exception(
-                f'KCBTextParser failed to find file "{filename}"')
+            raise Exception(f'KCBTextParser failed to find file "{filename}"')
 
         self.bgc_genes = set()
         self.mibig_bgcs = []
@@ -276,7 +266,7 @@ class KCBTextParser():
 
         with open(filename) as f:
             line = next(f)
-            while not line.startswith('Table of genes'):
+            while not line.startswith("Table of genes"):
                 line = next(f)
             # now we're in the first block. this is the section beginning with the
             # line "Table of genes, locations, strands and annotations of query cluster:"
@@ -284,7 +274,7 @@ class KCBTextParser():
             top_block = []
             while True:
                 line = next(f)
-                if line.startswith('Significant'):
+                if line.startswith("Significant"):
                     break
                 else:
                     if len(line) > 1:
@@ -295,7 +285,7 @@ class KCBTextParser():
             second_block = []
             while True:
                 line = next(f)
-                if line.startswith('Details'):
+                if line.startswith("Details"):
                     break
                 else:
                     if len(line) > 1:
@@ -305,7 +295,7 @@ class KCBTextParser():
             while True:
                 try:
                     line = next(f)
-                    if line.startswith('>>'):
+                    if line.startswith(">>"):
                         break
                 except Exception as e:
                     # EOF
@@ -318,7 +308,7 @@ class KCBTextParser():
                 while True:
                     try:
                         line = next(f)
-                        if line.startswith('>>'):
+                        if line.startswith(">>"):
                             # finished current section
                             details.append(temp_list)
                             break
@@ -354,57 +344,56 @@ class KCBTextParser():
             # particular hit
             for i, detail in enumerate(details):
                 # the first line is of the form "1. BGC0000279_c1"
-                current_bgc_id = detail[0].split()[
-                    1]  # this is the MiBIG ID, e.g. BGC0001666
+                current_bgc_id = detail[0].split()[1]  # this is the MiBIG ID, e.g. BGC0001666
 
                 self.hits[current_bgc_id] = {}
-                self.hits[current_bgc_id]['all_bgc_genes'] = self.bgc_genes
+                self.hits[current_bgc_id]["all_bgc_genes"] = self.bgc_genes
 
                 # if the detail sections don't appear in the same order as the "Significant hits"
                 # section then something is wrong and can't continue parsing this
                 if current_bgc_id != self.mibig_bgcs[i][0]:
                     raise Exception(
-                        'Mismatched ordering found in knownclusterblast file {}'
-                        .format(filename))
+                        "Mismatched ordering found in knownclusterblast file {}".format(filename)
+                    )
 
                 # get the line numbers where these two tables start
                 table_pos = detail.index(
-                    'Table of genes, locations, strands and annotations of subject cluster:'
+                    "Table of genes, locations, strands and annotations of subject cluster:"
                 )
                 pos = detail.index(
-                    'Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):'
+                    "Table of Blast hits (query gene, subject gene, %identity, blast score, %coverage, e-value):"
                 )
 
                 # get the list of all of the genes within the MiBIG BGC by iterating over
                 # the lines in the "Table of genes ..." table
                 all_mibig_genes = []
-                for line in detail[table_pos + 1:pos]:
+                for line in detail[table_pos + 1 : pos]:
                     all_mibig_genes.append(line.split()[0])
 
                 if len(all_mibig_genes) == 0:
                     logger.warning(
-                        'KCBTextParser failed to extract any MiBIG genes from file {}, BGC ID {}'
-                        .format(filename, current_bgc_id))
+                        "KCBTextParser failed to extract any MiBIG genes from file {}, BGC ID {}".format(
+                            filename, current_bgc_id
+                        )
+                    )
                     # just continue to the next section here because this currently makes the rest of the processing invalid
                     del self.hits[current_bgc_id]
                     continue
 
-                self.hits[current_bgc_id]['all_mibig_genes'] = all_mibig_genes
-                self.hits[current_bgc_id]['individual_hits'] = []
+                self.hits[current_bgc_id]["all_mibig_genes"] = all_mibig_genes
+                self.hits[current_bgc_id]["individual_hits"] = []
 
-                for line in detail[pos + 1:]:
+                for line in detail[pos + 1 :]:
                     tokens = line.split()
                     bgc_id = tokens[0]
-                    self.hits[current_bgc_id]['individual_hits'].append({
-                        'source_bgc_gene':
-                        tokens[0],
-                        'mibig_bgc_gene':
-                        tokens[1],
-                        'identity_percent':
-                        int(tokens[2]),
-                        'blast_score':
-                        int(tokens[3])
-                    })
+                    self.hits[current_bgc_id]["individual_hits"].append(
+                        {
+                            "source_bgc_gene": tokens[0],
+                            "mibig_bgc_gene": tokens[1],
+                            "identity_percent": int(tokens[2]),
+                            "blast_score": int(tokens[3]),
+                        }
+                    )
 
     @staticmethod
     def get_kcb_filename_from_bgc(bgc):
@@ -433,24 +422,23 @@ class KCBTextParser():
             supplied BGC, or None if an error occurred/file doesn't exist
         """
         if bgc.antismash_file is None:
-            logger.warning(f'BGC {bgc} has no antismash_file set')
+            logger.warning(f"BGC {bgc} has no antismash_file set")
             return None
 
         # expecting to find the .txt files inside a 'knownclusterblast' subdir in the
         # same location as the .gbk file, give up if that doesn't exist
-        base_path = os.path.join(os.path.dirname(bgc.antismash_file),
-                                 'knownclusterblast')
+        base_path = os.path.join(os.path.dirname(bgc.antismash_file), "knownclusterblast")
 
         if not os.path.exists(base_path):
             logger.warning(
-                'Expected "knownclusterblast" directory not found at "{}"'.
-                format(base_path))
+                'Expected "knownclusterblast" directory not found at "{}"'.format(base_path)
+            )
             return None
 
         # get the name of the .gbk file itself (no path)
         genbank_file = os.path.split(bgc.antismash_file)[1]
 
-        if 'region' in genbank_file:
+        if "region" in genbank_file:
             # case 1: assume the genbank files have a <someID>.region<num>.gbk naming scheme.
             # this seems to be the case for all the more recent datasets i've seen.
 
@@ -461,9 +449,8 @@ class KCBTextParser():
 
             # construct the expected filename using the prefix and number
             # (note no leading zeroes on the number)
-            kcb_name = os.path.join(base_path,
-                                    f'{prefix}_c{number}.txt')
-        elif 'cluster' in genbank_file:
+            kcb_name = os.path.join(base_path, f"{prefix}_c{number}.txt")
+        elif "cluster" in genbank_file:
             # case 2: assume the genbank files have a <someID>.cluster<num>.gbk naming scheme.
             # this is the case with the Crusemann dataset on the paired platform among others.
 
@@ -473,10 +460,10 @@ class KCBTextParser():
 
             # construct the expected filename
             # (note no leading zeroes on the number)
-            kcb_name = os.path.join(base_path, f'cluster{number}.txt')
+            kcb_name = os.path.join(base_path, f"cluster{number}.txt")
         else:
             logger.warning(
-                'Unknown GenBank file naming scheme, failed to determine knownclusterblast filenames!'
+                "Unknown GenBank file naming scheme, failed to determine knownclusterblast filenames!"
             )
             return None
 

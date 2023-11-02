@@ -13,7 +13,7 @@ from . import DATA_DIR
 
 def get_file_hash(file_path):
     h = hashlib.sha256()
-    with open(file_path, 'rb') as file:
+    with open(file_path, "rb") as file:
         while True:
             # Reading is buffered, so we can read smaller chunks.
             chunk = file.read(h.block_size)
@@ -24,28 +24,26 @@ def get_file_hash(file_path):
     return h.hexdigest()
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def npl() -> NPLinker:
-    npl = NPLinker(str(DATA_DIR / 'nplinker_demo1.toml'))
+    npl = NPLinker(str(DATA_DIR / "nplinker_demo1.toml"))
     npl.load_data()
     hash_proj_file = get_file_hash(
-        os.path.join(npl._loader._root.parent.parent,
-                     npl._loader._platform_id + '.json'))
-    if hash_proj_file != '97f31f13f7a4c87c0b7648e2a2bad5ab2f96c38f92c304a5dc17299b44e698c7':
+        os.path.join(npl._loader._root.parent.parent, npl._loader._platform_id + ".json")
+    )
+    if hash_proj_file != "97f31f13f7a4c87c0b7648e2a2bad5ab2f96c38f92c304a5dc17299b44e698c7":
         pytest.exit(
-            'PoDP project file has changed, please clean your local cache folder and rerun the tests.'
+            "PoDP project file has changed, please clean your local cache folder and rerun the tests."
         )
     # remove cached score results before running tests
     root_dir = Path(npl.root_dir)
-    score_cache = root_dir / 'metcalf' / 'metcalf_scores.pckl'
+    score_cache = root_dir / "metcalf" / "metcalf_scores.pckl"
     score_cache.unlink(missing_ok=True)
     return npl
 
 
-@pytest.mark.skipif(os.environ.get('CI') == 'true',
-                    reason="Skip when running on CI")
+@pytest.mark.skipif(os.environ.get("CI") == "true", reason="Skip when running on CI")
 def test_load_data(npl: NPLinker):
-
     assert len(npl.bgcs) == 390
     assert len(npl.gcfs) == 113
     assert len(npl.spectra) == 25935

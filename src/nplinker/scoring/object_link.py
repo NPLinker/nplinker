@@ -1,4 +1,4 @@
-class ObjectLink():
+class ObjectLink:
     """
     Class which stores information about a single link between two objects.
 
@@ -53,8 +53,9 @@ class ObjectLink():
         return hash(self.source.id)
 
     def __str__(self):
-        return 'ObjectLink(source={}, target={}, #methods={})'.format(
-            self.source, self.target, len(self._method_data))
+        return "ObjectLink(source={}, target={}, #methods={})".format(
+            self.source, self.target, len(self._method_data)
+        )
 
     def __repr__(self):
         return str(self)

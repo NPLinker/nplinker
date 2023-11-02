@@ -11,15 +11,10 @@ def test_load_spectra(spec_dict):
 def test_load_dataset():
     strains = StrainCollection()
     mgf_file = GNPS_DATA_DIR / "spectra.mgf"
-    edges_file = GNPS_DATA_DIR /  "edges.pairsinfo"
+    edges_file = GNPS_DATA_DIR / "edges.pairsinfo"
     nodes_file = GNPS_DATA_DIR / "nodes.tsv"
 
-    spec_dict, spectra, _, _ = load_dataset(
-        strains,
-        mgf_file,
-        edges_file,
-        nodes_file
-    )
+    spec_dict, spectra, _, _ = load_dataset(strains, mgf_file, edges_file, nodes_file)
 
     assert isinstance(spec_dict, dict)
     assert len(spectra) > 1

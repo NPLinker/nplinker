@@ -10,7 +10,6 @@ from .. import DATA_DIR
 
 
 class TestMibigBGCLoader:
-
     @pytest.fixture
     def data_dir(self, tmp_path):
         download_root = tmp_path / "download"

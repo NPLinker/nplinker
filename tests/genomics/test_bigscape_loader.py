@@ -6,7 +6,6 @@ from .. import DATA_DIR
 
 
 class TestBigscapelGCFLoader:
-
     @pytest.fixture
     def loader(self):
         cluster_file = DATA_DIR / "bigscape" / "mix" / "mix_clustering_c0.30.tsv"
@@ -18,8 +17,9 @@ class TestBigscapelGCFLoader:
         assert isinstance(loader, GCFLoaderBase)
 
     def test_init(self, loader):
-        assert loader.cluster_file == str(DATA_DIR / "bigscape" / "mix" /
-                                          "mix_clustering_c0.30.tsv")
+        assert loader.cluster_file == str(
+            DATA_DIR / "bigscape" / "mix" / "mix_clustering_c0.30.tsv"
+        )
 
     def test_get_gcfs(self, loader):
         gcfs = loader.get_gcfs(keep_mibig_only=True)
@@ -41,5 +41,5 @@ class TestBigscapelGCFLoader:
         assert isinstance(gcf, GCF)
         assert len(gcf.bgc_ids) == 4
         assert gcf.bgc_ids == set(
-            ("BGC0000145", "BGC0001041", "NC_009380.1.region004",
-             "NZ_AZWK01000002.region002"))
+            ("BGC0000145", "BGC0001041", "NC_009380.1.region004", "NZ_AZWK01000002.region002")
+        )

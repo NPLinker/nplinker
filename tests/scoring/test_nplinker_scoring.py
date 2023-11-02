@@ -4,8 +4,7 @@ from nplinker.scoring import LinkCollection
 from nplinker.scoring import ObjectLink
 
 
-def test_get_links_gcf_standardised_false(npl, mc, gcfs, spectra, mfs,
-                                          strains_list):
+def test_get_links_gcf_standardised_false(npl, mc, gcfs, spectra, mfs, strains_list):
     """Test `get_links` method when input is GCF objects and `standardised` is False."""
     # test raw scores (no standardisation)
     mc.standardised = False
@@ -16,7 +15,7 @@ def test_get_links_gcf_standardised_false(npl, mc, gcfs, spectra, mfs,
     assert isinstance(links, LinkCollection)
     links = links.links  # dict of link values
     assert len(links) == 3
-    assert {i.gcf_id for i in links.keys()} == {'gcf1', 'gcf2', 'gcf3'}
+    assert {i.gcf_id for i in links.keys()} == {"gcf1", "gcf2", "gcf3"}
     assert isinstance(links[gcfs[0]][spectra[0]], ObjectLink)
     # expected values are from `test_get_links_gcf` of test_link_finder.py
     assert links[gcfs[0]][spectra[0]].data(mc) == 12
@@ -38,7 +37,7 @@ def test_get_links_gcf_standardised_false(npl, mc, gcfs, spectra, mfs,
     links = npl.get_links(list(gcfs), mc, and_mode=True)
     assert isinstance(links, LinkCollection)
     links = links.links
-    assert {i.gcf_id for i in links.keys()} == {'gcf1', 'gcf2', 'gcf3'}
+    assert {i.gcf_id for i in links.keys()} == {"gcf1", "gcf2", "gcf3"}
     assert isinstance(links[gcfs[0]][spectra[0]], ObjectLink)
     # test scores
     assert links[gcfs[0]][spectra[0]].data(mc) == 12
@@ -55,16 +54,14 @@ def test_get_links_gcf_standardised_false(npl, mc, gcfs, spectra, mfs,
     assert set(links[gcfs[2]][mfs[2]].shared_strains) == set(strains_list[0:2])
 
 
-@pytest.mark.skip(reason='To add after refactoring relevant code.')
-def test_get_links_gcf_standardised_true(npl, mc, gcfs, spectra, mfs,
-                                         strains_list):
+@pytest.mark.skip(reason="To add after refactoring relevant code.")
+def test_get_links_gcf_standardised_true(npl, mc, gcfs, spectra, mfs, strains_list):
     """Test `get_links` method when input is GCF objects and `standardised` is True."""
     mc.standardised = True
     ...
 
 
-def test_get_links_spec_standardised_false(npl, mc, gcfs, spectra,
-                                           strains_list):
+def test_get_links_spec_standardised_false(npl, mc, gcfs, spectra, strains_list):
     """Test `get_links` method when input is Spectrum objects and `standardised` is False."""
     mc.standardised = False
 
@@ -73,8 +70,7 @@ def test_get_links_spec_standardised_false(npl, mc, gcfs, spectra,
     assert isinstance(links, LinkCollection)
     links = links.links  # dict of link values
     assert len(links) == 3
-    assert {i.spectrum_id
-            for i in links.keys()} == {'spectrum1', 'spectrum2', 'spectrum3'}
+    assert {i.spectrum_id for i in links.keys()} == {"spectrum1", "spectrum2", "spectrum3"}
     assert isinstance(links[spectra[0]][gcfs[0]], ObjectLink)
     assert links[spectra[0]][gcfs[0]].data(mc) == 12
     assert links[spectra[0]][gcfs[1]].data(mc) == -9
@@ -88,8 +84,7 @@ def test_get_links_spec_standardised_false(npl, mc, gcfs, spectra,
     assert isinstance(links, LinkCollection)
     links = links.links  # dict of link values
     assert len(links) == 3
-    assert {i.spectrum_id
-            for i in links.keys()} == {'spectrum1', 'spectrum2', 'spectrum3'}
+    assert {i.spectrum_id for i in links.keys()} == {"spectrum1", "spectrum2", "spectrum3"}
     assert isinstance(links[spectra[0]][gcfs[0]], ObjectLink)
     assert links[spectra[0]][gcfs[0]].data(mc) == 12
     assert links[spectra[0]].get(gcfs[1]) is None
@@ -98,9 +93,8 @@ def test_get_links_spec_standardised_false(npl, mc, gcfs, spectra,
     assert links[spectra[0]][gcfs[2]].shared_strains == [strains_list[0]]
 
 
-@pytest.mark.skip(reason='To add after refactoring relevant code.')
-def test_get_links_spec_standardised_true(npl, mc, gcfs, spectra,
-                                          strains_list):
+@pytest.mark.skip(reason="To add after refactoring relevant code.")
+def test_get_links_spec_standardised_true(npl, mc, gcfs, spectra, strains_list):
     """Test `get_links` method when input is Spectrum objects and `standardised` is True."""
     mc.standardised = True
     ...
@@ -115,7 +109,7 @@ def test_get_links_mf_standardised_false(npl, mc, gcfs, mfs, strains_list):
     assert isinstance(links, LinkCollection)
     links = links.links
     assert len(links) == 3
-    assert {i.family_id for i in links.keys()} == {'mf1', 'mf2', 'mf3'}
+    assert {i.family_id for i in links.keys()} == {"mf1", "mf2", "mf3"}
     assert isinstance(links[mfs[0]][gcfs[0]], ObjectLink)
     assert links[mfs[0]][gcfs[0]].data(mc) == 12
     assert links[mfs[0]][gcfs[1]].data(mc) == -9
@@ -129,7 +123,7 @@ def test_get_links_mf_standardised_false(npl, mc, gcfs, mfs, strains_list):
     assert isinstance(links, LinkCollection)
     links = links.links
     assert len(links) == 3
-    assert {i.family_id for i in links.keys()} == {'mf1', 'mf2', 'mf3'}
+    assert {i.family_id for i in links.keys()} == {"mf1", "mf2", "mf3"}
     assert isinstance(links[mfs[0]][gcfs[0]], ObjectLink)
     assert links[mfs[0]][gcfs[0]].data(mc) == 12
     assert links[mfs[0]].get(gcfs[1]) is None
@@ -138,7 +132,7 @@ def test_get_links_mf_standardised_false(npl, mc, gcfs, mfs, strains_list):
     assert links[mfs[0]][gcfs[2]].shared_strains == [strains_list[0]]
 
 
-@pytest.mark.skip(reason='To add after refactoring relevant code.')
+@pytest.mark.skip(reason="To add after refactoring relevant code.")
 def test_get_links_mf_standardised_true(npl, mc, gcfs, mfs, strains_list):
     """Test `get_links` method when input is MolecularFamily objects and `standardised` is True."""
     mc.standardised = True

@@ -28,8 +28,7 @@ from .spec_lib import SpecLib
 logger = LogConfig.getLogger(__name__)
 
 
-class Rosetta():
-
+class Rosetta:
     DEF_MS1_TOL = 100
     DEF_MS2_TOL = 0.2
     DEF_SCORE_THRESH = 0.5
@@ -41,37 +40,30 @@ class Rosetta():
         self._nplinker = nplinker
         self._mgf_data = {}
         self._csv_data = {}
-        self._mgf_path = os.path.join(nplinker.data_dir,
-                                      'matched_mibig_gnps_update.mgf')
-        self._csv_path = os.path.join(nplinker.data_dir,
-                                      'matched_mibig_gnps_update.csv')
+        self._mgf_path = os.path.join(nplinker.data_dir, "matched_mibig_gnps_update.mgf")
+        self._csv_path = os.path.join(nplinker.data_dir, "matched_mibig_gnps_update.csv")
         self._data_path = nplinker.data_dir
         self._root_path = nplinker.root_dir
         self._dataset_id = nplinker.dataset_id
         self._ignore_genomic_cache = ignore_genomic_cache
-        self._pickle_dir = os.path.join(nplinker.root_dir, 'rosetta')
+        self._pickle_dir = os.path.join(nplinker.root_dir, "rosetta")
         if not os.path.exists(self._pickle_dir):
             os.makedirs(self._pickle_dir, exist_ok=True)
-        self._speclib_pickle_path = os.path.join(self._pickle_dir,
-                                                 'SpecLib.pckl')
-        self._spechits_pickle_path = os.path.join(self._pickle_dir,
-                                                  'spec_hits.pckl')
-        self._bgchits_pickle_path = os.path.join(self._pickle_dir,
-                                                 'bgc_hits.pckl')
-        self._rhits_pickle_path = os.path.join(self._pickle_dir,
-                                               'RosettaHits.pckl')
-        self._params_pickle_path = os.path.join(self._pickle_dir,
-                                                'RosettaParams.pckl')
+        self._speclib_pickle_path = os.path.join(self._pickle_dir, "SpecLib.pckl")
+        self._spechits_pickle_path = os.path.join(self._pickle_dir, "spec_hits.pckl")
+        self._bgchits_pickle_path = os.path.join(self._pickle_dir, "bgc_hits.pckl")
+        self._rhits_pickle_path = os.path.join(self._pickle_dir, "RosettaHits.pckl")
+        self._params_pickle_path = os.path.join(self._pickle_dir, "RosettaParams.pckl")
 
         if not os.path.exists(self._mgf_path):
             logger.warning(
-                'Failed to load Rosetta data ({}), matching disabled'.format(
-                    self._mgf_path))
+                "Failed to load Rosetta data ({}), matching disabled".format(self._mgf_path)
+            )
             return
         if not os.path.exists(self._csv_path):
             logger.warning(
-                'Failed to load Rosetta data ({}), matching disabled'.format(
-                    self._csv_path))
+                "Failed to load Rosetta data ({}), matching disabled".format(self._csv_path)
+            )
             return
 
         self._gnps2mibig = None
@@ -92,13 +84,13 @@ class Rosetta():
         return self._spec_hits
 
     def _load_csv(self, csv_path):
-        logger.info('constructing rosetta dicts')
+        logger.info("constructing rosetta dicts")
 
         self._gnps2mibig = {}
         self._mibig2gnps = {}
 
         with open(csv_path) as f:
-            rdr = csv.reader(f, delimiter=',')
+            rdr = csv.reader(f, delimiter=",")
             headers = next(rdr)
             for line in rdr:
                 gnps, mibig = line[0], line[3]
@@ -112,33 +104,31 @@ class Rosetta():
                 else:
                     self._mibig2gnps[mibig] = [gnps]
 
-    def _generate_spec_hits(self, spectra, ms1_tol, ms2_tol, score_thresh,
-                            min_match_peaks):
+    def _generate_spec_hits(self, spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
         spec_hits = {}
         for i, sp in enumerate(spectra):
-            hits = self.speclib.spectral_match(sp,
-                                               ms2_tol=ms2_tol,
-                                               min_match_peaks=min_match_peaks,
-                                               ms1_tol=ms1_tol,
-                                               score_thresh=score_thresh)
+            hits = self.speclib.spectral_match(
+                sp,
+                ms2_tol=ms2_tol,
+                min_match_peaks=min_match_peaks,
+                ms1_tol=ms1_tol,
+                score_thresh=score_thresh,
+            )
             if len(hits) > 0:
                 spec_hits[sp] = hits
             if i % 100 == 0:
-                logger.info('Searching for spectral hits {}/{}'.format(
-                    i, len(spectra)))
+                logger.info("Searching for spectral hits {}/{}".format(i, len(spectra)))
 
         save_pickled_data(spec_hits, self._spechits_pickle_path)
         return spec_hits
 
     def _generate_speclib(self):
-        logger.warning(
-            'No pickle SpecLib found, generating (this will take some time!)...'
-        )
+        logger.warning("No pickle SpecLib found, generating (this will take some time!)...")
         self.speclib = SpecLib(self._mgf_path)
         self.speclib._load_mgf()
         self.speclib.filter()
 
-        logger.info('Finished generating SpecLib')
+        logger.info("Finished generating SpecLib")
 
         save_pickled_data(self.speclib, self._speclib_pickle_path)
 
@@ -165,7 +155,7 @@ class Rosetta():
         # separately for each genome from the antiSMASH DB and this means the format may not
         # be consistent.
 
-        logger.debug('Collecting BGC hit information...')
+        logger.debug("Collecting BGC hit information...")
         # go through the list of all available BGCs (ignoring MiBIGBGC instances) and
         # group them by the directory they appear in
         bgc_groups = {}
@@ -182,13 +172,14 @@ class Rosetta():
             else:
                 bgc_groups[prefix].append(bgc)
 
-        logger.debug('{} BGC groups based on filenames'.format(
-            len(bgc_groups)))
+        logger.debug("{} BGC groups based on filenames".format(len(bgc_groups)))
 
         for prefix, prefix_bgcs in bgc_groups.items():
             logger.debug(
-                'Attempting to parse JSON data for prefix {} with {} BGCs'.
-                format(prefix, len(prefix_bgcs)))
+                "Attempting to parse JSON data for prefix {} with {} BGCs".format(
+                    prefix, len(prefix_bgcs)
+                )
+            )
             # preferred option is to parse the results for the whole group using the
             # JSON file, but this may not be available...
             json_hits = KCBJSONParser(prefix_bgcs).parse_hits()
@@ -198,8 +189,10 @@ class Rosetta():
                 # number of hits can often be less than number of BGCs (e.g. if no significant hits found)
                 sum_hits = sum(len(json_hits[x]) for x in json_hits)
                 logger.debug(
-                    'JSON parsing was successful! Returned {} hits from {} BGCs'
-                    .format(sum_hits, len(prefix_bgcs)))
+                    "JSON parsing was successful! Returned {} hits from {} BGCs".format(
+                        sum_hits, len(prefix_bgcs)
+                    )
+                )
 
                 # unlike the KCBTextParser where each set of results is easy to link
                 # back to the appropriate BGC object, here we need to do some extra work
@@ -237,14 +230,15 @@ class Rosetta():
                         # simplest case where there's a direct match on region number
                         if pbgc.antismash_region in json_hits[pbgc.antismash_id]:
                             logger.debug(
-                                'Matched {} using {} + region{:03d}!'.format(
-                                    pbgc.antismash_file, pbgc.antismash_id,
-                                    pbgc.antismash_region))
+                                "Matched {} using {} + region{:03d}!".format(
+                                    pbgc.antismash_file, pbgc.antismash_id, pbgc.antismash_region
+                                )
+                            )
                             if pbgc not in matched_bgcs:
                                 matched_bgcs[pbgc] = {}
 
                             hit = json_hits[pbgc.antismash_id][pbgc.antismash_region]
-                            matched_bgcs[pbgc][hit['mibig_id']] = hit
+                            matched_bgcs[pbgc][hit["mibig_id"]] = hit
                             continue
                         else:
                             # if the above case doesn't apply, check through every
@@ -253,31 +247,34 @@ class Rosetta():
                             # number. if so assume it is the correct match.
                             for region in json_hits[pbgc.antismash_id]:
                                 if pbgc.antismash_file.endswith(
-                                        'region{:03d}.gbk'.format(
-                                            pbgc.antismash_region)):
+                                    "region{:03d}.gbk".format(pbgc.antismash_region)
+                                ):
                                     logger.debug(
-                                        'Matched {} using fallback {} + region{:03d} (orig={})'
-                                        .format(pbgc.antismash_file,
-                                                pbgc.antismash_id, region,
-                                                pbgc.antismash_region))
+                                        "Matched {} using fallback {} + region{:03d} (orig={})".format(
+                                            pbgc.antismash_file,
+                                            pbgc.antismash_id,
+                                            region,
+                                            pbgc.antismash_region,
+                                        )
+                                    )
                                     if pbgc not in matched_bgcs:
                                         matched_bgcs[pbgc] = {}
 
                                     hit = json_hits[pbgc.antismash_id][region]
-                                    matched_bgcs[pbgc][hit['mibig_id']] = hit
+                                    matched_bgcs[pbgc][hit["mibig_id"]] = hit
                                     break
                     else:
                         # this could simply mean no significant hits found
                         logger.info(
-                            'Found no matching hits for BGC ID={}, region={}, file={}'
-                            .format(pbgc.antismash_id, pbgc.antismash_region,
-                                    pbgc.antismash_file))
+                            "Found no matching hits for BGC ID={}, region={}, file={}".format(
+                                pbgc.antismash_id, pbgc.antismash_region, pbgc.antismash_file
+                            )
+                        )
 
             else:
                 # ... if JSON parsing failed, fall back to the original text parser. this
                 # must be called on each BGC individually
-                logger.debug(
-                    'JSON parsing failed, falling back to text instead')
+                logger.debug("JSON parsing failed, falling back to text instead")
                 for i, bgc in enumerate(prefix_bgcs):
                     kcb_name = KCBTextParser.get_kcb_filename_from_bgc(bgc)
                     if kcb_name is not None:
@@ -289,13 +286,14 @@ class Rosetta():
                             logger.warning(e)
                             errors += 1
 
-            logger.debug('Found matches for {}/{} bgcs'.format(
-                len(matched_bgcs), len(prefix_bgcs)))
+            logger.debug("Found matches for {}/{} bgcs".format(len(matched_bgcs), len(prefix_bgcs)))
             if len(matched_bgcs) != len(prefix_bgcs):
                 # not necessarily fatal but probably not good either
                 logger.warning(
-                    'Failed to match {} BGCs to hits in directory {}!'.format(
-                        len(prefix_bgcs) - len(matched_bgcs), prefix))
+                    "Failed to match {} BGCs to hits in directory {}!".format(
+                        len(prefix_bgcs) - len(matched_bgcs), prefix
+                    )
+                )
 
             # now insert the matched hits into the _bgc_hits structure so the original code
             # below can parse them in the same way as the text parser results
@@ -309,13 +307,12 @@ class Rosetta():
                     self._mibig2bgc[mibig_bgc_id] = set()
                 self._mibig2bgc[mibig_bgc_id].add(bgc)
 
-        logger.info(f'Completed, {len(self._bgc_hits)} BGC hits found')
+        logger.info(f"Completed, {len(self._bgc_hits)} BGC hits found")
         if errors > 0:
             logger.warning(
-                'Some knownclusterblast files could not be loaded, results may be incomplete'
+                "Some knownclusterblast files could not be loaded, results may be incomplete"
             )
-        save_pickled_data((self._bgc_hits, self._mibig2bgc),
-                          self._bgchits_pickle_path)
+        save_pickled_data((self._bgc_hits, self._mibig2bgc), self._bgchits_pickle_path)
 
     def _collect_rosetta_hits(self):
         self._rosetta_hits = []
@@ -328,9 +325,9 @@ class Rosetta():
                             # get the bgc score
                             bgc_score = bgc_summary_scores[bgc][mibig_id]
                             self._rosetta_hits.append(
-                                RosettaHit(spec, gnps_id, mibig_id, bgc, score,
-                                           bgc_score))
-        logger.info(f'Found {len(self._rosetta_hits)} rosetta hits!')
+                                RosettaHit(spec, gnps_id, mibig_id, bgc, score, bgc_score)
+                            )
+        logger.info(f"Found {len(self._rosetta_hits)} rosetta hits!")
 
     def generate_bgc_summary_scores(self):
         # process the hit to compress it into more useful info
@@ -349,26 +346,26 @@ class Rosetta():
             mibig_bgcs = list(hit.keys())
             scores = {}
             for mibig_id in mibig_bgcs:
-                n_mibig_genes = len(hit[mibig_id]['all_mibig_genes'])
+                n_mibig_genes = len(hit[mibig_id]["all_mibig_genes"])
                 if n_mibig_genes == 0:
                     logger.warning(
-                        'Found a BGC entry with zero genes, this should never happen! (BGC={})'
-                        .format(bgc))
+                        "Found a BGC entry with zero genes, this should never happen! (BGC={})".format(
+                            bgc
+                        )
+                    )
                     continue
                 # n_source_genes = len(hit[mibig_id]['all_bgc_genes'])
                 total_hit_identity = 0
-                for hit_gene in hit[mibig_id]['individual_hits']:
-                    identity_percent = hit_gene['identity_percent']
+                for hit_gene in hit[mibig_id]["individual_hits"]:
+                    identity_percent = hit_gene["identity_percent"]
                     total_hit_identity += identity_percent / 100.0
                 score = total_hit_identity / n_mibig_genes
                 scores[mibig_id] = score
             processed[bgc] = scores
         return processed
 
-    def run(self, spectra, bgcs, ms1_tol, ms2_tol, score_thresh,
-            min_match_peaks):
-        """ Function which actually computes the rosetta score somehow
-        """
+    def run(self, spectra, bgcs, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
+        """Function which actually computes the rosetta score somehow"""
 
         params_ok = self._load_cached_params(ms1_tol, ms2_tol, score_thresh, min_match_peaks)
 
@@ -383,13 +380,14 @@ class Rosetta():
 
         # next, try to load the cached rosetta_hits list. if parameters were invalidated above,
         # the file will have been deleted and this will fail
-        logger.info('Trying to load cached Rosetta hits data')
-        cached_rosetta_hits = load_pickled_data(self._nplinker,
-                                                self._rhits_pickle_path)
+        logger.info("Trying to load cached Rosetta hits data")
+        cached_rosetta_hits = load_pickled_data(self._nplinker, self._rhits_pickle_path)
         if cached_rosetta_hits is not None:
             logger.info(
-                'Loaded cached Rosetta hits for dataset {} at {}'.format(
-                    self._dataset_id, self._rhits_pickle_path))
+                "Loaded cached Rosetta hits for dataset {} at {}".format(
+                    self._dataset_id, self._rhits_pickle_path
+                )
+            )
             self._rosetta_hits = cached_rosetta_hits
             return self._rosetta_hits
 
@@ -397,22 +395,19 @@ class Rosetta():
         #
         # create the _gnps2mibig and _mibig2gnps dicts if not already done
         if self._mibig2gnps is None or self._gnps2mibig is None:
-            logger.info('Constructing GNPS/MiBIG dicts')
+            logger.info("Constructing GNPS/MiBIG dicts")
             self._load_csv(self._csv_path)
 
         self._init_bgc_hits(bgcs)
 
         # if we didn't find any BGC hits, no point in continuing
         if len(self._bgc_hits) == 0:
-            logger.warning(
-                'Aborting Rosetta scoring data generation, no BGC hits were found!'
-            )
+            logger.warning("Aborting Rosetta scoring data generation, no BGC hits were found!")
             # create an empty rosetta_hits.csv file
-            self.export_to_csv(
-                os.path.join(self._pickle_dir, 'rosetta_hits.csv'))
+            self.export_to_csv(os.path.join(self._pickle_dir, "rosetta_hits.csv"))
             return self._rosetta_hits
 
-        logger.info('No cached Rosetta hits data found')
+        logger.info("No cached Rosetta hits data found")
 
         self._init_speclib(spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks)
 
@@ -423,13 +418,14 @@ class Rosetta():
 
         # export cached data for future runs
         save_pickled_data(self._rosetta_hits, self._rhits_pickle_path)
-        save_pickled_data((Rosetta.PARAM_VERSION, ms1_tol, ms2_tol,
-                           score_thresh, min_match_peaks),
-                          self._params_pickle_path)
+        save_pickled_data(
+            (Rosetta.PARAM_VERSION, ms1_tol, ms2_tol, score_thresh, min_match_peaks),
+            self._params_pickle_path,
+        )
 
         # automatically export CSV file containing hit data to <dataset>/rosetta
         # along with the pickled data
-        self.export_to_csv(os.path.join(self._pickle_dir, 'rosetta_hits.csv'))
+        self.export_to_csv(os.path.join(self._pickle_dir, "rosetta_hits.csv"))
 
         return self._rosetta_hits
 
@@ -440,50 +436,52 @@ class Rosetta():
         the genomics data aren't available in the current dataset
         """
 
-        cached_bgc_hits = load_pickled_data(self._nplinker,
-                                            self._bgchits_pickle_path)
+        cached_bgc_hits = load_pickled_data(self._nplinker, self._bgchits_pickle_path)
         if cached_bgc_hits is not None and not self._ignore_genomic_cache:
-            logger.info('Found pickled bgc_hits for dataset {}!'.format(
-                self._dataset_id))
+            logger.info("Found pickled bgc_hits for dataset {}!".format(self._dataset_id))
             self._bgc_hits, self._mibig2bgc = cached_bgc_hits
         else:
-            logger.info('Generating BGC hits')
+            logger.info("Generating BGC hits")
             self._generate_bgc_hits(bgcs)
 
-
     def _init_spec_hits(self, spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
-        spec_hits = load_pickled_data(self._nplinker,
-                                      self._spechits_pickle_path)
+        spec_hits = load_pickled_data(self._nplinker, self._spechits_pickle_path)
         if spec_hits is not None:
             logger.info(
-                'Found pickled spectral hits for dataset {} at {}'.format(
-                    self._dataset_id, self._spechits_pickle_path))
+                "Found pickled spectral hits for dataset {} at {}".format(
+                    self._dataset_id, self._spechits_pickle_path
+                )
+            )
             self._spec_hits = spec_hits
 
         if self._spec_hits is None:
             # no cached spectral hits available, generate (and cache)
-            logger.info('Generating spectral hits')
-            self._spec_hits = self._generate_spec_hits(spectra, ms1_tol,
-                                                       ms2_tol, score_thresh,
-                                                       min_match_peaks)
+            logger.info("Generating spectral hits")
+            self._spec_hits = self._generate_spec_hits(
+                spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks
+            )
 
-        logger.info('SpecLib has {} spectra, {} hits'.format(
-            self.speclib.get_n_spec(), len(self._spec_hits)))
+        logger.info(
+            "SpecLib has {} spectra, {} hits".format(
+                self.speclib.get_n_spec(), len(self._spec_hits)
+            )
+        )
 
     def _init_speclib(self, spectra, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
-        """ next is the metabolomic part. check if we have a pickled SpecLib object...
-        """
+        """next is the metabolomic part. check if we have a pickled SpecLib object..."""
         speclib = load_pickled_data(self._nplinker, self._speclib_pickle_path)
         if speclib is not None:
-            logger.info('Found pickled SpecLib for dataset {} at {}!'.format(
-                self._dataset_id, self._speclib_pickle_path))
+            logger.info(
+                "Found pickled SpecLib for dataset {} at {}!".format(
+                    self._dataset_id, self._speclib_pickle_path
+                )
+            )
             self.speclib = speclib
 
         if self.speclib is None:
             # no cached speclib available, generate (and cache)
-            logger.info('Generating SpecLib')
+            logger.info("Generating SpecLib")
             self._generate_speclib(spectra)
-
 
     def _load_cached_params(self, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
         """
@@ -498,50 +496,72 @@ class Rosetta():
             try:
                 if params[0] != Rosetta.PARAM_VERSION:
                     logger.warning(
-                        'Rosetta: pickled data version mismatch (old {}, new {})'
-                        .format(params[0], Rosetta.PARAM_VERSION))
+                        "Rosetta: pickled data version mismatch (old {}, new {})".format(
+                            params[0], Rosetta.PARAM_VERSION
+                        )
+                    )
                 else:
                     _version, _ms1_tol, _ms2_tol, _score_thresh, _min_match_peaks = params
 
-                    if ms1_tol == _ms1_tol and ms2_tol == _ms2_tol and score_thresh == _score_thresh and min_match_peaks == _min_match_peaks:
+                    if (
+                        ms1_tol == _ms1_tol
+                        and ms2_tol == _ms2_tol
+                        and score_thresh == _score_thresh
+                        and min_match_peaks == _min_match_peaks
+                    ):
                         # params only valid if all of these match up
                         params_ok = True
 
             except Exception as e:
-                logger.warning(
-                    f'Failed to parse pickled Rosetta parameters: {e}')
+                logger.warning(f"Failed to parse pickled Rosetta parameters: {e}")
 
         return params_ok
 
     def _clear_cache(self, ms1_tol, ms2_tol, score_thresh, min_match_peaks):
         logger.info(
-                'SpecLib parameters have been changed or do not exist, regenerating cached data files!'
-            )
+            "SpecLib parameters have been changed or do not exist, regenerating cached data files!"
+        )
         logger.debug(
-                'ms1_tol={:.3f}, ms2_tol={:.3f}, score_thresh={:.3f}, min_match_peaks={:d}'
-                .format(ms1_tol, ms2_tol, score_thresh, min_match_peaks))
+            "ms1_tol={:.3f}, ms2_tol={:.3f}, score_thresh={:.3f}, min_match_peaks={:d}".format(
+                ms1_tol, ms2_tol, score_thresh, min_match_peaks
+            )
+        )
         for path in [
-                    self._bgchits_pickle_path, self._spechits_pickle_path,
-                    self._rhits_pickle_path, self._params_pickle_path,
-                    self._speclib_pickle_path,
-                    os.path.join(self._pickle_dir, 'rosetta_hits.csv')
-            ]:
+            self._bgchits_pickle_path,
+            self._spechits_pickle_path,
+            self._rhits_pickle_path,
+            self._params_pickle_path,
+            self._speclib_pickle_path,
+            os.path.join(self._pickle_dir, "rosetta_hits.csv"),
+        ]:
             if os.path.exists(path):
                 os.unlink(path)
 
     def export_to_csv(self, filename):
         # convenience method for exporting a full set of rosetta hits to a CSV file
-        with open(filename, 'w', newline='') as csvfile:
-            csvwriter = csv.writer(csvfile, delimiter=',')
+        with open(filename, "w", newline="") as csvfile:
+            csvwriter = csv.writer(csvfile, delimiter=",")
 
-            csvwriter.writerow([
-                'nplinker spectrum ID', 'spectrum ID', 'GNPS ID',
-                'spectral score', 'BGC ID', 'MiBIG BGC ID',
-                'BGC score'
-            ])
+            csvwriter.writerow(
+                [
+                    "nplinker spectrum ID",
+                    "spectrum ID",
+                    "GNPS ID",
+                    "spectral score",
+                    "BGC ID",
+                    "MiBIG BGC ID",
+                    "BGC score",
+                ]
+            )
             for hit in self._rosetta_hits:
-                csvwriter.writerow([
-                    hit.spec.id, hit.spec.spectrum_id, hit.gnps_id,
-                    hit.spec_match_score, hit.bgc.bgc_id,
-                    hit.mibig_id, hit.bgc_match_score
-                ])
+                csvwriter.writerow(
+                    [
+                        hit.spec.id,
+                        hit.spec.spectrum_id,
+                        hit.gnps_id,
+                        hit.spec_match_score,
+                        hit.bgc.bgc_id,
+                        hit.mibig_id,
+                        hit.bgc_match_score,
+                    ]
+                )

@@ -38,30 +38,28 @@ logger = LogConfig.getLogger(__name__)
 
 
 class NPLinkerPickler(pickle.Pickler):
-
     def persistent_id(self, obj):
         if isinstance(obj, BGC):
-            return ('BGC', obj.bgc_id)
+            return ("BGC", obj.bgc_id)
         elif isinstance(obj, GCF):
-            return ('GCF', obj.gcf_id)
+            return ("GCF", obj.gcf_id)
         elif isinstance(obj, Spectrum):
-            return ('Spectrum', obj.id)
+            return ("Spectrum", obj.id)
         elif isinstance(obj, MolecularFamily):
-            return ('MolecularFamily', obj.id)
+            return ("MolecularFamily", obj.id)
         else:
             # TODO: ideally should use isinstance(obj, ScoringMethod) here
             # but it's currently a problem because it creates a circular
             # import situation
             name = type(obj).__name__
-            if name == 'RosettaScoring' or name == 'MetcalfScoring':
-                return ('ScoringMethod', obj.name)
+            if name == "RosettaScoring" or name == "MetcalfScoring":
+                return ("ScoringMethod", obj.name)
 
         # pickle anything else as usual
         return None
 
 
 class NPLinkerUnpickler(pickle.Unpickler):
-
     def __init__(self, file, nplinker, protocol=4):
         super().__init__(file)
         self.nplinker = nplinker
@@ -71,19 +69,18 @@ class NPLinkerUnpickler(pickle.Unpickler):
         # persistent ID that's been unpickled
         obj_type, obj_id = pid
 
-        if obj_type == 'BGC':
+        if obj_type == "BGC":
             return self.nplinker.bgcs[obj_id]
-        elif obj_type == 'GCF':
+        elif obj_type == "GCF":
             return self.nplinker.gcfs[obj_id]
-        elif obj_type == 'Spectrum':
+        elif obj_type == "Spectrum":
             return self.nplinker.spectra[obj_id]
-        elif obj_type == 'MolecularFamily':
+        elif obj_type == "MolecularFamily":
             return self.nplinker.molfams[obj_id]
-        elif obj_type == 'ScoringMethod':
+        elif obj_type == "ScoringMethod":
             return self.nplinker.scoring_method(obj_id)
 
-        raise pickle.UnpicklingError(
-            f'Unsupported persistent object: {pid}')
+        raise pickle.UnpicklingError(f"Unsupported persistent object: {pid}")
 
 
 # basic wrapper for loading pickled data files. this is done in various places
@@ -95,14 +92,14 @@ def load_pickled_data(nplinker, path, delete_on_error=True):
     if not os.path.exists(path):
         return None
 
-    unp = NPLinkerUnpickler(open(path, 'rb'), nplinker)
+    unp = NPLinkerUnpickler(open(path, "rb"), nplinker)
     data = None
     try:
         data = unp.load()
     except Exception as e:
         logger.warning(
-            'Failed to unpickle file "{}", deleting it (exception={})'.format(
-                path, str(e)))
+            'Failed to unpickle file "{}", deleting it (exception={})'.format(path, str(e))
+        )
         try:
             os.unlink(path)
         except OSError as oe:
@@ -116,5 +113,5 @@ def save_pickled_data(data, path):
     if not os.path.exists(dirpath):
         os.makedirs(dirpath)
 
-    pic = NPLinkerPickler(open(path, 'wb'))
+    pic = NPLinkerPickler(open(path, "wb"))
     pic.dump(data)

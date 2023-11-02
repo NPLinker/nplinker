@@ -22,9 +22,11 @@ from .logconfig import LogConfig
 
 logger = LogConfig.getLogger(__name__)
 
-GNPS_URL_FORMAT = "https://metabolomics-usi.gnps2.org/{}/?usi1=mzspec:GNPS:GNPS-LIBRARY:accession:{}"
-GNPS_INDEX_COLUMN = '#Scan#'
-GNPS_DATA_COLUMNS = ['Compound_Name', 'Organism', 'MQScore', 'SpectrumID']
+GNPS_URL_FORMAT = (
+    "https://metabolomics-usi.gnps2.org/{}/?usi1=mzspec:GNPS:GNPS-LIBRARY:accession:{}"
+)
+GNPS_INDEX_COLUMN = "#Scan#"
+GNPS_DATA_COLUMNS = ["Compound_Name", "Organism", "MQScore", "SpectrumID"]
 
 
 def _headers_match_gnps(headers: list[str]) -> bool:
@@ -46,24 +48,25 @@ def create_gnps_annotation(spec: Spectrum, gnps_anno: dict):
         Exception: Raises exception if the spectrum already contains a GNPS annotation.
     """
     # also insert useful URLs
-    for t in ['png', 'json', 'svg', 'spectrum']:
-        gnps_anno[f'{t}_url'] = GNPS_URL_FORMAT.format(t,
-                                                       gnps_anno['SpectrumID'])
+    for t in ["png", "json", "svg", "spectrum"]:
+        gnps_anno[f"{t}_url"] = GNPS_URL_FORMAT.format(t, gnps_anno["SpectrumID"])
 
     if GNPS_KEY in spec.annotations:
         # TODO is this actually an error or can it happen normally?
-        raise Exception('Multiple GNPS annotations for Spectrum {}!'.format(
-            spec.spectrum_id))
+        raise Exception("Multiple GNPS annotations for Spectrum {}!".format(spec.spectrum_id))
 
     spec.set_annotations(GNPS_KEY, [gnps_anno])
     # shortcut, useful for rosetta code
-    spec.gnps_id = gnps_anno['SpectrumID']
+    spec.gnps_id = gnps_anno["SpectrumID"]
 
 
 @deprecated(version="1.3.3", reason="Use GNPSAnnotationLoader class instead.")
-def load_annotations(root: str | os.PathLike, config: str | os.PathLike,
-                     spectra: list[Spectrum],
-                     spec_dict: dict[str, Spectrum]) -> list[Spectrum]:
+def load_annotations(
+    root: str | os.PathLike,
+    config: str | os.PathLike,
+    spectra: list[Spectrum],
+    spec_dict: dict[str, Spectrum],
+) -> list[Spectrum]:
     """Load the annotations from the GNPS annotation file present in root to the spectra.
 
     Args:
@@ -80,27 +83,26 @@ def load_annotations(root: str | os.PathLike, config: str | os.PathLike,
     """
 
     if not os.path.exists(root):
-        logger.debug(f'Annotation directory not found ({root})')
+        logger.debug(f"Annotation directory not found ({root})")
         return spectra
 
     ac = _read_config(config)
 
-    logger.debug(f'Parsed {len(ac)} annotations configuration entries')
+    logger.debug(f"Parsed {len(ac)} annotations configuration entries")
 
     annotation_files = _find_annotation_files(root, config)
 
-    logger.debug('Found {} annotations .tsv files in {}'.format(
-        len(annotation_files), root))
+    logger.debug("Found {} annotations .tsv files in {}".format(len(annotation_files), root))
 
     for af in annotation_files:
         with open(af) as f:
-            rdr = csv.reader(f, delimiter='\t')
+            rdr = csv.reader(f, delimiter="\t")
             headers = next(rdr)
             filename = os.path.split(af)[1]
 
             if _headers_match_gnps(headers):
                 # assume this is our main annotations file
-                logger.debug(f'Parsing GNPS annotations from {af}')
+                logger.debug(f"Parsing GNPS annotations from {af}")
 
                 scans_index = headers.index(GNPS_INDEX_COLUMN)
 
@@ -110,8 +112,10 @@ def load_annotations(root: str | os.PathLike, config: str | os.PathLike,
                     scan_id = line[scans_index]
                     if scan_id not in spec_dict:
                         logger.warning(
-                            'Unknown spectrum ID found in GNPS annotation file (ID={})'
-                            .format(scan_id))
+                            "Unknown spectrum ID found in GNPS annotation file (ID={})".format(
+                                scan_id
+                            )
+                        )
                         continue
 
                     spec = spec_dict[scan_id]
@@ -129,19 +133,23 @@ def load_annotations(root: str | os.PathLike, config: str | os.PathLike,
 
                     create_gnps_annotation(spec, data)
             else:
-                logger.debug(f'Parsing general annotations from {af}')
+                logger.debug(f"Parsing general annotations from {af}")
                 # this is a general annotations file, so rely purely on the user-provided columns
                 if filename not in ac:
                     logger.warning(
-                        'Failed to parse annotations from "{}", no config info supplied in {}'
-                        .format(filename, config))
+                        'Failed to parse annotations from "{}", no config info supplied in {}'.format(
+                            filename, config
+                        )
+                    )
                     continue
 
                 index_col, data_cols = ac[filename]
                 if index_col not in headers:
                     raise Exception(
-                        'Annotation index column "{}" not found in file "{}"!'.
-                        format(index_col, filename))
+                        'Annotation index column "{}" not found in file "{}"!'.format(
+                            index_col, filename
+                        )
+                    )
 
                 spec_id_index = headers.index(index_col)
 
@@ -151,8 +159,10 @@ def load_annotations(root: str | os.PathLike, config: str | os.PathLike,
                     scan_id = line[spec_id_index]
                     if scan_id not in spec_dict:
                         logger.warning(
-                            'Unknown spectrum ID found in annotation file "{}", ID is "{}"'
-                            .format(filename, scan_id))
+                            'Unknown spectrum ID found in annotation file "{}", ID is "{}"'.format(
+                                filename, scan_id
+                            )
+                        )
                         continue
 
                     spec = spec_dict[scan_id]
@@ -167,8 +177,7 @@ def load_annotations(root: str | os.PathLike, config: str | os.PathLike,
                         data[dc] = line[headers.index(dc)]
                     spec_annotations[spec].append(data)
 
-                logger.debug('Adding annotation data to {} spectra'.format(
-                    len(spec_annotations)))
+                logger.debug("Adding annotation data to {} spectra".format(len(spec_annotations)))
                 for spec, anno in spec_annotations.items():
                     spec.set_annotations(filename, anno)
 
@@ -187,7 +196,7 @@ def _find_annotation_files(root: str, config: str) -> list[str]:
     """
     annotation_files = []
     for f in os.listdir(root):
-        if f == os.path.split(config)[1] or not f.endswith('.tsv'):
+        if f == os.path.split(config)[1] or not f.endswith(".tsv"):
             continue
         annotation_files.append(os.path.join(root, f))
     return annotation_files
@@ -198,20 +207,20 @@ def _read_config(config):
     if os.path.exists(config):
         # parse annotations config file if it exists
         with open(config) as f:
-            rdr = csv.reader(f, delimiter='\t')
+            rdr = csv.reader(f, delimiter="\t")
             for row in rdr:
                 # expecting 3 columns: filename, index col name, data col name(s)
                 if len(row) != 3:
-                    logger.warning(
-                        'Malformed line in annotations configuration: {}'.
-                        format(row))
+                    logger.warning("Malformed line in annotations configuration: {}".format(row))
                     continue
                 # record the columns with filename as key
-                data_cols = row[2].split(',')
+                data_cols = row[2].split(",")
                 if len(data_cols) == 0:
                     logger.warning(
-                        'No data columns selected in annotation file {}, skipping it!'
-                        .format(row[0]))
+                        "No data columns selected in annotation file {}, skipping it!".format(
+                            row[0]
+                        )
+                    )
                     continue
                 ac[row[0]] = (row[1], data_cols)
     return ac

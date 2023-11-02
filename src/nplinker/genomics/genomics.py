@@ -19,8 +19,8 @@ logger = LogConfig.getLogger(__name__)
 
 
 def generate_mappings_genome_id_bgc_id(
-        bgc_dir: str | PathLike,
-        output_file: str | PathLike | None = None) -> None:
+    bgc_dir: str | PathLike, output_file: str | PathLike | None = None
+) -> None:
     """Generate a file that maps genome id to BGC id.
 
     Note that the `output_file` will be overwritten if it already exists.
@@ -43,9 +43,7 @@ def generate_mappings_genome_id_bgc_id(
     for subdir in list_dirs(bgc_dir):
         genome_id = Path(subdir).name
         bgc_files = list_files(subdir, suffix=(".gbk"), keep_parent=False)
-        bgc_ids = [
-            bgc_id for f in bgc_files if (bgc_id := Path(f).stem) != genome_id
-        ]
+        bgc_ids = [bgc_id for f in bgc_files if (bgc_id := Path(f).stem) != genome_id]
         if bgc_ids:
             genome_bgc_mappings[genome_id] = bgc_ids
         else:
@@ -53,10 +51,7 @@ def generate_mappings_genome_id_bgc_id(
 
     # sort mappings by genome_id and construct json data
     genome_bgc_mappings = dict(sorted(genome_bgc_mappings.items()))
-    json_data = [{
-        "genome_ID": k,
-        "BGC_ID": v
-    } for k, v in genome_bgc_mappings.items()]
+    json_data = [{"genome_ID": k, "BGC_ID": v} for k, v in genome_bgc_mappings.items()]
     json_data = {"mappings": json_data, "version": "1.0"}
 
     # validate json data
@@ -88,11 +83,13 @@ def map_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]):
         except ValueError as e:
             raise ValueError(
                 f"Strain id '{bgc.bgc_id}' from BGC object '{bgc.bgc_id}' "
-                "not found in the strain collection.") from e
+                "not found in the strain collection."
+            ) from e
         if len(strain_list) > 1:
             raise ValueError(
                 f"Multiple strain objects found for BGC id '{bgc.bgc_id}'."
-                f"BGC object accept only one strain.")
+                f"BGC object accept only one strain."
+            )
         bgc.strain = strain_list[0]
 
 
@@ -116,15 +113,16 @@ def map_bgc_to_gcf(bgcs: list[BGC], gcfs: list[GCF]):
             except KeyError as e:
                 raise KeyError(
                     f"BGC id '{bgc_id}' from GCF object '{gcf.gcf_id}' "
-                    "not found in the list of BGC objects.") from e
+                    "not found in the list of BGC objects."
+                ) from e
             gcf.add_bgc(bgc)
 
 
 def filter_mibig_only_gcf(gcfs: list[GCF]) -> list[GCF]:
     """Filter out GCFs that contain only MIBiG BGC objects.
 
-        This method returns a new list of GCFs that have at least one non-MIBiG
-        BGC object as its child.
+    This method returns a new list of GCFs that have at least one non-MIBiG
+    BGC object as its child.
     """
     return [gcf for gcf in gcfs if gcf.has_mibig_only() is False]
 
@@ -148,17 +146,24 @@ def get_strains_from_bgcs(bgcs: list[BGC]) -> StrainCollection:
     return sc
 
 
-
-@deprecated(version="1.3.3", reason="It is split to separate functions: " \
-            "map_strain_to_bgc, map_bgc_to_gcf, filter_mibig_only_gcf, " \
-            "get_bgcs_from_gcfs and get_strains_from_bgcs.")
-def load_gcfs(bigscape_dir: str | PathLike, strains: StrainCollection,
-              mibig_bgc_dict: dict[str, BGC], antismash_bgc_dict: dict[str,
-                                                                       BGC],
-              antismash_file_dict: dict[str, str], bigscape_cutoff: int):
-
+@deprecated(
+    version="1.3.3",
+    reason="It is split to separate functions: "
+    "map_strain_to_bgc, map_bgc_to_gcf, filter_mibig_only_gcf, "
+    "get_bgcs_from_gcfs and get_strains_from_bgcs.",
+)
+def load_gcfs(
+    bigscape_dir: str | PathLike,
+    strains: StrainCollection,
+    mibig_bgc_dict: dict[str, BGC],
+    antismash_bgc_dict: dict[str, BGC],
+    antismash_file_dict: dict[str, str],
+    bigscape_cutoff: int,
+):
     bigscape_dir = Path(bigscape_dir)
-    product_class_cluster_file = bigscape_dir / "mix" / f"mix_clustering_c0.{bigscape_cutoff:02d}.tsv"
+    product_class_cluster_file = (
+        bigscape_dir / "mix" / f"mix_clustering_c0.{bigscape_cutoff:02d}.tsv"
+    )
     network_annotations_file = bigscape_dir / "Network_Annotations_Full.tsv"
 
     new_bgc: BGC
@@ -183,7 +188,7 @@ def load_gcfs(bigscape_dir: str | PathLike, strains: StrainCollection,
     # - Taxonomy [6]
     metadata = {}
     with open(network_annotations_file) as f:
-        reader = csv.reader(f, delimiter='\t')
+        reader = csv.reader(f, delimiter="\t")
         next(reader)  # skip headers
         for line in reader:
             metadata[line[0]] = line
@@ -193,7 +198,7 @@ def load_gcfs(bigscape_dir: str | PathLike, strains: StrainCollection,
     # - BGC name
     # - cluster ID
     with open(product_class_cluster_file, "rt") as f:
-        reader = csv.reader(f, delimiter='\t')
+        reader = csv.reader(f, delimiter="\t")
         next(reader)  # skip headers
         for line in reader:
             bgc_name = line[0]
@@ -213,17 +218,17 @@ def load_gcfs(bigscape_dir: str | PathLike, strains: StrainCollection,
                 continue
 
             # build new bgc
-            if strain.id.startswith('BGC'):
+            if strain.id.startswith("BGC"):
                 try:
                     new_bgc = mibig_bgc_dict[strain.id]
                 except KeyError:
-                    raise KeyError(f'Unknown MiBIG: {strain.id}')
+                    raise KeyError(f"Unknown MiBIG: {strain.id}")
                 num_mibig += 1
             else:
                 try:
                     new_bgc = antismash_bgc_dict[bgc_name]
                 except KeyError:
-                    raise KeyError(f'Unknown AntiSMASH BGC: {bgc_name}')
+                    raise KeyError(f"Unknown AntiSMASH BGC: {bgc_name}")
 
             new_bgc.strain = strain
             bgc_list.append(new_bgc)
@@ -241,24 +246,27 @@ def load_gcfs(bigscape_dir: str | PathLike, strains: StrainCollection,
             used_strains.add(strain)
 
     logger.info(
-        '# MiBIG BGCs = {}, non-MiBIG BGCS = {}, total bgcs = {}, GCFs = {}, strains={}'
-        .format(num_mibig,
-                len(bgc_list) - num_mibig, len(bgc_list), len(gcf_dict),
-                len(strains)))
+        "# MiBIG BGCs = {}, non-MiBIG BGCS = {}, total bgcs = {}, GCFs = {}, strains={}".format(
+            num_mibig, len(bgc_list) - num_mibig, len(bgc_list), len(gcf_dict), len(strains)
+        )
+    )
 
     # filter out MiBIG-only GCFs)
-    gcf_list, bgc_list, used_strains = _filter_gcfs(gcf_list, bgc_list,
-                                                    used_strains)
+    gcf_list, bgc_list, used_strains = _filter_gcfs(gcf_list, bgc_list, used_strains)
     logger.info(
-        '# after filtering, total bgcs = {}, GCFs = {}, strains={}, unknown_strains={}'
-        .format(len(bgc_list), len(gcf_list), len(used_strains),
-                len(unknown_strains)))
+        "# after filtering, total bgcs = {}, GCFs = {}, strains={}, unknown_strains={}".format(
+            len(bgc_list), len(gcf_list), len(used_strains), len(unknown_strains)
+        )
+    )
 
     return gcf_list, bgc_list, used_strains, unknown_strains
 
 
-@deprecated(version="1.3.3", reason="It is split to separate functions: " \
-            "filter_mibig_only_gcf, get_bgcs_from_gcfs and get_strains_from_bgcs.")
+@deprecated(
+    version="1.3.3",
+    reason="It is split to separate functions: "
+    "filter_mibig_only_gcf, get_bgcs_from_gcfs and get_strains_from_bgcs.",
+)
 def _filter_gcfs(
     gcfs: list[GCF], bgcs: list[BGC], strains: StrainCollection
 ) -> tuple[list[GCF], list[BGC], StrainCollection]:
@@ -281,8 +289,7 @@ def _filter_gcfs(
     bgcs_to_remove = set()
 
     for gcf in gcfs:
-        num_non_mibig_bgcs = len(
-            list(filter(lambda bgc: not bgc.is_mibig(), gcf.bgcs)))
+        num_non_mibig_bgcs = len(list(filter(lambda bgc: not bgc.is_mibig(), gcf.bgcs)))
         if num_non_mibig_bgcs == 0:
             gcfs_to_remove.add(gcf)
             for bgc in gcf.bgcs:
@@ -301,7 +308,9 @@ def _filter_gcfs(
             strains.remove(bgc.strain)
 
     logger.info(
-        'Remove GCFs that has only MIBiG BGCs: removing {} GCFs and {} BGCs'.
-        format(len(gcfs_to_remove), len(bgcs_to_remove)))
+        "Remove GCFs that has only MIBiG BGCs: removing {} GCFs and {} BGCs".format(
+            len(gcfs_to_remove), len(bgcs_to_remove)
+        )
+    )
 
     return gcfs, bgcs, strains

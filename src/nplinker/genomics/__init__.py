@@ -23,5 +23,5 @@ __all__ = [
     "get_strains_from_bgcs",
     "load_gcfs",
     "map_bgc_to_gcf",
-    "map_strain_to_bgc"
+    "map_strain_to_bgc",
 ]

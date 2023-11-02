@@ -11,7 +11,6 @@ logger = LogConfig.getLogger(__name__)
 
 
 class MibigLoader:
-
     def __init__(self, data_dir: str):
         """Parse MIBiG metadata files and return BGC objects
 

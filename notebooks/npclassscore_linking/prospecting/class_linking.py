@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-'''
+"""
 Initial code for NPClassScore
-'''
+"""
 import glob
 import os
 import sys
@@ -10,7 +10,7 @@ from collections import defaultdict
 import pandas as pd
 
 
-sys.path.append('../../src')
+sys.path.append("../../src")
 from nplinker.nplinker import BGC
 from nplinker.nplinker import GCF
 from nplinker.nplinker import NPLinker
@@ -18,8 +18,8 @@ from nplinker.nplinker import Spectrum
 
 
 class Class_links:
-    '''Holds all info concerning class links (based on known bgc-compound links in MIBiG)
-    '''
+    """Holds all info concerning class links (based on known bgc-compound links in MIBiG)"""
+
     def __init__(self, mibig_classes_file):
         self._mibig_classes_file = mibig_classes_file
         self._read_mibig_classes()
@@ -28,23 +28,48 @@ class Class_links:
         pd.options.display.float_format = "{:,.3f}".format  # adjust pd formatting
 
         self._bigscape_mibig_conversion = {
-            'PKSI': 'Polyketide', 'PKSother': 'Polyketide',
-            'NRPS': 'NRP', 'RiPPs': 'RiPP', 'Saccharides': 'Saccharide',
-            'Others': 'Other', 'Terpene': 'Terpene', 'PKS-NRP_Hybrids': 'PKS-NRP_Hybrids'}
+            "PKSI": "Polyketide",
+            "PKSother": "Polyketide",
+            "NRPS": "NRP",
+            "RiPPs": "RiPP",
+            "Saccharides": "Saccharide",
+            "Others": "Other",
+            "Terpene": "Terpene",
+            "PKS-NRP_Hybrids": "PKS-NRP_Hybrids",
+        }
 
         self._as_conversion = {
-            'NAGGN': 'other', 'NAPAA': 'other', 'RRE-containing': 'bacteriocin',
-            'RiPP-like': 'bacteriocin', 'cf_fatty_acid': "fatty_acid", 'cf_putative': 'other',
-            'cf_saccharide': 'saccharide', 'guanidinotides': 'fused', 'lanthipeptide-class-i': 'lanthipeptide',
-            'lanthipeptide-class-ii': 'lanthipeptide', 'lanthipeptide-class-iii': 'lanthipeptide',
-            'lanthipeptide-class-iv': 'lanthipeptide', 'lanthipeptide-class-v': 'lanthipeptide',
-            'lantipeptide': 'lanthipeptide', 'linaridin': 'lanthipeptide', 'lipolanthine': 'lanthipeptide',
-            'nrps': 'NRPS', 'otherks': 'hglE-KS', 'prodigiosin': 'other', 'pyrrolidine': 'other',
-            'ranthipeptide': 'bacteriocin', 'redox-cofactor': 'other', 't1pks': 'T1PKS', 't2pks': 'T2PKS',
-            't3pks': 'T3PKS', 'thioamide-NRP': 'other', 'thioamitides': 'bacteriocin',
-            'transatpks': 'transAT-PKS'}
+            "NAGGN": "other",
+            "NAPAA": "other",
+            "RRE-containing": "bacteriocin",
+            "RiPP-like": "bacteriocin",
+            "cf_fatty_acid": "fatty_acid",
+            "cf_putative": "other",
+            "cf_saccharide": "saccharide",
+            "guanidinotides": "fused",
+            "lanthipeptide-class-i": "lanthipeptide",
+            "lanthipeptide-class-ii": "lanthipeptide",
+            "lanthipeptide-class-iii": "lanthipeptide",
+            "lanthipeptide-class-iv": "lanthipeptide",
+            "lanthipeptide-class-v": "lanthipeptide",
+            "lantipeptide": "lanthipeptide",
+            "linaridin": "lanthipeptide",
+            "lipolanthine": "lanthipeptide",
+            "nrps": "NRPS",
+            "otherks": "hglE-KS",
+            "prodigiosin": "other",
+            "pyrrolidine": "other",
+            "ranthipeptide": "bacteriocin",
+            "redox-cofactor": "other",
+            "t1pks": "T1PKS",
+            "t2pks": "T2PKS",
+            "t3pks": "T3PKS",
+            "thioamide-NRP": "other",
+            "thioamitides": "bacteriocin",
+            "transatpks": "transAT-PKS",
+        }
 
-    def get_gcf_as_classes(self, gcf, cutoff = 0.5):
+    def get_gcf_as_classes(self, gcf, cutoff=0.5):
         """Get antismash classes for a gcf if antismash class occurs in more than <cutoff> of gcf
 
         Args:
@@ -55,7 +80,9 @@ class Class_links:
         """
         # todo: move to GCF object?
         gcf_size = len(gcf.bgcs)
-        unlist_all_products = [product for bgc in gcf.bgcs for product in bgc.product_prediction.split('.')]
+        unlist_all_products = [
+            product for bgc in gcf.bgcs for product in bgc.product_prediction.split(".")
+        ]
         sorted_as_classes = Counter(unlist_all_products).most_common()
         # keep if in more than half of bgcs?
         cutoff = 0.5
@@ -91,19 +118,19 @@ class Class_links:
             for line in inf:
                 elems = line.strip().split("\t")
                 chem_id = elems.pop(0)
-                class_base = elems.pop(0).split(',')
-                classes = [cls.partition(':')[0] for cls in class_base]
+                class_base = elems.pop(0).split(",")
+                classes = [cls.partition(":")[0] for cls in class_base]
                 sub_classes = [cls for cls in class_base if cls.split(":")[1]]
-                as_classes = elems.pop(0).split(',')
+                as_classes = elems.pop(0).split(",")
 
                 bgc_classes = [classes, sub_classes, as_classes]
-                chem_classes = [chem_cls.split('; ') for chem_cls in elems[2:]]
+                chem_classes = [chem_cls.split("; ") for chem_cls in elems[2:]]
                 classes_dict[chem_id] = [bgc_classes, chem_classes]
         self._mibig_classes = classes_dict
         # add header info
-        s_h = header.strip().split('\t')
+        s_h = header.strip().split("\t")
 
-        self._bgc_class_names = ['mibig_classes']+s_h[1:3]
+        self._bgc_class_names = ["mibig_classes"] + s_h[1:3]
         self._chem_class_names = s_h[5:]
 
         return self._mibig_classes
@@ -118,10 +145,10 @@ class Class_links:
         result = _rec_dd()
         # loop through each mibig compound
         for mibig_chem_id, (bgc_classes, chem_classes) in self._mibig_classes.items():
-        # get all combinations of classes for this compound
+            # get all combinations of classes for this compound
             for i, bgc_cat in enumerate(self.bgc_class_names):
                 init_bgc_class = bgc_classes[i]
-                if not init_bgc_class or init_bgc_class == ['']:
+                if not init_bgc_class or init_bgc_class == [""]:
                     continue
 
                 bgc_class = init_bgc_class[:]  # if no exceptions, just assign classes
@@ -129,15 +156,30 @@ class Class_links:
                 # do some cleanup for mibig classes
                 if bgc_cat == "mibig_classes":
                     # group pks-nrp hybrids for MIBiG classes
-                    hyb_count = len([1 for init_bgc_c in init_bgc_class \
-                                     if any([test in init_bgc_c.lower() for test in ['nrp', 'pks', 'polyketide']])])
+                    hyb_count = len(
+                        [
+                            1
+                            for init_bgc_c in init_bgc_class
+                            if any(
+                                [
+                                    test in init_bgc_c.lower()
+                                    for test in ["nrp", "pks", "polyketide"]
+                                ]
+                            )
+                        ]
+                    )
                     if hyb_count >= 2:
                         # if hybrid, reconstruct the bgc_class
                         bgc_class = []
                         bgc_class.append("PKS-NRP_Hybrids")
                         # append other classes if there are more
                         for init_bgc_c in init_bgc_class:
-                            if not any([test in init_bgc_c.lower() for test in ['nrp', 'pks', 'polyketide']]):
+                            if not any(
+                                [
+                                    test in init_bgc_c.lower()
+                                    for test in ["nrp", "pks", "polyketide"]
+                                ]
+                            ):
                                 bgc_class.append(init_bgc_c)
 
                     # replace Alkaloid with Other in bgc_class
@@ -145,7 +187,7 @@ class Class_links:
 
                 for j, chem_cat in enumerate(self.chem_class_names):
                     chem_class = chem_classes[j]
-                    if not chem_class or chem_class == ['']:
+                    if not chem_class or chem_class == [""]:
                         continue
 
                     for bgc_c in bgc_class:
@@ -175,9 +217,13 @@ class Class_links:
                     class_linking_counts[chem_key] = {}
                 # add linking tables as DataFrames
                 counts_df = pd.DataFrame.from_dict(counts, dtype=int)
-                class_linking_tables[bgc_key][chem_key] = (counts_df/counts_df.sum(axis=0)).fillna(0)
+                class_linking_tables[bgc_key][chem_key] = (
+                    counts_df / counts_df.sum(axis=0)
+                ).fillna(0)
                 class_linking_counts[bgc_key][chem_key] = counts_df.fillna(0)
-                class_linking_tables[chem_key][bgc_key] = (counts_df.T/counts_df.sum(axis=1)).fillna(0)
+                class_linking_tables[chem_key][bgc_key] = (
+                    counts_df.T / counts_df.sum(axis=1)
+                ).fillna(0)
                 class_linking_counts[chem_key][bgc_key] = counts_df.T.fillna(0)
         self._class_links = class_linking_tables
         self._class_links_counts = class_linking_counts
@@ -215,6 +261,7 @@ class Canopus_results:
         -cluster_index_classifications.txt
         -component_index_classifications.txt
     """
+
     def __init__(self, root_dir):
         """Read the class info from root_dir/canopus
 
@@ -224,12 +271,12 @@ class Canopus_results:
         spectra_classes_names, spectra_classes = self._read_spectra_classes(root_dir)
         self._spectra_classes = spectra_classes
         self._spectra_classes_names = spectra_classes_names
-        self._spectra_classes_names_inds = {elem:i for i,elem in enumerate(spectra_classes_names)}
+        self._spectra_classes_names_inds = {elem: i for i, elem in enumerate(spectra_classes_names)}
 
         molfam_classes_names, molfam_classes = self._read_molfam_classes(root_dir)
         self._molfam_classes = molfam_classes
         self._molfam_classes_names = molfam_classes_names
-        self._molfam_classes_names_inds = {elem:i for i,elem in enumerate(molfam_classes_names)}
+        self._molfam_classes_names_inds = {elem: i for i, elem in enumerate(molfam_classes_names)}
 
     def _read_spectra_classes(self, root_dir):
         """Read canopus classes for spectra, return classes_names, classes
@@ -243,8 +290,7 @@ class Canopus_results:
                 where each level is a list of (class_name, score) sorted on best choice so index 0 is the best
                 class prediction for a level
         """
-        input_file = os.path.join(
-            root_dir, 'canopus', 'cluster_index_classifications.txt')
+        input_file = os.path.join(root_dir, "canopus", "cluster_index_classifications.txt")
 
         ci_classes = {}  # make a dict {ci: [[(class,score)]]}
         ci_classes_header = None
@@ -254,7 +300,7 @@ class Canopus_results:
             with open(input_file) as inf:
                 ci_classes_header = inf.readline().strip().split("\t")
                 for line in inf:
-                    line = line.strip('\n').split("\t")
+                    line = line.strip("\n").split("\t")
                     classes_list = []
                     for lvl in line[3:]:
                         lvl_list = []
@@ -269,8 +315,9 @@ class Canopus_results:
                     ci_classes[line[1]] = classes_list
         if ci_classes_header:
             #  todo: rename the output from the canopus script directly
-            ci_classes_names = [f"cf_{elem}" for elem in ci_classes_header[3:-3]] +\
-                   [f"npc_{elem}" for elem in ci_classes_header[-3:]]
+            ci_classes_names = [f"cf_{elem}" for elem in ci_classes_header[3:-3]] + [
+                f"npc_{elem}" for elem in ci_classes_header[-3:]
+            ]
         return ci_classes_names, ci_classes
 
     def _read_molfam_classes(self, root_dir):
@@ -285,8 +332,7 @@ class Canopus_results:
                 where each level is a list of (class_name, fraction) sorted on best choice so index 0 is the best
                 class prediction for a level
         """
-        input_file = os.path.join(
-            root_dir, 'canopus', 'component_index_classifications.txt')
+        input_file = os.path.join(root_dir, "canopus", "component_index_classifications.txt")
 
         compi_classes = {}  # make a dict {compi: [[(class,score)]]}
         compi_classes_header = None
@@ -296,7 +342,7 @@ class Canopus_results:
             with open(input_file) as inf:
                 compi_classes_header = inf.readline().strip().split("\t")
                 for line in inf:
-                    line = line.strip('\n').split("\t")
+                    line = line.strip("\n").split("\t")
                     classes_list = []
                     for lvl in line[2:]:
                         lvl_list = []
@@ -311,8 +357,9 @@ class Canopus_results:
                     compi_classes[line[0]] = classes_list
         if compi_classes_header:
             #  todo: rename the output from the canopus script directly
-            compi_classes_names = [f"cf_{elem}" for elem in compi_classes_header[2:-3]] +\
-                      [f"npc_{elem}" for elem in compi_classes_header[-3:]]
+            compi_classes_names = [f"cf_{elem}" for elem in compi_classes_header[2:-3]] + [
+                f"npc_{elem}" for elem in compi_classes_header[-3:]
+            ]
         return compi_classes_names, compi_classes
 
     @property
@@ -346,6 +393,7 @@ class MolNetEnhancer_results:
     The input file for ClassyFire results is read from the molnetenhancer directory:
         - ClassyFireResults_Network.txt
     """
+
     def __init__(self, root_dir):
         """Read the class info from file in root_dir/molnetenhancer/
 
@@ -356,7 +404,7 @@ class MolNetEnhancer_results:
         self._spectra2molfam = spectra2molfam
         self._molfam_classes = molfam_classes
         self._spectra_classes_names = cf_classes_names  # if NPC gets implemented, add here
-        self._spectra_classes_names_inds = {elem:i for i,elem in enumerate(cf_classes_names)}
+        self._spectra_classes_names_inds = {elem: i for i, elem in enumerate(cf_classes_names)}
 
     def _read_cf_classes(self, root_dir):
         r"""Read ClassyFireResults_Network.txt in molnetenhancer dir
@@ -379,16 +427,19 @@ class MolNetEnhancer_results:
             return columns, mne_component_dict, mne_cluster2component
         with open(input_file) as inf:
             header = inf.readline().strip().split("\t")
-            columns = ['cf_direct_parent' if col == 'CF_Dparent' else col.lower()
-                       for i, col in enumerate(header[3:]) if i%2 == 0]
+            columns = [
+                "cf_direct_parent" if col == "CF_Dparent" else col.lower()
+                for i, col in enumerate(header[3:])
+                if i % 2 == 0
+            ]
             for line in inf:
-                line = line.strip('\n').split("\t")
+                line = line.strip("\n").split("\t")
                 cluster = line.pop(0)
                 component = line.pop(0)
                 nr_nodes = line.pop(0)
                 class_info = []
                 for i in range(0, len(line), 2):
-                    class_tup = (line[i], float(line[i+1]))
+                    class_tup = (line[i], float(line[i + 1]))
                     class_info.append(class_tup)
                 if not component in mne_component_dict:
                     mne_component_dict[component] = class_info
@@ -437,20 +488,22 @@ class NPLinker_classes(NPLinker):
 
         returns a Canopus and MNE object with info about classes, and the Class links object
         """
-        mibig_classes_file = glob.glob(os.path.join(self.root_dir, "MIBiG*_compounds_with_AS_BGC_CF_NPC_classes.txt"))[0]
+        mibig_classes_file = glob.glob(
+            os.path.join(self.root_dir, "MIBiG*_compounds_with_AS_BGC_CF_NPC_classes.txt")
+        )[0]
         self._class_links = Class_links(mibig_classes_file)
 
         class_predict_options = []
         self._canopus = Canopus_results(self.root_dir)
         if self._canopus.spectra_classes:
             print("CANOPUS classes loaded succesfully")
-            class_predict_options.append('canopus')
+            class_predict_options.append("canopus")
         self._molnetenhancer = MolNetEnhancer_results(self.root_dir)
         if self._molnetenhancer.spectra2molfam:
             print("MolNetEnhancer classes loaded succesfully")
-            class_predict_options.append('molnetenhancer')
+            class_predict_options.append("molnetenhancer")
         if class_predict_options:
-            class_predict_options = ['mix', 'main'] + class_predict_options
+            class_predict_options = ["mix", "main"] + class_predict_options
         self._class_predict_options = class_predict_options
 
     def class_linking_score(self, obj, target):
@@ -516,16 +569,29 @@ class NPLinker_classes(NPLinker):
                         # does info exist for this spectra class level
                         spec_class_i = spec_like_classes_names_inds.get(chem_class_name)
                         if spec_class_i:
-                            spec_class_options = spec_like_classes[spec_class_i][0]  # get class - for now only use first
+                            spec_class_options = spec_like_classes[spec_class_i][
+                                0
+                            ]  # get class - for now only use first
                             if spec_class_options:  # if there is a class at this lvl
-                                spec_class = spec_class_options[0]  # is a tuple of (name, score) so take [0]
-                                score = self.class_links.class_links[bgc_class_name][chem_class_name]\
-                                    .get(bgc_class,{}).get(spec_class, std_score)
-                                result_tuple = (score, bgc_class_name, chem_class_name, bgc_class, spec_class)
+                                spec_class = spec_class_options[
+                                    0
+                                ]  # is a tuple of (name, score) so take [0]
+                                score = (
+                                    self.class_links.class_links[bgc_class_name][chem_class_name]
+                                    .get(bgc_class, {})
+                                    .get(spec_class, std_score)
+                                )
+                                result_tuple = (
+                                    score,
+                                    bgc_class_name,
+                                    chem_class_name,
+                                    bgc_class,
+                                    spec_class,
+                                )
                                 scores.append(result_tuple)
         return sorted(scores, reverse=True)
 
-    def npclass_score(self, obj, target, method = 'main'):
+    def npclass_score(self, obj, target, method="main"):
         """Return sorted class link scores for scoring obj and target
 
         The input objects can be any mix of the following NPLinker types:
@@ -571,17 +637,22 @@ class NPLinker_classes(NPLinker):
         # todo: read options from NPLinker object - add option if the canopus/mne results are read correctly
         method_options = self.class_predict_options
         assert method in method_options, (
-            f"NPClass method should be one of method options: {method_options}, if your method is not "+
-            "in the options check if the class predictions (canopus, etc.) are loaded correctly")
+            f"NPClass method should be one of method options: {method_options}, if your method is not "
+            + "in the options check if the class predictions (canopus, etc.) are loaded correctly"
+        )
 
         # gather correct classes based on input, dict for bgcs and list for spec
         bgc_like_classes_dict = self._get_bgc_like_classes(bgc_like, is_bgc)
 
         # gather classes for spectra, choose right method
         # choose the main method here by including it as 'main' in the method parameter
-        use_canopus = 'main' in method or 'canopus' in method or 'mix' in method
-        use_mne = 'molnetenhancer' in method or 'mix' in method
-        spec_like_classes, spec_like_classes_names, spec_like_classes_names_inds = (None, None, None)
+        use_canopus = "main" in method or "canopus" in method or "mix" in method
+        use_mne = "molnetenhancer" in method or "mix" in method
+        spec_like_classes, spec_like_classes_names, spec_like_classes_names_inds = (
+            None,
+            None,
+            None,
+        )
         # the order in which the classes are read, determines the priority (now: first canopus, then mne)
         if use_canopus and not spec_like_classes:
             if is_spectrum:
@@ -589,26 +660,33 @@ class NPLinker_classes(NPLinker):
                 # take only 'best' (first) classification per ontology level
                 all_classes = self.canopus.spectra_classes.get(str(spec_like.spectrum_id))
                 if all_classes:
-                    spec_like_classes = [cls_per_lvl for lvl in all_classes
-                                         for i, cls_per_lvl in enumerate(lvl) if i==0]
+                    spec_like_classes = [
+                        cls_per_lvl
+                        for lvl in all_classes
+                        for i, cls_per_lvl in enumerate(lvl)
+                        if i == 0
+                    ]
                 spec_like_classes_names = self.canopus.spectra_classes_names
                 spec_like_classes_names_inds = self.canopus.spectra_classes_names_inds
             else:  # molfam
                 all_classes = self.canopus.molfam_classes.get(str(spec_like.family_id))
                 if all_classes:
-                    spec_like_classes = [cls_per_lvl for lvl in all_classes
-                                         for i, cls_per_lvl in enumerate(lvl) if i==0]
+                    spec_like_classes = [
+                        cls_per_lvl
+                        for lvl in all_classes
+                        for i, cls_per_lvl in enumerate(lvl)
+                        if i == 0
+                    ]
                 spec_like_classes_names = self.canopus.molfam_classes_names
                 spec_like_classes_names_inds = self.canopus.molfam_classes_names_inds
         if use_mne and not spec_like_classes:  # if mne or when main/canopus does not get classes
             if is_spectrum:
                 spec_like_classes = self.molnetenhancer.spectra_classes(spec_like.spectrum_id)
-            else: # molfam
+            else:  # molfam
                 spec_like_classes = self.molnetenhancer.molfam_classes.get(str(spec_like.family_id))
             # classes are same for molfam and spectrum so names are irrespective of is_spectrum
             spec_like_classes_names = self.molnetenhancer.spectra_classes_names
             spec_like_classes_names_inds = self.molnetenhancer.spectra_classes_names_inds
-
 
         scores = []  # this will be returned if one of the class sides is absent
         std_score = 0  # if link not recorded in scores (mibig) return this score
@@ -629,17 +707,41 @@ class NPLinker_classes(NPLinker):
                         if spec_class_level_i:
                             spec_class_tup = spec_like_classes[spec_class_level_i]
                             if spec_class_tup:  # if there is a class at this lvl
-                                spec_class = spec_class_tup[0]  # is a tuple of (name, score) so take [0]
+                                spec_class = spec_class_tup[
+                                    0
+                                ]  # is a tuple of (name, score) so take [0]
 
                                 # determine direction of scoring: BGC -> spectrum
                                 if bgc_to_spec:
-                                    score = self.class_links.class_links[bgc_class_name][chem_class_name]\
-                                        .get(bgc_class,{}).get(spec_class, std_score)
-                                    result_tuple = (score, bgc_class_name, chem_class_name, bgc_class, spec_class)
+                                    score = (
+                                        self.class_links.class_links[bgc_class_name][
+                                            chem_class_name
+                                        ]
+                                        .get(bgc_class, {})
+                                        .get(spec_class, std_score)
+                                    )
+                                    result_tuple = (
+                                        score,
+                                        bgc_class_name,
+                                        chem_class_name,
+                                        bgc_class,
+                                        spec_class,
+                                    )
                                 else:  # spectrum -> BGC
-                                    score = self.class_links.class_links[chem_class_name][bgc_class_name]\
-                                        .get(spec_class, {}).get(bgc_class, std_score)
-                                    result_tuple = (score, chem_class_name, bgc_class_name, spec_class, bgc_class)
+                                    score = (
+                                        self.class_links.class_links[chem_class_name][
+                                            bgc_class_name
+                                        ]
+                                        .get(spec_class, {})
+                                        .get(bgc_class, std_score)
+                                    )
+                                    result_tuple = (
+                                        score,
+                                        chem_class_name,
+                                        bgc_class_name,
+                                        spec_class,
+                                        bgc_class,
+                                    )
                                 scores.append(result_tuple)
         return sorted(scores, reverse=True)
 
@@ -659,7 +761,6 @@ class NPLinker_classes(NPLinker):
     def class_predict_options(self):
         return self._class_predict_options
 
-
     def _get_bgc_like_classes(self, bgc_like, is_bgc):
         # gather correct classes based on input, dict for bgcs and list for spec
         if is_bgc:
@@ -667,12 +768,18 @@ class NPLinker_classes(NPLinker):
             bgc_like_gcf = self._get_bgc_like_gcf(bgc_like)
             # gather AS classes and convert to names in scoring dict
             as_classes = self.class_links.convert_as_classes(bgc_like.product_prediction.split("."))
-            bgc_like_classes_dict = {"bigscape_class": bgc_like_gcf.bigscape_class,  # str - always one bigscape class right?
-                                     "as_classes": as_classes}  # list(str)
+            bgc_like_classes_dict = {
+                "bigscape_class": bgc_like_gcf.bigscape_class,  # str - always one bigscape class right?
+                "as_classes": as_classes,
+            }  # list(str)
         else:
-            as_classes = self.class_links.convert_as_classes(self.class_links.get_gcf_as_classes(bgc_like, 0.5))
-            bgc_like_classes_dict = {"bigscape_class": bgc_like.bigscape_class,  # str - always one bigscape class right?
-                                     "as_classes": as_classes}  # list(str)
+            as_classes = self.class_links.convert_as_classes(
+                self.class_links.get_gcf_as_classes(bgc_like, 0.5)
+            )
+            bgc_like_classes_dict = {
+                "bigscape_class": bgc_like.bigscape_class,  # str - always one bigscape class right?
+                "as_classes": as_classes,
+            }  # list(str)
 
         return bgc_like_classes_dict
 

@@ -9,7 +9,6 @@ logger = LogConfig.getLogger(__name__)
 
 
 class GNPSSpectrumLoader(SpectrumLoaderBase):
-
     def __init__(self, file: str | PathLike):
         """Class to load mass spectra from the given GNPS MGF file.
 
@@ -56,14 +55,15 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
         # check the local scope of a single MS/MS query (spectrum) has the
         # required parameters. Note that this is not the header of the MGF
         # file, but the local scope of each spectrum.
-        required_params = ['scans', 'pepmass', 'charge']
+        required_params = ["scans", "pepmass", "charge"]
         for spec in mgf.MGF(self._file):
             for param in required_params:
-                if param not in spec['params']:
+                if param not in spec["params"]:
                     raise ValueError(
                         f"Invalid MGF file '{self._file}'. "
                         f"Expected parameter '{param}' not found, "
-                        f"but got '{spec['params']}'.")
+                        f"but got '{spec['params']}'."
+                    )
 
     def _load(self):
         """Load the MGF file into Spectrum objects."""
@@ -73,26 +73,22 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
             # The invalid spectrum does not exist in other GNPS files, e.g.
             # file mappings file and molecular families file. So we can safely
             # skip it.
-            if len(spec['m/z array']) == 0:
+            if len(spec["m/z array"]) == 0:
                 continue
 
             # Load the spectrum
-            peaks: list[tuple[float, float]] = list(
-                zip(spec['m/z array'], spec['intensity array']))
-            spectrum_id: str = spec['params']['scans']
+            peaks: list[tuple[float, float]] = list(zip(spec["m/z array"], spec["intensity array"]))
+            spectrum_id: str = spec["params"]["scans"]
             # calculate precursor m/z from precursor mass and charge
-            precursor_mass = spec['params']['pepmass'][0]
-            precursor_charge = self._get_precursor_charge(
-                spec['params']['charge'])
+            precursor_mass = spec["params"]["pepmass"][0]
+            precursor_charge = self._get_precursor_charge(spec["params"]["charge"])
             precursor_mz: float = precursor_mass / abs(precursor_charge)
-            rt: float | None = spec['params'].get('rtinseconds', None)
+            rt: float | None = spec["params"].get("rtinseconds", None)
 
-            spectrum = Spectrum(id=i,
-                                peaks=peaks,
-                                spectrum_id=spectrum_id,
-                                precursor_mz=precursor_mz,
-                                rt=rt)
-            spectrum.metadata = spec['params']
+            spectrum = Spectrum(
+                id=i, peaks=peaks, spectrum_id=spectrum_id, precursor_mz=precursor_mz, rt=rt
+            )
+            spectrum.metadata = spec["params"]
             self._spectra.append(spectrum)
             i += 1
 
@@ -109,6 +105,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
         if charge == 0:
             logger.warning(
                 f"Invalid precursor charge value 0. "
-                f"Assuming charge is 1 for spectrum '{self._file}'.")
+                f"Assuming charge is 1 for spectrum '{self._file}'."
+            )
             charge = 1
         return charge

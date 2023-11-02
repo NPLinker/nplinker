@@ -7,8 +7,8 @@ from nplinker.strains import Strain
 if TYPE_CHECKING:
     from .spectrum import Spectrum
 
-class MolecularFamily():
 
+class MolecularFamily:
     def __init__(self, family_id: str):
         """Class to model molecular families.
 
@@ -55,13 +55,11 @@ class MolecularFamily():
         self.spectra.append(spectrum)
 
     def __str__(self) -> str:
-        return 'MolFam(family_id={}, spectra={})'.format(
-            self.family_id, len(self.spectra))
+        return "MolFam(family_id={}, spectra={})".format(self.family_id, len(self.spectra))
 
     def __eq__(self, other) -> bool:
         if isinstance(other, MolecularFamily):
-            return (self.id == other.id
-                    and self.family_id == other.family_id)
+            return self.id == other.id and self.family_id == other.family_id
         return NotImplemented
 
     def __hash__(self) -> int:

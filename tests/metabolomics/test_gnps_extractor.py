@@ -11,23 +11,31 @@ def test_unknown_workflow(gnps_zip_files, tmpdir):
     assert "Unknown workflow type for GNPS archive" in str(e.value)
 
 
-@pytest.mark.parametrize(
-    "workflow", [GNPSFormat.FBMN, GNPSFormat.SNETS, GNPSFormat.SNETSV2])
+@pytest.mark.parametrize("workflow", [GNPSFormat.FBMN, GNPSFormat.SNETS, GNPSFormat.SNETSV2])
 def test_supported_workflows(workflow, gnps_zip_files, tmpdir):
     extractor = GNPSExtractor(gnps_zip_files[workflow], tmpdir)
     assert extractor.gnps_format == workflow
     assert extractor.extract_dir == tmpdir
 
 
-@pytest.mark.parametrize(
-    "workflow", [GNPSFormat.FBMN, GNPSFormat.SNETS, GNPSFormat.SNETSV2])
-def test_extract(workflow, gnps_zip_files, gnps_file_mappings_files,
-                 gnps_spectra_files, gnps_mf_files, gnps_annotations_files,
-                 tmpdir):
+@pytest.mark.parametrize("workflow", [GNPSFormat.FBMN, GNPSFormat.SNETS, GNPSFormat.SNETSV2])
+def test_extract(
+    workflow,
+    gnps_zip_files,
+    gnps_file_mappings_files,
+    gnps_spectra_files,
+    gnps_mf_files,
+    gnps_annotations_files,
+    tmpdir,
+):
     GNPSExtractor(gnps_zip_files[workflow], tmpdir)
     assert len(list(Path(tmpdir).iterdir())) == 4
 
-    file_mappings_file = tmpdir / "file_mappings.csv" if workflow == GNPSFormat.FBMN else tmpdir / "file_mappings.tsv"
+    file_mappings_file = (
+        tmpdir / "file_mappings.csv"
+        if workflow == GNPSFormat.FBMN
+        else tmpdir / "file_mappings.tsv"
+    )
     spec_file = tmpdir / "spectra.mgf"
     mf_file = tmpdir / "molecular_families.tsv"
     annotations_file = tmpdir / "annotations.tsv"

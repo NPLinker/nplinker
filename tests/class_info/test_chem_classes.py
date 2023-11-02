@@ -26,27 +26,30 @@ from .. import DATA_DIR
 
 
 class TestMolNetEnhancerResults(unittest.TestCase):
-
     def setUp(self):
         # ./data/ClassyFireResults_Network.txt is required
         mne_res = MolNetEnhancerResults(DATA_DIR)
         self._mr = mne_res
 
     def test_running(self):
-        for i, elem in enumerate([
-                self._mr.spectra2molfam, self._mr.spectra_classes_names,
-                self._mr.spectra_classes_names_inds, self._mr.molfam_classes
-        ]):
+        for i, elem in enumerate(
+            [
+                self._mr.spectra2molfam,
+                self._mr.spectra_classes_names,
+                self._mr.spectra_classes_names_inds,
+                self._mr.molfam_classes,
+            ]
+        ):
             self.assertTrue(len(elem) != 0, f"Element {i} failed to load")
 
-        test_spec_classes = self._mr.spectra_classes('130522')
+        test_spec_classes = self._mr.spectra_classes("130522")
+        self.assertTrue(len(test_spec_classes) != 0, f"func spectra_classes() not working")
         self.assertTrue(
-            len(test_spec_classes) != 0, f"func spectra_classes() not working")
-        self.assertTrue(
-            self._mr.spectra_classes('31') is None,
+            self._mr.spectra_classes("31") is None,
             "handling 'no matches' goes wrong, MFs/spectra without"
-            " classes end up in mne results")
+            " classes end up in mne results",
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

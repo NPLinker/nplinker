@@ -15,7 +15,6 @@ logger = LogConfig.getLogger(__name__)
 
 
 class AntismashBGCLoader:
-
     def __init__(self, data_dir: str) -> None:
         """Build a loader for AntiSMASH BGC genbank (.gbk) files
 
@@ -48,8 +47,7 @@ class AntismashBGCLoader:
                 id (the directory name of the gbk file).
         """
         return {
-            bid: os.path.basename(os.path.dirname(bpath))
-            for bid, bpath in self._file_dict.items()
+            bid: os.path.basename(os.path.dirname(bpath)) for bid, bpath in self._file_dict.items()
         }
 
     def get_files(self) -> dict[str, str]:
@@ -135,8 +133,7 @@ def parse_bgc_genbank(file: str) -> BGC:
     features = _parse_antismash_genbank(record)
     product_prediction = features.get("product")
     if product_prediction is None:
-        raise ValueError(
-            f"Not found product prediction in antiSMASH Genbank file {file}")
+        raise ValueError(f"Not found product prediction in antiSMASH Genbank file {file}")
 
     # init BGC
     bgc = BGC(fname, *product_prediction)
@@ -154,15 +151,14 @@ def _parse_antismash_genbank(record: SeqRecord.SeqRecord) -> dict:
     for feature in record.features:
         if feature.type == "region":
             # biopython assumes region numer is a list, but it's actually an int
-            features["region_number"] = feature.qualifiers.get(
-                'region_number')[0]
-            features["product"] = feature.qualifiers.get('product')
+            features["region_number"] = feature.qualifiers.get("region_number")[0]
+            features["product"] = feature.qualifiers.get("product")
         if feature.type == "cand_cluster":
-            smiles = feature.qualifiers.get('SMILES')
+            smiles = feature.qualifiers.get("SMILES")
             # space is not allowed in SMILES spec
             # biopython generates space when reading multi-line SMILES from .gbk
             if smiles is not None:
-                smiles = tuple(i.replace(' ', '') for i in smiles)
+                smiles = tuple(i.replace(" ", "") for i in smiles)
             features["smiles"] = smiles
     return features
 

@@ -5,7 +5,7 @@ from nplinker.logconfig import LogConfig
 logger = LogConfig.getLogger(__name__)
 
 
-class LinkCollection():
+class LinkCollection:
     """
     Class which stores the results of running one or more scoring methods.
 
@@ -25,9 +25,7 @@ class LinkCollection():
     def _add_links_from_method(self, method, object_links):
         if method in self._methods:
             # this is probably an error...
-            raise Exception(
-                'Duplicate method found in LinkCollection: {}'.format(
-                    method.name))
+            raise Exception("Duplicate method found in LinkCollection: {}".format(method.name))
 
         # if this is the first set of results to be generated, can just dump
         # them all straight in
@@ -40,13 +38,17 @@ class LinkCollection():
 
             if not self._and_mode:
                 logger.debug(
-                    'Merging {} results from method {} in OR mode'.format(
-                        len(object_links), method.name))
+                    "Merging {} results from method {} in OR mode".format(
+                        len(object_links), method.name
+                    )
+                )
                 self._merge_or_mode(object_links)
             else:
                 logger.debug(
-                    'Merging {} results from method {} in AND mode'.format(
-                        len(object_links), method.name))
+                    "Merging {} results from method {} in AND mode".format(
+                        len(object_links), method.name
+                    )
+                )
                 self._merge_and_mode(object_links)
 
         self._methods.add(method)
@@ -67,10 +69,7 @@ class LinkCollection():
             links_to_merge = object_links[source]
             intersect2 = existing_links.keys() & links_to_merge.keys()
 
-            self._link_data[source] = {
-                k: v
-                for k, v in existing_links.items() if k in intersect2
-            }
+            self._link_data[source] = {k: v for k, v in existing_links.items() if k in intersect2}
 
             for target, object_link in object_links[source].items():
                 if target in self._link_data[source]:
@@ -85,16 +84,13 @@ class LinkCollection():
     def _merge_or_mode(self, object_links):
         # source = GCF/Spectrum, links = {Spectrum/GCF: ObjectLink} dict
         for source, links in object_links.items():
-
             # update the existing dict with the new entries that don't appear in it already
             if source not in self._link_data:
                 self._link_data[source] = links
             else:
-                self._link_data[source].update({
-                    k: v
-                    for k, v in links.items()
-                    if k not in self._link_data[source]
-                })
+                self._link_data[source].update(
+                    {k: v for k, v in links.items() if k not in self._link_data[source]}
+                )
 
             # now merge the remainder (common to both)
             for target, object_link in links.items():
@@ -103,25 +99,19 @@ class LinkCollection():
     def filter_no_shared_strains(self):
         len_before = len(self._link_data)
         self.filter_links(lambda x: len(x.shared_strains) > 0)
-        logger.debug('filter_no_shared_strains: {} => {}'.format(
-            len_before, len(self._link_data)))
+        logger.debug("filter_no_shared_strains: {} => {}".format(len_before, len(self._link_data)))
 
     def filter_sources(self, callable_obj):
         len_before = len(self._link_data)
-        self._link_data = {
-            k: v
-            for k, v in self._link_data.items() if callable_obj(k)
-        }
-        logger.debug('filter_sources: {} => {}'.format(len_before,
-                                                       len(self._link_data)))
+        self._link_data = {k: v for k, v in self._link_data.items() if callable_obj(k)}
+        logger.debug("filter_sources: {} => {}".format(len_before, len(self._link_data)))
 
     def filter_targets(self, callable_obj, sources=None):
         to_remove = []
         sources_list = self._link_data.keys() if sources is None else sources
         for source in sources_list:
             self._link_data[source] = {
-                k: v
-                for k, v in self._link_data[source].items() if callable_obj(k)
+                k: v for k, v in self._link_data[source].items() if callable_obj(k)
             }
             # if there are now no links for this source, remove it completely
             if len(self._link_data[source]) == 0:
@@ -135,8 +125,7 @@ class LinkCollection():
         sources_list = self._link_data.keys() if sources is None else sources
         for source in sources_list:
             self._link_data[source] = {
-                k: v
-                for k, v in self._link_data[source].items() if callable_obj(v)
+                k: v for k, v in self._link_data[source].items() if callable_obj(v)
             }
             # if there are now no links for this source, remove it completely
             if len(self._link_data[source]) == 0:
@@ -158,17 +147,15 @@ class LinkCollection():
         # the given method, with any remaining links appended in arbitrary order.
 
         # run <method>.sort on the links found by that method
-        sorted_links_for_method = method.sort([
-            link for link in self._link_data[source].values()
-            if method in link.methods
-        ], reverse)
+        sorted_links_for_method = method.sort(
+            [link for link in self._link_data[source].values() if method in link.methods], reverse
+        )
 
         if not strict:
             # append any remaining links
-            sorted_links_for_method.extend([
-                link for link in self._link_data[source].values()
-                if method not in link.methods
-            ])
+            sorted_links_for_method.extend(
+                [link for link in self._link_data[source].values() if method not in link.methods]
+            )
 
         return sorted_links_for_method
 
@@ -176,8 +163,10 @@ class LinkCollection():
         return list(
             set(
                 itertools.chain.from_iterable(
-                    self._link_data[x].keys()
-                    for x in self._link_data.keys())))
+                    self._link_data[x].keys() for x in self._link_data.keys()
+                )
+            )
+        )
 
     @property
     def methods(self):

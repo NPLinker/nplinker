@@ -16,7 +16,7 @@ from nplinker.nplinker import NPLinker
 
 # the standard method of loading a dataset configuration is to pass the filename
 # of a TOML configuration file to the NPLinker constructor.
-npl = NPLinker('./nplinker_demo1.toml')
+npl = NPLinker("./nplinker_demo1.toml")
 # loading the actual data files can take some time depending on the dataset,
 # so this is done separately by calling the load_data method.
 #
@@ -51,10 +51,10 @@ print(npl.root_dir)
 
 # objects
 # - you can directly access lists of each of the 4 object types:
-print('BGCs:', len(npl.bgcs))
-print('GCFs:', len(npl.gcfs)) # contains GCF objects
-print('Spectra:', len(npl.spectra)) # contains Spectrum objects
-print('Molecular Families:', len(npl.molfams)) # contains MolecularFamily objects
+print("BGCs:", len(npl.bgcs))
+print("GCFs:", len(npl.gcfs))  # contains GCF objects
+print("Spectra:", len(npl.spectra))  # contains Spectrum objects
+print("Molecular Families:", len(npl.molfams))  # contains MolecularFamily objects
 
 
 # In[ ]:
@@ -67,13 +67,13 @@ print('Molecular Families:', len(npl.molfams)) # contains MolecularFamily object
 # NPLinker provides a set of scoring methods that can be used individually or
 # in combination to find interesting links in the current dataset. To get a
 # get a list of the names of the available scoring methods:
-print('Available scoring methods:')
+print("Available scoring methods:")
 for m in npl.scoring_methods:
-    print(f' - {m}')
+    print(f" - {m}")
 
 # The first step in running a scoring operation is to get an instance of the
 # method(s) you want to use by calling scoring_method():
-mc = npl.scoring_method('metcalf')
+mc = npl.scoring_method("metcalf")
 
 # Now mc is an instance of the class that implements Metcalf scoring. Once
 # you have such an instance, you may change any of the parameters it exposes.
@@ -108,7 +108,7 @@ results = npl.get_links(npl.gcfs[:10], mc, and_mode=True)
 # around the results of the scoring operation and has various useful properties/methods:
 #
 # - len(results) or .source_count will tell you how many of the input_objects were found to have links
-print(f'Number of results: {len(results)}')
+print(f"Number of results: {len(results)}")
 # - .sources is a list of those objects
 objects_with_links = results.sources
 # - .links is a dict with structure {input_object: {linked_object: ObjectLink}}
@@ -145,7 +145,9 @@ methods = results.methods
 # the information stored in the ObjectLink)
 for obj, result in results.links.items():
     # display the object, the number of links it has, and the number of methods that were used to get them
-    print(f'Results for object: {obj}, {len(result)} total links, {results.method_count} methods used')
+    print(
+        f"Results for object: {obj}, {len(result)} total links, {results.method_count} methods used"
+    )
 
     # sorting is method-dependent since they might have very different "scores", so you should
     # use the original object to do this. For Metcalf scoring, this will return the ObjectLinks sorted
@@ -162,16 +164,19 @@ for obj, result in results.links.items():
     # Each scoring method also has a format_data method which should provide a relatively short
     # human-readable summary of the data, as a quick way to print and examine results.
     for link_data in sorted_links:
-        print('  --> [{}] {} | {} | shared strains = {}'.format(','.join(method.name for method in link_data.methods),
-                                                                link_data.target,
-                                                                mc.format_data(link_data[mc]),
-                                                                len(link_data.shared_strains)))
+        print(
+            "  --> [{}] {} | {} | shared strains = {}".format(
+                ",".join(method.name for method in link_data.methods),
+                link_data.target,
+                mc.format_data(link_data[mc]),
+                len(link_data.shared_strains),
+            )
+        )
 
     # alternatively, if you don't care about ordering, you can just iterate directly over the
     # linked objects like this:
     # for link_target, link_data in result.items():
     #    print(link_target, link_data)
-
 
 
 # In[ ]:
@@ -210,7 +215,7 @@ results.filter_links(lambda link: link[mc] > 3.6)
 # The get_links method can be passed more complex parameters types than the above example which
 # used a flat list of input objects and a single scoring method instance.
 
-ts = npl.scoring_method('testscore') # copy of Metcalf method, only for debug use
+ts = npl.scoring_method("testscore")  # copy of Metcalf method, only for debug use
 
 # You can use the same set of objects with two different methods, and AND the results
 # together so that objects will only be returned which have links according to

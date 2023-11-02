@@ -22,8 +22,7 @@ import numpy
 
 
 def normalise_kernel(matrix):
-    return matrix / numpy.sqrt(
-        numpy.outer(matrix.diagonal(), matrix.diagonal()))
+    return matrix / numpy.sqrt(numpy.outer(matrix.diagonal(), matrix.diagonal()))
 
 
 def load_kernel_file(filename):
@@ -65,7 +64,7 @@ def run_iokr(data):
     collected_rankings = []
 
     for label in sorted(list(set(data.folds))):
-        print('label %s' % label)
+        print("label %s" % label)
         label_indices = data.get_indices(label, complement=True)
 
         iokr = iokr_opt.InputOutputKernelRegression(data)
@@ -79,8 +78,8 @@ def run_iokr(data):
                 continue
 
             sample = data.get_sample(i)
-            formula = sample['formula']
-            sample_inchi = sample['inchi']
+            formula = sample["formula"]
+            sample_inchi = sample["inchi"]
 
             candidates = data.get_candidates(formula)
             candidate_inchi = [x[0] for x in candidates]
@@ -92,40 +91,40 @@ def run_iokr(data):
 
             total_count = len(candidate_inchi)
 
-            print(f'iokr job idx {i}, cand.set size {total_count}')
+            print(f"iokr job idx {i}, cand.set size {total_count}")
             # ranking = iokr.rank_candidates_opt(i, candidate_fingerprints)
             # # print(ranking)
             # ranking = list(ranking)
             # correct_ranking = ranking.index(correct_index)
             # print('ranked {} / {}'.format(correct_ranking, total_count))
 
-            latent, x_kernel_vector, latent_basis, gamma = iokr.get_data_for_candidate_ranking(
-                i)
-            args = (i, candidate_fingerprints, latent, x_kernel_vector,
-                    latent_basis, gamma)
+            latent, x_kernel_vector, latent_basis, gamma = iokr.get_data_for_candidate_ranking(i)
+            args = (i, candidate_fingerprints, latent, x_kernel_vector, latent_basis, gamma)
             job = p.apply_async(iokr_opt.rank_candidates_opt, args)
-            active_jobs.append(
-                (i, formula, correct_index, label, total_count, job))
+            active_jobs.append((i, formula, correct_index, label, total_count, job))
 
             if len(active_jobs) > job_limit:
                 active_jobs, results = gather_results(active_jobs, job_limit)
-                for res_i, res_formula, res_correct_index, res_label, res_total_count, res_output in results:
+                for (
+                    res_i,
+                    res_formula,
+                    res_correct_index,
+                    res_label,
+                    res_total_count,
+                    res_output,
+                ) in results:
                     res_ranking = list(res_output[0])
                     # print(res_ranking)
                     correct_ranking = res_ranking.index(res_correct_index)
 
-                    collected_rankings.append(
-                        (res_i, correct_ranking, res_total_count))
+                    collected_rankings.append((res_i, correct_ranking, res_total_count))
 
                     total = len(collected_rankings)
-                    print(
-                        float([x[1]
-                               for x in collected_rankings].count(0)) / total,
-                        total)
+                    print(float([x[1] for x in collected_rankings].count(0)) / total, total)
 
                     # print(cr_b[res_i], cr_a[res_i], cr_a[res_i] == cr_b[res_i])
 
-    print('Clean up remaining jobs')
+    print("Clean up remaining jobs")
 
     # clean up the last remaining jobs
     active_jobs, results = gather_results(active_jobs, 0)
@@ -134,37 +133,27 @@ def run_iokr(data):
         correct_ranking = res_ranking.index(res_correct_index)
         collected_rankings.append((res_i, correct_ranking, res_total_count))
         total = len(collected_rankings)
-        print(
-            float([x[1] for x in collected_rankings].count(0)) / total, total)
+        print(float([x[1] for x in collected_rankings].count(0)) / total, total)
 
-    print('')
-    print('IOKR test run done!')
-    print(f'#samples: {len(collected_rankings)}')
-    print('top-1 acc: {}'.format(
-        float([x[1] for x in collected_rankings].count(0)) / total, total))
+    print("")
+    print("IOKR test run done!")
+    print(f"#samples: {len(collected_rankings)}")
+    print("top-1 acc: {}".format(float([x[1] for x in collected_rankings].count(0)) / total, total))
 
     return collected_rankings
 
 
 def main():
-    parser = argparse.ArgumentParser('Run IOKR test on a set')
-    parser.add_argument('--kernel',
-                        dest='kernel',
-                        help='Kernel files',
-                        nargs='+')
+    parser = argparse.ArgumentParser("Run IOKR test on a set")
+    parser.add_argument("--kernel", dest="kernel", help="Kernel files", nargs="+")
     parser.add_argument(
-        '--fp',
-        dest='fingerprint',
-        help='fingerprint type (substructure, cdk (default), klekota-roth',
-        default='cdk_default')
-    parser.add_argument('--data',
-                        dest='datapath',
-                        help='data path',
-                        required=True)
-    parser.add_argument('--output',
-                        dest='output',
-                        help='output label',
-                        required=True)
+        "--fp",
+        dest="fingerprint",
+        help="fingerprint type (substructure, cdk (default), klekota-roth",
+        default="cdk_default",
+    )
+    parser.add_argument("--data", dest="datapath", help="data path", required=True)
+    parser.add_argument("--output", dest="output", help="output label", required=True)
     args = parser.parse_args()
 
     # read from args
@@ -177,12 +166,12 @@ def main():
 
     fingerprint = args.fingerprint
 
-    output_file = 'IOKRranking_%s.bin' % args.output
+    output_file = "IOKRranking_%s.bin" % args.output
 
     iokrdata = iokrdataserver.IOKRDataServer(datapath, kernel=None)
     kernel_matrix = load_kernels(kernel_files)
     iokrdata.kernel = kernel_matrix
-    with open(datapath + os.sep + 'ind_eval.txt') as f:
+    with open(datapath + os.sep + "ind_eval.txt") as f:
         raw_data = f.read()
         test_sample_indices = [int(x) - 1 for x in raw_data.strip().split()]
     iokrdata.test_sample_indices = test_sample_indices
@@ -190,11 +179,11 @@ def main():
     if fingerprint is not None:
         iokrdata.set_fingerprint(fingerprint)
 
-    print('run iokr')
+    print("run iokr")
     rankings = run_iokr(iokrdata)
 
     numpy.save(output_file, rankings)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

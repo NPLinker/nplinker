@@ -8,7 +8,6 @@ from .gnps_format import GNPSFormat
 
 
 class GNPSFileMappingLoader(FileMappingLoaderBase):
-
     def __init__(self, file: str | PathLike):
         """Class to load file mappings from GNPS output file.
 
@@ -39,8 +38,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         """
         self._gnps_format = gnps_format_from_file_mapping(file)
         if self._gnps_format is GNPSFormat.Unknown:
-            raise ValueError(
-                "Unknown workflow type for GNPS file mappings file ")
+            raise ValueError("Unknown workflow type for GNPS file mappings file ")
 
         self._file = Path(file)
         self._mapping: dict[str, list[str]] = {}
@@ -84,49 +82,50 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         """
         # validate file format
         required_file_formats = {
-            GNPSFormat.SNETS: 'tsv',
-            GNPSFormat.SNETSV2: 'tsv',
-            GNPSFormat.FBMN: 'csv'
+            GNPSFormat.SNETS: "tsv",
+            GNPSFormat.SNETSV2: "tsv",
+            GNPSFormat.FBMN: "csv",
         }
-        if not is_file_format(self._file,
-                              required_file_formats[self._gnps_format]):
+        if not is_file_format(self._file, required_file_formats[self._gnps_format]):
             raise ValueError(
                 f"Invalid GNPS file mappings file '{self._file}'. "
-                f"Expected a {required_file_formats[self._gnps_format]} file.")
+                f"Expected a {required_file_formats[self._gnps_format]} file."
+            )
 
         # validate required columns against the header
         required_columns = {
-            GNPSFormat.SNETS: ['cluster index', 'AllFiles'],
-            GNPSFormat.SNETSV2: ['cluster index', 'UniqueFileSources'],
-            GNPSFormat.FBMN: ['row ID', ' Peak area']
+            GNPSFormat.SNETS: ["cluster index", "AllFiles"],
+            GNPSFormat.SNETSV2: ["cluster index", "UniqueFileSources"],
+            GNPSFormat.FBMN: ["row ID", " Peak area"],
         }
-        with open(self._file, mode='rt') as f:
+        with open(self._file, mode="rt") as f:
             header = f.readline()
             for k in required_columns[self._gnps_format]:
                 if k not in header:
                     raise ValueError(
                         f"Invalid GNPS file mappings file '{self._file}'. "
                         f"Expected a header line with '{k}' column, "
-                        f"but got '{header}'.")
+                        f"but got '{header}'."
+                    )
 
         # validate that cluster index or row id must be unique
-        with open(self._file, mode='rt') as f:
+        with open(self._file, mode="rt") as f:
             if self._gnps_format is GNPSFormat.FBMN:
-                reader = csv.DictReader(f, delimiter=',')
+                reader = csv.DictReader(f, delimiter=",")
                 ids = [row["row ID"] for row in reader]
             else:
-                reader = csv.DictReader(f, delimiter='\t')
+                reader = csv.DictReader(f, delimiter="\t")
                 ids = [row["cluster index"] for row in reader]
         duplicates = {x for x in ids if ids.count(x) > 1}
         if len(duplicates) > 0:
             raise ValueError(
                 f"Invalid GNPS file mappings file '{self._file}'. "
                 f"Expected unique 'cluster index' or 'row ID', "
-                f"but found duplicates '{duplicates}'.")
+                f"but found duplicates '{duplicates}'."
+            )
 
     def _load(self) -> None:
-        """Load file mapping from the file based on the GNPS workflow type.
-        """
+        """Load file mapping from the file based on the GNPS workflow type."""
         if self._gnps_format is GNPSFormat.SNETS:
             self._load_snets()
         elif self._gnps_format is GNPSFormat.SNETSV2:
@@ -144,14 +143,14 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             An example data of "AllFiles" column is as follows:
             "2b.mzXML:1503195###6a.mzXML:1502983###"
         """
-        with open(self._file, mode='rt', encoding='utf-8') as f:
-            reader = csv.DictReader(f, delimiter='\t')
+        with open(self._file, mode="rt", encoding="utf-8") as f:
+            reader = csv.DictReader(f, delimiter="\t")
             for row in reader:
                 spectrum_id = row["cluster index"]
                 occurrences = row["AllFiles"].split("###")  # split by '###'
                 occurrences.pop()  # remove last empty entry
                 # separate the scan position from the files
-                samples = [x.split(':')[0] for x in occurrences]
+                samples = [x.split(":")[0] for x in occurrences]
                 self._mapping[spectrum_id] = samples
 
     def _load_snetsv2(self) -> None:
@@ -164,8 +163,8 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             An example data of "UniqueFileSources" column is as follows:
             "140221_Blanc5.mzML|140221_Blanc8.mzML|140221_ME_14_12.mzML"
         """
-        with open(self._file, mode='rt', encoding='utf-8') as f:
-            reader = csv.DictReader(f, delimiter='\t')
+        with open(self._file, mode="rt", encoding="utf-8") as f:
+            reader = csv.DictReader(f, delimiter="\t")
             for row in reader:
                 spectrum_id = row["cluster index"]
                 samples = row["UniqueFileSources"].split("|")
@@ -184,8 +183,8 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             1,1764067.8434999974,0.0
         """
         pattern = " Peak area"
-        with open(self._file, mode='rt', encoding='utf-8') as f:
-            reader = csv.DictReader(f, delimiter=',')
+        with open(self._file, mode="rt", encoding="utf-8") as f:
+            reader = csv.DictReader(f, delimiter=",")
             for row in reader:
                 spectrum_id = row["row ID"]
                 samples = []

@@ -24,11 +24,10 @@ logger = LogConfig.getLogger(__name__)
 
 
 # CG: TODO refactor this class to abstract base class
-class ScoringMethod():
-    """Base class of scoring methods
-    """
+class ScoringMethod:
+    """Base class of scoring methods"""
 
-    NAME = 'ScoringMethod'
+    NAME = "ScoringMethod"
 
     def __init__(self, npl):
         self.npl = npl
@@ -45,7 +44,7 @@ class ScoringMethod():
 
     def format_data(self, data):
         """Given whatever output data the method produces, return a readable string version"""
-        return ''
+        return ""
 
     def sort(self, objects, reverse=True):
         """Given a list of objects, return them sorted by link score"""

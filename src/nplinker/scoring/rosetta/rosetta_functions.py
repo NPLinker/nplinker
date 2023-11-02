@@ -13,7 +13,6 @@
 # limitations under the License.
 
 
-
 def fast_cosine_shift(spectrum1, spectrum2, tol, min_match):
     if spectrum1.n_peaks == 0 or spectrum2.n_peaks == 0:
         return 0.0, []
@@ -53,16 +52,13 @@ def find_pairs(spec1, spec2, tol, shift=0):
 
     for idx, (mz, intensity) in enumerate(spec1):
         # do we need to increase the lower idx?
-        while spec2lowpos < spec2length and spec2[spec2lowpos][
-                0] + shift < mz - tol:
+        while spec2lowpos < spec2length and spec2[spec2lowpos][0] + shift < mz - tol:
             spec2lowpos += 1
         if spec2lowpos == spec2length:
             break
         spec2pos = spec2lowpos
-        while (spec2pos < spec2length
-               and spec2[spec2pos][0] + shift < mz + tol):
-            matching_pairs.append(
-                (idx, spec2pos, intensity * spec2[spec2pos][1]))
+        while spec2pos < spec2length and spec2[spec2pos][0] + shift < mz + tol:
+            matching_pairs.append((idx, spec2pos, intensity * spec2[spec2pos][1]))
             spec2pos += 1
 
     return matching_pairs
@@ -95,15 +91,13 @@ def fast_cosine(spectrum1, spectrum2, tol, min_match):
     return score, used_matches
 
 
-def comp_scores(spectra, file_scan, similarity_function, similarity_tolerance,
-                min_match):
+def comp_scores(spectra, file_scan, similarity_function, similarity_tolerance, min_match):
     # a method for testing -- just computes scores between a bunch of scans
     specs = []
     for file_name, scan_number in file_scan:
         specs.append(
-            filter(
-                lambda x: x.file_name == file_name and x.scan_number ==
-                scan_number, spectra)[0])
+            filter(lambda x: x.file_name == file_name and x.scan_number == scan_number, spectra)[0]
+        )
 
     for i in range(len(file_scan) - 1):
         for j in range(i + 1, len(file_scan)):
@@ -111,6 +105,5 @@ def comp_scores(spectra, file_scan, similarity_function, similarity_tolerance,
             spec = specs[i]
             (f2, s2) = file_scan[j]
             spec2 = specs[j]
-            sc, _ = similarity_function(spec, spec2, similarity_tolerance,
-                                        min_match)
+            sc, _ = similarity_function(spec, spec2, similarity_tolerance, min_match)
             print(f"{f},{s} <-> {f2},{s2} = {sc}")

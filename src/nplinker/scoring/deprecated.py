@@ -1,12 +1,17 @@
 def expand_spectrum_score(spectrum, gcf, scoring_function, strain_list):
-    initial_score, initial_metadata = scoring_function(spectrum, gcf,
-                                                       strain_list)
-    expanded_score, expanded_metadata = scoring_function(
-        spectrum.family, gcf, strain_list)
+    initial_score, initial_metadata = scoring_function(spectrum, gcf, strain_list)
+    expanded_score, expanded_metadata = scoring_function(spectrum.family, gcf, strain_list)
     print(
-        "{} <-> {}\tInitial: {}, expanded: {} ({} spectra in family (id = {}))"
-        .format(spectrum, gcf, initial_score, expanded_score,
-                len(spectrum.family.spectra), spectrum.family.family_id))
+        "{} <-> {}\tInitial: {}, expanded: {} ({} spectra in family (id = {}))".format(
+            spectrum,
+            gcf,
+            initial_score,
+            expanded_score,
+            len(spectrum.family.spectra),
+            spectrum.family.family_id,
+        )
+    )
+
 
 # TODO needs updating due to annotation changes
 def knownclusterblast_scoring(spectral_like, gcf_like, mibig_map):
@@ -28,7 +33,7 @@ def knownclusterblast_scoring(spectral_like, gcf_like, mibig_map):
     total_score = 0
     for annotation in spectral_like.get_annotations():
         for mibig, score in kcb:
-            short_mibig = mibig.split('_')[0]
+            short_mibig = mibig.split("_")[0]
             if short_mibig in mibig_map:
                 m = match(annotation, mibig_map[short_mibig])
                 if m:

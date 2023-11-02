@@ -16,8 +16,7 @@ import numpy
 from numba import jit
 
 
-class MSSpectrum():
-
+class MSSpectrum:
     def __init__(self, mgf_dict=None, spec=None):
         self.compound = None
         self.formula = None
@@ -51,23 +50,23 @@ class MSSpectrum():
         # should check for it in the mgf in metabolomics.py and store
         # in the Spectrum object if found
         # (TODO what is the MGF field name for this??)
-        self.ionisation = '[M+H]+'
+        self.ionisation = "[M+H]+"
 
     def init_from_mgf(self, mgf_dict):
         self.output_spectrum = None
 
-        self.filename = mgf_dict['params']['filename']
+        self.filename = mgf_dict["params"]["filename"]
         self.compound = None
         self.formula = None
-        self.ionisation = mgf_dict['params']['charge']
-        self.raw_parentmass = mgf_dict['params']['pepmass'][0]
+        self.ionisation = mgf_dict["params"]["charge"]
+        self.raw_parentmass = mgf_dict["params"]["pepmass"][0]
         self.inchi = None
         self.id = None
-        if 'smiles' in mgf_dict['params']:
-            self.smiles = mgf_dict['params']['smiles']
+        if "smiles" in mgf_dict["params"]:
+            self.smiles = mgf_dict["params"]["smiles"]
 
         spec = []
-        for a in zip(mgf_dict['m/z array'], mgf_dict['intensity array']):
+        for a in zip(mgf_dict["m/z array"], mgf_dict["intensity array"]):
             spec.append(a)
 
         self.raw_spectrum = numpy.array(spec)
@@ -81,21 +80,21 @@ class MSSpectrum():
                 line = line.strip()
                 if len(line) == 0:
                     pass
-                elif line.startswith('>compound'):
+                elif line.startswith(">compound"):
                     self.compound = strip_leading(line)
-                elif line.startswith('>formula'):
+                elif line.startswith(">formula"):
                     self.formula = strip_leading(line)
-                elif line.startswith('>ionization'):
+                elif line.startswith(">ionization"):
                     self.ionisation = strip_leading(line)
-                elif line.startswith('>parentmass'):
+                elif line.startswith(">parentmass"):
                     self.raw_parentmass = float(strip_leading(line))
-                elif line.startswith('>'):
+                elif line.startswith(">"):
                     pass
-                elif line.startswith('#inchi'):
+                elif line.startswith("#inchi"):
                     self.inchi = strip_leading(line)
-                elif line.startswith('#SpectrumID'):
+                elif line.startswith("#SpectrumID"):
                     self.id = strip_leading(line)
-                elif line.startswith('#'):
+                elif line.startswith("#"):
                     pass
                 else:
                     mass, charge = line.split()
@@ -148,7 +147,7 @@ IONISATION_MASSES = {
     "[M+H]+": PROTON_MASS,
     "[M+H-H2O]+": PROTON_MASS - 18.01056468638,
     "[M+K]+": 38.963158,
-    "[M+Na]+": 22.989218
+    "[M+Na]+": 22.989218,
 }
 
 
@@ -158,7 +157,7 @@ def _normalise_spectrum(spectrum, peak=100.0):
 
 
 def strip_leading(line):
-    return ' '.join(line.split()[1:])
+    return " ".join(line.split()[1:])
 
 
 def _ppk(i_peaks, j_peaks, sm, si):
@@ -168,16 +167,26 @@ def _ppk(i_peaks, j_peaks, sm, si):
     N1 = X1.shape[0]
     N2 = X2.shape[0]
     if N1 == 0 or N2 == 0:
-        raise Exception(
-            "[ERROR]:No peaks when computing the kernel.(try not clean the peaks)"
-        )
+        raise Exception("[ERROR]:No peaks when computing the kernel.(try not clean the peaks)")
     constant = 1.0 / (N1 * N2) * 0.25 / (numpy.pi * numpy.sqrt(sm * si))
-    mass_term = 1.0 / sm * numpy.power(
-        numpy.kron(X1[:, 0].flatten(), numpy.ones(N2)) -
-        numpy.kron(numpy.ones(N1), X2[:, 0].flatten()), 2)
-    inte_term = 1.0 / si * numpy.power(
-        numpy.kron(X1[:, 1].flatten(), numpy.ones(N2)) -
-        numpy.kron(numpy.ones(N1), X2[:, 1].flatten()), 2)
+    mass_term = (
+        1.0
+        / sm
+        * numpy.power(
+            numpy.kron(X1[:, 0].flatten(), numpy.ones(N2))
+            - numpy.kron(numpy.ones(N1), X2[:, 0].flatten()),
+            2,
+        )
+    )
+    inte_term = (
+        1.0
+        / si
+        * numpy.power(
+            numpy.kron(X1[:, 1].flatten(), numpy.ones(N2))
+            - numpy.kron(numpy.ones(N1), X2[:, 1].flatten()),
+            2,
+        )
+    )
     return constant * numpy.sum(numpy.exp(-0.25 * (mass_term + inte_term)))
 
 
@@ -201,8 +210,7 @@ def ppk_loop(spectrum_1, spectrum_2, sigma_mass, sigma_int):
     sigma_inv = numpy.linalg.inv(sigma_array)
     len_1 = spectrum_1.shape[0]
     len_2 = spectrum_2.shape[0]
-    constant_term = 1.0 / (len_1 * len_2 * 4 * numpy.pi *
-                           numpy.sqrt(sigma_mass * sigma_int))
+    constant_term = 1.0 / (len_1 * len_2 * 4 * numpy.pi * numpy.sqrt(sigma_mass * sigma_int))
     sum_term = 0
     # for p_1, p_2 in itertools.product(spectrum_1, spectrum_2):
     for p_1_idx in range(len_1):
@@ -225,8 +233,7 @@ def ppk_limit(spectrum_1, spectrum_2, sigma_mass, sigma_int):
     sigma_inv = numpy.linalg.inv(sigma_array)
     len_1 = spectrum_1.shape[0]
     len_2 = spectrum_2.shape[0]
-    constant_term = 1.0 / (len_1 * len_2 * 4 * numpy.pi *
-                           numpy.sqrt(sigma_mass * sigma_int))
+    constant_term = 1.0 / (len_1 * len_2 * 4 * numpy.pi * numpy.sqrt(sigma_mass * sigma_int))
     sum_term = 0
 
     tol = 5 * numpy.sqrt(sigma_mass)
@@ -250,14 +257,12 @@ def find_pairs(spec1, spec2, tol, shift=0):
 
     for idx in range(len(spec1)):
         mz, intensity = spec1[idx, :]
-        while spec2_lowpos < spec2_length and spec2[spec2_lowpos][
-                0] + shift < mz - tol:
+        while spec2_lowpos < spec2_length and spec2[spec2_lowpos][0] + shift < mz - tol:
             spec2_lowpos += 1
         if spec2_lowpos == spec2_length:
             break
         spec2_pos = spec2_lowpos
-        while spec2_pos < spec2_length and spec2[spec2_pos][
-                0] + shift < mz + tol:
+        while spec2_pos < spec2_length and spec2[spec2_pos][0] + shift < mz + tol:
             matching_pairs.append((idx, spec2_pos))
             spec2_pos += 1
 

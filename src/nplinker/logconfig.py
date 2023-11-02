@@ -17,10 +17,9 @@ import sys
 from typing_extensions import Self
 
 
-class LogConfig():
-
+class LogConfig:
     active_loggers: dict[str, logging.Logger] = {}
-    logfmt = '%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d, %(message)s'
+    logfmt = "%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d, %(message)s"
     default_loglevel = logging.INFO
     # default destination for new Loggers
     default_logdest = logging.StreamHandler(sys.stdout)
@@ -39,8 +38,7 @@ class LogConfig():
 
         logger = logging.getLogger(obj)
         logger.setLevel(level)
-        dest.setFormatter(
-            logging.Formatter(LogConfig.logfmt, datefmt='%H:%M:%S'))
+        dest.setFormatter(logging.Formatter(LogConfig.logfmt, datefmt="%H:%M:%S"))
         logger.addHandler(dest)
         LogConfig.active_loggers[obj] = logger
         return logger

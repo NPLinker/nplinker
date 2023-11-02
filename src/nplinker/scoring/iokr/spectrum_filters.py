@@ -16,9 +16,10 @@ import json
 import os
 import pickle
 import numpy
-#import sys
-#sys.path.append('/home/grimur/git/lda')
-#from lda.code.formula import Formula
+
+# import sys
+# sys.path.append('/home/grimur/git/lda')
+# from lda.code.formula import Formula
 from .formula import Formula
 
 
@@ -28,7 +29,7 @@ _ALL_DAG_MASSES = None
 _ALL_TREE_MASSES = None
 
 global datapath
-datapath = ''
+datapath = ""
 
 
 def load_formula_dag(filename):
@@ -36,16 +37,16 @@ def load_formula_dag(filename):
 
     with open(filename) as f:
         for line in f.readlines():
-            if not line.startswith('v'):
+            if not line.startswith("v"):
                 continue
 
             fields = line.strip().split()
-            if fields[1] == '->':
+            if fields[1] == "->":
                 # network edge
                 f = fields[3].split('="')[1][:-3]
             else:
                 # network vertex
-                f = line.split('\\n')[0].split('"')[-1]
+                f = line.split("\\n")[0].split('"')[-1]
 
             formula.add(f)
 
@@ -53,32 +54,32 @@ def load_formula_dag(filename):
 
 
 def load_formula_tree(filename):
-    with open(filename, 'rb') as f:
+    with open(filename, "rb") as f:
         data = json.load(f)
 
-    formula = [data['molecularFormula'], data['root']]
-    formula.extend([x['molecularFormula'] for x in data['fragments']])
-    formula.extend([x['source'] for x in data['losses']])
-    formula.extend([x['target'] for x in data['losses']])
-    formula.extend([x['molecularFormula'] for x in data['losses']])
+    formula = [data["molecularFormula"], data["root"]]
+    formula.extend([x["molecularFormula"] for x in data["fragments"]])
+    formula.extend([x["source"] for x in data["losses"]])
+    formula.extend([x["target"] for x in data["losses"]])
+    formula.extend([x["molecularFormula"] for x in data["losses"]])
 
     return list(set(formula))
 
 
 def load_peaks_from_tree(filename):
-    with open(filename, 'rb') as f:
+    with open(filename, "rb") as f:
         data = json.load(f)
 
     spectrum = []
-    for f in data['fragments']:
-        if len(f['peaks']) > 0:
-            for p in f['peaks']:
-                mass = p['mz']
-                intensity = p['int']
+    for f in data["fragments"]:
+        if len(f["peaks"]) > 0:
+            for p in f["peaks"]:
+                mass = p["mz"]
+                intensity = p["int"]
                 spectrum.append((mass, intensity))
         else:
-            mass = f['mz']
-            intensity = f['intensity']
+            mass = f["mz"]
+            intensity = f["intensity"]
             spectrum.append((mass, intensity))
 
     return numpy.array(spectrum)
@@ -86,13 +87,13 @@ def load_peaks_from_tree(filename):
 
 # These functions should be hanged onto the MS object
 def filter_by_tree(self):
-    treepath = '/home/grimur/iokr/data/trees'
+    treepath = "/home/grimur/iokr/data/trees"
     tol = 0.005
 
     try:
-        formula = load_formula_tree(treepath + os.path.sep + self.id + '.json')
+        formula = load_formula_tree(treepath + os.path.sep + self.id + ".json")
     except:
-        formula = load_formula_dag(treepath + os.path.sep + self.id + '.dot')
+        formula = load_formula_dag(treepath + os.path.sep + self.id + ".dot")
     formula_objects = [Formula(x) for x in formula]
     formula_masses = sorted(x.compute_exact_mass() for x in formula_objects)
 
@@ -100,11 +101,10 @@ def filter_by_tree(self):
 
 
 def filter_by_tree_unshifted(self):
-    treepath = '/home/grimur/iokr/data/trees'
+    treepath = "/home/grimur/iokr/data/trees"
 
     try:
-        spectrum = load_peaks_from_tree(treepath + os.path.sep + self.id +
-                                        '.json')
+        spectrum = load_peaks_from_tree(treepath + os.path.sep + self.id + ".json")
     except FileNotFoundError:
         spectrum = self.raw_spectrum
 
@@ -112,10 +112,10 @@ def filter_by_tree_unshifted(self):
 
 
 def filter_by_dag(self):
-    treepath = '/home/grimur/iokr/data/trees'
+    treepath = "/home/grimur/iokr/data/trees"
     tol = 0.005
 
-    formula = load_formula_dag(treepath + os.sep + self.id + '.dot')
+    formula = load_formula_dag(treepath + os.sep + self.id + ".dot")
     formula_objects = [Formula(x) for x in formula]
     formula_masses = sorted(x.compute_exact_mass() for x in formula_objects)
 
@@ -125,17 +125,16 @@ def filter_by_dag(self):
 def load_all_dag_masses(path):
     formula_masses_collected = []
     for filename in os.listdir(path):
-        if filename.endswith('.dot'):
+        if filename.endswith(".dot"):
             formula = load_formula_dag(path + os.sep + filename)
             formula_objects = [Formula(x) for x in formula]
-            formula_masses_collected.extend(
-                [x.compute_exact_mass() for x in formula_objects])
+            formula_masses_collected.extend([x.compute_exact_mass() for x in formula_objects])
 
     return sorted(list(set(formula_masses_collected)))
 
 
 def filter_by_collected_dag(self):
-    treepath = '/home/grimur/iokr/data/trees'
+    treepath = "/home/grimur/iokr/data/trees"
     tol = 0.005
     global _ALL_DAG_MASSES
 
@@ -146,7 +145,7 @@ def filter_by_collected_dag(self):
 
 
 def filter_by_frozen_dag(self):
-    with open(os.path.join(datapath, 'dag_masses.bin'), 'rb') as f:
+    with open(os.path.join(datapath, "dag_masses.bin"), "rb") as f:
         dag_masses = pickle.load(f)
     tol = 0.005
     return filter_by_mass(self.shifted_spectrum, dag_masses, tol)
@@ -155,17 +154,16 @@ def filter_by_frozen_dag(self):
 def load_all_tree_masses(path):
     formula_masses_collected = []
     for filename in os.listdir(path):
-        if filename.endswith('.json'):
+        if filename.endswith(".json"):
             formula = load_formula_tree(path + os.sep + filename)
             formula_objects = [Formula(x) for x in formula]
-            formula_masses_collected.extend(
-                [x.compute_exact_mass() for x in formula_objects])
+            formula_masses_collected.extend([x.compute_exact_mass() for x in formula_objects])
 
     return sorted(list(set(formula_masses_collected)))
 
 
 def filter_by_collected_tree(self):
-    treepath = '/home/grimur/iokr/data/trees'
+    treepath = "/home/grimur/iokr/data/trees"
     tol = 0.005
     global _ALL_TREE_MASSES
 
@@ -180,13 +178,19 @@ def filter_by_mass(raw_spectrum, formula_masses, tol):
     spectrum_index = 0
     mass_index = 0
     while mass_index < len(formula_masses):
-        while spectrum_index < len(raw_spectrum) and raw_spectrum[
-                spectrum_index, 0] < formula_masses[mass_index] + tol:
-            while spectrum_index < len(raw_spectrum) and raw_spectrum[
-                    spectrum_index, 0] < formula_masses[mass_index] - tol:
+        while (
+            spectrum_index < len(raw_spectrum)
+            and raw_spectrum[spectrum_index, 0] < formula_masses[mass_index] + tol
+        ):
+            while (
+                spectrum_index < len(raw_spectrum)
+                and raw_spectrum[spectrum_index, 0] < formula_masses[mass_index] - tol
+            ):
                 spectrum_index += 1
-            if spectrum_index < len(raw_spectrum) and raw_spectrum[
-                    spectrum_index, 0] < formula_masses[mass_index] + tol:
+            if (
+                spectrum_index < len(raw_spectrum)
+                and raw_spectrum[spectrum_index, 0] < formula_masses[mass_index] + tol
+            ):
                 filtered_spectrum.append(raw_spectrum[spectrum_index, :])
             spectrum_index += 1
         mass_index += 1

@@ -5,8 +5,7 @@ from .logconfig import LogConfig
 logger = LogConfig.getLogger(__name__)
 
 
-class Strain():
-
+class Strain:
     def __init__(self, primary_id: str) -> None:
         """To model the mapping between strain id and its aliases.
 
@@ -23,7 +22,7 @@ class Strain():
         return str(self)
 
     def __str__(self) -> str:
-        return f'Strain({self.id}) [{len(self._aliases)} aliases]'
+        return f"Strain({self.id}) [{len(self._aliases)} aliases]"
 
     def __eq__(self, other) -> bool:
         if isinstance(other, Strain):
@@ -40,7 +39,7 @@ class Strain():
 
     def __contains__(self, alias: str) -> bool:
         if not isinstance(alias, str):
-            raise TypeError(f'Expected str, got {type(alias)}')
+            raise TypeError(f"Expected str, got {type(alias)}")
         return alias in self._aliases
 
     @property
@@ -68,9 +67,8 @@ class Strain():
             alias(str): The alias to add to the list of known aliases.
         """
         if not isinstance(alias, str):
-            raise TypeError(f'Expected str, got {type(alias)}')
+            raise TypeError(f"Expected str, got {type(alias)}")
         if len(alias) == 0:
-            logger.warning(
-                'Refusing to add an empty-string alias to strain {%s}', self)
+            logger.warning("Refusing to add an empty-string alias to strain {%s}", self)
         else:
             self._aliases.add(alias)

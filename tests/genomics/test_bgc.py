@@ -4,7 +4,6 @@ from nplinker.strains import Strain
 
 
 def test_default():
-
     bgc = BGC("BGC0000001", "Polyketide")
     assert bgc.bgc_id == "BGC0000001"
     assert bgc.product_prediction == ("Polyketide",)

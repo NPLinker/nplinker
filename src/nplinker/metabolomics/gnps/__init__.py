@@ -14,8 +14,14 @@ from .gnps_spectrum_loader import GNPSSpectrumLoader
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 __all__ = [
-    "GNPSAnnotationLoader", "GNPSDownloader", "GNPSExtractor",
-    "GNPSFileMappingLoader", "GNPSFormat", "GNPSMolecularFamilyLoader",
-    "GNPSSpectrumLoader", "gnps_format_from_archive",
-    "gnps_format_from_file_mapping", "gnps_format_from_task_id"
+    "GNPSAnnotationLoader",
+    "GNPSDownloader",
+    "GNPSExtractor",
+    "GNPSFileMappingLoader",
+    "GNPSFormat",
+    "GNPSMolecularFamilyLoader",
+    "GNPSSpectrumLoader",
+    "gnps_format_from_archive",
+    "gnps_format_from_file_mapping",
+    "gnps_format_from_task_id",
 ]

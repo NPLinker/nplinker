@@ -20,10 +20,9 @@ import pylab as plt
 # Method to perform the projection from the input object that
 # Grimur provided
 def bgc_projection(input_pickle, bgc_list, weights=[0, 1, 0]):
-
     # javcard, sequence, adjacency
-    with open(input_pickle, 'rb') as f:
-        data = pickle.load(f, encoding='latin1')
+    with open(input_pickle, "rb") as f:
+        data = pickle.load(f, encoding="latin1")
 
     bgc_name_list = data[0]
     families = data[2]
@@ -52,10 +51,10 @@ def plot_and_highlight(bgc_dict, strains):
         strains = [strains]
     plt.figure(figsize=(10, 10))
     for b, pos in bgc_dict.items():
-        plt.plot(pos[0], pos[1], 'ko')
+        plt.plot(pos[0], pos[1], "ko")
         for s in strains:
             if b.strain == s:
-                plt.plot(pos[0], pos[1], 'ro', markersize=10)
+                plt.plot(pos[0], pos[1], "ro", markersize=10)
 
 
 def plot_families(bgc_dict, family_dict, min_size=0):
@@ -67,10 +66,10 @@ def plot_families(bgc_dict, family_dict, min_size=0):
         fam_data[fam].append(bgc_dict[b])
     for f, dat in fam_data.items():
         if len(dat) < min_size:
-            plt.plot(dat[0][0], dat[0][1], 'ko', markersize=5)
+            plt.plot(dat[0][0], dat[0][1], "ko", markersize=5)
         else:
             x, y = zip(*dat)
-            plt.plot(x, y, 'o', markersize=10)
+            plt.plot(x, y, "o", markersize=10)
 
 
 def k_means(bgc_dict, K=5, n_starts=10):
@@ -91,8 +90,7 @@ def k_means(bgc_dict, K=5, n_starts=10):
             # compute z
             some_empty = True
             while some_empty:
-
-                di = (((X[None, :, :] - mu[:, None, :])**2).sum(axis=2)).T
+                di = (((X[None, :, :] - mu[:, None, :]) ** 2).sum(axis=2)).T
                 z = np.zeros((N, K))
                 for i, d in enumerate(di):
                     z[i, d.argmin()] = 1
@@ -117,9 +115,8 @@ def k_means(bgc_dict, K=5, n_starts=10):
             dis = 0.0
             dis_current = 0.0
             for n in range(N):
-                dis += np.sqrt(((X[n, :] - mu[z[n, :].argmax(), :])**2).sum())
-                dis_current += np.sqrt(
-                    ((X[n, :] - best_mu[best_z[n, :].argmax(), :])**2).sum())
+                dis += np.sqrt(((X[n, :] - mu[z[n, :].argmax(), :]) ** 2).sum())
+                dis_current += np.sqrt(((X[n, :] - best_mu[best_z[n, :].argmax(), :]) ** 2).sum())
             if dis < dis_current:
                 best_z = z.copy()
                 best_mu = mu.copy()
@@ -135,7 +132,7 @@ def k_means(bgc_dict, K=5, n_starts=10):
 def plot_families_strain_highlight(bgc_dict, gcf_list, strain_list):
     plt.figure(figsize=(20, 20))
     for b, pos in bgc_dict.items():
-        plt.plot(pos[0], pos[1], 'ko')
+        plt.plot(pos[0], pos[1], "ko")
         plt.text(pos[0] + 0.001, pos[1] + 0.001, b.strain, fontsize=10)
     fam_success = {s: set() for s in strain_list}
     for s in strain_list:
@@ -152,12 +149,13 @@ def plot_families_strain_highlight(bgc_dict, gcf_list, strain_list):
         for b in f.bgc_list:
             x.append(bgc_dict[b][0])
             y.append(bgc_dict[b][1])
-        plt.plot(x, y, 'o', markersize=10)
+        plt.plot(x, y, "o", markersize=10)
 
 
 def hierarchical_clustering(bgc_dict, K=10):
     from genomics import GCF
     from sklearn.cluster import AgglomerativeClustering
+
     X = []
     bgc_list = []
     for b, pos in bgc_dict.items():

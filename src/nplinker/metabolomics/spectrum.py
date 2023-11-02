@@ -1,41 +1,34 @@
-
 from nplinker.strain_collection import StrainCollection
 from nplinker.strains import Strain
 from nplinker.utils import sqrt_normalise
 
 
-GNPS_KEY = 'gnps'
+GNPS_KEY = "gnps"
 
-JCAMP = '##TITLE={}\\n' +\
-        '##JCAMP-DX=nplinker vTODO\\n' +\
-        '##DATA TYPE=Spectrum\\n' +\
-        '##DATA CLASS=PEAKTABLE\\n' +\
-        '##ORIGIN=TODO_DATASET_ID\\n' +\
-        '##OWNER=nobody\\n' +\
-        '##XUNITS=M/Z\\n' +\
-        '##YUNITS=RELATIVE ABUNDANCE\\n' +\
-        '##NPOINTS={}\\n' +\
-        '##PEAK TABLE=(XY..XY)\\n' +\
-        '{}\\n' +\
-        '##END=\\n'
+JCAMP = (
+    "##TITLE={}\\n"
+    + "##JCAMP-DX=nplinker vTODO\\n"
+    + "##DATA TYPE=Spectrum\\n"
+    + "##DATA CLASS=PEAKTABLE\\n"
+    + "##ORIGIN=TODO_DATASET_ID\\n"
+    + "##OWNER=nobody\\n"
+    + "##XUNITS=M/Z\\n"
+    + "##YUNITS=RELATIVE ABUNDANCE\\n"
+    + "##NPOINTS={}\\n"
+    + "##PEAK TABLE=(XY..XY)\\n"
+    + "{}\\n"
+    + "##END=\\n"
+)
 
-class Spectrum():
 
-    def __init__(self,
-                 id,
-                 peaks,
-                 spectrum_id: str,
-                 precursor_mz,
-                 parent_mz=None,
-                 rt=None):
+class Spectrum:
+    def __init__(self, id, peaks, spectrum_id: str, precursor_mz, parent_mz=None, rt=None):
         self.id = id
         self.peaks = sorted(peaks, key=lambda x: x[0])  # ensure sorted by mz
         self.normalised_peaks = sqrt_normalise(self.peaks)  # useful later
         self.n_peaks = len(self.peaks)
-        self.max_ms2_intensity = max(
-            intensity for mz, intensity in self.peaks)
-        self.total_ms2_intensity = sum(
-            intensity for mz, intensity in self.peaks)
+        self.max_ms2_intensity = max(intensity for mz, intensity in self.peaks)
+        self.total_ms2_intensity = sum(intensity for mz, intensity in self.peaks)
         self.spectrum_id = spectrum_id  # MS1.name
         self.rt = rt
         # TODO CG: should include precursor mass and charge to calculate precursor_mz
@@ -51,7 +44,7 @@ class Spectrum():
         # the values being dicts of the form {growth_medium: peak intensity} for the parent strain
         self.growth_media = {}
         # TODO CG: self.family_id should be removed, used in deprecated make_families method
-        self.family_id = '-1'
+        self.family_id = "-1"
         self.family = None
         # a dict indexed by filename, or "gnps"
         self.annotations = {}
@@ -66,16 +59,13 @@ class Spectrum():
             self.growth_media[strain] = {}
 
         if growth_medium is None:
-            self.growth_media[strain].update({
-                f'unknown_medium_{len(self.growth_media[strain])}':
-                peak_intensity
-            })
+            self.growth_media[strain].update(
+                {f"unknown_medium_{len(self.growth_media[strain])}": peak_intensity}
+            )
             return
 
-        if strain in self.growth_media and growth_medium in self.growth_media[
-                strain]:
-            raise Exception('Growth medium clash: {} / {} {}'.format(
-                self, strain, growth_medium))
+        if strain in self.growth_media and growth_medium in self.growth_media[strain]:
+            raise Exception("Growth medium clash: {} / {} {}".format(self, strain, growth_medium))
 
         self.growth_media[strain].update({growth_medium: peak_intensity})
 
@@ -114,23 +104,26 @@ class Spectrum():
         if self._jcamp is not None and not force_refresh:
             return self._jcamp
 
-        peakdata = '\\n'.join('{}, {}'.format(*p) for p in self.peaks)
+        peakdata = "\\n".join("{}, {}".format(*p) for p in self.peaks)
         self._jcamp = JCAMP.format(str(self), self.n_peaks, peakdata)
         return self._jcamp
 
     def __str__(self):
         return "Spectrum(id={}, spectrum_id={}, strains={})".format(
-            self.id, self.spectrum_id, len(self.strains))
+            self.id, self.spectrum_id, len(self.strains)
+        )
 
     def __repr__(self):
         return str(self)
 
     def __eq__(self, other) -> bool:
         if isinstance(other, Spectrum):
-            return (self.id == other.id
-                    and self.spectrum_id == other.spectrum_id
-                    and self.precursor_mz == other.precursor_mz
-                    and self.parent_mz == other.parent_mz)
+            return (
+                self.id == other.id
+                and self.spectrum_id == other.spectrum_id
+                and self.precursor_mz == other.precursor_mz
+                and self.parent_mz == other.parent_mz
+            )
         return NotImplemented
 
     def __hash__(self) -> int:
@@ -159,8 +152,7 @@ class Spectrum():
             end_pos = start_pos
 
             n_bigger = 0
-            while end_pos < len(
-                    self.peaks) and self.peaks[end_pos][0] <= mz + mz_range:
+            while end_pos < len(self.peaks) and self.peaks[end_pos][0] <= mz + mz_range:
                 if self.peaks[end_pos][1] > intensity:
                     n_bigger += 1
                 end_pos += 1
@@ -172,10 +164,8 @@ class Spectrum():
         self.n_peaks = len(self.peaks)
         if self.n_peaks > 0:
             self.normalised_peaks = sqrt_normalise(self.peaks)
-            self.max_ms2_intensity = max(
-                intensity for mz, intensity in self.peaks)
-            self.total_ms2_intensity = sum(
-                intensity for mz, intensity in self.peaks)
+            self.max_ms2_intensity = max(intensity for mz, intensity in self.peaks)
+            self.total_ms2_intensity = sum(intensity for mz, intensity in self.peaks)
         else:
             self.normalised_peaks = []
             self.max_ms2_intensity = 0.0
@@ -193,14 +183,13 @@ class Spectrum():
                 loss = self.precursor_mz - self.peaks[i][0]
                 losses.append((loss, self.id, i))
 
+            # THIS SEEMED TO ME LIKE IT WOULD TAKE THE WRONG DIFFERENCES AS LOSSES:
+            # TODO: please check!
+            #                for j in range(i):
+            #                    loss = self.peaks[i][0] - self.peaks[j][0]
+            #                    losses.append((loss, i, j))
 
-# THIS SEEMED TO ME LIKE IT WOULD TAKE THE WRONG DIFFERENCES AS LOSSES:
-# TODO: please check!
-#                for j in range(i):
-#                    loss = self.peaks[i][0] - self.peaks[j][0]
-#                    losses.append((loss, i, j))
-
-# Sort by loss
+            # Sort by loss
             losses.sort(key=lambda x: x[0])
             self._losses = losses
         return self._losses

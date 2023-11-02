@@ -65,14 +65,13 @@ def run_iokr(data):
         sample_kernel_vector = sample_kernel_vector[filtered_indices]
         # match the sample to the candidate set
         correct_indices = data.spectra_to_bgc_indices[i]
-        candidate_fingerprints = numpy.array([x[1]
-                                              for x in candidate_set]).copy()
+        candidate_fingerprints = numpy.array([x[1] for x in candidate_set]).copy()
         candidate_ids = [x[0] for x in candidate_set]
 
-        args = (0, candidate_fingerprints, latent, sample_kernel_vector,
-                latent_basis, gamma)
-        with open('secondary.bin', 'wb') as f:
+        args = (0, candidate_fingerprints, latent, sample_kernel_vector, latent_basis, gamma)
+        with open("secondary.bin", "wb") as f:
             import pickle
+
             pickle.dump(args, f)
         output = iokr_opt.rank_candidates_opt(*args)
 
@@ -83,8 +82,7 @@ def run_iokr(data):
         res_ranking = list(res_output[0])
 
         # actual rankings
-        correct_ranking = min(
-            res_ranking.index(x) for x in res_correct_indices)
+        correct_ranking = min(res_ranking.index(x) for x in res_correct_indices)
         collected_rankings.append((res_i, correct_ranking, len(res_ranking)))
 
         # correct_random_rankings = []
@@ -95,28 +93,30 @@ def run_iokr(data):
         # collected_baseline_rankings.append((res_i, numpy.mean(correct_random_rankings), len(res_ranking)))
 
         random.shuffle(res_ranking)
-        correct_random_ranking = min(
-            res_ranking.index(x) for x in res_correct_indices)
-        collected_baseline_rankings.append(
-            (res_i, correct_random_ranking, len(res_ranking)))
+        correct_random_ranking = min(res_ranking.index(x) for x in res_correct_indices)
+        collected_baseline_rankings.append((res_i, correct_random_ranking, len(res_ranking)))
 
         total = len(collected_rankings)
-        print('%.06f, %.06f, %s' %
-              (float([x[1] for x in collected_rankings].count(0)) / total,
-               float([x[1]
-                      for x in collected_baseline_rankings].count(0)) / total,
-               total))
+        print(
+            "%.06f, %.06f, %s"
+            % (
+                float([x[1] for x in collected_rankings].count(0)) / total,
+                float([x[1] for x in collected_baseline_rankings].count(0)) / total,
+                total,
+            )
+        )
 
         # print(cr_b[res_i], cr_a[res_i], cr_a[res_i] == cr_b[res_i])
 
-    print('')
-    print('IOKR test run done!')
-    print(f'#samples: {len(collected_rankings)}')
-    print('top-1 acc: {}'.format(
-        float([x[1] for x in collected_rankings].count(0)) / total, total))
-    print('top-1 base: {}'.format(
-        float([x[1] for x in collected_baseline_rankings].count(0)) / total,
-        total))
+    print("")
+    print("IOKR test run done!")
+    print(f"#samples: {len(collected_rankings)}")
+    print("top-1 acc: {}".format(float([x[1] for x in collected_rankings].count(0)) / total, total))
+    print(
+        "top-1 base: {}".format(
+            float([x[1] for x in collected_baseline_rankings].count(0)) / total, total
+        )
+    )
 
     return collected_rankings, collected_baseline_rankings
 
@@ -127,9 +127,9 @@ def get_test_set(fingerprint):
 
     mapping = []
     # TODO: fix the path
-    with open('/home/grimur/iokr/data/mibig/matched_mibig_gnps_2.0.csv') as f:
+    with open("/home/grimur/iokr/data/mibig/matched_mibig_gnps_2.0.csv") as f:
         for line in csv.reader(f):
-            if not line[0].startswith('#'):
+            if not line[0].startswith("#"):
                 mapping.append(line)
 
     mapping_dict = {}
@@ -152,11 +152,11 @@ def get_test_set(fingerprint):
     bgc_fp_list = [bgc_fps[x] for x in bgc_id_list]
     candidate_set = zip(bgc_id_list, bgc_fp_list)
 
-    mgf_file = '/home/grimur/iokr/data/mibig/matched_mibig_gnps_2.0.mgf'
+    mgf_file = "/home/grimur/iokr/data/mibig/matched_mibig_gnps_2.0.mgf"
     spectra_to_bgc_indices = []
     for i, spectrum in enumerate(mgf.read(mgf_file)):
-        spec_file = spectrum['params']['filename']
-        spec_id = spectrum['params']['feature_id']
+        spec_file = spectrum["params"]["filename"]
+        spec_id = spectrum["params"]["feature_id"]
         spec_filename = spec_file + spec_id
         bgc_matches = mapping_dict[spec_filename]
         bgc_indices = []
@@ -169,8 +169,8 @@ def get_test_set(fingerprint):
     kernel_files = [
         #'/home/grimur/iokr/sml_test_test_nloss.npy',
         #'/home/grimur/iokr/sml_test_test_peaks.npy'
-        '/home/grimur/iokr/mibig_test_nloss.npy',
-        '/home/grimur/iokr/mibig_test_peaks.npy'
+        "/home/grimur/iokr/mibig_test_nloss.npy",
+        "/home/grimur/iokr/mibig_test_peaks.npy",
     ]
     spectra_kernels = load_kernels(kernel_files, normalise=False)
 
@@ -178,24 +178,16 @@ def get_test_set(fingerprint):
 
 
 def main():
-    parser = argparse.ArgumentParser('Run IOKR test on a set')
-    parser.add_argument('--kernel',
-                        dest='kernel',
-                        help='Kernel files',
-                        nargs='+')
+    parser = argparse.ArgumentParser("Run IOKR test on a set")
+    parser.add_argument("--kernel", dest="kernel", help="Kernel files", nargs="+")
     parser.add_argument(
-        '--fp',
-        dest='fingerprint',
-        help='fingerprint type (substructure, cdk (default), klekota-roth',
-        default='cdk_default')
-    parser.add_argument('--data',
-                        dest='datapath',
-                        help='data path',
-                        required=True)
-    parser.add_argument('--output',
-                        dest='output',
-                        help='output label',
-                        required=True)
+        "--fp",
+        dest="fingerprint",
+        help="fingerprint type (substructure, cdk (default), klekota-roth",
+        default="cdk_default",
+    )
+    parser.add_argument("--data", dest="datapath", help="data path", required=True)
+    parser.add_argument("--output", dest="output", help="output label", required=True)
     args = parser.parse_args()
 
     # read from args
@@ -208,13 +200,13 @@ def main():
 
     fingerprint = args.fingerprint
 
-    output_file = 'IOKRranking_%s.bin' % args.output
-    output_baseline = 'IOKRranking_baseline_%s.bin' % args.output
+    output_file = "IOKRranking_%s.bin" % args.output
+    output_baseline = "IOKRranking_baseline_%s.bin" % args.output
 
     iokrdata = iokrdataserver.IOKRDataServer(datapath, kernel=None)
     kernel_matrix = load_kernels(kernel_files)
     iokrdata.kernel = kernel_matrix
-    with open(datapath + os.sep + 'ind_eval.txt') as f:
+    with open(datapath + os.sep + "ind_eval.txt") as f:
         raw_data = f.read()
         test_sample_indices = [int(x) - 1 for x in raw_data.strip().split()]
     iokrdata.test_sample_indices = test_sample_indices
@@ -222,12 +214,11 @@ def main():
     if fingerprint is not None:
         iokrdata.set_fingerprint(fingerprint)
 
-    spectra_kernels, candidate_set, spectra_to_bgc_indices = get_test_set(
-        fingerprint)
-    with open('inputtest.bin', 'wb') as f:
+    spectra_kernels, candidate_set, spectra_to_bgc_indices = get_test_set(fingerprint)
+    with open("inputtest.bin", "wb") as f:
         import pickle
-        pickle.dump((spectra_kernels, candidate_set, spectra_to_bgc_indices),
-                    f)
+
+        pickle.dump((spectra_kernels, candidate_set, spectra_to_bgc_indices), f)
     # with open('inputtest.bin', 'rb') as f:
     #     import pickle
     #     spectra_kernels, candidate_set, spectra_to_bgc_indices = pickle.load(f)
@@ -240,12 +231,12 @@ def main():
     iokrdata.candidate_set = candidate_set
     iokrdata.spectra_to_bgc_indices = spectra_to_bgc_indices
 
-    print('run iokr')
+    print("run iokr")
     rankings, baseline = run_iokr(iokrdata)
 
     numpy.save(output_file, rankings)
     numpy.save(output_baseline, baseline)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
