@@ -72,6 +72,7 @@ select = [
     "W",    # pycodestyle (warning)
     "I",    # isort
     "D",    # pydocstyle
+    "N", # pep8-naming
 ]
 ignore = [
     'D100',  # Missing module docstring
