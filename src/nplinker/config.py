@@ -1,6 +1,6 @@
 import argparse
-from collections.abc import Mapping
 import os
+from collections.abc import Mapping
 from shutil import copyfile
 import toml
 from xdg import XDG_CONFIG_HOME
@@ -15,51 +15,48 @@ except ImportError:
 logger = LogConfig.getLogger(__name__)
 
 
-class Args():
-
+class Args:
     def __init__(self):
-
         def bool_checker(x):
-            return str(x).lower() == 'true'
+            return str(x).lower() == "true"
 
         # TODO need to finalise these
         self.parser = argparse.ArgumentParser(
-            description='nplinker arguments',
-            epilog='Note: command-line arguments will override '
-            'arguments from configuration files')
-        self.parser.add_argument('-c',
-                                 '--config',
-                                 help='Path to a .toml configuration file',
-                                 metavar='path')
+            description="nplinker arguments",
+            epilog="Note: command-line arguments will override "
+            "arguments from configuration files",
+        )
         self.parser.add_argument(
-            '-d',
-            '--dataset.root',
-            help=
-            'Root path for the dataset to be loaded (or "platform:datasetID" for remote datasets)',
-            metavar='root')
+            "-c", "--config", help="Path to a .toml configuration file", metavar="path"
+        )
         self.parser.add_argument(
-            '-l',
-            '--loglevel',
-            help='Logging verbosity level: DEBUG, INFO, WARNING, ERROR',
-            metavar='loglevel')
+            "-d",
+            "--dataset.root",
+            help='Root path for the dataset to be loaded (or "platform:datasetID" for remote datasets)',
+            metavar="root",
+        )
         self.parser.add_argument(
-            '-f',
-            '--logfile',
-            help='Redirect logging from stdout to this file',
-            metavar='logfile')
+            "-l",
+            "--loglevel",
+            help="Logging verbosity level: DEBUG, INFO, WARNING, ERROR",
+            metavar="loglevel",
+        )
         self.parser.add_argument(
-            '-s',
-            '--log_to_stdout',
-            help='keep logging to stdout even if --logfile used',
-            metavar='log_to_stdout')
+            "-f", "--logfile", help="Redirect logging from stdout to this file", metavar="logfile"
+        )
+        self.parser.add_argument(
+            "-s",
+            "--log_to_stdout",
+            help="keep logging to stdout even if --logfile used",
+            metavar="log_to_stdout",
+        )
 
-        self.parser.add_argument('--bigscape-cutoff',
-                                 help='BIGSCAPE clustering cutoff threshold',
-                                 metavar='cutoff')
         self.parser.add_argument(
-            '--repro-file',
-            help='Filename to store reproducibility data in',
-            metavar='filename')
+            "--bigscape-cutoff", help="BIGSCAPE clustering cutoff threshold", metavar="cutoff"
+        )
+        self.parser.add_argument(
+            "--repro-file", help="Filename to store reproducibility data in", metavar="filename"
+        )
 
         self.args = self.parser.parse_args()
 
@@ -73,12 +70,12 @@ class Args():
                 continue
 
             # values with non-dotted names can get inserted directly
-            if k.find('.') == -1:
+            if k.find(".") == -1:
                 args[k] = v
             else:
                 # otherwise add a nested dict for each dotted part, then
                 # insert the actual value on the innermost level
-                parts = k.split('.')
+                parts = k.split(".")
                 root = args
                 for p in parts[:-1]:
                     if p not in root:
@@ -88,34 +85,30 @@ class Args():
         return args
 
 
-class Config():
-    """Wrapper for all NPLinker configuration options"""
+class Config:
+    """Wrapper for all NPLinker configuration options."""
 
-    DEFAULT_CONFIG = 'nplinker.toml'
+    DEFAULT_CONFIG = "nplinker.toml"
 
     def __init__(self, config_dict):
-        self.default_config_path = os.path.join(XDG_CONFIG_HOME, 'nplinker',
-                                                Config.DEFAULT_CONFIG)
+        self.default_config_path = os.path.join(XDG_CONFIG_HOME, "nplinker", Config.DEFAULT_CONFIG)
         if not os.path.exists(self.default_config_path):
-            logger.debug('Creating default config file')
-            os.makedirs(os.path.join(XDG_CONFIG_HOME, 'nplinker'),
-                        exist_ok=True)
+            logger.debug("Creating default config file")
+            os.makedirs(os.path.join(XDG_CONFIG_HOME, "nplinker"), exist_ok=True)
             copyfile(
-                files('nplinker').joinpath('data', Config.DEFAULT_CONFIG),
-                self.default_config_path)
+                files("nplinker").joinpath("data", Config.DEFAULT_CONFIG), self.default_config_path
+            )
 
         # load the default per-user config file, then check for one provided as an argument
         # and if present use it to override the defaults
-        logger.debug('Parsing default config file: {}'.format(
-            self.default_config_path))
+        logger.debug("Parsing default config file: {}".format(self.default_config_path))
         config = toml.load(open(self.default_config_path))
-        if 'config' in config_dict:
-            logger.debug('Loading user config {}'.format(
-                config_dict['config']))
-            if config_dict['config'] is not None:
-                user_config = toml.load(open(config_dict['config']))
+        if "config" in config_dict:
+            logger.debug("Loading user config {}".format(config_dict["config"]))
+            if config_dict["config"] is not None:
+                user_config = toml.load(open(config_dict["config"]))
                 config.update(user_config)
-                del config_dict['config']
+                del config_dict["config"]
 
         # remaining values in the dict should override the existing ones from config files
         # however if running non-interactively, argparse will set values of all non-specified
@@ -143,25 +136,22 @@ class Config():
             ValueError: If the configuration dictionary is missing required
                 fields or contains invalid values.
         """
-        if 'dataset' not in config:
+        if "dataset" not in config:
             raise ValueError('Not found config for "dataset".')
 
-        root = config['dataset'].get('root')
+        root = config["dataset"].get("root")
         if root is None:
             raise ValueError('Not found config for "root".')
 
-        if root.startswith('platform:'):
-            config['dataset']['platform_id'] = root.replace('platform:', '')
-            logger.info('Loading from platform project ID %s',
-                        config['dataset']['platform_id'])
+        if root.startswith("platform:"):
+            config["dataset"]["platform_id"] = root.replace("platform:", "")
+            logger.info("Loading from platform project ID %s", config["dataset"]["platform_id"])
         else:
-            config['dataset']['platform_id'] = ''
-            logger.info('Loading from local data in directory %s', root)
+            config["dataset"]["platform_id"] = ""
+            logger.info("Loading from local data in directory %s", root)
 
-        antismash = config['dataset'].get('antismash')
+        antismash = config["dataset"].get("antismash")
         allowed_antismash_formats = ["default", "flat"]
         if antismash is not None:
-            if 'format' in antismash and antismash[
-                    'format'] not in allowed_antismash_formats:
-                raise ValueError(
-                    f'Unknown antismash format: {antismash["format"]}')
+            if "format" in antismash and antismash["format"] not in allowed_antismash_formats:
+                raise ValueError(f'Unknown antismash format: {antismash["format"]}')

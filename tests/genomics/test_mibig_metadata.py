@@ -5,7 +5,6 @@ from .. import DATA_DIR
 
 @pytest.mark.parametrize("version", ["v1.4", "v3.1"])
 class TestMibigMetadata:
-
     @pytest.fixture
     def json_file(self, version):
         json_file = DATA_DIR / "mibig" / f"BGC0000001_{version}.json"

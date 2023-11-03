@@ -1,6 +1,5 @@
-class ObjectLink():
-    """
-    Class which stores information about a single link between two objects.
+class ObjectLink:
+    """Class which stores information about a single link between two objects.
 
     There will be at most one instance of an ObjectLink for a given pair of
     objects (source, target) after running 1 or more scoring methods. Some
@@ -53,8 +52,9 @@ class ObjectLink():
         return hash(self.source.id)
 
     def __str__(self):
-        return 'ObjectLink(source={}, target={}, #methods={})'.format(
-            self.source, self.target, len(self._method_data))
+        return "ObjectLink(source={}, target={}, #methods={})".format(
+            self.source, self.target, len(self._method_data)
+        )
 
     def __repr__(self):
         return str(self)

@@ -1,15 +1,15 @@
+import zipfile
 from enum import Enum
 from enum import unique
 from os import PathLike
 from pathlib import Path
-import zipfile
+import httpx
 from bs4 import BeautifulSoup
 from bs4 import Tag
-import httpx
 from nplinker.utils import get_headers
 
 
-GNPS_TASK_URL = 'https://gnps.ucsd.edu/ProteoSAFe/status.jsp?task={}'
+GNPS_TASK_URL = "https://gnps.ucsd.edu/ProteoSAFe/status.jsp?task={}"
 
 
 @unique
@@ -20,6 +20,7 @@ class GNPSFormat(Enum):
     simple short name for the workflow, and the value of the enum is the actual
     name of the workflow in the GNPS website.
     """
+
     # Format: ShortName = "GNPSWorkflowName"
     SNETS = "METABOLOMICS-SNETS"
     SNETSV2 = "METABOLOMICS-SNETS-V2"
@@ -44,9 +45,8 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
     """
     task_html = httpx.get(GNPS_TASK_URL.format(task_id))
     soup = BeautifulSoup(task_html.text, features="html.parser")
-    tags = soup.find_all('th')
-    workflow_tag: Tag = list(filter(lambda x: x.contents == ['Workflow'],
-                                    tags))[0]
+    tags = soup.find_all("th")
+    workflow_tag: Tag = list(filter(lambda x: x.contents == ["Workflow"], tags))[0]
     workflow_format_tag: Tag = workflow_tag.parent.contents[3]
     workflow_format = workflow_format_tag.contents[0].strip()
 
@@ -75,7 +75,7 @@ def gnps_format_from_archive(zip_file: str | PathLike) -> GNPSFormat:
         >>> gnps_format_from_archive("downloads/ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip") == GNPSFormat.SNETS
         >>> gnps_format_from_archive("downloads/ProteoSAFe-METABOLOMICS-SNETS-V2-189e8bf1-download_clustered_spectra.zip") == GNPSFormat.SNETSV2
         >>> gnps_format_from_archive("downloads/ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-672d0a53-download_cytoscape_data.zip") == GNPSFormat.FBMN
-     """
+    """
     file = Path(zip_file)
     # Guess the format from the filename of the zip file
     if GNPSFormat.FBMN.value in file.name:
@@ -116,10 +116,10 @@ def gnps_format_from_file_mapping(file: str | PathLike) -> GNPSFormat:
         GNPSFormat: GNPS format identified in the file.
     """
     headers = get_headers(file)
-    if 'AllFiles' in headers:
+    if "AllFiles" in headers:
         return GNPSFormat.SNETS
-    if 'UniqueFileSources' in headers:
+    if "UniqueFileSources" in headers:
         return GNPSFormat.SNETSV2
-    if 'row ID' in headers:
+    if "row ID" in headers:
         return GNPSFormat.FBMN
     return GNPSFormat.Unknown

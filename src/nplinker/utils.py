@@ -20,13 +20,14 @@ import hashlib
 import lzma
 import math
 import os
-from os import PathLike
 import os.path
-from pathlib import Path
 import sys
 import tarfile
-from typing import Callable, IO
 import zipfile
+from os import PathLike
+from pathlib import Path
+from typing import IO
+from typing import Callable
 import httpx
 from tqdm import tqdm
 
@@ -59,7 +60,7 @@ def find_delimiter(file: str | PathLike) -> str:
         >>> delim = find_delimiter("~/table.csv")
     """
     sniffer = csv.Sniffer()
-    with open(file, mode='rt', encoding='utf-8') as fp:
+    with open(file, mode="rt", encoding="utf-8") as fp:
         delimiter = sniffer.sniff(fp.read(5000)).delimiter
     return delimiter
 
@@ -90,11 +91,11 @@ def is_file_format(file: str | PathLike, format: str = "tsv") -> bool:
         bool: True if the file is in the given format, False otherwise.
     """
     try:
-        with open(file, 'rt') as f:
+        with open(file, "rt") as f:
             if format == "tsv":
-                reader = csv.reader(f, delimiter='\t')
+                reader = csv.reader(f, delimiter="\t")
             elif format == "csv":
-                reader = csv.reader(f, delimiter=',')
+                reader = csv.reader(f, delimiter=",")
             else:
                 raise ValueError(f"Unknown format '{format}'.")
             for _ in reader:
@@ -136,12 +137,14 @@ def check_integrity(fpath: str | PathLike, md5: str | None = None) -> bool:
     return check_md5(fpath, md5)
 
 
-def download_url(url: str,
-                 root: str | PathLike,
-                 filename: str | None = None,
-                 md5: str | None = None,
-                 http_method: str = "GET",
-                 allow_http_redirect: bool = True) -> None:
+def download_url(
+    url: str,
+    root: str | PathLike,
+    filename: str | None = None,
+    md5: str | None = None,
+    http_method: str = "GET",
+    allow_http_redirect: bool = True,
+) -> None:
     """Download a file from a url and place it in root.
 
     Args:
@@ -169,34 +172,27 @@ def download_url(url: str,
 
     # download the file
     with open(fpath, "wb") as fh:
-        with httpx.stream(http_method,
-                          url,
-                          follow_redirects=allow_http_redirect) as response:
+        with httpx.stream(http_method, url, follow_redirects=allow_http_redirect) as response:
             if not response.is_success:
                 fpath.unlink(missing_ok=True)
                 raise RuntimeError(
                     f"Failed to download url {url} with status code {response.status_code}"
                 )
             total = int(response.headers.get("Content-Length", 0))
-            with tqdm(total=total,
-                      unit_scale=True,
-                      unit_divisor=1024,
-                      unit="B") as progress:
+            with tqdm(total=total, unit_scale=True, unit_divisor=1024, unit="B") as progress:
                 num_bytes_downloaded = response.num_bytes_downloaded
                 for chunk in response.iter_bytes():
                     fh.write(chunk)
-                    progress.update(response.num_bytes_downloaded -
-                                    num_bytes_downloaded)
+                    progress.update(response.num_bytes_downloaded - num_bytes_downloaded)
                     num_bytes_downloaded = response.num_bytes_downloaded
 
     # check integrity of downloaded file
     if not check_integrity(fpath, md5):
-        raise RuntimeError(
-            "File not found or corrupted, or md5 validation failed.")
+        raise RuntimeError("File not found or corrupted, or md5 validation failed.")
 
 
 def list_dirs(root: str | PathLike, keep_parent: bool = True) -> list[str]:
-    """List all directories at a given root
+    """List all directories at a given root.
 
     Args:
         root (str or Path): Path to directory whose folders need to be listed
@@ -210,11 +206,13 @@ def list_dirs(root: str | PathLike, keep_parent: bool = True) -> list[str]:
     return directories
 
 
-def list_files(root: str | PathLike,
-               prefix: str | tuple[str, ...] = "",
-               suffix: str | tuple[str, ...] = "",
-               keep_parent: bool = True) -> list[str]:
-    """List all files at a given root
+def list_files(
+    root: str | PathLike,
+    prefix: str | tuple[str, ...] = "",
+    suffix: str | tuple[str, ...] = "",
+    keep_parent: bool = True,
+) -> list[str]:
+    """List all files at a given root.
 
     Args:
         root (str or Path): Path to directory whose files need to be listed
@@ -229,8 +227,9 @@ def list_files(root: str | PathLike,
     """
     root = Path(root).expanduser()
     files = [
-        str(p) for p in root.iterdir() if p.is_file()
-        and p.name.startswith(prefix) and p.name.endswith(suffix)
+        str(p)
+        for p in root.iterdir()
+        if p.is_file() and p.name.startswith(prefix) and p.name.endswith(suffix)
     ]
 
     if not keep_parent:
@@ -239,11 +238,13 @@ def list_files(root: str | PathLike,
     return files
 
 
-def _extract_tar(from_path: str | PathLike, to_path: str | PathLike,
-                 members: list[tarfile.TarInfo] | None,
-                 compression: str | None) -> None:
-    with tarfile.open(from_path,
-                      f"r:{compression[1:]}" if compression else "r") as tar:
+def _extract_tar(
+    from_path: str | PathLike,
+    to_path: str | PathLike,
+    members: list[tarfile.TarInfo] | None,
+    compression: str | None,
+) -> None:
+    with tarfile.open(from_path, f"r:{compression[1:]}" if compression else "r") as tar:
         tar.extractall(to_path, members)
 
 
@@ -253,21 +254,24 @@ _ZIP_COMPRESSION_MAP: dict[str, int] = {
 }
 
 
-def _extract_zip(from_path: str | PathLike, to_path: str | PathLike,
-                 members: list[str | zipfile.ZipInfo] | None,
-                 compression: str | None) -> None:
-    with zipfile.ZipFile(from_path,
-                         "r",
-                         compression=_ZIP_COMPRESSION_MAP[compression]
-                         if compression else zipfile.ZIP_STORED) as zf:
+def _extract_zip(
+    from_path: str | PathLike,
+    to_path: str | PathLike,
+    members: list[str | zipfile.ZipInfo] | None,
+    compression: str | None,
+) -> None:
+    with zipfile.ZipFile(
+        from_path,
+        "r",
+        compression=_ZIP_COMPRESSION_MAP[compression] if compression else zipfile.ZIP_STORED,
+    ) as zf:
         zf.extractall(to_path, members)
 
 
-_ARCHIVE_EXTRACTORS: dict[str, Callable[[str, str, list | None, str | None],
-                                        None]] = {
-                                            ".tar": _extract_tar,
-                                            ".zip": _extract_zip,
-                                        }
+_ARCHIVE_EXTRACTORS: dict[str, Callable[[str, str, list | None, str | None], None]] = {
+    ".tar": _extract_tar,
+    ".zip": _extract_zip,
+}
 _COMPRESSED_FILE_OPENERS: dict[str, Callable[..., IO]] = {
     ".bz2": bz2.open,
     ".gz": gzip.open,
@@ -320,17 +324,16 @@ def _detect_file_type(file: str | Path) -> tuple[str, str | None, str | None]:
         return suffix, None, suffix
 
     valid_suffixes = sorted(
-        set(_FILE_TYPE_ALIASES)
-        | set(_ARCHIVE_EXTRACTORS)
-        | set(_COMPRESSED_FILE_OPENERS))
+        set(_FILE_TYPE_ALIASES) | set(_ARCHIVE_EXTRACTORS) | set(_COMPRESSED_FILE_OPENERS)
+    )
     raise RuntimeError(
         f"Unknown compression or archive type: '{suffix}'.\nKnown suffixes are: '{valid_suffixes}'."
     )
 
 
-def _decompress(from_path: Path | str,
-                to_path: Path | str | None = None,
-                remove_finished: bool = False) -> str:
+def _decompress(
+    from_path: Path | str, to_path: Path | str | None = None, remove_finished: bool = False
+) -> str:
     r"""Decompress a file.
 
     The compression is automatically detected from the file name.
@@ -345,17 +348,14 @@ def _decompress(from_path: Path | str,
     """
     suffix, archive_type, compression = _detect_file_type(from_path)
     if not compression:
-        raise RuntimeError(
-            f"Couldn't detect a compression from suffix {suffix}.")
+        raise RuntimeError(f"Couldn't detect a compression from suffix {suffix}.")
 
     if to_path is None:
-        to_path = str(from_path).replace(
-            suffix, archive_type if archive_type is not None else "")
+        to_path = str(from_path).replace(suffix, archive_type if archive_type is not None else "")
 
     compressed_file_opener = _COMPRESSED_FILE_OPENERS[compression]
 
-    with compressed_file_opener(from_path, "rb") as rfh, open(to_path,
-                                                              "wb") as wfh:
+    with compressed_file_opener(from_path, "rb") as rfh, open(to_path, "wb") as wfh:
         wfh.write(rfh.read())
 
     if remove_finished:
@@ -364,10 +364,12 @@ def _decompress(from_path: Path | str,
     return str(to_path)
 
 
-def extract_archive(from_path: str | PathLike,
-                    extract_root: str | PathLike | None = None,
-                    members: list | None = None,
-                    remove_finished: bool = False) -> str:
+def extract_archive(
+    from_path: str | PathLike,
+    extract_root: str | PathLike | None = None,
+    members: list | None = None,
+    remove_finished: bool = False,
+) -> str:
     """Extract an archive.
 
     The archive type and a possible compression is automatically detected from
@@ -420,7 +422,7 @@ def download_and_extract_archive(
     md5: str | None = None,
     remove_finished: bool = False,
 ) -> None:
-    """Download a file from url and extract it
+    """Download a file from url and extract it.
 
        This method is a wrapper of `download_url` and `extract_archive` methods.
 
@@ -436,7 +438,6 @@ def download_and_extract_archive(
         remove_finished (bool, optional): If `True`, remove the downloaded file
              after the extraction. Defaults to False.
     """
-
     download_root = Path(download_root).expanduser()
     if extract_root is None:
         extract_root = download_root

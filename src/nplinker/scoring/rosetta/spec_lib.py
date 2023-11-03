@@ -21,8 +21,7 @@ from .rosetta_functions import fast_cosine
 logger = LogConfig.getLogger(__name__)
 
 
-class SpecLib():
-
+class SpecLib:
     def __init__(self, mgf_file):
         self.mgf_file = mgf_file
         self.spectra = []
@@ -53,19 +52,22 @@ class SpecLib():
             spec.keep_top_k()
             n_done += 1
             if n_done % 100 == 0:
-                logger.info('SpecLib filtered {}/{}, {:.2f}%'.format(
-                    n_done, len(self.spectra),
-                    100 * (n_done / len(self.spectra))))
+                logger.info(
+                    "SpecLib filtered {}/{}, {:.2f}%".format(
+                        n_done, len(self.spectra), 100 * (n_done / len(self.spectra))
+                    )
+                )
 
-    def spectral_match(self,
-                       query,
-                       scoring_function=fast_cosine,
-                       ms2_tol=0.2,
-                       min_match_peaks=1,
-                       ms1_tol=0.2,
-                       score_thresh=0.7):
-        candidates = self._candidates(self.sorted_spectra, query.precursor_mz,
-                                      ms1_tol)
+    def spectral_match(
+        self,
+        query,
+        scoring_function=fast_cosine,
+        ms2_tol=0.2,
+        min_match_peaks=1,
+        ms1_tol=0.2,
+        score_thresh=0.7,
+    ):
+        candidates = self._candidates(self.sorted_spectra, query.precursor_mz, ms1_tol)
         hits = []
         for c in candidates:
             sc, _ = scoring_function(query, c, ms2_tol, min_match_peaks)

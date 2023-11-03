@@ -3,13 +3,12 @@ from pathlib import Path
 from jsonschema import Draft7Validator
 
 
-with open(Path(__file__).parent / "podp_adapted_schema.json", 'r') as f:
+with open(Path(__file__).parent / "podp_adapted_schema.json", "r") as f:
     PODP_ADAPTED_SCHEMA = json.load(f)
 
 
 def validate_podp_json(json_data: dict) -> None:
-    """
-    Validate a dictionary of JSON data against the PODP JSON schema.
+    """Validate a dictionary of JSON data against the PODP JSON schema.
 
     All validation error messages are collected and raised as a single
     ValueError.
@@ -26,4 +25,5 @@ def validate_podp_json(json_data: dict) -> None:
         error_messages = [f"{e.json_path}: {e.message}" for e in errors]
         raise ValueError(
             "Not match PODP adapted schema, here are the detailed error:\n  - "
-            + "\n  - ".join(error_messages))
+            + "\n  - ".join(error_messages)
+        )

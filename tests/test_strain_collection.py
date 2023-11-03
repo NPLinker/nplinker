@@ -16,7 +16,7 @@ def test_repr(collection: StrainCollection):
 
 
 def test_str(collection: StrainCollection):
-    assert str(collection) == 'StrainCollection(n=1) [strain_1]'
+    assert str(collection) == "StrainCollection(n=1) [strain_1]"
 
 
 def test_len(collection: StrainCollection):
@@ -95,8 +95,7 @@ def test_add_same_id_different_alias(collection: StrainCollection):
     assert collection._strain_dict_name["strain_1_b"] == [strain]
 
 
-def test_add_different_id_same_alias(strain: Strain,
-                                     collection: StrainCollection):
+def test_add_different_id_same_alias(strain: Strain, collection: StrainCollection):
     strain2 = Strain("strain_2")
     strain2.add_alias("strain_1_a")
     collection.add(strain2)
@@ -108,8 +107,7 @@ def test_add_different_id_same_alias(strain: Strain,
     assert collection._strain_dict_name["strain_1_a"] == [strain, strain2]
 
 
-def test_add_different_id_different_alias(strain: Strain,
-                                          collection: StrainCollection):
+def test_add_different_id_different_alias(strain: Strain, collection: StrainCollection):
     strain2 = Strain("strain_2")
     strain2.add_alias("strain_2_a")
     collection.add(strain2)
@@ -129,8 +127,7 @@ def test_remove(strain: Strain):
     assert strain not in sc
 
 
-def test_remove_same_id_same_alias(collection: StrainCollection,
-                                   strain: Strain):
+def test_remove_same_id_same_alias(collection: StrainCollection, strain: Strain):
     collection.remove(strain)
     assert strain not in collection
 
@@ -176,15 +173,11 @@ def test_lookup(collection: StrainCollection, strain: Strain):
 @pytest.fixture
 def json_file(tmp_path):
     data = {
-        "strain_mappings": [{
-            "strain_id": "strain_1",
-            "strain_alias": ["alias_1", "alias_2"]
-        }, {
-            "strain_id": "strain_2",
-            "strain_alias": ["alias_3", "alias_4"]
-        }],
-        "version":
-        "1.0"
+        "strain_mappings": [
+            {"strain_id": "strain_1", "strain_alias": ["alias_1", "alias_2"]},
+            {"strain_id": "strain_2", "strain_alias": ["alias_3", "alias_4"]},
+        ],
+        "version": "1.0",
     }
     file_path = tmp_path / "test.json"
     with open(file_path, "w") as f:
@@ -210,12 +203,8 @@ def test_read_json(json_file):
 def test_to_json(collection: StrainCollection, tmp_path):
     # tests writing to string
     expected_data = {
-        "strain_mappings": [{
-            "strain_id": "strain_1",
-            "strain_alias": ["strain_1_a"]
-        }],
-        "version":
-        "1.0"
+        "strain_mappings": [{"strain_id": "strain_1", "strain_alias": ["strain_1_a"]}],
+        "version": "1.0",
     }
     expected_json = json.dumps(expected_data)
     actual_json = collection.to_json()

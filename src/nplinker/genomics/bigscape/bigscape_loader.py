@@ -9,8 +9,7 @@ from ..gcf import GCF
 logger = LogConfig.getLogger(__name__)
 
 
-class BigscapeGCFLoader():
-
+class BigscapeGCFLoader:
     def __init__(self, cluster_file: str | PathLike, /) -> None:
         """Build a loader for BiG-SCAPE GCF cluster file.
 
@@ -43,7 +42,7 @@ class BigscapeGCFLoader():
         """Parse BiG-SCAPE cluster file to return GCF objects."""
         gcf_dict: dict[str, GCF] = {}
         with open(cluster_file, "rt", encoding="utf-8") as f:
-            reader = csv.reader(f, delimiter='\t')
+            reader = csv.reader(f, delimiter="\t")
             next(reader)  # skip headers
             for line in reader:
                 bgc_id, family_id = line[:]

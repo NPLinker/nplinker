@@ -1,27 +1,25 @@
 {
   "editor.rulers": [
-    72,
-    79
+    80,
+    100
   ],
 
   // python
   "[python]": {
-    "editor.defaultFormatter": "ms-python.python"
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": true,
+      "source.organizeImports.ruff": true,
+    }
   },
+  "python.linting.prospectorEnabled": false
   "python.analysis.completeFunctionParens": true,
-  "python.autoComplete.addBrackets": true,
   "python.defaultInterpreterPath": "",
   "python.languageServer": "Pylance",
-  // formatting and linting
-  "python.formatting.provider": "yapf",
-  "python.linting.enabled": true,
-  "python.linting.prospectorEnabled": true,
-  "python.linting.pylintEnabled": false,
   // python docstring
   "autoDocstring.docstringFormat": "google",
   "autoDocstring.customTemplatePath": ".vscode/vscode_docstring_google_adapted.mustache",
-  "jupyter.askForKernelRestart": false,
   "notebook.lineNumbers": "on",
   "notebook.diff.ignoreMetadata": true,
-  "jupyter.interactiveWindow.textEditor.executeSelection": true
 }

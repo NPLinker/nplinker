@@ -3,7 +3,6 @@ from .molecular_family import MolecularFamily
 
 
 class SingletonFamily(MolecularFamily):
-
     def __init__(self):
         super().__init__("singleton-" + str(uuid.uuid4()))
 

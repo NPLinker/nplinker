@@ -1,5 +1,3 @@
-
-
 import time
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
@@ -14,7 +12,7 @@ logger = LogConfig.getLogger(__name__)
 
 
 class NPClassScoring(ScoringMethod):
-    NAME = 'npclassscore'
+    NAME = "npclassscore"
 
     def __init__(self, npl):
         super().__init__(npl)
@@ -30,13 +28,8 @@ class NPClassScoring(ScoringMethod):
         self.filter_missing_scores = False
         self._target_no_scores = set()
 
-    def _npclass_score(self,
-                       obj,
-                       target,
-                       method='mix',
-                       obj_classes=None,
-                       target_classes=None):
-        """Return sorted class link scores for scoring obj and target
+    def _npclass_score(self, obj, target, method="mix", obj_classes=None, target_classes=None):
+        """Return sorted class link scores for scoring obj and target.
 
         The input objects can be any mix of the following NPLinker types:
             - BGC
@@ -89,9 +82,10 @@ class NPClassScoring(ScoringMethod):
             bgc_to_spec = True
 
         # assess method - move to get_links?
-        assert method in self.method_options, \
-            (f"NPClass method should be one of method options: {self.method_options}, if your method is not " +
-             "in the options check if the class predictions (canopus, etc.) are loaded correctly")
+        assert method in self.method_options, (
+            f"NPClass method should be one of method options: {self.method_options}, if your method is not "
+            + "in the options check if the class predictions (canopus, etc.) are loaded correctly"
+        )
 
         # gather correct classes if not provided, dict for bgcs, tup for spec
         if not bgc_like_classes_dict:
@@ -101,8 +95,7 @@ class NPClassScoring(ScoringMethod):
         # unpack spec_like classes - both are lists
         spec_like_classes, spec_like_classes_names_inds = spec_like_classes_tup
 
-        scores = [
-        ]  # this will be returned if one of the class sides is absent
+        scores = []  # this will be returned if one of the class sides is absent
         std_score = 0  # if link not recorded in scores (mibig) return this score
         # loop through classes that are possible to link (names in class_match object)
         for bgc_class_name in self.npl.class_matches.bgc_class_names:
@@ -111,8 +104,7 @@ class NPClassScoring(ScoringMethod):
                 bigscape_class = bgc_like_classes_dict["bigscape_class"]
                 # convert bigscape class to mibig class
                 bgc_like_classes = [
-                    self.npl.class_matches.bigscape_mibig_conversion.get(
-                        bigscape_class)
+                    self.npl.class_matches.bigscape_mibig_conversion.get(bigscape_class)
                 ]
             else:
                 bgc_like_classes = bgc_like_classes_dict.get(bgc_class_name)
@@ -120,37 +112,48 @@ class NPClassScoring(ScoringMethod):
                 for bgc_class in bgc_like_classes:
                     for chem_class_name in self.npl.class_matches.chem_class_names:
                         # does info exist for this spectrum class level, return index for class level
-                        spec_class_level_i = spec_like_classes_names_inds.get(
-                            chem_class_name)
+                        spec_class_level_i = spec_like_classes_names_inds.get(chem_class_name)
                         if spec_class_level_i:
-                            spec_class_tup = spec_like_classes[
-                                spec_class_level_i]
+                            spec_class_tup = spec_like_classes[spec_class_level_i]
                             if spec_class_tup:  # if there is a class at this lvl
                                 # is a tuple of (name, score) so take [0]
                                 spec_class = spec_class_tup[0]
                                 # determine direction of scoring: BGC -> spectrum
                                 if bgc_to_spec:
-                                    score = self.npl.class_matches.\
-                                        class_matches[bgc_class_name]\
-                                        [chem_class_name].get(bgc_class, {})\
+                                    score = (
+                                        self.npl.class_matches.class_matches[bgc_class_name][
+                                            chem_class_name
+                                        ]
+                                        .get(bgc_class, {})
                                         .get(spec_class, std_score)
-                                    result_tuple = (score, bgc_class_name,
-                                                    chem_class_name, bgc_class,
-                                                    spec_class)
+                                    )
+                                    result_tuple = (
+                                        score,
+                                        bgc_class_name,
+                                        chem_class_name,
+                                        bgc_class,
+                                        spec_class,
+                                    )
                                 else:  # spectrum -> BGC
-                                    score = self.npl.class_matches.\
-                                        class_matches[chem_class_name]\
-                                        [bgc_class_name].get(spec_class, {})\
+                                    score = (
+                                        self.npl.class_matches.class_matches[chem_class_name][
+                                            bgc_class_name
+                                        ]
+                                        .get(spec_class, {})
                                         .get(bgc_class, std_score)
-                                    result_tuple = (score, chem_class_name,
-                                                    bgc_class_name, spec_class,
-                                                    bgc_class)
+                                    )
+                                    result_tuple = (
+                                        score,
+                                        chem_class_name,
+                                        bgc_class_name,
+                                        spec_class,
+                                        bgc_class,
+                                    )
                                 scores.append(result_tuple)
         return sorted(scores, reverse=True)
 
     def _get_targets(self, test_id):
-        """
-        Get the targets based upon instance of test_id, returns list of targets
+        """Get the targets based upon instance of test_id, returns list of targets.
 
         Args:
             test_id: one of the NPLinker objects: BGC, GCF, Spectrum, Molfam
@@ -193,7 +196,7 @@ class NPClassScoring(ScoringMethod):
         return targets
 
     def _get_gen_classes(self, bgc_like, gcf_as_cutoff=0.5):
-        """Get classes for genomics objects
+        """Get classes for genomics objects.
 
         Args:
             bgc_like: BGC or GCF object from NPLinker input objects
@@ -209,30 +212,30 @@ class NPClassScoring(ScoringMethod):
         if is_bgc:
             # get parent gcf for bgc
             bgc_like_gcf = [
-                gcf for gcf in self.npl.gcfs
-                if bgc_like.bgc_id in [b.bgc_id for b in gcf.bgcs]
+                gcf for gcf in self.npl.gcfs if bgc_like.bgc_id in [b.bgc_id for b in gcf.bgcs]
             ][0]
             # gather AS classes and convert to names in scoring dict
             as_classes = self.npl.class_matches.convert_as_classes(
-                bgc_like.product_prediction.split("."))
+                bgc_like.product_prediction.split(".")
+            )
             bgc_like_classes_dict = {
                 "bigscape_class": bgc_like_gcf.bigscape_class,
                 # str - always one bigscape class right?
-                "as_classes": as_classes
+                "as_classes": as_classes,
             }  # list(str)
         else:
             as_classes = self.npl.class_matches.convert_as_classes(
-                self.npl.class_matches.get_gcf_as_classes(
-                    bgc_like, gcf_as_cutoff))
+                self.npl.class_matches.get_gcf_as_classes(bgc_like, gcf_as_cutoff)
+            )
             bgc_like_classes_dict = {
                 "bigscape_class": bgc_like.bigscape_class,
                 # str - always one bigscape class right?
-                "as_classes": as_classes
+                "as_classes": as_classes,
             }  # list(str)
         return bgc_like_classes_dict
 
-    def _get_met_classes(self, spec_like, method='mix'):
-        """Get chemical classes for a Spectrum or MolFam based on method
+    def _get_met_classes(self, spec_like, method="mix"):
+        """Get chemical classes for a Spectrum or MolFam based on method.
 
         Args:
             spec_like: Spectrum or MolFam, one of the NPLinker input types
@@ -249,71 +252,85 @@ class NPClassScoring(ScoringMethod):
 
         # gather classes for spectra, using right method
         # choose the main method here by including it as 'main' in the method parameter
-        use_canopus = ('main' in method or 'canopus' in method
-                       or 'mix' in method) and 'canopus' in self.method_options
-        use_mne = ('molnetenhancer' in method or 'mix' in method) and \
-                  'molnetenhancer' in self.method_options
-        spec_like_classes, spec_like_classes_names, \
-            spec_like_classes_names_inds = (None, None, None)
+        use_canopus = (
+            "main" in method or "canopus" in method or "mix" in method
+        ) and "canopus" in self.method_options
+        use_mne = (
+            "molnetenhancer" in method or "mix" in method
+        ) and "molnetenhancer" in self.method_options
+        spec_like_classes, spec_like_classes_names, spec_like_classes_names_inds = (
+            None,
+            None,
+            None,
+        )
         # the order in which the classes are read, determines the priority (now: first canopus, then mne)
         if use_canopus and not spec_like_classes:
             if is_spectrum:
                 # list of list of tuples/None - todo: add to spectrum object?
                 # take only 'best' (first) classification per ontology level
-                all_classes = self.npl.chem_classes.canopus. \
-                    spectra_classes.get(spec_like.spectrum_id)
+                all_classes = self.npl.chem_classes.canopus.spectra_classes.get(
+                    spec_like.spectrum_id
+                )
                 if all_classes:
                     spec_like_classes = [
-                        cls_per_lvl for lvl in all_classes
-                        for i, cls_per_lvl in enumerate(lvl) if i == 0
+                        cls_per_lvl
+                        for lvl in all_classes
+                        for i, cls_per_lvl in enumerate(lvl)
+                        if i == 0
                     ]
-                spec_like_classes_names_inds = self.npl.chem_classes.canopus. \
-                    spectra_classes_names_inds
+                spec_like_classes_names_inds = (
+                    self.npl.chem_classes.canopus.spectra_classes_names_inds
+                )
             else:  # molfam
                 fam_id = spec_like.family_id
                 if fam_id.startswith("singleton-"):  # account for singleton families
-                    fam_id += f'_{spec_like.spectra[0].spectrum_id}'
-                all_classes = self.npl.chem_classes.canopus.molfam_classes.get(
-                    fam_id)
+                    fam_id += f"_{spec_like.spectra[0].spectrum_id}"
+                all_classes = self.npl.chem_classes.canopus.molfam_classes.get(fam_id)
                 if all_classes:
                     spec_like_classes = [
-                        cls_per_lvl for lvl in all_classes
-                        for i, cls_per_lvl in enumerate(lvl) if i == 0
+                        cls_per_lvl
+                        for lvl in all_classes
+                        for i, cls_per_lvl in enumerate(lvl)
+                        if i == 0
                     ]
-                spec_like_classes_names_inds = self.npl.chem_classes.canopus. \
-                    molfam_classes_names_inds
+                spec_like_classes_names_inds = (
+                    self.npl.chem_classes.canopus.molfam_classes_names_inds
+                )
         if use_mne and not spec_like_classes:
             # if mne or when main/canopus does not get classes
             if is_spectrum:
-                spec_like_classes = self.npl.chem_classes.molnetenhancer. \
-                    spectra_classes(spec_like.spectrum_id)
+                spec_like_classes = self.npl.chem_classes.molnetenhancer.spectra_classes(
+                    spec_like.spectrum_id
+                )
             else:  # molfam
                 fam_id = spec_like.family_id
                 if fam_id.startswith("singleton"):  # account for singleton families
-                    fam_id += f'_{spec_like.spectra[0].spectrum_id}'
-                spec_like_classes = self.npl.chem_classes.molnetenhancer. \
-                    molfam_classes.get(fam_id)
+                    fam_id += f"_{spec_like.spectra[0].spectrum_id}"
+                spec_like_classes = self.npl.chem_classes.molnetenhancer.molfam_classes.get(fam_id)
             # classes are same for molfam and spectrum so names are irrespective of is_spectrum
-            spec_like_classes_names_inds = self.npl.chem_classes.\
-                molnetenhancer.spectra_classes_names_inds
+            spec_like_classes_names_inds = (
+                self.npl.chem_classes.molnetenhancer.spectra_classes_names_inds
+            )
         return spec_like_classes, spec_like_classes_names_inds
 
     @staticmethod
     def setup(npl):
-        """Perform any one-off initialisation required (will only be called once)"""
+        """Perform any one-off initialisation required (will only be called once)."""
         logger.info("Set up NPClassScore scoring")
         met_options = npl.chem_classes.class_predict_options
         logger.info(f"Please choose one of the methods from {met_options}")
         if not met_options:
-            logger.warn(f"There are no methods available! This is probably "
-                        f"because no class predictions (canopus, etc.) were "
-                        f"present or they are not loaded correctly")
+            logger.warn(
+                "There are no methods available! This is probably "
+                "because no class predictions (canopus, etc.) were "
+                "present or they are not loaded correctly"
+            )
         else:
             logger.info(f"Currently the method '{met_options[0]}' is selected")
         # todo: give info about parameters
 
     def get_links(self, objects, link_collection):
-        """Given a set of objects, return link information"""
+        """Given a set of objects, return link information."""
         # todo: pickle results
         logger.info("Running NPClassScore...")
         begin = time.time()
@@ -323,30 +340,24 @@ class NPClassScoring(ScoringMethod):
 
         # only get target classes once for each target here
         if obj_is_gen:  # obj is genome so get metabolome classes for target
-            targets_classes = [
-                self._get_met_classes(target, self.method)
-                for target in targets
-            ]
+            targets_classes = [self._get_met_classes(target, self.method) for target in targets]
         else:
-            targets_classes = [
-                self._get_gen_classes(target) for target in targets
-            ]
+            targets_classes = [self._get_gen_classes(target) for target in targets]
 
         logger.info("Using Metcalf scoring to get shared strains")
         # get mapping of shared strains
         if not self.npl._datalinks:
-            self.npl._datalinks = self.npl.scoring_method(
-                MetcalfScoring.NAME).datalinks
+            self.npl._datalinks = self.npl.scoring_method(MetcalfScoring.NAME).datalinks
         if obj_is_gen:
-            common_strains = self.npl.get_common_strains(
-                targets, objects)
+            common_strains = self.npl.get_common_strains(targets, objects)
         else:
-            common_strains = self.npl.get_common_strains(
-                objects, targets)
-        logger.info(f"Calculating NPClassScore for {len(objects)} objects to "
-                    f"{len(targets)} targets ({len(common_strains)} pairwise "
-                    f"interactions that share at least 1 strain). This might "
-                    f"take a while.")
+            common_strains = self.npl.get_common_strains(objects, targets)
+        logger.info(
+            f"Calculating NPClassScore for {len(objects)} objects to "
+            f"{len(targets)} targets ({len(common_strains)} pairwise "
+            f"interactions that share at least 1 strain). This might "
+            f"take a while."
+        )
 
         results = {}
         for obj in objects:
@@ -358,58 +369,59 @@ class NPClassScoring(ScoringMethod):
                 obj_classes = self._get_met_classes(obj, self.method)
 
             for target, target_classes in zip(targets, targets_classes):
-                self._create_object_link(obj_is_gen, common_strains, results, obj, obj_classes, target, target_classes)
+                self._create_object_link(
+                    obj_is_gen, common_strains, results, obj, obj_classes, target, target_classes
+                )
 
         # info about spectra/MFs with missing scoring
         len_missing = len(self._target_no_scores)
         if len_missing > 0:
-            filter_msg = 'kept'
+            filter_msg = "kept"
             if self.filter_missing_scores:
-                filter_msg = 'filtered out'
+                filter_msg = "filtered out"
             logger.warning(
-                f'{len_missing} targets have no NPClassScore '
-                f'prediction due to missing class predictions and are '
-                f'{filter_msg} by default. Adjust .filter_missing_scores '
-                f'to change.')
+                f"{len_missing} targets have no NPClassScore "
+                f"prediction due to missing class predictions and are "
+                f"{filter_msg} by default. Adjust .filter_missing_scores "
+                f"to change."
+            )
 
         logger.info(f"NPClassScore completed in {time.time() - begin:.1f}s")
         link_collection._add_links_from_method(self, results)
         return link_collection
 
-    def _create_object_link(self, obj_is_gen, common_strains, results, obj, obj_classes, target, target_classes):
+    def _create_object_link(
+        self, obj_is_gen, common_strains, results, obj, obj_classes, target, target_classes
+    ):
         # only consider targets that have shared strains
         common_tup = (obj, target)
         if obj_is_gen:
             common_tup = (target, obj)
         shared_strains = common_strains.get(common_tup)
         if shared_strains is not None:  # todo: fix for bgcs
-            full_score = self._npclass_score(
-                        obj, target, self.method, obj_classes,
-                        target_classes)[:self.num_results]
+            full_score = self._npclass_score(obj, target, self.method, obj_classes, target_classes)[
+                : self.num_results
+            ]
             try:
                 npclassscore = full_score[0][0]
             except IndexError:
-                        # no score is found due to missing classes for spectra
+                # no score is found due to missing classes for spectra
                 self._target_no_scores.add(target)  # keep track
                 if not self.filter_missing_scores:
-                    results[obj][target] = ObjectLink(
-                                obj, target, self, full_score)
+                    results[obj][target] = ObjectLink(obj, target, self, full_score)
             else:
                 if npclassscore > self.cutoff:
-                    results[obj][target] = ObjectLink(
-                                obj, target, self, full_score)
+                    results[obj][target] = ObjectLink(obj, target, self, full_score)
 
     def format_data(self, data):
-        """Given whatever output data the method produces, return a readable string version"""
+        """Given whatever output data the method produces, return a readable string version."""
         # data or full_score is a list of tuples, here return just NPClassScore
         formatted_data = None  # default when there is no score (missing class)
         if data:
             # there is a score
-            formatted_data = f'{data[0][0]:.3f}'
+            formatted_data = f"{data[0][0]:.3f}"
         return formatted_data
 
     def sort(self, objects, reverse=True):
-        """Given a list of objects, return them sorted by link score"""
-        return sorted(objects,
-                      key=lambda objlink: objlink[self],
-                      reverse=reverse)
+        """Given a list of objects, return them sorted by link score."""
+        return sorted(objects, key=lambda objlink: objlink[self], reverse=reverse)

@@ -27,11 +27,9 @@ def k_vec(a_mat, b, gamma=0.01):
 
 
 @jit(nopython=True)
-def project_candidate_opt(index, fingerprint, latent, x_kernel_vector,
-                          latent_basis, gamma):
+def project_candidate_opt(index, fingerprint, latent, x_kernel_vector, latent_basis, gamma):
     fingerprint_kernel_vector = k_vec(latent, fingerprint.T, gamma)
-    res = numpy.dot(numpy.dot(fingerprint_kernel_vector, latent_basis),
-                    x_kernel_vector)
+    res = numpy.dot(numpy.dot(fingerprint_kernel_vector, latent_basis), x_kernel_vector)
     return res, fingerprint_kernel_vector
 
 
@@ -47,47 +45,43 @@ def project_candidate_preprocessed(preprocessed_fingerprint, x_kernel_vector):
     return numpy.dot(preprocessed_fingerprint, x_kernel_vector)
 
 
-def project_candidate_wrapper(index, candidate_fingerprints, latent,
-                              x_kernel_vector, latent_basis, gamma):
+def project_candidate_wrapper(
+    index, candidate_fingerprints, latent, x_kernel_vector, latent_basis, gamma
+):
     return [
-        project_candidate_opt(index, fingerprint, latent, x_kernel_vector,
-                              latent_basis, gamma)
+        project_candidate_opt(index, fingerprint, latent, x_kernel_vector, latent_basis, gamma)
         for fingerprint in candidate_fingerprints
     ]
 
 
 @jit(nopython=True)
-def project_candidate_kernel_opt(index, fingerprint_kernel_vector,
-                                 x_kernel_vector, latent_basis):
-    res = numpy.dot(numpy.dot(fingerprint_kernel_vector, latent_basis),
-                    x_kernel_vector)
+def project_candidate_kernel_opt(index, fingerprint_kernel_vector, x_kernel_vector, latent_basis):
+    res = numpy.dot(numpy.dot(fingerprint_kernel_vector, latent_basis), x_kernel_vector)
     return res, fingerprint_kernel_vector
 
 
-def project_candidate_kernel_wrapper(index, candidate_kernels, x_kernel_vector,
-                                     latent_basis):
+def project_candidate_kernel_wrapper(index, candidate_kernels, x_kernel_vector, latent_basis):
     return [
-        project_candidate_kernel_opt(index, kernel_vector, x_kernel_vector,
-                                     latent_basis)
+        project_candidate_kernel_opt(index, kernel_vector, x_kernel_vector, latent_basis)
         for kernel_vector in candidate_kernels
     ]
 
 
 # @jit(nopython=True)
-def rank_candidates_opt(index, candidate_fingerprints, latent, x_kernel_vector,
-                        latent_basis, gamma):
+def rank_candidates_opt(
+    index, candidate_fingerprints, latent, x_kernel_vector, latent_basis, gamma
+):
     candidate_distances, fingerprint_kernel_vectors = project_candidates_opt(
-        index, candidate_fingerprints, latent, x_kernel_vector, latent_basis,
-        gamma)
-    return numpy.argsort(
-        numpy.array(candidate_distances))[::-1], fingerprint_kernel_vectors
+        index, candidate_fingerprints, latent, x_kernel_vector, latent_basis, gamma
+    )
+    return numpy.argsort(numpy.array(candidate_distances))[::-1], fingerprint_kernel_vectors
 
 
-def project_candidates_opt(index, candidate_fingerprints, latent,
-                           x_kernel_vector, latent_basis, gamma):
+def project_candidates_opt(
+    index, candidate_fingerprints, latent, x_kernel_vector, latent_basis, gamma
+):
     candidate_projections = [
-        project_candidate_opt(index, fingerprint, latent, x_kernel_vector,
-                              latent_basis, gamma)
+        project_candidate_opt(index, fingerprint, latent, x_kernel_vector, latent_basis, gamma)
         for fingerprint in candidate_fingerprints
     ]
     candidate_distances = [x[0] for x in candidate_projections]
@@ -105,27 +99,22 @@ def preprocess_candidates(candidate_fingerprints, latent, latent_basis, gamma):
 
 def project_candidates_preprocessed(preprocessed_candidates, x_kernel_vector):
     candidate_distances = [
-        project_candidate_preprocessed(x, x_kernel_vector)
-        for x in preprocessed_candidates
+        project_candidate_preprocessed(x, x_kernel_vector) for x in preprocessed_candidates
     ]
     return candidate_distances, []
 
 
-def rank_candidate_kernel_opt(index, candidate_kernels, latent,
-                              x_kernel_vector, latent_basis):
+def rank_candidate_kernel_opt(index, candidate_kernels, latent, x_kernel_vector, latent_basis):
     candidate_projections = [
-        project_candidate_kernel_opt(index, kernel_vector, x_kernel_vector,
-                                     latent_basis)
+        project_candidate_kernel_opt(index, kernel_vector, x_kernel_vector, latent_basis)
         for kernel_vector in candidate_kernels
     ]
     candidate_distances = [x[0] for x in candidate_projections]
     fingerprint_kernel_vectors = [x[1] for x in candidate_projections]
-    return numpy.argsort(
-        numpy.array(candidate_distances))[::-1], fingerprint_kernel_vectors
+    return numpy.argsort(numpy.array(candidate_distances))[::-1], fingerprint_kernel_vectors
 
 
-class InputOutputKernelRegression():
-
+class InputOutputKernelRegression:
     def __init__(self, data):
         self.data = data
         self.kernel_vector_cache = {}
@@ -146,17 +135,15 @@ class InputOutputKernelRegression():
 
         training_data_latent = numpy.array(training_data_latent).T
 
-        latent_basis = numpy.linalg.inv(self._lambda * eye +
-                                        training_data_kernel)
+        latent_basis = numpy.linalg.inv(self._lambda * eye + training_data_kernel)
         self.latent_basis = latent_basis
         self.basis = numpy.dot(training_data_latent, latent_basis)
 
         self.latent = self.data.get_latent_vectors_vec(self.training_set)
 
-    def calculate_fingerprint_kernel_vector(self,
-                                            fingerprint,
-                                            training_data_latent,
-                                            kernel='gaussian'):
+    def calculate_fingerprint_kernel_vector(
+        self, fingerprint, training_data_latent, kernel="gaussian"
+    ):
         # if kernel == 'gaussian':
         #     def k_vec(a_mat, b, gamma=0.01):
         #         # vectorised kernel function
@@ -167,13 +154,9 @@ class InputOutputKernelRegression():
         return kernel_vector
 
     def project_candidate(self, index, fingerprint, latent, output=None):
-        fingerprint_kernel_vector = self.calculate_fingerprint_kernel_vector(
-            fingerprint, latent)
-        x_kernel_vector = self.data.kernel_product_set(index,
-                                                       self.training_set)
-        res = numpy.dot(
-            numpy.dot(fingerprint_kernel_vector, self.latent_basis),
-            x_kernel_vector)
+        fingerprint_kernel_vector = self.calculate_fingerprint_kernel_vector(fingerprint, latent)
+        x_kernel_vector = self.data.kernel_product_set(index, self.training_set)
+        res = numpy.dot(numpy.dot(fingerprint_kernel_vector, self.latent_basis), x_kernel_vector)
 
         if output is not None:
             output.value = res
@@ -188,20 +171,17 @@ class InputOutputKernelRegression():
         batch_size = 100
         for i in range(int(len(candidate_fingerprints) / batch_size) + 1):
             if i % 10 == 0:
-                print('processing set %s' % i)
-            candidate_fingerprints_subset = candidate_fingerprints[i *
-                                                                   batch_size:
-                                                                   (i + 1) *
-                                                                   batch_size]
+                print("processing set %s" % i)
+            candidate_fingerprints_subset = candidate_fingerprints[
+                i * batch_size : (i + 1) * batch_size
+            ]
             values = [
                 multiprocessing.Value(ctypes.c_float)
                 for x in range(len(candidate_fingerprints_subset))
             ]
             candidate_distance_jobs = [
-                Process(target=self.project_candidate,
-                        args=(index, fingerprint, latent, value))
-                for fingerprint, value in zip(candidate_fingerprints_subset,
-                                              values)
+                Process(target=self.project_candidate, args=(index, fingerprint, latent, value))
+                for fingerprint, value in zip(candidate_fingerprints_subset, values)
             ]
             [x.start() for x in candidate_distance_jobs]
             [x.join() for x in candidate_distance_jobs]
@@ -209,25 +189,23 @@ class InputOutputKernelRegression():
             candidate_distances.extend(candidate_distances_subset)
 
         return [
-            x[1] for x in sorted(zip(candidate_distances,
-                                     range(len(candidate_distances))),
-                                 key=lambda x: x[0],
-                                 reverse=True)
+            x[1]
+            for x in sorted(
+                zip(candidate_distances, range(len(candidate_distances))),
+                key=lambda x: x[0],
+                reverse=True,
+            )
         ]
 
-    def rank_candidates_opt(self,
-                            index,
-                            candidate_fingerprints,
-                            candidate_set_name=None):
+    def rank_candidates_opt(self, index, candidate_fingerprints, candidate_set_name=None):
         latent = self.latent
-        x_kernel_vector = self.data.kernel_product_set(index,
-                                                       self.training_set)
+        x_kernel_vector = self.data.kernel_product_set(index, self.training_set)
         latent_basis = self.latent_basis
         gamma = 0.01
 
         candidate_ranking, fp_kernels = rank_candidates_opt(
-            index, candidate_fingerprints, latent, x_kernel_vector,
-            latent_basis, gamma)
+            index, candidate_fingerprints, latent, x_kernel_vector, latent_basis, gamma
+        )
 
         # if candidate_set_name is not None:
         #     with open('/home/grimur/iokr/data/candidate_hash/fp_gamma0.01_%s.bin' % candidate_set_name, 'wb') as f:
@@ -236,10 +214,8 @@ class InputOutputKernelRegression():
         return candidate_ranking
 
     def get_data_for_candidate_ranking(self, index):
-        latent, latent_basis, gamma = self.get_data_for_novel_candidate_ranking(
-        )
-        x_kernel_vector = self.data.kernel_product_set(index,
-                                                       self.training_set)
+        latent, latent_basis, gamma = self.get_data_for_novel_candidate_ranking()
+        x_kernel_vector = self.data.kernel_product_set(index, self.training_set)
 
         return latent, x_kernel_vector, latent_basis, gamma
 
@@ -250,8 +226,7 @@ class InputOutputKernelRegression():
         return latent, latent_basis, gamma
 
     def project(self, index):
-        x_kernel_vector = self.data.kernel_product_set(index,
-                                                       self.training_set)
+        x_kernel_vector = self.data.kernel_product_set(index, self.training_set)
         projection = numpy.dot(self.basis, x_kernel_vector)
         return projection
 
@@ -274,18 +249,17 @@ class InputOutputKernelRegression():
 
 
 def main():
-    target_vectors = numpy.array([[0, 1, 0], [1, 0, 0], [1, 1, 0], [1, 1, 1],
-                                  [0, 0, 1], [0, 1, 1], [1, 0, 1]],
-                                 dtype='float')
-    repr_vectors = numpy.array([[0, 1, 0], [1, 0, 0], [1, 1, 0], [1, 1, 1],
-                                [0, 0, 1], [0, 1, 1], [1, 0, 1]],
-                               dtype='float')
+    target_vectors = numpy.array(
+        [[0, 1, 0], [1, 0, 0], [1, 1, 0], [1, 1, 1], [0, 0, 1], [0, 1, 1], [1, 0, 1]], dtype="float"
+    )
+    repr_vectors = numpy.array(
+        [[0, 1, 0], [1, 0, 0], [1, 1, 0], [1, 1, 1], [0, 0, 1], [0, 1, 1], [1, 0, 1]], dtype="float"
+    )
 
     kernel_matrix = numpy.zeros((7, 7))
     for i in range(7):
         for j in range(i + 1):
-            kernel_matrix[i, j] = kernel_matrix[j, i] = numpy.dot(
-                repr_vectors[i], repr_vectors[j])
+            kernel_matrix[i, j] = kernel_matrix[j, i] = numpy.dot(repr_vectors[i], repr_vectors[j])
 
     data = DataStore(kernel_matrix, target_vectors)
     okr = InputOutputKernelRegression(data)
@@ -297,5 +271,5 @@ def main():
     print(okr.test(3), target_vectors[3])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

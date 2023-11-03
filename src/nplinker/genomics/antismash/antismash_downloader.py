@@ -1,7 +1,7 @@
 import os
+import shutil
 from os import PathLike
 from pathlib import Path
-import shutil
 from nplinker.logconfig import LogConfig
 from nplinker.utils import download_and_extract_archive
 from nplinker.utils import list_dirs
@@ -11,14 +11,14 @@ from nplinker.utils import list_files
 logger = LogConfig.getLogger(__name__)
 
 # urls to be given to download antismash data
-ANTISMASH_DB_DOWNLOAD_URL = 'https://antismash-db.secondarymetabolites.org/output/{}/{}'
+ANTISMASH_DB_DOWNLOAD_URL = "https://antismash-db.secondarymetabolites.org/output/{}/{}"
 # The antiSMASH DBV2 is for the availability of the old version, better to keep it.
-ANTISMASH_DBV2_DOWNLOAD_URL = 'https://antismash-dbv2.secondarymetabolites.org/output/{}/{}'
+ANTISMASH_DBV2_DOWNLOAD_URL = "https://antismash-dbv2.secondarymetabolites.org/output/{}/{}"
 
 
-def download_and_extract_antismash_data(antismash_id: str,
-                                        download_root: str | PathLike,
-                                        extract_root: str | PathLike) -> None:
+def download_and_extract_antismash_data(
+    antismash_id: str, download_root: str | PathLike, extract_root: str | PathLike
+) -> None:
     """Download and extract antiSMASH BGC archive for a specified genome.
 
     The antiSMASH database (https://antismash-db.secondarymetabolites.org/)
@@ -52,12 +52,9 @@ def download_and_extract_antismash_data(antismash_id: str,
         else:
             extract_path.mkdir(parents=True, exist_ok=True)
 
-        for base_url in [
-                ANTISMASH_DB_DOWNLOAD_URL, ANTISMASH_DBV2_DOWNLOAD_URL
-        ]:
-            url = base_url.format(antismash_id, antismash_id + '.zip')
-            download_and_extract_archive(url, download_root, extract_path,
-                                         antismash_id + '.zip')
+        for base_url in [ANTISMASH_DB_DOWNLOAD_URL, ANTISMASH_DBV2_DOWNLOAD_URL]:
+            url = base_url.format(antismash_id, antismash_id + ".zip")
+            download_and_extract_archive(url, download_root, extract_path, antismash_id + ".zip")
             break
 
         # delete subdirs
@@ -70,8 +67,7 @@ def download_and_extract_antismash_data(antismash_id: str,
             if file not in files_to_keep:
                 os.remove(file)
 
-        logger.info('antiSMASH BGC data of %s is downloaded and extracted.',
-                    antismash_id)
+        logger.info("antiSMASH BGC data of %s is downloaded and extracted.", antismash_id)
 
     except Exception as e:
         shutil.rmtree(extract_path)
@@ -81,8 +77,7 @@ def download_and_extract_antismash_data(antismash_id: str,
 
 def _check_roots(download_root: PathLike, extract_root: PathLike):
     if download_root == extract_root:
-        raise ValueError(
-            "Identical path of download directory and extract directory")
+        raise ValueError("Identical path of download directory and extract directory")
 
 
 def _check_extract_path(extract_path: PathLike):

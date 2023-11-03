@@ -2,13 +2,17 @@ from os import PathLike
 from pathlib import Path
 from typing_extensions import Self
 from nplinker.utils import download_url
-from .gnps_format import gnps_format_from_task_id
 from .gnps_format import GNPSFormat
+from .gnps_format import gnps_format_from_task_id
 
 
 class GNPSDownloader:
-    GNPS_DATA_DOWNLOAD_URL = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_clustered_spectra'
-    GNPS_DATA_DOWNLOAD_URL_FBMN = 'https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_cytoscape_data'
+    GNPS_DATA_DOWNLOAD_URL = (
+        "https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_clustered_spectra"
+    )
+    GNPS_DATA_DOWNLOAD_URL_FBMN = (
+        "https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_cytoscape_data"
+    )
 
     def __init__(self, task_id: str, download_root: str | PathLike):
         """Download GNPS zip archive for the given task id.
@@ -32,7 +36,8 @@ class GNPSDownloader:
                 f"Unknown workflow type for GNPS task '{task_id}'."
                 f"Supported GNPS workflows are described in the GNPSFormat enum, "
                 f"including such as 'METABOLOMICS-SNETS', 'METABOLOMICS-SNETS-V2' "
-                f"and 'FEATURE-BASED-MOLECULAR-NETWORKING'.")
+                f"and 'FEATURE-BASED-MOLECULAR-NETWORKING'."
+            )
 
         self._task_id = task_id
         self._download_root: Path = Path(download_root)
@@ -48,16 +53,14 @@ class GNPSDownloader:
         """
         return self._gnps_format
 
-
     def download(self) -> Self:
         """Execute the downloading process.
 
         Note: GNPS data is downloaded using the POST method (empty payload is OK).
         """
-        download_url(self.get_url(),
-                     self._download_root,
-                     filename=self._file_name,
-                     http_method="POST")
+        download_url(
+            self.get_url(), self._download_root, filename=self._file_name, http_method="POST"
+        )
         return self
 
     def get_download_file(self) -> str:
@@ -83,6 +86,5 @@ class GNPSDownloader:
             str: URL pointing to the GNPS data to be downloaded.
         """
         if self.gnps_format == GNPSFormat.FBMN:
-            return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL_FBMN.format(
-                self._task_id)
+            return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL_FBMN.format(self._task_id)
         return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL.format(self._task_id)

@@ -5,6 +5,7 @@ from nplinker.utils import download_and_extract_archive
 from nplinker.utils import list_dirs
 from nplinker.utils import list_files
 
+
 logger = LogConfig.getLogger(__name__)
 
 MIBIG_METADATA_URL = "https://dl.secondarymetabolites.org/mibig/mibig_json_{version}.tar.gz"
@@ -17,7 +18,7 @@ _MD5_MIBIG_METADATA = {
     "1.4": "a85530571d9dd7978b1bb0f2580cd30e",
     "2.0": "843ce4677db6d11422f0e6d94dd03e81",
     "3.0": "7c38b90f939086c03392d99a913baef9",
-    "3.1": "643d1349722a9437d8dcf558dac5f815"
+    "3.1": "643d1349722a9437d8dcf558dac5f815",
 }
 
 
@@ -26,7 +27,7 @@ def download_and_extract_mibig_metadata(
     extract_path: str,
     version: str = "3.1",
 ):
-    """Download and extract MIBiG metadata json files
+    """Download and extract MIBiG metadata json files.
 
     Args:
         download_root(str): Path to the directory to place downloaded archive in
@@ -41,8 +42,7 @@ def download_and_extract_mibig_metadata(
         >>> download_and_extract_mibig_metadata("/data/download", "/data/mibig_metadata")
     """
     if download_root == extract_path:
-        raise ValueError(
-            "Identical path of download directory and extract directory")
+        raise ValueError("Identical path of download directory and extract directory")
 
     # check if extract_path is empty
     files = [i for i in os.listdir(extract_path)]
@@ -55,23 +55,19 @@ def download_and_extract_mibig_metadata(
         url=MIBIG_METADATA_URL.format(version=version),
         download_root=download_root,
         extract_root=extract_path,
-        md5=md5)
+        md5=md5,
+    )
 
     # After extracting mibig archive, it's either one dir or many json files,
     # if it's a dir, then move all json files from it to extract_path
     subdirs = list_dirs(extract_path)
     if len(subdirs) > 1:
-        raise ValueError(
-            f"Expected one extracted directory, got {len(subdirs)}")
+        raise ValueError(f"Expected one extracted directory, got {len(subdirs)}")
 
     if len(subdirs) == 1:
         subdir_path = subdirs[0]
-        for fname in list_files(subdir_path,
-                                prefix="BGC",
-                                suffix=".json",
-                                keep_parent=False):
-            shutil.move(os.path.join(subdir_path, fname),
-                        os.path.join(extract_path, fname))
+        for fname in list_files(subdir_path, prefix="BGC", suffix=".json", keep_parent=False):
+            shutil.move(os.path.join(subdir_path, fname), os.path.join(extract_path, fname))
         # delete subdir
         if subdir_path != extract_path:
             shutil.rmtree(subdir_path)

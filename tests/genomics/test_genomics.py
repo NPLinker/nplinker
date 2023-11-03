@@ -2,8 +2,8 @@ from __future__ import annotations
 import json
 import pytest
 from nplinker.genomics import BGC
-from nplinker.genomics import filter_mibig_only_gcf
 from nplinker.genomics import GCF
+from nplinker.genomics import filter_mibig_only_gcf
 from nplinker.genomics import generate_mappings_genome_id_bgc_id
 from nplinker.genomics import get_bgcs_from_gcfs
 from nplinker.genomics import get_strains_from_bgcs
@@ -21,8 +21,7 @@ def test_generate_mappings_genome_id_bgc_id(tmp_path):
     # using default output file path
     generate_mappings_genome_id_bgc_id(bgc_dir)
     # using custom output file path
-    generate_mappings_genome_id_bgc_id(bgc_dir,
-                                       tmp_path / GENOME_BGC_MAPPINGS_FILENAME)
+    generate_mappings_genome_id_bgc_id(bgc_dir, tmp_path / GENOME_BGC_MAPPINGS_FILENAME)
 
     # read both files
     with open(bgc_dir / GENOME_BGC_MAPPINGS_FILENAME) as f:
@@ -91,11 +90,7 @@ def strain_collection() -> StrainCollection:
 
 @pytest.fixture
 def bgc_list() -> list[BGC]:
-    return [
-        BGC("BGC_01", "NPR"),
-        BGC("BGC_02", "Alkaloid"),
-        BGC("SAMPLE_BGC_03", "Polyketide")
-    ]
+    return [BGC("BGC_01", "NPR"), BGC("BGC_02", "Alkaloid"), BGC("SAMPLE_BGC_03", "Polyketide")]
 
 
 @pytest.fixture
@@ -129,8 +124,7 @@ def test_map_strain_to_bgc_error(strain_collection):
     bgcs = [BGC("BGC_04", "NPR")]
     with pytest.raises(ValueError) as e:
         map_strain_to_bgc(strain_collection, bgcs)
-    assert "Strain id 'BGC_04' from BGC object 'BGC_04' not found" in e.value.args[
-        0]
+    assert "Strain id 'BGC_04' from BGC object 'BGC_04' not found" in e.value.args[0]
 
 
 def test_map_bgc_to_gcf(bgc_list, gcf_list):

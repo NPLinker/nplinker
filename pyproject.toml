@@ -55,14 +55,6 @@ branch = true
 source = ["src"]
 command_line = "-m pytest"
 
-[tool.isort]
-lines_after_imports = 2
-force_single_line = true
-no_lines_before = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
-known_first_party = ["nplinker"]
-src_paths = ["src", "tests"]
-line_length = 80
-
 # Mypy: to check static type
 # see https://mypy.readthedocs.io/en/stable/config_file.html#example-pyproject-toml
 [tool.mypy]
@@ -70,3 +62,41 @@ python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+select = [
+    "F",  # Pyflakes
+    "E",  # pycodestyle (error)
+    "W",    # pycodestyle (warning)
+    "I",    # isort
+    "D",    # pydocstyle
+]
+ignore = [
+    'D100',  # Missing module docstring
+    'D104',  # Missing public package docstring
+    'D105',  # Missing docstring in magic method
+    # The following list excludes rules irrelevant to the Google style
+    'D203',
+    'D204',
+    'D213',
+    'D215',
+    'D400',
+    'D401',
+    'D404',
+    'D406',
+    'D407',
+    'D408',
+    'D409',
+    'D413',
+]
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["A", "B", "C", "D", "E", "F", "I"]
+
+[tool.ruff.isort]
+known-first-party = ["nplinker"]
+force-single-line = true
+lines-after-imports = 2
+no-lines-before = ["future","standard-library","third-party","first-party","local-folder"]

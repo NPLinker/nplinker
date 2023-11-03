@@ -7,7 +7,6 @@ from nplinker.utils import is_file_format
 
 
 class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
-
     def __init__(self, file: str | PathLike):
         """Class to load molecular families from GNPS output file.
 
@@ -54,18 +53,19 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
         # validate file format
         if not is_file_format(self._file, "tsv"):
             raise ValueError(
-                f"Invalid GNPS molecular family file '{self._file}'. "
-                f"Expected a '.tsv' file.")
+                f"Invalid GNPS molecular family file '{self._file}'. " f"Expected a '.tsv' file."
+            )
         # validate required columns against the header
-        required_columns = ['CLUSTERID1', 'CLUSTERID2', 'ComponentIndex']
-        with open(self._file, mode='rt') as f:
+        required_columns = ["CLUSTERID1", "CLUSTERID2", "ComponentIndex"]
+        with open(self._file, mode="rt") as f:
             header = f.readline()
             for k in required_columns:
                 if k not in header:
                     raise ValueError(
                         f"Invalid GNPS molecular famliy file '{self._file}'. "
                         f"Expected a header line with '{k}' column, "
-                        f"but got '{header}'.")
+                        f"but got '{header}'."
+                    )
 
     def _load(self) -> None:
         """Load molecular families from GNPS output file.
@@ -76,12 +76,12 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
         """
         # load molecular families to dict
         family_dict = {}
-        with open(self._file, mode='rt', encoding='utf-8') as f:
-            reader = csv.DictReader(f, delimiter='\t')
+        with open(self._file, mode="rt", encoding="utf-8") as f:
+            reader = csv.DictReader(f, delimiter="\t")
             for row in reader:
-                spec1_id = row['CLUSTERID1']
-                spec2_id = row['CLUSTERID2']
-                family_id = row['ComponentIndex']
+                spec1_id = row["CLUSTERID1"]
+                spec2_id = row["CLUSTERID2"]
+                family_id = row["ComponentIndex"]
                 if family_id not in family_dict:
                     family_dict[family_id] = set([spec1_id, spec2_id])
                 else:
@@ -89,7 +89,7 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
                     family_dict[family_id].add(spec2_id)
         # convert dict to list of MolecularFamily objects
         for family_id, spectra_ids in family_dict.items():
-            if family_id == '-1':  # the "-1" is from GNPS result
+            if family_id == "-1":  # the "-1" is from GNPS result
                 for spectrum_id in spectra_ids:
                     family = SingletonFamily()  ## uuid as family id
                     family.spectra_ids = set([spectrum_id])

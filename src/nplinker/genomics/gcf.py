@@ -11,8 +11,7 @@ if TYPE_CHECKING:
 logger = LogConfig.getLogger(__name__)
 
 
-class GCF():
-
+class GCF:
     def __init__(self, gcf_id: str, /) -> None:
         """Class to model gene cluster family (GCF).
 
@@ -45,7 +44,7 @@ class GCF():
 
     def __eq__(self, other) -> bool:
         if isinstance(other, GCF):
-            return (self.gcf_id == other.gcf_id and self.bgcs == other.bgcs)
+            return self.gcf_id == other.gcf_id and self.bgcs == other.bgcs
         return NotImplemented
 
     def __hash__(self) -> int:

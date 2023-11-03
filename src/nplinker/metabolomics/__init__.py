@@ -7,4 +7,4 @@ from .spectrum import Spectrum
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-__all__ = ['MolecularFamily', 'SingletonFamily', 'GNPS_KEY', 'Spectrum']
+__all__ = ["MolecularFamily", "SingletonFamily", "GNPS_KEY", "Spectrum"]

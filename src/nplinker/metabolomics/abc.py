@@ -6,14 +6,13 @@ from nplinker.metabolomics import Spectrum
 
 
 class SpectrumLoaderBase(ABC):
-
     @property
     @abstractmethod
     def spectra(self) -> Sequence[Spectrum]:
         ...
 
-class MolecularFamilyLoaderBase(ABC):
 
+class MolecularFamilyLoaderBase(ABC):
     @property
     @abstractmethod
     def families(self) -> Sequence[MolecularFamily]:
@@ -21,7 +20,6 @@ class MolecularFamilyLoaderBase(ABC):
 
 
 class FileMappingLoaderBase(ABC):
-
     @property
     @abstractmethod
     def mappings(self) -> dict[str, list[str]]:
@@ -29,7 +27,6 @@ class FileMappingLoaderBase(ABC):
 
 
 class AnnotationLoaderBase(ABC):
-
     @property
     @abstractmethod
     def annotations(self) -> dict[str, dict]:

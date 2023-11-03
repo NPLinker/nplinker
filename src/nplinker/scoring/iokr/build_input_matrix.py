@@ -33,23 +33,21 @@ def ppk_r(spec1, spec2, prec1, prec2, sigma_mass, sigma_int):
 
 
 def ppk_diff(spec1, spec2, sigma_mass, sigma_int):
-    spec1_diff = numpy.array(
-        [y - x for x, y in itertools.combinations(spec1, 2)])
-    spec2_diff = numpy.array(
-        [y - x for x, y in itertools.combinations(spec2, 2)])
+    spec1_diff = numpy.array([y - x for x, y in itertools.combinations(spec1, 2)])
+    spec2_diff = numpy.array([y - x for x, y in itertools.combinations(spec2, 2)])
     k_diff = ppk(spec1_diff, spec2_diff, sigma_mass, sigma_int)
     return k_diff
 
 
 def create_ppk_matrix():
-    iokr_data_path = '/home/grimur/iokr/data'
+    iokr_data_path = "/home/grimur/iokr/data"
     data_gnps = scipy.io.loadmat("/home/grimur/iokr/data/data_GNPS.mat")
-    ms_path = '/home/grimur/iokr/data/SPEC'
+    ms_path = "/home/grimur/iokr/data/SPEC"
 
     sigma_mass = 0.00001
     sigma_int = 100000.0
 
-    iokrdata = data.IOKRDataServer(iokr_data_path, kernel='PPKr.txt')
+    iokrdata = data.IOKRDataServer(iokr_data_path, kernel="PPKr.txt")
     ker_size = len(iokrdata.spectra)
 
     kernel_matrix_peaks = numpy.zeros((ker_size, ker_size))
@@ -62,31 +60,36 @@ def create_ppk_matrix():
     i_ms.filter = spectrum_filters.filter_by_collected_dag
 
     import time
+
     t0 = time.time()
     cnt = 0
     for i in range(len(iokrdata.spectra)):
         i_name = iokrdata.spectra[i][0]
-        i_ms.load(ms_path + os.sep + i_name + '.ms')
+        i_ms.load(ms_path + os.sep + i_name + ".ms")
         # for j in range(i + 1):
         if True:
             j = i
             cnt += 1
 
             j_name = iokrdata.spectra[j][0]
-            j_ms.load(ms_path + os.sep + j_name + '.ms')
+            j_ms.load(ms_path + os.sep + j_name + ".ms")
 
             # print('%s vs %s' % (len(i_ms.spectrum), len(j_ms.spectrum)))
 
             if len(i_ms.spectrum) == 0 or len(j_ms.spectrum) == 0:
-                print('empty')
+                print("empty")
                 ij_peaks = 0
                 ij_nloss = 0
             else:
-                ij_peaks = ppk(i_ms.spectrum, j_ms.spectrum, sigma_mass,
-                               sigma_int)
-                ij_nloss = ppk_nloss(i_ms.spectrum, j_ms.spectrum,
-                                     i_ms.parentmass, j_ms.parentmass,
-                                     sigma_mass, sigma_int)
+                ij_peaks = ppk(i_ms.spectrum, j_ms.spectrum, sigma_mass, sigma_int)
+                ij_nloss = ppk_nloss(
+                    i_ms.spectrum,
+                    j_ms.spectrum,
+                    i_ms.parentmass,
+                    j_ms.parentmass,
+                    sigma_mass,
+                    sigma_int,
+                )
 
             kernel_matrix_peaks[i, j] = ij_peaks
             kernel_matrix_peaks[j, i] = ij_peaks
@@ -98,22 +101,20 @@ def create_ppk_matrix():
             kernel_matrix_ppkr[j, i] = ij_peaks + ij_nloss
 
             if cnt % 100 == 0:
-                print('done {}/{}, {}'.format(cnt,
-                                          (ker_size**2) / 2, time.time() - t0))
+                print("done {}/{}, {}".format(cnt, (ker_size**2) / 2, time.time() - t0))
                 t0 = time.time()
 
     # numpy.savetxt('ppk_peaks.csv', kernel_matrix_peaks, delimiter=',')
     # numpy.savetxt('ppk_nloss.csv', kernel_matrix_nloss, delimiter=',')
     # numpy.savetxt('ppk_r.csv', kernel_matrix_ppkr, delimiter=',')
-    numpy.save('ppk_dag_peaks.npy', kernel_matrix_peaks)
-    numpy.save('ppk_dag_nloss.npy', kernel_matrix_nloss)
+    numpy.save("ppk_dag_peaks.npy", kernel_matrix_peaks)
+    numpy.save("ppk_dag_nloss.npy", kernel_matrix_nloss)
 
 
-def create_ppk_matrix_stripe_serial(filter_func, shift, normalise,
-                                    output_name):
-    iokr_data_path = '/home/grimur/iokr/data'
+def create_ppk_matrix_stripe_serial(filter_func, shift, normalise, output_name):
+    iokr_data_path = "/home/grimur/iokr/data"
     data_gnps = scipy.io.loadmat("/home/grimur/iokr/data/data_GNPS.mat")
-    ms_path = '/home/grimur/iokr/data/SPEC'
+    ms_path = "/home/grimur/iokr/data/SPEC"
 
     iokrdata = data.IOKRDataServer(iokr_data_path)
     ker_size = len(iokrdata.spectra)
@@ -152,12 +153,11 @@ def create_ppk_matrix_stripe_serial(filter_func, shift, normalise,
 
                 cnt += 1
                 if cnt % 100 == 0:
-                    print('done %s/%s, %s' %
-                          (cnt, (ker_size**2) / 2, time.time() - t0))
+                    print("done %s/%s, %s" % (cnt, (ker_size**2) / 2, time.time() - t0))
                     t0 = time.time()
 
-    numpy.save(output_name + '_peaks.npy', kernel_matrix_peaks)
-    numpy.save(output_name + '_nloss.npy', kernel_matrix_nloss)
+    numpy.save(output_name + "_peaks.npy", kernel_matrix_peaks)
+    numpy.save(output_name + "_nloss.npy", kernel_matrix_nloss)
 
 
 def gather_results(active_jobs):
@@ -191,9 +191,9 @@ def gather_results_2(active_jobs, queue_length):
 
 
 def do_stripe(i, names, filter_func, shift, normalise):
-    iokr_data_path = '/home/grimur/iokr/data'
+    iokr_data_path = "/home/grimur/iokr/data"
     data_gnps = scipy.io.loadmat("/home/grimur/iokr/data/data_GNPS.mat")
-    ms_path = '/home/grimur/iokr/data/SPEC'
+    ms_path = "/home/grimur/iokr/data/SPEC"
 
     sigma_mass = 0.00001
     sigma_int = 100000.0
@@ -207,63 +207,58 @@ def do_stripe(i, names, filter_func, shift, normalise):
     j_ms.filter = filter_func
     j_ms.normalise = normalise
 
-    i_ms.load(ms_path + os.sep + names[i] + '.ms')
+    i_ms.load(ms_path + os.sep + names[i] + ".ms")
     results = []
     for j in range(i + 1):
-        j_ms.load(ms_path + os.sep + names[j] + '.ms')
+        j_ms.load(ms_path + os.sep + names[j] + ".ms")
 
         ij_peaks = ppk(i_ms.spectrum, j_ms.spectrum, sigma_mass, sigma_int)
-        ij_nloss = ppk_nloss(i_ms.spectrum, j_ms.spectrum, i_ms.parentmass,
-                             j_ms.parentmass, sigma_mass, sigma_int)
+        ij_nloss = ppk_nloss(
+            i_ms.spectrum, j_ms.spectrum, i_ms.parentmass, j_ms.parentmass, sigma_mass, sigma_int
+        )
 
         results.append((ij_peaks, ij_nloss))
 
     return results
 
 
-def do_pair(i_spectrum, j_spectrum, i_parentmass, j_parentmass, sigma_mass,
-            sigma_int):
+def do_pair(i_spectrum, j_spectrum, i_parentmass, j_parentmass, sigma_mass, sigma_int):
     if len(i_spectrum) == 0 or len(j_spectrum) == 0:
-        print('empty spectrum!')
+        print("empty spectrum!")
         return 0, 0
     ij_peaks = ppk(i_spectrum, j_spectrum, sigma_mass, sigma_int)
-    ij_nloss = ppk_nloss(i_spectrum, j_spectrum, i_parentmass, j_parentmass,
-                         sigma_mass, sigma_int)
+    ij_nloss = ppk_nloss(i_spectrum, j_spectrum, i_parentmass, j_parentmass, sigma_mass, sigma_int)
     # ij_diff = ppk_diff(i_spectrum, j_spectrum, sigma_mass, sigma_int)
     return ij_peaks, ij_nloss  # , ij_diff
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser()
-    parser.add_argument('-f',
-                        dest='filter_type',
-                        help='filter type (dag, tree)',
-                        default=None)
-    parser.add_argument('-c',
-                        dest='collected',
-                        help='build filter from all input files',
-                        action='store_true',
-                        default=False)
-    parser.add_argument('-s',
-                        dest='shift',
-                        help='correct for ionisation',
-                        action='store_true',
-                        default=False)
-    parser.add_argument('-o', dest='output', help='output name', required=True)
-    parser.add_argument('-n',
-                        dest='normalise',
-                        help='normalise',
-                        action='store_true',
-                        default=False)
+    parser.add_argument("-f", dest="filter_type", help="filter type (dag, tree)", default=None)
+    parser.add_argument(
+        "-c",
+        dest="collected",
+        help="build filter from all input files",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "-s", dest="shift", help="correct for ionisation", action="store_true", default=False
+    )
+    parser.add_argument("-o", dest="output", help="output name", required=True)
+    parser.add_argument(
+        "-n", dest="normalise", help="normalise", action="store_true", default=False
+    )
     args = parser.parse_args()
 
-    if args.filter_type == 'dag':
+    if args.filter_type == "dag":
         if args.collected:
             filter_func = spectrum_filters.filter_by_collected_dag
         else:
             filter_func = spectrum_filters.filter_by_dag
-    elif args.filter_type == 'tree':
+    elif args.filter_type == "tree":
         if args.collected:
             filter_func = spectrum_filters.filter_by_collected_tree
         else:
@@ -274,9 +269,8 @@ if __name__ == '__main__':
     elif args.filter_type is None:
         filter_func = None
     else:
-        raise SystemExit('Unknown filter: %s' % args.filter_type)
+        raise SystemExit("Unknown filter: %s" % args.filter_type)
 
     # create_ppk_matrix_parallell()
-    create_ppk_matrix_stripe_serial(filter_func, args.shift, args.normalise,
-                                    args.output)
+    create_ppk_matrix_stripe_serial(filter_func, args.shift, args.normalise, args.output)
     # create_ppk_matrix()

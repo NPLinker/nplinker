@@ -1,8 +1,7 @@
 import json
 
 
-class MibigMetadata():
-
+class MibigMetadata:
     def __init__(self, file) -> None:
         """Class to model the BGC metadata/annotations defined in MIBiG.
 
@@ -26,7 +25,7 @@ class MibigMetadata():
 
     @property
     def mibig_accession(self) -> str:
-        """Get the value of metadata item 'mibig_accession'"""
+        """Get the value of metadata item 'mibig_accession'."""
         return self._mibig_accession
 
     @property
@@ -45,13 +44,10 @@ class MibigMetadata():
         return self._biosyn_class
 
     def _parse_metadata(self) -> None:
-        """Parse metadata to get 'mibig_accession' and 'biosyn_class' values.
-        """
-        if 'general_params' in self.metadata:
-            self._mibig_accession = self.metadata['general_params'][
-                'mibig_accession']
-            self._biosyn_class = tuple(self.metadata['general_params'][
-                'biosyn_class'])
+        """Parse metadata to get 'mibig_accession' and 'biosyn_class' values."""
+        if "general_params" in self.metadata:
+            self._mibig_accession = self.metadata["general_params"]["mibig_accession"]
+            self._biosyn_class = tuple(self.metadata["general_params"]["biosyn_class"])
         else:  # version≥2.0
-            self._mibig_accession = self.metadata['cluster']['mibig_accession']
-            self._biosyn_class = tuple(self.metadata['cluster']['biosyn_class'])
+            self._mibig_accession = self.metadata["cluster"]["mibig_accession"]
+            self._biosyn_class = tuple(self.metadata["cluster"]["biosyn_class"])

@@ -6,7 +6,6 @@ from .gcf import GCF
 
 
 class BGCLoaderBase(ABC):
-
     def __init__(self, data_dir: str):
         """Abstract base class for BGC loader.
 
@@ -18,7 +17,7 @@ class BGCLoaderBase(ABC):
 
     @abstractmethod
     def get_files(self) -> dict[str, str]:
-        """Get path to BGC files
+        """Get path to BGC files.
 
         Returns:
             dict[str, str]: key is BGC name and value is path to BGC file
@@ -26,7 +25,7 @@ class BGCLoaderBase(ABC):
 
     @abstractmethod
     def get_bgcs(self) -> dict[str, BGC]:
-        """Get BGC objects
+        """Get BGC objects.
 
         Returns:
             dict[str, BGC]: key is BGC name and value is
@@ -35,10 +34,9 @@ class BGCLoaderBase(ABC):
 
 
 class GCFLoaderBase(ABC):
-
     @abstractmethod
     def get_gcfs(self, keep_mibig_only) -> Sequence[GCF]:
-        """Get GCF objects
+        """Get GCF objects.
 
         Args:
             keep_mibig_only(bool): True to keep GCFs that contain only MIBiG

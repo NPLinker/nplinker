@@ -1,5 +1,5 @@
-from jsonschema import Draft7Validator
 import pytest
+from jsonschema import Draft7Validator
 from nplinker.schemas import PODP_ADAPTED_SCHEMA
 from nplinker.schemas import validate_podp_json
 
@@ -13,32 +13,21 @@ def test_podp_adapted_schema_itself():
 def test_validate_podp_json_minimum_valid_data():
     # minimum valid data, containing only required fields
     data = {
-        "version":
-        "3",
+        "version": "3",
         "metabolomics": {
-            "project": {
-                "molecular_network": "01234567890123456789012345678901"
-            },
+            "project": {"molecular_network": "01234567890123456789012345678901"},
         },
         "genomes": [
-            {
-                "genome_label": "strain1",
-                "genome_ID": {
-                    "RefSeq_accession": "GCF_1"
-                }
-            },
+            {"genome_label": "strain1", "genome_ID": {"RefSeq_accession": "GCF_1"}},
         ],
         "genome_metabolome_links": [
-            {
-                "metabolomics_file": "ftp://example.org/001.mzXML",
-                "genome_label": "strain1"
-            },
-        ]
+            {"metabolomics_file": "ftp://example.org/001.mzXML", "genome_label": "strain1"},
+        ],
     }
     try:
         validate_podp_json(data)
     except ValueError:
-        pytest.fail('Unexpected ValueError')
+        pytest.fail("Unexpected ValueError")
 
 
 def test_validate_podp_json_invalid_data():

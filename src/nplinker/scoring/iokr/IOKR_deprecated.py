@@ -24,15 +24,14 @@ logger = LogConfig.getLogger(__name__)
 
 
 def run_iokr_ranking(spec, bgc_list):
-    logger.debug(f'IOKR datapath: {nplinker_iokr.get_datapath()}')
+    logger.debug(f"IOKR datapath: {nplinker_iokr.get_datapath()}")
 
     # extract SMILES strings for each supplied BGC (caching them in the object)
     smiles = [bgc.smiles for bgc in bgc_list]
 
     # TODO could probably handle this more gracefully by not submitting any BGC with no SMILES
     if None in smiles:
-        logger.error(
-            'Failed to run IOKR scoring, one or more BGCs missing SMILES data')
+        logger.error("Failed to run IOKR scoring, one or more BGCs missing SMILES data")
         return None
 
     iokr_server = nplinker_iokr.get_iokr_server()
@@ -41,11 +40,10 @@ def run_iokr_ranking(spec, bgc_list):
 
 
 def run_iokr_scoring(spec_list, bgc_list):
-    logger.debug(f'IOKR datapath: {nplinker_iokr.get_datapath()}')
+    logger.debug(f"IOKR datapath: {nplinker_iokr.get_datapath()}")
     smiles = [bgc.smiles for bgc in bgc_list]
     if None in smiles:
-        logger.error(
-            'Failed to run IOKR scoring, one or more BGCs missing SMILES data')
+        logger.error("Failed to run IOKR scoring, one or more BGCs missing SMILES data")
         return None
 
     spectra = [MSSpectrum(spec=spec) for spec in spec_list]

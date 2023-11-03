@@ -14,13 +14,11 @@
 
 import logging
 import sys
-from typing_extensions import Self
 
 
-class LogConfig():
-
+class LogConfig:
     active_loggers: dict[str, logging.Logger] = {}
-    logfmt = '%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d, %(message)s'
+    logfmt = "%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d, %(message)s"
     default_loglevel = logging.INFO
     # default destination for new Loggers
     default_logdest = logging.StreamHandler(sys.stdout)
@@ -39,22 +37,21 @@ class LogConfig():
 
         logger = logging.getLogger(obj)
         logger.setLevel(level)
-        dest.setFormatter(
-            logging.Formatter(LogConfig.logfmt, datefmt='%H:%M:%S'))
+        dest.setFormatter(logging.Formatter(LogConfig.logfmt, datefmt="%H:%M:%S"))
         logger.addHandler(dest)
         LogConfig.active_loggers[obj] = logger
         return logger
 
     @staticmethod
     def setLogLevel(level):
-        """Apply a new log level value to all loggers created by getLogger"""
+        """Apply a new log level value to all loggers created by getLogger."""
         LogConfig.default_loglevel = level
         for logger in LogConfig.active_loggers.values():
             logger.setLevel(level)
 
     @staticmethod
     def setLogLevelStr(level):
-        """Apply a new log level value to all loggers created by getLogger
+        """Apply a new log level value to all loggers created by getLogger.
 
         Identical to setLogLevel but parameter is a string instead of a
         constant from the logging module (e.g. "INFO", "DEBUG")

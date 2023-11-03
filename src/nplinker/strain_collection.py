@@ -11,8 +11,7 @@ from .strains import Strain
 logger = LogConfig.getLogger(__name__)
 
 
-class StrainCollection():
-
+class StrainCollection:
     def __init__(self):
         """A collection of Strain objects."""
         # the order of strains is needed for scoring part, so use a list
@@ -24,18 +23,19 @@ class StrainCollection():
 
     def __str__(self) -> str:
         if len(self) > 20:
-            return f'StrainCollection(n={len(self)})'
+            return f"StrainCollection(n={len(self)})"
 
-        return f'StrainCollection(n={len(self)}) [' + ','.join(
-            s.id for s in self._strains) + ']'
+        return f"StrainCollection(n={len(self)}) [" + ",".join(s.id for s in self._strains) + "]"
 
     def __len__(self) -> int:
         return len(self._strains)
 
     def __eq__(self, other) -> bool:
         if isinstance(other, StrainCollection):
-            return (self._strains == other._strains
-                    and self._strain_dict_name == other._strain_dict_name)
+            return (
+                self._strains == other._strains
+                and self._strain_dict_name == other._strain_dict_name
+            )
         return NotImplemented
 
     def __add__(self, other) -> StrainCollection:
@@ -49,8 +49,7 @@ class StrainCollection():
         return NotImplemented
 
     def __contains__(self, item: Strain) -> bool:
-        """Check if the strain collection contains the given Strain object.
-        """
+        """Check if the strain collection contains the given Strain object."""
         if isinstance(item, Strain):
             return item.id in self._strain_dict_name
         raise TypeError(f"Expected Strain, got {type(item)}")
@@ -69,10 +68,7 @@ class StrainCollection():
         if strain in self._strains:
             # only one strain object per id
             strain_ref = self._strain_dict_name[strain.id][0]
-            new_aliases = [
-                alias for alias in strain.aliases
-                if alias not in strain_ref.aliases
-            ]
+            new_aliases = [alias for alias in strain.aliases if alias not in strain_ref.aliases]
             for alias in new_aliases:
                 strain_ref.add_alias(alias)
                 if alias not in self._strain_dict_name:
@@ -105,22 +101,16 @@ class StrainCollection():
             strain_ref = self._strain_dict_name[strain.id][0]
             for name in strain_ref.names:
                 if name in self._strain_dict_name:
-                    new_strain_list = [
-                        s for s in self._strain_dict_name[name]
-                        if s.id != strain.id
-                    ]
+                    new_strain_list = [s for s in self._strain_dict_name[name] if s.id != strain.id]
                     if not new_strain_list:
                         del self._strain_dict_name[name]
                     else:
                         self._strain_dict_name[name] = new_strain_list
         else:
-            raise ValueError(
-                f"Strain {strain} not found in strain collection.")
+            raise ValueError(f"Strain {strain} not found in strain collection.")
 
     def filter(self, strain_set: set[Strain]):
-        """
-        Remove all strains that are not in strain_set from the strain collection
-        """
+        """Remove all strains that are not in strain_set from the strain collection."""
         # note that we need to copy the list of strains, as we are modifying it
         for strain in self._strains.copy():
             if strain not in strain_set:
@@ -141,7 +131,6 @@ class StrainCollection():
         """Lookup a strain by name (id or alias).
 
         Args:
-
             name(str): Strain name (id or alias) to lookup.
 
         Returns:
@@ -155,7 +144,7 @@ class StrainCollection():
         raise ValueError(f"Strain {name} not found in the strain collection.")
 
     @staticmethod
-    def read_json(file: str | PathLike) -> 'StrainCollection':
+    def read_json(file: str | PathLike) -> "StrainCollection":
         """Read a strain mappings JSON file and return a StrainCollection object.
 
         Args:
@@ -164,16 +153,16 @@ class StrainCollection():
         Returns:
             StrainCollection: StrainCollection object.
         """
-        with open(file, 'r') as f:
+        with open(file, "r") as f:
             json_data = json.load(f)
 
         # validate json data
         validate(instance=json_data, schema=STRAIN_MAPPINGS_SCHEMA)
 
         strain_collection = StrainCollection()
-        for data in json_data['strain_mappings']:
-            strain = Strain(data['strain_id'])
-            for alias in data['strain_alias']:
+        for data in json_data["strain_mappings"]:
+            strain = Strain(data["strain_id"])
+            for alias in data["strain_alias"]:
                 strain.add_alias(alias)
             strain_collection.add(strain)
         return strain_collection
@@ -189,17 +178,16 @@ class StrainCollection():
             str | None: If `file` is None, return the JSON string. Otherwise,
                 write the JSON string to the given file.
         """
-        data_list = [{
-            "strain_id": strain.id,
-            "strain_alias": list(strain.aliases)
-        } for strain in self]
+        data_list = [
+            {"strain_id": strain.id, "strain_alias": list(strain.aliases)} for strain in self
+        ]
         json_data = {"strain_mappings": data_list, "version": "1.0"}
 
         # validate json data
         validate(instance=json_data, schema=STRAIN_MAPPINGS_SCHEMA)
 
         if file is not None:
-            with open(file, 'w') as f:
+            with open(file, "w") as f:
                 json.dump(json_data, f)
             return None
         return json.dumps(json_data)

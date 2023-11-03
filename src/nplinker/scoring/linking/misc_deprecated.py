@@ -37,8 +37,7 @@ def metcalf_std_count(*arg):
     return (raw - exp) / np.sqrt(std)
 
 
-def metcalf_count(n, m, overlap, N, in_both, spec_not_gen, gen_not_spec,
-                  neither):
+def metcalf_count(n, m, overlap, N, in_both, spec_not_gen, gen_not_spec, neither):
     # compute metcalf score for n strains in spectrum
     # m strains in gcf
     # where overlap of them are the same
@@ -49,8 +48,7 @@ def metcalf_count(n, m, overlap, N, in_both, spec_not_gen, gen_not_spec,
     return score
 
 
-def metcalf_expected_count(met, gcf, overlap, N, both, met_not_gcf,
-                           gcf_not_met, neither):
+def metcalf_expected_count(met, gcf, overlap, N, both, met_not_gcf, gcf_not_met, neither):
     # Compute the expected value of the Metcalf score for the given MF/GCF sizes
     global METCALF_EXPECTED_CACHE
     global METCALF_VARIANCE_CACHE
@@ -60,8 +58,7 @@ def metcalf_expected_count(met, gcf, overlap, N, both, met_not_gcf,
         METCALF_EXPECTED_CACHE = np.zeros(cache_size)
         METCALF_VARIANCE_CACHE = np.zeros(cache_size)
 
-    if METCALF_EXPECTED_CACHE[met, gcf] != 0.0 or METCALF_VARIANCE_CACHE[
-            met, gcf] != 0.0:
+    if METCALF_EXPECTED_CACHE[met, gcf] != 0.0 or METCALF_VARIANCE_CACHE[met, gcf] != 0.0:
         expected = METCALF_EXPECTED_CACHE[met, gcf]
         variance = METCALF_VARIANCE_CACHE[met, gcf]
         return expected, variance
@@ -72,8 +69,7 @@ def metcalf_expected_count(met, gcf, overlap, N, both, met_not_gcf,
     this_e2 = 0
     for o in range(int(min_overlap), int(max_overlap) + 1):
         o_prob = scipy.stats.hypergeom.pmf(o, N, met, gcf)
-        score = metcalf_count(met, gcf, o, N, both, met_not_gcf, gcf_not_met,
-                              neither)
+        score = metcalf_count(met, gcf, o, N, both, met_not_gcf, gcf_not_met, neither)
         this_e += o_prob * score
         this_e2 += o_prob * (score**2)
 
@@ -89,17 +85,18 @@ def metcalf_expected_count(met, gcf, overlap, N, both, met_not_gcf,
     return expected, variance
 
 
-def metcalf_scoring(spectral_like,
-                    gcf_like,
-                    strains,
-                    both=10,
-                    met_not_gcf=-10,
-                    gcf_not_met=0,
-                    neither=1,
-                    standardised=False):
-    """
-    Calculate the Metcalf score for the provided objects
-    strains should be a list of strain names
+def metcalf_scoring(
+    spectral_like,
+    gcf_like,
+    strains,
+    both=10,
+    met_not_gcf=-10,
+    gcf_not_met=0,
+    neither=1,
+    standardised=False,
+):
+    """Calculate the Metcalf score for the provided objects
+    strains should be a list of strain names.
     """
     N = len(strains)
 
@@ -109,13 +106,12 @@ def metcalf_scoring(spectral_like,
     n = len(mf_strains)
     m = len(gcf_strains)
     o = len(set(mf_strains).intersection(gcf_strains))
-    actual_score = metcalf_count(n, m, o, N, both, met_not_gcf, gcf_not_met,
-                                 neither)
+    actual_score = metcalf_count(n, m, o, N, both, met_not_gcf, gcf_not_met, neither)
 
     if standardised:
-        expected, variance = metcalf_expected_count(n, m, o, N, both,
-                                                    met_not_gcf, gcf_not_met,
-                                                    neither)
+        expected, variance = metcalf_expected_count(
+            n, m, o, N, both, met_not_gcf, gcf_not_met, neither
+        )
         actual_score = (actual_score - expected) / np.sqrt(variance)
 
     return actual_score
@@ -162,7 +158,7 @@ def name_scoring(spectral_like, gcf_like, mibig_map):
 
     for annotation in spectral_like.get_annotations():
         for mibig in mibig_bgcs:
-            short_mibig = mibig.name.split('.')[0]
+            short_mibig = mibig.name.split(".")[0]
             if short_mibig in mibig_map:
                 m = match(annotation, mibig_map[short_mibig])
                 if m:
@@ -183,11 +179,10 @@ def match(spectral_annotation, mibig_name):
 
 
 def aa_scoring(spectrum, gcf_like, tol=0.01):
-    """
-    Check for the prescence of AA mass shifts in the spectrum
-    """
+    """Check for the prescence of AA mass shifts in the spectrum."""
     from nplinker.metabolomics import read_aa_losses
-    aa_loss_file = 'aa_residues.csv'
+
+    aa_loss_file = "aa_residues.csv"
     aa_losses = read_aa_losses(aa_loss_file)
 
     probs = []

@@ -12,8 +12,7 @@ if TYPE_CHECKING:
 logger = LogConfig.getLogger(__name__)
 
 
-class BGC():
-
+class BGC:
     def __init__(self, bgc_id: str, /, *product_prediction: str):
         """Class to model BGC (biosynthetic gene cluster) data.
 
@@ -88,14 +87,19 @@ class BGC():
         return str(self)
 
     def __str__(self):
-        return '{}(bgc_id={}, strain={}, asid={}, region={})'.format(
-            self.__class__.__name__, self.bgc_id, self.strain,
-            self.antismash_id, self.antismash_region)
+        return "{}(bgc_id={}, strain={}, asid={}, region={})".format(
+            self.__class__.__name__,
+            self.bgc_id,
+            self.strain,
+            self.antismash_id,
+            self.antismash_region,
+        )
 
     def __eq__(self, other) -> bool:
         if isinstance(other, BGC):
-            return (self.bgc_id == other.bgc_id
-                    and self.product_prediction == other.product_prediction)
+            return (
+                self.bgc_id == other.bgc_id and self.product_prediction == other.product_prediction
+            )
         return NotImplemented
 
     def __hash__(self) -> int:
@@ -110,7 +114,7 @@ class BGC():
         gcf.add_bgc(self)
 
     def detach_parent(self, gcf: GCF) -> None:
-        """Remove a parent GCF"""
+        """Remove a parent GCF."""
         gcf.detach_bgc(self)
 
     @property
@@ -141,12 +145,12 @@ class BGC():
         Returns:
             bool: True if it's MIBiG reference BGC
         """
-        return self.bgc_id.startswith('BGC')
+        return self.bgc_id.startswith("BGC")
 
     # CG: why not providing whole product but only amino acid as product monomer?
     # this property is not used in NPLinker core business.
     @property
-    @deprecated(version='2.0.0', reason="This method will be removed soon")
+    @deprecated(version="2.0.0", reason="This method will be removed soon")
     def aa_predictions(self):
         """Amino acids as predicted monomers of product.
 

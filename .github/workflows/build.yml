@@ -114,8 +114,8 @@ jobs:
         run: |
           python3 -m pip install .[dev]
           install-nplinker-deps --run-on-github
-      - name: Check style against standards using prospector
-        run: prospector --zero-exit --output-format grouped --output-format pylint:pylint-report.txt
+      - name: Check style against standards using ruff
+        run: ruff .
       - name: Run unit tests with coverage
         run: pytest --cov --cov-report term --cov-report xml --junitxml=xunit-result.xml tests/
       - name: Correct coverage paths

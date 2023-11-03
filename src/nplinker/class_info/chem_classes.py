@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections import Counter
 import glob
 import os
+from collections import Counter
 from canopus import Canopus
 from canopus.classifications_to_gnps import analyse_canopus
 from ..logconfig import LogConfig
@@ -27,13 +27,13 @@ logger = LogConfig.getLogger(__name__)
 # for canopus, check if results can be converted with canopus_treemap
 # otherwise use the pre-existing output of canopus
 class ChemClassPredictions:
-    """Class for storing results for chemical class predictions of spectra
+    """Class for storing results for chemical class predictions of spectra.
 
     Currently, CANOPUS and MolNetEnhancer results are loaded
     """
 
     def __init__(self, canopus_dir, mne_dir, gnps_dir):
-        """Load classes with CanopusResults, MolNetEnhancerResults
+        """Load classes with CanopusResults, MolNetEnhancerResults.
 
         Args:
             canopus_dir: str, canopus_dir found in root_dir of nplinker project
@@ -45,11 +45,11 @@ class ChemClassPredictions:
 
         class_predict_options = []
         if self._canopus.spectra_classes:
-            class_predict_options.append('canopus')
+            class_predict_options.append("canopus")
         if self._molnetenhancer.spectra2molfam:
-            class_predict_options.append('molnetenhancer')
+            class_predict_options.append("molnetenhancer")
         if class_predict_options:
-            class_predict_options = ['mix', 'main'] + class_predict_options
+            class_predict_options = ["mix", "main"] + class_predict_options
         self._class_predict_options = class_predict_options
 
     @property
@@ -62,12 +62,12 @@ class ChemClassPredictions:
 
     @property
     def class_predict_options(self):
-        """The available class predictions"""
+        """The available class predictions."""
         return self._class_predict_options
 
 
 class CanopusResults:
-    """Class for storing canopus results
+    """Class for storing canopus results.
 
     The results from the canopus dir are read and combined with the MN from GNPS
     using canopus_treemap: github.com/louwenjjr/canopus_treemap/tree/master/canopus
@@ -80,7 +80,7 @@ class CanopusResults:
     """
 
     def __init__(self, canopus_dir, gnps_dir):
-        """Read the class info from root_dir/canopus
+        """Read the class info from root_dir/canopus.
 
         Args:
             canopus_dir: str, canopus_dir found in root_dir of nplinker project
@@ -92,28 +92,38 @@ class CanopusResults:
         """
         self._canopus_dir = canopus_dir
         self._gnps_dir = gnps_dir
-        self._molfam_classes, self._molfam_classes_names, \
-            self._molfam_classes_names_inds = (None, None, None)
-        self._spectra_classes, self._spectra_classes_names, \
-            self._spectra_classes_names_inds = (None, None, None)
+        self._molfam_classes, self._molfam_classes_names, self._molfam_classes_names_inds = (
+            None,
+            None,
+            None,
+        )
+        self._spectra_classes, self._spectra_classes_names, self._spectra_classes_names_inds = (
+            None,
+            None,
+            None,
+        )
         if os.path.isdir(self._canopus_dir):
             self._read_all_classes()
         else:
-            logger.info(f"No CANOPUS results present at {self._canopus_dir}. "
-                        f"(set run_canopus=true in the .toml to run CANOPUS)")
+            logger.info(
+                f"No CANOPUS results present at {self._canopus_dir}. "
+                f"(set run_canopus=true in the .toml to run CANOPUS)"
+            )
 
     def _read_all_classes(self):
-        """Wrapper to read all canopus output and store them in the object"""
+        """Wrapper to read all canopus output and store them in the object."""
         ci_file = False  # find cluster_index_classifications in canopus_dir
         compi_file = False  # same for component_index_classifications
         canopus_files = glob.glob(os.path.join(self._canopus_dir, "*"))
         possible_ci_file = [
-            canopus_file for canopus_file in canopus_files
-            if canopus_file.endswith('cluster_index_classifications.txt')
+            canopus_file
+            for canopus_file in canopus_files
+            if canopus_file.endswith("cluster_index_classifications.txt")
         ]
         possible_compi_file = [
-            canopus_file for canopus_file in canopus_files
-            if canopus_file.endswith('component_index_classifications.txt')
+            canopus_file
+            for canopus_file in canopus_files
+            if canopus_file.endswith("component_index_classifications.txt")
         ]
         if possible_ci_file:
             ci_file = possible_ci_file[0]
@@ -121,29 +131,29 @@ class CanopusResults:
             compi_file = possible_compi_file[0]
 
         if not os.path.isfile(ci_file):
-            logger.info('Converting canopus output using canopus_treemap')
+            logger.info("Converting canopus output using canopus_treemap")
             try:
-                analyse_canopus(self._canopus_dir, self._gnps_dir,
-                                self._canopus_dir)
+                analyse_canopus(self._canopus_dir, self._gnps_dir, self._canopus_dir)
             except FileNotFoundError as er1:
-                logger.warning(
-                    f'{er1}. CANOPUS output is missing in {self._canopus_dir}')
+                logger.warning(f"{er1}. CANOPUS output is missing in {self._canopus_dir}")
             except Exception as er2:
                 logger.warning(
-                    f'canopus_treemap failed with: {er2}. Probably the MN '
-                    f'version from GNPS is too old. Will attempt to read '
-                    f'directly from canopus_dir')
+                    f"canopus_treemap failed with: {er2}. Probably the MN "
+                    f"version from GNPS is too old. Will attempt to read "
+                    f"directly from canopus_dir"
+                )
             else:
                 # find processed canopus files again
                 canopus_files = glob.glob(os.path.join(self._canopus_dir, "*"))
                 possible_ci_file = [
-                    canopus_file for canopus_file in canopus_files if
-                    canopus_file.endswith('cluster_index_classifications.txt')
+                    canopus_file
+                    for canopus_file in canopus_files
+                    if canopus_file.endswith("cluster_index_classifications.txt")
                 ]
                 possible_compi_file = [
-                    canopus_file for canopus_file in canopus_files
-                    if canopus_file.endswith(
-                        'component_index_classifications.txt')
+                    canopus_file
+                    for canopus_file in canopus_files
+                    if canopus_file.endswith("component_index_classifications.txt")
                 ]
                 if possible_ci_file:
                     ci_file = possible_ci_file[0]
@@ -151,36 +161,31 @@ class CanopusResults:
                     compi_file = possible_compi_file[0]
 
         if os.path.isfile(ci_file):
-            spectra_classes_names, spectra_classes = \
-                self._read_spectra_classes(ci_file)
+            spectra_classes_names, spectra_classes = self._read_spectra_classes(ci_file)
 
             if os.path.isfile(compi_file):
-                molfam_classes_names, molfam_classes = self.\
-                    _read_molfam_classes(compi_file)
+                molfam_classes_names, molfam_classes = self._read_molfam_classes(compi_file)
                 self._molfam_classes = molfam_classes
                 self._molfam_classes_names = molfam_classes_names
                 self._molfam_classes_names_inds = {
-                    elem: i
-                    for i, elem in enumerate(molfam_classes_names)
+                    elem: i for i, elem in enumerate(molfam_classes_names)
                 }
         else:
             # use canopus output correctly (only for spectra)
-            logger.info("Attempting to read spectra classes directly from "
-                        "canopus_dir (canopus_summary.tsv)")
-            spectra_classes_names, spectra_classes = \
-                self._read_spectra_classes_directly()
+            logger.info(
+                "Attempting to read spectra classes directly from "
+                "canopus_dir (canopus_summary.tsv)"
+            )
+            spectra_classes_names, spectra_classes = self._read_spectra_classes_directly()
             # molfams have to be added later with info about molfam <- spectra
             # this happens with transfer_spec_classes_to_molfams() in loader.py
 
         self._spectra_classes = spectra_classes
         self._spectra_classes_names = spectra_classes_names
-        self._spectra_classes_names_inds = {
-            elem: i
-            for i, elem in enumerate(spectra_classes_names)
-        }
+        self._spectra_classes_names_inds = {elem: i for i, elem in enumerate(spectra_classes_names)}
 
     def _read_spectra_classes(self, input_file):
-        """Read canopus classes for spectra, return classes_names, classes
+        """Read canopus classes for spectra, return classes_names, classes.
 
         Args:
             input_file: str, cluster_index_classifications.txt
@@ -196,12 +201,11 @@ class CanopusResults:
         ci_classes_names = []
 
         if os.path.isfile(input_file):
-            logger.info(
-                f"reading canopus results for spectra from {input_file}")
+            logger.info(f"reading canopus results for spectra from {input_file}")
             with open(input_file) as inf:
                 ci_classes_header = inf.readline().strip().split("\t")
                 for line in inf:
-                    line = line.strip('\n').split("\t")
+                    line = line.strip("\n").split("\t")
                     classes_list = []
                     for lvl in line[3:]:
                         lvl_list = []
@@ -216,19 +220,18 @@ class CanopusResults:
                     ci_classes[line[1]] = classes_list
         else:
             logger.warn(
-                'could not load cluster_index_classifications.txt; missing from canopus_dir'
+                "could not load cluster_index_classifications.txt; missing from canopus_dir"
             )
 
         if ci_classes_header:
             #  todo: rename the output from the canopus script directly
-            ci_classes_names = [f"cf_{elem}" for elem in
-                                ci_classes_header[3:-3]] + \
-                               [f"npc_{elem}" for elem in
-                                ci_classes_header[-3:]]
+            ci_classes_names = [f"cf_{elem}" for elem in ci_classes_header[3:-3]] + [
+                f"npc_{elem}" for elem in ci_classes_header[-3:]
+            ]
         return ci_classes_names, ci_classes
 
     def _read_spectra_classes_directly(self):
-        """Read canopus classes directly from canopus output and save output
+        """Read canopus classes directly from canopus output and save output.
 
         Returns:
             Tuple of:
@@ -241,23 +244,21 @@ class CanopusResults:
         can_classes_header = None
         can_classes_names = []
 
-        input_file = os.path.join(self._canopus_dir, 'canopus_summary.tsv')
-        sep = '\t'
+        input_file = os.path.join(self._canopus_dir, "canopus_summary.tsv")
+        sep = "\t"
         if os.path.isfile(input_file):
-            logger.info(f"reading canopus results for spectra directly from "
-                        f"{input_file}")
+            logger.info(f"reading canopus results for spectra directly from " f"{input_file}")
             with open(input_file) as inf:
                 can_classes_header = inf.readline().strip().split(sep)
                 # get [4:8] - level 5 subclass        class   superclass
                 starti = 4
                 stopi = 8
                 for line in inf:
-                    line = line.strip('\n').split(sep)
+                    line = line.strip("\n").split(sep)
                     # make tuples with scores as 1
-                    classes_list = [[(cls, 1)] if cls else [None]
-                                    for cls in line[starti:stopi]]
+                    classes_list = [[(cls, 1)] if cls else [None] for cls in line[starti:stopi]]
                     # assuming that all MGFs have ScanNumber headers..
-                    spec_index = line[0].split('ScanNumber')[-1]
+                    spec_index = line[0].split("ScanNumber")[-1]
                     classes_list.reverse()  # reverse so superclass is first
                     can_classes[spec_index] = classes_list
 
@@ -273,31 +274,29 @@ class CanopusResults:
                 npc_starti = 2
                 npc_stopi = 7
                 for line in inf:
-                    line = line.strip('\n').split(sep)
+                    line = line.strip("\n").split(sep)
                     # make tuples with scores
                     npc_classes_list = [
-                        [(cls, float(c_score))] if cls != 'N/A' else [None]
+                        [(cls, float(c_score))] if cls != "N/A" else [None]
                         for cls, c_score in zip(
-                            line[npc_starti:npc_stopi:2], line[npc_starti +
-                                                               1:npc_stopi +
-                                                               1:2])
+                            line[npc_starti:npc_stopi:2], line[npc_starti + 1 : npc_stopi + 1 : 2]
+                        )
                     ]
                     # assuming that all MGFs have ScanNumber headers..
-                    spec_index = line[1].split('ScanNumber')[-1]
+                    spec_index = line[1].split("ScanNumber")[-1]
                     can_classes[spec_index].extend(npc_classes_list)
         else:
-            logger.warn(f'could not load canopus results for spectra; '
-                        f'{input_file} missing from canopus_dir')
+            logger.warn(
+                f"could not load canopus results for spectra; "
+                f"{input_file} missing from canopus_dir"
+            )
 
         if can_classes_header:
             # important that the names here match with MIBiG
-            can_classes_names = [
-                f"cf_{elem}" for elem in can_classes_header[starti:stopi]
-            ]
+            can_classes_names = [f"cf_{elem}" for elem in can_classes_header[starti:stopi]]
             can_classes_names.reverse()  # reverse so superclass is first
             npc_can_classes_names = [
-                f"npc_{elem}"
-                for elem in npc_can_classes_header[npc_starti:npc_stopi:2]
+                f"npc_{elem}" for elem in npc_can_classes_header[npc_starti:npc_stopi:2]
             ]
             can_classes_names.extend(npc_can_classes_names)
 
@@ -313,28 +312,28 @@ class CanopusResults:
             # save output, next time clusterindex_classifications.txt is read
             # save just the info that we need in the format that is parsed in
             # read_spectra_classes()
-            output_file = os.path.join(self._canopus_dir,
-                                       "cluster_index_classifications.txt")
-            with open(output_file, 'w') as outf:
-                header = ['componentindex', 'cluster index', 'formula'] +\
-                    [name.partition('_')[-1] for name in can_classes_names]
-                outf.write('\t'.join(header) + '\n')
+            output_file = os.path.join(self._canopus_dir, "cluster_index_classifications.txt")
+            with open(output_file, "w") as outf:
+                header = ["componentindex", "cluster index", "formula"] + [
+                    name.partition("_")[-1] for name in can_classes_names
+                ]
+                outf.write("\t".join(header) + "\n")
                 for spec, classes in can_classes.items():
                     formatted_classes = []
                     for lvl in classes:
                         lvl_classes = []
                         for tup in lvl:
                             if not tup:
-                                lvl_classes.append('')
+                                lvl_classes.append("")
                             else:
                                 lvl_classes.append(f"{tup[0]}:{tup[1]:.3f}")
-                        formatted_classes.append('; '.join(lvl_classes))
-                    output_l = ['-', spec, '-'] + formatted_classes
-                    outf.write('\t'.join(output_l) + '\n')
+                        formatted_classes.append("; ".join(lvl_classes))
+                    output_l = ["-", spec, "-"] + formatted_classes
+                    outf.write("\t".join(output_l) + "\n")
         return can_classes_names, can_classes
 
     def _read_molfam_classes(self, input_file):
-        """Read canopus classes for molfams, return classes_names, classes
+        """Read canopus classes for molfams, return classes_names, classes.
 
         Args:
             input_file: str, component_index_classifications.txt
@@ -353,7 +352,7 @@ class CanopusResults:
             with open(input_file) as inf:
                 compi_classes_header = inf.readline().strip().split("\t")
                 for line in inf:
-                    line = line.strip('\n').split("\t")
+                    line = line.strip("\n").split("\t")
                     classes_list = []
                     for lvl in line[2:]:
                         lvl_list = []
@@ -368,19 +367,18 @@ class CanopusResults:
                     compi_classes[line[0]] = classes_list
         else:
             logger.warn(
-                'could not load component_index_classifications.txt; missing from canopus_dir'
+                "could not load component_index_classifications.txt; missing from canopus_dir"
             )
 
         if compi_classes_header:
             #  todo: rename the output from the canopus script directly
-            compi_classes_names = [f"cf_{elem}" for elem in
-                                   compi_classes_header[2:-3]] + \
-                                  [f"npc_{elem}" for elem in
-                                   compi_classes_header[-3:]]
+            compi_classes_names = [f"cf_{elem}" for elem in compi_classes_header[2:-3]] + [
+                f"npc_{elem}" for elem in compi_classes_header[-3:]
+            ]
         return compi_classes_names, compi_classes
 
-    def transfer_spec_classes_to_molfams(self, molfams, fraction_cutoff=0.):
-        """Set _molfam_classes(_names) from spectra_classes and return classes
+    def transfer_spec_classes_to_molfams(self, molfams, fraction_cutoff=0.0):
+        """Set _molfam_classes(_names) from spectra_classes and return classes.
 
         This can be used in the _loader to get molfam classes when the GNPS MN
         version is too old and canopus_treemap fails to work directly.
@@ -402,9 +400,9 @@ class CanopusResults:
             fid = molfam.family_id  # the key
             spectra = molfam.spectra
             # if singleton family, format like 'fid_spectrum-id'
-            if fid.startswith('singleton-'):
+            if fid.startswith("singleton-"):
                 spec_id = spectra[0].spectrum_id
-                fid += f'_{spec_id}'
+                fid += f"_{spec_id}"
             len_molfam = len(spectra)
 
             classes_per_spectra = []
@@ -435,11 +433,14 @@ class CanopusResults:
                 counts_cur_level = Counter(classes_cur_level)
                 # 3. calculate fraction and sort high to low, filter out Nones
                 fraction_tups = sorted(
-                    ((cls, count / len_molfam)
-                     for cls, count in counts_cur_level.most_common()
-                     if count / len_molfam >= fraction_cutoff),
+                    (
+                        (cls, count / len_molfam)
+                        for cls, count in counts_cur_level.most_common()
+                        if count / len_molfam >= fraction_cutoff
+                    ),
                     key=lambda x: x[1],
-                    reverse=True)
+                    reverse=True,
+                )
                 if not fraction_tups:
                     fraction_tups = [None]
                 sorted_classes.append(fraction_tups)
@@ -449,7 +450,7 @@ class CanopusResults:
         return molfam_classes
 
     def show(self, objects):
-        """Show a table of predicted chemical compound classes for spectrum/MF
+        """Show a table of predicted chemical compound classes for spectrum/MF.
 
         Args:
               objects: list of Spectrum or MolecularFamily objects
@@ -484,30 +485,26 @@ class CanopusResults:
 
 
 class MolNetEnhancerResults:
-    """Class for storing MolNetEnhancer results
+    """Class for storing MolNetEnhancer results.
 
     The input file for ClassyFire results is read from the molnetenhancer directory:
         - ClassyFireResults_Network.txt
     """
 
     def __init__(self, mne_dir):
-        """Read the class info from file in root_dir/molnetenhancer/
+        """Read the class info from file in root_dir/molnetenhancer/.
 
         Args:
             mne_dir: str, mne_dir found in root_dir of nplinker project
         """
-        cf_classes_names, molfam_classes, spectra2molfam = self._read_cf_classes(
-            mne_dir)
+        cf_classes_names, molfam_classes, spectra2molfam = self._read_cf_classes(mne_dir)
         self._spectra2molfam = spectra2molfam
         self._molfam_classes = molfam_classes
         self._spectra_classes_names = cf_classes_names  # if NPC gets implemented, add here
-        self._spectra_classes_names_inds = {
-            elem: i
-            for i, elem in enumerate(cf_classes_names)
-        }
+        self._spectra_classes_names_inds = {elem: i for i, elem in enumerate(cf_classes_names)}
 
     def _read_cf_classes(self, mne_dir):
-        r"""Read ClassyFireResults_Network.txt in molnetenhancer dir
+        r"""Read ClassyFireResults_Network.txt in molnetenhancer dir.
 
         Args:
             mne_dir: str, mne_dir found in root_dir of nplinker project
@@ -522,22 +519,24 @@ class MolNetEnhancerResults:
         mne_component_dict = {}
         mne_cluster2component = {}
         # flexible finding of CF results
-        input_file = 'not_found'
+        input_file = "not_found"
         wanted_file = "ClassyFireResults_Network.txt"
-        possible_files = glob.glob(os.path.join(mne_dir, "*")) + \
-                         glob.glob(os.path.join(mne_dir, "*", "*"))
+        possible_files = glob.glob(os.path.join(mne_dir, "*")) + glob.glob(
+            os.path.join(mne_dir, "*", "*")
+        )
         try:
             input_file = [
-                pos_file for pos_file in possible_files
-                if pos_file.endswith(wanted_file)
+                pos_file for pos_file in possible_files if pos_file.endswith(wanted_file)
             ][0]
         except IndexError:
             pass
 
         if not os.path.isfile(input_file):
-            logger.info(f"No MolNetEnhancer result present at {mne_dir}. "
-                        f"(run it on GNPS and download it here if you want to "
-                        f"use it)")
+            logger.info(
+                f"No MolNetEnhancer result present at {mne_dir}. "
+                f"(run it on GNPS and download it here if you want to "
+                f"use it)"
+            )
             return columns, mne_component_dict, mne_cluster2component
 
         with open(input_file) as inf:
@@ -545,19 +544,20 @@ class MolNetEnhancerResults:
             header = inf.readline().strip().split("\t")
             # get the columns that are of interest to us
             columns = [
-                'cf_direct_parent' if col == 'CF_Dparent' else col.lower()
-                for i, col in enumerate(header[3:]) if i % 2 == 0
+                "cf_direct_parent" if col == "CF_Dparent" else col.lower()
+                for i, col in enumerate(header[3:])
+                if i % 2 == 0
             ]
             for line in inf:
-                line = line.strip('\n').split("\t")
+                line = line.strip("\n").split("\t")
                 cluster = line.pop(0)
                 component = line.pop(0)
                 nr_nodes = line.pop(0)
                 # todo: make it easier to query classes of singleton families
                 # if singleton family, format like '-1_spectrum-id' like canopus results
                 # CG: Note that the singleton families id is "singleton-" + uuid.
-                if nr_nodes == '1':
-                    component = f'-1_{cluster}'
+                if nr_nodes == "1":
+                    component = f"-1_{cluster}"
                 class_info = []
                 # get class names and scores in (class, score)
                 for i in range(0, len(line), 2):
@@ -580,7 +580,7 @@ class MolNetEnhancerResults:
         return columns, mne_component_dict, mne_cluster2component
 
     def spectra_classes(self, spectrum_id):
-        """Return classes by relating spectrum_id in the molfam_classes
+        """Return classes by relating spectrum_id in the molfam_classes.
 
         Args:
             spectrum_id: int/str, spectrum_id - ints will be converted to str

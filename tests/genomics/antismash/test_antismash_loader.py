@@ -7,7 +7,6 @@ from ... import DATA_DIR
 
 
 class TestAntismashBGCLoader:
-
     @pytest.fixture
     def loader(self):
         data_dir = str(DATA_DIR / "antismash")
@@ -49,7 +48,8 @@ class TestAntismashBGCLoader:
         assert "GCF_000514855.1" not in bgc_files
         assert "GCF_000514515.1" not in bgc_files
         assert bgc_files["NZ_AZWB01000005.region001"] == str(
-            data_dir / "GCF_000514515.1" / "NZ_AZWB01000005.region001.gbk")
+            data_dir / "GCF_000514515.1" / "NZ_AZWB01000005.region001.gbk"
+        )
 
     def test_get_bgcs(self, loader):
         bgcs = loader.get_bgcs()
@@ -62,8 +62,7 @@ class TestAntismashBGCLoader:
 
 
 def test_parse_bgc_genbank():
-    gbk_file = str(DATA_DIR / "antismash" / "GCF_000514515.1" /
-                   "NZ_AZWB01000005.region001.gbk")
+    gbk_file = str(DATA_DIR / "antismash" / "GCF_000514515.1" / "NZ_AZWB01000005.region001.gbk")
     bgc = parse_bgc_genbank(gbk_file)
     assert isinstance(bgc, BGC)
     assert bgc.bgc_id == "NZ_AZWB01000005.region001"
@@ -73,6 +72,7 @@ def test_parse_bgc_genbank():
     assert bgc.antismash_file == gbk_file
     assert bgc.antismash_region == "1"
     assert bgc.smiles == ("NC([*])C(=O)NC([*])C(=O)NC(CO)C(=O)NC(Cc1ccccc1)C(=O)NCC(=O)O",)
+
 
 def test_parse_bgc_genbank_error():
     gbk_file = str(DATA_DIR / "fake_antismash.region001.gbk")

@@ -1,14 +1,13 @@
 import os
+import zipfile
 from os import PathLike
 from pathlib import Path
-import zipfile
 from nplinker import utils
-from .gnps_format import gnps_format_from_archive
 from .gnps_format import GNPSFormat
+from .gnps_format import gnps_format_from_archive
 
 
 class GNPSExtractor:
-
     def __init__(self, file: str | PathLike, extract_dir: str | PathLike):
         """Class to extract files from a GNPS molecular networking archive(.zip).
 
@@ -56,15 +55,18 @@ class GNPSExtractor:
                 f"Unknown workflow type for GNPS archive '{file}'."
                 f"Supported GNPS workflows are described in the GNPSFormat enum, "
                 f"including such as 'METABOLOMICS-SNETS', 'METABOLOMICS-SNETS-V2' "
-                f"and 'FEATURE-BASED-MOLECULAR-NETWORKING'.")
+                f"and 'FEATURE-BASED-MOLECULAR-NETWORKING'."
+            )
 
         self._file = Path(file)
         self._extract_path = Path(extract_dir)
         self._gnps_format = gnps_format
         # the order of filenames matters
         self._target_files = [
-            "file_mappings", "spectra.mgf", "molecular_families.tsv",
-            "annotations.tsv"
+            "file_mappings",
+            "spectra.mgf",
+            "molecular_families.tsv",
+            "annotations.tsv",
         ]
 
         self._extract()
@@ -88,8 +90,7 @@ class GNPSExtractor:
         return str(self._extract_path)
 
     def _extract(self):
-        """Extract required files from archive.
-        """
+        """Extract required files from archive."""
         if self._gnps_format == GNPSFormat.SNETS:
             self._extract_snets()
         elif self._gnps_format == GNPSFormat.SNETSV2:
@@ -101,17 +102,18 @@ class GNPSExtractor:
         # the order of members matters
         members = [
             self._select_member(
-                "clusterinfosummarygroup_attributes_withIDs_withcomponentID",
-                ".tsv"),
+                "clusterinfosummarygroup_attributes_withIDs_withcomponentID", ".tsv"
+            ),
             self._select_member("METABOLOMICS-SNETS", ".mgf"),
             self._select_member("networkedges_selfloop", ".pairsinfo"),
-            self._select_member("result_specnets_DB", ".tsv")
+            self._select_member("result_specnets_DB", ".tsv"),
         ]
         utils.extract_archive(self._file, self._extract_path, members)
         # rename the files to the expected names
         # os.renames automatically remove empty directories after renaming
-        os.renames(self._extract_path / members[0],
-                   self._extract_path / (self._target_files[0] + ".tsv"))
+        os.renames(
+            self._extract_path / members[0], self._extract_path / (self._target_files[0] + ".tsv")
+        )
         for member, fname in zip(members[1:], self._target_files[1:]):
             os.renames(self._extract_path / member, self._extract_path / fname)
 
@@ -119,15 +121,16 @@ class GNPSExtractor:
         # the order of members matters
         members = [
             self._select_member(
-                "clusterinfosummarygroup_attributes_withIDs_withcomponentID",
-                ".clustersummary"),
+                "clusterinfosummarygroup_attributes_withIDs_withcomponentID", ".clustersummary"
+            ),
             self._select_member("METABOLOMICS-SNETS-V2", ".mgf"),
             self._select_member("networkedges_selfloop", ".selfloop"),
-            self._select_member("result_specnets_DB", ".tsv")
+            self._select_member("result_specnets_DB", ".tsv"),
         ]
         utils.extract_archive(self._file, self._extract_path, members)
-        os.renames(self._extract_path / members[0],
-                   self._extract_path / (self._target_files[0] + ".tsv"))
+        os.renames(
+            self._extract_path / members[0], self._extract_path / (self._target_files[0] + ".tsv")
+        )
         for member, fname in zip(members[1:], self._target_files[1:]):
             os.renames(self._extract_path / member, self._extract_path / fname)
 
@@ -137,11 +140,12 @@ class GNPSExtractor:
             self._select_member("quantification_table", ".csv"),
             self._select_member("spectra", ".mgf"),
             self._select_member("networkedges_selfloop", ".selfloop"),
-            self._select_member("DB_result", ".tsv")
+            self._select_member("DB_result", ".tsv"),
         ]
         utils.extract_archive(self._file, self._extract_path, members)
-        os.renames(self._extract_path / members[0],
-                   self._extract_path / (self._target_files[0] + ".csv"))
+        os.renames(
+            self._extract_path / members[0], self._extract_path / (self._target_files[0] + ".csv")
+        )
         for member, fname in zip(members[1:], self._target_files[1:]):
             os.renames(self._extract_path / member, self._extract_path / fname)
 
@@ -149,7 +153,8 @@ class GNPSExtractor:
         """Helper function to extract files matching a prefix and suffix from the archive."""
         with zipfile.ZipFile(self._file) as zf:
             member_list = [
-                member for member in zf.namelist()
+                member
+                for member in zf.namelist()
                 if member.startswith(prefix) and member.endswith(suffix)
             ]
             if len(member_list) != 1:

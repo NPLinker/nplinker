@@ -1,12 +1,12 @@
 import json
-from os import PathLike
-from pathlib import Path
 import re
 import time
+from os import PathLike
+from pathlib import Path
+import httpx
 from bs4 import BeautifulSoup
 from bs4 import NavigableString
 from bs4 import Tag
-import httpx
 from jsonschema import validate
 from nplinker.genomics.antismash import download_and_extract_antismash_data
 from nplinker.globals import GENOME_STATUS_FILENAME
@@ -16,9 +16,11 @@ from nplinker.schemas import GENOME_STATUS_SCHEMA
 
 logger = LogConfig.getLogger(__name__)
 
-NCBI_LOOKUP_URL = 'https://www.ncbi.nlm.nih.gov/assembly/?term={}'
-JGI_GENOME_LOOKUP_URL = 'https://img.jgi.doe.gov/cgi-bin/m/main.cgi?section=TaxonDetail&page=taxonDetail&taxon_oid={}'
-USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'
+NCBI_LOOKUP_URL = "https://www.ncbi.nlm.nih.gov/assembly/?term={}"
+JGI_GENOME_LOOKUP_URL = (
+    "https://img.jgi.doe.gov/cgi-bin/m/main.cgi?section=TaxonDetail&page=taxonDetail&taxon_oid={}"
+)
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0"
 
 
 class GenomeStatus:
@@ -28,11 +30,13 @@ class GenomeStatus:
     in variable `GENOME_STATUS_FILENAME`.
     """
 
-    def __init__(self,
-                 original_id: str,
-                 resolved_refseq_id: str = "",
-                 resolve_attempted: bool = False,
-                 bgc_path: str = ""):
+    def __init__(
+        self,
+        original_id: str,
+        resolved_refseq_id: str = "",
+        resolve_attempted: bool = False,
+        bgc_path: str = "",
+    ):
         """Initialize a GenomeStatus object for the given genome.
 
         Args:
@@ -45,12 +49,12 @@ class GenomeStatus:
                 the genome. Defaults to "".
         """
         self.original_id = original_id
-        self.resolved_refseq_id = "" if resolved_refseq_id == 'None' else resolved_refseq_id
+        self.resolved_refseq_id = "" if resolved_refseq_id == "None" else resolved_refseq_id
         self.resolve_attempted = resolve_attempted
         self.bgc_path = bgc_path
 
     @staticmethod
-    def read_json(file: str | PathLike) -> dict[str, 'GenomeStatus']:
+    def read_json(file: str | PathLike) -> dict[str, "GenomeStatus"]:
         """Get a dict of GenomeStatus objects by loading given genome status file.
 
         Note that an empty dict is returned if the given file doesn't exist.
@@ -71,14 +75,14 @@ class GenomeStatus:
             validate(data, schema=GENOME_STATUS_SCHEMA)
 
             genome_status_dict = {
-                gs["original_id"]: GenomeStatus(**gs)
-                for gs in data["genome_status"]
+                gs["original_id"]: GenomeStatus(**gs) for gs in data["genome_status"]
             }
         return genome_status_dict
 
     @staticmethod
-    def to_json(genome_status_dict: dict[str, 'GenomeStatus'],
-                file: str | PathLike | None = None) -> str | None:
+    def to_json(
+        genome_status_dict: dict[str, "GenomeStatus"], file: str | PathLike | None = None
+    ) -> str | None:
         """Convert the genome status dictionary to a JSON string.
 
         If a file path is provided, the JSON string is written to the file. If
@@ -112,14 +116,15 @@ class GenomeStatus:
             "original_id": self.original_id,
             "resolved_refseq_id": self.resolved_refseq_id,
             "resolve_attempted": self.resolve_attempted,
-            "bgc_path": self.bgc_path
+            "bgc_path": self.bgc_path,
         }
 
 
 def podp_download_and_extract_antismash_data(
-        genome_records: list[dict[str, dict[str, str]]],
-        project_download_root: str | PathLike,
-        project_extract_root: str | PathLike):
+    genome_records: list[dict[str, dict[str, str]]],
+    project_download_root: str | PathLike,
+    project_extract_root: str | PathLike,
+):
     """Download and extract antiSMASH BGC archive for the given genome records.
 
     Args:
@@ -136,7 +141,6 @@ def podp_download_and_extract_antismash_data(
             `extract_root` if it doesn't exist. The files will be extracted to
             `<extract_root>/antismash/<antismash_id>` directory.
     """
-
     if not Path(project_download_root).exists():
         # otherwise in case of failed first download, the folder doesn't exist and
         # genome_status_file can't be written
@@ -147,7 +151,7 @@ def podp_download_and_extract_antismash_data(
 
     for i, genome_record in enumerate(genome_records):
         # get the best available ID from the dict
-        genome_id_data = genome_record['genome_ID']
+        genome_id_data = genome_record["genome_ID"]
         raw_genome_id = get_best_available_genome_id(genome_id_data)
         if raw_genome_id is None or len(raw_genome_id) == 0:
             logger.warning(
@@ -162,52 +166,51 @@ def podp_download_and_extract_antismash_data(
         gs_obj = gs_dict[raw_genome_id]
 
         logger.info(
-            f'Checking for antismash data {i + 1}/{len(genome_records)}, '
-            f'current genome ID={raw_genome_id}')
+            f"Checking for antismash data {i + 1}/{len(genome_records)}, "
+            f"current genome ID={raw_genome_id}"
+        )
         # first, check if BGC data is downloaded
-        if (gs_obj.bgc_path and Path(gs_obj.bgc_path).exists()):
-            logger.info(
-                f'Genome ID {raw_genome_id} already downloaded to {gs_obj.bgc_path}'
-            )
+        if gs_obj.bgc_path and Path(gs_obj.bgc_path).exists():
+            logger.info(f"Genome ID {raw_genome_id} already downloaded to {gs_obj.bgc_path}")
             continue
         # second, check if lookup attempted previously
         if gs_obj.resolve_attempted:
-            logger.info(
-                f'Genome ID {raw_genome_id} skipped due to previous failure')
+            logger.info(f"Genome ID {raw_genome_id} skipped due to previous failure")
             continue
 
         # if not downloaded or lookup attempted, then try to resolve the ID
         # and download
-        logger.info(f'Beginning lookup process for genome ID {raw_genome_id}')
+        logger.info(f"Beginning lookup process for genome ID {raw_genome_id}")
         gs_obj.resolved_refseq_id = _resolve_refseq_id(genome_id_data)
         gs_obj.resolve_attempted = True
 
         if gs_obj.resolved_refseq_id == "":
             # give up on this one
-            logger.warning(f'Failed lookup for genome ID {raw_genome_id}')
+            logger.warning(f"Failed lookup for genome ID {raw_genome_id}")
             continue
 
         # if resolved id is valid, try to download and extract antismash data
         try:
-            download_and_extract_antismash_data(gs_obj.resolved_refseq_id,
-                                                project_download_root,
-                                                project_extract_root)
+            download_and_extract_antismash_data(
+                gs_obj.resolved_refseq_id, project_download_root, project_extract_root
+            )
 
             gs_obj.bgc_path = str(
-                Path(project_download_root,
-                     gs_obj.resolved_refseq_id + '.zip').absolute())
+                Path(project_download_root, gs_obj.resolved_refseq_id + ".zip").absolute()
+            )
 
-            output_path = Path(project_extract_root, 'antismash',
-                               gs_obj.resolved_refseq_id)
+            output_path = Path(project_extract_root, "antismash", gs_obj.resolved_refseq_id)
             if output_path.exists():
-                Path.touch(output_path / 'completed', exist_ok=True)
+                Path.touch(output_path / "completed", exist_ok=True)
 
         except Exception:
             gs_obj.bgc_path = ""
 
     missing = len([gs for gs in gs_dict.values() if not gs.bgc_path])
-    logger.info(f'Dataset has {missing} missing sets of antiSMASH data '
-                f' (from a total of {len(genome_records)}).')
+    logger.info(
+        f"Dataset has {missing} missing sets of antiSMASH data "
+        f" (from a total of {len(genome_records)})."
+    )
 
     # save updated genome status to json file
     GenomeStatus.to_json(gs_dict, gs_file)
@@ -226,46 +229,41 @@ def get_best_available_genome_id(genome_id_data: dict[str, str]) -> str | None:
     Returns:
         str | None: ID for the genome, if present, otherwise None.
     """
-    if 'RefSeq_accession' in genome_id_data:
-        best_id = genome_id_data['RefSeq_accession']
-    elif 'GenBank_accession' in genome_id_data:
-        best_id = genome_id_data['GenBank_accession']
-    elif 'JGI_Genome_ID' in genome_id_data:
-        best_id = genome_id_data['JGI_Genome_ID']
+    if "RefSeq_accession" in genome_id_data:
+        best_id = genome_id_data["RefSeq_accession"]
+    elif "GenBank_accession" in genome_id_data:
+        best_id = genome_id_data["GenBank_accession"]
+    elif "JGI_Genome_ID" in genome_id_data:
+        best_id = genome_id_data["JGI_Genome_ID"]
     else:
         best_id = None
 
     if best_id is None or len(best_id) == 0:
-        logger.warning(
-            f'Failed to get valid genome ID in genome data: {genome_id_data}')
+        logger.warning(f"Failed to get valid genome ID in genome data: {genome_id_data}")
         return None
     return best_id
 
 
-def _ncbi_genbank_search(genbank_id: str,
-                         retry_times: int = 3) -> Tag | NavigableString | None:
-
+def _ncbi_genbank_search(genbank_id: str, retry_times: int = 3) -> Tag | NavigableString | None:
     url = NCBI_LOOKUP_URL.format(genbank_id)
     retry = 1
     while retry <= retry_times:
-        logger.debug(f'Looking up GenBank data for {genbank_id} at {url}')
+        logger.debug(f"Looking up GenBank data for {genbank_id} at {url}")
         resp = httpx.get(url, follow_redirects=True)
         if resp.status_code == httpx.codes.OK:
             # the page should contain a <dl> element with class "assembly_summary_new". retrieving
             # the page seems to fail occasionally in the middle of lengthy sequences of genome
             # lookups, so there might be some throttling going on. this will automatically retry
             # the lookup if the expected content isn't found the first time
-            soup = BeautifulSoup(resp.content, 'html.parser')
+            soup = BeautifulSoup(resp.content, "html.parser")
             # find the <dl> element with class "assembly_summary_new"
-            dl_element = soup.find('dl', {'class': 'assembly_summary_new'})
+            dl_element = soup.find("dl", {"class": "assembly_summary_new"})
             if dl_element is not None:
                 return dl_element
         retry = retry + 1
         time.sleep(5)
 
-    logger.warning(
-        f'Failed to resolve NCBI genome ID {genbank_id} at URL {url} (after retrying)'
-    )
+    logger.warning(f"Failed to resolve NCBI genome ID {genbank_id} at URL {url} (after retrying)")
     return None
 
 
@@ -282,9 +280,7 @@ def _resolve_genbank_accession(genbank_id: str) -> str:
     Returns:
         str | None: RefSeq ID if the search is successful, otherwise None.
     """
-    logger.info(
-        f'Attempting to resolve Genbank accession {genbank_id} to RefSeq accession'
-    )
+    logger.info(f"Attempting to resolve Genbank accession {genbank_id} to RefSeq accession")
     # genbank id => genbank seq => refseq
 
     # The GenBank accession can have several formats:
@@ -292,10 +288,10 @@ def _resolve_genbank_accession(genbank_id: str) -> str:
     # 2: NZ_BAGG00000000.1
     # 3: NC_016887.1
     # Case 1 is the default.
-    if '_' in genbank_id:
+    if "_" in genbank_id:
         # case 2
-        if len(genbank_id.split('_')[-1].split('.')[0]) == 12:
-            genbank_id = genbank_id.split('_')[-1]
+        if len(genbank_id.split("_")[-1].split(".")[0]) == 12:
+            genbank_id = genbank_id.split("_")[-1]
         # case 3
         else:
             genbank_id = genbank_id.lower()
@@ -308,29 +304,28 @@ def _resolve_genbank_accession(genbank_id: str) -> str:
     try:
         dl_element = _ncbi_genbank_search(genbank_id)
         if dl_element is None:
-            raise Exception('Unknown HTML format')
+            raise Exception("Unknown HTML format")
 
         refseq_idx = -1
         for field_idx, field in enumerate(dl_element.children):
             # this is the element immediately preceding the one with
             # the actual RefSeq ID we want
-            if field.getText().strip() == 'RefSeq assembly accession:':
+            if field.getText().strip() == "RefSeq assembly accession:":
                 refseq_idx = field_idx + 1
 
             # this should be True when we've reached the right element
             if field_idx == refseq_idx:
                 refseq_id = field.getText()
                 # if it has any spaces, take everything up to first one (some have annotations afterwards)
-                if refseq_id.find(' ') != -1:
-                    refseq_id = refseq_id[:refseq_id.find(' ')]
+                if refseq_id.find(" ") != -1:
+                    refseq_id = refseq_id[: refseq_id.find(" ")]
 
                 return str(refseq_id)
 
         if refseq_idx == -1:
-            raise Exception('Expected HTML elements not found')
+            raise Exception("Expected HTML elements not found")
     except Exception as e:
-        logger.warning(
-            f'Failed resolving GenBank accession {genbank_id}, error {e}')
+        logger.warning(f"Failed resolving GenBank accession {genbank_id}, error {e}")
 
     return ""
 
@@ -345,23 +340,19 @@ def _resolve_jgi_accession(jgi_id: str) -> str:
         str | None: Return RefSeq ID if search is successful, otherwise None.
     """
     url = JGI_GENOME_LOOKUP_URL.format(jgi_id)
-    logger.info(
-        f'Attempting to resolve JGI_Genome_ID {jgi_id} to GenBank accession via {url}'
-    )
+    logger.info(f"Attempting to resolve JGI_Genome_ID {jgi_id} to GenBank accession via {url}")
     # no User-Agent header produces a 403 Forbidden error on this site...
     try:
-        resp = httpx.get(url,
-                         headers={'User-Agent': USER_AGENT},
-                         timeout=10.0,
-                         follow_redirects=True)
+        resp = httpx.get(
+            url, headers={"User-Agent": USER_AGENT}, timeout=10.0, follow_redirects=True
+        )
     except httpx.ReadTimeout:
-        logger.warning('Timed out waiting for result of JGI_Genome_ID lookup')
+        logger.warning("Timed out waiting for result of JGI_Genome_ID lookup")
         return ""
 
-    soup = BeautifulSoup(resp.content, 'html.parser')
+    soup = BeautifulSoup(resp.content, "html.parser")
     # find the table entry giving the NCBI assembly accession ID
-    link = soup.find(
-        'a', href=re.compile('https://www.ncbi.nlm.nih.gov/nuccore/.*'))
+    link = soup.find("a", href=re.compile("https://www.ncbi.nlm.nih.gov/nuccore/.*"))
     if link is None:
         return ""
 
@@ -379,15 +370,15 @@ def _resolve_refseq_id(genome_id_data: dict[str, str]) -> str:
     Returns:
         str: Return RefSeq ID if present, otherwise an empty string.
     """
-    if 'RefSeq_accession' in genome_id_data:
+    if "RefSeq_accession" in genome_id_data:
         # best case, can use this directly
-        return genome_id_data['RefSeq_accession']
-    if 'GenBank_accession' in genome_id_data:
+        return genome_id_data["RefSeq_accession"]
+    if "GenBank_accession" in genome_id_data:
         # resolve via NCBI
-        return _resolve_genbank_accession(genome_id_data['GenBank_accession'])
-    if 'JGI_Genome_ID' in genome_id_data:
+        return _resolve_genbank_accession(genome_id_data["GenBank_accession"])
+    if "JGI_Genome_ID" in genome_id_data:
         # resolve via JGI => NCBI
-        return _resolve_jgi_accession(genome_id_data['JGI_Genome_ID'])
+        return _resolve_jgi_accession(genome_id_data["JGI_Genome_ID"])
 
-    logger.warning(f'Unable to resolve genome_ID: {genome_id_data}')
+    logger.warning(f"Unable to resolve genome_ID: {genome_id_data}")
     return ""
