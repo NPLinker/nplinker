@@ -96,6 +96,8 @@ ignore = [
 
 # Allow autofix for all enabled rules (when `--fix`) is provided.
 fixable = ["A", "B", "C", "D", "E", "F", "I"]
+ignore-init-module-imports = true
+
 
 [tool.ruff.isort]
 known-first-party = ["nplinker"]

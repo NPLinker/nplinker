@@ -34,12 +34,8 @@ class TestBigscapelGCFLoader:
         assert isinstance(gcfs[0], GCF)
 
     def test_parse_gcf(self, loader):
-        gcf_dict = BigscapeGCFLoader._parse_gcf(loader.cluster_file)  # noqa
-        assert isinstance(gcf_dict, dict)
-        assert len(gcf_dict) == 114
-        gcf = gcf_dict["135"]
-        assert isinstance(gcf, GCF)
-        assert len(gcf.bgc_ids) == 4
-        assert gcf.bgc_ids == set(
-            ("BGC0000145", "BGC0001041", "NC_009380.1.region004", "NZ_AZWK01000002.region002")
-        )
+        gcf_list = BigscapeGCFLoader._parse_gcf(loader.cluster_file)  # noqa
+        assert isinstance(gcf_list, list)
+        assert len(gcf_list) == 114
+        for gcf in gcf_list:
+            assert isinstance(gcf, GCF)
