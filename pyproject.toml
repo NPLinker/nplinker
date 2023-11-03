@@ -3,7 +3,7 @@
 # see https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
 
 [build-system]
-requires = ["setuptools", "wheel"]
+requires      = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -13,7 +13,7 @@ description = "Natural Products Linker"
 readme = "README.md"
 requires-python = ">=3.9"
 keywords = ["Genome", "Metabolome", "Natural Products", "Data Mining"]
-license = {text = "Apache-2.0 license"}
+license = { text = "Apache-2.0 license" }
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Education",
@@ -25,72 +25,73 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11"
+    "Programming Language :: Python :: 3.11",
 ]
 dynamic = ["dependencies", "optional-dependencies"]
 
 [tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
-optional-dependencies.dev = {file = ["requirements.dev.txt"]}
+dependencies              = { file = ["requirements.txt"] }
+optional-dependencies.dev = { file = ["requirements.dev.txt"] }
 
 [project.urls]
-"Homepage" = "https://github.com/NPLinker/nplinker"
+"Homepage"    = "https://github.com/NPLinker/nplinker"
 "Bug Tracker" = "https://github.com/NPLinker/nplinker/issues"
 
 [tool.setuptools.packages.find]
-where = ["src"]
-namespaces = true  # enable data directory to be identified
+where      = ["src"]
+namespaces = true    # enable data directory to be identified
 
 [tool.setuptools.package-data]
-"nplinker.data" = [ "*" ]
-"nplinker.schemas" = [ "*" ]
+"nplinker.data"    = ["*"]
+"nplinker.schemas" = ["*"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -q"
-testpaths = ["tests"]
+addopts    = "-ra -q"
+testpaths  = ["tests"]
 
 [tool.coverage.run]
-branch = true
-source = ["src"]
+branch       = true
+source       = ["src"]
 command_line = "-m pytest"
 
 # Mypy: to check static type
 # see https://mypy.readthedocs.io/en/stable/config_file.html#example-pyproject-toml
 [tool.mypy]
-python_version = "3.10"
-warn_return_any = true
-warn_unused_configs = true
+python_version         = "3.10"
+warn_return_any        = true
+warn_unused_configs    = true
 ignore_missing_imports = true
 
 [tool.ruff]
 target-version = "py310"
 line-length = 100
 select = [
-    "F",  # Pyflakes
-    "E",  # pycodestyle (error)
-    "W",    # pycodestyle (warning)
-    "I",    # isort
-    "D",    # pydocstyle
+    "D", # pydocstyle
+    "E", # pycodestyle (error)
+    "W", # pycodestyle (warning)
+    "F", # Pyflakes
+    "I", # isort
     "N", # pep8-naming
 ]
 ignore = [
-    'D100',  # Missing module docstring
-    'D104',  # Missing public package docstring
-    'D105',  # Missing docstring in magic method
+    "D100", # Missing module docstring
+    "D101", # Missing class docstring
+    "D104", # Missing public package docstring
+    "D105", # Missing docstring in magic method
     # The following list excludes rules irrelevant to the Google style
-    'D203',
-    'D204',
-    'D213',
-    'D215',
-    'D400',
-    'D401',
-    'D404',
-    'D406',
-    'D407',
-    'D408',
-    'D409',
-    'D413',
+    "D203",
+    "D204",
+    "D213",
+    "D215",
+    "D400",
+    "D401",
+    "D404",
+    "D406",
+    "D407",
+    "D408",
+    "D409",
+    "D413",
 ]
 
 # Allow autofix for all enabled rules (when `--fix`) is provided.
@@ -100,4 +101,10 @@ fixable = ["A", "B", "C", "D", "E", "F", "I"]
 known-first-party = ["nplinker"]
 force-single-line = true
 lines-after-imports = 2
-no-lines-before = ["future","standard-library","third-party","first-party","local-folder"]
+no-lines-before = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
