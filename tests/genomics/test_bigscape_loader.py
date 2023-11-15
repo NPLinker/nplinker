@@ -21,21 +21,19 @@ class TestBigscapelGCFLoader:
             DATA_DIR / "bigscape" / "mix" / "mix_clustering_c0.30.tsv"
         )
 
-    def test_get_gcfs(self, loader):
-        gcfs = loader.get_gcfs(keep_mibig_only=True)
+    @pytest.mark.parametrize(
+        "keep_mibig_only, keep_singleton, expected",
+        [(False, False, 2), (True, False, 3), (False, True, 3), (True, True, 5)],
+    )
+    def test_get_gcfs(self, loader, keep_mibig_only, keep_singleton, expected):
+        gcfs = loader.get_gcfs(keep_mibig_only, keep_singleton)
         assert isinstance(gcfs, list)
-        assert len(gcfs) == 114
-        assert isinstance(gcfs[0], GCF)
-
-    def test_get_gcfs_without_mibig_only(self, loader):
-        gcfs = loader.get_gcfs(keep_mibig_only=False)
-        assert isinstance(gcfs, list)
-        assert len(gcfs) == 113
+        assert len(gcfs) == expected
         assert isinstance(gcfs[0], GCF)
 
     def test_parse_gcf(self, loader):
         gcf_list = BigscapeGCFLoader._parse_gcf(loader.cluster_file)  # noqa
         assert isinstance(gcf_list, list)
-        assert len(gcf_list) == 114
+        assert len(gcf_list) == 5
         for gcf in gcf_list:
             assert isinstance(gcf, GCF)
