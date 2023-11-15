@@ -99,3 +99,11 @@ class GCF:
             bool: True if `GCF.bgc_ids` are only MIBiG BGC ids.
         """
         return all(map(lambda id: id.startswith("BGC"), self.bgc_ids))
+
+    def is_singleton(self) -> bool:
+        """Check if the GCF contains only one BGC.
+
+        Returns:
+            bool: True if `GCF.bgc_ids` contains only one BGC id.
+        """
+        return len(self.bgc_ids) == 1
