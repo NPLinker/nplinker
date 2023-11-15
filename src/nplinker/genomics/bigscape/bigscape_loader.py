@@ -23,19 +23,24 @@ class BigscapeGCFLoader:
         self.cluster_file = str(cluster_file)
         self._gcf_list = self._parse_gcf(self.cluster_file)
 
-    def get_gcfs(self, keep_mibig_only=False) -> list[GCF]:
+    def get_gcfs(self, keep_mibig_only=False, keep_singleton=False) -> list[GCF]:
         """Get all GCF objects.
 
         Args:
             keep_mibig_only(bool): True to keep GCFs that contain only MIBiG
                 BGCs.
+            keep_singleton(bool): True to keep singleton GCFs. A singleton GCF
+                is a GCF that contains only one BGC.
 
         Returns:
             list[GCF]: a list of GCF objects.
         """
+        gcf_list = self._gcf_list
         if not keep_mibig_only:
-            return [gcf for gcf in self._gcf_list if not gcf.has_mibig_only()]
-        return self._gcf_list
+            gcf_list = [gcf for gcf in gcf_list if not gcf.has_mibig_only()]
+        if not keep_singleton:
+            gcf_list = [gcf for gcf in gcf_list if not gcf.is_singleton()]
+        return gcf_list
 
     @staticmethod
     def _parse_gcf(cluster_file: str) -> list[GCF]:
