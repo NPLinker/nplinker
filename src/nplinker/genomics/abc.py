@@ -35,12 +35,14 @@ class BGCLoaderBase(ABC):
 
 class GCFLoaderBase(ABC):
     @abstractmethod
-    def get_gcfs(self, keep_mibig_only) -> Sequence[GCF]:
+    def get_gcfs(self, keep_mibig_only, keep_singleton) -> Sequence[GCF]:
         """Get GCF objects.
 
         Args:
             keep_mibig_only(bool): True to keep GCFs that contain only MIBiG
                 BGCs.
+            keep_singleton(bool): True to keep singleton GCFs. A singleton GCF
+                is a GCF that contains only one BGC.
 
         Returns:
             Sequence[GCF]: a list of :class:`~nplinker.genomic.GCF` objects
