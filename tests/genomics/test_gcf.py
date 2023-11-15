@@ -70,3 +70,15 @@ def test_has_mibig_only():
     assert gcf.has_mibig_only() is False
     gcf.add_bgc(mibig_bgc)
     assert gcf.has_mibig_only() is False
+
+
+def test_is_singleton():
+    bgc1 = BGC("BGC0000001", "NPR")
+    bgc2 = BGC("BGC0000002", "NPR")
+    gcf = GCF("1")
+    gcf.add_bgc(bgc1)
+    assert gcf.is_singleton() is True
+    gcf.add_bgc(bgc2)
+    assert gcf.is_singleton() is False
+    gcf.detach_bgc(bgc1)
+    assert gcf.is_singleton() is True
