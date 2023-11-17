@@ -12,6 +12,7 @@ __all__ = [
     "GENOME_BGC_MAPPINGS_SCHEMA",
     "STRAIN_MAPPINGS_SCHEMA",
     "PODP_ADAPTED_SCHEMA",
+    "USER_STRAINS_SCHEMA",
     "validate_podp_json",
 ]
 
@@ -24,3 +25,6 @@ with open(SCHEMA_DIR / "genome_bgc_mappings_schema.json", "r") as f:
 
 with open(SCHEMA_DIR / "strain_mappings_schema.json", "r") as f:
     STRAIN_MAPPINGS_SCHEMA = json.load(f)
+
+with open(SCHEMA_DIR / "user_strains.json", "r") as f:
+    USER_STRAINS_SCHEMA = json.load(f)
