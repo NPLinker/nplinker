@@ -66,11 +66,9 @@ class TestMibigBGCLoader:
 
     def test_get_bgcs(self, loader):
         bgcs = loader.get_bgcs()
-        assert isinstance(bgcs, dict)
+        assert isinstance(bgcs, list)
         assert len(bgcs) == 2502  # MIBiG v3.1 has 2502 BGCs
-        assert "BGC0000001" in bgcs
-        assert "BGC0000246" not in bgcs
-        assert isinstance(bgcs["BGC0000001"], BGC)
+        assert isinstance(bgcs[0], BGC)
 
 
 def test_parse_bgc_metadata_json():

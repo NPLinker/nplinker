@@ -123,7 +123,7 @@ class DatasetLoader:
             os.path.split(self._root)[-1] if not self._remote_loading else self._platform_id
         )
         self.bgcs, self.gcfs, self.spectra, self.molfams = [], [], [], []
-        self.mibig_bgc_dict = {}
+        self.mibig_bgcs = []
         self._mibig_strain_bgc_mapping = {}
         self.product_types = []
         self.strains = StrainCollection()
@@ -374,7 +374,7 @@ class DatasetLoader:
 
     def _load_mibig(self):
         mibig_bgc_loader = MibigLoader(self.mibig_json_dir)
-        self.mibig_bgc_dict = mibig_bgc_loader.get_bgcs()
+        self.mibig_bgcs = mibig_bgc_loader.get_bgcs()
         self._mibig_strain_bgc_mapping = mibig_bgc_loader.get_strain_bgc_mapping()
         return True
 
@@ -437,7 +437,7 @@ class DatasetLoader:
         # Step 1: load all BGC objects
         logger.debug("Parsing AntiSMASH directory...")
         antismash_bgc_dict = AntismashBGCLoader(self.antismash_dir).get_bgcs()
-        raw_bgcs = list(antismash_bgc_dict.values()) + list(self.mibig_bgc_dict.values())
+        raw_bgcs = list(antismash_bgc_dict.values()) + self.mibig_bgcs)
 
         # Step 2: load all GCF objects
         bigscape_cluster_file = (
