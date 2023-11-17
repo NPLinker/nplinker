@@ -53,12 +53,9 @@ class TestAntismashBGCLoader:
 
     def test_get_bgcs(self, loader):
         bgcs = loader.get_bgcs()
-        assert isinstance(bgcs, dict)
+        assert isinstance(bgcs, list)
         assert len(bgcs) == 44
-        assert isinstance(bgcs["NZ_AZWB01000005.region001"], BGC)
-        assert isinstance(bgcs["NZ_AZWS01000001.region001"], BGC)
-        assert bgcs.get("GCF_000514855.1", "NotExist") == "NotExist"
-        assert bgcs.get("GCF_000514515.1", "NotExist") == "NotExist"
+        assert isinstance(bgcs[0], BGC)
 
 
 def test_parse_bgc_genbank():
