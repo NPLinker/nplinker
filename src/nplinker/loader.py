@@ -25,6 +25,7 @@ from nplinker.pairedomics.downloader import PODPDownloader
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.pairedomics.strain_mappings_generator import podp_generate_strain_mappings
 from nplinker.strain_collection import StrainCollection
+from nplinker.strain_loader import load_user_strains
 from nplinker.strains import Strain
 
 
@@ -384,9 +385,12 @@ class DatasetLoader:
             self.strains.add(strain)
         logger.info("Loaded {} non-MiBIG Strain objects".format(len(self.strains)))
 
-        # 2. filter user specificied strains (remove all that are not specified by user)
-        user_strains = self._load_user_strains()
-        if user_strains:
+        # 2. filter user specificied strains (remove all that are not specified by user).
+        # It's not allowed to specify empty list of strains, otherwise validation will fail.
+        if os.path.exists(self.include_strains_file):
+            logger.info(f"Loading user specified strains from file {self.include_strains_file}.")
+            user_strains = load_user_strains(self.include_strains_file)
+            logger.info(f"Loaded {len(user_strains)} user specified strains.")
             self.strains.filter(user_strains)
 
         # 3. load MiBIG strain mappings
@@ -398,25 +402,6 @@ class DatasetLoader:
         logger.info("Loaded {} Strain objects in total".format(len(self.strains)))
 
         return True
-
-    def _load_user_strains(self) -> set[Strain]:
-        """Load user-specified strains from a file.
-
-        The file must contain one strain name per line.
-
-        Returns:
-            set[Strain]: A set of user specified strains.
-        """
-        strains = set()
-        if os.path.exists(self.include_strains_file):
-            logger.debug(f"Loading user specified strains from {self.include_strains_file}.")
-            with open(self.include_strains_file, "r") as f:
-                for line in f.readlines():
-                    strains.add(Strain(line.strip()))
-
-        if len(strains) != 0:
-            logger.debug(f"Loaded {len(strains)} user specified strains.")
-        return strains
 
     # TODO CG: replace deprecated load_dataset with GPNSLoader
     def _load_metabolomics(self):
