@@ -24,12 +24,11 @@ class BGCLoaderBase(ABC):
         """
 
     @abstractmethod
-    def get_bgcs(self) -> dict[str, BGC]:
+    def get_bgcs(self) -> Sequence[BGC]:
         """Get BGC objects.
 
         Returns:
-            dict[str, BGC]: key is BGC name and value is
-                :class:`~nplinker.genomic.BGC` objects
+            Sequence[BGC]: a list of :class:`~nplinker.genomic.BGC` objects
         """
 
 
