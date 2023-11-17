@@ -23,7 +23,7 @@ class MibigLoader:
         self.data_dir = data_dir
         self._file_dict = self.parse_data_dir(self.data_dir)
         self._metadata_dict = self._parse_metadatas()
-        self._bgc_dict = self._parse_bgcs()
+        self._bgcs = self._parse_bgcs()
 
     def get_strain_bgc_mapping(self) -> dict[str, str]:
         """Get the mapping from strain to BGC.
@@ -85,27 +85,21 @@ class MibigLoader:
             metadata_dict[name] = metadata
         return metadata_dict
 
-    def get_bgcs(self) -> dict[str, BGC]:
+    def get_bgcs(self) -> list[BGC]:
         """Get BGC objects.
 
         Returns:
-            dict[str, BGC]: key is BGC name and value is
-                :class:`nplinker.genomics.BGC` object
+            list[str, BGC]: a list of :class:`nplinker.genomics.BGC` objects
         """
-        return self._bgc_dict
+        return self._bgcs
 
-    def _parse_bgcs(self) -> dict[str, BGC]:
+    def _parse_bgcs(self) -> list[BGC]:
         """Parse all metadata files as BGC objects.
 
         Returns:
-            dict[str, BGC]: key is BGC accession (file name) and value is
-                BGC object
+            list[BGC]: a list of BGC objects
         """
-        bgc_dict = {}
-        for name, file in self._file_dict.items():
-            bgc = parse_bgc_metadata_json(file)
-            bgc_dict[name] = bgc
-        return bgc_dict
+        return [parse_bgc_metadata_json(file) for file in self._file_dict.values()]
 
 
 def parse_bgc_metadata_json(file: str) -> BGC:
