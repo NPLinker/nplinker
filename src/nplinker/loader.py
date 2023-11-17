@@ -436,8 +436,8 @@ class DatasetLoader:
 
         # Step 1: load all BGC objects
         logger.debug("Parsing AntiSMASH directory...")
-        antismash_bgc_dict = AntismashBGCLoader(self.antismash_dir).get_bgcs()
-        raw_bgcs = list(antismash_bgc_dict.values()) + self.mibig_bgcs)
+        antismash_bgcs = AntismashBGCLoader(self.antismash_dir).get_bgcs()
+        raw_bgcs = antismash_bgcs + self.mibig_bgcs
 
         # Step 2: load all GCF objects
         bigscape_cluster_file = (
