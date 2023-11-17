@@ -35,7 +35,7 @@ class AntismashBGCLoader:
         """
         self.data_dir = data_dir
         self._file_dict = self._parse_data_dir(self.data_dir)
-        self._bgc_dict = self._parse_bgcs(self._file_dict)
+        self._bgcs = self._parse_bgcs(self._file_dict)
 
     def get_bgc_genome_mapping(self) -> dict[str, str]:
         """Get the mapping from BGC to genome.
@@ -85,17 +85,16 @@ class AntismashBGCLoader:
 
         return bgc_files
 
-    def get_bgcs(self) -> dict[str, BGC]:
+    def get_bgcs(self) -> list[BGC]:
         """Get all BGC objects.
 
         Returns:
-            dict[str, BGC]: key is BGC name and value is
-                :class:`~nplinker.genomic.BGC` objects
+            list[BGC]: a list of :class:`~nplinker.genomic.BGC` objects
         """
-        return self._bgc_dict
+        return self._bgcs
 
     @staticmethod
-    def _parse_bgcs(bgc_files: dict[str, str]) -> dict[str, BGC]:
+    def _parse_bgcs(bgc_files: dict[str, str]) -> list[BGC]:
         """Load given BGC files as BGC objects.
 
         Args:
@@ -103,13 +102,9 @@ class AntismashBGCLoader:
                 BGC gbk file, see method :meth:`.bgc_files`.
 
         Returns:
-            dict[str, BGC]: key is BGC name and value is :class:`~nplinker.genomic.BGC` objects
+            list[BGC]: a list of :class:`~nplinker.genomic.BGC` objects
         """
-        bgcs = {}
-        for bgc_id in bgc_files:
-            bgc = parse_bgc_genbank(bgc_files[bgc_id])
-            bgcs[bgc_id] = bgc
-        return bgcs
+        return [parse_bgc_genbank(file) for file in bgc_files.values()]
 
 
 def parse_bgc_genbank(file: str) -> BGC:
