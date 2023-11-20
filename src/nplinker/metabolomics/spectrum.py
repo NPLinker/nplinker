@@ -1,5 +1,5 @@
-from nplinker.strain_collection import StrainCollection
 from nplinker.strain import Strain
+from nplinker.strain_collection import StrainCollection
 from nplinker.utils import sqrt_normalise
 
 

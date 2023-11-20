@@ -2,8 +2,8 @@ import pytest
 from nplinker.globals import STRAIN_MAPPINGS_FILENAME
 from nplinker.metabolomics import Spectrum
 from nplinker.metabolomics.metabolomics import load_spectra
-from nplinker.strain_collection import StrainCollection
 from nplinker.strain import Strain
+from nplinker.strain_collection import StrainCollection
 from . import DATA_DIR
 from . import GNPS_DATA_DIR
 

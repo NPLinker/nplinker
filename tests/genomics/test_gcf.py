@@ -1,8 +1,8 @@
 import pytest
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
-from nplinker.strain_collection import StrainCollection
 from nplinker.strain import Strain
+from nplinker.strain_collection import StrainCollection
 
 
 @pytest.fixture()
