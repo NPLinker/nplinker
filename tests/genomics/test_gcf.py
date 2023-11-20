@@ -2,7 +2,7 @@ import pytest
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
 from nplinker.strain_collection import StrainCollection
-from nplinker.strains import Strain
+from nplinker.strain import Strain
 
 
 @pytest.fixture()

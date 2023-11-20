@@ -1,6 +1,6 @@
 import os.path
 from nplinker.logconfig import LogConfig
-from nplinker.strains import Strain
+from nplinker.strain import Strain
 from nplinker.utils import list_files
 from ..abc import BGCLoaderBase
 from ..bgc import BGC

@@ -7,7 +7,7 @@ from nplinker.metabolomics.gnps import GNPSFileMappingLoader
 from nplinker.schemas import GENOME_BGC_MAPPINGS_SCHEMA
 from nplinker.schemas import validate_podp_json
 from nplinker.strain_collection import StrainCollection
-from nplinker.strains import Strain
+from nplinker.strain import Strain
 from .podp_antismash_downloader import GenomeStatus
 from .podp_antismash_downloader import get_best_available_genome_id
 

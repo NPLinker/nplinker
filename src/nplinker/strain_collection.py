@@ -5,7 +5,7 @@ from typing import Iterator
 from jsonschema import validate
 from nplinker.schemas import STRAIN_MAPPINGS_SCHEMA
 from .logconfig import LogConfig
-from .strains import Strain
+from .strain import Strain
 
 
 logger = LogConfig.getLogger(__name__)
