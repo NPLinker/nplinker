@@ -2,11 +2,11 @@ import logging
 from .abc import BGCLoaderBase
 from .bgc import BGC
 from .gcf import GCF
-from .genomics import generate_mappings_genome_id_bgc_id
-from .genomics import get_bgcs_from_gcfs
-from .genomics import get_strains_from_bgcs
-from .genomics import map_bgc_to_gcf
-from .genomics import map_strain_to_bgc
+from .utils import generate_mappings_genome_id_bgc_id
+from .utils import get_bgcs_from_gcfs
+from .utils import get_strains_from_bgcs
+from .utils import map_bgc_to_gcf
+from .utils import map_strain_to_bgc
 
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
