@@ -8,7 +8,7 @@ from nplinker.metabolomics import Spectrum
 from nplinker.metabolomics.gnps import GNPSFormat
 from nplinker.metabolomics.gnps import gnps_format_from_file_mapping
 from nplinker.strain_collection import StrainCollection
-from nplinker.strains import Strain
+from nplinker.strain import Strain
 
 
 logger = LogConfig.getLogger(__name__)
