@@ -6,11 +6,11 @@ from nplinker.class_info.chem_classes import ChemClassPredictions
 from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
 from nplinker.genomics import generate_mappings_genome_id_bgc_id
+from nplinker.genomics import get_bgcs_from_gcfs
+from nplinker.genomics import map_bgc_to_gcf
+from nplinker.genomics import map_strain_to_bgc
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.bigscape import BigscapeGCFLoader
-from nplinker.genomics.genomics import get_bgcs_from_gcfs
-from nplinker.genomics.genomics import map_bgc_to_gcf
-from nplinker.genomics.genomics import map_strain_to_bgc
 from nplinker.genomics.mibig import MibigLoader
 from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.globals import GENOME_STATUS_FILENAME
