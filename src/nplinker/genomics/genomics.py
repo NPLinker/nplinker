@@ -116,15 +116,6 @@ def map_bgc_to_gcf(bgcs: list[BGC], gcfs: list[GCF]):
             gcf.add_bgc(bgc)
 
 
-def filter_mibig_only_gcf(gcfs: list[GCF]) -> list[GCF]:
-    """Filter out GCFs that contain only MIBiG BGC objects.
-
-    This method returns a new list of GCFs that have at least one non-MIBiG
-    BGC object as its child.
-    """
-    return [gcf for gcf in gcfs if gcf.has_mibig_only() is False]
-
-
 def get_bgcs_from_gcfs(gcfs: list[GCF]) -> list[BGC]:
     """Get all BGC objects from given GCF objects."""
     s = set()
