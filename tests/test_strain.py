@@ -1,4 +1,4 @@
-from nplinker.strains import Strain
+from nplinker.strain import Strain
 
 
 def test_default():

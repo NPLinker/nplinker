@@ -3,7 +3,7 @@ from os import PathLike
 from jsonschema import validate
 from nplinker.logconfig import LogConfig
 from nplinker.schemas import USER_STRAINS_SCHEMA
-from .strains import Strain
+from .strain import Strain
 
 
 logger = LogConfig.getLogger(__name__)

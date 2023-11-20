@@ -8,7 +8,7 @@ from nplinker.pairedomics import get_mappings_strain_id_bgc_id
 from nplinker.pairedomics import get_mappings_strain_id_spectrum_id
 from nplinker.pairedomics import podp_generate_strain_mappings
 from nplinker.strain_collection import StrainCollection
-from nplinker.strains import Strain
+from nplinker.strain import Strain
 
 
 def test_podp_generate_strain_mappings(monkeypatch, tmp_path):

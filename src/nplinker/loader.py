@@ -26,7 +26,7 @@ from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.pairedomics.strain_mappings_generator import podp_generate_strain_mappings
 from nplinker.strain_collection import StrainCollection
 from nplinker.strain_loader import load_user_strains
-from nplinker.strains import Strain
+from nplinker.strain import Strain
 
 
 try:
