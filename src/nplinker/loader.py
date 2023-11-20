@@ -1,7 +1,6 @@
 import glob
 import os
 from pathlib import Path
-from nplinker.annotations import load_annotations
 from nplinker.class_info.chem_classes import ChemClassPredictions
 from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
@@ -18,7 +17,6 @@ from nplinker.globals import GNPS_FILE_MAPPINGS_FILENAME
 from nplinker.globals import PFAM_PATH
 from nplinker.globals import STRAIN_MAPPINGS_FILENAME
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics.metabolomics import load_dataset
 from nplinker.pairedomics.downloader import PODPDownloader
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.pairedomics.strain_mappings_generator import podp_generate_strain_mappings
@@ -401,30 +399,8 @@ class DatasetLoader:
 
         return True
 
-    # TODO CG: replace deprecated load_dataset with GPNSLoader
+    # TODO CG: rewrite the loading process using GPNSLoader
     def _load_metabolomics(self):
-        spec_dict, self.spectra, self.molfams, unknown_strains = load_dataset(
-            self.strains,
-            self.mgf_file,
-            self.edges_file,
-            self.nodes_file,
-            self.quantification_table_file,
-            self.metadata_table_file,
-            self._extended_metadata_table_parsing,
-        )
-
-        us_path = os.path.join(self._root, "unknown_strains_met.csv")
-        logger.warning("Writing unknown strains from METABOLOMICS data to {}".format(us_path))
-        with open(us_path, "w") as us:
-            us.write("# unknown strain label\n")
-            for strain in unknown_strains.keys():
-                us.write(f"{strain}\n")
-
-        # load any available annotations from GNPS or user-provided files
-        logger.info("Loading provided annotation files ({})".format(self.annotations_dir))
-        self.spectra = load_annotations(
-            self.annotations_dir, self.annotations_config_file, self.spectra, spec_dict
-        )
         return True
 
     def _load_genomics(self):
