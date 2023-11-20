@@ -8,7 +8,6 @@ from nplinker.class_info.runcanopus import run_canopus
 from nplinker.genomics import generate_mappings_genome_id_bgc_id
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.bigscape import BigscapeGCFLoader
-from nplinker.genomics.genomics import filter_mibig_only_gcf
 from nplinker.genomics.genomics import get_bgcs_from_gcfs
 from nplinker.genomics.genomics import get_strains_from_bgcs
 from nplinker.genomics.genomics import map_bgc_to_gcf
@@ -453,7 +452,7 @@ class DatasetLoader:
         map_bgc_to_gcf(raw_bgcs, raw_gcfs)
 
         # Step 5: get clean GCF objects, BGC objects and Strain objects
-        self.gcfs = filter_mibig_only_gcf(raw_gcfs)
+        self.gcfs = raw_gcfs
         self.bgcs = get_bgcs_from_gcfs(self.gcfs)
         self.strains = get_strains_from_bgcs(self.bgcs)
 
