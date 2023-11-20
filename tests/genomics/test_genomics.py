@@ -3,7 +3,6 @@ import json
 import pytest
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
-from nplinker.genomics import filter_mibig_only_gcf
 from nplinker.genomics import generate_mappings_genome_id_bgc_id
 from nplinker.genomics import get_bgcs_from_gcfs
 from nplinker.genomics import get_strains_from_bgcs
@@ -147,13 +146,6 @@ def test_map_bgc_to_gcf_error(bgc_list, gcf_list_error):
     with pytest.raises(KeyError) as e:
         map_bgc_to_gcf(bgc_list, gcf_list_error)
     assert "BGC id 'BGC_04' from GCF object '1' not found" in e.value.args[0]
-
-
-def test_filter_mibig_only_gcf(bgc_list, gcf_list):
-    map_bgc_to_gcf(bgc_list, gcf_list)
-    gcfs = filter_mibig_only_gcf(gcf_list)
-    assert len(gcfs) == 1
-    assert gcfs[0].gcf_id == "2"
 
 
 def test_get_bgcs_from_gcfs(bgc_list, gcf_list):
