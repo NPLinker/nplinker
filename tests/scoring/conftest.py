@@ -6,8 +6,8 @@ from nplinker.nplinker import NPLinker
 from nplinker.scoring import MetcalfScoring
 from nplinker.scoring.linking import DataLinks
 from nplinker.scoring.linking import LinkFinder
-from nplinker.strain_collection import StrainCollection
 from nplinker.strain import Strain
+from nplinker.strain_collection import StrainCollection
 from .. import DATA_DIR
 
 

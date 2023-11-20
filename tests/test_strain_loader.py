@@ -1,7 +1,7 @@
 import json
 import pytest
-from nplinker.strain_loader import load_user_strains
 from nplinker.strain import Strain
+from nplinker.strain_loader import load_user_strains
 
 
 @pytest.fixture
