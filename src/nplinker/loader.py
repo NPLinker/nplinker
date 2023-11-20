@@ -9,7 +9,6 @@ from nplinker.genomics import generate_mappings_genome_id_bgc_id
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.bigscape import BigscapeGCFLoader
 from nplinker.genomics.genomics import get_bgcs_from_gcfs
-from nplinker.genomics.genomics import get_strains_from_bgcs
 from nplinker.genomics.genomics import map_bgc_to_gcf
 from nplinker.genomics.genomics import map_strain_to_bgc
 from nplinker.genomics.mibig import MibigLoader
@@ -428,9 +427,8 @@ class DatasetLoader:
         )
         return True
 
-    # TODO CG: self.strains will be overwritten by this method, rename it?
     def _load_genomics(self):
-        """Loads all genomics data (BGCs and GCFs) into the object."""
+        """Loads genomics data to BGC and GCF objects."""
         logger.debug("\nLoading genomics data starts...")
 
         # Step 1: load all BGC objects
@@ -439,11 +437,11 @@ class DatasetLoader:
         raw_bgcs = antismash_bgcs + self.mibig_bgcs
 
         # Step 2: load all GCF objects
+        # TODO: create a config for "bigscape_cluster_file" and discard "bigscape_dir" and "bigscape_cutoff"?
         bigscape_cluster_file = (
             Path(self.bigscape_dir) / "mix" / f"mix_clustering_c0.{self._bigscape_cutoff:02d}.tsv"
         )
-        bigscape_gcf_list = BigscapeGCFLoader(bigscape_cluster_file).get_gcfs()
-        raw_gcfs = bigscape_gcf_list
+        raw_gcfs = BigscapeGCFLoader(bigscape_cluster_file).get_gcfs()
 
         # Step 3: assign Strain object to BGC.strain
         map_strain_to_bgc(self.strains, raw_bgcs)
@@ -451,10 +449,9 @@ class DatasetLoader:
         # Step 4: assign BGC objects to GCF.bgcs
         map_bgc_to_gcf(raw_bgcs, raw_gcfs)
 
-        # Step 5: get clean GCF objects, BGC objects and Strain objects
+        # Step 5: get GCF objects and their BGC members
         self.gcfs = raw_gcfs
         self.bgcs = get_bgcs_from_gcfs(self.gcfs)
-        self.strains = get_strains_from_bgcs(self.bgcs)
 
         logger.debug("Loading genomics data completed\n")
         return True
