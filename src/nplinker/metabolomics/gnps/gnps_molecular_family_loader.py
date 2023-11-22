@@ -38,8 +38,7 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
         self._validate()
         self._load()
 
-    @property
-    def families(self) -> list[MolecularFamily]:
+    def get_mfs(self) -> list[MolecularFamily]:
         """Get all molecular families.
 
         Returns:
