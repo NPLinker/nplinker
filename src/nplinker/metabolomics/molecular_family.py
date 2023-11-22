@@ -64,11 +64,14 @@ class MolecularFamily:
         """
         return strain in self._strains
 
-    # TODO: update the logics, mf should also be added to the spectrum object
-    def add_spectrum(self, spectrum: Spectrum):
-        """Add a spectrum to the spectra list.
+    def add_spectrum(self, spectrum: Spectrum) -> None:
+        """Add a Spectrum object to the molecular family.
 
         Args:
-            spectrum(Spectrum): Spectrum to add to the molecular family.
+            spectrum(Spectrum): `Spectrum` object to add to the molecular family.
         """
         self._spectra.add(spectrum)
+        self.spectra_ids.add(spectrum.spectrum_id)
+        self._strains = self._strains + spectrum.strains
+        # add the molecular family to the spectrum
+        spectrum.family = self

@@ -1,7 +1,12 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from nplinker.strain import Strain
 from nplinker.strain_collection import StrainCollection
 from nplinker.utils import sqrt_normalise
 
+
+if TYPE_CHECKING:
+    from .molecular_family import MolecularFamily
 
 GNPS_KEY = "gnps"
 
@@ -43,9 +48,7 @@ class Spectrum:
         # this is a dict indexed by Strain objects (the strains found in this Spectrum), with
         # the values being dicts of the form {growth_medium: peak intensity} for the parent strain
         self.growth_media = {}
-        # TODO CG: self.family_id should be removed, used in deprecated make_families method
-        self.family_id = "-1"
-        self.family = None
+        self.family: MolecularFamily | None = None
         # a dict indexed by filename, or "gnps"
         self.annotations = {}
         self._losses = None
