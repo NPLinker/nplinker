@@ -14,6 +14,11 @@ class MolecularFamily:
 
         Args:
             family_id(str): Id for the molecular family.
+
+        Attributes:
+            id(int): Unique id for the molecular family.
+            family_id(str): Id for the molecular family.
+            spectra_ids(set[str]): Set of spectrum ids in the molecular family.
         """
         self.id: int = -1
         self.family_id: str = family_id
