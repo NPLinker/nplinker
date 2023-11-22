@@ -17,7 +17,7 @@ class MolecularFamily:
         """
         self.id: int = -1
         self.family_id: str = family_id
-        self._spectra: list[Spectrum] = []
+        self._spectra: set[Spectrum] = set()
         self.spectra_ids: set[str] = set()
 
     def __str__(self) -> str:
@@ -43,7 +43,7 @@ class MolecularFamily:
         return hash((self.id, self.family_id))
 
     @property
-    def spectra(self) -> list[Spectrum]:
+    def spectra(self) -> set[Spectrum]:
         """Get the Spectrum objects."""
         return self._spectra
 
@@ -79,4 +79,4 @@ class MolecularFamily:
         Args:
             spectrum(Spectrum): Spectrum to add to the molecular family.
         """
-        self._spectra.append(spectrum)
+        self._spectra.add(spectrum)
