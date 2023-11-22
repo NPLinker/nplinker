@@ -21,7 +21,9 @@ class MolecularFamily:
         self.spectra_ids: set[str] = set()
 
     def __str__(self) -> str:
-        return "MolFam(family_id={}, spectra={})".format(self.family_id, len(self.spectra))
+        return "MF(family_id={}, #Spectrum_objects={}, #spectrum_ids={}, #strains={})".format(
+            self.family_id, len(self.spectra), len(self.spectra_ids), len(self.strains)
+        )
 
     def __eq__(self, other) -> bool:
         if isinstance(other, MolecularFamily):
