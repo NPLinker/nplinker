@@ -35,8 +35,11 @@ class GCF:
         self._bgcs: set[BGC] = set()
         self._strains: StrainCollection = StrainCollection()
 
-    def __str__(self):
-        return f"GCF(id={self.gcf_id}, #bgcs={len(self.bgcs)}, #strains={len(self._strains)})."
+    def __str__(self) -> str:
+        return (
+            f"GCF(id={self.gcf_id}, #BGC_objects={len(self.bgcs)}, #bgc_ids={len(self.bgc_ids)},"
+            f"#strains={len(self._strains)})."
+        )
 
     def __repr__(self):
         return str(self)
