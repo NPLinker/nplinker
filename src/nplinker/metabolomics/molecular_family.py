@@ -88,6 +88,14 @@ class MolecularFamily:
         # remove the molecular family from the spectrum
         spectrum.family = None
 
+    def is_singleton(self) -> bool:
+        """Check if the molecular family contains only one spectrum.
+
+        Returns:
+            bool: True when `MolecularFamily.spectra_ids` contains only one spectrum id.
+        """
+        return len(self.spectra_ids) == 1
+
     def _update_strains(self) -> StrainCollection:
         """Update strains in the molecular family.
 
