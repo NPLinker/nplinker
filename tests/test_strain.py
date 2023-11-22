@@ -1,4 +1,13 @@
+import pytest
 from nplinker.strain import Strain
+
+
+@pytest.fixture
+def strain() -> Strain:
+    """Return a Strain object with one alias."""
+    strain = Strain("strain_1")
+    strain.add_alias("strain_1_a")
+    return strain
 
 
 def test_default():
