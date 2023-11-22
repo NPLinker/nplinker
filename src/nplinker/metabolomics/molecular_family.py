@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 class MolecularFamily:
     def __init__(self, family_id: str):
-        """Class to model molecular families.
+        """Class to model molecular family.
 
         Args:
             family_id(str): Id for the molecular family.
@@ -19,6 +19,23 @@ class MolecularFamily:
         self.family_id: str = family_id
         self.spectra: list[Spectrum] = []
         self.spectra_ids: set[str] = set()
+
+    def __str__(self) -> str:
+        return "MolFam(family_id={}, spectra={})".format(self.family_id, len(self.spectra))
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, MolecularFamily):
+            return self.id == other.id and self.family_id == other.family_id
+        return NotImplemented
+
+    def __hash__(self) -> int:
+        """Hash function for MolecularFamily.
+
+        Note that MolecularFamily is a mutable container, so here we hash on
+        the id and family_id only to avoid the hash value changing when
+        `self.spectra` is updated.
+        """
+        return hash((self.id, self.family_id))
 
     # TODO: change property to attibute
     @property
@@ -53,20 +70,3 @@ class MolecularFamily:
             spectrum(Spectrum): Spectrum to add to the molecular family.
         """
         self.spectra.append(spectrum)
-
-    def __str__(self) -> str:
-        return "MolFam(family_id={}, spectra={})".format(self.family_id, len(self.spectra))
-
-    def __eq__(self, other) -> bool:
-        if isinstance(other, MolecularFamily):
-            return self.id == other.id and self.family_id == other.family_id
-        return NotImplemented
-
-    def __hash__(self) -> int:
-        """Hash function for MolecularFamily.
-
-        Note that MolecularFamily is a mutable container, so here we hash on
-        the id and family_id only to avoid the hash value changing when
-        `self.spectra` is updated.
-        """
-        return hash((self.id, self.family_id))
