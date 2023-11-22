@@ -5,6 +5,14 @@ from nplinker.strain_collection import StrainCollection
 
 
 @pytest.fixture
+def strain() -> Strain:
+    """Return a Strain object with one alias."""
+    strain = Strain("strain_1")
+    strain.add_alias("strain_1_a")
+    return strain
+
+
+@pytest.fixture
 def collection(strain: Strain) -> StrainCollection:
     sut = StrainCollection()
     sut.add(strain)
