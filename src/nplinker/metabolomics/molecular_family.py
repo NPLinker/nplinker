@@ -17,12 +17,12 @@ class MolecularFamily:
         """
         self.id: int = -1
         self.family_id: str = family_id
-        self.spectra: list[Spectrum] = []
+        self._spectra: list[Spectrum] = []
         self.spectra_ids: set[str] = set()
 
     def __str__(self) -> str:
         return "MF(family_id={}, #Spectrum_objects={}, #spectrum_ids={}, #strains={})".format(
-            self.family_id, len(self.spectra), len(self.spectra_ids), len(self.strains)
+            self.family_id, len(self._spectra), len(self.spectra_ids), len(self.strains)
         )
 
     def __repr__(self) -> str:
@@ -41,6 +41,11 @@ class MolecularFamily:
         `self.spectra` is updated.
         """
         return hash((self.id, self.family_id))
+
+    @property
+    def spectra(self) -> list[Spectrum]:
+        """Get the Spectrum objects."""
+        return self._spectra
 
     # TODO: change property to attibute
     @property
@@ -74,4 +79,4 @@ class MolecularFamily:
         Args:
             spectrum(Spectrum): Spectrum to add to the molecular family.
         """
-        self.spectra.append(spectrum)
+        self._spectra.append(spectrum)
