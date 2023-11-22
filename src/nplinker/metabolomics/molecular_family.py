@@ -75,3 +75,30 @@ class MolecularFamily:
         self._strains = self._strains + spectrum.strains
         # add the molecular family to the spectrum
         spectrum.family = self
+
+    def detach_spectrum(self, spectrum: Spectrum) -> None:
+        """Remove a Spectrum object from the molecular family.
+
+        Args:
+            spectrum(Spectrum): `Spectrum` object to remove from the molecular family.
+        """
+        self._spectra.remove(spectrum)
+        self.spectra_ids.remove(spectrum.spectrum_id)
+        self._strains = self._update_strains()
+        # remove the molecular family from the spectrum
+        spectrum.family = None
+
+    def _update_strains(self) -> StrainCollection:
+        """Update strains in the molecular family.
+
+        The strains is regenerated from the existing spectra in the molecular family. This method
+        is mainly used when the spectra are updated (e.g. remove a spectrum from the molecular
+        family).
+
+        Returns:
+            StrainCollection: Updated StrainCollection object.
+        """
+        strains = StrainCollection()
+        for spectrum in self._spectra:
+            strains = strains + spectrum.strains
+        return strains
