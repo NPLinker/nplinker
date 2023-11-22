@@ -22,8 +22,9 @@ class MolecularFamily:
         self._strains: StrainCollection = StrainCollection()
 
     def __str__(self) -> str:
-        return "MolecularFamily(family_id={}, #Spectrum_objects={}, #spectrum_ids={}, #strains={})".format(
-            self.family_id, len(self._spectra), len(self.spectra_ids), len(self._strains)
+        return (
+            f"MolecularFamily(family_id={self.family_id}, #Spectrum_objects={len(self._spectra)}, "
+            f"#spectrum_ids={len(self.spectra_ids)}, #strains={len(self._strains)})"
         )
 
     def __repr__(self) -> str:
