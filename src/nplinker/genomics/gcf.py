@@ -23,17 +23,16 @@ class GCF:
 
         Attributes:
             gcf_id(str): id of the GCF object.
-            bgcs(set[BGC]): a set of BGC objects that belongs to the GCF.
-            strains(StrainCollection):  a collection of strains.
+            bgc_ids(set[str]): a set of BGC ids that belongs to the GCF.
             bigscape_class(str | None): BiG-SCAPE's BGC class.
                 BiG-SCAPE's BGC classes are similar to those defined in MiBIG
                 but have more categories (7 classes). More details see:
                 https://doi.org/10.1038%2Fs41589-019-0400-9.
         """
         self.gcf_id = gcf_id
-        self._bgcs: set[BGC] = set()
-        self.bigscape_class: str | None = None
         self.bgc_ids: set[str] = set()
+        self.bigscape_class: str | None = None
+        self._bgcs: set[BGC] = set()
         self._strains: StrainCollection = StrainCollection()
 
     def __str__(self):
