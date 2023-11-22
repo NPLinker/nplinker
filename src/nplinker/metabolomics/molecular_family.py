@@ -53,17 +53,6 @@ class MolecularFamily:
         """Get strains in the molecular family."""
         return self._strains
 
-    def has_strain(self, strain: Strain) -> bool:
-        """Check if the given strain exists.
-
-        Args:
-            strain(Strain): `Strain` object.
-
-        Returns:
-            bool: True when the given strain exist.
-        """
-        return strain in self._strains
-
     def add_spectrum(self, spectrum: Spectrum) -> None:
         """Add a Spectrum object to the molecular family.
 
@@ -87,6 +76,17 @@ class MolecularFamily:
         self._strains = self._update_strains()
         # remove the molecular family from the spectrum
         spectrum.family = None
+
+    def has_strain(self, strain: Strain) -> bool:
+        """Check if the given strain exists.
+
+        Args:
+            strain(Strain): `Strain` object.
+
+        Returns:
+            bool: True when the given strain exist.
+        """
+        return strain in self._strains
 
     def is_singleton(self) -> bool:
         """Check if the molecular family contains only one spectrum.
