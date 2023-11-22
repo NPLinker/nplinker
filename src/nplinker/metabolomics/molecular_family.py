@@ -25,6 +25,9 @@ class MolecularFamily:
             self.family_id, len(self.spectra), len(self.spectra_ids), len(self.strains)
         )
 
+    def __repr__(self) -> str:
+        return str(self)
+
     def __eq__(self, other) -> bool:
         if isinstance(other, MolecularFamily):
             return self.id == other.id and self.family_id == other.family_id
