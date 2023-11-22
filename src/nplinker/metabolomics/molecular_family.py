@@ -17,12 +17,13 @@ class MolecularFamily:
         """
         self.id: int = -1
         self.family_id: str = family_id
-        self._spectra: set[Spectrum] = set()
         self.spectra_ids: set[str] = set()
+        self._spectra: set[Spectrum] = set()
+        self._strains: StrainCollection = StrainCollection()
 
     def __str__(self) -> str:
         return "MF(family_id={}, #Spectrum_objects={}, #spectrum_ids={}, #strains={})".format(
-            self.family_id, len(self._spectra), len(self.spectra_ids), len(self.strains)
+            self.family_id, len(self._spectra), len(self.spectra_ids), len(self._strains)
         )
 
     def __repr__(self) -> str:
@@ -44,22 +45,13 @@ class MolecularFamily:
 
     @property
     def spectra(self) -> set[Spectrum]:
-        """Get the Spectrum objects."""
+        """Get Spectrum objects in the molecular family."""
         return self._spectra
 
-    # TODO: change property to attibute
     @property
     def strains(self) -> StrainCollection:
-        """Get strains of spectra in the molecular family.
-
-        Returns:
-            set[StrainCollection]: StrainCollection of strains from which the spectra in the molecular family are coming.
-        """
-        strains: StrainCollection = StrainCollection()
-        for spectrum in self.spectra:
-            for strain in spectrum.strains:
-                strains.add(strain)
-        return strains
+        """Get strains in the molecular family."""
+        return self._strains
 
     def has_strain(self, strain: Strain) -> bool:
         """Check if the given strain exists.
@@ -70,7 +62,7 @@ class MolecularFamily:
         Returns:
             bool: True when the given strain exist.
         """
-        return strain in self.strains
+        return strain in self._strains
 
     # TODO: update the logics, mf should also be added to the spectrum object
     def add_spectrum(self, spectrum: Spectrum):
