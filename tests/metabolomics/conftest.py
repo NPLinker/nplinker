@@ -1,4 +1,3 @@
-import shutil
 from os import PathLike
 import httpx
 import pytest
@@ -7,7 +6,7 @@ from nplinker.utils import extract_archive
 from .. import GNPS_DATA_DIR
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def gnps_website_is_down():
     gnps_url = "https://gnps.ucsd.edu"
     try:
@@ -17,7 +16,7 @@ def gnps_website_is_down():
         return True
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def gnps_zip_files() -> dict[GNPSFormat, PathLike]:
     """Get the GNPS zip archives as a dictionary.
 
