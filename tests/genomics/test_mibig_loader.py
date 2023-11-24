@@ -10,16 +10,15 @@ from .. import DATA_DIR
 
 
 class TestMibigBGCLoader:
-    @pytest.fixture
-    def data_dir(self, tmp_path):
-        download_root = tmp_path / "download"
-        extract_path = tmp_path / "metadata"
-        download_root.mkdir()
-        extract_path.mkdir()
+    @pytest.fixture(scope="session")
+    def data_dir(self, tmp_path_factory):
+        # get the temp directory shared by all workers
+        download_root = tmp_path_factory.mktemp("download")
+        extract_path = tmp_path_factory.mktemp("metadata")
         download_and_extract_mibig_metadata(download_root, extract_path)
         yield str(extract_path)
 
-    @pytest.fixture
+    @pytest.fixture(scope="session")
     def loader(self, data_dir):
         loader = MibigLoader(data_dir)
         yield loader
