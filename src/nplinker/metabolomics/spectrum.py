@@ -71,10 +71,6 @@ class Spectrum:
 
         self.growth_media[strain].update({growth_medium: peak_intensity})
 
-    @property
-    def is_library(self):
-        return GNPS_KEY in self.annotations
-
     def set_annotations(self, key, data):
         self.annotations[key] = data
 
