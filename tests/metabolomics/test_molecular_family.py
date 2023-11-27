@@ -27,7 +27,6 @@ def test_init():
     """Test MolecularFamily class initialization."""
     mf = MolecularFamily("mf001")
     assert mf.family_id == "mf001"
-    assert mf.id == -1
     assert mf.spectra_ids == set()
     assert mf.spectra == set()
     assert mf.strains == StrainCollection()
@@ -53,7 +52,7 @@ def test_eq():
 def test_hash():
     """Test __hash__ method."""
     mf = MolecularFamily("mf001")
-    assert hash(mf) == hash((-1, "mf001"))
+    assert hash(mf) == hash("mf001")
 
 
 def test_spectra(spectrum1):
