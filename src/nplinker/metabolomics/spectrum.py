@@ -51,7 +51,6 @@ class Spectrum:
         self.family: MolecularFamily | None = None
         # a dict indexed by filename, or "gnps"
         self.annotations = {}
-        self._losses = None
         self._jcamp = None
 
     def add_strain(self, strain, growth_medium, peak_intensity):
@@ -173,42 +172,3 @@ class Spectrum:
             self.normalised_peaks = []
             self.max_ms2_intensity = 0.0
             self.total_ms2_intensity = 0.0
-
-    @property
-    def losses(self):
-        """All mass shifts in the spectrum, and the indices of the peaks."""
-        if self._losses is None:
-            # populate loss table
-            losses = []
-            for i in range(len(self.peaks)):
-                loss = self.precursor_mz - self.peaks[i][0]
-                losses.append((loss, self.id, i))
-
-            # THIS SEEMED TO ME LIKE IT WOULD TAKE THE WRONG DIFFERENCES AS LOSSES:
-            # TODO: please check!
-            #                for j in range(i):
-            #                    loss = self.peaks[i][0] - self.peaks[j][0]
-            #                    losses.append((loss, i, j))
-
-            # Sort by loss
-            losses.sort(key=lambda x: x[0])
-            self._losses = losses
-        return self._losses
-
-    def has_loss(self, mass, tol):
-        """Check if the scan has the specified loss (within tolerance)."""
-        matched_losses = []
-
-        idx = 0
-        # Check losses in range [0, mass]
-        while idx < len(self.losses) and self.losses[idx][0] <= mass:
-            if mass - self.losses[idx][0] < tol:
-                matched_losses.append(self.losses[idx])
-            idx += 1
-
-        # Add all losses in range [mass, mass+tol(
-        while idx < len(self.losses) and self.losses[idx][0] < mass + tol:
-            matched_losses.append(self.losses[idx])
-            idx += 1
-
-        return matched_losses
