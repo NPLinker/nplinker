@@ -52,18 +52,12 @@ class Spectrum:
         self.annotations = {}
         self._jcamp = None
 
-    def set_annotations(self, key, data):
-        self.annotations[key] = data
-
     @property
     def gnps_annotations(self):
         if GNPS_KEY not in self.annotations:
             return None
 
         return self.annotations[GNPS_KEY][0]
-
-    def has_annotations(self):
-        return len(self.annotations) > 0
 
     def get_metadata_value(self, key):
         val = self.metadata.get(key, None)
