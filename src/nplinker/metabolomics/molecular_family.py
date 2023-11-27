@@ -13,14 +13,12 @@ class MolecularFamily:
         """Class to model molecular family.
 
         Args:
-            family_id(str): Id for the molecular family.
+            family_id(str): Unique id for the molecular family.
 
         Attributes:
-            id(int): Unique id for the molecular family.
-            family_id(str): Id for the molecular family.
+            family_id(str): Unique id for the molecular family.
             spectra_ids(set[str]): Set of spectrum ids in the molecular family.
         """
-        self.id: int = -1
         self.family_id: str = family_id
         self.spectra_ids: set[str] = set()
         self._spectra: set[Spectrum] = set()
@@ -37,17 +35,11 @@ class MolecularFamily:
 
     def __eq__(self, other) -> bool:
         if isinstance(other, MolecularFamily):
-            return self.id == other.id and self.family_id == other.family_id
+            return self.family_id == other.family_id
         return NotImplemented
 
     def __hash__(self) -> int:
-        """Hash function for MolecularFamily.
-
-        Note that MolecularFamily is a mutable container, so here we hash on
-        the id and family_id only to avoid the hash value changing when
-        `self.spectra` is updated.
-        """
-        return hash((self.id, self.family_id))
+        return hash(self.family_id)
 
     @property
     def spectra(self) -> set[Spectrum]:
