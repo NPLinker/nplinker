@@ -10,21 +10,6 @@ if TYPE_CHECKING:
 
 GNPS_KEY = "gnps"
 
-JCAMP = (
-    "##TITLE={}\\n"
-    + "##JCAMP-DX=nplinker vTODO\\n"
-    + "##DATA TYPE=Spectrum\\n"
-    + "##DATA CLASS=PEAKTABLE\\n"
-    + "##ORIGIN=TODO_DATASET_ID\\n"
-    + "##OWNER=nobody\\n"
-    + "##XUNITS=M/Z\\n"
-    + "##YUNITS=RELATIVE ABUNDANCE\\n"
-    + "##NPOINTS={}\\n"
-    + "##PEAK TABLE=(XY..XY)\\n"
-    + "{}\\n"
-    + "##END=\\n"
-)
-
 
 class Spectrum:
     def __init__(self, id, peaks, spectrum_id: str, precursor_mz, parent_mz=None, rt=None):
@@ -50,7 +35,6 @@ class Spectrum:
         self.family: MolecularFamily | None = None
         # a dict indexed by filename, or "gnps"
         self.annotations = {}
-        self._jcamp = None
 
     @property
     def gnps_annotations(self):
@@ -61,14 +45,6 @@ class Spectrum:
 
     def has_strain(self, strain: Strain):
         return strain in self.strains
-
-    def to_jcamp_str(self, force_refresh=False):
-        if self._jcamp is not None and not force_refresh:
-            return self._jcamp
-
-        peakdata = "\\n".join("{}, {}".format(*p) for p in self.peaks)
-        self._jcamp = JCAMP.format(str(self), self.n_peaks, peakdata)
-        return self._jcamp
 
     def __str__(self):
         return "Spectrum(id={}, spectrum_id={}, strains={})".format(
