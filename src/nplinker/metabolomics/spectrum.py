@@ -59,10 +59,6 @@ class Spectrum:
 
         return self.annotations[GNPS_KEY][0]
 
-    def get_metadata_value(self, key):
-        val = self.metadata.get(key, None)
-        return val
-
     def has_strain(self, strain: Strain):
         return strain in self.strains
 
