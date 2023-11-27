@@ -14,10 +14,10 @@ GNPS_KEY = "gnps"
 class Spectrum:
     def __init__(self, id, peaks, spectrum_id: str, precursor_mz, parent_mz=None, rt=None):
         self.id = id
+
         self.peaks = sorted(peaks, key=lambda x: x[0])  # ensure sorted by mz
         self.normalised_peaks = sqrt_normalise(self.peaks)  # useful later
-        self.max_ms2_intensity = max(intensity for mz, intensity in self.peaks)
-        self.total_ms2_intensity = sum(intensity for mz, intensity in self.peaks)
+
         self.spectrum_id = spectrum_id  # MS1.name
         self.rt = rt
         # TODO CG: should include precursor mass and charge to calculate precursor_mz
@@ -100,9 +100,5 @@ class Spectrum:
         self.peaks = new_peaks
         if len(self.peaks) > 0:
             self.normalised_peaks = sqrt_normalise(self.peaks)
-            self.max_ms2_intensity = max(intensity for mz, intensity in self.peaks)
-            self.total_ms2_intensity = sum(intensity for mz, intensity in self.peaks)
         else:
             self.normalised_peaks = []
-            self.max_ms2_intensity = 0.0
-            self.total_ms2_intensity = 0.0
