@@ -47,29 +47,10 @@ class Spectrum:
         self.strains = StrainCollection()
         # this is a dict indexed by Strain objects (the strains found in this Spectrum), with
         # the values being dicts of the form {growth_medium: peak intensity} for the parent strain
-        self.growth_media = {}
         self.family: MolecularFamily | None = None
         # a dict indexed by filename, or "gnps"
         self.annotations = {}
         self._jcamp = None
-
-    def add_strain(self, strain, growth_medium, peak_intensity):
-        # adds the strain to the StrainCollection if not already there
-        self.strains.add(strain)
-
-        if strain not in self.growth_media:
-            self.growth_media[strain] = {}
-
-        if growth_medium is None:
-            self.growth_media[strain].update(
-                {f"unknown_medium_{len(self.growth_media[strain])}": peak_intensity}
-            )
-            return
-
-        if strain in self.growth_media and growth_medium in self.growth_media[strain]:
-            raise Exception("Growth medium clash: {} / {} {}".format(self, strain, growth_medium))
-
-        self.growth_media[strain].update({growth_medium: peak_intensity})
 
     def set_annotations(self, key, data):
         self.annotations[key] = data
@@ -90,13 +71,6 @@ class Spectrum:
 
     def has_strain(self, strain: Strain):
         return strain in self.strains
-
-    def get_growth_medium(self, strain):
-        if strain not in self.strains:
-            return None
-
-        gms = self.growth_media[strain]
-        return list(gms.keys())[0]
 
     def to_jcamp_str(self, force_refresh=False):
         if self._jcamp is not None and not force_refresh:
