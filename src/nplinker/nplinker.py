@@ -427,8 +427,6 @@ class NPLinker:
     ) -> dict[tuple[Spectrum | MolecularFamily, GCF], list[Strain]]:
         """Get common strains between given spectra/molecular families and GCFs.
 
-        Note that SingletonFamily objects are excluded from given molecular families.
-
         Args:
             met(Sequence[Spectrum] | Sequence[MolecularFamily]):
                 A list of Spectrum or MolecularFamily objects.

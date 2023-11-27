@@ -6,7 +6,6 @@ import pandas as pd
 from nplinker.genomics.gcf import GCF
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import MolecularFamily
-from nplinker.metabolomics import SingletonFamily
 from nplinker.metabolomics import Spectrum
 from .utils import calc_correlation_matrix
 from .utils import isinstance_all
@@ -108,8 +107,6 @@ class DataLinks:
     ) -> dict[tuple[Spectrum | MolecularFamily, GCF], list[Strain]]:
         """Get common strains between given spectra/molecular families and GCFs.
 
-        Note that SingletonFamily objects are excluded from given `spectra_or_mfs`.
-
         Args:
             spectra_or_mfs(Sequence[Spectrum | MolecularFamily]):
                 A list of Spectrum and/or MolecularFamily objects.
@@ -138,8 +135,6 @@ class DataLinks:
         strain_ids = self.occurrence_gcf_strain.columns
         results = {}
         for obj in spectra_or_mfs:
-            if isinstance(obj, SingletonFamily):
-                continue
             for gcf in gcfs:
                 if isinstance(obj, Spectrum):
                     shared_strains = strain_ids[
@@ -215,12 +210,7 @@ class DataLinks:
         strains as columns, where index is `mf.family_id` and column name is
         `strain.id`. The values are 1 if the molecular family contains the
         strain and 0 otherwise.
-
-        Note that SingletonFamily objects are excluded from given `mfs`.
         """
-        # remove SingletonFamily objects
-        mfs = [mf for mf in mfs if not isinstance(mf, SingletonFamily)]
-
         df_mf_strain = pd.DataFrame(
             np.zeros((len(mfs), len(strains))),
             index=[mf.family_id for mf in mfs],

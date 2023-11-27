@@ -1,7 +1,6 @@
 import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
-from nplinker.metabolomics import SingletonFamily
 
 
 def test_init(datalinks):
@@ -165,36 +164,6 @@ def test_get_common_strains_spec_mf(datalinks, spectra, mfs, gcfs, strains_list)
         (spectra[0], gcfs[2]): [strains_list[0]],
         (spectra[1], gcfs[1]): [strains_list[1]],
         (spectra[1], gcfs[2]): [strains_list[1]],
-        (mfs[0], gcfs[0]): [strains_list[0]],
-        (mfs[0], gcfs[2]): [strains_list[0]],
-        (mfs[1], gcfs[1]): [strains_list[1]],
-        (mfs[1], gcfs[2]): [strains_list[1]],
-    }
-    assert sut == expected
-
-
-def test_get_common_strains_sf(datalinks, mfs, gcfs, strains_list):
-    """Test get_common_strains method for input SingletonFamily."""
-    smf = SingletonFamily()
-
-    sut = datalinks.get_common_strains([smf], gcfs)
-    assert sut == {}
-
-    # the expected are same as `test_get_common_strains_mf`
-    mfs_mix = (*mfs[:2], smf)
-    sut = datalinks.get_common_strains(mfs_mix, gcfs)
-    expected = {
-        (mfs[0], gcfs[0]): [strains_list[0]],
-        (mfs[0], gcfs[1]): [],
-        (mfs[0], gcfs[2]): [strains_list[0]],
-        (mfs[1], gcfs[0]): [],
-        (mfs[1], gcfs[1]): [strains_list[1]],
-        (mfs[1], gcfs[2]): [strains_list[1]],
-    }
-    assert sut == expected
-
-    sut = datalinks.get_common_strains(mfs_mix, gcfs, filter_no_shared=True)
-    expected = {
         (mfs[0], gcfs[0]): [strains_list[0]],
         (mfs[0], gcfs[2]): [strains_list[0]],
         (mfs[1], gcfs[1]): [strains_list[1]],
