@@ -14,7 +14,7 @@
 
 
 def fast_cosine_shift(spectrum1, spectrum2, tol, min_match):
-    if spectrum1.n_peaks == 0 or spectrum2.n_peaks == 0:
+    if len(spectrum1.peaks) == 0 or len(spectrum2.peaks) == 0:
         return 0.0, []
 
     spec1 = spectrum1.normalised_peaks
@@ -66,7 +66,7 @@ def find_pairs(spec1, spec2, tol, shift=0):
 
 def fast_cosine(spectrum1, spectrum2, tol, min_match):
     # spec 1 and spec 2 have to be sorted by mz
-    if spectrum1.n_peaks == 0 or spectrum2.n_peaks == 0:
+    if len(spectrum1.peaks) == 0 or len(spectrum2.peaks) == 0:
         return 0.0, []
     # find all the matching pairs
 

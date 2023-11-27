@@ -43,7 +43,7 @@ class SpecLib:
         return list(s.spectrum_id for s in self.spectra)
 
     def get_n_peaks(self):
-        return [s.n_peaks for s in self.spectra]
+        return [len(s.peaks) for s in self.spectra]
 
     def filter(self):
         # top_k_filter
