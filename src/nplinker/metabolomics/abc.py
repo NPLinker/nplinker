@@ -14,8 +14,17 @@ class SpectrumLoaderBase(ABC):
 
 class MolecularFamilyLoaderBase(ABC):
     @abstractmethod
-    def get_mfs(self) -> Sequence[MolecularFamily]:
-        ...
+    def get_mfs(self, keep_singleton: bool) -> Sequence[MolecularFamily]:
+        """Get MolecularFamily objects.
+
+        Args:
+            keep_singleton(bool): True to keep singleton molecular families. A
+                singleton molecular family is a molecular family that contains
+                only one spectrum.
+
+        Returns:
+            Sequence[MolecularFamily]: a list of MolecularFamily objects.
+        """
 
 
 class FileMappingLoaderBase(ABC):

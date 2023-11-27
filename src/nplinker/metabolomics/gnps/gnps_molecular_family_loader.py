@@ -38,14 +38,22 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
         self._validate()
         self._load()
 
-    def get_mfs(self) -> list[MolecularFamily]:
-        """Get all molecular families.
+    def get_mfs(self, keep_singleton: bool = False) -> list[MolecularFamily]:
+        """Get MolecularFamily objects.
+
+        Args:
+            keep_singleton(bool): True to keep singleton molecular families. A
+                singleton molecular family is a molecular family that contains
+                only one spectrum.
 
         Returns:
-            list[MolecularFamily]: List of all molecular family objects with
-                their spectra ids.
+            list[MolecularFamily]: A list of MolecularFamily objects with their
+                spectra ids.
         """
-        return self._mfs
+        mfs = self._mfs
+        if not keep_singleton:
+            mfs = [mf for mf in mfs if not mf.is_singleton()]
+        return mfs
 
     def _validate(self):
         """Validate the GNPS molecular family file."""
