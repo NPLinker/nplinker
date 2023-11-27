@@ -1,7 +1,6 @@
 import csv
 from os import PathLike
 from nplinker.metabolomics import MolecularFamily
-from nplinker.metabolomics import SingletonFamily
 from nplinker.metabolomics.abc import MolecularFamilyLoaderBase
 from nplinker.utils import is_file_format
 
@@ -19,6 +18,13 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
         3. FEATURE-BASED-MOLECULAR-NETWORKING
             - networkedges_selfloop/*.selfloop
 
+        The "ComponentIndex" column in the GNPS molecular family file is treated
+        as family id. But for molecular families that have only one member (i.e. spectrum),
+        which are called singleton molecular family, they have the same value of
+        "-1" in the "ComponentIndex" column. To make the family id unique,the
+        spectrum id plus a prefix "singleton-" is used as the family id of
+        singleton molecular families.
+
         Args:
             file(str | PathLike): Path to the GNPS molecular family file.
 
@@ -32,7 +38,7 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
             >>> print(loader.families[0].spectra_ids)
             {'1', '3', '7', ...}
         """
-        self._mfs: list[MolecularFamily | SingletonFamily] = []
+        self._mfs: list[MolecularFamily] = []
         self._file = file
 
         self._validate()
@@ -96,12 +102,14 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
                     family_dict[family_id].add(spec2_id)
         # convert dict to list of MolecularFamily objects
         for family_id, spectra_ids in family_dict.items():
-            if family_id == "-1":  # the "-1" is from GNPS result
+            if family_id == "-1":  # "-1" is from GNPS, it means the singleton molecular family
                 for spectrum_id in spectra_ids:
-                    family = SingletonFamily()  ## uuid as family id
+                    # family id must be unique, so using "singleton-" + spectrum id as family id
+                    family = MolecularFamily("singleton-" + str(spectrum_id))
                     family.spectra_ids = set([spectrum_id])
                     self._mfs.append(family)
             else:
+                # for regular molecular families, use the value of "ComponentIndex" as family id
                 family = MolecularFamily(family_id)
                 family.spectra_ids = spectra_ids
                 self._mfs.append(family)
