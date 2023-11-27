@@ -16,7 +16,6 @@ class Spectrum:
         self.id = id
         self.peaks = sorted(peaks, key=lambda x: x[0])  # ensure sorted by mz
         self.normalised_peaks = sqrt_normalise(self.peaks)  # useful later
-        self.n_peaks = len(self.peaks)
         self.max_ms2_intensity = max(intensity for mz, intensity in self.peaks)
         self.total_ms2_intensity = sum(intensity for mz, intensity in self.peaks)
         self.spectrum_id = spectrum_id  # MS1.name
@@ -99,8 +98,7 @@ class Spectrum:
                 new_peaks.append((mz, intensity))
 
         self.peaks = new_peaks
-        self.n_peaks = len(self.peaks)
-        if self.n_peaks > 0:
+        if len(self.peaks) > 0:
             self.normalised_peaks = sqrt_normalise(self.peaks)
             self.max_ms2_intensity = max(intensity for mz, intensity in self.peaks)
             self.total_ms2_intensity = sum(intensity for mz, intensity in self.peaks)
