@@ -32,7 +32,7 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
             >>> print(loader.families[0].spectra_ids)
             {'1', '3', '7', ...}
         """
-        self._families: list[MolecularFamily | SingletonFamily] = []
+        self._mfs: list[MolecularFamily | SingletonFamily] = []
         self._file = file
 
         self._validate()
@@ -46,7 +46,7 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
             list[MolecularFamily]: List of all molecular family objects with
                 their spectra ids.
         """
-        return self._families
+        return self._mfs
 
     def _validate(self):
         """Validate the GNPS molecular family file."""
@@ -93,8 +93,8 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
                 for spectrum_id in spectra_ids:
                     family = SingletonFamily()  ## uuid as family id
                     family.spectra_ids = set([spectrum_id])
-                    self._families.append(family)
+                    self._mfs.append(family)
             else:
                 family = MolecularFamily(family_id)
                 family.spectra_ids = spectra_ids
-                self._families.append(family)
+                self._mfs.append(family)
