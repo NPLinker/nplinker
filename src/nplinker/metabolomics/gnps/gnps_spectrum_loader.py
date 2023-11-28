@@ -76,7 +76,6 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
                 continue
 
             # Load the spectrum
-            peaks: list[tuple[float, float]] = list(zip(spec["m/z array"], spec["intensity array"]))
             spectrum_id: str = spec["params"]["scans"]
             # calculate precursor m/z from precursor mass and charge
             precursor_mass = spec["params"]["pepmass"][0]
@@ -85,7 +84,11 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
             rt: float | None = spec["params"].get("rtinseconds", None)
 
             spectrum = Spectrum(
-                spectrum_id=spectrum_id, peaks=peaks, precursor_mz=precursor_mz, rt=rt
+                spectrum_id=spectrum_id,
+                mz=list(spec["m/z array"]),
+                intensity=list(spec["intensity array"]),
+                precursor_mz=precursor_mz,
+                rt=rt,
             )
             spectrum.metadata = spec["params"]
             self._spectra.append(spectrum)
