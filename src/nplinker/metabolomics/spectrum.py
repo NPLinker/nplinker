@@ -12,11 +12,12 @@ GNPS_KEY = "gnps"
 
 
 class Spectrum:
-    def __init__(self, peaks, spectrum_id: str, precursor_mz, rt=None):
+    def __init__(self, spectrum_id: str, peaks, precursor_mz, rt=None):
+        self.spectrum_id = spectrum_id
+
         self.peaks = sorted(peaks, key=lambda x: x[0])  # ensure sorted by mz
         self.normalised_peaks = sqrt_normalise(self.peaks)  # useful later
 
-        self.spectrum_id = spectrum_id  # MS1.name
         self.rt = rt
         # TODO CG: should include precursor mass and charge to calculate precursor_mz
         self.precursor_mz = precursor_mz

@@ -85,7 +85,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
             rt: float | None = spec["params"].get("rtinseconds", None)
 
             spectrum = Spectrum(
-                peaks=peaks, spectrum_id=spectrum_id, precursor_mz=precursor_mz, rt=rt
+                spectrum_id=spectrum_id, peaks=peaks, precursor_mz=precursor_mz, rt=rt
             )
             spectrum.metadata = spec["params"]
             self._spectra.append(spectrum)
