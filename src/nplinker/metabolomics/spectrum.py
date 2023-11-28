@@ -12,7 +12,7 @@ GNPS_KEY = "gnps"
 
 
 class Spectrum:
-    def __init__(self, id, peaks, spectrum_id: str, precursor_mz, parent_mz=None, rt=None):
+    def __init__(self, id, peaks, spectrum_id: str, precursor_mz, rt=None):
         self.id = id
 
         self.peaks = sorted(peaks, key=lambda x: x[0])  # ensure sorted by mz
@@ -21,9 +21,8 @@ class Spectrum:
         self.spectrum_id = spectrum_id  # MS1.name
         self.rt = rt
         # TODO CG: should include precursor mass and charge to calculate precursor_mz
-        # parent_mz can be calculate from precursor_mass and charge mass
         self.precursor_mz = precursor_mz
-        self.parent_mz = parent_mz
+        # TODO CG: remove parent m/z
         self.gnps_id = None  # CCMSLIB...
         self.metadata = {}
         self.strains = StrainCollection()
@@ -57,21 +56,20 @@ class Spectrum:
                 self.id == other.id
                 and self.spectrum_id == other.spectrum_id
                 and self.precursor_mz == other.precursor_mz
-                and self.parent_mz == other.parent_mz
             )
         return NotImplemented
 
     def __hash__(self) -> int:
-        return hash((self.id, self.spectrum_id, self.precursor_mz, self.parent_mz))
+        return hash((self.id, self.spectrum_id, self.precursor_mz))
 
     def __cmp__(self, other):
-        if self.parent_mz >= other.parent_mz:
+        if self.precursor_mz >= other.precursor_mz:
             return 1
         else:
             return -1
 
     def __lt__(self, other):
-        if self.parent_mz <= other.parent_mz:
+        if self.precursor_mz <= other.precursor_mz:
             return 1
         else:
             return 0

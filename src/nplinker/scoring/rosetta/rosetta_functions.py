@@ -22,7 +22,7 @@ def fast_cosine_shift(spectrum1, spectrum2, tol, min_match):
 
     zero_pairs = find_pairs(spec1, spec2, tol, shift=0.0)
 
-    shift = spectrum1.parent_mz - spectrum2.parent_mz
+    shift = spectrum1.precursor_mz - spectrum2.precursor_mz
 
     nonzero_pairs = find_pairs(spec1, spec2, tol, shift=shift)
 
