@@ -76,12 +76,6 @@ class Spectrum:
     def __hash__(self) -> int:
         return hash((self.spectrum_id, self.precursor_mz))
 
-    def __cmp__(self, other):
-        if self.precursor_mz >= other.precursor_mz:
-            return 1
-        else:
-            return -1
-
     def __lt__(self, other):
         if self.precursor_mz <= other.precursor_mz:
             return 1
