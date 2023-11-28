@@ -62,10 +62,10 @@ class Spectrum:
         self.strains = StrainCollection()
         self.family: MolecularFamily | None = None
 
-    def __str__(self):
-        return "Spectrum(spectrum_id={}, strains={})".format(self.spectrum_id, len(self.strains))
+    def __str__(self) -> str:
+        return f"Spectrum(spectrum_id={self.spectrum_id}, #strains={len(self.strains)})"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
 
     def __eq__(self, other) -> bool:
