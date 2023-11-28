@@ -67,7 +67,6 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
 
     def _load(self):
         """Load the MGF file into Spectrum objects."""
-        i = 0
         for spec in mgf.MGF(self._file):
             # Skip if m/z array is empty, as this is an invalid spectrum.
             # The invalid spectrum does not exist in other GNPS files, e.g.
@@ -86,11 +85,10 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
             rt: float | None = spec["params"].get("rtinseconds", None)
 
             spectrum = Spectrum(
-                id=i, peaks=peaks, spectrum_id=spectrum_id, precursor_mz=precursor_mz, rt=rt
+                peaks=peaks, spectrum_id=spectrum_id, precursor_mz=precursor_mz, rt=rt
             )
             spectrum.metadata = spec["params"]
             self._spectra.append(spectrum)
-            i += 1
 
     def _get_precursor_charge(self, charges: list) -> int:
         """Get the precursor charge from the charge list.
