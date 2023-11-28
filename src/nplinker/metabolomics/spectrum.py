@@ -25,9 +25,7 @@ class Spectrum:
         self.precursor_mz = precursor_mz
         self.parent_mz = parent_mz
         self.gnps_id = None  # CCMSLIB...
-        # TODO should add intensity here too
         self.metadata = {}
-        self.edges = []
         self.strains = StrainCollection()
         # this is a dict indexed by Strain objects (the strains found in this Spectrum), with
         # the values being dicts of the form {growth_medium: peak intensity} for the parent strain
