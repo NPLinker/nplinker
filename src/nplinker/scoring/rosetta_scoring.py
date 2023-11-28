@@ -121,7 +121,7 @@ class RosettaScoring(ScoringMethod):
     def _collect_results_spectra(self, objects, ro_hits, results):
         for spec in objects:
             for hit in ro_hits:
-                if spec.id == hit.spec.id:
+                if spec.spectrum_id == hit.spec.spectrum_id:
                     if not self.bgc_to_gcf:
                         # can use the BGC directly
                         results = self._insert_result_met(results, spec, hit.bgc, hit)
