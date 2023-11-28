@@ -12,9 +12,7 @@ GNPS_KEY = "gnps"
 
 
 class Spectrum:
-    def __init__(self, id, peaks, spectrum_id: str, precursor_mz, rt=None):
-        self.id = id
-
+    def __init__(self, peaks, spectrum_id: str, precursor_mz, rt=None):
         self.peaks = sorted(peaks, key=lambda x: x[0])  # ensure sorted by mz
         self.normalised_peaks = sqrt_normalise(self.peaks)  # useful later
 
@@ -43,24 +41,18 @@ class Spectrum:
         return strain in self.strains
 
     def __str__(self):
-        return "Spectrum(id={}, spectrum_id={}, strains={})".format(
-            self.id, self.spectrum_id, len(self.strains)
-        )
+        return "Spectrum(spectrum_id={}, strains={})".format(self.spectrum_id, len(self.strains))
 
     def __repr__(self):
         return str(self)
 
     def __eq__(self, other) -> bool:
         if isinstance(other, Spectrum):
-            return (
-                self.id == other.id
-                and self.spectrum_id == other.spectrum_id
-                and self.precursor_mz == other.precursor_mz
-            )
+            return self.spectrum_id == other.spectrum_id and self.precursor_mz == other.precursor_mz
         return NotImplemented
 
     def __hash__(self) -> int:
-        return hash((self.id, self.spectrum_id, self.precursor_mz))
+        return hash((self.spectrum_id, self.precursor_mz))
 
     def __cmp__(self, other):
         if self.precursor_mz >= other.precursor_mz:
