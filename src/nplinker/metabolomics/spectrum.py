@@ -16,7 +16,8 @@ class Spectrum:
     def __init__(
         self,
         spectrum_id: str,
-        peaks: list[tuple[float, float]],
+        mz: list[float],
+        intensity: list[float],
         precursor_mz: float,
         rt: float | None = None,
         metadata: dict | None = None,
@@ -26,8 +27,8 @@ class Spectrum:
 
         Args:
             spectrum_id (str): the spectrum ID.
-            peaks (list[tuple[float, float]]): the list of ordered peaks, as tuples of
-                (m/z, intensity). Make sure the peaks are sorted by m/z.
+            mz (list[float]): the list of m/z values.
+            intensity (list[float]): the list of intensity values.
             precursor_mz (float): the precursor m/z.
             rt (float, optional): the retention time in seconds.
             metadata (dict, optional): the metadata of the spectrum, i.e. the header infomation
@@ -51,7 +52,8 @@ class Spectrum:
                 m/z.
         """
         self.spectrum_id = spectrum_id
-        self.peaks = peaks
+        self.mz = mz
+        self.intensity = intensity
         self.precursor_mz = precursor_mz
         self.rt = rt
         self.metadata = metadata or {}
@@ -74,6 +76,11 @@ class Spectrum:
 
     def __hash__(self) -> int:
         return hash((self.spectrum_id, self.precursor_mz))
+
+    @property
+    def peaks(self) -> list[tuple[float, float]]:
+        """Get the peaks, ordered by m/z."""
+        return list(zip(self.mz, self.intensity))
 
     @cached_property
     def normalised_peaks(self) -> list[tuple[float, float]]:
