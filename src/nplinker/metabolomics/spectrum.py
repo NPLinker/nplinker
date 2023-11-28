@@ -62,16 +62,6 @@ class Spectrum:
         self.strains = StrainCollection()
         self.family: MolecularFamily | None = None
 
-    @property
-    def gnps_annotations(self):
-        if GNPS_KEY not in self.annotations:
-            return None
-
-        return self.annotations[GNPS_KEY][0]
-
-    def has_strain(self, strain: Strain):
-        return strain in self.strains
-
     def __str__(self):
         return "Spectrum(spectrum_id={}, strains={})".format(self.spectrum_id, len(self.strains))
 
@@ -97,6 +87,16 @@ class Spectrum:
             return 1
         else:
             return 0
+
+    @property
+    def gnps_annotations(self):
+        if GNPS_KEY not in self.annotations:
+            return None
+
+        return self.annotations[GNPS_KEY][0]
+
+    def has_strain(self, strain: Strain):
+        return strain in self.strains
 
     # from molnet repo
     def keep_top_k(self, k=6, mz_range=50):
