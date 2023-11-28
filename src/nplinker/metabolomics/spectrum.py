@@ -1,4 +1,5 @@
 from __future__ import annotations
+from functools import cached_property
 from typing import TYPE_CHECKING
 from nplinker.strain import Strain
 from nplinker.strain_collection import StrainCollection
@@ -43,11 +44,11 @@ class Spectrum:
             metadata (dict): the metadata of the spectrum, i.e. the header infomation in the MGF
                 file.
             annotations (dict): the annotations of the spectrum, e.g. annotations from GNPS.
-            normalised_peaks (list[tuple[float, float]]): the list of normalised peaks, ordered by
-                m/z.
             gnps_id (str): the GNPS ID of the spectrum.
             strains (StrainCollection): the strains that this spectrum belongs to.
             family (MolecularFamily): the molecular family that this spectrum belongs to.
+            normalised_peaks (list[tuple[float, float]]): the list of normalised peaks, ordered by
+                m/z.
         """
         self.spectrum_id = spectrum_id
         self.peaks = peaks
@@ -55,8 +56,6 @@ class Spectrum:
         self.rt = rt
         self.metadata = metadata or {}
         self.annotations = annotations or {}
-
-        self.normalised_peaks = sqrt_normalise(self.peaks)
 
         self.gnps_id = None
         self.strains = StrainCollection()
@@ -75,6 +74,11 @@ class Spectrum:
 
     def __hash__(self) -> int:
         return hash((self.spectrum_id, self.precursor_mz))
+
+    @cached_property
+    def normalised_peaks(self) -> list[tuple[float, float]]:
+        """Get the normalised peaks, ordered by m/z."""
+        return sqrt_normalise(self.peaks)
 
     @property
     def gnps_annotations(self):
@@ -106,7 +110,3 @@ class Spectrum:
                 new_peaks.append((mz, intensity))
 
         self.peaks = new_peaks
-        if len(self.peaks) > 0:
-            self.normalised_peaks = sqrt_normalise(self.peaks)
-        else:
-            self.normalised_peaks = []
