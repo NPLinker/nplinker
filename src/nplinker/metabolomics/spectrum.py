@@ -12,24 +12,55 @@ GNPS_KEY = "gnps"
 
 
 class Spectrum:
-    def __init__(self, spectrum_id: str, peaks, precursor_mz, rt=None):
+    def __init__(
+        self,
+        spectrum_id: str,
+        peaks: list[tuple[float, float]],
+        precursor_mz: float,
+        rt: float | None = None,
+        metadata: dict | None = None,
+        annotations: dict | None = None,
+    ) -> None:
+        """Class to model MS/MS Spectrum.
+
+        Args:
+            spectrum_id (str): the spectrum ID.
+            peaks (list[tuple[float, float]]): the list of ordered peaks, as tuples of
+                (m/z, intensity). Make sure the peaks are sorted by m/z.
+            precursor_mz (float): the precursor m/z.
+            rt (float, optional): the retention time in seconds.
+            metadata (dict, optional): the metadata of the spectrum, i.e. the header infomation
+                in the MGF file.
+            annotations (dict, optional): the annotations of the spectrum, e.g. annotations from
+                GNPS.
+
+        Attributes:
+            spectrum_id (str): the spectrum ID.
+            peaks (list[tuple[float, float]]): the list of ordered peaks, as tuples of
+                (m/z, intensity), ordered by m/z.
+            precursor_mz (float): the precursor m/z.
+            rt (float): the retention time in seconds.
+            metadata (dict): the metadata of the spectrum, i.e. the header infomation in the MGF
+                file.
+            annotations (dict): the annotations of the spectrum, e.g. annotations from GNPS.
+            normalised_peaks (list[tuple[float, float]]): the list of normalised peaks, ordered by
+                m/z.
+            gnps_id (str): the GNPS ID of the spectrum.
+            strains (StrainCollection): the strains that this spectrum belongs to.
+            family (MolecularFamily): the molecular family that this spectrum belongs to.
+        """
         self.spectrum_id = spectrum_id
-
-        self.peaks = sorted(peaks, key=lambda x: x[0])  # ensure sorted by mz
-        self.normalised_peaks = sqrt_normalise(self.peaks)  # useful later
-
-        self.rt = rt
-        # TODO CG: should include precursor mass and charge to calculate precursor_mz
+        self.peaks = peaks
         self.precursor_mz = precursor_mz
-        # TODO CG: remove parent m/z
-        self.gnps_id = None  # CCMSLIB...
-        self.metadata = {}
+        self.rt = rt
+        self.metadata = metadata or {}
+        self.annotations = annotations or {}
+
+        self.normalised_peaks = sqrt_normalise(self.peaks)
+
+        self.gnps_id = None
         self.strains = StrainCollection()
-        # this is a dict indexed by Strain objects (the strains found in this Spectrum), with
-        # the values being dicts of the form {growth_medium: peak intensity} for the parent strain
         self.family: MolecularFamily | None = None
-        # a dict indexed by filename, or "gnps"
-        self.annotations = {}
 
     @property
     def gnps_annotations(self):
