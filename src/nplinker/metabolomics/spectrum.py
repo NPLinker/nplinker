@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 import numpy as np
 from nplinker.strain import Strain
 from nplinker.strain_collection import StrainCollection
-from nplinker.utils import sqrt_normalise
 
 
 if TYPE_CHECKING:
@@ -48,8 +47,6 @@ class Spectrum:
             strains (StrainCollection): the strains that this spectrum belongs to.
             family (MolecularFamily): the molecular family that this spectrum belongs to.
             peaks (np.ndarray): 2D array of peaks, and each row is a peak of (m/z, intensity).
-            normalised_peaks (list[tuple[float, float]]): the list of normalised peaks, ordered by
-                m/z.
         """
         self.spectrum_id = spectrum_id
         self.mz = mz
@@ -81,11 +78,6 @@ class Spectrum:
     def peaks(self) -> np.ndarray:
         """Get the peaks, a 2D array with each row containing the values of (m/z, intensity)."""
         return np.array(list(zip(self.mz, self.intensity)))
-
-    @cached_property
-    def normalised_peaks(self) -> list[tuple[float, float]]:
-        """Get the normalised peaks, ordered by m/z."""
-        return sqrt_normalise(self.peaks)
 
     @property
     def gnps_annotations(self):
