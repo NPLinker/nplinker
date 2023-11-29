@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import math
+
 
 def fast_cosine_shift(spectrum1, spectrum2, tol, min_match):
     if len(spectrum1.peaks) == 0 or len(spectrum2.peaks) == 0:
         return 0.0, []
 
-    spec1 = spectrum1.normalised_peaks
-    spec2 = spectrum2.normalised_peaks
+    spec1 = sqrt_normalise(spectrum1.peaks)
+    spec2 = sqrt_normalise(spectrum2.peaks)
 
     zero_pairs = find_pairs(spec1, spec2, tol, shift=0.0)
 
@@ -70,8 +72,8 @@ def fast_cosine(spectrum1, spectrum2, tol, min_match):
         return 0.0, []
     # find all the matching pairs
 
-    spec1 = spectrum1.normalised_peaks
-    spec2 = spectrum2.normalised_peaks
+    spec1 = sqrt_normalise(spectrum1.peaks)
+    spec2 = sqrt_normalise(spectrum2.peaks)
 
     matching_pairs = find_pairs(spec1, spec2, tol, shift=0.0)
 
@@ -107,3 +109,16 @@ def comp_scores(spectra, file_scan, similarity_function, similarity_tolerance, m
             spec2 = specs[j]
             sc, _ = similarity_function(spec, spec2, similarity_tolerance, min_match)
             print(f"{f},{s} <-> {f2},{s2} = {sc}")
+
+
+def sqrt_normalise(peaks):
+    temp = []
+    total = 0.0
+    for mz, intensity in peaks:
+        temp.append((mz, math.sqrt(intensity)))
+        total += intensity
+    norm_facc = math.sqrt(total)
+    normalised_peaks = []
+    for mz, intensity in temp:
+        normalised_peaks.append((mz, intensity / norm_facc))
+    return normalised_peaks
