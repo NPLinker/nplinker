@@ -96,24 +96,3 @@ class Spectrum:
 
     def has_strain(self, strain: Strain):
         return strain in self.strains
-
-    # from molnet repo
-    def keep_top_k(self, k=6, mz_range=50):
-        # only keep peaks that are in the top k in += mz_range
-        start_pos = 0
-        new_peaks = []
-        for mz, intensity in self.peaks:
-            while self.peaks[start_pos][0] < mz - mz_range:
-                start_pos += 1
-            end_pos = start_pos
-
-            n_bigger = 0
-            while end_pos < len(self.peaks) and self.peaks[end_pos][0] <= mz + mz_range:
-                if self.peaks[end_pos][1] > intensity:
-                    n_bigger += 1
-                end_pos += 1
-
-            if n_bigger < k:
-                new_peaks.append((mz, intensity))
-
-        self.peaks = new_peaks
