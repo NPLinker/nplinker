@@ -1,6 +1,7 @@
 from __future__ import annotations
 from functools import cached_property
 from typing import TYPE_CHECKING
+import numpy as np
 from nplinker.strain import Strain
 from nplinker.strain_collection import StrainCollection
 from nplinker.utils import sqrt_normalise
@@ -38,8 +39,6 @@ class Spectrum:
 
         Attributes:
             spectrum_id (str): the spectrum ID.
-            peaks (list[tuple[float, float]]): the list of ordered peaks, as tuples of
-                (m/z, intensity), ordered by m/z.
             precursor_mz (float): the precursor m/z.
             rt (float): the retention time in seconds.
             metadata (dict): the metadata of the spectrum, i.e. the header infomation in the MGF
@@ -48,6 +47,7 @@ class Spectrum:
             gnps_id (str): the GNPS ID of the spectrum.
             strains (StrainCollection): the strains that this spectrum belongs to.
             family (MolecularFamily): the molecular family that this spectrum belongs to.
+            peaks (np.ndarray): 2D array of peaks, and each row is a peak of (m/z, intensity).
             normalised_peaks (list[tuple[float, float]]): the list of normalised peaks, ordered by
                 m/z.
         """
@@ -77,10 +77,10 @@ class Spectrum:
     def __hash__(self) -> int:
         return hash((self.spectrum_id, self.precursor_mz))
 
-    @property
-    def peaks(self) -> list[tuple[float, float]]:
-        """Get the peaks, ordered by m/z."""
-        return list(zip(self.mz, self.intensity))
+    @cached_property
+    def peaks(self) -> np.ndarray:
+        """Get the peaks, a 2D array with each row containing the values of (m/z, intensity)."""
+        return np.array(list(zip(self.mz, self.intensity)))
 
     @cached_property
     def normalised_peaks(self) -> list[tuple[float, float]]:
