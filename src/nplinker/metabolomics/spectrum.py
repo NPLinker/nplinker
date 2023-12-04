@@ -9,8 +9,6 @@ from nplinker.strain_collection import StrainCollection
 if TYPE_CHECKING:
     from .molecular_family import MolecularFamily
 
-GNPS_KEY = "gnps"
-
 
 class Spectrum:
     def __init__(
