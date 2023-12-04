@@ -38,7 +38,7 @@ class Spectrum:
             metadata (dict): the metadata of the spectrum, i.e. the header infomation in the MGF
                 file.
             gnps_annotations (dict): the GNPS annotations of the spectrum.
-            gnps_id (str): the GNPS ID of the spectrum.
+            gnps_id (str | None): the GNPS ID of the spectrum.
             strains (StrainCollection): the strains that this spectrum belongs to.
             family (MolecularFamily): the molecular family that this spectrum belongs to.
             peaks (np.ndarray): 2D array of peaks, and each row is a peak of (m/z, intensity).
@@ -51,7 +51,7 @@ class Spectrum:
         self.metadata = metadata or {}
 
         self.gnps_annotations: dict = {}
-        self.gnps_id = None
+        self.gnps_id: str | None = None
         self.strains = StrainCollection()
         self.family: MolecularFamily | None = None
 
