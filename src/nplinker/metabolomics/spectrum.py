@@ -52,7 +52,7 @@ class Spectrum:
 
         self.gnps_annotations: dict = {}
         self.gnps_id: str | None = None
-        self.strains = StrainCollection()
+        self.strains: StrainCollection = StrainCollection()
         self.family: MolecularFamily | None = None
 
     def __str__(self) -> str:
@@ -75,4 +75,12 @@ class Spectrum:
         return np.array(list(zip(self.mz, self.intensity)))
 
     def has_strain(self, strain: Strain):
+        """Check if the given strain exists in the spectrum.
+
+        Args:
+            strain(Strain): `Strain` object.
+
+        Returns:
+            bool: True when the given strain exist in the spectrum.
+        """
         return strain in self.strains
