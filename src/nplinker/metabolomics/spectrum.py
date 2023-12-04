@@ -19,7 +19,7 @@ class Spectrum:
         mz: list[float],
         intensity: list[float],
         precursor_mz: float,
-        rt: float | None = None,
+        rt: float = 0,
         metadata: dict | None = None,
         annotations: dict | None = None,
     ) -> None:
@@ -30,7 +30,7 @@ class Spectrum:
             mz (list[float]): the list of m/z values.
             intensity (list[float]): the list of intensity values.
             precursor_mz (float): the precursor m/z.
-            rt (float, optional): the retention time in seconds.
+            rt (float): the retention time in seconds. Defaults to 0.
             metadata (dict, optional): the metadata of the spectrum, i.e. the header infomation
                 in the MGF file.
             annotations (dict, optional): the annotations of the spectrum, e.g. annotations from

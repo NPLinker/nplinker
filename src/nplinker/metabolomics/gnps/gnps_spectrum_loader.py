@@ -81,7 +81,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
             precursor_mass = spec["params"]["pepmass"][0]
             precursor_charge = self._get_precursor_charge(spec["params"]["charge"])
             precursor_mz: float = precursor_mass / abs(precursor_charge)
-            rt: float | None = spec["params"].get("rtinseconds", None)
+            rt = spec["params"].get("rtinseconds", 0)
 
             spectrum = Spectrum(
                 spectrum_id=spectrum_id,
