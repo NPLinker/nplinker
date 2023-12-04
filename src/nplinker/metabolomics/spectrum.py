@@ -33,7 +33,9 @@ class Spectrum:
 
         Attributes:
             spectrum_id (str): the spectrum ID.
-            precursor_mz (float): the precursor m/z.
+            mz (list[float]): the list of m/z values.
+            intensity (list[float]): the list of intensity values.
+            precursor_mz (float): the m/z value of the precursor.
             rt (float): the retention time in seconds.
             metadata (dict): the metadata of the spectrum, i.e. the header infomation in the MGF
                 file.
@@ -41,7 +43,7 @@ class Spectrum:
             gnps_id (str | None): the GNPS ID of the spectrum.
             strains (StrainCollection): the strains that this spectrum belongs to.
             family (MolecularFamily): the molecular family that this spectrum belongs to.
-            peaks (np.ndarray): 2D array of peaks, and each row is a peak of (m/z, intensity).
+            peaks (np.ndarray): 2D array of peaks, each row is a peak of (m/z, intensity) values.
         """
         self.spectrum_id = spectrum_id
         self.mz = mz
