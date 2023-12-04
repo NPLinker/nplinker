@@ -89,8 +89,8 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
                 intensity=list(spec["intensity array"]),
                 precursor_mz=precursor_mz,
                 rt=rt,
+                metadata=spec["params"],
             )
-            spectrum.metadata = spec["params"]
             self._spectra.append(spectrum)
 
     def _get_precursor_charge(self, charges: list) -> int:
