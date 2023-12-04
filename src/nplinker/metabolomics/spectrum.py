@@ -21,7 +21,6 @@ class Spectrum:
         precursor_mz: float,
         rt: float = 0,
         metadata: dict | None = None,
-        annotations: dict | None = None,
     ) -> None:
         """Class to model MS/MS Spectrum.
 
@@ -33,8 +32,6 @@ class Spectrum:
             rt (float): the retention time in seconds. Defaults to 0.
             metadata (dict, optional): the metadata of the spectrum, i.e. the header infomation
                 in the MGF file.
-            annotations (dict, optional): the annotations of the spectrum, e.g. annotations from
-                GNPS.
 
         Attributes:
             spectrum_id (str): the spectrum ID.
@@ -42,7 +39,7 @@ class Spectrum:
             rt (float): the retention time in seconds.
             metadata (dict): the metadata of the spectrum, i.e. the header infomation in the MGF
                 file.
-            annotations (dict): the annotations of the spectrum, e.g. annotations from GNPS.
+            gnps_annotations (dict): the GNPS annotations of the spectrum.
             gnps_id (str): the GNPS ID of the spectrum.
             strains (StrainCollection): the strains that this spectrum belongs to.
             family (MolecularFamily): the molecular family that this spectrum belongs to.
@@ -54,8 +51,8 @@ class Spectrum:
         self.precursor_mz = precursor_mz
         self.rt = rt
         self.metadata = metadata or {}
-        self.annotations = annotations or {}
 
+        self.gnps_annotations: dict = {}
         self.gnps_id = None
         self.strains = StrainCollection()
         self.family: MolecularFamily | None = None
@@ -78,13 +75,6 @@ class Spectrum:
     def peaks(self) -> np.ndarray:
         """Get the peaks, a 2D array with each row containing the values of (m/z, intensity)."""
         return np.array(list(zip(self.mz, self.intensity)))
-
-    @property
-    def gnps_annotations(self):
-        if GNPS_KEY not in self.annotations:
-            return None
-
-        return self.annotations[GNPS_KEY][0]
 
     def has_strain(self, strain: Strain):
         return strain in self.strains
