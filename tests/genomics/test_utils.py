@@ -3,11 +3,11 @@ import json
 import pytest
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
+from nplinker.genomics import add_strain_to_bgc
 from nplinker.genomics import generate_mappings_genome_id_bgc_id
 from nplinker.genomics import get_bgcs_from_gcfs
 from nplinker.genomics import get_strains_from_bgcs
 from nplinker.genomics import map_bgc_to_gcf
-from nplinker.genomics import map_strain_to_bgc
 from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.strain import Strain
 from nplinker.strain_collection import StrainCollection
@@ -111,7 +111,7 @@ def gcf_list_error() -> list[GCF]:
 def test_map_strain_to_bgc(strain_collection, bgc_list):
     for bgc in bgc_list:
         assert bgc.strain is None
-    map_strain_to_bgc(strain_collection, bgc_list)
+    add_strain_to_bgc(strain_collection, bgc_list)
     for bgc in bgc_list:
         assert bgc.strain is not None
     assert bgc_list[0].strain.id == "STRAIN_01"
@@ -122,7 +122,7 @@ def test_map_strain_to_bgc(strain_collection, bgc_list):
 def test_map_strain_to_bgc_error(strain_collection):
     bgcs = [BGC("BGC_04", "NPR")]
     with pytest.raises(ValueError) as e:
-        map_strain_to_bgc(strain_collection, bgcs)
+        add_strain_to_bgc(strain_collection, bgcs)
     assert "Strain id 'BGC_04' from BGC object 'BGC_04' not found" in e.value.args[0]
 
 
@@ -158,7 +158,7 @@ def test_get_bgcs_from_gcfs(bgc_list, gcf_list):
 
 
 def test_get_strains_from_bgcs(strain_collection, bgc_list):
-    map_strain_to_bgc(strain_collection, bgc_list)
+    add_strain_to_bgc(strain_collection, bgc_list)
     strains = get_strains_from_bgcs(bgc_list)
     assert isinstance(strains, StrainCollection)
     assert strains == strain_collection
