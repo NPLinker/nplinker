@@ -3,11 +3,11 @@ import json
 import pytest
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
+from nplinker.genomics import add_bgc_to_gcf
 from nplinker.genomics import add_strain_to_bgc
 from nplinker.genomics import generate_mappings_genome_id_bgc_id
 from nplinker.genomics import get_bgcs_from_gcfs
 from nplinker.genomics import get_strains_from_bgcs
-from nplinker.genomics import map_bgc_to_gcf
 from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.strain import Strain
 from nplinker.strain_collection import StrainCollection
@@ -131,7 +131,7 @@ def test_map_bgc_to_gcf(bgc_list, gcf_list):
     assert gcf_list[1].bgc_ids == {"BGC_02", "SAMPLE_BGC_03"}
     assert len(gcf_list[0].bgcs) == 0
     assert len(gcf_list[1].bgcs) == 0
-    map_bgc_to_gcf(bgc_list, gcf_list)
+    add_bgc_to_gcf(bgc_list, gcf_list)
     assert gcf_list[0].bgc_ids == {"BGC_01"}
     assert gcf_list[1].bgc_ids == {"BGC_02", "SAMPLE_BGC_03"}
     assert len(gcf_list[0].bgcs) == 1
@@ -144,12 +144,12 @@ def test_map_bgc_to_gcf_error(bgc_list, gcf_list_error):
     assert gcf_list_error[0].bgc_ids == {"SAMPLE_BGC_03", "BGC_04"}
     assert len(gcf_list_error[0].bgcs) == 0
     with pytest.raises(KeyError) as e:
-        map_bgc_to_gcf(bgc_list, gcf_list_error)
+        add_bgc_to_gcf(bgc_list, gcf_list_error)
     assert "BGC id 'BGC_04' from GCF object '1' not found" in e.value.args[0]
 
 
 def test_get_bgcs_from_gcfs(bgc_list, gcf_list):
-    map_bgc_to_gcf(bgc_list, gcf_list)
+    add_bgc_to_gcf(bgc_list, gcf_list)
     bgcs = get_bgcs_from_gcfs(gcf_list)
     assert isinstance(bgcs, list)
     assert len(bgcs) == 3

@@ -94,7 +94,7 @@ def add_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]) -> None:
         bgc.strain = strain_list[0]
 
 
-def map_bgc_to_gcf(bgcs: list[BGC], gcfs: list[GCF]):
+def add_bgc_to_gcf(bgcs: list[BGC], gcfs: list[GCF]) -> None:
     """To add BGC objects to GCF object based on GCF's BGC ids.
 
     This method changes the lists `bgcs` and `gcfs` in place.
