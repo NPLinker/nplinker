@@ -62,10 +62,13 @@ def generate_mappings_genome_id_bgc_id(
     logger.info("Generated genome-BGC mappings file: %s", output_file)
 
 
-def map_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]):
-    """To set BGC object's strain with representative strain object.
+def add_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]) -> None:
+    """Assign a Strain object to `BGC.strain` for input BGCs.
 
-    This method changes the list `bgcs` in place.
+    BGC id is used to find the corresponding Strain object. It's possible that
+    no Strain object is found for a BGC id.
+
+    Note that the input list `bgcs` will be changed in place.
 
     Args:
         strains(StrainCollection): A collection of all strain objects.
