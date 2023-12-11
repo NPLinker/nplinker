@@ -106,8 +106,16 @@ def add_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]) -> tuple[list[
     return bgc_with_strain, bgc_without_strain
 
 
-def add_bgc_to_gcf(bgcs: list[BGC], gcfs: list[GCF]) -> None:
-    """To add BGC objects to GCF object based on GCF's BGC ids.
+def add_bgc_to_gcf(
+    bgcs: list[BGC], gcfs: list[GCF]
+) -> tuple[list[GCF], list[GCF], dict[GCF, set[str]]]:
+    """Add BGC objects to GCF object based on GCF's BGC ids.
+
+    The attribute of `GCF.bgc_ids` contains the ids of BGC objects. These ids
+    are used to find BGC objects from the input `bgcs` list. The found BGC
+    objects are added to the `bgcs` attribute of GCF object. It is possible that
+    some BGC ids are not found in the input `bgcs` list, and so their BGC
+    objects are missing in the GCF object.
 
     This method changes the lists `bgcs` and `gcfs` in place.
 
@@ -115,20 +123,41 @@ def add_bgc_to_gcf(bgcs: list[BGC], gcfs: list[GCF]) -> None:
         bgcs(list[BGC]): A list of BGC objects.
         gcfs(list[GCF]): A list of GCF objects.
 
-    Raises:
-        KeyError: BGC id not found in the list of BGC objects.
+    Returns:
+        tuple(list[GCF], list[GCF], dict[GCF, set[str]]):
+            The first list contains GCF objects that are updated with BGC objects;
+            The second list contains GCF objects that are not updated with BGC objects
+            because no BGC objects are found;
+            The dictionary contains GCF objects as keys and a set of ids of missing
+            BGC objects as values.
     """
     bgc_dict = {bgc.bgc_id: bgc for bgc in bgcs}
+    gcf_with_bgc = []
+    gcf_without_bgc = []
+    gcf_missing_bgc: dict[GCF, set[str]] = {}
     for gcf in gcfs:
         for bgc_id in gcf.bgc_ids:
             try:
                 bgc = bgc_dict[bgc_id]
-            except KeyError as e:
-                raise KeyError(
-                    f"BGC id '{bgc_id}' from GCF object '{gcf.gcf_id}' "
-                    "not found in the list of BGC objects."
-                ) from e
+            except KeyError:
+                if gcf not in gcf_missing_bgc:
+                    gcf_missing_bgc[gcf] = {bgc_id}
+                else:
+                    gcf_missing_bgc[gcf].add(bgc_id)
+                continue
             gcf.add_bgc(bgc)
+
+        if gcf.bgcs:
+            gcf_with_bgc.append(gcf)
+        else:
+            gcf_without_bgc.append(gcf)
+
+    logger.info(
+        f"{len(gcf_with_bgc)} GCF objects updated with BGC objects.\n"
+        f"{len(gcf_without_bgc)} GCF objects not updated with BGC objects.\n"
+        f"{len(gcf_missing_bgc)} GCF objects have missing BGC objects."
+    )
+    return gcf_with_bgc, gcf_without_bgc, gcf_missing_bgc
 
 
 def get_bgcs_from_gcfs(gcfs: list[GCF]) -> list[BGC]:
