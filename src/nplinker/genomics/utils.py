@@ -62,7 +62,7 @@ def generate_mappings_genome_id_bgc_id(
     logger.info("Generated genome-BGC mappings file: %s", output_file)
 
 
-def add_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]) -> None:
+def add_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]) -> tuple[list[BGC], list[BGC]]:
     """Assign a Strain object to `BGC.strain` for input BGCs.
 
     BGC id is used to find the corresponding Strain object. It's possible that
@@ -74,24 +74,36 @@ def add_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]) -> None:
         strains(StrainCollection): A collection of all strain objects.
         bgcs(list[BGC]): A list of BGC objects.
 
+    Returns:
+        tuple(list[BGC], list[BGC]): A tuple of two lists of BGC objects. The
+            first list contains BGC objects that are updated with Strain object;
+            the second list contains BGC objects that are not updated with
+            Strain object because no Strain object is found.
+
     Raises:
-        ValueError: Strain id not found in the strain collection.
         ValueError: Multiple strain objects found for a BGC id.
     """
+    bgc_with_strain = []
+    bgc_without_strain = []
     for bgc in bgcs:
         try:
             strain_list = strains.lookup(bgc.bgc_id)
-        except ValueError as e:
-            raise ValueError(
-                f"Strain id '{bgc.bgc_id}' from BGC object '{bgc.bgc_id}' "
-                "not found in the strain collection."
-            ) from e
+        except ValueError:
+            bgc_without_strain.append(bgc)
+            continue
         if len(strain_list) > 1:
             raise ValueError(
                 f"Multiple strain objects found for BGC id '{bgc.bgc_id}'."
                 f"BGC object accept only one strain."
             )
         bgc.strain = strain_list[0]
+        bgc_with_strain.append(bgc)
+
+    logger.info(
+        f"{len(bgc_with_strain)} BGC objects updated with Strain object.\n"
+        f"{len(bgc_without_strain)} BGC objects not updated with Strain object."
+    )
+    return bgc_with_strain, bgc_without_strain
 
 
 def add_bgc_to_gcf(bgcs: list[BGC], gcfs: list[GCF]) -> None:
