@@ -158,22 +158,3 @@ def add_bgc_to_gcf(
         f"{len(gcf_missing_bgc)} GCF objects have missing BGC objects."
     )
     return gcf_with_bgc, gcf_without_bgc, gcf_missing_bgc
-
-
-def get_bgcs_from_gcfs(gcfs: list[GCF]) -> list[BGC]:
-    """Get all BGC objects from given GCF objects."""
-    s = set()
-    for gcf in gcfs:
-        s |= gcf.bgcs
-    return list(s)
-
-
-def get_strains_from_bgcs(bgcs: list[BGC]) -> StrainCollection:
-    """Get all strain objects from given BGC objects."""
-    sc = StrainCollection()
-    for bgc in bgcs:
-        if bgc.strain is not None:
-            sc.add(bgc.strain)
-        else:
-            logger.warning("Strain is None for BGC %s", bgc.bgc_id)
-    return sc

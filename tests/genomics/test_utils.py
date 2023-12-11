@@ -6,8 +6,6 @@ from nplinker.genomics import GCF
 from nplinker.genomics import add_bgc_to_gcf
 from nplinker.genomics import add_strain_to_bgc
 from nplinker.genomics import generate_mappings_genome_id_bgc_id
-from nplinker.genomics import get_bgcs_from_gcfs
-from nplinker.genomics import get_strains_from_bgcs
 from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.strain import Strain
 from nplinker.strain_collection import StrainCollection
@@ -156,21 +154,3 @@ def test_add_bgc_to_gcf_error(bgc_list, gcf_list_error):
     with pytest.raises(KeyError) as e:
         add_bgc_to_gcf(bgc_list, gcf_list_error)
     assert "BGC id 'BGC_04' from GCF object '1' not found" in e.value.args[0]
-
-
-def test_get_bgcs_from_gcfs(bgc_list, gcf_list):
-    """Test get_bgcs_from_gcfs function."""
-    add_bgc_to_gcf(bgc_list, gcf_list)
-    bgcs = get_bgcs_from_gcfs(gcf_list)
-    assert isinstance(bgcs, list)
-    assert len(bgcs) == 3
-    for i in bgcs:
-        assert isinstance(i, BGC)
-
-
-def test_get_strains_from_bgcs(strain_collection, bgc_list):
-    """Test get_strains_from_bgcs function."""
-    add_strain_to_bgc(strain_collection, bgc_list)
-    strains = get_strains_from_bgcs(bgc_list)
-    assert isinstance(strains, StrainCollection)
-    assert strains == strain_collection
