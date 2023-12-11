@@ -4,7 +4,6 @@ from .spectrum import Spectrum
 from .utils import add_annotation_to_spectrum
 from .utils import add_spectrum_to_mf
 from .utils import add_strains_to_spectrum
-from .utils import get_spectra_from_mfs
 
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
@@ -13,7 +12,6 @@ logging.getLogger(__name__).addHandler(logging.NullHandler())
 __all__ = [
     "MolecularFamily",
     "Spectrum",
-    "get_spectra_from_mfs",
     "add_annotation_to_spectrum",
     "add_spectrum_to_mf",
     "add_strains_to_spectrum",

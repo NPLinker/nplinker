@@ -4,7 +4,6 @@ from nplinker.metabolomics import Spectrum
 from nplinker.metabolomics import add_annotation_to_spectrum
 from nplinker.metabolomics import add_spectrum_to_mf
 from nplinker.metabolomics import add_strains_to_spectrum
-from nplinker.metabolomics import get_spectra_from_mfs
 from nplinker.strain import Strain
 from nplinker.strain_collection import StrainCollection
 
@@ -77,24 +76,3 @@ def test_add_spectrum_to_mf(spectra):
     assert mf_with_spec == [mf0, mf1]
     assert mf_without_spec == [mf2]
     assert mf_missing_spec == {mf1: {"spec-missing-1"}, mf2: {"spec-missing-2", "spec-missing-3"}}
-
-
-def test_get_spectra_from_mfs(spectra):
-    """Test the get_spectra_from_mfs function."""
-    mf0 = MolecularFamily("mf0")
-    mf0.spectra_ids = {"spec0", "spec1"}
-    mf0.add_spectrum(spectra[0])
-    mf0.add_spectrum(spectra[1])
-    mf1 = MolecularFamily("mf1")
-    mf1.spectra_ids = {
-        "spec2",
-        "spec-missing-1",
-    }
-    mf1.add_spectrum(spectra[2])
-    mf2 = MolecularFamily("mf2")
-    mf2.spectra_ids = {"spec-missing-2", "spec-missing-3"}
-    mfs = [mf0, mf1, mf2]
-
-    spec_from_mfs = get_spectra_from_mfs(mfs)
-
-    assert len(spec_from_mfs) == 3

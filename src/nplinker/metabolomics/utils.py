@@ -113,18 +113,3 @@ def add_spectrum_to_mf(
         f"{len(mf_missing_spec)} MolecularFamily objects have missing Spectrum objects."
     )
     return mf_with_spec, mf_without_spec, mf_missing_spec
-
-
-def get_spectra_from_mfs(mfs: list[MolecularFamily]) -> list[Spectrum]:
-    """Get all Spectrum objects from given MolecularFamily objects.
-
-    Args:
-        mfs(list[MolecularFamily]): A list of MolecularFamily objects.
-
-    Returns:
-        list[Spectrum]: A list of Spectrum objects.
-    """
-    s = set()
-    for mf in mfs:
-        s |= set(mf.spectra)
-    return list(s)
