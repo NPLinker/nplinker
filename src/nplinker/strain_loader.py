@@ -12,7 +12,7 @@ logger = LogConfig.getLogger(__name__)
 def load_user_strains(json_file: str | PathLike) -> set[Strain]:
     """Load user specified strains from a JSON file.
 
-    The JSON file must follow the schema defined in "nplinker/schemas/user_strains_schema.json".
+    The JSON file must follow the schema defined in "nplinker/schemas/user_strains.json".
     An example content of the JSON file:
         {"strain_ids": ["strain1", "strain2"]}
 
