@@ -20,7 +20,6 @@ from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import add_annotation_to_spectrum
 from nplinker.metabolomics import add_spectrum_to_mf
 from nplinker.metabolomics import add_strains_to_spectrum
-from nplinker.metabolomics import get_spectra_from_mfs
 from nplinker.metabolomics.gnps import GNPSAnnotationLoader
 from nplinker.metabolomics.gnps import GNPSMolecularFamilyLoader
 from nplinker.metabolomics.gnps import GNPSSpectrumLoader
@@ -407,7 +406,16 @@ class DatasetLoader:
         return True
 
     def _load_metabolomics(self):
-        """Loads metabolomics data to Spectrum and MolecularFamily objects."""
+        """Loads metabolomics data to Spectrum and MolecularFamily objects.
+
+        The attribute of `self.spectra` is set to the loaded Spectrum objects that have Strain
+        objects added (i.e. `Spectrum.strains` updated). If a Spectrum object does not have Strain
+        objects, it is not added to `self.spectra`.
+
+        The attribute of `self.molfams` is set to the loaded MolecularFamily objects that have
+        Strain objects added (i.e. `MolecularFamily._strains` updated). This means only Spectra
+        objects with updated strains (i.e. `self.spectra`) can be added to MolecularFamily objects.
+        """
         logger.debug("\nLoading metabolomics data starts...")
 
         # Step 1: load all Spectrum objects
@@ -425,9 +433,9 @@ class DatasetLoader:
         # Step 6: add Spectrum objects to MolecularFamily
         mf_with_spec, _, _ = add_spectrum_to_mf(spectra_with_strains, raw_molfams)
 
-        # Step 7: get MolecularFamily objects and their Spectrum members
+        # Step 7: set attributes of self.spectra and self.molfams with valid objects
+        self.spectra = spectra_with_strains
         self.molfams = mf_with_spec
-        self.spectra = get_spectra_from_mfs(self.molfams)
 
         logger.debug("Loading metabolomics data completed\n")
         return True
