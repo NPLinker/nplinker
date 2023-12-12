@@ -76,7 +76,6 @@ class DatasetLoader:
     OR_MIBIG_JSON = "mibig_json_dir"
     OR_STRAINS = "strain_mappings_file"
     # misc files
-    OR_PARAMS = "gnps_params_file"
     OR_DESCRIPTION = "description_file"
     OR_INCLUDE_STRAINS = "include_strains_file"
     # class predictions
@@ -241,9 +240,6 @@ class DatasetLoader:
         self._init_metabolomics_paths()
 
         self._init_genomics_paths()
-
-        # 12. MISC: <root>/params.xml
-        self.params_file = os.path.join(self._root, "params.xml")
 
         # 13. MISC: <root>/description.txt
         self.description_file = os.path.join(self._root, "description.txt")
@@ -577,20 +573,6 @@ class DatasetLoader:
         return True
 
     def _load_optional(self):
-        self.gnps_params = {}
-        if os.path.exists(self.params_file):
-            logger.debug("Loading params.xml")
-            tree = ET.parse(self.params_file)
-            root = tree.getroot()
-            # this file has a simple structure:
-            # <parameters>
-            #   <parameter name="something">value</parameter>
-            # </parameters>
-            for param in root:
-                self.gnps_params[param.attrib["name"]] = param.text
-
-            logger.debug(f"Parsed {len(self.gnps_params)} GNPS params")
-
         self.description_text = "<no description>"
         if os.path.exists(self.description_file):
             self.description_text = open(self.description_file).read()

@@ -215,15 +215,6 @@ class NPLinker:
         return NPLINKER_APP_DATA_DIR
 
     @property
-    def gnps_params(self):
-        """Returns a dict containing data from GNPS params.xml (if available).
-
-        Returns:
-            dict: GNPS parameters, or an empty dict if none exist in the dataset
-        """
-        return self._loader.gnps_params
-
-    @property
     def dataset_description(self):
         """Returns dataset description.
 
