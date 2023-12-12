@@ -49,6 +49,8 @@ def test_add_strains_to_spectrum(spectra):
 
     assert len(spectra_with_strains) == 2
     assert len(spectra_without_strains) == 1
+    assert spectra_with_strains == [spectra[0], spectra[1]]
+    assert spectra_without_strains == [spectra[2]]
     assert strain0 in spectra_with_strains[0].strains
     assert strain1 in spectra_with_strains[1].strains
     assert spectra_without_strains[0].strains == StrainCollection()
@@ -76,3 +78,6 @@ def test_add_spectrum_to_mf(spectra):
     assert mf_with_spec == [mf0, mf1]
     assert mf_without_spec == [mf2]
     assert mf_missing_spec == {mf1: {"spec-missing-1"}, mf2: {"spec-missing-2", "spec-missing-3"}}
+    assert mf0.spectra == {spectra[0], spectra[1]}
+    assert mf1.spectra == {spectra[2]}
+    assert mf2.spectra == set()
