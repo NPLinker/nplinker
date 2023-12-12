@@ -1,6 +1,7 @@
 import glob
 import os
 from pathlib import Path
+from deprecated import deprecated
 from nplinker.class_info.chem_classes import ChemClassPredictions
 from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
@@ -195,9 +196,6 @@ class DatasetLoader:
             return False
 
         if not self._load_genomics():
-            return False
-
-        if not self._load_class_info():
             return False
 
         self._load_optional()
@@ -519,6 +517,7 @@ class DatasetLoader:
 
                 self.bigscape_dir = find_bigscape_dir(self.bigscape_dir)
 
+    @deprecated(reason="To be refactored. It was used in the `self.load` method before.")
     def _load_class_info(self):
         """Load class match info (based on mibig) and chemical class predictions.
 
