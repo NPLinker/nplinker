@@ -76,7 +76,6 @@ class DatasetLoader:
     OR_MIBIG_JSON = "mibig_json_dir"
     OR_STRAINS = "strain_mappings_file"
     # misc files
-    OR_DESCRIPTION = "description_file"
     OR_INCLUDE_STRAINS = "include_strains_file"
     # class predictions
     OR_CANOPUS = "canopus_dir"
@@ -199,8 +198,6 @@ class DatasetLoader:
         if not self._load_genomics():
             return False
 
-        self._load_optional()
-
         # Restrict strain list to only relevant strains (those that are present
         # in both genomic and metabolomic data)
         # TODO add a config file option for this?
@@ -240,9 +237,6 @@ class DatasetLoader:
         self._init_metabolomics_paths()
 
         self._init_genomics_paths()
-
-        # 13. MISC: <root>/description.txt
-        self.description_file = os.path.join(self._root, "description.txt")
 
         # 14. MISC: <root>/include_strains.csv / include_strains_file=<override>
         self.include_strains_file = self._config_overrides.get(
@@ -571,12 +565,6 @@ class DatasetLoader:
         # include them in loader
         self.chem_classes = chem_classes
         return True
-
-    def _load_optional(self):
-        self.description_text = "<no description>"
-        if os.path.exists(self.description_file):
-            self.description_text = open(self.description_file).read()
-            logger.debug("Parsed description text")
 
     def _filter_only_common_strains(self):
         """Filter strain population to only strains present in both genomic and molecular data."""
