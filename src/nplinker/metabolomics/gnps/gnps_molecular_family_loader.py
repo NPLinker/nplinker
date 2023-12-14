@@ -18,7 +18,7 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
         3. FEATURE-BASED-MOLECULAR-NETWORKING
             - networkedges_selfloop/*.selfloop
 
-        The "ComponentIndex" column in the GNPS molecular family file is treated
+        The "ComponentIndex" column in the GNPS molecular family's file is treated
         as family id. But for molecular families that have only one member (i.e. spectrum),
         named singleton molecular families, have the same value of
         "-1" in the "ComponentIndex" column. To make the family id unique,the
