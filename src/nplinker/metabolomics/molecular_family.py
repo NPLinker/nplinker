@@ -90,7 +90,7 @@ class MolecularFamily:
             strain(Strain): `Strain` object.
 
         Returns:
-            bool: True when the given strain exist.
+            bool: True when the given strain exists.
         """
         return strain in self._strains
 
