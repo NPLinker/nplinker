@@ -105,7 +105,7 @@ class MolecularFamily:
     def _update_strains(self) -> StrainCollection:
         """Update strains in the molecular family.
 
-        The strains is regenerated from the existing spectra in the molecular family. This method
+        The strains are re-extracted from the existing spectra in the molecular family. This method
         is mainly used when the spectra are updated (e.g. remove a spectrum from the molecular
         family).
 
