@@ -20,7 +20,7 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
 
         The "ComponentIndex" column in the GNPS molecular family file is treated
         as family id. But for molecular families that have only one member (i.e. spectrum),
-        which are called singleton molecular family, they have the same value of
+        named singleton molecular families, have the same value of
         "-1" in the "ComponentIndex" column. To make the family id unique,the
         spectrum id plus a prefix "singleton-" is used as the family id of
         singleton molecular families.
