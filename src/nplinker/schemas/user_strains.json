@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/NPLinker/nplinker/main/src/nplinker/schemas/user_strains.json",
+  "title": "User specificed strains",
+  "description": "A list of strain IDs specified by user",
+  "type": "object",
+  "required": [
+    "strain_ids"
+  ],
+  "properties": {
+    "strain_ids": {
+      "type": "array",
+      "title": "Strain IDs",
+      "description": "A list of strain IDs specificed by user. The strain IDs must be the same as the ones in the strain mappings file.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "version": {
+      "type": "string",
+      "enum": [
+        "1.0"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

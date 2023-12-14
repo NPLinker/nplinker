@@ -110,7 +110,11 @@ class StrainCollection:
             raise ValueError(f"Strain {strain} not found in strain collection.")
 
     def filter(self, strain_set: set[Strain]):
-        """Remove all strains that are not in strain_set from the strain collection."""
+        """Remove all strains that are not in strain_set from the strain collection.
+
+        Args:
+            strain_set(set[Strain]): Set of strains to keep.
+        """
         # note that we need to copy the list of strains, as we are modifying it
         for strain in self._strains.copy():
             if strain not in strain_set:
