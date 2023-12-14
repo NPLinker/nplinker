@@ -13,8 +13,8 @@ from .utils import isinstance_all
 
 
 if TYPE_CHECKING:
+    from nplinker.strain import Strain
     from nplinker.strain_collection import StrainCollection
-    from nplinker.strains import Strain
 
 logger = LogConfig.getLogger(__name__)
 

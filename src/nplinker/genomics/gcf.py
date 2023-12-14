@@ -5,7 +5,7 @@ from nplinker.strain_collection import StrainCollection
 
 
 if TYPE_CHECKING:
-    from nplinker.strains import Strain
+    from nplinker.strain import Strain
     from .bgc import BGC
 
 logger = LogConfig.getLogger(__name__)

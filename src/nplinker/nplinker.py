@@ -20,7 +20,7 @@ from .scoring.rosetta_scoring import RosettaScoring
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from .strains import Strain
+    from .strain import Strain
 
 logger = LogConfig.getLogger(__name__)
 

@@ -10,8 +10,8 @@ from nplinker.genomics import get_strains_from_bgcs
 from nplinker.genomics import map_bgc_to_gcf
 from nplinker.genomics import map_strain_to_bgc
 from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
+from nplinker.strain import Strain
 from nplinker.strain_collection import StrainCollection
-from nplinker.strains import Strain
 from .. import DATA_DIR
 
 

@@ -6,7 +6,7 @@ from .aa_pred import predict_aa
 
 
 if TYPE_CHECKING:
-    from ..strains import Strain
+    from ..strain import Strain
     from .gcf import GCF
 
 logger = LogConfig.getLogger(__name__)
