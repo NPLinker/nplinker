@@ -116,7 +116,7 @@ class NPLinker:
         self._strains = None
         self._metadata = {}
         self._molfams = []
-        self._mibig_bgc_dict = {}
+        self._mibig_bgcs = []
         self._chem_classes = None
         self._class_matches = None
 
@@ -267,7 +267,7 @@ class NPLinker:
         self._molfams = self._loader.molfams
         self._bgcs = self._loader.bgcs
         self._gcfs = self._loader.gcfs
-        self._mibig_bgc_dict = self._loader.mibig_bgc_dict
+        self._mibig_bgcs = self._loader.mibig_bgcs
         self._strains = self._loader.strains
         self._product_types = self._loader.product_types
         self._chem_classes = self._loader.chem_classes
@@ -495,8 +495,9 @@ class NPLinker:
         return self._metadata
 
     @property
-    def mibig_bgc_dict(self):
-        return self._mibig_bgc_dict
+    def mibig_bgcs(self):
+        """Get a list of all the MIBiG BGCs in the dataset."""
+        return self._mibig_bgcs
 
     @property
     def product_types(self):
