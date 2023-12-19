@@ -555,7 +555,7 @@ class MolNetEnhancerResults:
                 nr_nodes = line.pop(0)
                 # todo: make it easier to query classes of singleton families
                 # if singleton family, format like '-1_spectrum-id' like canopus results
-                # CG: Note that the singleton families id is "singleton-" + uuid.
+                # Note that the singleton families id is "singleton-" + spectrum-id.
                 if nr_nodes == "1":
                     component = f"-1_{cluster}"
                 class_info = []
