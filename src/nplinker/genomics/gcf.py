@@ -23,26 +23,28 @@ class GCF:
 
         Attributes:
             gcf_id(str): id of the GCF object.
-            bgcs(set[BGC]): a set of BGC objects that belongs to the GCF.
-            strains(StrainCollection):  a collection of strains.
+            bgc_ids(set[str]): a set of BGC ids that belongs to the GCF.
             bigscape_class(str | None): BiG-SCAPE's BGC class.
                 BiG-SCAPE's BGC classes are similar to those defined in MiBIG
                 but have more categories (7 classes). More details see:
                 https://doi.org/10.1038%2Fs41589-019-0400-9.
         """
         self.gcf_id = gcf_id
-        self._bgcs: set[BGC] = set()
-        self.bigscape_class: str | None = None
         self.bgc_ids: set[str] = set()
-        self.strains: StrainCollection = StrainCollection()
+        self.bigscape_class: str | None = None
+        self._bgcs: set[BGC] = set()
+        self._strains: StrainCollection = StrainCollection()
 
-    def __str__(self):
-        return f"GCF(id={self.gcf_id}, #bgcs={len(self.bgcs)}, #strains={len(self.strains)})."
+    def __str__(self) -> str:
+        return (
+            f"GCF(id={self.gcf_id}, #BGC_objects={len(self.bgcs)}, #bgc_ids={len(self.bgc_ids)},"
+            f"#strains={len(self._strains)})."
+        )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: GCF) -> bool:
         if isinstance(other, GCF):
             return self.gcf_id == other.gcf_id and self.bgcs == other.bgcs
         return NotImplemented
@@ -60,13 +62,18 @@ class GCF:
         """Get the BGC objects."""
         return self._bgcs
 
+    @property
+    def strains(self) -> StrainCollection:
+        """Get the strains in the GCF."""
+        return self._strains
+
     def add_bgc(self, bgc: BGC) -> None:
         """Add a BGC object to the GCF."""
         bgc.parents.add(self)
         self._bgcs.add(bgc)
         self.bgc_ids.add(bgc.bgc_id)
         if bgc.strain is not None:
-            self.strains.add(bgc.strain)
+            self._strains.add(bgc.strain)
         else:
             logger.warning("No strain specified for the BGC %s", bgc.bgc_id)
 
@@ -79,7 +86,7 @@ class GCF:
             for other_bgc in self._bgcs:
                 if other_bgc.strain == bgc.strain:
                     return
-            self.strains.remove(bgc.strain)
+            self._strains.remove(bgc.strain)
 
     def has_strain(self, strain: Strain) -> bool:
         """Check if the given strain exists.
@@ -90,7 +97,7 @@ class GCF:
         Returns:
             bool: True when the given strain exist.
         """
-        return strain in self.strains
+        return strain in self._strains
 
     def has_mibig_only(self) -> bool:
         """Check if the GCF's children are only MIBiG BGCs.

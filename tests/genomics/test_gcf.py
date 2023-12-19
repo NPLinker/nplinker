@@ -7,6 +7,7 @@ from nplinker.strain_collection import StrainCollection
 
 @pytest.fixture()
 def bgc_with_strain():
+    """Return a BGC object that has a Strain."""
     bgc = BGC("S0001", "NPR")
     bgc.strain = Strain("strain001")
     yield bgc
@@ -14,11 +15,13 @@ def bgc_with_strain():
 
 @pytest.fixture()
 def bgc_without_strain():
+    """Return a BGC object that does not have Strain."""
     bgc = BGC("S002", "NPR")
     yield bgc
 
 
-def test_default():
+def test_init():
+    """Test the initialization of GCF."""
     gcf = GCF("1")
     assert gcf.gcf_id == "1"
     assert gcf.bgcs == set()
@@ -27,7 +30,33 @@ def test_default():
     assert gcf.bigscape_class is None
 
 
+def test_str_repr_():
+    """Test __str__ and __repr__ method."""
+    gcf = GCF("1")
+    assert str(gcf) == "GCF(id=1, #BGC_objects=0, #bgc_ids=0,#strains=0)."
+    assert repr(gcf) == "GCF(id=1, #BGC_objects=0, #bgc_ids=0,#strains=0)."
+
+
+def test_eq():
+    """Test __eq__ method."""
+    gcf1 = GCF("1")
+    gcf2 = GCF("1")
+    assert gcf1 == gcf2
+    gcf3 = GCF("2")
+    assert gcf1 != gcf3
+
+
+def test_hash():
+    """Test __hash__ method."""
+    gcf1 = GCF("1")
+    gcf2 = GCF("1")
+    assert hash(gcf1) == hash(gcf2)
+    gcf3 = GCF("2")
+    assert hash(gcf1) != hash(gcf3)
+
+
 def test_add_bgc(bgc_with_strain):
+    """Test add_bgc method."""
     gcf = GCF("1")
     gcf.add_bgc(bgc_with_strain)
     assert gcf.bgcs == {bgc_with_strain}
@@ -35,6 +64,7 @@ def test_add_bgc(bgc_with_strain):
 
 
 def test_detach_bgc(bgc_with_strain):
+    """Test detach_bgc method."""
     gcf = GCF("1")
     gcf.add_bgc(bgc_with_strain)
     gcf.detach_bgc(bgc_with_strain)
@@ -44,6 +74,7 @@ def test_detach_bgc(bgc_with_strain):
 
 
 def test_add_bgc_wo_strain(bgc_without_strain, caplog):
+    """Test add_bgc method with a BGC that does have strain."""
     gcf = GCF("1")
     gcf.add_bgc(bgc_without_strain)
     assert gcf.gcf_id == "1"
@@ -53,6 +84,7 @@ def test_add_bgc_wo_strain(bgc_without_strain, caplog):
 
 
 def test_has_strain(bgc_with_strain):
+    """Test has_strain method."""
     gcf = GCF("1")
     gcf.add_bgc(bgc_with_strain)
     assert gcf.has_strain(Strain("strain001")) is True
@@ -60,6 +92,7 @@ def test_has_strain(bgc_with_strain):
 
 
 def test_has_mibig_only():
+    """Test has_mibig_only method."""
     mibig_bgc = BGC("BGC0000001", "NPR")
     nonmibig_bgc = BGC("S0001", "NPR")
     gcf = GCF("1")
@@ -73,6 +106,7 @@ def test_has_mibig_only():
 
 
 def test_is_singleton():
+    """Test is_singleton method."""
     bgc1 = BGC("BGC0000001", "NPR")
     bgc2 = BGC("BGC0000002", "NPR")
     gcf = GCF("1")
