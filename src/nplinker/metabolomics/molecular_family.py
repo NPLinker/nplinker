@@ -10,52 +10,30 @@ if TYPE_CHECKING:
 
 class MolecularFamily:
     def __init__(self, family_id: str):
-        """Class to model molecular families.
+        """Class to model molecular family.
 
         Args:
             family_id(str): Id for the molecular family.
+
+        Attributes:
+            id(int): Unique id for the molecular family.
+            family_id(str): Id for the molecular family.
+            spectra_ids(set[str]): Set of spectrum ids in the molecular family.
         """
         self.id: int = -1
         self.family_id: str = family_id
-        self.spectra: list[Spectrum] = []
         self.spectra_ids: set[str] = set()
-
-    # TODO: change property to attibute
-    @property
-    def strains(self) -> StrainCollection:
-        """Get strains of spectra in the molecular family.
-
-        Returns:
-            set[StrainCollection]: StrainCollection of strains from which the spectra in the molecular family are coming.
-        """
-        strains: StrainCollection = StrainCollection()
-        for spectrum in self.spectra:
-            for strain in spectrum.strains:
-                strains.add(strain)
-        return strains
-
-    def has_strain(self, strain: Strain) -> bool:
-        """Check if the given strain exists.
-
-        Args:
-            strain(Strain): `Strain` object.
-
-        Returns:
-            bool: True when the given strain exist.
-        """
-        return strain in self.strains
-
-    # TODO: update the logics, mf should also be added to the spectrum object
-    def add_spectrum(self, spectrum: Spectrum):
-        """Add a spectrum to the spectra list.
-
-        Args:
-            spectrum(Spectrum): Spectrum to add to the molecular family.
-        """
-        self.spectra.append(spectrum)
+        self._spectra: set[Spectrum] = set()
+        self._strains: StrainCollection = StrainCollection()
 
     def __str__(self) -> str:
-        return "MolFam(family_id={}, spectra={})".format(self.family_id, len(self.spectra))
+        return (
+            f"MolecularFamily(family_id={self.family_id}, #Spectrum_objects={len(self._spectra)}, "
+            f"#spectrum_ids={len(self.spectra_ids)}, #strains={len(self._strains)})"
+        )
+
+    def __repr__(self) -> str:
+        return str(self)
 
     def __eq__(self, other) -> bool:
         if isinstance(other, MolecularFamily):
@@ -70,3 +48,71 @@ class MolecularFamily:
         `self.spectra` is updated.
         """
         return hash((self.id, self.family_id))
+
+    @property
+    def spectra(self) -> set[Spectrum]:
+        """Get Spectrum objects in the molecular family."""
+        return self._spectra
+
+    @property
+    def strains(self) -> StrainCollection:
+        """Get strains in the molecular family."""
+        return self._strains
+
+    def add_spectrum(self, spectrum: Spectrum) -> None:
+        """Add a Spectrum object to the molecular family.
+
+        Args:
+            spectrum(Spectrum): `Spectrum` object to add to the molecular family.
+        """
+        self._spectra.add(spectrum)
+        self.spectra_ids.add(spectrum.spectrum_id)
+        self._strains = self._strains + spectrum.strains
+        # add the molecular family to the spectrum
+        spectrum.family = self
+
+    def detach_spectrum(self, spectrum: Spectrum) -> None:
+        """Remove a Spectrum object from the molecular family.
+
+        Args:
+            spectrum(Spectrum): `Spectrum` object to remove from the molecular family.
+        """
+        self._spectra.remove(spectrum)
+        self.spectra_ids.remove(spectrum.spectrum_id)
+        self._strains = self._update_strains()
+        # remove the molecular family from the spectrum
+        spectrum.family = None
+
+    def has_strain(self, strain: Strain) -> bool:
+        """Check if the given strain exists.
+
+        Args:
+            strain(Strain): `Strain` object.
+
+        Returns:
+            bool: True when the given strain exists.
+        """
+        return strain in self._strains
+
+    def is_singleton(self) -> bool:
+        """Check if the molecular family contains only one spectrum.
+
+        Returns:
+            bool: True when `MolecularFamily.spectra_ids` contains only one spectrum id.
+        """
+        return len(self.spectra_ids) == 1
+
+    def _update_strains(self) -> StrainCollection:
+        """Update strains in the molecular family.
+
+        The strains are re-extracted from the existing spectra in the molecular family. This method
+        is mainly used when the spectra are updated (e.g. remove a spectrum from the molecular
+        family).
+
+        Returns:
+            StrainCollection: Updated StrainCollection object.
+        """
+        strains = StrainCollection()
+        for spectrum in self._spectra:
+            strains = strains + spectrum.strains
+        return strains
