@@ -1,4 +1,3 @@
-import shutil
 from os import PathLike
 import httpx
 import pytest
@@ -7,8 +6,9 @@ from nplinker.utils import extract_archive
 from .. import GNPS_DATA_DIR
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def gnps_website_is_down():
+    """Check if the GNPS website is down."""
     gnps_url = "https://gnps.ucsd.edu"
     try:
         _ = httpx.get(gnps_url)
@@ -17,9 +17,9 @@ def gnps_website_is_down():
         return True
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def gnps_zip_files() -> dict[GNPSFormat, PathLike]:
-    """Get the GNPS zip archives as a dictionary.
+    """Get the paths of the GNPS zip archives as a dict.
 
     The dict keys are the workflow short names taken from the GNPSFormat enum.
     The dict values are the paths to the zip archives.
@@ -41,32 +41,39 @@ def gnps_zip_files() -> dict[GNPSFormat, PathLike]:
     }
 
 
-@pytest.fixture(scope="session", autouse=True)
-def prepare_data(gnps_zip_files):
-    """Extract GNPS zip archive to a temporary directory and delete it after the test run.
+@pytest.fixture(scope="session")
+def tmp_gnps_dir(tmp_path_factory):
+    """Temporary root directory for testing gnps."""
+    return tmp_path_factory.mktemp("gnps")
 
-    The temporary directory is named after the workflow, e.g. "SNETS", "SNETSV2", "FBMN".
-    Note that these directory names are also used in other fixtures.
+
+@pytest.fixture(scope="session", autouse=True)
+def prepare_data(tmp_gnps_dir, gnps_zip_files):
+    """Extract GNPS zip archives to the "tmp_gnps_dir" directory.
+
+    The extracted archive is named after the workflow, e.g. "SNETS", "SNETSV2", "FBMN", so for
+    example the SNETS archive is extracted to the "SNETS" directory in the "tmp_gnps_dir" directory.
+
+    Note that the `autouse` must be set to `True` so that the fixture is executed before any other
+    test function.
     """
     for workflow, zip_file in gnps_zip_files.items():
-        extract_archive(zip_file, GNPS_DATA_DIR / workflow.name)
-    yield
-    for workflow in gnps_zip_files:
-        shutil.rmtree(GNPS_DATA_DIR / workflow.name)
+        extract_archive(zip_file, tmp_gnps_dir / workflow.name)
 
 
 @pytest.fixture(scope="session")
-def gnps_file_mappings_files() -> dict[GNPSFormat, PathLike]:
+def gnps_file_mappings_files(tmp_gnps_dir) -> dict[GNPSFormat, PathLike]:
+    """Get the paths of the GNPS file mappings."""
     return {
-        GNPSFormat.SNETS: GNPS_DATA_DIR
+        GNPSFormat.SNETS: tmp_gnps_dir
         / GNPSFormat.SNETS.name
         / "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
         / "d69356c8e5044c2a9fef3dd2a2f991e1.tsv",
-        GNPSFormat.SNETSV2: GNPS_DATA_DIR
+        GNPSFormat.SNETSV2: tmp_gnps_dir
         / GNPSFormat.SNETSV2.name
         / "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
         / "16f782af01bc4f50a23ed163566072f9.clustersummary",
-        GNPSFormat.FBMN: GNPS_DATA_DIR
+        GNPSFormat.FBMN: tmp_gnps_dir
         / GNPSFormat.FBMN.name
         / "quantification_table_reformatted"
         / "1a12f6fbd2ca4e099ec56bdaea56368f.csv",
@@ -74,30 +81,32 @@ def gnps_file_mappings_files() -> dict[GNPSFormat, PathLike]:
 
 
 @pytest.fixture(scope="session")
-def gnps_spectra_files() -> dict[GNPSFormat, PathLike]:
+def gnps_spectra_files(tmp_gnps_dir) -> dict[GNPSFormat, PathLike]:
+    """Get the paths of the GNPS spectra."""
     return {
-        GNPSFormat.SNETS: GNPS_DATA_DIR
+        GNPSFormat.SNETS: tmp_gnps_dir
         / GNPSFormat.SNETS.name
         / "METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra-main.mgf",
-        GNPSFormat.SNETSV2: GNPS_DATA_DIR
+        GNPSFormat.SNETSV2: tmp_gnps_dir
         / GNPSFormat.SNETSV2.name
         / "METABOLOMICS-SNETS-V2-189e8bf1-download_clustered_spectra-main.mgf",
-        GNPSFormat.FBMN: GNPS_DATA_DIR / GNPSFormat.FBMN.name / "spectra" / "specs_ms.mgf",
+        GNPSFormat.FBMN: tmp_gnps_dir / GNPSFormat.FBMN.name / "spectra" / "specs_ms.mgf",
     }
 
 
 @pytest.fixture(scope="session")
-def gnps_mf_files() -> dict[GNPSFormat, PathLike]:
+def gnps_mf_files(tmp_gnps_dir) -> dict[GNPSFormat, PathLike]:
+    """Get the paths of the GNPS molecular formula files."""
     return {
-        GNPSFormat.SNETS: GNPS_DATA_DIR
+        GNPSFormat.SNETS: tmp_gnps_dir
         / GNPSFormat.SNETS.name
         / "networkedges_selfloop"
         / "6da5be36f5b14e878860167fa07004d6.pairsinfo",
-        GNPSFormat.SNETSV2: GNPS_DATA_DIR
+        GNPSFormat.SNETSV2: tmp_gnps_dir
         / GNPSFormat.SNETSV2.name
         / "networkedges_selfloop"
         / "06dd31e28bb547ba852859219db9298c..selfloop",
-        GNPSFormat.FBMN: GNPS_DATA_DIR
+        GNPSFormat.FBMN: tmp_gnps_dir
         / GNPSFormat.FBMN.name
         / "networkedges_selfloop"
         / "c74fec018736475483e9c8b05e230cce..selfloop",
@@ -105,17 +114,18 @@ def gnps_mf_files() -> dict[GNPSFormat, PathLike]:
 
 
 @pytest.fixture(scope="session")
-def gnps_annotations_files() -> dict[GNPSFormat, PathLike]:
+def gnps_annotations_files(tmp_gnps_dir) -> dict[GNPSFormat, PathLike]:
+    """Get the paths of the GNPS annotations."""
     return {
-        GNPSFormat.SNETS: GNPS_DATA_DIR
+        GNPSFormat.SNETS: tmp_gnps_dir
         / GNPSFormat.SNETS.name
         / "result_specnets_DB"
         / "885e4c5485ba42569e4876d1fe90d759.tsv",
-        GNPSFormat.SNETSV2: GNPS_DATA_DIR
+        GNPSFormat.SNETSV2: tmp_gnps_dir
         / GNPSFormat.SNETSV2.name
         / "result_specnets_DB"
         / "017fadadf6744c10b5d39f109e1438dc.tsv",
-        GNPSFormat.FBMN: GNPS_DATA_DIR
+        GNPSFormat.FBMN: tmp_gnps_dir
         / GNPSFormat.FBMN.name
         / "DB_result"
         / "7dc5b46b50d94246a1de12ef485d0f75.tsv",

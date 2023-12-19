@@ -4,6 +4,7 @@ bump2version
 coverage[toml]
 pytest
 pytest-cov
+pytest-xdist
 ruff
 sphinx
 sphinx_rtd_theme
