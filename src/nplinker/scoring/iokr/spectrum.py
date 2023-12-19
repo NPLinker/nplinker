@@ -44,8 +44,8 @@ class MSSpectrum:
 
     def init_from_spec(self, spec):
         self.id = spec.id
-        self.raw_parentmass = spec.parent_mz
-        self.raw_spectrum = numpy.array(spec.peaks)
+        self.raw_parentmass = spec.precursor_mz
+        self.raw_spectrum = spec.peaks
         # TODO this is a temporary default for the Crusemann data
         # should check for it in the mgf in metabolomics.py and store
         # in the Spectrum object if found

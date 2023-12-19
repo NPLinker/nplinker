@@ -18,7 +18,6 @@ import csv
 import gzip
 import hashlib
 import lzma
-import math
 import os
 import os.path
 import sys
@@ -30,21 +29,6 @@ from typing import IO
 from typing import Callable
 import httpx
 from tqdm import tqdm
-
-
-# CG: it's only used by metabolomics, should move it there
-# code to normalise peaks for spectral matching ("rosetta stone" stuff)
-def sqrt_normalise(peaks):
-    temp = []
-    total = 0.0
-    for mz, intensity in peaks:
-        temp.append((mz, math.sqrt(intensity)))
-        total += intensity
-    norm_facc = math.sqrt(total)
-    normalised_peaks = []
-    for mz, intensity in temp:
-        normalised_peaks.append((mz, intensity / norm_facc))
-    return normalised_peaks
 
 
 def find_delimiter(file: str | PathLike) -> str:

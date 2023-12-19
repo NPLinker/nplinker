@@ -38,11 +38,11 @@ def gcfs(strains_list) -> tuple[GCF, GCF, GCF]:
 
 @fixture(scope="session")
 def spectra(strains_list) -> tuple[Spectrum, Spectrum, Spectrum]:
-    spectrum1 = Spectrum(1, [(1, 1)], "spectrum1", None)
+    spectrum1 = Spectrum("spectrum1", [1], [1], 10.0)
     spectrum1.strains.add(strains_list[0])
-    spectrum2 = Spectrum(2, [(1, 1)], "spectrum2", None)
+    spectrum2 = Spectrum("spectrum2", [1], [1], 10.0)
     spectrum2.strains.add(strains_list[1])
-    spectrum3 = Spectrum(3, [(1, 1)], "spectrum3", None)
+    spectrum3 = Spectrum("spectrum3", [1], [1], 10.0)
     spectrum3.strains.add(strains_list[0])
     spectrum3.strains.add(strains_list[1])
     return spectrum1, spectrum2, spectrum3

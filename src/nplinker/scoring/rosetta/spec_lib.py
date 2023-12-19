@@ -43,13 +43,13 @@ class SpecLib:
         return list(s.spectrum_id for s in self.spectra)
 
     def get_n_peaks(self):
-        return [s.n_peaks for s in self.spectra]
+        return [len(s.peaks) for s in self.spectra]
 
     def filter(self):
         # top_k_filter
         n_done = 0
         for spec in self.spectra:
-            spec.keep_top_k()
+            self._keep_top_k(spec)
             n_done += 1
             if n_done % 100 == 0:
                 logger.info(
@@ -82,3 +82,27 @@ class SpecLib:
         start = pmz_list.bisect(lower)
         end = pmz_list.bisect(upper)
         return mz_list[start:end]
+
+    # from molnet repo
+    def _keep_top_k(self, spec, k=6, mz_range=50):
+        # only keep peaks that are in the top k in += mz_range
+        start_pos = 0
+        new_mz = []
+        new_intensities = []
+        for mz, intensity in spec.peaks:
+            while spec.peaks[start_pos][0] < mz - mz_range:
+                start_pos += 1
+            end_pos = start_pos
+
+            n_bigger = 0
+            while end_pos < len(spec.peaks) and spec.peaks[end_pos][0] <= mz + mz_range:
+                if spec.peaks[end_pos][1] > intensity:
+                    n_bigger += 1
+                end_pos += 1
+
+            if n_bigger < k:
+                new_mz.append(mz)
+                new_intensities.append(intensity)
+
+        spec.mz = new_mz
+        spec.intensity = new_intensities

@@ -44,9 +44,9 @@ class NPLinkerPickler(pickle.Pickler):
         elif isinstance(obj, GCF):
             return ("GCF", obj.gcf_id)
         elif isinstance(obj, Spectrum):
-            return ("Spectrum", obj.id)
+            return ("Spectrum", obj.spectrum_id)
         elif isinstance(obj, MolecularFamily):
-            return ("MolecularFamily", obj.id)
+            return ("MolecularFamily", obj.family_id)
         else:
             # TODO: ideally should use isinstance(obj, ScoringMethod) here
             # but it's currently a problem because it creates a circular

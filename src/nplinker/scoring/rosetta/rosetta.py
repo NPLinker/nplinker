@@ -548,7 +548,6 @@ class Rosetta:
             for hit in self._rosetta_hits:
                 csvwriter.writerow(
                     [
-                        hit.spec.id,
                         hit.spec.spectrum_id,
                         hit.gnps_id,
                         hit.spec_match_score,

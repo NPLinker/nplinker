@@ -67,7 +67,6 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
 
     def _load(self):
         """Load the MGF file into Spectrum objects."""
-        i = 0
         for spec in mgf.MGF(self._file):
             # Skip if m/z array is empty, as this is an invalid spectrum.
             # The invalid spectrum does not exist in other GNPS files, e.g.
@@ -77,20 +76,22 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
                 continue
 
             # Load the spectrum
-            peaks: list[tuple[float, float]] = list(zip(spec["m/z array"], spec["intensity array"]))
             spectrum_id: str = spec["params"]["scans"]
             # calculate precursor m/z from precursor mass and charge
             precursor_mass = spec["params"]["pepmass"][0]
             precursor_charge = self._get_precursor_charge(spec["params"]["charge"])
             precursor_mz: float = precursor_mass / abs(precursor_charge)
-            rt: float | None = spec["params"].get("rtinseconds", None)
+            rt = spec["params"].get("rtinseconds", 0)
 
             spectrum = Spectrum(
-                id=i, peaks=peaks, spectrum_id=spectrum_id, precursor_mz=precursor_mz, rt=rt
+                spectrum_id=spectrum_id,
+                mz=list(spec["m/z array"]),
+                intensity=list(spec["intensity array"]),
+                precursor_mz=precursor_mz,
+                rt=rt,
+                metadata=spec["params"],
             )
-            spectrum.metadata = spec["params"]
             self._spectra.append(spectrum)
-            i += 1
 
     def _get_precursor_charge(self, charges: list) -> int:
         """Get the precursor charge from the charge list.
