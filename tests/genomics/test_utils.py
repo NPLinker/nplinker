@@ -6,6 +6,7 @@ from nplinker.genomics import GCF
 from nplinker.genomics import add_bgc_to_gcf
 from nplinker.genomics import add_strain_to_bgc
 from nplinker.genomics import generate_mappings_genome_id_bgc_id
+from nplinker.genomics import get_mibig_from_gcf
 from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.strain import Strain
 from nplinker.strain_collection import StrainCollection
@@ -135,3 +136,26 @@ def test_add_bgc_to_gcf(bgcs):
     assert gcf_with_bgc[0].bgcs == {bgcs[0], bgcs[1]}
     assert gcf_with_bgc[1].bgcs == {bgcs[2]}
     assert gcf_without_bgc[0].bgcs == set()
+
+
+def test_get_mibig_from_gcf():
+    """Test get_mibig_from_gcf function."""
+    bgc1 = BGC("BGC_01", "NPR")
+    bgc1.strain = Strain("BGC_01")
+    bgc2 = BGC("BGC_02", "Alkaloid")
+    bgc2.strain = Strain("BGC_02")
+    bgc3 = BGC("antismash_c", "Polyketide")
+    bgc3.strain = Strain("strain_01")
+    gcf1 = GCF("1")
+    gcf1.add_bgc(bgc1)
+    gcf2 = GCF("2")
+    gcf2.add_bgc(bgc2)
+    gcf2.add_bgc(bgc3)
+    gcfs = [gcf1, gcf2]
+
+    mibig_bgcs_in_use, mibig_strains_in_use = get_mibig_from_gcf(gcfs)
+
+    assert len(mibig_bgcs_in_use) == 2
+    assert len(mibig_strains_in_use) == 2
+    assert bgc3 not in mibig_bgcs_in_use
+    assert bgc3.strain not in mibig_strains_in_use
