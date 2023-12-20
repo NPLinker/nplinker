@@ -25,16 +25,6 @@ class MibigLoader:
         self._metadata_dict = self._parse_metadatas()
         self._bgcs = self._parse_bgcs()
 
-    def get_strain_bgc_mapping(self) -> dict[str, str]:
-        """Get the mapping from strain to BGC.
-
-        Note that for MIBiG BGC, same value is used for strain name and BGC id.
-
-        Returns:
-            dict[str, str]: key is strain name, value is BGC id.
-        """
-        return {bid: bid for bid in self._file_dict}
-
     def get_files(self) -> dict[str, str]:
         """Get the path of all MIBiG metadata json files.
 
