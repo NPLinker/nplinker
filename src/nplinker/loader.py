@@ -132,6 +132,7 @@ class DatasetLoader:
         self.webapp_scoring_cutoff = self._config_webapp.get(
             "tables_metcalf_threshold", self.TABLES_CUTOFF_DEFAULT
         )
+        self.class_matches = None
         self.chem_classes = None
 
         logger.debug(
