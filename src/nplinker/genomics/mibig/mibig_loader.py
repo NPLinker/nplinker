@@ -17,6 +17,9 @@ class MibigLoader:
         MIBiG metadata file (json) contains annotations/metadata information
         for each BGC. See https://mibig.secondarymetabolites.org/download.
 
+        The MiBIG accession is used as BGC id and strain name. The loaded BGC
+        objects has Strain object as their strain attribute (i.e. `BGC.strain`).
+
         Args:
             data_dir(str): Path to the directory of MIBiG metadata json files
         """
@@ -36,8 +39,7 @@ class MibigLoader:
 
     @staticmethod
     def parse_data_dir(data_dir: str) -> dict[str, str]:
-        """Parse metadata directory and return pathes to all metadata json
-            files.
+        """Parse metadata directory and return pathes to all metadata json files.
 
         Args:
             data_dir(str): path to the directory of MIBiG metadata json files
@@ -78,6 +80,10 @@ class MibigLoader:
     def get_bgcs(self) -> list[BGC]:
         """Get BGC objects.
 
+        The BGC objects use MiBIG accession as id and has Strain object as
+        its strain attribute (i.e. `BGC.strain`), where the name of the Strain
+        object is also MiBIG accession.
+
         Returns:
             list[str, BGC]: a list of :class:`nplinker.genomics.BGC` objects
         """
@@ -94,6 +100,9 @@ class MibigLoader:
 
 def parse_bgc_metadata_json(file: str) -> BGC:
     """Parse MIBiG metadata file and return BGC object.
+
+    Note that the MiBIG accession is used as the BGC id and strain name. The BGC
+    object has Strain object as its strain attribute.
 
     Args:
         file(str): Path to the MIBiG metadata json file
