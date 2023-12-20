@@ -8,6 +8,7 @@ from nplinker.class_info.runcanopus import run_canopus
 from nplinker.genomics import add_bgc_to_gcf
 from nplinker.genomics import add_strain_to_bgc
 from nplinker.genomics import generate_mappings_genome_id_bgc_id
+from nplinker.genomics import get_mibig_from_gcf
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.bigscape import BigscapeGCFLoader
 from nplinker.genomics.mibig import MibigLoader
@@ -26,7 +27,6 @@ from nplinker.metabolomics.gnps import GNPSSpectrumLoader
 from nplinker.pairedomics.downloader import PODPDownloader
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.pairedomics.strain_mappings_generator import podp_generate_strain_mappings
-from nplinker.strain import Strain
 from nplinker.strain_collection import StrainCollection
 from nplinker.strain_loader import load_user_strains
 
@@ -124,7 +124,7 @@ class DatasetLoader:
         )
         self.bgcs, self.gcfs, self.spectra, self.molfams = [], [], [], []
         self.mibig_bgcs = []
-        self._mibig_strain_bgc_mapping = {}
+        self.mibig_strains_in_use = StrainCollection()
         self.product_types = []
         self.strains = StrainCollection()
         self.webapp_scoring_cutoff = self._config_webapp.get(
@@ -185,10 +185,6 @@ class DatasetLoader:
         )
 
     def load(self):
-        if self._use_mibig:
-            if not self._load_mibig():
-                return False
-
         if not self._load_strain_mappings():
             return False
 
@@ -197,6 +193,9 @@ class DatasetLoader:
 
         if not self._load_genomics():
             return False
+
+        # set self.strains with all strains from input plus mibig strains in use
+        self.strains = self.strains + self.mibig_strains_in_use
 
         if len(self.strains) == 0:
             raise Exception(f"Failed to find *ANY* strains, missing {STRAIN_MAPPINGS_FILENAME}?")
@@ -356,12 +355,6 @@ class DatasetLoader:
             if not os.path.exists(str(f)):
                 logger.warning('Optional file/directory "%s" does not exist', f)
 
-    def _load_mibig(self):
-        mibig_bgc_loader = MibigLoader(self.mibig_json_dir)
-        self.mibig_bgcs = mibig_bgc_loader.get_bgcs()
-        self._mibig_strain_bgc_mapping = mibig_bgc_loader.get_strain_bgc_mapping()
-        return True
-
     def _load_strain_mappings(self):
         # 1. load strain mappings
         sc = StrainCollection.read_json(self.strain_mappings_file)
@@ -377,14 +370,7 @@ class DatasetLoader:
             logger.info(f"Loaded {len(user_strains)} user specified strains.")
             self.strains.filter(user_strains)
 
-        # 3. load MiBIG strain mappings
-        if self._mibig_strain_bgc_mapping:
-            for k, v in self._mibig_strain_bgc_mapping.items():
-                strain = Strain(k)
-                strain.add_alias(v)
-                self.strains.add(strain)
         logger.info("Loaded {} Strain objects in total".format(len(self.strains)))
-
         return True
 
     def _load_metabolomics(self):
@@ -427,7 +413,7 @@ class DatasetLoader:
 
         The attribute of `self.bgcs` is set to the loaded BGC objects that have the Strain object
         added (i.e. `BGC.strain` updated). If a BGC object does not have the Strain object, it is
-        not added to `self.bgcs`.
+        not added to `self.bgcs`. For MIBiG BGC objects, only those in use are added to `self.bgcs`.
 
         The attribute of `self.gcfs` is set to the loaded GCF objects that have the Strain objects
         added (i.e. `GCF._strains` updated). This means only BGC objects with updated Strain objects
@@ -435,27 +421,38 @@ class DatasetLoader:
         """
         logger.debug("\nLoading genomics data starts...")
 
-        # Step 1: load all BGC objects
+        # Step 1: load antismash BGC objects & add strain info
         logger.debug("Parsing AntiSMASH directory...")
         antismash_bgcs = AntismashBGCLoader(self.antismash_dir).get_bgcs()
-        raw_bgcs = antismash_bgcs + self.mibig_bgcs
+        antismash_bgcs_with_strain, _ = add_strain_to_bgc(self.strains, antismash_bgcs)
 
-        # Step 2: load all GCF objects
+        # Step 2: load mibig BGC objects (having strain info)
+        if self._use_mibig:
+            self.mibig_bgcs = MibigLoader(self.mibig_json_dir).get_bgcs()
+
+        # Step 3: get all BGC objects with strain info
+        all_bgcs_with_strain = antismash_bgcs_with_strain + self.mibig_bgcs
+
+        # Step 4: load all GCF objects
         # TODO: create a config for "bigscape_cluster_file" and discard "bigscape_dir" and "bigscape_cutoff"?
         bigscape_cluster_file = (
             Path(self.bigscape_dir) / "mix" / f"mix_clustering_c0.{self._bigscape_cutoff:02d}.tsv"
         )
         raw_gcfs = BigscapeGCFLoader(bigscape_cluster_file).get_gcfs()
 
-        # Step 3: add Strain object to BGC
-        bgc_with_strain, _ = add_strain_to_bgc(self.strains, raw_bgcs)
+        # Step 5: add BGC objects to GCF
+        all_gcfs_with_bgc, _, _ = add_bgc_to_gcf(all_bgcs_with_strain, raw_gcfs)
 
-        # Step 4: add BGC objects to GCF
-        gcf_with_bgc, _, _ = add_bgc_to_gcf(bgc_with_strain, raw_gcfs)
+        # Step 6: get mibig bgcs and strains in use from GCFs
+        mibig_bgcs_in_use = []
+        mibig_strains_in_use = StrainCollection()
+        if self._use_mibig:
+            mibig_bgcs_in_use, mibig_strains_in_use = get_mibig_from_gcf(all_gcfs_with_bgc)
 
-        # Step 5: set attributes of self.bgcs and self.gcfs with valid objects
-        self.bgcs = bgc_with_strain
-        self.gcfs = gcf_with_bgc
+        # Step 7: set attributes with valid objects
+        self.bgcs = antismash_bgcs_with_strain + mibig_bgcs_in_use
+        self.gcfs = all_gcfs_with_bgc
+        self.mibig_strains_in_use = mibig_strains_in_use
 
         logger.debug("Loading genomics data completed\n")
         return True
