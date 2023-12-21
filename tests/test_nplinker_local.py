@@ -42,21 +42,26 @@ def npl() -> NPLinker:
     return npl
 
 
+# ---------------------------------------------------------------------------------------------------
+# After manually checking data files for PODP MSV000079284, we have the following numbers:
+# 370 antismash BGCs
+# 114 GCFs
+#   - 49 singleton GCFs
+#   - 1 mibig-only GCF (not singleton)
+#   - 12 GCFs having mibig bgcs (not singleton, not mibig-only); in total 20 mibig bgcs used in GCFs
+# 25935 spectra
+#   - 24652 spectra have strain info (from strain mapping file)
+#   - 1283 spectra do not have strain info
+# 25769 molecular families
+#   - 25740 singleton families
+#   - 29 non-singleton families
+# 26 strains from strain mapping file
+#   - all strains loaded = 26 (from strain mappings) + 20 (from mibig) = 46
+# ---------------------------------------------------------------------------------------------------
+
+
 @pytest.mark.skipif(os.environ.get("CI") == "true", reason="Skip when running on CI")
 def test_load_data(npl: NPLinker):
-    # After checking the files manuualy, we know that demo data contains:
-    # 370 antismash BGCs
-    # 114 GCFs
-    # - 49 singleton GCFs
-    # - 1 mibig-only GCF (not singleton)
-    # - 12 GCFs that have mibig bgcs (not singleton, not mibig-only), 20 unique mibig bgcs
-    # 25935 spectra
-    # - 24652 spectra have strain info
-    # 25769 molecular families
-    # - 25740 singleton families
-    # - 29 non-singleton families
-    # 26 strains from strain mapping file
-    # - so all strains = 26 + 20 unique mibig bgcs = 46
     assert len(npl.bgcs) == 390
     assert len(npl.gcfs) == 64
     assert len(npl.spectra) == 24652
