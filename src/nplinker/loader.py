@@ -61,11 +61,10 @@ class DatasetLoader:
     EXTRA_CANOPUS_PARAMS_DEFAULT = "--maxmz 600 formula zodiac structure canopus"
 
     # keys for overriding metabolomics data elements
-    OR_NODES = "nodes_file"
-    OR_EDGES = "edges_file"
-    OR_MGF = "mgf_file"
-    OR_ANNO = "annotations_dir"
-    OR_ANNO_CONFIG = "annotations_config_file"
+    OR_GNPS_NODES = "gnps_nodes_file"
+    OR_GNPS_EDGES = "gnps_edges_file"
+    OR_GNPS_MGF = "gnps_mgf_file"
+    OR_GNPS_ANNOTATIONS = "gnps_annotations_file"
     # and the same for genomics data
     OR_ANTISMASH = "antismash_dir"
     OR_BIGSCAPE = "bigscape_dir"
@@ -133,9 +132,9 @@ class DatasetLoader:
     def __repr__(self):
         return "Root={}\n   MGF={}\n   EDGES={}\n   NODES={}\n   BIGSCAPE={}\n   ANTISMASH={}\n".format(
             self._root,
-            self.mgf_file,
-            self.edges_file,
-            self.nodes_file,
+            self.gnps_mgf_file,
+            self.gnps_edges_file,
+            self.gnps_nodes_file,
             self.bigscape_dir,
             self.antismash_dir,
         )
@@ -239,51 +238,50 @@ class DatasetLoader:
         ) or os.path.join(self._root, "molnetenhancer")
 
     def _init_metabolomics_paths(self):
-        # 2. MET: <root>/clusterinfo_summary/<some UID>.tsv (or .clustersummary apparently...) / nodes_file=<override>
-        self.nodes_file = self._config_overrides.get(self.OR_NODES) or find_via_glob_alts(
+        """Initializes the paths for metabolomics data."""
+        # GNPS nodes_files is `file_mappings.tsv/csv` file
+        self.gnps_nodes_file = self._config_overrides.get(self.OR_GNPS_NODES) or find_via_glob_alts(
             [
+                os.path.join(self._root, "file_mappings.csv"),
                 os.path.join(self._root, "file_mappings.tsv"),
                 os.path.join(self._root, "clusterinfo*", "*.tsv"),
                 os.path.join(self._root, "clusterinfo*", "*.clustersummary"),
             ],
-            self.OR_NODES,
+            self.OR_GNPS_NODES,
         )
 
-        # 3. MET: <root>/networkedges_selfloop/<some UID>.selfloop (new) or .pairsinfo (old) / edges_file=<override>
-        self.edges_file = self._config_overrides.get(self.OR_EDGES) or find_via_glob_alts(
+        # GNPS edges_file is `molecular_families.tsv` file
+        self.gnps_edges_file = self._config_overrides.get(self.OR_GNPS_EDGES) or find_via_glob_alts(
             [
+                os.path.join(self._root, "molecular_families.tsv"),
                 os.path.join(self._root, "*.pairsinfo"),
                 os.path.join(self._root, "networkedges_selfloop", "*.pairsinfo"),
                 os.path.join(self._root, "networkedges_selfloop", "*.selfloop"),
             ],
-            self.OR_EDGES,
+            self.OR_GNPS_EDGES,
         )
 
-        # 5. MET: <root>/spectra/*.mgf (or <root>/*.mgf)/ mgf_file=<override>
-        self.mgf_file = self._config_overrides.get(self.OR_MGF) or find_via_glob_alts(
-            [os.path.join(self._root, "*.mgf"), os.path.join(self._root, "spectra", "*.mgf")],
-            self.OR_MGF,
+        # GNPS mgf_file is `spectra.mgf` file
+        self.gnps_mgf_file = self._config_overrides.get(self.OR_GNPS_MGF) or find_via_glob_alts(
+            [
+                os.path.join("spectra.mgf"),
+                os.path.join(self._root, "*.mgf"),
+                os.path.join(self._root, "spectra", "*.mgf"),
+            ],
+            self.OR_GNPS_MGF,
         )
 
-        # 8. MET: <root>/DB_result/*.tsv (new) or <root>/result_specnets_DB/*.tsv (old) / annotations_dir=<override>
-        if Path.is_file(Path(self._root) / "annotations.tsv"):
-            self.annotations_dir = str(self._root)
-            self.annotations_config_file = os.path.join(self._root, "annotations.tsv")
-        else:
-            self.annotations_dir = self._config_overrides.get(
-                self.OR_ANNO
-            ) or find_via_glob_alts_dir(
-                [
-                    os.path.join(self._root, "DB_result"),
-                    os.path.join(self._root, "result_specnets_DB"),
-                ],
-                self.OR_ANNO,
-                optional=False,
-            )
-            if self.annotations_dir is not None:
-                self.annotations_config_file = self._config_overrides.get(
-                    self.OR_ANNO_CONFIG
-                ) or os.path.join(self.annotations_dir, "annotations.tsv")
+        # GNPS annotations_file is `annotations.tsv` file
+        self.gnps_annotations_file = self._config_overrides.get(
+            self.OR_GNPS_ANNOTATIONS
+        ) or find_via_glob_alts(
+            [
+                os.path.join(self._root, "annotations.tsv"),
+                os.path.join(self._root, "DB_result", "*.tsv"),
+                os.path.join(self._root, "result_specnets_DB", "*.tsv"),
+            ],
+            self.OR_GNPS_ANNOTATIONS,
+        )
 
     def _init_genomics_paths(self):
         # 9. GEN: <root>/antismash / antismash_dir=<override>
@@ -313,16 +311,16 @@ class DatasetLoader:
 
     def _validate_paths(self):
         """Validates that the required files and directories exist before loading starts."""
-        required_paths = [self.nodes_file, self.edges_file, self.mgf_file, self.antismash_dir]
-        optional_paths = [self.annotations_dir]
+        required_paths = [
+            self.gnps_nodes_file,
+            self.gnps_edges_file,
+            self.gnps_mgf_file,
+            self.antismash_dir,
+        ]
 
         for f in required_paths:
             if not os.path.exists(str(f)):
                 raise FileNotFoundError(f'File/directory "{f}" does not exist.')
-
-        for f in optional_paths:
-            if not os.path.exists(str(f)):
-                logger.warning('Optional file/directory "%s" does not exist', f)
 
     def _load_strain_mappings(self):
         # 1. load strain mappings
@@ -356,11 +354,11 @@ class DatasetLoader:
         logger.debug("\nLoading metabolomics data starts...")
 
         # Step 1: load all Spectrum objects
-        raw_spectra = GNPSSpectrumLoader(self.mgf_file).spectra
+        raw_spectra = GNPSSpectrumLoader(self.gnps_mgf_file).spectra
         # Step 2: load all GNPS annotations
-        raw_annotations = GNPSAnnotationLoader(self.annotations_config_file).annotations
+        raw_annotations = GNPSAnnotationLoader(self.gnps_annotations_file).annotations
         # Step 3: load all MolecularFamily objects
-        raw_molfams = GNPSMolecularFamilyLoader(self.edges_file).get_mfs(keep_singleton=False)
+        raw_molfams = GNPSMolecularFamilyLoader(self.gnps_edges_file).get_mfs(keep_singleton=False)
 
         # Step 4: add GNPS annotations to Spectrum.gnps_annotations
         add_annotation_to_spectrum(raw_annotations, raw_spectra)
@@ -499,14 +497,14 @@ class DatasetLoader:
                     )
                 )
                 try:
-                    run_canopus(self.mgf_file, self.canopus_dir, extra_canopus_parameters)
+                    run_canopus(self.gnps_mgf_file, self.canopus_dir, extra_canopus_parameters)
                 except Exception as e:
                     logger.warning(
                         'Failed to run CANOPUS on mgf file with docker, error was "{}"'.format(e)
                     )
                     logger.info("Trying to run CANOPUS again using SIRIUS from path")
                     try:
-                        run_canopus(self.mgf_file, self.canopus_dir, extra_canopus_parameters)
+                        run_canopus(self.gnps_mgf_file, self.canopus_dir, extra_canopus_parameters)
                     except Exception as e:
                         logger.warning(
                             'Again failed to run CANOPUS on mgf file using sirius from path, error was "{}"'.format(
