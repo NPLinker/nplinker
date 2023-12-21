@@ -64,7 +64,6 @@ class DatasetLoader:
     # keys for overriding metabolomics data elements
     OR_NODES = "nodes_file"
     OR_EDGES = "edges_file"
-    OR_EXTRA_NODES = "extra_nodes_file"
     OR_MGF = "mgf_file"
     OR_METADATA = "metadata_table_file"
     OR_QUANT = "quantification_table_file"
@@ -266,15 +265,6 @@ class DatasetLoader:
             self.OR_EDGES,
         )
 
-        # 4. MET: <root>/*.csv / extra_nodes_file=<override>
-        # TODO is the glob input OK?
-        # => wait for updated dataset with latest output format
-        # NOTE: only optional for Crusemann or Crusemann-like dataset format!
-        self.extra_nodes_file = self._config_overrides.get(self.OR_EXTRA_NODES) or find_via_glob(
-            os.path.join(self._root, "quantification_table_reformatted", "*.csv"),
-            self.OR_EXTRA_NODES,
-            optional=True,
-        )
 
         # 5. MET: <root>/spectra/*.mgf (or <root>/*.mgf)/ mgf_file=<override>
         self.mgf_file = self._config_overrides.get(self.OR_MGF) or find_via_glob_alts(

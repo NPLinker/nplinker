@@ -63,7 +63,6 @@ repro_file = ""
 #   |- metadata_table/metadata_table-00000.txt (only present in FBMN GNPS jobs?)
 #   |- networkedges_selfloop/<UID>.selfloop (the "edges" file for spectra network)
 #   |- spectra/*.mgf (mass spec data)
-#   |- quantification_table_reformatted/<UID>.csv ("extra" spectrum metadata, only present in FBMN jobs? TODO proper name for this?)
 #   |- DB_result/*.tsv (GNPS and other spectral annotation files, optional)
 #   |- result_specnets_DB/*.tsv (GNPS and other spectral annotation files, optional)
 #   |- DB_result/annotations.tsv (annotation data to extract from each file, see docs for details)
@@ -306,10 +305,6 @@ tables_metcalf_threshold = 2.0
 
 # nodes filename. This path is passed to glob.glob, default is <root>/clusterinfo_summary/*.tsv
 #nodes_file = ""
-
-# don't know what to call this yet? TODO
-# "extra" spectrum metadata file, default is <root>/*_quant.csv
-#extra_nodes_file = ""
 
 # edges filename. This path is passed to glob.glob, default is <root>/networkedges_selfloop/*.selfloop
 #edges_file = ""
