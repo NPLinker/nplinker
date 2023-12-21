@@ -48,7 +48,6 @@ class DatasetLoader:
     TABLES_CUTOFF_DEFAULT = 2.0
 
     BIGSCAPE_CUTOFF_DEFAULT = 30
-    EXTENDED_METADATA_TABLE_PARSING_DEFAULT = False
     USE_MIBIG_DEFAULT = True
     MIBIG_VERSION_DEFAULT = "3.1"
 
@@ -65,7 +64,6 @@ class DatasetLoader:
     OR_NODES = "nodes_file"
     OR_EDGES = "edges_file"
     OR_MGF = "mgf_file"
-    OR_METADATA = "metadata_table_file"
     OR_QUANT = "quantification_table_file"
     OR_ANNO = "annotations_dir"
     OR_ANNO_CONFIG = "annotations_config_file"
@@ -107,9 +105,6 @@ class DatasetLoader:
         )
         self._bigscape_cutoff = self._config_dataset.get(
             "bigscape_cutoff", self.BIGSCAPE_CUTOFF_DEFAULT
-        )
-        self._extended_metadata_table_parsing = self._config_dataset.get(
-            "extended_metadata_table_parsing", self.EXTENDED_METADATA_TABLE_PARSING_DEFAULT
         )
         self._use_mibig = self._config_dataset.get("use_mibig", self.USE_MIBIG_DEFAULT)
         self._mibig_version = self._config_dataset.get("mibig_version", self.MIBIG_VERSION_DEFAULT)
@@ -265,18 +260,10 @@ class DatasetLoader:
             self.OR_EDGES,
         )
 
-
         # 5. MET: <root>/spectra/*.mgf (or <root>/*.mgf)/ mgf_file=<override>
         self.mgf_file = self._config_overrides.get(self.OR_MGF) or find_via_glob_alts(
             [os.path.join(self._root, "*.mgf"), os.path.join(self._root, "spectra", "*.mgf")],
             self.OR_MGF,
-        )
-
-        # 6. MET: <root>/metadata_table/metadata_table-<number>.txt / metadata_table_file=<override>
-        self.metadata_table_file = self._config_overrides.get(self.OR_METADATA) or find_via_glob(
-            os.path.join(self._root, "metadata_table", "metadata_table*.txt"),
-            self.OR_METADATA,
-            optional=True,
         )
 
         # 7. MET: <root>/quantification_table/quantification_table-<number>.csv / quantification_table_file=<override>

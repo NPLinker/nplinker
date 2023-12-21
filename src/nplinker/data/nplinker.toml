@@ -60,7 +60,6 @@ repro_file = ""
 #   |- strain_mappings.csv (strain ID mappings)
 #   |   (METABOLOMICS DATA)
 #   |- clusterinfo*/<UID>.tsv (spectrum metadata, NOTE: NPLinker will search any folder beginning with "clusterinfo")
-#   |- metadata_table/metadata_table-00000.txt (only present in FBMN GNPS jobs?)
 #   |- networkedges_selfloop/<UID>.selfloop (the "edges" file for spectra network)
 #   |- spectra/*.mgf (mass spec data)
 #   |- DB_result/*.tsv (GNPS and other spectral annotation files, optional)
@@ -108,17 +107,6 @@ root = "<root directory of dataset>"
 # value after the dataset has initially been loaded, which will cause only the affected
 # data to be reloaded. Possibly only useful for the webapp
 #bigscape_cutoff = 30
-
-# For datasets using the GNPS FBMN workflow, NPLinker can optionally try to parse
-# more data out of the "metadata table" file included in the output. This can both
-# simplify the process of creating a strain mappings file and allow NPLinker to
-# extract growth media labels for each strain, which are then displayed in the
-# web application. This option defaults to being disabled to provide a consistent
-# experience with other types of dataset, but you can choose to enable it if you
-# have a compatible metadata table file.
-#
-# For more information: https://github.com/sdrogers/nplinker/wiki/Strain-mappings
-#extended_metadata_table_parsing = false
 
 # NPLinker can automatically download a copy of the MiBIG database in the JSON
 # format it expects to find, and place it in the same folder as the current dataset.
@@ -308,9 +296,6 @@ tables_metcalf_threshold = 2.0
 
 # edges filename. This path is passed to glob.glob, default is <root>/networkedges_selfloop/*.selfloop
 #edges_file = ""
-
-# metadata table filename. This path is passed to glob.glob, default is <root>/metadata_table/metadata_table-*.txt
-#metadata_table_file = ""
 
 # quantification table filename. This path is passed to glob.glob, default is <root>/quantification_table/quantification_table-*.csv
 #quantification_table_file = ""
