@@ -525,40 +525,6 @@ class DatasetLoader:
         return True
 
 
-def find_via_glob(path, file_type, optional=False):
-    try:
-        filename = glob.glob(path)[0]
-        return filename
-    except (OSError, IndexError):
-        if not optional:
-            # "from None" suppresses the traceback for the original exception, which isn't really needed
-            raise Exception(
-                'ERROR: unable to find {} in path "{}"'.format(file_type, path)
-            ) from None
-
-        logger.warn('WARNING: unable to find {} in path "{}"'.format(file_type, path))
-        return None
-
-
-def find_via_glob_alts_dir(paths, file_type, optional=False):
-    path = None
-    for p in paths:
-        if os.path.exists(p):
-            path = p
-            break
-
-    if path is None and not optional:
-        raise Exception(
-            "ERROR: unable to find {} in {} paths: ({})".format(file_type, len(paths), paths)
-        )
-    elif path is None:
-        logger.warning(
-            "WARNING: unable to find {} in {} paths: ({})".format(file_type, len(paths), paths)
-        )
-
-    return path
-
-
 def find_via_glob_alts(paths, file_type, optional=False):
     filename = None
     for path in paths:
