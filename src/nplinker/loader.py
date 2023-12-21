@@ -64,7 +64,6 @@ class DatasetLoader:
     OR_NODES = "nodes_file"
     OR_EDGES = "edges_file"
     OR_MGF = "mgf_file"
-    OR_QUANT = "quantification_table_file"
     OR_ANNO = "annotations_dir"
     OR_ANNO_CONFIG = "annotations_config_file"
     # and the same for genomics data
@@ -264,13 +263,6 @@ class DatasetLoader:
         self.mgf_file = self._config_overrides.get(self.OR_MGF) or find_via_glob_alts(
             [os.path.join(self._root, "*.mgf"), os.path.join(self._root, "spectra", "*.mgf")],
             self.OR_MGF,
-        )
-
-        # 7. MET: <root>/quantification_table/quantification_table-<number>.csv / quantification_table_file=<override>
-        self.quantification_table_file = self._config_overrides.get(self.OR_QUANT) or find_via_glob(
-            os.path.join(self._root, "quantification_table", "quantification_table*.csv"),
-            self.OR_QUANT,
-            optional=True,
         )
 
         # 8. MET: <root>/DB_result/*.tsv (new) or <root>/result_specnets_DB/*.tsv (old) / annotations_dir=<override>

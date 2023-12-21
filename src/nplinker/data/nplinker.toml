@@ -297,9 +297,6 @@ tables_metcalf_threshold = 2.0
 # edges filename. This path is passed to glob.glob, default is <root>/networkedges_selfloop/*.selfloop
 #edges_file = ""
 
-# quantification table filename. This path is passed to glob.glob, default is <root>/quantification_table/quantification_table-*.csv
-#quantification_table_file = ""
-
 # GNPS spectral annotations directory, default is <root>/DB_result
 #annotations_dir = ""
 
