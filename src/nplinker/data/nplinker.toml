@@ -22,38 +22,38 @@ repro_file = ""
 # Dataset configuration
 # ---------------------
 # NPLinker supports two basic methods for loading datasets:
-# 
+#
 #   1. All files stored locally
 #   2. Some/all files retrieved from the paired omics platform (http://pairedomicsdata.bioinformatics.nl/)
 #
-# The method you want to use determines the values that should be populated in 
+# The method you want to use determines the values that should be populated in
 # the [dataset] section below. If working with a purely local dataset, NPLinker
 # defaults to looking for all the necessary files in a single directory, given
-# by the "root" parameter. 
+# by the "root" parameter.
 #
 # Alternatively, to load metabolomics data from the paired platform, set the "root"
-# parameter to "platform:<projectID>", where "<projectID>" is taken from the platform 
+# parameter to "platform:<projectID>", where "<projectID>" is taken from the platform
 # project list. For example, "platform:MSV000079284" would select the dataset with
 # the ID MSV000079284.
 #
-# For more details see below. 
+# For more details see below.
 #
 # 1. Loading local datasets
 # -------------------------
 # Generally speaking the dataset layout the application expects matches the structure
 # of the output from a GNPS job. Workflows that are known to work so far are:
-# 
-#  - METABOLOMICS-SNETS (version 1.2.3) 
-#  - METABOLOMICS-SNETS-V2 (version release_14) 
+#
+#  - METABOLOMICS-SNETS (version 1.2.3)
+#  - METABOLOMICS-SNETS-V2 (version release_14)
 #  - FEATURE-BASED-MOLECULAR-NETWORKING (version 1.2.3)
 #
-# The simplest starting point is to download the "Clustered Spectra as MGF" zip 
+# The simplest starting point is to download the "Clustered Spectra as MGF" zip
 # file from GNPS and extract that into a folder to serve as the root directory for the dataset.
-# antiSMASH and BiG-SCAPE output are then added as additional subfolders. 
+# antiSMASH and BiG-SCAPE output are then added as additional subfolders.
 #
 # Typically all you will need to do is tell NPLinker where the root directory
 # is located. Otherwise you can customise the locations of the individual elements
-# using the various override settings below. 
+# using the various override settings below.
 #
 # The layout is as follows (see the documentation for more details):
 # <root>
@@ -77,16 +77,16 @@ repro_file = ""
 #
 # 2. Loading platform datasets
 # ----------------------------
-# Given a platform ID, NPLinker will retrieve the associated metabolomics data using the 
-# GNPS task ID. By default, it will also attempt to retrieve any available 
-# genomics data from the antiSMASH database using the RefSeq accession labels 
-# in the platform project data. 
-# 
+# Given a platform ID, NPLinker will retrieve the associated metabolomics data using the
+# GNPS task ID. By default, it will also attempt to retrieve any available
+# genomics data from the antiSMASH database using the RefSeq accession labels
+# in the platform project data.
+#
 # However, if you have local antismash results instead, you should also set the
-# location of those files using the "antismash_dir" parameter in the 
-# [dataset.overrides] section. NPLinker can optionally also run bigscape on 
+# location of those files using the "antismash_dir" parameter in the
+# [dataset.overrides] section. NPLinker can optionally also run bigscape on
 # these results during the loading process. If you already have bigscape results
-# you can additionally set the "bigscape_dir" parameter to the appropriate 
+# you can additionally set the "bigscape_dir" parameter to the appropriate
 # location to skip this step (or simply place them inside the <root>/bigscape folder)
 #
 # All files are downloaded and extracted to locations inside ~/nplinker_data. On Windows
@@ -97,10 +97,10 @@ repro_file = ""
 # If the dataset has the expected directory structure, this value is all that's required.
 # It should be set to the path of the local directory containing the various data files
 # described above.
-# 
+#
 # If you want to load a dataset from the paired platform, the value should be a string
-# of the form: "platform:datasetID". For example, "platform:MSV000079284" would 
-# load the dataset with ID MSV000079284. 
+# of the form: "platform:datasetID". For example, "platform:MSV000079284" would
+# load the dataset with ID MSV000079284.
 root = "<root directory of dataset>"
 
 # you can optionally set the BIGSCAPE clustering cutoff value here. the default value
@@ -112,11 +112,11 @@ root = "<root directory of dataset>"
 
 # For datasets using the GNPS FBMN workflow, NPLinker can optionally try to parse
 # more data out of the "metadata table" file included in the output. This can both
-# simplify the process of creating a strain mappings file and allow NPLinker to 
-# extract growth media labels for each strain, which are then displayed in the 
+# simplify the process of creating a strain mappings file and allow NPLinker to
+# extract growth media labels for each strain, which are then displayed in the
 # web application. This option defaults to being disabled to provide a consistent
 # experience with other types of dataset, but you can choose to enable it if you
-# have a compatible metadata table file. 
+# have a compatible metadata table file.
 #
 # For more information: https://github.com/sdrogers/nplinker/wiki/Strain-mappings
 #extended_metadata_table_parsing = false
@@ -124,33 +124,33 @@ root = "<root directory of dataset>"
 # NPLinker can automatically download a copy of the MiBIG database in the JSON
 # format it expects to find, and place it in the same folder as the current dataset.
 # This behaviour is enabled by default. If you wish to disable it for any reason
-# change the value of this setting to "false". 
+# change the value of this setting to "false".
 #use_mibig = true
 
 # When the "use_mibig" setting described above is set to "true", NPLinker will use
 # the value of this setting to determine which version of the MiBIG database should
-# be downloaded. The default is "1.4". If you need a newer version, define the 
+# be downloaded. The default is "1.4". If you need a newer version, define the
 # value to be the appropriate version, e.g. "2.0". Currently tested versions are
-# "1.4" and "2.0". 
+# "1.4" and "2.0".
 #
 # NOTE: the value MUST be a string (i.e. enclosed by " characters: "2.0" not 2.0)
 #mibig_version = "1.4"
 
 [antismash]
-# antismash file structure. Should be either 'default' or 'flat'. 
+# antismash file structure. Should be either 'default' or 'flat'.
 # default = the standard structure with nested subdirectories
 # flat = all .gbk files placed in a single flat directory
-# TODO: is "flat" required any more? 
+# TODO: is "flat" required any more?
 antismash_format = "default"
 
 # NPLinker needs to know how to parse antiSMASH filenames from BiG-SCAPE output
-# to identify strain labels as part of the process of loading a dataset. 
+# to identify strain labels as part of the process of loading a dataset.
 # Since the format of the filenames can vary from dataset to dataset, there isn't
 # a single rule that can be applied here. In most cases, the required action is
-# "take all text up to the first occurrence of <character>", e.g. the first 
+# "take all text up to the first occurrence of <character>", e.g. the first
 # underscore or period character. By default NPLinker will try the set of characters
 # defined below in sequence until a match is found. If you need to override this
-# then define a new list of at least one character to search for (note that it 
+# then define a new list of at least one character to search for (note that it
 # doesn't need to be a single character, e.g. ".abc" would also work)
 # antismash_delimiters = [".", "_", "-"]
 
@@ -158,13 +158,13 @@ antismash_format = "default"
 # automatically, you can choose to have the application automatically rename any
 # files under the <root>/antismash folder which contain spaces in their filenames
 # (both subfolders and .gbk files). This is to avoid BiG-SCAPE throwing up errors
-# because it can't handle filenames with spaces in them. If you already have 
+# because it can't handle filenames with spaces in them. If you already have
 # BiG-SCAPE results or don't want NPLinker to rename anything automatically, set
 # this to true instead
 ignore_spaces = false
 
 [docker]
-# this optional section contains various settings that only apply to the dockerised 
+# this optional section contains various settings that only apply to the dockerised
 # version of NPLinker. The Docker image contains BiG-SCAPE, and this tool can be run
 # as part of the dataset loading process. If you want to enable/disable this, and
 # configure the parameters used, this can be done by modifying the settings below.
@@ -211,7 +211,7 @@ run_bigscape = true
 #
 # The default simply enables MiBIG, disables the extra GCF clustering step. If you
 # need to select a particular version of the MiBIG database, see the "mibig_version"
-# setting. 
+# setting.
 # Note that BiG-SCAPE defaults to using 0.3 as a clustering cutoff if "--cutoffs"
 # is not set.
 #extra_bigscape_parameters = "--mibig --clans-off"
@@ -267,14 +267,14 @@ run_canopus = false
 extra_canopus_parameters = "--maxmz 600 formula zodiac structure canopus"
 
 # this optional section contains various settings that only affect the webapp interface
-# for NPLinker. If you're not using it, you can leave this out of your configuration. 
+# for NPLinker. If you're not using it, you can leave this out of your configuration.
 [webapp]
 # A fundamental part of the webapp is a set of tables which display objects in the dataset
-# that have been found to have links, based on the output of the Metcalf scoring method. 
+# that have been found to have links, based on the output of the Metcalf scoring method.
 # The value of this parameter is the minimum Metcalf score that a link must have for its
 # associated objects to appear in the table. In other words, the higher this is set, the
 # smaller the number of objects that will remain to be displayed in the tables. This may
-# be useful for improving performance on larger datasets. 
+# be useful for improving performance on larger datasets.
 # The default value is 2.0
 tables_metcalf_threshold = 2.0
 
@@ -283,11 +283,11 @@ tables_metcalf_threshold = 2.0
 
 # the "Rosetta" scoring method involves some preprocessing steps that can take
 # significant time. NPLinker will automatically run these steps as it loads the
-# dataset and cache the results. if you would like to adjust the parameters used 
+# dataset and cache the results. if you would like to adjust the parameters used
 # by the Rosetta method you can do by setting them below (note that changing
 # these values will invalidate any cached data and force the preprocessing steps
 # to be run again)
-# 
+#
 # TODO document what these do
 [scoring.rosetta]
 # ms1_tol = 100
