@@ -444,10 +444,11 @@ class DatasetLoader:
         all_gcfs_with_bgc, _, _ = add_bgc_to_gcf(all_bgcs_with_strain, raw_gcfs)
 
         # Step 6: get mibig bgcs and strains in use from GCFs
-        mibig_bgcs_in_use = []
         mibig_strains_in_use = StrainCollection()
         if self._use_mibig:
             mibig_bgcs_in_use, mibig_strains_in_use = get_mibig_from_gcf(all_gcfs_with_bgc)
+        else:
+            mibig_bgcs_in_use = []
 
         # Step 7: set attributes with valid objects
         self.bgcs = antismash_bgcs_with_strain + mibig_bgcs_in_use
