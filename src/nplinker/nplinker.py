@@ -215,27 +215,6 @@ class NPLinker:
         return NPLINKER_APP_DATA_DIR
 
     @property
-    def gnps_params(self):
-        """Returns a dict containing data from GNPS params.xml (if available).
-
-        Returns:
-            dict: GNPS parameters, or an empty dict if none exist in the dataset
-        """
-        return self._loader.gnps_params
-
-    @property
-    def dataset_description(self):
-        """Returns dataset description.
-
-        If nplinker finds a 'description.txt' file in the root directory of the
-        dataset, the content will be parsed and made available through this property.
-
-        Returns:
-            str: the content of description.txt or '<no description>'
-        """
-        return self._loader.description_text
-
-    @property
     def bigscape_cutoff(self):
         """Returns the current BiGSCAPE clustering cutoff value."""
         return self._loader._bigscape_cutoff
