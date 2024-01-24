@@ -1,6 +1,7 @@
 import glob
 import os
 from pathlib import Path
+from deprecated import deprecated
 from nplinker.class_info.chem_classes import ChemClassPredictions
 from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
@@ -131,6 +132,8 @@ class DatasetLoader:
         self.webapp_scoring_cutoff = self._config_webapp.get(
             "tables_metcalf_threshold", self.TABLES_CUTOFF_DEFAULT
         )
+        self.class_matches = None
+        self.chem_classes = None
 
         logger.debug(
             "DatasetLoader({}, {}, {})".format(self._root, self.dataset_id, self._remote_loading)
@@ -195,9 +198,6 @@ class DatasetLoader:
             return False
 
         if not self._load_genomics():
-            return False
-
-        if not self._load_class_info():
             return False
 
         self._load_optional()
@@ -519,6 +519,7 @@ class DatasetLoader:
 
                 self.bigscape_dir = find_bigscape_dir(self.bigscape_dir)
 
+    @deprecated(reason="To be refactored. It was used in the `self.load` method before.")
     def _load_class_info(self):
         """Load class match info (based on mibig) and chemical class predictions.
 
