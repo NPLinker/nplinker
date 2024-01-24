@@ -44,19 +44,25 @@ def npl() -> NPLinker:
 
 # ---------------------------------------------------------------------------------------------------
 # After manually checking data files for PODP MSV000079284, we have the following numbers:
-# 370 antismash BGCs
-# 114 GCFs
+# 370 BGCs from antismash files
+# 114 GCFs, including:
 #   - 49 singleton GCFs
 #   - 1 mibig-only GCF (not singleton)
-#   - 12 GCFs having mibig bgcs (not singleton, not mibig-only); in total 20 mibig bgcs used in GCFs
-# 25935 spectra
+#   - 12 GCFs (neither singleton nor mibig-only) have mibig bgcs and in total 20 mibig BGCs are used
+# 25935 spectra, including:
 #   - 24652 spectra have strain info (from strain mapping file)
 #   - 1283 spectra do not have strain info
-# 25769 molecular families
+# 25769 molecular families, including:
 #   - 25740 singleton families
 #   - 29 non-singleton families
 # 26 strains from strain mapping file
-#   - all strains loaded = 26 (from strain mappings) + 20 (from mibig) = 46
+# ---------------------------------------------------------------------------------------------------
+# So, after data loading, we should get following numbers in the tests:
+# 390 BGCs = 370 antismash BGCs + 20 mibig BGCs
+# 64 GCFs (neither singleton nor mibig-only) = 114 GCFs - 49 singleton GCFs - 1 mibig-only GCF
+# 24652 spectra (having strain info)
+# 29 molecular families (non-singleton)
+# 46 strains = 26 strains from strain mapping file + 20 strains from mibig
 # ---------------------------------------------------------------------------------------------------
 
 
