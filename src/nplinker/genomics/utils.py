@@ -62,7 +62,7 @@ def generate_mappings_genome_id_bgc_id(
     logger.info("Generated genome-BGC mappings file: %s", output_file)
 
 
-def add_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]) -> None:
+def add_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]) -> tuple[list[BGC], list[BGC]]:
     """Assign a Strain object to `BGC.strain` for input BGCs.
 
     BGC id is used to find the corresponding Strain object. It's possible that
@@ -74,28 +74,48 @@ def add_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]) -> None:
         strains(StrainCollection): A collection of all strain objects.
         bgcs(list[BGC]): A list of BGC objects.
 
+    Returns:
+        tuple(list[BGC], list[BGC]): A tuple of two lists of BGC objects. The
+            first list contains BGC objects that are updated with Strain object;
+            the second list contains BGC objects that are not updated with
+            Strain object because no Strain object is found.
+
     Raises:
-        ValueError: Strain id not found in the strain collection.
         ValueError: Multiple strain objects found for a BGC id.
     """
+    bgc_with_strain = []
+    bgc_without_strain = []
     for bgc in bgcs:
         try:
             strain_list = strains.lookup(bgc.bgc_id)
-        except ValueError as e:
-            raise ValueError(
-                f"Strain id '{bgc.bgc_id}' from BGC object '{bgc.bgc_id}' "
-                "not found in the strain collection."
-            ) from e
+        except ValueError:
+            bgc_without_strain.append(bgc)
+            continue
         if len(strain_list) > 1:
             raise ValueError(
                 f"Multiple strain objects found for BGC id '{bgc.bgc_id}'."
                 f"BGC object accept only one strain."
             )
         bgc.strain = strain_list[0]
+        bgc_with_strain.append(bgc)
+
+    logger.info(
+        f"{len(bgc_with_strain)} BGC objects updated with Strain object.\n"
+        f"{len(bgc_without_strain)} BGC objects not updated with Strain object."
+    )
+    return bgc_with_strain, bgc_without_strain
 
 
-def add_bgc_to_gcf(bgcs: list[BGC], gcfs: list[GCF]) -> None:
-    """To add BGC objects to GCF object based on GCF's BGC ids.
+def add_bgc_to_gcf(
+    bgcs: list[BGC], gcfs: list[GCF]
+) -> tuple[list[GCF], list[GCF], dict[GCF, set[str]]]:
+    """Add BGC objects to GCF object based on GCF's BGC ids.
+
+    The attribute of `GCF.bgc_ids` contains the ids of BGC objects. These ids
+    are used to find BGC objects from the input `bgcs` list. The found BGC
+    objects are added to the `bgcs` attribute of GCF object. It is possible that
+    some BGC ids are not found in the input `bgcs` list, and so their BGC
+    objects are missing in the GCF object.
 
     This method changes the lists `bgcs` and `gcfs` in place.
 
@@ -103,36 +123,38 @@ def add_bgc_to_gcf(bgcs: list[BGC], gcfs: list[GCF]) -> None:
         bgcs(list[BGC]): A list of BGC objects.
         gcfs(list[GCF]): A list of GCF objects.
 
-    Raises:
-        KeyError: BGC id not found in the list of BGC objects.
+    Returns:
+        tuple(list[GCF], list[GCF], dict[GCF, set[str]]):
+            The first list contains GCF objects that are updated with BGC objects;
+            The second list contains GCF objects that are not updated with BGC objects
+            because no BGC objects are found;
+            The dictionary contains GCF objects as keys and a set of ids of missing
+            BGC objects as values.
     """
     bgc_dict = {bgc.bgc_id: bgc for bgc in bgcs}
+    gcf_with_bgc = []
+    gcf_without_bgc = []
+    gcf_missing_bgc: dict[GCF, set[str]] = {}
     for gcf in gcfs:
         for bgc_id in gcf.bgc_ids:
             try:
                 bgc = bgc_dict[bgc_id]
-            except KeyError as e:
-                raise KeyError(
-                    f"BGC id '{bgc_id}' from GCF object '{gcf.gcf_id}' "
-                    "not found in the list of BGC objects."
-                ) from e
+            except KeyError:
+                if gcf not in gcf_missing_bgc:
+                    gcf_missing_bgc[gcf] = {bgc_id}
+                else:
+                    gcf_missing_bgc[gcf].add(bgc_id)
+                continue
             gcf.add_bgc(bgc)
 
-
-def get_bgcs_from_gcfs(gcfs: list[GCF]) -> list[BGC]:
-    """Get all BGC objects from given GCF objects."""
-    s = set()
-    for gcf in gcfs:
-        s |= gcf.bgcs
-    return list(s)
-
-
-def get_strains_from_bgcs(bgcs: list[BGC]) -> StrainCollection:
-    """Get all strain objects from given BGC objects."""
-    sc = StrainCollection()
-    for bgc in bgcs:
-        if bgc.strain is not None:
-            sc.add(bgc.strain)
+        if gcf.bgcs:
+            gcf_with_bgc.append(gcf)
         else:
-            logger.warning("Strain is None for BGC %s", bgc.bgc_id)
-    return sc
+            gcf_without_bgc.append(gcf)
+
+    logger.info(
+        f"{len(gcf_with_bgc)} GCF objects updated with BGC objects.\n"
+        f"{len(gcf_without_bgc)} GCF objects not updated with BGC objects.\n"
+        f"{len(gcf_missing_bgc)} GCF objects have missing BGC objects."
+    )
+    return gcf_with_bgc, gcf_without_bgc, gcf_missing_bgc

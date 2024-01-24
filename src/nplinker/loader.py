@@ -7,7 +7,6 @@ from nplinker.class_info.runcanopus import run_canopus
 from nplinker.genomics import add_bgc_to_gcf
 from nplinker.genomics import add_strain_to_bgc
 from nplinker.genomics import generate_mappings_genome_id_bgc_id
-from nplinker.genomics import get_bgcs_from_gcfs
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.bigscape import BigscapeGCFLoader
 from nplinker.genomics.mibig import MibigLoader
@@ -441,7 +440,16 @@ class DatasetLoader:
         return True
 
     def _load_genomics(self):
-        """Loads genomics data to BGC and GCF objects."""
+        """Loads genomics data to BGC and GCF objects.
+
+        The attribute of `self.bgcs` is set to the loaded BGC objects that have the Strain object
+        added (i.e. `BGC.strain` updated). If a BGC object does not have the Strain object, it is
+        not added to `self.bgcs`.
+
+        The attribute of `self.gcfs` is set to the loaded GCF objects that have the Strain objects
+        added (i.e. `GCF._strains` updated). This means only BGC objects with updated Strain objects
+        (i.e. `self.bgcs`) can be added to GCF objects.
+        """
         logger.debug("\nLoading genomics data starts...")
 
         # Step 1: load all BGC objects
@@ -456,15 +464,15 @@ class DatasetLoader:
         )
         raw_gcfs = BigscapeGCFLoader(bigscape_cluster_file).get_gcfs()
 
-        # Step 3: assign Strain object to BGC.strain
-        add_strain_to_bgc(self.strains, raw_bgcs)
+        # Step 3: add Strain object to BGC
+        bgc_with_strain, _ = add_strain_to_bgc(self.strains, raw_bgcs)
 
-        # Step 4: assign BGC objects to GCF.bgcs
-        add_bgc_to_gcf(raw_bgcs, raw_gcfs)
+        # Step 4: add BGC objects to GCF
+        gcf_with_bgc, _, _ = add_bgc_to_gcf(bgc_with_strain, raw_gcfs)
 
-        # Step 5: get GCF objects and their BGC members
-        self.gcfs = raw_gcfs
-        self.bgcs = get_bgcs_from_gcfs(self.gcfs)
+        # Step 5: set attributes of self.bgcs and self.gcfs with valid objects
+        self.bgcs = bgc_with_strain
+        self.gcfs = gcf_with_bgc
 
         logger.debug("Loading genomics data completed\n")
         return True
