@@ -198,13 +198,6 @@ class DatasetLoader:
         if not self._load_genomics():
             return False
 
-        # Restrict strain list to only relevant strains (those that are present
-        # in both genomic and metabolomic data)
-        # TODO add a config file option for this?
-        self._filter_only_common_strains()
-
-        # if we don't have at least *some* strains here it probably means missing mappings
-        # or a complete failure to parse things, so bail out
         if len(self.strains) == 0:
             raise Exception(f"Failed to find *ANY* strains, missing {STRAIN_MAPPINGS_FILENAME}?")
 
@@ -565,38 +558,6 @@ class DatasetLoader:
         # include them in loader
         self.chem_classes = chem_classes
         return True
-
-    def _filter_only_common_strains(self):
-        """Filter strain population to only strains present in both genomic and molecular data."""
-        # TODO: Maybe there should be an option to specify which strains are used, both so we can
-        #    selectively exclude strains, and include strains that are missing from either side.
-        bgc_strains = {x.strain for x in self.bgcs}
-        spectrum_strains = set().union(*[x.strains for x in self.spectra])
-        common_strains = bgc_strains.intersection(spectrum_strains)
-        logger.debug(
-            "Filtering strains: genomics count {}, metabolomics count: {}".format(
-                len(bgc_strains), len(spectrum_strains)
-            )
-        )
-        logger.debug(f"Common strains found: {len(common_strains)}")
-
-        # write out a list of the common strains to the dataset folder (might be useful for
-        # anyone wanting to do additional filtering)
-        cs_path = os.path.join(self._root, "common_strains.csv")
-        logger.info(f"Writing common strain labels to {cs_path}")
-        with open(cs_path, "w") as cs:
-            cs.write("# strain label\n")
-            for strain in self.strains:
-                cs.write(f"{strain.id}\n")
-
-        # filter the master list of strains down to include only the common set
-        self.strains.filter(common_strains)
-
-        for gcf in self.gcfs:
-            gcf.strains.filter(common_strains)
-        for spec in self.spectra:
-            spec.strains.filter(common_strains)
-        logger.info("Strains filtered down to total of {}".format(len(self.strains)))
 
 
 def find_via_glob(path, file_type, optional=False):
