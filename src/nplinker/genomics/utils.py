@@ -158,3 +158,25 @@ def add_bgc_to_gcf(
         f"{len(gcf_missing_bgc)} GCF objects have missing BGC objects."
     )
     return gcf_with_bgc, gcf_without_bgc, gcf_missing_bgc
+
+
+def get_mibig_from_gcf(gcfs: list[GCF]) -> tuple[list[BGC], StrainCollection]:
+    """Get MIBiG BGCs and strains from GCF objects.
+
+    Args:
+        gcfs(list[GCF]): A list of GCF objects.
+
+    Returns:
+        tuple[list[BGC], StrainCollection]: The first is a list of MIBiG BGC
+            objects used in the GCFs; the second is a StrainCollection object
+            that contains all Strain objects used in the GCFs.
+    """
+    mibig_bgcs_in_use = []
+    mibig_strains_in_use = StrainCollection()
+    for gcf in gcfs:
+        for bgc in gcf.bgcs:
+            if bgc.is_mibig():
+                mibig_bgcs_in_use.append(bgc)
+                if bgc.strain is not None:
+                    mibig_strains_in_use.add(bgc.strain)
+    return mibig_bgcs_in_use, mibig_strains_in_use
