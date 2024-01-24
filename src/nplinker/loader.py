@@ -17,6 +17,12 @@ from nplinker.globals import GNPS_FILE_MAPPINGS_FILENAME
 from nplinker.globals import PFAM_PATH
 from nplinker.globals import STRAIN_MAPPINGS_FILENAME
 from nplinker.logconfig import LogConfig
+from nplinker.metabolomics import add_annotation_to_spectrum
+from nplinker.metabolomics import add_spectrum_to_mf
+from nplinker.metabolomics import add_strains_to_spectrum
+from nplinker.metabolomics.gnps import GNPSAnnotationLoader
+from nplinker.metabolomics.gnps import GNPSMolecularFamilyLoader
+from nplinker.metabolomics.gnps import GNPSSpectrumLoader
 from nplinker.pairedomics.downloader import PODPDownloader
 from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.pairedomics.strain_mappings_generator import podp_generate_strain_mappings
@@ -399,8 +405,39 @@ class DatasetLoader:
 
         return True
 
-    # TODO CG: rewrite the loading process using GPNSLoader
     def _load_metabolomics(self):
+        """Loads metabolomics data to Spectrum and MolecularFamily objects.
+
+        The attribute of `self.spectra` is set to the loaded Spectrum objects that have Strain
+        objects added (i.e. `Spectrum.strains` updated). If a Spectrum object does not have Strain
+        objects, it is not added to `self.spectra`.
+
+        The attribute of `self.molfams` is set to the loaded MolecularFamily objects that have
+        Strain objects added (i.e. `MolecularFamily._strains` updated). This means only Spectra
+        objects with updated strains (i.e. `self.spectra`) can be added to MolecularFamily objects.
+        """
+        logger.debug("\nLoading metabolomics data starts...")
+
+        # Step 1: load all Spectrum objects
+        raw_spectra = GNPSSpectrumLoader(self.mgf_file).spectra
+        # Step 2: load all GNPS annotations
+        raw_annotations = GNPSAnnotationLoader(self.annotations_config_file).annotations
+        # Step 3: load all MolecularFamily objects
+        raw_molfams = GNPSMolecularFamilyLoader(self.edges_file).get_mfs(keep_singleton=False)
+
+        # Step 4: add GNPS annotations to Spectrum.gnps_annotations
+        add_annotation_to_spectrum(raw_annotations, raw_spectra)
+        # Step 5: add strains to Spectrum.strains
+        spectra_with_strains, _ = add_strains_to_spectrum(self.strains, raw_spectra)
+
+        # Step 6: add Spectrum objects to MolecularFamily
+        mf_with_spec, _, _ = add_spectrum_to_mf(spectra_with_strains, raw_molfams)
+
+        # Step 7: set attributes of self.spectra and self.molfams with valid objects
+        self.spectra = spectra_with_strains
+        self.molfams = mf_with_spec
+
+        logger.debug("Loading metabolomics data completed\n")
         return True
 
     def _load_genomics(self):
