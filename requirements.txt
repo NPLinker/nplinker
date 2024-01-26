@@ -1,6 +1,7 @@
 beautifulsoup4
 biopython
 deprecated
+dynaconf
 httpx
 numpy
 pandas
