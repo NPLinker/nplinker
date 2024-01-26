@@ -5,6 +5,7 @@ from deprecated import deprecated
 from nplinker.class_info.chem_classes import ChemClassPredictions
 from nplinker.class_info.class_matches import ClassMatches
 from nplinker.class_info.runcanopus import run_canopus
+from nplinker.config import config
 from nplinker.genomics import add_bgc_to_gcf
 from nplinker.genomics import add_strain_to_bgc
 from nplinker.genomics import generate_mappings_genome_id_bgc_id
@@ -87,13 +88,12 @@ class DatasetLoader:
         "Terpene",
     ]
 
-    def __init__(self, config_data):
+    def __init__(self):
         # load the config data
-        self._config_dataset = config_data["dataset"]
-        self._config_docker = config_data.get("docker", {})
-        self._config_webapp = config_data.get("webapp", {})
-        self._config_antismash = config_data.get("antismash", {})
-        self._config_overrides = self._config_dataset.get("overrides", {})
+        self._config_docker = config.get("docker", {})
+        self._config_webapp = config.get("webapp", {})
+        self._config_antismash = config.get("antismash", {})
+        self._config_overrides = config.dataset.get("overrides", {})
         # set private attributes
         self._antismash_delimiters = self._config_antismash.get(
             "antismash_delimiters", self.ANTISMASH_DELIMITERS_DEFAULT
@@ -101,13 +101,12 @@ class DatasetLoader:
         self._antismash_ignore_spaces = self._config_antismash.get(
             "ignore_spaces", self.ANTISMASH_IGNORE_SPACES_DEFAULT
         )
-        self._bigscape_cutoff = self._config_dataset.get(
-            "bigscape_cutoff", self.BIGSCAPE_CUTOFF_DEFAULT
-        )
-        self._use_mibig = self._config_dataset.get("use_mibig", self.USE_MIBIG_DEFAULT)
-        self._mibig_version = self._config_dataset.get("mibig_version", self.MIBIG_VERSION_DEFAULT)
-        self._root = Path(self._config_dataset["root"])
-        self._platform_id = self._config_dataset["platform_id"]
+        self._bigscape_cutoff = config.dataset.get("bigscape_cutoff", self.BIGSCAPE_CUTOFF_DEFAULT)
+        self._use_mibig = config.dataset.get("use_mibig", self.USE_MIBIG_DEFAULT)
+        self._mibig_version = config.dataset.get("mibig_version", self.MIBIG_VERSION_DEFAULT)
+        # TODO: the actual value of self._root is set in _start_downloads() method
+        self._root = Path(config.dataset["root"])
+        self._platform_id = config.dataset["platform_id"]
         self._remote_loading = len(self._platform_id) > 0
 
         # set public attributes
