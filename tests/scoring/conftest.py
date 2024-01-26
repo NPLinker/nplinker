@@ -8,7 +8,6 @@ from nplinker.scoring.linking import DataLinks
 from nplinker.scoring.linking import LinkFinder
 from nplinker.strain import Strain
 from nplinker.strain_collection import StrainCollection
-from .. import DATA_DIR
 
 
 @fixture(scope="session")
@@ -87,7 +86,7 @@ def npl(gcfs, spectra, mfs, strains, tmp_path_factory) -> NPLinker:
     The config file `nplinker_demo1.toml` does not affect the tests, just
     making sure the NPLinker object can be created succesfully.
     """
-    npl = NPLinker(str(DATA_DIR / "nplinker_demo1.toml"))
+    npl = NPLinker()
     npl._gcfs = gcfs
     npl._spectra = spectra
     npl._molfams = mfs
