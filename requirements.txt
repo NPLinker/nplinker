@@ -9,7 +9,5 @@ pyteomics
 pytest-lazy-fixture
 scipy
 sortedcontainers
-toml
 tqdm
 typing_extensions
-xdg
