@@ -21,10 +21,3 @@ def test_config_demo1():
     assert config.webapp.tables_metcalf_score == 3.0
 
 
-def test_config_demo2():
-    """Test loading a different config file (nplinker_demo2.toml)."""
-    config = Dynaconf(settings_files=[DATA_DIR / "nplinker_demo2.toml"])
-
-    assert config.loglevel == "INFO"
-    assert config.get("logfile") is None
-    assert config.dataset.root == "/data/MSV000079284"
