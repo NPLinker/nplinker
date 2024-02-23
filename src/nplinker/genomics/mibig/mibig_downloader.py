@@ -1,5 +1,6 @@
 import os
 import shutil
+from pathlib import Path
 from nplinker.logconfig import LogConfig
 from nplinker.utils import download_and_extract_archive
 from nplinker.utils import list_dirs
@@ -23,16 +24,15 @@ _MD5_MIBIG_METADATA = {
 
 
 def download_and_extract_mibig_metadata(
-    download_root: str,
-    extract_path: str,
+    download_root: str | os.PathLike,
+    extract_path: str | os.PathLike,
     version: str = "3.1",
 ):
     """Download and extract MIBiG metadata json files.
 
     Args:
-        download_root(str): Path to the directory to place downloaded archive in
-        extract_path(str): Path to the empty directory metadata json files will
-            be extracted to.
+        download_root(str): Path to the directory to place downloaded archive in.
+        extract_path(str): Path to the directory where json files will be extracted to.
             Note that if it's a directory containing the metadata json files
             after extraction, the json files will be moved to `extract_path`,
             and then the extracted directory will be removed.
@@ -41,6 +41,9 @@ def download_and_extract_mibig_metadata(
     Examples:
         >>> download_and_extract_mibig_metadata("/data/download", "/data/mibig_metadata")
     """
+    download_root = Path(download_root)
+    extract_path = Path(extract_path)
+
     if download_root == extract_path:
         raise ValueError("Identical path of download directory and extract directory")
 
