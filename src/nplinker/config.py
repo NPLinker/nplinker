@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from dynaconf import Dynaconf
 from dynaconf import Validator
+from nplinker.utils import transform_to_full_path
 
 
 # The Dynaconf library is used for loading NPLinker config file.
@@ -10,6 +11,7 @@ from dynaconf import Validator
 # directory.
 # The loaded config data is available by importing this module and accessing the 'config' variable.
 
+__all__ = ["config"]
 
 # Locate the user's config file
 user_config_file = os.environ.get("NPLINKER_CONFIG_FILE", "nplinker.toml")
@@ -29,7 +31,9 @@ config = Dynaconf(settings_files=[user_config_file], preload=[default_config_fil
 validators = [
     # General settings
     ## `root_dir` value is transformed to a `pathlib.Path` object and must be a directory.
-    Validator("root_dir", required=True, cast=Path, condition=lambda v: v.is_dir()),
+    Validator(
+        "root_dir", required=True, cast=transform_to_full_path, condition=lambda v: v.is_dir()
+    ),
     Validator("mode", required=True, cast=lambda v: v.lower(), is_in=["local", "podp"]),
     ## `podp_id` must be set if `mode` is "podp"; must not be set if `mode` is "local".
     Validator("podp_id", required=True, when=Validator("mode", eq="podp")),
