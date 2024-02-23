@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 import pytest
 from nplinker.nplinker import NPLinker
-from . import DATA_DIR
 
 
 # NOTE: This file only contains tests that run locally and are skipped on CI.
@@ -26,7 +25,7 @@ def get_file_hash(file_path):
 
 @pytest.fixture(scope="module")
 def npl() -> NPLinker:
-    npl = NPLinker(str(DATA_DIR / "nplinker_demo1.toml"))
+    npl = NPLinker()
     npl.load_data()
     hash_proj_file = get_file_hash(
         os.path.join(npl._loader._root.parent.parent, npl._loader._platform_id + ".json")

@@ -1,0 +1,6 @@
+# NPLinker default configurations
+
+loglevel = "INFO"
+logfile = ""
+log_to_stdout = true
+repro_file = ""

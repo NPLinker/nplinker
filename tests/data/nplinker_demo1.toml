@@ -3,6 +3,7 @@ logfile = ""
 repro_file = ""
 [dataset]
 root = "platform:MSV000079284"
+platform_id = "MSV000079284"
 
 [webapp]
 tables_metcalf_score = 3.0

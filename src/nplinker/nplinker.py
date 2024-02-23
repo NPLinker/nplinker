@@ -1,9 +1,8 @@
 from __future__ import annotations
-import copy
 import logging
 import sys
 from typing import TYPE_CHECKING
-from .config import Config
+from .config import config
 from .genomics import BGC
 from .genomics import GCF
 from .loader import NPLINKER_APP_DATA_DIR
@@ -36,79 +35,21 @@ class NPLinker:
         NPClassScoring.NAME: NPClassScoring,
     }
 
-    def __init__(self, userconfig=None):
-        """Initialise an NPLinker instance.
-
-        NPLinker instances can be configured in multiple ways, in ascending order of priority:
-
-        1. A global user-level default configuration file in TOML format, found in the directory XDG_CONFIG_HOME/nplinker/nplinker.toml
-        2. A local TOML configuration file
-        3. Command-line arguments / supplying a manually constructed parameter dictionary
-
-        The global user-level configuration file will be created automatically the first time
-        an NPLinker instance is initialised if it doesn't already exist. The default file contains
-        sensible default values for each setting and is intended to be copied and edited to
-        produce dataset-specific configuration files, which will then override any parameters shared
-        with the user-level file. To load such a file, simply set the "userconfig" parameter to a
-        string containing the filename.
-
-        It's also possible to selectively override configuration file parameters by
-        supplying command-line arguments (if running nplinker.py as a script), or by passing
-        a dict with a structure corresponding to the configuration file format to this method.
-
-        Some examples may make the various possible combinations a bit clearer::
-
-            # simplest option: load a local configuration file
-            > npl = NPLinker('myconfig.toml')
-
-            # the same thing but running as a script
-            > python -m nplinker.nplinker --config "myconfig.toml"
-
-            # use the defaults from the user-level config while modifying the root path
-            # to load the dataset from (this is the minimum you would need to change in the
-            # default config file)
-            > npl = NPLinker({'dataset': {'root': '/path/to/dataset'}})
-
-            # the same thing running NPLinker as a script
-            > python nplinker.py --dataset.root /path/to/dataset
-
-        Args:
-            userconfig: supplies user-defined configuration data. May take one of 3 types:
-
-                - str: treat as filename of a local configuration file to load
-                        (overriding the defaults)
-                - dict: contents will be used to override values in the dict generated
-                        from loading the configuration file(s)
-        """
-        # if userconfig is a string => create a dict with 'config' key and string as filename
-        # if userconfig is a dict => pass it to Config() directly
-        if isinstance(userconfig, str):
-            userconfig = {"config": userconfig}
-        elif not isinstance(userconfig, dict):
-            raise Exception(
-                'Invalid type for userconfig (should be None/str/dict, found "{}")'.format(
-                    type(userconfig)
-                )
-            )
-
-        self._config = Config(userconfig)
-
+    def __init__(self):
+        """Initialise an NPLinker instance."""
         # configure logging based on the supplied config params
-        LogConfig.setLogLevelStr(self._config.config["loglevel"])
-        logfile = self._config.config["logfile"]
-        if len(logfile) > 0:
+        LogConfig.setLogLevelStr(config.loglevel)
+        logfile = config.get("logfile")
+        if logfile:
             logfile_dest = logging.FileHandler(logfile)
             # if we want to log to stdout plus logfile, add the new destination
-            if self._config.config.get("log_to_stdout", True):  # default to True
+            if config.get("log_to_stdout"):  # default to True
                 LogConfig.addLogDestination(logfile_dest)
             else:
                 # otherwise overwrite the default stdout destination
                 LogConfig.setLogDestination(logfile_dest)
 
-        # the DatasetLoader takes care of figuring out the locations of all the relevant files/folders
-        # and will show error/warning if any missing (depends if optional or
-        # not)
-        self._loader = DatasetLoader(self._config.config)
+        self._loader = DatasetLoader()
 
         self._spectra = []
         self._bgcs = []
@@ -126,7 +67,7 @@ class NPLinker:
         self._mf_lookup = {}
 
         self._scoring_methods = {}
-        config_methods = self._config.config.get("scoring_methods", [])
+        config_methods = config.get("scoring_methods", [])
         for name, method in NPLinker.SCORING_METHODS.items():
             if len(config_methods) == 0 or name in config_methods:
                 self._scoring_methods[name] = method
@@ -139,8 +80,8 @@ class NPLinker:
         self._datalinks = None
 
         self._repro_data = {}
-        repro_file = self._config.config["repro_file"]
-        if len(repro_file) > 0:
+        repro_file = config.get("repro_file")
+        if repro_file:
             self.save_repro_data(repro_file)
 
     def _collect_repro_data(self):
@@ -175,15 +116,6 @@ class NPLinker:
             # TODO is pickle the best format to use?
             save_pickled_data(self._repro_data, repro_file)
             logger.info(f"Saving reproducibility data to {filename}")
-
-    @property
-    def config(self):
-        """Returns a copy of the data parsed from the configuration file as a dict.
-
-        Returns:
-                dict: configuration file parameters as a nested dict
-        """
-        return copy.deepcopy(self._config.config)
 
     @property
     def root_dir(self):

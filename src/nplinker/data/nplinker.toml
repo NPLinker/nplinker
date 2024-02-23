@@ -100,6 +100,7 @@ repro_file = ""
 # of the form: "platform:datasetID". For example, "platform:MSV000079284" would
 # load the dataset with ID MSV000079284.
 root = "<root directory of dataset>"
+platform_id = ""
 
 # you can optionally set the BIGSCAPE clustering cutoff value here. the default value
 # is 30, but any of the valid BIGSCAPE clustering thresholds can be used assuming the

@@ -1,6 +1,7 @@
 beautifulsoup4
 biopython
 deprecated
+dynaconf
 httpx
 numpy
 pandas
@@ -9,7 +10,5 @@ pyteomics
 pytest-lazy-fixture
 scipy
 sortedcontainers
-toml
 tqdm
 typing_extensions
-xdg
