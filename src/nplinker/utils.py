@@ -113,14 +113,6 @@ def check_md5(fpath: str | PathLike, md5: str) -> bool:
     return md5 == calculate_md5(fpath)
 
 
-def check_integrity(fpath: str | PathLike, md5: str | None = None) -> bool:
-    if not os.path.isfile(fpath):
-        return False
-    if md5 is None:
-        return True
-    return check_md5(fpath, md5)
-
-
 def download_url(
     url: str,
     root: str | PathLike,
@@ -150,7 +142,7 @@ def download_url(
     Path.mkdir(root, exist_ok=True)
 
     # check if file is already present locally
-    if check_integrity(fpath, md5):
+    if fpath.is_file() and md5 is not None and check_md5(fpath, md5):
         print("Using downloaded and verified file: " + str(fpath))
         return
 
@@ -171,8 +163,8 @@ def download_url(
                     num_bytes_downloaded = response.num_bytes_downloaded
 
     # check integrity of downloaded file
-    if not check_integrity(fpath, md5):
-        raise RuntimeError("File not found or corrupted, or md5 validation failed.")
+    if md5 is not None and not check_md5(fpath, md5):
+        raise RuntimeError("MD5 validation failed.")
 
 
 def list_dirs(root: str | PathLike, keep_parent: bool = True) -> list[str]:
