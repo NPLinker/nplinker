@@ -1,10 +1,6 @@
-import os
-import sys
 from pathlib import Path
 from nplinker.config import config
 
-
-PFAM_PATH = os.path.join(sys.prefix, "nplinker_lib")
 
 STRAIN_MAPPINGS_FILENAME = "strain_mappings.json"
 GENOME_BGC_MAPPINGS_FILENAME = "genome_bgc_mappings.json"
