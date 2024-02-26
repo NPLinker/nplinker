@@ -16,7 +16,6 @@ from nplinker.genomics.mibig import MibigLoader
 from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.globals import GENOME_STATUS_FILENAME
 from nplinker.globals import GNPS_FILE_MAPPINGS_FILENAME
-from nplinker.globals import PFAM_PATH
 from nplinker.globals import STRAIN_MAPPINGS_FILENAME
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import add_annotation_to_spectrum
@@ -26,7 +25,6 @@ from nplinker.metabolomics.gnps import GNPSAnnotationLoader
 from nplinker.metabolomics.gnps import GNPSMolecularFamilyLoader
 from nplinker.metabolomics.gnps import GNPSSpectrumLoader
 from nplinker.pairedomics.downloader import PODPDownloader
-from nplinker.pairedomics.runbigscape import run_bigscape
 from nplinker.pairedomics.strain_mappings_generator import podp_generate_strain_mappings
 from nplinker.strain_collection import StrainCollection
 from nplinker.strain_loader import load_user_strains
@@ -424,48 +422,6 @@ class DatasetLoader:
         logger.debug("Loading genomics data completed\n")
         return True
 
-    # TODO CG: run bigscape before loading and after downloading
-    def _run_bigscape(self):
-        # Check for spaces in the folder names under <dataset>/antismash and
-        # rename them by replacing spaces with underscores
-        if not self._antismash_ignore_spaces:
-            logger.debug("Checking for spaces in antiSMASH folder names...")
-            for root, dirs, _ in os.walk(self.antismash_dir):
-                for d in dirs:
-                    if d.find(" ") != -1:
-                        os.rename(os.path.join(root, d), os.path.join(root, d.replace(" ", "_")))
-                        logger.warn(
-                            'Renaming antiSMASH folder "{}" to "{}" to remove spaces! (suppress with ignore_spaces = true in config file)'.format(
-                                d, d.replace(" ", "_")
-                            )
-                        )
-
-        if not os.path.exists(self.bigscape_dir):
-            should_run_bigscape = self._config_docker.get("run_bigscape", self.RUN_BIGSCAPE_DEFAULT)
-            extra_bigscape_parameters = self._config_docker.get(
-                "extra_bigscape_parameters", self.EXTRA_BIGSCAPE_PARAMS_DEFAULT
-            )
-            if should_run_bigscape:
-                logger.info(
-                    'Running BiG-SCAPE! extra_bigscape_parameters="{}"'.format(
-                        extra_bigscape_parameters
-                    )
-                )
-                try:
-                    run_bigscape(
-                        "bigscape.py",
-                        os.path.join(self._root, "antismash"),
-                        os.path.join(self._root, "bigscape"),
-                        PFAM_PATH,
-                        extra_params=extra_bigscape_parameters,
-                    )
-                except Exception as e:
-                    logger.warning(
-                        'Failed to run BiG-SCAPE on antismash data, error was "{}"'.format(e)
-                    )
-
-                self.bigscape_dir = find_bigscape_dir(self.bigscape_dir)
-
     @deprecated(reason="To be refactored. It was used in the `self.load` method before.")
     def _load_class_info(self):
         """Load class match info (based on mibig) and chemical class predictions.
@@ -543,13 +499,3 @@ def find_via_glob_alts(paths, file_type, optional=False):
         )
 
     return filename
-
-
-def find_bigscape_dir(broot):
-    logger.info(f"Trying to discover correct bigscape directory under {broot}")
-    for root, _, files in os.walk(broot):
-        if "Network_Annotations_Full.tsv" in files:
-            logger.info(f"Found network files directory: {root}")
-            return root
-
-    return None
