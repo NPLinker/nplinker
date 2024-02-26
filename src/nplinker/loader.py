@@ -40,33 +40,9 @@ NPLINKER_APP_DATA_DIR = files("nplinker").joinpath("data")
 
 
 class DatasetLoader:
-    ANTISMASH_DELIMITERS_DEFAULT = [".", "_", "-"]
-    ANTISMASH_IGNORE_SPACES_DEFAULT = False
-
-    TABLES_CUTOFF_DEFAULT = 2.0
-
-    BIGSCAPE_CUTOFF_DEFAULT = 30
-    USE_MIBIG_DEFAULT = True
-    MIBIG_VERSION_DEFAULT = "3.1"
-
-    RUN_BIGSCAPE_DEFAULT = True
-
-    # https://git.wageningenur.nl/medema-group/BiG-SCAPE/-/wikis/parameters#mibig
-    # BigScape mibig default version is 3.1
-    EXTRA_BIGSCAPE_PARAMS_DEFAULT = "--mibig --clans-off --mix --include_singletons"
-
     RUN_CANOPUS_DEFAULT = False
     EXTRA_CANOPUS_PARAMS_DEFAULT = "--maxmz 600 formula zodiac structure canopus"
 
-    # keys for overriding metabolomics data elements
-    OR_GNPS_NODES = "gnps_nodes_file"
-    OR_GNPS_EDGES = "gnps_edges_file"
-    OR_GNPS_MGF = "gnps_mgf_file"
-    OR_GNPS_ANNOTATIONS = "gnps_annotations_file"
-    # and the same for genomics data
-    OR_ANTISMASH = "antismash_dir"
-    OR_BIGSCAPE = "bigscape_dir"
-    OR_MIBIG_JSON = "mibig_json_dir"
     OR_STRAINS = "strain_mappings_file"
     # misc files
     OR_INCLUDE_STRAINS = "include_strains_file"
@@ -74,42 +50,16 @@ class DatasetLoader:
     OR_CANOPUS = "canopus_dir"
     OR_MOLNETENHANCER = "molnetenhancer_dir"
 
-    BIGSCAPE_PRODUCT_TYPES = [
-        "NRPS",
-        "Others",
-        "PKSI",
-        "PKS-NRP_Hybrids",
-        "PKSother",
-        "RiPPs",
-        "Saccharides",
-        "Terpene",
-    ]
-
     def __init__(self):
         # load the config data
         self._config_docker = config.get("docker", {})
         self._config_webapp = config.get("webapp", {})
-        self._config_antismash = config.get("antismash", {})
         self._config_overrides = config.dataset.get("overrides", {})
         # set private attributes
-        self._antismash_delimiters = self._config_antismash.get(
-            "antismash_delimiters", self.ANTISMASH_DELIMITERS_DEFAULT
-        )
-        self._antismash_ignore_spaces = self._config_antismash.get(
-            "ignore_spaces", self.ANTISMASH_IGNORE_SPACES_DEFAULT
-        )
-        self._bigscape_cutoff = config.dataset.get("bigscape_cutoff", self.BIGSCAPE_CUTOFF_DEFAULT)
-        self._use_mibig = config.dataset.get("use_mibig", self.USE_MIBIG_DEFAULT)
-        self._mibig_version = config.dataset.get("mibig_version", self.MIBIG_VERSION_DEFAULT)
-        # TODO: the actual value of self._root is set in _start_downloads() method
         self._root = Path(config.dataset["root"])
         self._platform_id = config.dataset["platform_id"]
-        self._remote_loading = len(self._platform_id) > 0
 
         # set public attributes
-        self.dataset_id = (
-            os.path.split(self._root)[-1] if not self._remote_loading else self._platform_id
-        )
         self.bgcs, self.gcfs, self.spectra, self.molfams = [], [], [], []
         self.mibig_bgcs = []
         self.mibig_strains_in_use = StrainCollection()
@@ -121,33 +71,9 @@ class DatasetLoader:
         self.class_matches = None
         self.chem_classes = None
 
-        logger.debug(
-            "DatasetLoader({}, {}, {})".format(self._root, self.dataset_id, self._remote_loading)
-        )
-
-    def __repr__(self):
-        return "Root={}\n   MGF={}\n   EDGES={}\n   NODES={}\n   BIGSCAPE={}\n   ANTISMASH={}\n".format(
-            self._root,
-            self.gnps_mgf_file,
-            self.gnps_edges_file,
-            self.gnps_nodes_file,
-            self.bigscape_dir,
-            self.antismash_dir,
-        )
-
     def validate(self):
         """Download data and build paths for local data."""
-        # construct the paths and filenames required to load everything else and check
-        # they all seem to exist (but don't parse anything yet)
-        # TODO CG: the logics of _init_paths and _validate_paths are not clear
-        # 1. after downloading (manual preparation), some files alreay exist, some not
-        # 2. get the default, constructed or real path for each file/dir (need refactoring)
-        #   - self._config_overrides.get()
-        #   - os.path.join(self._root, 'strain_mappings.json')
-        #   - find_via_glob() --> actually check if the file/dir exists
-        # 3. check if (some) file/dir exists
         self._init_paths()
-        self._validate_paths()
 
     def generate_strain_mappings(self):
         generate_mappings_genome_id_bgc_id(self._root / "antismash")
@@ -191,10 +117,6 @@ class DatasetLoader:
             self._root, STRAIN_MAPPINGS_FILENAME
         )
 
-        self._init_metabolomics_paths()
-
-        self._init_genomics_paths()
-
         # 14. MISC: <root>/include_strains.csv / include_strains_file=<override>
         self.include_strains_file = self._config_overrides.get(
             self.OR_INCLUDE_STRAINS
@@ -209,91 +131,6 @@ class DatasetLoader:
         self.molnetenhancer_dir = self._config_overrides.get(
             self.OR_MOLNETENHANCER
         ) or os.path.join(self._root, "molnetenhancer")
-
-    def _init_metabolomics_paths(self):
-        """Initializes the paths for metabolomics data."""
-        # GNPS nodes_files is `file_mappings.tsv/csv` file
-        self.gnps_nodes_file = self._config_overrides.get(self.OR_GNPS_NODES) or find_via_glob_alts(
-            [
-                os.path.join(self._root, "file_mappings.csv"),
-                os.path.join(self._root, "file_mappings.tsv"),
-                os.path.join(self._root, "clusterinfo*", "*.tsv"),
-                os.path.join(self._root, "clusterinfo*", "*.clustersummary"),
-            ],
-            self.OR_GNPS_NODES,
-        )
-
-        # GNPS edges_file is `molecular_families.tsv` file
-        self.gnps_edges_file = self._config_overrides.get(self.OR_GNPS_EDGES) or find_via_glob_alts(
-            [
-                os.path.join(self._root, "molecular_families.tsv"),
-                os.path.join(self._root, "*.pairsinfo"),
-                os.path.join(self._root, "networkedges_selfloop", "*.pairsinfo"),
-                os.path.join(self._root, "networkedges_selfloop", "*.selfloop"),
-            ],
-            self.OR_GNPS_EDGES,
-        )
-
-        # GNPS mgf_file is `spectra.mgf` file
-        self.gnps_mgf_file = self._config_overrides.get(self.OR_GNPS_MGF) or find_via_glob_alts(
-            [
-                os.path.join("spectra.mgf"),
-                os.path.join(self._root, "*.mgf"),
-                os.path.join(self._root, "spectra", "*.mgf"),
-            ],
-            self.OR_GNPS_MGF,
-        )
-
-        # GNPS annotations_file is `annotations.tsv` file
-        self.gnps_annotations_file = self._config_overrides.get(
-            self.OR_GNPS_ANNOTATIONS
-        ) or find_via_glob_alts(
-            [
-                os.path.join(self._root, "annotations.tsv"),
-                os.path.join(self._root, "DB_result", "*.tsv"),
-                os.path.join(self._root, "result_specnets_DB", "*.tsv"),
-            ],
-            self.OR_GNPS_ANNOTATIONS,
-        )
-
-    def _init_genomics_paths(self):
-        # 9. GEN: <root>/antismash / antismash_dir=<override>
-        self.antismash_dir = self._config_overrides.get(self.OR_ANTISMASH) or os.path.join(
-            self._root, "antismash"
-        )
-        self.antismash_cache = {}
-
-        # 10. GEN: <root>/bigscape / bigscape_dir=<override>
-        self.bigscape_dir = self._config_overrides.get(self.OR_BIGSCAPE) or os.path.join(
-            self._root, "bigscape"
-        )
-        # what we really want here is the subdirectory containing the network/annotation files,
-        # but in case this is the path to the top level bigscape output, try to figure it out automatically
-        if not os.path.exists(os.path.join(self.bigscape_dir, "mix")):
-            new_bigscape_dir = find_bigscape_dir(self.bigscape_dir)
-            if new_bigscape_dir is not None:
-                logger.info(
-                    "Updating bigscape_dir to discovered location {}".format(new_bigscape_dir)
-                )
-                self.bigscape_dir = new_bigscape_dir
-
-        # 11. GEN: <root>/mibig_json / mibig_json_dir=<override>
-        self.mibig_json_dir = self._config_overrides.get(self.OR_MIBIG_JSON) or os.path.join(
-            self._root, "mibig_json"
-        )
-
-    def _validate_paths(self):
-        """Validates that the required files and directories exist before loading starts."""
-        required_paths = [
-            self.gnps_nodes_file,
-            self.gnps_edges_file,
-            self.gnps_mgf_file,
-            self.antismash_dir,
-        ]
-
-        for f in required_paths:
-            if not os.path.exists(str(f)):
-                raise FileNotFoundError(f'File/directory "{f}" does not exist.')
 
     def _load_strain_mappings(self):
         # 1. load strain mappings
