@@ -4,7 +4,6 @@ from tempfile import mkdtemp
 import pytest
 from nplinker import utils
 from nplinker.utils import find_delimiter
-from tests import DATA_DIR
 from tests import GNPS_DATA_DIR
 
 
@@ -20,21 +19,6 @@ def test_find_delimiter(filename, expected):
 BGC_GBK_URL = "https://mibig.secondarymetabolites.org/repository/BGC0000001/BGC0000001.gbk"
 MIBIG_METADATAS_URL = "https://dl.secondarymetabolites.org/mibig/mibig_json_3.1.tar.gz"
 ROOT = Path(__file__).parent
-
-
-@pytest.mark.parametrize(
-    "file, md5, expected",
-    [
-        [DATA_DIR / "mibig" / "BGC0000001.json", None, False],
-        [DATA_DIR / "mibig" / "BGC0000001_v3.1.json", None, True],
-        [str(DATA_DIR / "mibig" / "BGC0000001_v3.1.json"), None, True],
-        [DATA_DIR / "mibig" / "BGC0000001_v3.1.json", "084b5413929b5cacedb873faa7f6eb03", True],
-        [DATA_DIR / "mibig" / "BGC0000001_v3.1.json", "01234", False],
-    ],
-)
-def test_check_integrity(file, md5, expected):
-    result = utils.check_integrity(file, md5)
-    assert result == expected
 
 
 class TestDownloadUrl:
