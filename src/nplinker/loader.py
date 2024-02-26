@@ -24,7 +24,6 @@ from nplinker.metabolomics import add_strains_to_spectrum
 from nplinker.metabolomics.gnps import GNPSAnnotationLoader
 from nplinker.metabolomics.gnps import GNPSMolecularFamilyLoader
 from nplinker.metabolomics.gnps import GNPSSpectrumLoader
-from nplinker.pairedomics.downloader import PODPDownloader
 from nplinker.pairedomics.strain_mappings_generator import podp_generate_strain_mappings
 from nplinker.strain_collection import StrainCollection
 from nplinker.strain_loader import load_user_strains
@@ -138,11 +137,6 @@ class DatasetLoader:
 
     def validate(self):
         """Download data and build paths for local data."""
-        # if remote loading mode, need to download the data here
-        # CG: for PODP workflow, strain_mappings.json is generated in the download step
-        if self._remote_loading:
-            self._start_downloads()
-
         # construct the paths and filenames required to load everything else and check
         # they all seem to exist (but don't parse anything yet)
         # TODO CG: the logics of _init_paths and _validate_paths are not clear
@@ -190,24 +184,6 @@ class DatasetLoader:
             raise Exception(f"Failed to find *ANY* strains, missing {STRAIN_MAPPINGS_FILENAME}?")
 
         return True
-
-    def _start_downloads(self):
-        downloader = PODPDownloader(self._platform_id)
-        # TODO CG: this step generates the real path for _root. Should generate
-        # it before loading process starts. Otherwise, npl.root_dir will get
-        # wrong value if loading from local data or not using download.
-        self._root = Path(downloader.project_results_dir)
-        logger.debug("remote loading mode, configuring root=%s", self._root)
-        # CG: to download both MET and GEN data
-        # CG: Continue to understand how strain_mappings.json is generated
-        downloader.get(
-            self._config_docker.get("run_bigscape", self.RUN_BIGSCAPE_DEFAULT),
-            self._config_docker.get(
-                "extra_bigscape_parameters", self.EXTRA_BIGSCAPE_PARAMS_DEFAULT
-            ),
-            self._use_mibig,
-            self._mibig_version,
-        )
 
     def _init_paths(self):
         # 1. strain mapping are used for everything else so
