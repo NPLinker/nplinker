@@ -23,6 +23,7 @@ logger = LogConfig.getLogger(__name__)
 
 # NOTE: for simplicity this is currently written with assumption it will only be
 # called in context of nplinker Docker image, where bigscape should be available
+PFAM_PATH = os.path.join(sys.prefix, "nplinker_lib")
 
 
 def run_bigscape(
