@@ -2,6 +2,7 @@ from __future__ import annotations
 import logging
 import sys
 from typing import TYPE_CHECKING
+from .arranger import DatasetArranger
 from .config import config
 from .genomics import BGC
 from .genomics import GCF
@@ -38,12 +39,12 @@ class NPLinker:
     def __init__(self):
         """Initialise an NPLinker instance."""
         # configure logging based on the supplied config params
-        LogConfig.setLogLevelStr(config.loglevel)
-        logfile = config.get("logfile")
+        LogConfig.setLogLevelStr(config.log.level)
+        logfile = config.get("log.file")
         if logfile:
             logfile_dest = logging.FileHandler(logfile)
             # if we want to log to stdout plus logfile, add the new destination
-            if config.get("log_to_stdout"):  # default to True
+            if config.get("log.to_stdout"):  # default to True
                 LogConfig.addLogDestination(logfile_dest)
             else:
                 # otherwise overwrite the default stdout destination
@@ -124,22 +125,7 @@ class NPLinker:
         Returns:
                 str: the path to the dataset root directory currently in use
         """
-        return self._loader._root
-
-    @property
-    def dataset_id(self):
-        """Returns dataset "ID".
-
-        For local datasets this will just be the last component of the directory path,
-        e.g. /path/to/my_dataset would produce an ID of "my_dataset".
-
-        For datasets loaded from the Paired Omics platform the ID will be the platform
-        project ID, e.g. "MSV000079284"
-
-        Returns:
-            str: the dataset ID
-        """
-        return self._loader.dataset_id
+        return config.root_dir
 
     @property
     def data_dir(self):
@@ -149,30 +135,13 @@ class NPLinker:
     @property
     def bigscape_cutoff(self):
         """Returns the current BiGSCAPE clustering cutoff value."""
-        return self._loader._bigscape_cutoff
+        return config.bigscape.cutoff
 
-    def load_data(self, new_bigscape_cutoff=None):
-        """Loads the basic components of a dataset.
-
-        This method is responsible for loading the various pieces of the supplied dataset into
-        memory and doing any initial parsing/object manipulation required. After it completes,
-        applications can access the lists of GCFs, Spectra, MolecularFamilies and strains
-        using the corresponding properties of the NPLinker class.
-
-        Returns:
-            bool: True if successful, False otherwise
-        """
-        logger.debug("load_data(new_bigscape_cutoff=%s)", new_bigscape_cutoff)
-        if new_bigscape_cutoff is None:
-            self._loader.validate()
-            self._loader.generate_strain_mappings()
-            if not self._loader.load():
-                return False
-        else:
-            # CG: only reload genomics data when changing bigscape cutoff
-            self._loader._bigscape_cutoff = new_bigscape_cutoff
-            # TODO: only need to reload gcfs using load_gcfs()
-            self._loader._load_genomics()
+    def load_data(self):
+        """Loads the basic components of a dataset."""
+        arranger = DatasetArranger()
+        arranger.arrange()
+        self._loader.load()
 
         self._spectra = self._loader.spectra
         self._molfams = self._loader.molfams
@@ -183,20 +152,6 @@ class NPLinker:
         self._product_types = self._loader.product_types
         self._chem_classes = self._loader.chem_classes
         self._class_matches = self._loader.class_matches
-
-        logger.debug("Generating lookup tables: genomics")
-        self._bgc_lookup = {bgc.bgc_id: bgc for bgc in self._bgcs}
-        self._gcf_lookup = {gcf.gcf_id: gcf for gcf in self._gcfs}
-
-        # don't need to do these two if cutoff changed (indicating genomics data
-        # was reloaded but not metabolomics)
-        if new_bigscape_cutoff is None:
-            logger.debug("Generating lookup tables: metabolomics")
-            self._spec_lookup = {spec.spectrum_id: spec for spec in self._spectra}
-            self._mf_lookup = {mf.family_id: mf for mf in self._molfams}
-
-        logger.debug("load_data: completed")
-        return True
 
     # TODO CG: refactor this method and update its unit tests
     def get_links(self, input_objects, scoring_methods, and_mode=True):
