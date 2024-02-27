@@ -1,4 +1,3 @@
-import glob
 import os
 from pathlib import Path
 from deprecated import deprecated
@@ -291,24 +290,3 @@ class DatasetLoader:
         # include them in loader
         self.chem_classes = chem_classes
         return True
-
-
-def find_via_glob_alts(paths, file_type, optional=False):
-    filename = None
-    for path in paths:
-        try:
-            filename = glob.glob(path)[0]
-            break
-        except (OSError, IndexError):
-            continue
-
-    if filename is None and not optional:
-        raise Exception(
-            "ERROR: unable to find {} in {} paths: ({})".format(file_type, len(paths), paths)
-        )
-    elif filename is None:
-        logger.warning(
-            "WARNING: unable to find {} in {} paths: ({})".format(file_type, len(paths), paths)
-        )
-
-    return filename
