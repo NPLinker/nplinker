@@ -3,13 +3,20 @@ import json
 import shutil
 from glob import glob
 from pathlib import Path
+from jsonschema import validate
 import nplinker.globals as globals
 from nplinker.config import config
+from nplinker.genomics import generate_mappings_genome_id_bgc_id
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
+from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
+from nplinker.globals import GENOME_STATUS_FILENAME
+from nplinker.globals import STRAIN_MAPPINGS_FILENAME
 from nplinker.metabolomics.gnps import GNPSDownloader
 from nplinker.metabolomics.gnps import GNPSExtractor
 from nplinker.pairedomics import podp_download_and_extract_antismash_data
 from nplinker.pairedomics.runbigscape import run_bigscape
+from nplinker.pairedomics.strain_mappings_generator import podp_generate_strain_mappings
+from nplinker.schemas import STRAIN_MAPPINGS_SCHEMA
 from nplinker.schemas import validate_podp_json
 from nplinker.utils import download_url
 from nplinker.utils import list_dirs
@@ -46,6 +53,7 @@ class DatasetArranger:
         self.arrange_gnps()
         self.arrange_antismash()
         self.arrange_bigscape()
+        self.arrange_strain_mappings()
 
     def arrange_podp_project_json(self) -> None:
         """Arrange the PODP project JSON file.
@@ -242,6 +250,62 @@ class DatasetArranger:
         )
         for f in glob(str(output / "network_files" / "*" / "mix" / "mix_clustering_c*.tsv")):
             shutil.copy(f, globals.BIGSCAPE_DEFAULT_PATH)
+
+    def arrange_strain_mappings(self) -> None:
+        """Arrange the strain mappings file.
+
+        If `config.mode` is "local", validate the strain mappings file.
+        If `config.mode` is "podp", always generate the strain mappings file and validate it.
+
+        The valiation checks if the strain mappings file exists and if it is a valid JSON file
+        according to the schema defined in `schemas/strain_mappings_schema.json`.
+        """
+        if config.mode == "podp":
+            self._generate_strain_mappings()
+
+        self._validate_strain_mappings()
+
+    def _validate_strain_mappings(self) -> None:
+        """Validate the strain mappings file.
+
+        The validation process includes:
+        - Check if the strain mappings file exists.
+        - Check if the strain mappings file is a valid JSON file according to the schema defined in
+            `schemas/strain_mappings_schema.json`.
+
+        Raises:
+            FileNotFoundError: If the strain mappings file is not found.
+            ValidationError: If the strain mappings file is not a valid JSON file according to the
+                schema.
+        """
+        strain_mappings_file = config.root_dir / STRAIN_MAPPINGS_FILENAME
+
+        if not strain_mappings_file.exists():
+            raise FileNotFoundError(f"Strain mappings file not found at {strain_mappings_file}")
+
+        with open(strain_mappings_file, "r") as f:
+            json_data = json.load(f)
+        # Will raise ValidationError if the JSON file is invalid
+        validate(instance=json_data, schema=STRAIN_MAPPINGS_SCHEMA)
+
+    def _generate_strain_mappings(self) -> None:
+        """Generate the strain mappings file for the PODP mode."""
+        podp_json_file = globals.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
+        genome_status_json_file = globals.DOWNLOADS_DEFAULT_PATH / GENOME_STATUS_FILENAME
+        genome_bgc_mappings_file = globals.ANTISMASH_DEFAULT_PATH / GENOME_BGC_MAPPINGS_FILENAME
+        gnps_file_mapping_file = self.gnps_file_mappings_file
+        strain_mappings_file = config.root_dir / STRAIN_MAPPINGS_FILENAME
+
+        # generate the genome_bgc_mappings_file
+        generate_mappings_genome_id_bgc_id(globals.ANTISMASH_DEFAULT_PATH)
+        # generate the strain_mappings_file
+        podp_generate_strain_mappings(
+            podp_json_file,
+            genome_status_json_file,
+            genome_bgc_mappings_file,
+            gnps_file_mapping_file,
+            strain_mappings_file,
+        )
 
 
 def validate_gnps(gnps_dir: Path) -> None:
