@@ -7,14 +7,10 @@ from nplinker.class_info.runcanopus import run_canopus
 from nplinker.config import config
 from nplinker.genomics import add_bgc_to_gcf
 from nplinker.genomics import add_strain_to_bgc
-from nplinker.genomics import generate_mappings_genome_id_bgc_id
 from nplinker.genomics import get_mibig_from_gcf
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.bigscape import BigscapeGCFLoader
 from nplinker.genomics.mibig import MibigLoader
-from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
-from nplinker.globals import GENOME_STATUS_FILENAME
-from nplinker.globals import GNPS_FILE_MAPPINGS_FILENAME
 from nplinker.globals import STRAIN_MAPPINGS_FILENAME
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import add_annotation_to_spectrum
@@ -23,7 +19,6 @@ from nplinker.metabolomics import add_strains_to_spectrum
 from nplinker.metabolomics.gnps import GNPSAnnotationLoader
 from nplinker.metabolomics.gnps import GNPSMolecularFamilyLoader
 from nplinker.metabolomics.gnps import GNPSSpectrumLoader
-from nplinker.pairedomics.strain_mappings_generator import podp_generate_strain_mappings
 from nplinker.strain_collection import StrainCollection
 from nplinker.strain_loader import load_user_strains
 
@@ -73,24 +68,6 @@ class DatasetLoader:
     def validate(self):
         """Download data and build paths for local data."""
         self._init_paths()
-
-    def generate_strain_mappings(self):
-        generate_mappings_genome_id_bgc_id(self._root / "antismash")
-
-        podp_project_json_file = self._root.parent.parent / (self._platform_id + ".json")
-        genome_status_json_file = (
-            self._root.parent.parent / "downloads" / self._platform_id / GENOME_STATUS_FILENAME
-        )
-        genome_bgc_mappings_file = self._root / "antismash" / GENOME_BGC_MAPPINGS_FILENAME
-        gnps_file_mapping_tsv_file = self._root / GNPS_FILE_MAPPINGS_FILENAME
-
-        podp_generate_strain_mappings(
-            podp_project_json_file,
-            genome_status_json_file,
-            genome_bgc_mappings_file,
-            gnps_file_mapping_tsv_file,
-            self.strain_mappings_file,
-        )
 
     def load(self):
         if not self._load_strain_mappings():

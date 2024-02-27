@@ -165,7 +165,6 @@ class NPLinker:
         logger.debug("load_data(new_bigscape_cutoff=%s)", new_bigscape_cutoff)
         if new_bigscape_cutoff is None:
             self._loader.validate()
-            self._loader.generate_strain_mappings()
             if not self._loader.load():
                 return False
         else:
