@@ -112,6 +112,25 @@ class DatasetArranger:
                     shutil.rmtree(globals.GNPS_DEFAULT_PATH, ignore_errors=True)
                     self._download_and_extract_gnps()
 
+        # get the path to file_mappings file (csv or tsv)
+        self.gnps_file_mappings_file = self._get_gnps_file_mappings_file()
+
+    def _get_gnps_file_mappings_file(self) -> Path:
+        """Get the GNPS file mappings file.
+
+        The GNPS file mappings file is either "file_mappings.tsv" or "file_mappings.csv" in the
+        default GNPS directory.
+        """
+        file_mappings_tsv = globals.GNPS_DEFAULT_PATH / "file_mappings.tsv"
+        file_mappings_csv = globals.GNPS_DEFAULT_PATH / "file_mappings.csv"
+
+        if file_mappings_tsv.exists():
+            gnps_file_mappings_file = file_mappings_tsv
+        elif file_mappings_csv.exists():
+            gnps_file_mappings_file = file_mappings_csv
+
+        return gnps_file_mappings_file
+
     def _download_and_extract_gnps(self) -> None:
         """Download and extract the GNPS data.
 
