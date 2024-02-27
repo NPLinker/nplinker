@@ -1,9 +1,3 @@
-loglevel = "DEBUG"
-logfile = ""
-repro_file = ""
-[dataset]
-root = "platform:MSV000079284"
-platform_id = "MSV000079284"
-
-[webapp]
-tables_metcalf_score = 3.0
+root_dir = "@format {env[NPLINKER_ROOT_DIR]}"
+mode = "podp"
+podp_id = "4b29ddc3-26d0-40d7-80c5-44fb6631dbf9.4"

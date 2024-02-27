@@ -1,321 +1,63 @@
+#############################
 # NPLinker configuration file
-# ---------------------------
+#############################
 
-# general options
-# log level (DEBUG/INFO/WARNING/ERROR)
-loglevel = "INFO"
-# if you want to redirect log messages from stdout to a file, set a valid path here
-logfile = ""
-# and if you still want to see log messages on stdout in addition to writing to
-# the logfile, set this to true
-log_to_stdout = true
-repro_file = ""
+# The root directory of the NPLinker project. You need to create it first.
+# The value is required and must be a full path.
+root_dir = "<NPLinker root directory>"
+# The mode for preparing dataset.
+# The available modes are "podp" and "local".
+# "podp" mode is for using the PODP platform (https://pairedomicsdata.bioinformatics.nl/) to prepare the dataset.
+# "local" mode is for preparing the dataset locally. So uers do not need to upload their data to the PODP platform.
+# The value is required.
+mode = "podp"
+# The PODP project identifier.
+# The value is required if the mode is "podp".
+podp_id = ""
 
-# scoring_methods to be enabled. currently available:
-#   - metcalf
-#   - rosetta
-#   - testscore (only for debug use)
-#
-# The default is to enable all available methods.
-# scoring_methods = ["metcalf", "rosetta"]
 
-# Dataset configuration
-# ---------------------
-# NPLinker supports two basic methods for loading datasets:
-#
-#   1. All files stored locally
-#   2. Some/all files retrieved from the paired omics platform (http://pairedomicsdata.bioinformatics.nl/)
-#
-# The method you want to use determines the values that should be populated in
-# the [dataset] section below. If working with a purely local dataset, NPLinker
-# defaults to looking for all the necessary files in a single directory, given
-# by the "root" parameter.
-#
-# Alternatively, to load metabolomics data from the paired platform, set the "root"
-# parameter to "platform:<projectID>", where "<projectID>" is taken from the platform
-# project list. For example, "platform:MSV000079284" would select the dataset with
-# the ID MSV000079284.
-#
-# For more details see below.
-#
-# 1. Loading local datasets
-# -------------------------
-# Generally speaking the dataset layout the application expects matches the structure
-# of the output from a GNPS job. Workflows that are known to work so far are:
-#
-#  - METABOLOMICS-SNETS (version 1.2.3)
-#  - METABOLOMICS-SNETS-V2 (version release_14)
-#  - FEATURE-BASED-MOLECULAR-NETWORKING (version 1.2.3)
-#
-# The simplest starting point is to download the "Clustered Spectra as MGF" zip
-# file from GNPS and extract that into a folder to serve as the root directory for the dataset.
-# antiSMASH and BiG-SCAPE output are then added as additional subfolders.
-#
-# Typically all you will need to do is tell NPLinker where the root directory
-# is located. Otherwise you can customise the locations of the individual elements
-# using the various override settings below.
-#
-# The layout is as follows (see the documentation for more details):
-# <root>
-#   |- strain_mappings.csv (strain ID mappings)
-#   |   (METABOLOMICS DATA)
-#   |- clusterinfo*/<UID>.tsv (spectrum metadata, NOTE: NPLinker will search any folder beginning with "clusterinfo")
-#   |- networkedges_selfloop/<UID>.selfloop (the "edges" file for spectra network)
-#   |- spectra/*.mgf (mass spec data)
-#   |- DB_result/*.tsv (GNPS and other spectral annotation files, optional)
-#   |- result_specnets_DB/*.tsv (GNPS and other spectral annotation files, optional)
-#   |- DB_result/annotations.tsv (annotation data to extract from each file, see docs for details)
-#   |- params.xml (optional, params.xml from GNPS job output)
-#       (GENOMICS DATA)
-#   |- antismash/*.gbk (antiSMASH GenBank files for the BGCs in the dataset)
-#   |- bigscape/<classes subfolders> (BiG-SCAPE clustering/annotation files in their subfolders)
-#       (MISC DATA)
-#   |- description.txt (a freeform optional text file containing information about a dataset)
-#   |- include_strains.csv (optional list of strain IDs to explicitly include when loading, others excluded)
-#
-# 2. Loading platform datasets
-# ----------------------------
-# Given a platform ID, NPLinker will retrieve the associated metabolomics data using the
-# GNPS task ID. By default, it will also attempt to retrieve any available
-# genomics data from the antiSMASH database using the RefSeq accession labels
-# in the platform project data.
-#
-# However, if you have local antismash results instead, you should also set the
-# location of those files using the "antismash_dir" parameter in the
-# [dataset.overrides] section. NPLinker can optionally also run bigscape on
-# these results during the loading process. If you already have bigscape results
-# you can additionally set the "bigscape_dir" parameter to the appropriate
-# location to skip this step (or simply place them inside the <root>/bigscape folder)
-#
-# All files are downloaded and extracted to locations inside ~/nplinker_data. On Windows
-# this corresponds to C:\Users\<username>\nplinker_data.
+[log]
+# Log level. The available levels are same as the levels in python package `logging`:
+# "NOTSET", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL".
+# The default value is "INFO".
+level = "INFO"
+# Redirect the log messages from stdout to a log file. If not set, the log messages will only be
+# printed to stdout.
+# The value is optional and must be a full path if set.
+file = "path/to/logfile"
+# Whether to print log messages to stdout in addition to writing to the logfile.
+# The default value is true.
+to_stdout = true
 
-# Dataset configuration settings
-[dataset]
-# If the dataset has the expected directory structure, this value is all that's required.
-# It should be set to the path of the local directory containing the various data files
-# described above.
-#
-# If you want to load a dataset from the paired platform, the value should be a string
-# of the form: "platform:datasetID". For example, "platform:MSV000079284" would
-# load the dataset with ID MSV000079284.
-root = "<root directory of dataset>"
-platform_id = ""
 
-# you can optionally set the BIGSCAPE clustering cutoff value here. the default value
-# is 30, but any of the valid BIGSCAPE clustering thresholds can be used assuming the
-# corresponding files exist in the dataset. Also note that it's possible to change this
-# value after the dataset has initially been loaded, which will cause only the affected
-# data to be reloaded. Possibly only useful for the webapp
-#bigscape_cutoff = 30
+[mibig]
+# Whether to use mibig metadta (json).
+# The default value is true.
+to_use = true
+# The version of mibig metadata.
+# Make sure using the same version of mibig in bigscape.
+# The default value is "3.1"
+version = "3.1"
 
-# NPLinker can automatically download a copy of the MiBIG database in the JSON
-# format it expects to find, and place it in the same folder as the current dataset.
-# This behaviour is enabled by default. If you wish to disable it for any reason
-# change the value of this setting to "false".
-#use_mibig = true
 
-# When the "use_mibig" setting described above is set to "true", NPLinker will use
-# the value of this setting to determine which version of the MiBIG database should
-# be downloaded. The default is "1.4". If you need a newer version, define the
-# value to be the appropriate version, e.g. "2.0". Currently tested versions are
-# "1.4" and "2.0".
-#
-# NOTE: the value MUST be a string (i.e. enclosed by " characters: "2.0" not 2.0)
-#mibig_version = "1.4"
+[bigscape]
+# The parameters to use for running BiG-SCAPE.
+# Required bigscape parameters are `--mix`, `--include_singletons` and `--cutoffs`. NPLinker needs
+# them to run the analysis properly.
+# Parameters that must NOT exist: `--inputdir`, `--outputdir`, `--pfam_dir`. NPLinker will
+# automatically configure them.
+# If parameter `--mibig` is set, make sure setting the config `mibig.to_use` to true and
+# `mibig.version` to the version of mibig in bigscape.
+# The default value is "--mibig --clans-off --mix --include_singletons --cutoffs 0.30".
+parameters = "--mibig --clans-off --mix --include_singletons --cutoffs 0.30"
+# Which bigscape cutoff to use for NPLinker analysis.
+# There might be multiple cutoffs in bigscape output.
+# The default value is 0.30.
+cutoff = 0.30
 
-[antismash]
-# antismash file structure. Should be either 'default' or 'flat'.
-# default = the standard structure with nested subdirectories
-# flat = all .gbk files placed in a single flat directory
-# TODO: is "flat" required any more?
-antismash_format = "default"
 
-# NPLinker needs to know how to parse antiSMASH filenames from BiG-SCAPE output
-# to identify strain labels as part of the process of loading a dataset.
-# Since the format of the filenames can vary from dataset to dataset, there isn't
-# a single rule that can be applied here. In most cases, the required action is
-# "take all text up to the first occurrence of <character>", e.g. the first
-# underscore or period character. By default NPLinker will try the set of characters
-# defined below in sequence until a match is found. If you need to override this
-# then define a new list of at least one character to search for (note that it
-# doesn't need to be a single character, e.g. ".abc" would also work)
-# antismash_delimiters = [".", "_", "-"]
-
-# if using the Docker version of NPLinker which contains BiG-SCAPE and can run it
-# automatically, you can choose to have the application automatically rename any
-# files under the <root>/antismash folder which contain spaces in their filenames
-# (both subfolders and .gbk files). This is to avoid BiG-SCAPE throwing up errors
-# because it can't handle filenames with spaces in them. If you already have
-# BiG-SCAPE results or don't want NPLinker to rename anything automatically, set
-# this to true instead
-ignore_spaces = false
-
-[docker]
-# this optional section contains various settings that only apply to the dockerised
-# version of NPLinker. The Docker image contains BiG-SCAPE, and this tool can be run
-# as part of the dataset loading process. If you want to enable/disable this, and
-# configure the parameters used, this can be done by modifying the settings below.
-
-# enable or disable running BiG-SCAPE on a dataset being used with the NPLinker Docker
-# image. If false, you must have existing BiG-SCAPE results for your dataset in the
-# format NPLinker expects (described above). If true, the copy of BiG-SCAPE installed
-# in the Docker image will be run on the directory containing the antiSMASH data for
-# the selected dataset, using the parameters configured below.
-# The default value is true
-run_bigscape = true
-
-# The extra_bigscape_parameters setting allows you to configure the parameters passed
-# to the BiG-SCAPE application when it's executed inside an NPLinker Docker image. In
-# most cases you won't need to adjust this, but if you want extra control over
-# the BiG-SCAPE run you can edit the default value to add/remove/change the supplied
-# parameters.
-#
-# The available parameters are listed on the BiG-SCAPE wiki at:
-#    https://git.wageningenur.nl/medema-group/BiG-SCAPE/-/wikis/parameters
-#
-# NPLinker will automatically configure the following parameter values so you
-# never need to include them:
-#   -i/--inputdir
-#   -o/--outputdir
-#   --pfam_dir
-#
-# NOTE: by default NPLinker will pass the "--mibig" parameter to BiG-SCAPE,
-# including MiBIG BGCs in the analysis. If you do NOT want to include this, you
-# will need to edit the default value and remove the "--mibig" section.
-#
-# Similarly, the "--clans-off" parameter is also passed by default. This disables
-# the BiG-SCAPE feature which performs a second level of clustering on GCFs.
-#
-# For example, to use a different set of cutoffs and enable verbose mode while
-# retaining the other defaults:
-#   extra_bigscape_parameters = "--mibig --clans-off --cutoffs 0.3 0.4 0.5 -v"
-#
-# Or to do the same with MiBIG disabled:
-#   extra_bigscape_parameters = "--clans-off --cutoffs 0.3 0.4 0.5 -v"
-#
-# Or to limit the number of cores used:
-#   extra_bigscape_parameters = "--mibig --clans-off --cores 4"
-#
-# The default simply enables MiBIG, disables the extra GCF clustering step. If you
-# need to select a particular version of the MiBIG database, see the "mibig_version"
-# setting.
-# Note that BiG-SCAPE defaults to using 0.3 as a clustering cutoff if "--cutoffs"
-# is not set.
-#extra_bigscape_parameters = "--mibig --clans-off"
-
-# The Docker image also contains SIRIUS to run CANOPUS, and this tool can be run
-# as part of the dataset loading process. If you want to enable/disable this, and
-# configure the parameters used, this can be done by modifying the settings below.
-
-# enable or disable running CANOPUS on a dataset being used with the NPLinker Docker
-# image. If false, you should have CANOPUS results already present in the canopus
-# directory if you want to use chemical class predictions from CANOPUS. If true,
-# the copy of SIRIUS installed
-# in the Docker image will be run on mgf file with the spectra data for
-# the selected dataset, using the parameters configured below.
-# The default value is false
-# NOTE: if run_canopus is true but NPLinker is not run from the docker image,
-# NPLinker also tries to look for SIRIUS in path.
-run_canopus = false
-
-# The extra_canopus_parameters setting allows you to configure the parameters passed
-# to the SIRIUS when run within NPLinker. In most cases you won't need to adjust
-# this, but if you want extra control over the SIRIUS/CANOPUS run you can edit
-# the default value to add/remove/change the supplied parameters.
-#
-# The available parameters are listed on the SIRIUS documentation at:
-#    https://boecker-lab.github.io/docs.sirius.github.io/cli/
-#
-# NPLinker will automatically configure the following parameter values so you
-# never need to include them:
-#   -i/--inputdir
-#   -o/--outputdir
-#
-# NOTE: the "canopus" parameter should always be passed to SIRIUS, as this is
-# responsible for running CANOPUS.
-# NOTE: The --maxmz is an important parameter as it only runs for spectra below
-# this mass cutoff. The default is 600 which will probably take at most a few hours
-# for moderate datasets. If you want CANOPUS to finish within 24 hours, we
-# recommend not setting this cutoff above 850 Da.
-#
-# The "formula zodiac structure" parameters are also passed by default.
-# This runs the other normal features of SIIRUS to get the best CANOPUS predictions.
-#
-# For example, to use a different maxmz cutoff while using a different loggin level
-# retaining the other defaults:
-#   extra_canopus_parameters = "--maxmz 850 --log FINER formula zodiac structure canopus"
-#
-# Or to do the same with ZODIAC disabled:
-#   extra_canopus_parameters = "--maxmz 850 --log FINER formula structure canopus"
-#
-# The default uses a --maxmz 600 cutoff, and uses formula zodiac structure canopus.
-# Note that SIRIUS defaults to using infinity as a maxmz cutoff if "--maxmz"
-# is not set.
-extra_canopus_parameters = "--maxmz 600 formula zodiac structure canopus"
-
-# this optional section contains various settings that only affect the webapp interface
-# for NPLinker. If you're not using it, you can leave this out of your configuration.
-[webapp]
-# A fundamental part of the webapp is a set of tables which display objects in the dataset
-# that have been found to have links, based on the output of the Metcalf scoring method.
-# The value of this parameter is the minimum Metcalf score that a link must have for its
-# associated objects to appear in the table. In other words, the higher this is set, the
-# smaller the number of objects that will remain to be displayed in the tables. This may
-# be useful for improving performance on larger datasets.
-# The default value is 2.0
-tables_metcalf_threshold = 2.0
-
-# a section for general scoring parameters (currently unused)
 [scoring]
-
-# the "Rosetta" scoring method involves some preprocessing steps that can take
-# significant time. NPLinker will automatically run these steps as it loads the
-# dataset and cache the results. if you would like to adjust the parameters used
-# by the Rosetta method you can do by setting them below (note that changing
-# these values will invalidate any cached data and force the preprocessing steps
-# to be run again)
-#
-# TODO document what these do
-[scoring.rosetta]
-# ms1_tol = 100
-# ms2_tol = 0.2
-# score_thresh = 0.5
-# min_match_peaks = 1
-
-# when loading, you can also override any combination of individual file paths
-# as required (empty paths are ignored)
-[dataset.overrides]
-# strain ID mapping filename, default is <root>/strain_mapping.csv
-#strain_mappings_file = ""
-
-# MGF filename. This path is passed to glob.glob, default is <root>/spectra/*.mgf
-#gnps_mgf_file = ""
-
-# nodes filename. This path is passed to glob.glob, default is <root>/clusterinfo_summary/*.tsv
-#gnps_nodes_file = ""
-
-# edges filename. This path is passed to glob.glob, default is <root>/networkedges_selfloop/*.selfloop
-#gnps_edges_file = ""
-
-# annotation configuration file, default is <root>/annotations.tsv
-#gnps_annotations_file = ""
-
-# Antismash data directory, default is <root>/antismash
-#antismash_dir = ""
-
-# bigscape directory, default is <root>/bigscape
-# it's expected that the various class subdirectory (NRPS etc) will exist at this location.
-# within each class subdirectory, there should be a Network_Annotations_<class>.tsv file plus
-# a set of <class>_clustering_<params>.tsv files
-#bigscape_dir = ""
-
-# directory containing MiBIG .json files, default is <root>/mibig_json
-# (if needed, download the appropriate version of the archive in JSON format
-# from https://mibig.secondarymetabolites.org/download and extract the contents)
-#mibig_json_dir = ""
-
-# list of strains to include when loading the dataset. this is optional but can be used
-# to e.g. filter out most of a large dataset to focus on some specific objects
-# default is <root>/include_strains.csv
-#include_strains_file = ""
+# Scoring methods.
+# Valid values are "metcalf" and "rosetta".
+# The default value is "metcalf".
+methods = ["metcalf"]

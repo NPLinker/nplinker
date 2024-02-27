@@ -1,6 +1,16 @@
 # NPLinker default configurations
 
-loglevel = "INFO"
-logfile = ""
-log_to_stdout = true
-repro_file = ""
+[log]
+level = "INFO"
+to_stdout = true
+
+[mibig]
+to_use = true
+version = "3.1"
+
+[bigscape]
+parameters = "--mibig --clans-off --mix --include_singletons --cutoffs 0.30"
+cutoff = 0.30
+
+[scoring]
+methods = ["metcalf"]
