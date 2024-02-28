@@ -52,8 +52,9 @@ version = "3.1"
 parameters = "--mibig --clans-off --mix --include_singletons --cutoffs 0.30"
 # Which bigscape cutoff to use for NPLinker analysis.
 # There might be multiple cutoffs in bigscape output.
-# The default value is 0.30.
-cutoff = 0.30
+# Note that this value must be a string.
+# The default value is "0.30".
+cutoff = "0.30"
 
 
 [scoring]

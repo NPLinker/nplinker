@@ -55,7 +55,7 @@ validators = [
     ),
     # BigScape
     Validator("bigscape.parameters", required=True, is_type_of=str),
-    Validator("bigscape.cutoff", required=True, is_type_of=float),
+    Validator("bigscape.cutoff", required=True, is_type_of=str),
     # Scoring
     ## `scoring.methods` must be a list of strings and must contain at least one of the
     ## supported scoring methods.
