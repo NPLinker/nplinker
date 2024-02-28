@@ -125,7 +125,7 @@ def download_url(
 
     Args:
         url (str): URL to download file from
-        root (str): Directory to place downloaded file in
+        root (str): Directory to place downloaded file in. If it doesn't exist, it will be created.
         filename (str, optional): Name to save the file under. If None, use the
             basename of the URL.
         md5 (str, optional): MD5 checksum of the download. If None, do not check.
@@ -134,12 +134,12 @@ def download_url(
         allow_http_redirect (bool, optional): If true, enable following redirects
          for all HTTP ("http:") methods.
     """
-    root = Path(root).expanduser()
+    root = transform_to_full_path(root)
+    # create the download directory if not exist
+    root.mkdir(exist_ok=True)
     if not filename:
         filename = Path(url).name
     fpath = root / filename
-
-    Path.mkdir(root, exist_ok=True)
 
     # check if file is already present locally
     if fpath.is_file() and md5 is not None and check_md5(fpath, md5):
@@ -175,7 +175,7 @@ def list_dirs(root: str | PathLike, keep_parent: bool = True) -> list[str]:
         prefix (bool, optional): If true, prepends the path to each result, otherwise
             only returns the name of the directories found
     """
-    root = Path(root).expanduser()
+    root = transform_to_full_path(root)
     directories = [str(p) for p in root.iterdir() if p.is_dir()]
     if not keep_parent:
         directories = [os.path.basename(d) for d in directories]
@@ -201,7 +201,7 @@ def list_files(
             result, otherwise only returns the name of the files found.
             Defaults to False.
     """
-    root = Path(root).expanduser()
+    root = Path(root)
     files = [
         str(p)
         for p in root.iterdir()
@@ -355,6 +355,7 @@ def extract_archive(
     Args:
         from_path: Path to the file to be extracted.
         extract_root: Path to the directory the file will be extracted to.
+            The given directory will be created if not exist.
             If omitted, the directory of the archive file is used.
         members: Optional selection of members to extract. If not specified,
             all members are extracted.
@@ -372,6 +373,9 @@ def extract_archive(
         extract_root = from_path.parent
     else:
         extract_root = Path(extract_root)
+
+    # create the extract directory if not exist
+    extract_root.mkdir(exist_ok=True)
 
     suffix, archive_type, compression = _detect_file_type(from_path)
     if not archive_type:
@@ -405,16 +409,17 @@ def download_and_extract_archive(
     Args:
         url (str): URL to download file from
         download_root (str or Path): Path to the directory to place downloaded
-            file in
+            file in. If it doesn't exist, it will be created.
         extract_root (str or Path, optional): Path to the directory the file
-            will be extracted to. If omitted, the `download_root` is used.
+            will be extracted to. The given directory will be created if not exist.
+            If omitted, the `download_root` is used.
         filename (str, optional): Name to save the downloaded file under.
             If None, use the basename of the URL
         md5 (str, optional): MD5 checksum of the download. If None, do not check
         remove_finished (bool, optional): If `True`, remove the downloaded file
              after the extraction. Defaults to False.
     """
-    download_root = Path(download_root).expanduser()
+    download_root = Path(download_root)
     if extract_root is None:
         extract_root = download_root
     else:
