@@ -1,12 +1,10 @@
 import hashlib
-import os
 from pathlib import Path
 import pytest
 from nplinker.nplinker import NPLinker
 
 
-# NOTE: This file only contains tests that run locally and are skipped on CI.
-# Basically, only tests related to data loading should be put here.
+# Only tests related to data arranging and loading should be put here.
 # For tests on scoring/links, add them to `scoring/test_nplinker_scoring.py`.
 
 
@@ -27,13 +25,6 @@ def get_file_hash(file_path):
 def npl() -> NPLinker:
     npl = NPLinker()
     npl.load_data()
-    hash_proj_file = get_file_hash(
-        os.path.join(npl._loader._root.parent.parent, npl._loader._platform_id + ".json")
-    )
-    if hash_proj_file != "97f31f13f7a4c87c0b7648e2a2bad5ab2f96c38f92c304a5dc17299b44e698c7":
-        pytest.exit(
-            "PoDP project file has changed, please clean your local cache folder and rerun the tests."
-        )
     # remove cached score results before running tests
     root_dir = Path(npl.root_dir)
     score_cache = root_dir / "metcalf" / "metcalf_scores.pckl"
@@ -65,7 +56,6 @@ def npl() -> NPLinker:
 # ---------------------------------------------------------------------------------------------------
 
 
-@pytest.mark.skipif(os.environ.get("CI") == "true", reason="Skip when running on CI")
 def test_load_data(npl: NPLinker):
     assert len(npl.bgcs) == 390
     assert len(npl.gcfs) == 64
