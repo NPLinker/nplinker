@@ -94,9 +94,6 @@ def npl(gcfs, spectra, mfs, strains, tmp_path_factory) -> NPLinker:
     npl._gcf_lookup = {gcf.gcf_id: gcf for gcf in gcfs}
     npl._mf_lookup = {mf.family_id: mf for mf in mfs}
     npl._spec_lookup = {spec.spectrum_id: spec for spec in spectra}
-    # tmp path to store 'metcalf/metcalf_scores.pckl' file
-    # Must use `tmp_path_factory` (session scope) instead of `tmp_path` (function scope)
-    npl._loader._root = tmp_path_factory.mktemp("npl_test")
     return npl
 
 
