@@ -427,3 +427,21 @@ def download_and_extract_archive(
     archive = download_root / filename
     print(f"Extracting {archive} to {extract_root}")
     extract_archive(archive, extract_root, remove_finished=remove_finished)
+
+
+def transform_to_full_path(p: str | PathLike) -> Path:
+    """Transform a path to a full path.
+
+    The path is expanded (i.e. the `~` will be replaced with actual path) and converted to an
+    absolute path (i.e. `.` or `..` will be replaced with actual path).
+
+    Args:
+        p (str or Path): The path to transform.
+
+    Returns:
+        (Path): The transformed full path.
+    """
+    # Multiple calls to `Path` are used to ensure static typing compatibility.
+    p = Path(p).expanduser()
+    p = Path(p).resolve()
+    return Path(p)
