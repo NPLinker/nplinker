@@ -45,9 +45,11 @@ def download_and_extract_mibig_metadata(
         raise ValueError("Identical path of download directory and extract directory")
 
     # check if extract_path is empty
-    files = [i for i in os.listdir(extract_path)]
-    if len(files) != 0:
-        raise ValueError(f'Nonempty directory: "{extract_path}"')
+    if not extract_path.exists():
+        extract_path.mkdir(parents=True)
+    else:
+        if len(list(extract_path.iterdir())) != 0:
+            raise ValueError(f'Nonempty directory: "{extract_path}"')
 
     # download and extract
     md5 = _MD5_MIBIG_METADATA[version]
