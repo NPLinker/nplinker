@@ -30,14 +30,14 @@ def download_and_extract_mibig_metadata(
 ):
     """Download and extract MIBiG metadata json files.
 
-        Note that no matter if metadata json files locate in nested folders or not in the archive,
-        all of the json files will be extracted to the same position i.e. `extract_path`. The nested
+        Note that it does not matter whether the metadata json files are in nested folders or not in the archive,
+        all json files will be extracted to the same location, i.e. `extract_path`. The nested
         folders will be removed if they exist. So the `extract_path` will have only json files.
 
     Args:
-        download_root(str): Path to the directory to place downloaded archive in.
-        extract_path(str): Path to an empty directory where json files will be extracted to.
-            The directory must be empty if it exists. If not exist, the directory will be created.
+        download_root(str | os.PathLike): Path to the directory in which to place the downloaded archive.
+        extract_path(str | os.PathLike): Path to an empty directory where the json files will be extracted.
+            The directory must be empty if it exists. If it doesn't exist, the directory will be created.
         version (str, optional): _description_. Defaults to "3.1".
 
     Examples:
