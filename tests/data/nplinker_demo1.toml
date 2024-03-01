@@ -1,3 +1,0 @@
-root_dir = "@format {env[NPLINKER_ROOT_DIR]}"
-mode = "podp"
-podp_id = "4b29ddc3-26d0-40d7-80c5-44fb6631dbf9.4"
