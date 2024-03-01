@@ -22,6 +22,6 @@ def test_config_demo1():
         config.bigscape.parameters
         == "--mibig --clans-off --mix --include_singletons --cutoffs 0.30"
     )
-    assert config.bigscape.cutoff == 0.30
+    assert config.bigscape.cutoff == "0.30"
 
     assert config.scoring.methods == ["metcalf"]
