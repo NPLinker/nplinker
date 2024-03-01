@@ -1,6 +1,5 @@
 # Default behaviour
 * text=auto
-
 # Explicitly text files
 *.py text
 *.txt text
@@ -10,3 +9,4 @@
 *.sh text
 *.bat text
 *.toml text
+*.zip filter=lfs diff=lfs merge=lfs -text
