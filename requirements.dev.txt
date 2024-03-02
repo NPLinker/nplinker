@@ -13,3 +13,10 @@ types-toml
 types-Deprecated
 myst_parser
 wheel
+# docs
+mkdocs
+mkdocs-material
+mike
+mkdocs-exclude
+mkdocstrings-python
+mkdocs-redirects
