@@ -36,8 +36,8 @@ class GNPSExtractor:
             - DB_result/*.tsv
 
         Args:
-            file(str | PathLike): The path to the GNPS zip file.
-            extract_path(str | PathLike): path to the directory where to extract the files to.
+            file: The path to the GNPS zip file.
+            extract_dir: path to the directory where to extract the files to.
 
         Raises:
             ValueError: If the given file is an invalid GNPS archive.
@@ -76,7 +76,7 @@ class GNPSExtractor:
         """Get the GNPS workflow type.
 
         Returns:
-            GNPSFormat: GNPS workflow type.
+            GNPS workflow type.
         """
         return self._gnps_format
 
@@ -85,7 +85,7 @@ class GNPSExtractor:
         """Get the path where to extract the files to.
 
         Returns:
-            str: Path where to extract files as string.
+            Path where to extract files as string.
         """
         return str(self._extract_path)
 

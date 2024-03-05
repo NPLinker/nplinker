@@ -63,7 +63,7 @@ class StrainCollection:
         If the strain already exists, merge the aliases.
 
         Args:
-            strain(Strain): The strain to add.
+            strain: The strain to add.
         """
         if strain in self._strains:
             # only one strain object per id
@@ -90,7 +90,7 @@ class StrainCollection:
         If the strain id is not found, raise ValueError.
 
         Args:
-            strain(Strain): The strain to remove.
+            strain: The strain to remove.
 
         Raises:
             ValueError: If the strain is not found in the collection.
@@ -113,7 +113,7 @@ class StrainCollection:
         """Remove all strains that are not in strain_set from the strain collection.
 
         Args:
-            strain_set(set[Strain]): Set of strains to keep.
+            strain_set: Set of strains to keep.
         """
         # note that we need to copy the list of strains, as we are modifying it
         for strain in self._strains.copy():
@@ -124,10 +124,10 @@ class StrainCollection:
         """Check if the strain collection contains the given strain name (id or alias).
 
         Args:
-            name(str): Strain name (id or alias) to check.
+            name: Strain name (id or alias) to check.
 
         Returns:
-            bool: True if the strain name is in the collection, False otherwise.
+            True if the strain name is in the collection, False otherwise.
         """
         return name in self._strain_dict_name
 
@@ -135,10 +135,10 @@ class StrainCollection:
         """Lookup a strain by name (id or alias).
 
         Args:
-            name(str): Strain name (id or alias) to lookup.
+            name: Strain name (id or alias) to lookup.
 
         Returns:
-            list[Strain]: List of Strain objects with the given name.
+            List of Strain objects with the given name.
 
         Raises:
             ValueError: If the strain name is not found.
@@ -152,10 +152,10 @@ class StrainCollection:
         """Read a strain mappings JSON file and return a StrainCollection object.
 
         Args:
-            file(str | PathLike): Path to the strain mappings JSON file.
+            file: Path to the strain mappings JSON file.
 
         Returns:
-            StrainCollection: StrainCollection object.
+            StrainCollection object.
         """
         with open(file, "r") as f:
             json_data = json.load(f)
@@ -175,12 +175,12 @@ class StrainCollection:
         """Convert the StrainCollection object to a JSON string.
 
         Args:
-            file(str | PathLike | None): Path to output JSON file. If None,
+            file: Path to output JSON file. If None,
                 return the JSON string instead.
 
         Returns:
-            str | None: If `file` is None, return the JSON string. Otherwise,
-                write the JSON string to the given file.
+            If `file` is None, return the JSON string. Otherwise, write the JSON string to the given
+            file.
         """
         data_list = [
             {"strain_id": strain.id, "strain_alias": list(strain.aliases)} for strain in self

@@ -2,7 +2,7 @@ import json
 
 
 class MibigMetadata:
-    def __init__(self, file) -> None:
+    def __init__(self, file: str) -> None:
         """Class to model the BGC metadata/annotations defined in MIBiG.
 
         MIBiG is a specification of BGC metadata and use JSON schema to
@@ -10,7 +10,7 @@ class MibigMetadata:
         https://mibig.secondarymetabolites.org/download.
 
         Args:
-            file(str): Path to the json file of MIBiG BGC metadata
+            file: Path to the json file of MIBiG BGC metadata
 
         Examples:
             >>> metadata = MibigMetadata("/data/BGC0000001.json")

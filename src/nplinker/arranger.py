@@ -106,6 +106,7 @@ class DatasetArranger:
         existing GNPS data and re-download it if it is invalid.
 
         The validation process includes:
+
         - Check if the GNPS data directory exists.
         - Check if the required files exist in the GNPS data directory, including:
             - file_mappings.tsv or file_mappings.csv
@@ -139,7 +140,7 @@ class DatasetArranger:
         the TSV file or the CSV file exists in the default GNPS directory.
 
         Returns:
-            Path: Path to the GNPS file mappings file.
+            Path to the GNPS file mappings file.
         """
         file_mappings_tsv = globals.GNPS_DEFAULT_PATH / globals.GNPS_FILE_MAPPINGS_TSV
         file_mappings_csv = globals.GNPS_DEFAULT_PATH / globals.GNPS_FILE_MAPPINGS_CSV
@@ -182,6 +183,7 @@ class DatasetArranger:
             is a number).
 
         AntiSMASH BGC directory must follow the structure below:
+        ```
         antismash
             ├── genome_id_1 (one AntiSMASH output, e.g. GCF_000514775.1)
             │  ├── GCF_000514775.1.gbk
@@ -190,6 +192,7 @@ class DatasetArranger:
             ├── genome_id_2
             │  ├── ...
             └── ...
+        ```
         """
         pass_validation = False
         if config.mode == "podp":
@@ -229,9 +232,10 @@ class DatasetArranger:
         will be copied to the default BiG-SCAPE directory.
 
         The validation process includes:
+
         - Check if the default BiG-SCAPE data directory exists.
         - Check if the clustering file "mix_clustering_c{config.bigscape.cutoff}.tsv" exists in the
-            BiG-SCAPE data directory.
+                BiG-SCAPE data directory.
         """
         pass_validation = False
         if config.mode == "podp":
@@ -290,6 +294,7 @@ class DatasetArranger:
         """Validate the strain mappings file.
 
         The validation process includes:
+
         - Check if the strain mappings file exists.
         - Check if the strain mappings file is a valid JSON file according to the schema defined in
             `schemas/strain_mappings_schema.json`.
@@ -346,13 +351,14 @@ def validate_gnps(gnps_dir: Path) -> None:
     """Validate the GNPS data directory and its contents.
 
     The GNPS data directory must contain the following files:
+
     - file_mappings.tsv or file_mappings.csv
     - spectra.mgf
     - molecular_families.tsv
     - annotations.tsv
 
     Args:
-        gnps_dir (Path): Path to the GNPS data directory.
+        gnps_dir: Path to the GNPS data directory.
 
     Raises:
         FileNotFoundError: If the GNPS data directory is not found or any of the required files
@@ -392,6 +398,7 @@ def validate_antismash(antismash_dir: Path) -> None:
 
     The validation only checks the structure of the antiSMASH data directory and file names.
     It does not check
+
     - the content of the BGC files
     - the consistency between the antiSMASH data and the PODP project JSON file for the PODP
         mode
@@ -401,7 +408,7 @@ def validate_antismash(antismash_dir: Path) -> None:
     file (with the suffix ".region???.gbk" where ??? is the region number).
 
     Args:
-        antismash_dir (Path): Path to the antiSMASH data directory.
+        antismash_dir: Path to the antiSMASH data directory.
 
     Raises:
         FileNotFoundError: If the antiSMASH data directory is not found, or no sub-directories
@@ -439,7 +446,7 @@ def validate_bigscape(bigscape_dir: Path) -> None:
     bigscape cutoff value set in the config file.
 
     Args:
-        bigscape_dir(Path): Path to the BiG-SCAPE data directory.
+        bigscape_dir: Path to the BiG-SCAPE data directory.
 
     Raises:
         FileNotFoundError: If the BiG-SCAPE data directory or the clustering file is not found.

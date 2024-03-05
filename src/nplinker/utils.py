@@ -35,10 +35,10 @@ def find_delimiter(file: str | PathLike) -> str:
     """Detect the delimiter for the given tabular file.
 
     Args:
-        file(str | PathLike): Path to tabular file.
+        file: Path to tabular file.
 
     Returns:
-        str: Detected delimiter character.
+        Detected delimiter character.
 
     Examples:
         >>> delim = find_delimiter("~/table.csv")
@@ -53,7 +53,7 @@ def get_headers(file: str | PathLike) -> list[str]:
     """Read headers from the given tabular file.
 
     Args:
-        file(str): Path to the file to read the header from.
+        file: Path to the file to read the header from.
 
     Returns:
         list[str]: list of column names from the header.
@@ -68,11 +68,11 @@ def is_file_format(file: str | PathLike, format: str = "tsv") -> bool:
     """Check if the file is in the given format.
 
     Args:
-        file(str): Path to the file to check.
-        format(str): The format to check for, either "tsv" or "csv".
+        file: Path to the file to check.
+        format: The format to check for, either "tsv" or "csv".
 
     Returns:
-        bool: True if the file is in the given format, False otherwise.
+        True if the file is in the given format, False otherwise.
     """
     try:
         with open(file, "rt") as f:
@@ -124,15 +124,14 @@ def download_url(
     """Download a file from a url and place it in root.
 
     Args:
-        url (str): URL to download file from
-        root (str): Directory to place downloaded file in. If it doesn't exist, it will be created.
-        filename (str, optional): Name to save the file under. If None, use the
+        url: URL to download file from
+        root: Directory to place downloaded file in. If it doesn't exist, it will be created.
+        filename: Name to save the file under. If None, use the
             basename of the URL.
-        md5 (str, optional): MD5 checksum of the download. If None, do not check.
-        http_method (str, optional): HTTP request method, e.g. "GET", "POST".
+        md5: MD5 checksum of the download. If None, do not check.
+        http_method: HTTP request method, e.g. "GET", "POST".
             Defaults to "GET".
-        allow_http_redirect (bool, optional): If true, enable following redirects
-         for all HTTP ("http:") methods.
+        allow_http_redirect: If true, enable following redirects for all HTTP ("http:") methods.
     """
     root = transform_to_full_path(root)
     # create the download directory if not exist
@@ -171,8 +170,8 @@ def list_dirs(root: str | PathLike, keep_parent: bool = True) -> list[str]:
     """List all directories at a given root.
 
     Args:
-        root (str or Path): Path to directory whose folders need to be listed
-        prefix (bool, optional): If true, prepends the path to each result, otherwise
+        root: Path to directory whose folders need to be listed
+        keep_parent: If true, prepends the path to each result, otherwise
             only returns the name of the directories found
     """
     root = transform_to_full_path(root)
@@ -191,13 +190,13 @@ def list_files(
     """List all files at a given root.
 
     Args:
-        root (str or Path): Path to directory whose files need to be listed
-        prefix (str or tuple): Prefix of the file names to match,
+        root: Path to directory whose files need to be listed
+        prefix: Prefix of the file names to match,
             Defaults to empty string '""'.
-        suffix (str or tuple): Suffix of the files to match, e.g. ".png" or
+        suffix: Suffix of the files to match, e.g. ".png" or
             (".jpg", ".png").
             Defaults to empty string '""'.
-        keep_parent (bool, optional): If true, prepends the parent path to each
+        keep_parent: If true, prepends the parent path to each
             result, otherwise only returns the name of the files found.
             Defaults to False.
     """
@@ -264,10 +263,10 @@ def _detect_file_type(file: str | Path) -> tuple[str, str | None, str | None]:
     """Detect the archive type and/or compression of a file.
 
     Args:
-        file (str, Path): the filename
+        file: the filename
 
     Returns:
-        (tuple): tuple of suffix, archive type, and compression
+        Tuple of suffix, archive type, and compression
 
     Raises:
         RuntimeError: if file has no suffix or suffix is not supported
@@ -315,12 +314,12 @@ def _decompress(
     The compression is automatically detected from the file name.
 
     Args:
-        from_path (str or Path): Path to the file to be decompressed.
-        to_path (str Path): Path to the decompressed file. If omitted, `from_path` without compression extension is used.
-        remove_finished (bool): If `True`, remove the file after the extraction.
+        from_path: Path to the file to be decompressed.
+        to_path: Path to the decompressed file. If omitted, `from_path` without compression extension is used.
+        remove_finished: If `True`, remove the file after the extraction.
 
     Returns:
-        (str): Path to the decompressed file.
+        Path to the decompressed file.
     """
     suffix, archive_type, compression = _detect_file_type(from_path)
     if not compression:
@@ -365,7 +364,7 @@ def extract_archive(
         remove_finished: If `True`, remove the file after the extraction.
 
     Returns:
-        (str): Path to the directory the file was extracted to.
+        Path to the directory the file was extracted to.
     """
     from_path = Path(from_path)
 
@@ -407,16 +406,16 @@ def download_and_extract_archive(
        This method is a wrapper of `download_url` and `extract_archive` methods.
 
     Args:
-        url (str): URL to download file from
-        download_root (str or Path): Path to the directory to place downloaded
+        url: URL to download file from
+        download_root: Path to the directory to place downloaded
             file in. If it doesn't exist, it will be created.
-        extract_root (str or Path, optional): Path to the directory the file
+        extract_root: Path to the directory the file
             will be extracted to. The given directory will be created if not exist.
             If omitted, the `download_root` is used.
-        filename (str, optional): Name to save the downloaded file under.
+        filename: Name to save the downloaded file under.
             If None, use the basename of the URL
-        md5 (str, optional): MD5 checksum of the download. If None, do not check
-        remove_finished (bool, optional): If `True`, remove the downloaded file
+        md5: MD5 checksum of the download. If None, do not check
+        remove_finished: If `True`, remove the downloaded file
              after the extraction. Defaults to False.
     """
     download_root = Path(download_root)
@@ -441,10 +440,10 @@ def transform_to_full_path(p: str | PathLike) -> Path:
     absolute path (i.e. `.` or `..` will be replaced with actual path).
 
     Args:
-        p (str or Path): The path to transform.
+        p: The path to transform.
 
     Returns:
-        (Path): The transformed full path.
+        The transformed full path.
     """
     # Multiple calls to `Path` are used to ensure static typing compatibility.
     p = Path(p).expanduser()

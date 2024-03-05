@@ -32,10 +32,10 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
     """Detect GNPS format for the given task id.
 
     Args:
-        task_id(str): GNPS task id.
+        task_id: GNPS task id.
 
     Returns:
-        GNPSFormat: the format identified in the GNPS task.
+        The format identified in the GNPS task.
 
     Examples:
         >>> gnps_format_from_task_id("c22f44b14a3d450eb836d607cb9521bb") == GNPSFormat.SNETS
@@ -69,7 +69,7 @@ def gnps_format_from_archive(zip_file: str | PathLike) -> GNPSFormat:
         zip_file: Path to the downloaded GNPS zip file.
 
     Returns:
-        GNPSFormat: the format identified in the GNPS zip file.
+        The format identified in the GNPS zip file.
 
     Examples:
         >>> gnps_format_from_archive("downloads/ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip") == GNPSFormat.SNETS
@@ -110,10 +110,10 @@ def gnps_format_from_file_mapping(file: str | PathLike) -> GNPSFormat:
     - FEATURE-BASED-MOLECULAR-NETWORKING workflow: the .csv file under folder "quantification_table"
 
     Args:
-        file(str | PathLike): Path to the file to peek the format for.
+        file: Path to the file to peek the format for.
 
     Returns:
-        GNPSFormat: GNPS format identified in the file.
+        GNPS format identified in the file.
     """
     headers = get_headers(file)
     if "AllFiles" in headers:

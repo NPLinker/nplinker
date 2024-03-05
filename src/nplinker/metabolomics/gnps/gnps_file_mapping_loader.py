@@ -24,7 +24,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             - quantification_table*/*.csv
 
         Args:
-            file(str | PathLike): Path to the GNPS file mappings file.
+            file: Path to the GNPS file mappings file.
 
         Raises:
             ValueError: Raises ValueError if the file is not valid.

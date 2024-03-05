@@ -26,7 +26,7 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
         singleton molecular families.
 
         Args:
-            file(str | PathLike): Path to the GNPS molecular family file.
+            file: Path to the GNPS molecular family file.
 
         Raises:
             ValueError: Raises ValueError if the file is not valid.
@@ -48,7 +48,7 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
         """Get MolecularFamily objects.
 
         Args:
-            keep_singleton(bool): True to keep singleton molecular families. A
+            keep_singleton: True to keep singleton molecular families. A
                 singleton molecular family is a molecular family that contains
                 only one spectrum.
 

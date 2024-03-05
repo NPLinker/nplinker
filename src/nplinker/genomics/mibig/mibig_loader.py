@@ -21,7 +21,7 @@ class MibigLoader:
         objects have Strain object as their strain attribute (i.e. `BGC.strain`).
 
         Args:
-            data_dir(str): Path to the directory of MIBiG metadata json files
+            data_dir: Path to the directory of MIBiG metadata json files
         """
         self.data_dir = data_dir
         self._file_dict = self.parse_data_dir(self.data_dir)
@@ -32,8 +32,8 @@ class MibigLoader:
         """Get the path of all MIBiG metadata json files.
 
         Returns:
-            dict[str, str]: key is metadata file name (BGC accession), value is
-                path to the metadata json file
+            The key is metadata file name (BGC accession), and the value is path to the metadata
+            json file
         """
         return self._file_dict
 
@@ -42,11 +42,11 @@ class MibigLoader:
         """Parse metadata directory and return paths to all metadata json files.
 
         Args:
-            data_dir(str): path to the directory of MIBiG metadata json files
+            data_dir: path to the directory of MIBiG metadata json files
 
         Returns:
-            dict[str, str]: key is metadata file name (BGC accession), value is
-                 path to the metadata json file
+            The key is metadata file name (BGC accession), and the value is path to the metadata
+            json file
         """
         file_dict = {}
         json_files = list_files(data_dir, prefix="BGC", suffix=".json")
@@ -59,8 +59,7 @@ class MibigLoader:
         """Get MibigMetadata objects.
 
         Returns:
-            dict[str, MibigMetadata]: key is BGC accession (file name) and
-                value is :class:`nplinker.genomics.mibig.MibigMetadata` object
+            The key is BGC accession (file name) and the value is MibigMetadata object
         """
         return self._metadata_dict
 
@@ -68,8 +67,7 @@ class MibigLoader:
         """Parse all metadata files and return MibigMetadata objects.
 
         Returns:
-            dict[str, MibigMetadata]: key is BGC accession (file name) and
-                value is :class:`nplinker.genomics.mibig.MibigMetadata` object
+            The key is BGC accession (file name) and the value is MibigMetadata object
         """
         metadata_dict = {}
         for name, file in self._file_dict.items():
@@ -85,7 +83,7 @@ class MibigLoader:
         object is also MiBIG accession.
 
         Returns:
-            list[str, BGC]: a list of :class:`nplinker.genomics.BGC` objects
+            A list of BGC objects
         """
         return self._bgcs
 
@@ -93,7 +91,7 @@ class MibigLoader:
         """Parse all metadata files as BGC objects.
 
         Returns:
-            list[BGC]: a list of BGC objects
+            A list of BGC objects
         """
         return [parse_bgc_metadata_json(file) for file in self._file_dict.values()]
 
@@ -105,10 +103,10 @@ def parse_bgc_metadata_json(file: str) -> BGC:
     object has Strain object as its strain attribute.
 
     Args:
-        file(str): Path to the MIBiG metadata json file
+        file: Path to the MIBiG metadata json file
 
     Returns:
-        BGC: :class:`nplinker.genomics.BGC` object
+        BGC object
     """
     metadata = MibigMetadata(file)
     mibig_bgc = BGC(metadata.mibig_accession, *metadata.biosyn_class)

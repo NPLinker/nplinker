@@ -34,41 +34,41 @@ class DataLinks:
         Co-occurrence refers to the presence of a spectrum/mf and a gcf in a strain.
 
         Args:
-            gcfs(Sequence[GCF]): A list of GCF objects.
-            spectra(Sequence[Spectrum]): A list of Spectrum objects.
-            mfs(Sequence[MolecularFamily]): A list of MolecularFamily objects.
-            strains(StrainCollection): A StrainCollection object.
+            gcfs: A list of GCF objects.
+            spectra: A list of Spectrum objects.
+            mfs: A list of MolecularFamily objects.
+            strains: A StrainCollection object.
 
         Attributes:
-            occurrence_gcf_strain(pd.DataFrame): A DataFrame to store occurrence of
+            occurrence_gcf_strain: A DataFrame to store occurrence of
                 gcfs with respect to strains.
-            occurrence_spec_strain(pd.DataFrame): A DataFrame to store occurrence of
+            occurrence_spec_strain: A DataFrame to store occurrence of
                 spectra with respect to strains.
-            occurrence_mf_strain(pd.DataFrame): A DataFrame to store occurrence of
+            occurrence_mf_strain: A DataFrame to store occurrence of
                 molecular families with respect to strains.
-            cooccurrence_spec_gcf(pd.DataFrame): A DataFrame to store co-occurrence
+            cooccurrence_spec_gcf: A DataFrame to store co-occurrence
                 of the presence of spectra and the presence of gcfs with respect
                 to strains.
-            cooccurrence_spec_notgcf(pd.DataFrame): A DataFrame to store co-occurrence
+            cooccurrence_spec_notgcf: A DataFrame to store co-occurrence
                 of the presence of spectra and the absence of gcfs with respect
                 to strains. "notgcf" means the absence of gcfs.
-            cooccurrence_notspec_gcf(pd.DataFrame): A DataFrame to store co-occurrence
+            cooccurrence_notspec_gcf: A DataFrame to store co-occurrence
                 of the absence of spectra and the presence of gcfs with respect
                 to strains. "notspec" means the absence of spectra.
-            cooccurrence_notspec_notgcf(pd.DataFrame): A DataFrame to store co-occurrence
+            cooccurrence_notspec_notgcf: A DataFrame to store co-occurrence
                 of the absence of spectra and the absence of gcfs with respect
                 to strains.
-            cooccurrence_mf_gcf(pd.DataFrame): A DataFrame to store co-occurrence
+            cooccurrence_mf_gcf: A DataFrame to store co-occurrence
                 of the presence of molecular families and the presence of gcfs
                 with respect to strains.
-            cooccurrence_mf_notgcf(pd.DataFrame): A DataFrame to store co-occurrence
+            cooccurrence_mf_notgcf: A DataFrame to store co-occurrence
                 of the presence of molecular families and the absence of gcfs
                 with respect to strains. "notgcf" means the absence of gcfs.
-            cooccurrence_notmf_gcf(pd.DataFrame): A DataFrame to store co-occurrence
+            cooccurrence_notmf_gcf: A DataFrame to store co-occurrence
                 of the absence of molecular families and the presence of gcfs
                 with respect to strains. "notmf" means the absence of molecular
                 families.
-            cooccurrence_notmf_notgcf(pd.DataFrame): A DataFrame to store co-occurrence
+            cooccurrence_notmf_notgcf: A DataFrame to store co-occurrence
                 of the absence of molecular families and the absence of gcfs
                 with respect to strains.
         """
@@ -108,15 +108,15 @@ class DataLinks:
         """Get common strains between given spectra/molecular families and GCFs.
 
         Args:
-            spectra_or_mfs(Sequence[Spectrum | MolecularFamily]):
+            spectra_or_mfs:
                 A list of Spectrum and/or MolecularFamily objects.
-            gcfs(Sequence[GCF]): A list of GCF objects.
-            filter_no_shared(bool): If True, the pairs of spectrum/mf and GCF
+            gcfs: A list of GCF objects.
+            filter_no_shared: If True, the pairs of spectrum/mf and GCF
                 without common strains will be removed from the returned dict;
 
         Returns:
-            dict: A dict where the keys are tuples of (Spectrum/MolecularFamily, GCF)
-            and values are a list of shared Strain objects.
+            Keys are tuples of (Spectrum/MolecularFamily, GCF) and values are a list of shared
+            Strain objects.
 
         Raises:
             ValueError: If given `spectra_or_mfs` or `gcfs` is empty.
@@ -229,7 +229,7 @@ class DataLinks:
         """Calculate co-occurrence for given link types across strains.
 
         Args:
-            link_type(str): Type of link to calculate co-occurrence for,
+            link_type: Type of link to calculate co-occurrence for,
                 either 'spec-gcf' or 'mf-gcf'.
         """
         if link_type == "spec-gcf":

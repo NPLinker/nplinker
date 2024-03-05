@@ -6,12 +6,19 @@
 {{  # parametersExist}}
 Args:
 {{  # args}}
-    {{var}}({{typePlaceholder}}): {{descriptionPlaceholder}}
+    {{var}}: {{descriptionPlaceholder}}
 {{/args}}
 {{  # kwargs}}
-    {{var}} ({{typePlaceholder}}, optional): {{descriptionPlaceholder}}. Defaults to {{& default}}.
+    {{var}}: {{descriptionPlaceholder}}. Defaults to {{& default}}.
 {{/kwargs}}
 {{/parametersExist}}
+
+{{  # returnsExist}}
+Returns:
+{{  # returns}}
+    {{descriptionPlaceholder}}
+{{/returns}}
+{{/returnsExist}}
 
 {{  # exceptionsExist}}
 Raises:
@@ -19,10 +26,3 @@ Raises:
     {{type}}: {{descriptionPlaceholder}}
 {{/exceptions}}
 {{/exceptionsExist}}
-
-{{  # returnsExist}}
-Returns:
-{{  # returns}}
-    {{typePlaceholder}}: {{descriptionPlaceholder}}
-{{/returns}}
-{{/returnsExist}}

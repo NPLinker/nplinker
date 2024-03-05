@@ -24,7 +24,7 @@ class GNPSAnnotationLoader(AnnotationLoaderBase):
             - DB_result/*.tsv
 
         Args:
-            file(str | PathLike): The GNPS annotation file.
+            file: The GNPS annotation file.
 
         Example:
             >>> loader = GNPSAnnotationLoader("gnps_annotations.tsv")

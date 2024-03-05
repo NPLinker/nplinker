@@ -10,7 +10,7 @@ class BGCLoaderBase(ABC):
         """Abstract base class for BGC loader.
 
         Args:
-            data_dir(str): Path to directory that contains BGC metadata files
+            data_dir: Path to directory that contains BGC metadata files
                 (.json) or full data genbank files (.gbk).
         """
         self.data_dir = data_dir
@@ -20,7 +20,7 @@ class BGCLoaderBase(ABC):
         """Get path to BGC files.
 
         Returns:
-            dict[str, str]: key is BGC name and value is path to BGC file
+            The key is BGC name and value is path to BGC file
         """
 
     @abstractmethod
@@ -28,21 +28,21 @@ class BGCLoaderBase(ABC):
         """Get BGC objects.
 
         Returns:
-            Sequence[BGC]: a list of :class:`~nplinker.genomic.BGC` objects
+            A list of BGC objects
         """
 
 
 class GCFLoaderBase(ABC):
     @abstractmethod
-    def get_gcfs(self, keep_mibig_only, keep_singleton) -> Sequence[GCF]:
+    def get_gcfs(self, keep_mibig_only: bool, keep_singleton: bool) -> Sequence[GCF]:
         """Get GCF objects.
 
         Args:
-            keep_mibig_only(bool): True to keep GCFs that contain only MIBiG
+            keep_mibig_only: True to keep GCFs that contain only MIBiG
                 BGCs.
-            keep_singleton(bool): True to keep singleton GCFs. A singleton GCF
+            keep_singleton: True to keep singleton GCFs. A singleton GCF
                 is a GCF that contains only one BGC.
 
         Returns:
-            Sequence[GCF]: a list of :class:`~nplinker.genomic.GCF` objects
+            A list of GCF objects
         """

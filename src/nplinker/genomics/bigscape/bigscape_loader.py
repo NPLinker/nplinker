@@ -14,22 +14,22 @@ class BigscapeGCFLoader:
         """Build a loader for BiG-SCAPE GCF cluster file.
 
         Args:
-            cluster_file(str | PathLike): Path to the BiG-SCAPE cluster file,
+            cluster_file: Path to the BiG-SCAPE cluster file,
                 the filename has a pattern of "<class>_clustering_c0.xx.tsv".
 
         Attributes:
-            cluster_file(str): path to the BiG-SCAPE cluster file.
+            cluster_file: path to the BiG-SCAPE cluster file.
         """
         self.cluster_file = str(cluster_file)
         self._gcf_list = self._parse_gcf(self.cluster_file)
 
-    def get_gcfs(self, keep_mibig_only=False, keep_singleton=False) -> list[GCF]:
+    def get_gcfs(self, keep_mibig_only: bool = False, keep_singleton: bool = False) -> list[GCF]:
         """Get all GCF objects.
 
         Args:
-            keep_mibig_only(bool): True to keep GCFs that contain only MIBiG
+            keep_mibig_only: True to keep GCFs that contain only MIBiG
                 BGCs.
-            keep_singleton(bool): True to keep singleton GCFs. A singleton GCF
+            keep_singleton: True to keep singleton GCFs. A singleton GCF
                 is a GCF that contains only one BGC.
 
         Returns:

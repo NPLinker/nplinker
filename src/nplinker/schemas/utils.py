@@ -14,7 +14,7 @@ def validate_podp_json(json_data: dict) -> None:
     ValueError.
 
     Parameters:
-        json_data (dict): The JSON data to validate.
+        json_data: The JSON data to validate.
 
     Raises:
         ValueError: If the JSON data does not match the schema.

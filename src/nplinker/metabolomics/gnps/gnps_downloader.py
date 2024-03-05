@@ -20,8 +20,8 @@ class GNPSDownloader:
         Note that only GNPS workflows listed in the GNPSFormat enum are supported.
 
         Args:
-            task_id(str): GNPS task id, identifying the data to be downloaded.
-            download_root(Path): Path where to store the downloaded archive.
+            task_id: GNPS task id, identifying the data to be downloaded.
+            download_root: Path where to store the downloaded archive.
 
         Raises:
             ValueError: If the given task id does not correspond to a supported
@@ -49,7 +49,7 @@ class GNPSDownloader:
         """Get the GNPS workflow type.
 
         Returns:
-            GNPSFormat: GNPS workflow type.
+            GNPS workflow type.
         """
         return self._gnps_format
 
@@ -67,7 +67,7 @@ class GNPSDownloader:
         """Get the path to the zip file.
 
         Returns:
-            str: Download path as string
+            Download path as string
         """
         return str(Path(self._download_root) / self._file_name)
 
@@ -75,7 +75,7 @@ class GNPSDownloader:
         """Get the GNPS task id.
 
         Returns:
-            str: Task id as string.
+            Task id as string.
         """
         return self._task_id
 
@@ -83,7 +83,7 @@ class GNPSDownloader:
         """Get the full URL linking to GNPS data to be dowloaded.
 
         Returns:
-            str: URL pointing to the GNPS data to be downloaded.
+            URL pointing to the GNPS data to be downloaded.
         """
         if self.gnps_format == GNPSFormat.FBMN:
             return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL_FBMN.format(self._task_id)

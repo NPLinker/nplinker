@@ -28,18 +28,18 @@ class BGC:
         and used by MIBiG.
 
         Args:
-            bgc_id(str): BGC identifier, e.g. MIBiG accession, GenBank accession.
-            product_prediction(tuple[str]): BGC's (predicted) natural products
+            bgc_id: BGC identifier, e.g. MIBiG accession, GenBank accession.
+            product_prediction: BGC's (predicted) natural products
                 or product classes.
 
         Attributes:
-            bgc_id(str): BGC identifier, e.g. MIBiG accession, GenBank accession.
-            product_prediction(tuple[str]): A tuple of (predicted) natural
+            bgc_id: BGC identifier, e.g. MIBiG accession, GenBank accession.
+            product_prediction: A tuple of (predicted) natural
                 products or product classes of the BGC.
                 For antiSMASH's GenBank data, the feature `region /product`
                 gives product information.
                 For MIBiG metadata, its biosynthetic class provides such info.
-            mibig_bgc_class(tuple[str] | None): A tuple of MIBiG biosynthetic
+            mibig_bgc_class: A tuple of MIBiG biosynthetic
                 classes to which the BGC belongs.
                 Defaults to None.
                 MIBiG defines 6 major biosynthetic classes for natural products,
@@ -47,21 +47,21 @@ class BGC:
                 and "Alkaloid". Note that natural products created by all other
                 biosynthetic mechanisms fall under the category "Other".
                 More details see the publication: https://doi.org/10.1186/s40793-018-0318-y.
-            description(str | None): Brief description of the BGC.
+            description: Brief description of the BGC.
                 Defaults to None.
-            smiles(tuple[str] | None): A tuple of SMILES formulas of the BGC's
+            smiles: A tuple of SMILES formulas of the BGC's
                 products.
                 Defaults to None.
-            antismash_file(str | None): The path to the antiSMASH GenBank file.
+            antismash_file: The path to the antiSMASH GenBank file.
                 Defaults to None.
-            antismash_id(str | None): Identifier of the antiSMASH BGC, referring
+            antismash_id: Identifier of the antiSMASH BGC, referring
                 to the feature `VERSION` of GenBank file.
                 Defaults to None.
-            antismash_region(int | None): AntiSMASH BGC region number, referring
+            antismash_region: AntiSMASH BGC region number, referring
                 to the feature `region` of GenBank file.
                 Defaults to None.
-            parents(set[GCF]): The set of GCFs that contain the BGC.
-            strain(Strain): The strain of the BGC.
+            parents: The set of GCFs that contain the BGC.
+            strain: The strain of the BGC.
 
         .. GenBank features:
             https://www.insdc.org/submitting-standards/feature-table/
@@ -109,7 +109,7 @@ class BGC:
         """Add a parent GCF to the BGC.
 
         Args:
-            gcf(GCF): gene cluster family
+            gcf: gene cluster family
         """
         gcf.add_bgc(self)
 
@@ -143,7 +143,7 @@ class BGC:
             BGC names start with "BGC". It might give false positive result.
 
         Returns:
-            bool: True if it's MIBiG reference BGC
+            True if it's MIBiG reference BGC
         """
         return self.bgc_id.startswith("BGC")
 
@@ -151,12 +151,12 @@ class BGC:
     # this property is not used in NPLinker core business.
     @property
     @deprecated(version="2.0.0", reason="This method will be removed soon")
-    def aa_predictions(self):
+    def aa_predictions(self) -> list:
         """Amino acids as predicted monomers of product.
 
         Returns:
-            list: list of dicts with key as amino acid and value as prediction
-                probability.
+            list of dicts with key as amino acid and value as prediction
+            probability.
         """
         # Load aa predictions and cache them
         self._aa_predictions = None

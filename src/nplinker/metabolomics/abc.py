@@ -18,7 +18,7 @@ class MolecularFamilyLoaderBase(ABC):
         """Get MolecularFamily objects.
 
         Args:
-            keep_singleton(bool): True to keep singleton molecular families. A
+            keep_singleton: True to keep singleton molecular families. A
                 singleton molecular family is a molecular family that contains
                 only one spectrum.
 

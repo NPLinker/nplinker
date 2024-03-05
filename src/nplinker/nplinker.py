@@ -14,6 +14,7 @@ from .metabolomics import Spectrum
 from .pickler import save_pickled_data
 from .scoring.link_collection import LinkCollection
 from .scoring.metcalf_scoring import MetcalfScoring
+from .scoring.methods import ScoringMethod
 from .scoring.np_class_scoring import NPClassScoring
 from .scoring.rosetta_scoring import RosettaScoring
 
@@ -119,11 +120,11 @@ class NPLinker:
             logger.info(f"Saving reproducibility data to {filename}")
 
     @property
-    def root_dir(self):
+    def root_dir(self) -> str:
         """Returns path to the current dataset root directory.
 
         Returns:
-                str: the path to the dataset root directory currently in use
+            The path to the dataset root directory currently in use
         """
         return config.root_dir
 
@@ -154,7 +155,9 @@ class NPLinker:
         self._class_matches = self._loader.class_matches
 
     # TODO CG: refactor this method and update its unit tests
-    def get_links(self, input_objects, scoring_methods, and_mode=True):
+    def get_links(
+        self, input_objects: list, scoring_methods: list, and_mode: bool = True
+    ) -> LinkCollection:
         """Find links for a set of input objects (BGCs/GCFs/Spectra/MolFams).
 
         The input objects can be any mix of the following NPLinker types:
@@ -171,7 +174,7 @@ class NPLinker:
                 This may be either a flat list of a uniform type (one of the 4
                 types above), or a list of such lists
             scoring_methods: a list of one or more scoring methods to use
-            and_mode (bool): determines how results from multiple methods are combined.
+            and_mode: determines how results from multiple methods are combined.
                 This is ignored if a single method is supplied. If multiple methods
                 are used and ``and_mode`` is True, the results will only contain
                 links found by ALL methods. If False, results will contain links
@@ -294,14 +297,14 @@ class NPLinker:
         """Get common strains between given spectra/molecular families and GCFs.
 
         Args:
-            met(Sequence[Spectrum] | Sequence[MolecularFamily]):
+            met:
                 A list of Spectrum or MolecularFamily objects.
-            gcfs(Sequence[GCF]): A list of GCF objects.
-            filter_no_shared(bool): If True, the pairs of spectrum/mf and GCF
+            gcfs: A list of GCF objects.
+            filter_no_shared: If True, the pairs of spectrum/mf and GCF
                 without common strains will be removed from the returned dict;
 
         Returns:
-            dict: A dict where the keys are tuples of (Spectrum/MolecularFamily, GCF)
+            A dict where the keys are tuples of (Spectrum/MolecularFamily, GCF)
             and values are a list of shared Strain objects.
         """
         if not self._datalinks:
@@ -388,11 +391,11 @@ class NPLinker:
         """ClassMatches with the matched classes and scoring tables from MIBiG."""
         return self._class_matches
 
-    def scoring_method(self, name):
+    def scoring_method(self, name: str) -> ScoringMethod | None:
         """Return an instance of a scoring method.
 
         Args:
-            name (str): the name of the method (see :func:`scoring_methods`)
+            name: the name of the method (see :func:`scoring_methods`)
 
         Returns:
             An instance of the named scoring method class, or None if the name is invalid

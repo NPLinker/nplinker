@@ -19,12 +19,12 @@ class GCF:
         tools such as BiG-SCAPE and BiG-SLICE.
 
         Args:
-            gcf_id(str): id of the GCF object.
+            gcf_id: id of the GCF object.
 
         Attributes:
-            gcf_id(str): id of the GCF object.
-            bgc_ids(set[str]): a set of BGC ids that belongs to the GCF.
-            bigscape_class(str | None): BiG-SCAPE's BGC class.
+            gcf_id: id of the GCF object.
+            bgc_ids: a set of BGC ids that belongs to the GCF.
+            bigscape_class: BiG-SCAPE's BGC class.
                 BiG-SCAPE's BGC classes are similar to those defined in MiBIG
                 but have more categories (7 classes). More details see:
                 https://doi.org/10.1038%2Fs41589-019-0400-9.
@@ -92,10 +92,10 @@ class GCF:
         """Check if the given strain exists.
 
         Args:
-            strain(Strain): `Strain` object.
+            strain: `Strain` object.
 
         Returns:
-            bool: True when the given strain exist.
+            True when the given strain exist.
         """
         return strain in self._strains
 
@@ -103,7 +103,7 @@ class GCF:
         """Check if the GCF's children are only MIBiG BGCs.
 
         Returns:
-            bool: True if `GCF.bgc_ids` are only MIBiG BGC ids.
+            True if `GCF.bgc_ids` are only MIBiG BGC ids.
         """
         return all(map(lambda id: id.startswith("BGC"), self.bgc_ids))
 
@@ -111,6 +111,6 @@ class GCF:
         """Check if the GCF contains only one BGC.
 
         Returns:
-            bool: True if `GCF.bgc_ids` contains only one BGC id.
+            True if `GCF.bgc_ids` contains only one BGC id.
         """
         return len(self.bgc_ids) == 1

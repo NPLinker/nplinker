@@ -22,7 +22,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
             - spectra/*.mgf
 
         Args:
-            file(str | PathLike): path to the MGF file.
+            file: path to the MGF file.
 
         Raises:
             ValueError: Raises ValueError if the file is not valid.
@@ -97,10 +97,10 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
         """Get the precursor charge from the charge list.
 
         Args:
-            charge(list): list of charge values.
+            charge: list of charge values.
 
         Returns:
-            int: the precursor charge.
+            the precursor charge.
         """
         charge = charges[0]
         if charge == 0:
