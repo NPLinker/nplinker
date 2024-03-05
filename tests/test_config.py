@@ -1,17 +1,15 @@
 from nplinker.config import config
 
 
-def test_config_demo1():
-    """Test loading the default config file (nplinker_demo1.toml)."""
-    # The file "nplinker_demo1.toml" is set in ./conftest.py
-
-    assert config.mode == "podp"
-    assert config.podp_id == "4b29ddc3-26d0-40d7-80c5-44fb6631dbf9.4"
+def test_config():
+    """Test loading the default config file."""
+    # The default config file is set in "./conftest.py", which is "data/nplinker_local_mode.toml"
+    assert config.mode == "local"
+    assert config.log.level == "DEBUG"
+    assert config["log.level"] == "DEBUG"
+    assert config.get("log.level") == "DEBUG"
 
     # The following are default values from nplinker_default.toml
-    assert config.log.level == "INFO"
-    assert config["log.level"] == "INFO"
-    assert config.get("log.level") == "INFO"
     assert config.get("log.file") is None
     assert config.log.to_stdout is True
 

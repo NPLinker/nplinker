@@ -48,7 +48,7 @@ namespaces = true    # enable data directory to be identified
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts    = "-ra -n auto"   # -ra: show summary info for all test outcomes; -n auto: run tests in parallel
+addopts    = "-ra -n 1"   # -ra: show summary info for all test outcomes; -n auto: run tests in parallel
 testpaths  = ["tests"]
 
 [tool.coverage.run]
