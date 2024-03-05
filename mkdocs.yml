@@ -1,0 +1,108 @@
+site_name: NPLinker
+site_description: Natural Products Linker
+strict: true
+site_url: https://nplinker.github.io/nplinker/
+
+theme:
+  name: 'material'
+  custom_dir: 'docs/theme' # https://squidfunk.github.io/mkdocs-material/customization/
+  palette:
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: deep orange
+    accent: indigo
+    toggle:
+      icon: material/weather-sunny
+      name: "Switch to dark mode"
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: deep orange
+    accent: indigo
+    toggle:
+      icon: material/weather-night
+      name: "Switch to light mode"
+  features:
+    - content.tabs.link
+    - content.code.annotate
+    - content.code.copy
+    - announce.dismiss
+    - navigation.tabs
+  icon:
+    logo: 'material/library-outline'
+    previous: fontawesome/solid/angle-left
+    next: fontawesome/solid/angle-right
+  favicon: 'favicon.png'
+
+repo_name: nplinker/nplinker
+repo_url: https://github.com/nplinker/nplinker
+edit_uri: edit/dev/docs/
+extra:
+  version:
+    provider: mike
+
+# https://www.mkdocs.org/user-guide/configuration/#validation
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+
+extra_css:
+  - 'extra/terminal.css'
+  - 'extra/tweaks.css'
+extra_javascript:
+  - 'extra/fluff.js'
+  - 'https://samuelcolvin.github.io/mkdocs-run-code/run_code_main.js'
+
+nav:
+- Get Started:
+  - Welcome to NPLinker: index.md
+- API:
+
+markdown_extensions:
+- tables
+- toc:
+    permalink: true
+    title: Page contents
+- admonition
+- pymdownx.details
+- pymdownx.superfences
+- pymdownx.highlight:
+    anchor_linenums: true
+    pygments_lang_class: true
+- pymdownx.extra
+- pymdownx.tabbed:
+    alternate_style: true
+- pymdownx.magiclink
+
+watch:
+- docs
+
+plugins:
+- mike:
+    alias_type: symlink
+    canonical_version: latest
+- search
+- exclude:
+    glob:
+    - theme/*
+    - __pycache__/*
+- mkdocstrings:
+    handlers:
+      python:
+        paths: [src]
+        import:
+          - https://docs.python.org/3/objects.inv
+          - https://numpy.org/doc/stable/objects.inv
+          - https://docs.scipy.org/doc/scipy/objects.inv
+          - https://pandas.pydata.org/docs/objects.inv
+        options:
+          members_order: source
+          filters: ["!^_"]
+          merge_init_into_class: true
+          show_root_heading: true
+          show_root_full_path: false
+          show_signature_annotations: true
+          signature_crossrefs: true
+          separate_signature: true
+          show_symbol_type_heading: true
+          show_symbol_type_toc: true
