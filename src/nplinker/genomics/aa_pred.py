@@ -55,7 +55,7 @@ class AntiSmashFile:
             directly use AntiSmash5Record or AntiSmash4Record.
 
         Args:
-            filename(str): AntiSMASH file path
+            filename: AntiSMASH file path
         """
         self.raw_data = []
         self.filename = filename
@@ -100,7 +100,7 @@ class AntiSmash5Record:
             AntiSMASH v5 data.
 
         Args:
-            seq_record(Bio.SeqRecord): SeqRecord of AntiSMASH
+            seq_record: SeqRecord of AntiSMASH
         """
         self.raw_data = seq_record
         self.description = self.raw_data.description
@@ -143,10 +143,10 @@ class AntiSmash5Record:
         """Get probability of predicted amino acid.
 
         Args:
-            aa(str): amino acid
+            aa: amino acid
 
         Returns:
-            float: prediction probability
+            prediction probability
         """
         if aa in self.specificities:
             return 1.0

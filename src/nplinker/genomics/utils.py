@@ -24,12 +24,12 @@ def generate_mappings_genome_id_bgc_id(
     Note that the `output_file` will be overwritten if it already exists.
 
     Args:
-        bgc_dir(str | PathLike): The directory has one-layer of subfolders and
+        bgc_dir: The directory has one-layer of subfolders and
             each subfolder contains BGC files in `.gbk` format.
             It assumes that
             - the subfolder name is the genome id (e.g. refseq),
             - the BGC file name is the BGC id.
-        output_file(str | PathLike | None): The path to the output file. Note
+        output_file: The path to the output file. Note
             that the file will be overwritten if it already exists.
             Defaults to None, in which case the output file will be placed in
             the directory `bgc_dir` with a file name defined in global variable
@@ -71,11 +71,11 @@ def add_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]) -> tuple[list[
     Note that the input list `bgcs` will be changed in place.
 
     Args:
-        strains(StrainCollection): A collection of all strain objects.
-        bgcs(list[BGC]): A list of BGC objects.
+        strains: A collection of all strain objects.
+        bgcs: A list of BGC objects.
 
     Returns:
-        tuple(list[BGC], list[BGC]): A tuple of two lists of BGC objects. The
+        A tuple of two lists of BGC objects. The
             first list contains BGC objects that are updated with Strain object;
             the second list contains BGC objects that are not updated with
             Strain object because no Strain object is found.
@@ -120,12 +120,11 @@ def add_bgc_to_gcf(
     This method changes the lists `bgcs` and `gcfs` in place.
 
     Args:
-        bgcs(list[BGC]): A list of BGC objects.
-        gcfs(list[GCF]): A list of GCF objects.
+        bgcs: A list of BGC objects.
+        gcfs: A list of GCF objects.
 
     Returns:
-        tuple(list[GCF], list[GCF], dict[GCF, set[str]]):
-            The first list contains GCF objects that are updated with BGC objects;
+        The first list contains GCF objects that are updated with BGC objects;
             The second list contains GCF objects that are not updated with BGC objects
             because no BGC objects are found;
             The dictionary contains GCF objects as keys and a set of ids of missing
@@ -164,7 +163,7 @@ def get_mibig_from_gcf(gcfs: list[GCF]) -> tuple[list[BGC], StrainCollection]:
     """Get MIBiG BGCs and strains from GCF objects.
 
     Args:
-        gcfs(list[GCF]): A list of GCF objects.
+        gcfs: A list of GCF objects.
 
     Returns:
         tuple[list[BGC], StrainCollection]: The first is a list of MIBiG BGC

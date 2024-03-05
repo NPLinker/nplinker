@@ -123,7 +123,7 @@ class NPLinker:
         """Returns path to the current dataset root directory.
 
         Returns:
-                str: the path to the dataset root directory currently in use
+                the path to the dataset root directory currently in use
         """
         return config.root_dir
 
@@ -171,7 +171,7 @@ class NPLinker:
                 This may be either a flat list of a uniform type (one of the 4
                 types above), or a list of such lists
             scoring_methods: a list of one or more scoring methods to use
-            and_mode (bool): determines how results from multiple methods are combined.
+            and_mode: determines how results from multiple methods are combined.
                 This is ignored if a single method is supplied. If multiple methods
                 are used and ``and_mode`` is True, the results will only contain
                 links found by ALL methods. If False, results will contain links
@@ -294,14 +294,14 @@ class NPLinker:
         """Get common strains between given spectra/molecular families and GCFs.
 
         Args:
-            met(Sequence[Spectrum] | Sequence[MolecularFamily]):
+            met:
                 A list of Spectrum or MolecularFamily objects.
-            gcfs(Sequence[GCF]): A list of GCF objects.
-            filter_no_shared(bool): If True, the pairs of spectrum/mf and GCF
+            gcfs: A list of GCF objects.
+            filter_no_shared: If True, the pairs of spectrum/mf and GCF
                 without common strains will be removed from the returned dict;
 
         Returns:
-            dict: A dict where the keys are tuples of (Spectrum/MolecularFamily, GCF)
+            A dict where the keys are tuples of (Spectrum/MolecularFamily, GCF)
             and values are a list of shared Strain objects.
         """
         if not self._datalinks:
@@ -392,7 +392,7 @@ class NPLinker:
         """Return an instance of a scoring method.
 
         Args:
-            name (str): the name of the method (see :func:`scoring_methods`)
+            name: the name of the method (see :func:`scoring_methods`)
 
         Returns:
             An instance of the named scoring method class, or None if the name is invalid

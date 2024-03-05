@@ -35,10 +35,10 @@ def download_and_extract_mibig_metadata(
         folders will be removed if they exist. So the `extract_path` will have only json files.
 
     Args:
-        download_root(str | os.PathLike): Path to the directory in which to place the downloaded archive.
-        extract_path(str | os.PathLike): Path to an empty directory where the json files will be extracted.
+        download_root: Path to the directory in which to place the downloaded archive.
+        extract_path: Path to an empty directory where the json files will be extracted.
             The directory must be empty if it exists. If it doesn't exist, the directory will be created.
-        version (str, optional): _description_. Defaults to "3.1".
+        version: _description_. Defaults to "3.1".
 
     Examples:
         >>> download_and_extract_mibig_metadata("/data/download", "/data/mibig_metadata")

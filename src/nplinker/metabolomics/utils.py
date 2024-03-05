@@ -14,9 +14,9 @@ def add_annotation_to_spectrum(annotations: dict[str, dict], spectra: list[Spect
     Note that the input `spectra` list is changed in place.
 
     Args:
-        annotations(dict[str, dict]): A dictionary of GNPS annotations, where the keys are
+        annotations: A dictionary of GNPS annotations, where the keys are
             spectrum ids and the values are GNPS annotations.
-        spectra(list[Spectrum]): A list of Spectrum objects.
+        spectra: A list of Spectrum objects.
     """
     for spec in spectra:
         if spec.spectrum_id in annotations:
@@ -31,11 +31,11 @@ def add_strains_to_spectrum(
     Note that the input `spectra` list is changed in place.
 
     Args:
-        strains(StrainCollection): A collection of strain objects.
-        spectra(list[Spectrum]): A list of Spectrum objects.
+        strains: A collection of strain objects.
+        spectra: A list of Spectrum objects.
 
     Returns:
-        tuple(list[Spectrum], list[Spectrum]): A tuple of two lists of Spectrum
+        A tuple of two lists of Spectrum
             objects. The first list contains Spectrum objects that are updated
             with Strain objects; the second list contains Spectrum objects that
             are not updated with Strain objects becuase no Strain objects are found.
@@ -75,11 +75,11 @@ def add_spectrum_to_mf(
     Note that the input `mfs` list is changed in place.
 
     Args:
-        spectra(list[Spectrum]): A list of Spectrum objects.
-        mfs(list[MolecularFamily]): A list of MolecularFamily objects.
+        spectra: A list of Spectrum objects.
+        mfs: A list of MolecularFamily objects.
 
     Returns:
-        tuple(list[MolecularFamily], list[MolecularFamily], dict[MolecularFamily, set[str]]):
+        tuple:
             The first list contains MolecularFamily objects that are updated with Spectrum objects.
             The second list contains MolecularFamily objects that are not updated with Spectrum
             objects (all Spectrum objects are missing).

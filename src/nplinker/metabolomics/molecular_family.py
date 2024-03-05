@@ -13,11 +13,11 @@ class MolecularFamily:
         """Class to model molecular family.
 
         Args:
-            family_id(str): Unique id for the molecular family.
+            family_id: Unique id for the molecular family.
 
         Attributes:
-            family_id(str): Unique id for the molecular family.
-            spectra_ids(set[str]): Set of spectrum ids in the molecular family.
+            family_id: Unique id for the molecular family.
+            spectra_ids: Set of spectrum ids in the molecular family.
         """
         self.family_id: str = family_id
         self.spectra_ids: set[str] = set()
@@ -55,7 +55,7 @@ class MolecularFamily:
         """Add a Spectrum object to the molecular family.
 
         Args:
-            spectrum(Spectrum): `Spectrum` object to add to the molecular family.
+            spectrum: `Spectrum` object to add to the molecular family.
         """
         self._spectra.add(spectrum)
         self.spectra_ids.add(spectrum.spectrum_id)
@@ -67,7 +67,7 @@ class MolecularFamily:
         """Remove a Spectrum object from the molecular family.
 
         Args:
-            spectrum(Spectrum): `Spectrum` object to remove from the molecular family.
+            spectrum: `Spectrum` object to remove from the molecular family.
         """
         self._spectra.remove(spectrum)
         self.spectra_ids.remove(spectrum.spectrum_id)
@@ -79,10 +79,10 @@ class MolecularFamily:
         """Check if the given strain exists.
 
         Args:
-            strain(Strain): `Strain` object.
+            strain: `Strain` object.
 
         Returns:
-            bool: True when the given strain exists.
+            True when the given strain exists.
         """
         return strain in self._strains
 
@@ -90,7 +90,7 @@ class MolecularFamily:
         """Check if the molecular family contains only one spectrum.
 
         Returns:
-            bool: True when `MolecularFamily.spectra_ids` contains only one spectrum id.
+            True when `MolecularFamily.spectra_ids` contains only one spectrum id.
         """
         return len(self.spectra_ids) == 1
 
@@ -102,7 +102,7 @@ class MolecularFamily:
         family).
 
         Returns:
-            StrainCollection: Updated StrainCollection object.
+            Updated StrainCollection object.
         """
         strains = StrainCollection()
         for spectrum in self._spectra:

@@ -139,7 +139,7 @@ class DatasetArranger:
         the TSV file or the CSV file exists in the default GNPS directory.
 
         Returns:
-            Path: Path to the GNPS file mappings file.
+            Path to the GNPS file mappings file.
         """
         file_mappings_tsv = globals.GNPS_DEFAULT_PATH / globals.GNPS_FILE_MAPPINGS_TSV
         file_mappings_csv = globals.GNPS_DEFAULT_PATH / globals.GNPS_FILE_MAPPINGS_CSV
@@ -352,7 +352,7 @@ def validate_gnps(gnps_dir: Path) -> None:
     - annotations.tsv
 
     Args:
-        gnps_dir (Path): Path to the GNPS data directory.
+        gnps_dir: Path to the GNPS data directory.
 
     Raises:
         FileNotFoundError: If the GNPS data directory is not found or any of the required files
@@ -401,7 +401,7 @@ def validate_antismash(antismash_dir: Path) -> None:
     file (with the suffix ".region???.gbk" where ??? is the region number).
 
     Args:
-        antismash_dir (Path): Path to the antiSMASH data directory.
+        antismash_dir: Path to the antiSMASH data directory.
 
     Raises:
         FileNotFoundError: If the antiSMASH data directory is not found, or no sub-directories
@@ -439,7 +439,7 @@ def validate_bigscape(bigscape_dir: Path) -> None:
     bigscape cutoff value set in the config file.
 
     Args:
-        bigscape_dir(Path): Path to the BiG-SCAPE data directory.
+        bigscape_dir: Path to the BiG-SCAPE data directory.
 
     Raises:
         FileNotFoundError: If the BiG-SCAPE data directory or the clustering file is not found.

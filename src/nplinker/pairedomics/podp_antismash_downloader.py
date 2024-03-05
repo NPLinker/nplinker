@@ -40,12 +40,12 @@ class GenomeStatus:
         """Initialize a GenomeStatus object for the given genome.
 
         Args:
-            original_id (str): The original ID of the genome.
-            resolved_refseq_id (str, optional): The resolved RefSeq ID of the
+            original_id: The original ID of the genome.
+            resolved_refseq_id: The resolved RefSeq ID of the
                 genome. Defaults to "".
-            resolve_attempted (bool, optional): A flag indicating whether an
+            resolve_attempted: A flag indicating whether an
                 attempt to resolve the RefSeq ID has been made. Defaults to False.
-            bgc_path (str, optional): The path to the downloaded BGC file for
+            bgc_path: The path to the downloaded BGC file for
                 the genome. Defaults to "".
         """
         self.original_id = original_id
@@ -60,10 +60,10 @@ class GenomeStatus:
         Note that an empty dict is returned if the given file doesn't exist.
 
         Args:
-            file(str | PathLike): Path to genome status file.
+            file: Path to genome status file.
 
         Returns:
-            dict: dict keys are genome original id and values are GenomeStatus
+            Dict keys are genome original id and values are GenomeStatus
                 objects. An empty dict is returned if the given file doesn't exist.
         """
         genome_status_dict = {}
@@ -89,14 +89,14 @@ class GenomeStatus:
         the file already exists, it is overwritten.
 
         Args:
-            genome_status_dict (dict[str, 'GenomeStatus']): A dictionary of genome
+            genome_status_dict: A dictionary of genome
                 status objects. The keys are the original genome IDs and the values
                 are GenomeStatus objects.
-            file(str | PathLike | None): The path to the output JSON file.
+            file: The path to the output JSON file.
                 If None, the JSON string is returned but not written to a file.
 
         Returns:
-            str | None: The JSON string if `file` is None, otherwise None.
+            The JSON string if `file` is None, otherwise None.
         """
         gs_list = [gs._to_dict() for gs in genome_status_dict.values()]
         json_data = {"genome_status": gs_list, "version": "1.0"}
@@ -128,14 +128,14 @@ def podp_download_and_extract_antismash_data(
     """Download and extract antiSMASH BGC archive for the given genome records.
 
     Args:
-        genome_records(list[dict[str, dict[str, str] | str]]): list of dicts
+        genome_records: list of dicts
             representing genome records. The dict of each genome record contains
                 - key(str): "genome_ID"
                 - value(dict[str, str]): a dict containing information about genome
                 type, label and accession ids (RefSeq, GenBank, and/or JGI).
-        project_download_root(str | PathLike): Path to the directory to place
+        project_download_root: Path to the directory to place
             downloaded archive in.
-        project_extract_root(str | PathLike): Path to the directory downloaded archive
+        project_extract_root: Path to the directory downloaded archive
             will be extracted to.
             Note that an `antismash` directory will be created in the specified
             `extract_root` if it doesn't exist. The files will be extracted to
@@ -223,11 +223,11 @@ def get_best_available_genome_id(genome_id_data: dict[str, str]) -> str | None:
     """Get the best available ID from genome_id_data dict.
 
     Args:
-        genome_id_data(dict): dictionary containing information
+        genome_id_data: dictionary containing information
         for each genome record present.
 
     Returns:
-        str | None: ID for the genome, if present, otherwise None.
+        ID for the genome, if present, otherwise None.
     """
     if "RefSeq_accession" in genome_id_data:
         best_id = genome_id_data["RefSeq_accession"]
@@ -271,14 +271,14 @@ def _resolve_genbank_accession(genbank_id: str) -> str:
     """Try to get RefSeq id through given GenBank id.
 
     Args:
-        genbank_id(str): ID for GenBank accession.
+        genbank_id: ID for GenBank accession.
 
     Raises:
         Exception: "Unknown HTML format" if the search of genbank does not give any results.
         Exception: "Expected HTML elements not found" if no match with RefSeq assembly accession is found.
 
     Returns:
-        str | None: RefSeq ID if the search is successful, otherwise None.
+        RefSeq ID if the search is successful, otherwise None.
     """
     logger.info(f"Attempting to resolve Genbank accession {genbank_id} to RefSeq accession")
     # genbank id => genbank seq => refseq
@@ -334,10 +334,10 @@ def _resolve_jgi_accession(jgi_id: str) -> str:
     """Try to get RefSeq id through given JGI id.
 
     Args:
-        jgi_id(str): JGI_Genome_ID for GenBank accession.
+        jgi_id: JGI_Genome_ID for GenBank accession.
 
     Returns:
-        str | None: Return RefSeq ID if search is successful, otherwise None.
+        RefSeq ID if search is successful, otherwise None.
     """
     url = JGI_GENOME_LOOKUP_URL.format(jgi_id)
     logger.info(f"Attempting to resolve JGI_Genome_ID {jgi_id} to GenBank accession via {url}")
@@ -361,14 +361,15 @@ def _resolve_jgi_accession(jgi_id: str) -> str:
 
 def _resolve_refseq_id(genome_id_data: dict[str, str]) -> str:
     """Get the RefSeq ID to which the genome accession is linked.
+
     Check https://pairedomicsdata.bioinformatics.nl/schema.json.
 
     Args:
-        genome_id_data(dict): dictionary containing information
+        genome_id_data: dictionary containing information
         for each genome record present.
 
     Returns:
-        str: Return RefSeq ID if present, otherwise an empty string.
+        RefSeq ID if present, otherwise an empty string.
     """
     if "RefSeq_accession" in genome_id_data:
         # best case, can use this directly

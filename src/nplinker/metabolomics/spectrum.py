@@ -23,27 +23,27 @@ class Spectrum:
         """Class to model MS/MS Spectrum.
 
         Args:
-            spectrum_id (str): the spectrum ID.
-            mz (list[float]): the list of m/z values.
-            intensity (list[float]): the list of intensity values.
-            precursor_mz (float): the precursor m/z.
-            rt (float): the retention time in seconds. Defaults to 0.
-            metadata (dict, optional): the metadata of the spectrum, i.e. the header infomation
+            spectrum_id: the spectrum ID.
+            mz: the list of m/z values.
+            intensity: the list of intensity values.
+            precursor_mz: the precursor m/z.
+            rt: the retention time in seconds. Defaults to 0.
+            metadata: the metadata of the spectrum, i.e. the header infomation
                 in the MGF file.
 
         Attributes:
-            spectrum_id (str): the spectrum ID.
-            mz (list[float]): the list of m/z values.
-            intensity (list[float]): the list of intensity values.
-            precursor_mz (float): the m/z value of the precursor.
-            rt (float): the retention time in seconds.
-            metadata (dict): the metadata of the spectrum, i.e. the header infomation in the MGF
+            spectrum_id: the spectrum ID.
+            mz: the list of m/z values.
+            intensity: the list of intensity values.
+            precursor_mz: the m/z value of the precursor.
+            rt: the retention time in seconds.
+            metadata: the metadata of the spectrum, i.e. the header infomation in the MGF
                 file.
-            gnps_annotations (dict): the GNPS annotations of the spectrum.
-            gnps_id (str | None): the GNPS ID of the spectrum.
-            strains (StrainCollection): the strains that this spectrum belongs to.
-            family (MolecularFamily): the molecular family that this spectrum belongs to.
-            peaks (np.ndarray): 2D array of peaks, each row is a peak of (m/z, intensity) values.
+            gnps_annotations: the GNPS annotations of the spectrum.
+            gnps_id: the GNPS ID of the spectrum.
+            strains: the strains that this spectrum belongs to.
+            family: the molecular family that this spectrum belongs to.
+            peaks: 2D array of peaks, each row is a peak of (m/z, intensity) values.
         """
         self.spectrum_id = spectrum_id
         self.mz = mz
@@ -80,9 +80,9 @@ class Spectrum:
         """Check if the given strain exists in the spectrum.
 
         Args:
-            strain(Strain): `Strain` object.
+            strain: `Strain` object.
 
         Returns:
-            bool: True when the given strain exist in the spectrum.
+            True when the given strain exist in the spectrum.
         """
         return strain in self.strains

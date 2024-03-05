@@ -17,7 +17,7 @@ def load_user_strains(json_file: str | PathLike) -> set[Strain]:
         {"strain_ids": ["strain1", "strain2"]}
 
     Args:
-        json_file(str | PathLike): Path to the JSON file containing user specified strains.
+        json_file: Path to the JSON file containing user specified strains.
 
     Returns:
         set[Strain]: A set of user specified strains.

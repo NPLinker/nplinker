@@ -23,13 +23,13 @@ class LinkFinder:
         """Initialise LinkFinder object.
 
         Attributes:
-            raw_score_spec_gcf (pd.DataFrame): The raw Metcalf scores for
+            raw_score_spec_gcf: The raw Metcalf scores for
                 spectrum-GCF links.
-            raw_score_mf_gcf (pd.DataFrame): The raw Metcalf scores for
+            raw_score_mf_gcf: The raw Metcalf scores for
                 molecular family-GCF links.
-            metcalf_mean (np.ndarray | None): The mean value used for
+            metcalf_mean: The mean value used for
                 standardising Metcalf scores.
-            metcalf_std (np.ndarray | None): The standard deviation value used
+            metcalf_std: The standard deviation value used
                 for standardising Metcalf scores.
         """
         self.raw_score_spec_gcf = pd.DataFrame()
@@ -47,10 +47,10 @@ class LinkFinder:
         """Calculate Metcalf scores.
 
         Args:
-            data_links(DataLinks): The DataLinks object to use for scoring.
-            link_type(str): The type of link to score. Must be 'spec-gcf' or
+            data_links: The DataLinks object to use for scoring.
+            link_type: The type of link to score. Must be 'spec-gcf' or
                 'mf-gcf'. Defaults to 'spec-gcf'.
-            scoring_weights(tuple[int,int,int,int]): The weights to
+            scoring_weights: The weights to
                 use for Metcalf scoring. The weights are applied to
                 '(met_gcf, met_not_gcf, gcf_not_met, not_met_not_gcf)'.
                 Defaults to (10, -10, 0, 1).
@@ -118,13 +118,13 @@ class LinkFinder:
         """Get links and scores for given objects.
 
         Args:
-            objects(tuple): A list of GCF, Spectrum or MolecularFamily objects
+            objects: A list of GCF, Spectrum or MolecularFamily objects
                 and all objects must be of the same type.
-            score_cutoff(float): Minimum score to consider a link (≥score_cutoff).
+            score_cutoff: Minimum score to consider a link (≥score_cutoff).
                 Default is 0.5.
 
         Returns:
-            list: List of data frames containing the ids of the linked objects
+            List of data frames containing the ids of the linked objects
                 and the score. The data frame has index names of
                 'source', 'target' and 'score':
                 - the 'source' row contains the ids of the input/source objects,

@@ -26,11 +26,11 @@ def download_and_extract_antismash_data(
     of a genome as the id of the archive.
 
     Args:
-        antismash_id(str): The id used to download BGC archive from antiSMASH database.
+        antismash_id: The id used to download BGC archive from antiSMASH database.
             If the id is versioned (e.g., "GCF_004339725.1") please be sure to
             specify the version as well.
-        download_root(str | PathLike): Path to the directory to place downloaded archive in.
-        extract_root(str | PathLike): Path to the directory data files will be extracted to.
+        download_root: Path to the directory to place downloaded archive in.
+        extract_root: Path to the directory data files will be extracted to.
             Note that an `antismash` directory will be created in the specified `extract_root` if
             it doesn't exist. The files will be extracted to `<extract_root>/antismash/<antismash_id>` directory.
 

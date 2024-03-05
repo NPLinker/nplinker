@@ -10,7 +10,7 @@ class MibigMetadata:
         https://mibig.secondarymetabolites.org/download.
 
         Args:
-            file(str): Path to the json file of MIBiG BGC metadata
+            file: Path to the json file of MIBiG BGC metadata
 
         Examples:
             >>> metadata = MibigMetadata("/data/BGC0000001.json")

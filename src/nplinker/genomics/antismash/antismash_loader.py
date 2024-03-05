@@ -30,7 +30,7 @@ class AntismashBGCLoader:
                 └── ...
 
         Args:
-            antismash_dir(str): Path to AntiSMASH directory that contains a
+            antismash_dir: Path to AntiSMASH directory that contains a
                 collection of AntiSMASH outputs.
         """
         self.data_dir = data_dir
@@ -43,8 +43,8 @@ class AntismashBGCLoader:
         Note that the directory name of the gbk file is treated as genome id.
 
         Returns:
-            dict[str, str]: key is BGC name (gbk file name) and value is genome
-                id (the directory name of the gbk file).
+            The key is BGC name (gbk file name) and value is genome id (the directory name of the gbk
+              file).
         """
         return {
             bid: os.path.basename(os.path.dirname(bpath)) for bid, bpath in self._file_dict.items()
@@ -54,8 +54,7 @@ class AntismashBGCLoader:
         """Get BGC gbk files.
 
         Returns:
-            dict[str, str]: key is BGC name (gbk file name) and value is path to
-                the gbk file
+            The key is BGC name (gbk file name) and value is path to the gbk file.
         """
         return self._file_dict
 
@@ -64,12 +63,11 @@ class AntismashBGCLoader:
         """Parse AntiSMASH directory to get path of all BGC gbk files.
 
         Args:
-            data_dir(str): Path to AntiSMASH directory that contains
+            data_dir: Path to AntiSMASH directory that contains
                 a collection of AntiSMASH outputs
 
         Returns:
-            dict[str, str]: key is BGC name (gbk file name) and value is path to
-                the gbk file
+            The key is BGC name (gbk file name) and value is path to the gbk file.
         """
         bgc_files = {}
         subdirs = list_dirs(data_dir)
@@ -89,7 +87,7 @@ class AntismashBGCLoader:
         """Get all BGC objects.
 
         Returns:
-            list[BGC]: a list of :class:`~nplinker.genomic.BGC` objects
+            A list of BGC objects
         """
         return self._bgcs
 
@@ -98,11 +96,11 @@ class AntismashBGCLoader:
         """Load given BGC files as BGC objects.
 
         Args:
-            bgc_files(dict[str, str]): key is BGC name and value is path to the
+            bgc_files: key is BGC name and value is path to the
                 BGC gbk file, see method :meth:`.bgc_files`.
 
         Returns:
-            list[BGC]: a list of :class:`~nplinker.genomic.BGC` objects
+            A list of BGC objects
         """
         return [parse_bgc_genbank(file) for file in bgc_files.values()]
 
@@ -111,10 +109,10 @@ def parse_bgc_genbank(file: str) -> BGC:
     """Parse a single BGC gbk file to BGC object.
 
     Args:
-        file(str): Path to BGC gbk file
+        file: Path to BGC gbk file
 
     Returns:
-        BGC: :class:`~nplinker.genomic.BGC` object
+        BGC object
 
     Examples:
         >>> bgc = AntismashBGCLoader.parse_bgc(

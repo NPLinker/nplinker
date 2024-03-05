@@ -28,9 +28,9 @@ class MetcalfScoring(ScoringMethod):
     """Metcalf scoring method.
 
     Attributes:
-        DATALINKS (DataLinks): The DataLinks object to use for scoring.
-        LINKFINDER (LinkFinder): The LinkFinder object to use for scoring.
-        NAME (str): The name of the scoring method. This is set to 'metcalf'.
+        DATALINKS: The DataLinks object to use for scoring.
+        LINKFINDER: The LinkFinder object to use for scoring.
+        NAME: The name of the scoring method. This is set to 'metcalf'.
     """
 
     DATALINKS = None
@@ -41,14 +41,14 @@ class MetcalfScoring(ScoringMethod):
         """Create a MetcalfScoring object.
 
         Args:
-            npl (NPLinker): The NPLinker object to use for scoring.
+            npl: The NPLinker object to use for scoring.
 
         Attributes:
-            cutoff (float): The cutoff value to use for scoring. Scores below
+            cutoff: The cutoff value to use for scoring. Scores below
                 this value will be discarded. Defaults to 1.0.
-            standardised (bool): Whether to use standardised scores. Defaults
+            standardised: Whether to use standardised scores. Defaults
                 to True.
-            name (str): The name of the scoring method. It's set to a fixed value
+            name: The name of the scoring method. It's set to a fixed value
                 'metcalf'.
         """
         super().__init__(npl)
@@ -132,7 +132,7 @@ class MetcalfScoring(ScoringMethod):
             link_collection: The LinkCollection object to add the links to.
 
         Returns:
-            LinkCollection: The LinkCollection object with the new links added.
+            The LinkCollection object with the new links added.
 
         Raises:
             ValueError: If the input objects are empty.

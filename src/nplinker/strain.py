@@ -13,7 +13,7 @@ class Strain:
         id.
 
         Args:
-            primary_id(str): the representative id of the strain.
+            primary_id: the representative id of the strain.
         """
         self.id: str = primary_id
         self._aliases: set[str] = set()
@@ -64,7 +64,7 @@ class Strain:
         """Add an alias to the list of known aliases.
 
         Args:
-            alias(str): The alias to add to the list of known aliases.
+            alias: The alias to add to the list of known aliases.
         """
         if not isinstance(alias, str):
             raise TypeError(f"Expected str, got {type(alias)}")
