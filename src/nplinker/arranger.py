@@ -113,18 +113,21 @@ class DatasetArranger:
             - molecular_families.tsv
             - annotations.tsv
         """
-        if config.mode == "local":
-            validate_gnps(globals.GNPS_DEFAULT_PATH)
-
+        pass_validation = False
         if config.mode == "podp":
-            # set range 3 to ensure download can try 2 times and downloaded data is valid
+            # retry downloading at most 3 times if downloaded data has problems
             for _ in range(3):
                 try:
                     validate_gnps(globals.GNPS_DEFAULT_PATH)
+                    pass_validation = True
+                    break
                 except (FileNotFoundError, ValueError):
                     # Don't need to remove downloaded archive, as it'll be overwritten
                     shutil.rmtree(globals.GNPS_DEFAULT_PATH, ignore_errors=True)
                     self._download_and_extract_gnps()
+
+        if not pass_validation:
+            validate_gnps(globals.GNPS_DEFAULT_PATH)
 
         # get the path to file_mappings file (csv or tsv)
         self.gnps_file_mappings_file = self._get_gnps_file_mappings_file()
@@ -188,18 +191,19 @@ class DatasetArranger:
             │  ├── ...
             └── ...
         """
-        if config.mode == "local":
-            validate_antismash(globals.ANTISMASH_DEFAULT_PATH)
-
+        pass_validation = False
         if config.mode == "podp":
-            # set range 3 to ensure download can try 2 times and downloaded data is valid
             for _ in range(3):
                 try:
                     validate_antismash(globals.ANTISMASH_DEFAULT_PATH)
+                    pass_validation = True
                     break
                 except FileNotFoundError:
                     shutil.rmtree(globals.ANTISMASH_DEFAULT_PATH, ignore_errors=True)
                     self._download_and_extract_antismash()
+
+        if not pass_validation:
+            validate_antismash(globals.ANTISMASH_DEFAULT_PATH)
 
     def _download_and_extract_antismash(self) -> None:
         """Download and extract the antiSMASH data.
@@ -229,17 +233,19 @@ class DatasetArranger:
         - Check if the clustering file "mix_clustering_c{config.bigscape.cutoff}.tsv" exists in the
             BiG-SCAPE data directory.
         """
-        if config.mode == "local":
-            validate_bigscape(globals.BIGSCAPE_DEFAULT_PATH)
-
+        pass_validation = False
         if config.mode == "podp":
             for _ in range(3):
                 try:
                     validate_bigscape(globals.BIGSCAPE_DEFAULT_PATH)
+                    pass_validation = True
                     break
                 except FileNotFoundError:
                     shutil.rmtree(globals.BIGSCAPE_DEFAULT_PATH, ignore_errors=True)
                     self._run_bigscape()
+
+        if not pass_validation:
+            validate_bigscape(globals.BIGSCAPE_DEFAULT_PATH)
 
     def _run_bigscape(self) -> None:
         """Run BiG-SCAPE to generate the clustering file.
