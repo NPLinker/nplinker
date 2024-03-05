@@ -23,7 +23,7 @@ class BigscapeGCFLoader:
         self.cluster_file = str(cluster_file)
         self._gcf_list = self._parse_gcf(self.cluster_file)
 
-    def get_gcfs(self, keep_mibig_only=False, keep_singleton=False) -> list[GCF]:
+    def get_gcfs(self, keep_mibig_only: bool = False, keep_singleton: bool = False) -> list[GCF]:
         """Get all GCF objects.
 
         Args:

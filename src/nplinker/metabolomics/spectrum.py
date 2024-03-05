@@ -76,7 +76,7 @@ class Spectrum:
         """Get the peaks, a 2D array with each row containing the values of (m/z, intensity)."""
         return np.array(list(zip(self.mz, self.intensity)))
 
-    def has_strain(self, strain: Strain):
+    def has_strain(self, strain: Strain) -> bool:
         """Check if the given strain exists in the spectrum.
 
         Args:

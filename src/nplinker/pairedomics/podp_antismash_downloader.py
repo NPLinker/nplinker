@@ -223,8 +223,7 @@ def get_best_available_genome_id(genome_id_data: dict[str, str]) -> str | None:
     """Get the best available ID from genome_id_data dict.
 
     Args:
-        genome_id_data: dictionary containing information
-        for each genome record present.
+        genome_id_data: dictionary containing information for each genome record present.
 
     Returns:
         ID for the genome, if present, otherwise None.

@@ -28,13 +28,13 @@ class BGCLoaderBase(ABC):
         """Get BGC objects.
 
         Returns:
-            A list of :class:`~nplinker.genomic.BGC` objects
+            A list of BGC objects
         """
 
 
 class GCFLoaderBase(ABC):
     @abstractmethod
-    def get_gcfs(self, keep_mibig_only, keep_singleton) -> Sequence[GCF]:
+    def get_gcfs(self, keep_mibig_only: bool, keep_singleton: bool) -> Sequence[GCF]:
         """Get GCF objects.
 
         Args:
@@ -44,5 +44,5 @@ class GCFLoaderBase(ABC):
                 is a GCF that contains only one BGC.
 
         Returns:
-            A list of :class:`~nplinker.genomic.GCF` objects
+            A list of GCF objects
         """

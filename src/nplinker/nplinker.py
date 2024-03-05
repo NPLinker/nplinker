@@ -14,6 +14,7 @@ from .metabolomics import Spectrum
 from .pickler import save_pickled_data
 from .scoring.link_collection import LinkCollection
 from .scoring.metcalf_scoring import MetcalfScoring
+from .scoring.methods import ScoringMethod
 from .scoring.np_class_scoring import NPClassScoring
 from .scoring.rosetta_scoring import RosettaScoring
 
@@ -119,11 +120,11 @@ class NPLinker:
             logger.info(f"Saving reproducibility data to {filename}")
 
     @property
-    def root_dir(self):
+    def root_dir(self) -> str:
         """Returns path to the current dataset root directory.
 
         Returns:
-                the path to the dataset root directory currently in use
+            The path to the dataset root directory currently in use
         """
         return config.root_dir
 
@@ -154,7 +155,9 @@ class NPLinker:
         self._class_matches = self._loader.class_matches
 
     # TODO CG: refactor this method and update its unit tests
-    def get_links(self, input_objects, scoring_methods, and_mode=True):
+    def get_links(
+        self, input_objects: list, scoring_methods: list, and_mode: bool = True
+    ) -> LinkCollection:
         """Find links for a set of input objects (BGCs/GCFs/Spectra/MolFams).
 
         The input objects can be any mix of the following NPLinker types:
@@ -388,7 +391,7 @@ class NPLinker:
         """ClassMatches with the matched classes and scoring tables from MIBiG."""
         return self._class_matches
 
-    def scoring_method(self, name):
+    def scoring_method(self, name: str) -> ScoringMethod | None:
         """Return an instance of a scoring method.
 
         Args:

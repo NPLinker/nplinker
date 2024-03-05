@@ -37,7 +37,7 @@ class GNPSExtractor:
 
         Args:
             file: The path to the GNPS zip file.
-            extract_path: path to the directory where to extract the files to.
+            extract_dir: path to the directory where to extract the files to.
 
         Raises:
             ValueError: If the given file is an invalid GNPS archive.

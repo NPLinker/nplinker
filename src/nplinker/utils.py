@@ -131,8 +131,7 @@ def download_url(
         md5: MD5 checksum of the download. If None, do not check.
         http_method: HTTP request method, e.g. "GET", "POST".
             Defaults to "GET".
-        allow_http_redirect: If true, enable following redirects
-         for all HTTP ("http:") methods.
+        allow_http_redirect: If true, enable following redirects for all HTTP ("http:") methods.
     """
     root = transform_to_full_path(root)
     # create the download directory if not exist
@@ -172,7 +171,7 @@ def list_dirs(root: str | PathLike, keep_parent: bool = True) -> list[str]:
 
     Args:
         root: Path to directory whose folders need to be listed
-        prefix: If true, prepends the path to each result, otherwise
+        keep_parent: If true, prepends the path to each result, otherwise
             only returns the name of the directories found
     """
     root = transform_to_full_path(root)

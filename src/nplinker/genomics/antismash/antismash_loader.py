@@ -20,6 +20,7 @@ class AntismashBGCLoader:
 
         Note:
             AntiSMASH BGC directory must follow the structure below:
+            ```
             antismash
                 ├── genome_id_1 (one AntiSMASH output, e.g. GCF_000514775.1)
                 │  ├── GCF_000514775.1.gbk
@@ -28,9 +29,10 @@ class AntismashBGCLoader:
                 ├── genome_id_2
                 │  ├── ...
                 └── ...
+            ```
 
         Args:
-            antismash_dir: Path to AntiSMASH directory that contains a
+            data_dir: Path to AntiSMASH directory that contains a
                 collection of AntiSMASH outputs.
         """
         self.data_dir = data_dir
@@ -43,8 +45,8 @@ class AntismashBGCLoader:
         Note that the directory name of the gbk file is treated as genome id.
 
         Returns:
-            The key is BGC name (gbk file name) and value is genome id (the directory name of the gbk
-              file).
+            The key is BGC name (gbk file name) and value is genome id (the directory name of the
+            gbk file).
         """
         return {
             bid: os.path.basename(os.path.dirname(bpath)) for bid, bpath in self._file_dict.items()

@@ -297,7 +297,7 @@ def extract_mappings_ms_filename_spectrum_id(
         from GNPS website to a file with a default name defined in `GNPS_FILE_MAPPINGS_FILENAME`.
 
     See Also:
-        `GNPSFileMappingLoader`: A class to load GNPS file mappings file.
+        GNPSFileMappingLoader: A class to load GNPS file mappings file.
     """
     loader = GNPSFileMappingLoader(gnps_file_mappings_file)
     return loader.mapping_reversed

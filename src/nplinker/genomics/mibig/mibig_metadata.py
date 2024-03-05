@@ -2,7 +2,7 @@ import json
 
 
 class MibigMetadata:
-    def __init__(self, file) -> None:
+    def __init__(self, file: str) -> None:
         """Class to model the BGC metadata/annotations defined in MIBiG.
 
         MIBiG is a specification of BGC metadata and use JSON schema to

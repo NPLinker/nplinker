@@ -151,12 +151,12 @@ class BGC:
     # this property is not used in NPLinker core business.
     @property
     @deprecated(version="2.0.0", reason="This method will be removed soon")
-    def aa_predictions(self):
+    def aa_predictions(self) -> list:
         """Amino acids as predicted monomers of product.
 
         Returns:
             list of dicts with key as amino acid and value as prediction
-                probability.
+            probability.
         """
         # Load aa predictions and cache them
         self._aa_predictions = None
