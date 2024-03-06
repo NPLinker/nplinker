@@ -290,11 +290,11 @@ def get_mappings_strain_id_bgc_id(
         Key is strain id and value is a set of BGC ids.
 
     See Also:
-        `extract_mappings_strain_id_original_genome_id`: Extract mappings
+        - `extract_mappings_strain_id_original_genome_id`: Extract mappings
             "strain_id <-> original_genome_id".
-        `extract_mappings_original_genome_id_resolved_genome_id`: Extract mappings
+        - `extract_mappings_original_genome_id_resolved_genome_id`: Extract mappings
             "original_genome_id <-> resolved_genome_id".
-        `extract_mappings_resolved_genome_id_bgc_id`: Extract mappings
+        - `extract_mappings_resolved_genome_id_bgc_id`: Extract mappings
             "resolved_genome_id <-> bgc_id".
     """
     mappings_dict = {}
