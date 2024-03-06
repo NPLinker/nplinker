@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 import pytest
 from nplinker.globals import GENOME_STATUS_FILENAME
-from nplinker.pairedomics import GenomeStatus
-from nplinker.pairedomics import podp_download_and_extract_antismash_data
+from nplinker.strain import GenomeStatus
+from nplinker.strain import podp_download_and_extract_antismash_data
 from nplinker.utils import list_files
 
 

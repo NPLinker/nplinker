@@ -13,9 +13,9 @@ from nplinker.globals import GENOME_STATUS_FILENAME
 from nplinker.globals import STRAIN_MAPPINGS_FILENAME
 from nplinker.metabolomics.gnps import GNPSDownloader
 from nplinker.metabolomics.gnps import GNPSExtractor
-from nplinker.pairedomics import podp_download_and_extract_antismash_data
+from nplinker.strain import podp_download_and_extract_antismash_data
 from nplinker.genomics.bigscape.runbigscape import run_bigscape
-from nplinker.pairedomics.strain_mappings_generator import podp_generate_strain_mappings
+from nplinker.strain.strain_mappings_generator import podp_generate_strain_mappings
 from nplinker.schemas import STRAIN_MAPPINGS_SCHEMA
 from nplinker.schemas import USER_STRAINS_SCHEMA
 from nplinker.schemas import validate_podp_json
