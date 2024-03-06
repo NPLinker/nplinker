@@ -1,7 +1,7 @@
 import json
 import pytest
 from nplinker.strain import Strain
-from nplinker.strain_collection import StrainCollection
+from nplinker.strain import StrainCollection
 
 
 @pytest.fixture

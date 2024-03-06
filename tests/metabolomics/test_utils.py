@@ -1,11 +1,15 @@
+import json
 import pytest
 from nplinker.metabolomics import MolecularFamily
 from nplinker.metabolomics import Spectrum
-from nplinker.metabolomics import add_annotation_to_spectrum
-from nplinker.metabolomics import add_spectrum_to_mf
-from nplinker.metabolomics import add_strains_to_spectrum
+from nplinker.metabolomics.utils import add_annotation_to_spectrum
+from nplinker.metabolomics.utils import add_spectrum_to_mf
+from nplinker.metabolomics.utils import add_strains_to_spectrum
+from nplinker.metabolomics.utils import extract_mappings_ms_filename_spectrum_id
+from nplinker.metabolomics.utils import extract_mappings_strain_id_ms_filename
+from nplinker.metabolomics.utils import get_mappings_strain_id_spectrum_id
 from nplinker.strain import Strain
-from nplinker.strain_collection import StrainCollection
+from nplinker.strain import StrainCollection
 
 
 @pytest.fixture
@@ -81,3 +85,66 @@ def test_add_spectrum_to_mf(spectra):
     assert mf0.spectra == {spectra[0], spectra[1]}
     assert mf1.spectra == {spectra[2]}
     assert mf2.spectra == set()
+
+
+def test_extract_mappings_strain_id_ms_filename(tmp_path):
+    test_data = {
+        "genome_metabolome_links": [
+            {"genome_label": "strain1", "metabolomics_file": "http://example.com/file1.mzXML"},
+            {"genome_label": "strain1", "metabolomics_file": "http://example.com/file2.mzXML"},
+            {"genome_label": "strain2", "metabolomics_file": "http://example.com/file3.mzXML"},
+            {"genome_label": "strain3", "metabolomics_file": "http://example.com/file4.mzXML"},
+        ],
+        "genomes": [
+            {"genome_label": "strain1", "genome_ID": {"RefSeq_accession": "id1"}},
+        ],
+        "metabolomics": {"project": {"molecular_network": "01234567890123456789012345678901"}},
+        "version": "3",
+    }
+    test_file = tmp_path / "test_data.json"
+    with open(test_file, "w") as f:
+        json.dump(test_data, f)
+    expected_result = {
+        "strain1": {"file1.mzXML", "file2.mzXML"},
+        "strain2": {"file3.mzXML"},
+        "strain3": {"file4.mzXML"},
+    }
+
+    assert extract_mappings_strain_id_ms_filename(test_file) == expected_result
+
+
+def test_extract_mappings_ms_filename_spectrum_id(tmp_path):
+    test_data = "cluster index\tAllFiles\nspec1\tfile1.mzXML:123###\nspec2\tfile2.mzXML:123###\nspec3\tfile2.mzXML:123###file3.mzXML:123###\n"
+    test_file = tmp_path / "test_data.tsv"
+    with open(test_file, "w") as f:
+        f.write(test_data)
+    expected_result = {
+        "file1.mzXML": {"spec1"},
+        "file2.mzXML": {"spec2", "spec3"},
+        "file3.mzXML": {"spec3"},
+    }
+
+    assert extract_mappings_ms_filename_spectrum_id(test_file) == expected_result
+
+
+def test_get_mappings_strain_id_spectrum_id():
+    mappings_strain_id_ms_filename = {
+        "strain1": {"file1.mzXML", "file2.mzXML"},
+        "strain2": {"file3.mzXML"},
+        "strain3": {"file4.mzXML"},
+    }
+    mappings_ms_filename_spectrum_id = {
+        "file1.mzXML": {"spec1"},
+        "file2.mzXML": {"spec2", "spec3"},
+        "file3.mzXML": {"spec3"},
+    }
+
+    expected_mappings_dict = {
+        "strain1": {"spec1", "spec2", "spec3"},
+        "strain2": {"spec3"},
+    }
+    actual_mappings_dict = get_mappings_strain_id_spectrum_id(
+        mappings_strain_id_ms_filename, mappings_ms_filename_spectrum_id
+    )
+
+    assert actual_mappings_dict == expected_mappings_dict

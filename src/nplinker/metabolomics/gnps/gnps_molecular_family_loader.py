@@ -1,8 +1,8 @@
 import csv
 from os import PathLike
-from nplinker.metabolomics import MolecularFamily
 from nplinker.metabolomics.abc import MolecularFamilyLoaderBase
 from nplinker.utils import is_file_format
+from ..molecular_family import MolecularFamily
 
 
 class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):

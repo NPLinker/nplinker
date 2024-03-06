@@ -1,20 +1,24 @@
 from abc import ABC
 from abc import abstractmethod
 from collections.abc import Sequence
-from nplinker.metabolomics import MolecularFamily
-from nplinker.metabolomics import Spectrum
+from typing import TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from .molecular_family import MolecularFamily
+    from .spectrum import Spectrum
 
 
 class SpectrumLoaderBase(ABC):
     @property
     @abstractmethod
-    def spectra(self) -> Sequence[Spectrum]:
+    def spectra(self) -> Sequence["Spectrum"]:
         ...
 
 
 class MolecularFamilyLoaderBase(ABC):
     @abstractmethod
-    def get_mfs(self, keep_singleton: bool) -> Sequence[MolecularFamily]:
+    def get_mfs(self, keep_singleton: bool) -> Sequence["MolecularFamily"]:
         """Get MolecularFamily objects.
 
         Args:
