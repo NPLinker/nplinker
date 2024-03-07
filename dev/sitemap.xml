@@ -1,97 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/antismash/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/antismash/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/arranger/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/arranger/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/bigscape/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/bigscape/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/genomics/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/genomics/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/genomics_abc/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/genomics_abc/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/genomics_utils/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/genomics_utils/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/gnps/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/gnps/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/loader/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/loader/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/metabolomics/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/metabolomics/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/metabolomics_abc/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/metabolomics_abc/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/metabolomics_utils/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/metabolomics_utils/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/mibig/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/mibig/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/nplinker/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/nplinker/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/schema/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/schema/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/scoring/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/scoring/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/strain/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/strain/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/strain_utils/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/strain_utils/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://nplinker.github.io/nplinker/dev/api/utils/</loc>
+         <loc>https://nplinker.github.io/nplinker/latest/api/utils/</loc>
          <lastmod>2024-03-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
