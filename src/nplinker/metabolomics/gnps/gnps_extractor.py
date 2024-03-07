@@ -12,6 +12,7 @@ class GNPSExtractor:
         """Class to extract files from a GNPS molecular networking archive(.zip).
 
         Four files are extracted and renamed to the following names:
+
         - file_mappings(.tsv/.csv)
         - spectra.mgf
         - molecular_families.tsv
@@ -19,6 +20,7 @@ class GNPSExtractor:
 
         The files to be extracted are selected based on the GNPS workflow type,
         as desribed below (in the order of the files above):
+
         1. METABOLOMICS-SNETS
             - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.tsv
             - METABOLOMICS-SNETS*.mgf

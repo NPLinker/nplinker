@@ -20,9 +20,12 @@ logger = LogConfig.getLogger(__name__)
 def load_user_strains(json_file: str | PathLike) -> set[Strain]:
     """Load user specified strains from a JSON file.
 
-    The JSON file must follow the schema defined in "nplinker/schemas/user_strains.json".
+    The JSON file must follow the schema defined in `schemas/user_strains.json`.
+
     An example content of the JSON file:
+        ```
         {"strain_ids": ["strain1", "strain2"]}
+        ```
 
     Args:
         json_file: Path to the JSON file containing user specified strains.
@@ -53,10 +56,12 @@ def podp_generate_strain_mappings(
     """Generate strain mappings JSON file for PODP pipeline.
 
     To get the strain mappings, we need to combine the following mappings:
+
     - strain_id <-> original_genome_id <-> resolved_genome_id <-> bgc_id
     - strain_id <-> MS_filename <-> spectrum_id
 
     These mappings are extracted from the following files:
+
     - "strain_id <-> original_genome_id" is extracted from `podp_project_json_file`.
     - "original_genome_id <-> resolved_genome_id" is extracted from `genome_status_json_file`.
     - "resolved_genome_id <-> bgc_id" is extracted from `genome_bgc_mappings_file`.
@@ -78,18 +83,18 @@ def podp_generate_strain_mappings(
         The strain mappings stored in a StrainCollection object.
 
     See Also:
-        `extract_mappings_strain_id_original_genome_id`: Extract mappings
+        - `extract_mappings_strain_id_original_genome_id`: Extract mappings
             "strain_id <-> original_genome_id".
-        `extract_mappings_original_genome_id_resolved_genome_id`: Extract mappings
+        - `extract_mappings_original_genome_id_resolved_genome_id`: Extract mappings
             "original_genome_id <-> resolved_genome_id".
-        `extract_mappings_resolved_genome_id_bgc_id`: Extract mappings
+        - `extract_mappings_resolved_genome_id_bgc_id`: Extract mappings
             "resolved_genome_id <-> bgc_id".
-        `get_mappings_strain_id_bgc_id`: Get mappings "strain_id <-> bgc_id".
-        `extract_mappings_strain_id_ms_filename`: Extract mappings
+        - `get_mappings_strain_id_bgc_id`: Get mappings "strain_id <-> bgc_id".
+        - `extract_mappings_strain_id_ms_filename`: Extract mappings
             "strain_id <-> MS_filename".
-        `extract_mappings_ms_filename_spectrum_id`: Extract mappings
+        - `extract_mappings_ms_filename_spectrum_id`: Extract mappings
             "MS_filename <-> spectrum_id".
-        `get_mappings_strain_id_spectrum_id`: Get mappings "strain_id <-> spectrum_id".
+        - `get_mappings_strain_id_spectrum_id`: Get mappings "strain_id <-> spectrum_id".
     """
     # Get mappings strain_id <-> original_geonme_id <-> resolved_genome_id <-> bgc_id
     mappings_strain_id_bgc_id = get_mappings_strain_id_bgc_id(

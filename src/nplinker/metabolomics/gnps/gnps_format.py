@@ -105,6 +105,7 @@ def gnps_format_from_file_mapping(file: str | PathLike) -> GNPSFormat:
 
     The GNSP file mapping file is located in different folders depending on the
     GNPS workflow. Here are the locations in corresponding GNPS zip archives:
+
     - METABOLOMICS-SNETS workflow: the .tsv file under folder "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
     - METABOLOMICS-SNETS-V2 workflow: the .clustersummary file (tsv) under folder "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
     - FEATURE-BASED-MOLECULAR-NETWORKING workflow: the .csv file under folder "quantification_table"

@@ -14,6 +14,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
 
         The file mappings file is from GNPS output archive, as described below
         for each GNPS workflow type:
+
         1. METABOLOMICS-SNETS
             - METABOLOMICS-SNETS*.mgf
         2. METABOLOMICS-SNETS-V2

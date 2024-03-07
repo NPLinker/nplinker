@@ -16,6 +16,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
 
         The file mappings file is from GNPS output archive, as described below
         for each GNPS workflow type:
+
         1. METABOLOMICS-SNETS
             - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.tsv
         2. METABOLOMICS-SNETS-V2
@@ -29,7 +30,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         Raises:
             ValueError: Raises ValueError if the file is not valid.
 
-        Example:
+        Examples:
             >>> loader = GNPSFileMappingLoader("gnps_file_mappings.tsv")
             >>> print(loader.mappings["1"])
             ['26c.mzXML']
@@ -137,6 +138,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         """Load file mapping from output of GNPS SNETS workflow.
 
         The following columns are loaded:
+
         - "cluster index": loaded as spectrum id
         - "AllFiles": a list of files in which the spectrum occurs, separated
             by '###'.
@@ -157,6 +159,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         """Load file mapping from output of GNPS SNETS-V2 workflow.
 
         The following columns are loaded:
+
         - "cluster index": loaded as spectrum id
         - "UniqueFileSources": a list of files in which the spectrum occurs,
             separated by '|'.
@@ -174,13 +177,17 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         """Load file mapping from output of GNPS FBMN workflow.
 
         The column "row ID" is loaded as spectrum id.
+
         The column names containing " Peak area" are used to extract the file
         names, and the values of these columns are used to determine whether
         the spectrum occurs in the file. The file name is taken only if the
         value is greater than 0.
+
         An example data of the file is as follows:
+            ```
             row ID,5434_5433_mod.mzXML Peak area,5425_5426_mod.mzXML Peak area
             1,1764067.8434999974,0.0
+            ```
         """
         pattern = " Peak area"
         with open(self._file, mode="rt", encoding="utf-8") as f:
