@@ -3,7 +3,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 import numpy as np
 from nplinker.strain import Strain
-from nplinker.strain_collection import StrainCollection
+from nplinker.strain import StrainCollection
 
 
 if TYPE_CHECKING:

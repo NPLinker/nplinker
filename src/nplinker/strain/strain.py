@@ -1,5 +1,5 @@
 from __future__ import annotations
-from .logconfig import LogConfig
+from nplinker.logconfig import LogConfig
 
 
 logger = LogConfig.getLogger(__name__)

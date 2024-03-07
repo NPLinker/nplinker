@@ -3,8 +3,8 @@ import json
 from os import PathLike
 from typing import Iterator
 from jsonschema import validate
+from nplinker.logconfig import LogConfig
 from nplinker.schemas import STRAIN_MAPPINGS_SCHEMA
-from .logconfig import LogConfig
 from .strain import Strain
 
 

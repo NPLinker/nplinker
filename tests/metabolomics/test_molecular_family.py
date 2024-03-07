@@ -2,7 +2,7 @@ import pytest
 from nplinker.metabolomics import MolecularFamily
 from nplinker.metabolomics import Spectrum
 from nplinker.strain import Strain
-from nplinker.strain_collection import StrainCollection
+from nplinker.strain import StrainCollection
 
 
 @pytest.fixture()

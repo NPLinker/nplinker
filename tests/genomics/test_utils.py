@@ -3,13 +3,17 @@ import json
 import pytest
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
-from nplinker.genomics import add_bgc_to_gcf
-from nplinker.genomics import add_strain_to_bgc
-from nplinker.genomics import generate_mappings_genome_id_bgc_id
-from nplinker.genomics import get_mibig_from_gcf
+from nplinker.genomics.utils import add_bgc_to_gcf
+from nplinker.genomics.utils import add_strain_to_bgc
+from nplinker.genomics.utils import extract_mappings_original_genome_id_resolved_genome_id
+from nplinker.genomics.utils import extract_mappings_resolved_genome_id_bgc_id
+from nplinker.genomics.utils import extract_mappings_strain_id_original_genome_id
+from nplinker.genomics.utils import generate_mappings_genome_id_bgc_id
+from nplinker.genomics.utils import get_mappings_strain_id_bgc_id
+from nplinker.genomics.utils import get_mibig_from_gcf
 from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.strain import Strain
-from nplinker.strain_collection import StrainCollection
+from nplinker.strain import StrainCollection
 from .. import DATA_DIR
 
 
@@ -159,3 +163,133 @@ def test_get_mibig_from_gcf():
     assert len(mibig_strains_in_use) == 2
     assert bgc3 not in mibig_bgcs_in_use
     assert bgc3.strain not in mibig_strains_in_use
+
+
+def test_extract_mappings_strain_id_original_genome_id(tmp_path):
+    test_data = {
+        "genomes": [
+            {"genome_label": "strain1", "genome_ID": {"RefSeq_accession": "id1"}},
+            {"genome_label": "strain1", "genome_ID": {"RefSeq_accession": "id2"}},
+            {"genome_label": "strain2", "genome_ID": {"RefSeq_accession": "id3"}},
+        ],
+        "metabolomics": {"project": {"molecular_network": "01234567890123456789012345678901"}},
+        "genome_metabolome_links": [
+            {"metabolomics_file": "ftp://example.org/001.mzXML", "genome_label": "strain1"},
+        ],
+        "version": "3",
+    }
+    test_file = tmp_path / "test_data.json"
+    with open(test_file, "w") as f:
+        json.dump(test_data, f)
+
+    expected_result = {
+        "strain1": {"id1", "id2"},
+        "strain2": {"id3"},
+    }
+    assert extract_mappings_strain_id_original_genome_id(test_file) == expected_result
+
+
+def test_extract_mappings_original_genome_id_resolved_genome_id(tmp_path):
+    test_data = {
+        "genome_status": [
+            {
+                "original_id": "id1",
+                "resolved_refseq_id": "refseq1",
+                "resolve_attempted": True,
+                "bgc_path": "",
+            },
+            {
+                "original_id": "id2",
+                "resolved_refseq_id": "refseq2",
+                "resolve_attempted": True,
+                "bgc_path": "",
+            },
+            {
+                "original_id": "id3",
+                "resolved_refseq_id": "refseq3",
+                "resolve_attempted": True,
+                "bgc_path": "",
+            },
+        ],
+        "version": "1.0",
+    }
+    test_file = tmp_path / "test_data.json"
+    with open(test_file, "w") as f:
+        json.dump(test_data, f)
+
+    expected_result = {"id1": "refseq1", "id2": "refseq2", "id3": "refseq3"}
+
+    assert extract_mappings_original_genome_id_resolved_genome_id(test_file) == expected_result
+
+
+def test_extract_mappings_resolved_genome_id_bgc_id(tmp_path):
+    test_data = {
+        "mappings": [
+            {"genome_ID": "id1", "BGC_ID": ["bgc1", "bgc2"]},
+            {"genome_ID": "id2", "BGC_ID": ["bgc3"]},
+        ],
+        "version": "1.0",
+    }
+    test_file = tmp_path / "test_data.json"
+    with open(test_file, "w") as f:
+        json.dump(test_data, f)
+    expected_result = {"id1": {"bgc1", "bgc2"}, "id2": {"bgc3"}}
+    assert extract_mappings_resolved_genome_id_bgc_id(test_file) == expected_result
+
+
+def test_get_mappings_strain_id_bgc_id():
+    # Test case 1: Test with empty mappings
+    mappings_strain_id_original_genome_id = {}
+    mappings_original_genome_id_resolved_genome_id = {}
+    mappings_resolved_genome_id_bgc_id = {}
+    expected_result = {}
+    assert (
+        get_mappings_strain_id_bgc_id(
+            mappings_strain_id_original_genome_id,
+            mappings_original_genome_id_resolved_genome_id,
+            mappings_resolved_genome_id_bgc_id,
+        )
+        == expected_result
+    )
+
+    # Test case 2: Test with one strain and one genome
+    mappings_strain_id_original_genome_id = {"strain1": {"genome1"}}
+    mappings_original_genome_id_resolved_genome_id = {"genome1": "resolved_genome1"}
+    mappings_resolved_genome_id_bgc_id = {"resolved_genome1": {"bgc1"}}
+    expected_result = {"strain1": {"bgc1"}}
+    assert (
+        get_mappings_strain_id_bgc_id(
+            mappings_strain_id_original_genome_id,
+            mappings_original_genome_id_resolved_genome_id,
+            mappings_resolved_genome_id_bgc_id,
+        )
+        == expected_result
+    )
+
+    # Test case 3: Test with multiple strains and genomes
+    mappings_strain_id_original_genome_id = {
+        "strain1": {"genome1", "genome2"},
+        "strain2": {"genome3"},
+        "strain3": {"genome4"},
+    }
+    mappings_original_genome_id_resolved_genome_id = {
+        "genome1": "resolved_genome1",
+        "genome2": "resolved_genome1",
+        "genome3": "resolved_genome2",
+        "genome4": "",
+    }
+    mappings_resolved_genome_id_bgc_id = {
+        "resolved_genome1": {
+            "bgc1",
+        },
+        "resolved_genome2": {"bgc2", "bgc3"},
+    }
+    expected_result = {"strain1": {"bgc1"}, "strain2": {"bgc2", "bgc3"}}
+    assert (
+        get_mappings_strain_id_bgc_id(
+            mappings_strain_id_original_genome_id,
+            mappings_original_genome_id_resolved_genome_id,
+            mappings_resolved_genome_id_bgc_id,
+        )
+        == expected_result
+    )

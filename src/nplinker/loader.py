@@ -2,12 +2,12 @@ import os
 from deprecated import deprecated
 from nplinker import globals
 from nplinker.config import config
-from nplinker.genomics import add_bgc_to_gcf
-from nplinker.genomics import add_strain_to_bgc
-from nplinker.genomics import get_mibig_from_gcf
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.bigscape import BigscapeGCFLoader
 from nplinker.genomics.mibig import MibigLoader
+from nplinker.genomics.utils import add_bgc_to_gcf
+from nplinker.genomics.utils import add_strain_to_bgc
+from nplinker.genomics.utils import get_mibig_from_gcf
 from nplinker.globals import GNPS_ANNOTATIONS_FILENAME
 from nplinker.globals import GNPS_DEFAULT_PATH
 from nplinker.globals import GNPS_MOLECULAR_FAMILY_FILENAME
@@ -15,14 +15,14 @@ from nplinker.globals import GNPS_SPECTRA_FILENAME
 from nplinker.globals import STRAIN_MAPPINGS_FILENAME
 from nplinker.globals import STRAINS_SELECTED_FILENAME
 from nplinker.logconfig import LogConfig
-from nplinker.metabolomics import add_annotation_to_spectrum
-from nplinker.metabolomics import add_spectrum_to_mf
-from nplinker.metabolomics import add_strains_to_spectrum
 from nplinker.metabolomics.gnps import GNPSAnnotationLoader
 from nplinker.metabolomics.gnps import GNPSMolecularFamilyLoader
 from nplinker.metabolomics.gnps import GNPSSpectrumLoader
-from nplinker.strain_collection import StrainCollection
-from nplinker.strain_loader import load_user_strains
+from nplinker.metabolomics.utils import add_annotation_to_spectrum
+from nplinker.metabolomics.utils import add_spectrum_to_mf
+from nplinker.metabolomics.utils import add_strains_to_spectrum
+from nplinker.strain import StrainCollection
+from nplinker.strain.utils import load_user_strains
 
 
 try:

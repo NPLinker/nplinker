@@ -1,9 +1,9 @@
 import pytest
 from nplinker.genomics import BGC
-from nplinker.genomics import BGCLoaderBase
+from nplinker.genomics.abc import BGCLoaderBase
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.antismash import parse_bgc_genbank
-from ... import DATA_DIR
+from .. import DATA_DIR
 
 
 class TestAntismashBGCLoader:

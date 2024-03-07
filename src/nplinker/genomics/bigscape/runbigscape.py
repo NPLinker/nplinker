@@ -2,7 +2,7 @@ import os
 import subprocess
 import sys
 from os import PathLike
-from ..logconfig import LogConfig
+from ...logconfig import LogConfig
 
 
 logger = LogConfig.getLogger(__name__)
