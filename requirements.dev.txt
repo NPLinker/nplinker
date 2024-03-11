@@ -2,7 +2,7 @@ autoflake
 build
 bump2version
 coverage[toml]
-pytest
+pytest<8
 pytest-cov
 pytest-xdist
 ruff
