@@ -57,8 +57,8 @@ if [[ "$OSTYPE" == "linux"* ]]; then
         if ${run_on_github}; then
             do_install="sudo apt install -y"
         else
-            apt update &> /dev/null
-            do_install="apt install -y"
+            sudo apt update &> /dev/null
+            do_install="sudo apt install -y"
         fi
     elif command -v dnf &> /dev/null; then
         echo -e "✅ Package manager is 'dnf'\n"
