@@ -57,6 +57,7 @@ if [[ "$OSTYPE" == "linux"* ]]; then
         if ${run_on_github}; then
             do_install="sudo apt install -y"
         else
+            echo "To use 'apt' command, you need to allow 'sudo apt' by providing your computer password"
             sudo apt update &> /dev/null
             do_install="sudo apt install -y"
         fi
