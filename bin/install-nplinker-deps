@@ -57,8 +57,9 @@ if [[ "$OSTYPE" == "linux"* ]]; then
         if ${run_on_github}; then
             do_install="sudo apt install -y"
         else
-            apt update &> /dev/null
-            do_install="apt install -y"
+            echo "To use 'apt' command, you need to allow 'sudo apt' by providing your computer password"
+            sudo apt update &> /dev/null
+            do_install="sudo apt install -y"
         fi
     elif command -v dnf &> /dev/null; then
         echo -e "✅ Package manager is 'dnf'\n"
