@@ -16,7 +16,7 @@ data_invalid_version = {"strain_ids": ["strain1", "strain2"], "version": "1.0.0"
     "data, expected",
     [
         [data_no_strain_ids, "'strain_ids' is a required property"],
-        [data_empty_strain_ids, "[] is too short"],
+        [data_empty_strain_ids, "[] should be non-empty"],
         [data_invalid_strain_ids, "1 is not of type 'string'"],
         [data_empty_version, "'' is not one of ['1.0']"],
         [data_invalid_version, "'1.0.0' is not one of ['1.0']"],

@@ -108,9 +108,9 @@ data_invalid_version = {
     "data, expected",
     [
         [data_no_genome_status, "'genome_status' is a required property"],
-        [data_empty_genome_status, "[] is too short"],
+        [data_empty_genome_status, "[] should be non-empty"],
         [data_no_original_id, "'original_id' is a required property"],
-        [data_empty_original_id, "'' is too short"],
+        [data_empty_original_id, "'' should be non-empty"],
         [data_invalid_original_id, "1 is not of type 'string'"],
         [data_no_resolved_refseq_id, "'resolved_refseq_id' is a required property"],
         [data_invalid_resolved_refseq_id, "1 is not of type 'string'"],
