@@ -4,7 +4,7 @@ from tempfile import mkdtemp
 import pytest
 from nplinker import utils
 from nplinker.utils import find_delimiter
-from tests import GNPS_DATA_DIR
+from . import GNPS_DATA_DIR
 
 
 @pytest.mark.parametrize(
