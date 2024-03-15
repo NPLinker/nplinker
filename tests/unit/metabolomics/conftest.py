@@ -11,8 +11,11 @@ def gnps_website_is_down():
     """Check if the GNPS website is down."""
     gnps_url = "https://gnps.ucsd.edu"
     try:
-        _ = httpx.get(gnps_url)
-        return False
+        r = httpx.get(gnps_url)
+        if r.is_success:
+            return False
+        else:
+            return True
     except httpx.HTTPError:
         return True
 
