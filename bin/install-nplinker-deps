@@ -150,8 +150,7 @@ echo "🔥 Start installing FastTree ..."
     fi
 echo -e "✅ FastTree installed successfully\n"
 
-#--- Install Hmmer (not support Windows and ARM64, required by BigScape)
-# brew hmmer not available ARM64 platform (e.g. Apple silicon)
+#--- Install Hmmer (required by BigScape)
 if ! command -v hmmpress &> /dev/null; then
     install_it hmmer
 fi
