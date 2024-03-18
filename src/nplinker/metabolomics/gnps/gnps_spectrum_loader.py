@@ -1,3 +1,4 @@
+from __future__ import annotations
 from os import PathLike
 from pyteomics import mgf
 from nplinker.logconfig import LogConfig

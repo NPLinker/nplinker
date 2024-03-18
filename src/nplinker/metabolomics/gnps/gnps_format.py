@@ -1,3 +1,4 @@
+from __future__ import annotations
 import zipfile
 from enum import Enum
 from enum import unique
