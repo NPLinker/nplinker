@@ -1,22 +1,23 @@
-autoflake
+# packaging
 build
 bump2version
-coverage[toml]
+wheel
+# formatting and linting
+ruff
+# testing
 pytest
 pytest-cov
 pytest-xdist
-ruff
-sphinx
-sphinx_rtd_theme
-sphinx-autoapi
+coverage[toml]
+# static typing
+mypy
 types-toml
 types-Deprecated
-myst_parser
-wheel
+typing_extensions
 # docs
 mkdocs
 mkdocs-material
-mike
 mkdocs-exclude
-mkdocstrings-python
 mkdocs-redirects
+mkdocstrings-python
+mike
