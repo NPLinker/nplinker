@@ -1,3 +1,4 @@
+from __future__ import annotations
 import csv
 from os import PathLike
 from nplinker.metabolomics.abc import MolecularFamilyLoaderBase
