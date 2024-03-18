@@ -7,19 +7,6 @@ text when the development of the software package takes off.
 For a quick reference on software development, we refer to [the software guide
 checklist](https://guide.esciencecenter.nl/#/best_practices/checklist).
 
-## Python versions
-
-This repository is set up with Python versions:
-
-- 3.6
-- 3.7
-- 3.8
-- 3.9
-
-
-Add or remove Python versions based on project requirements. See [the
-guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python) for more information about Python
-versions.
 
 ## Package management and dependencies
 
@@ -43,21 +30,15 @@ help you decide which tool to use for packaging.
 - The testing framework used is [PyTest](https://pytest.org)
   - [PyTest introduction](https://pythontest.com/pytest-book/)
   - PyTest is listed as a development dependency
-  - This is configured in `setup.cfg`
+  - This is configured in `pyproject.toml`
 - The project uses [GitHub action workflows](https://docs.github.com/en/actions) to automatically run tests on GitHub infrastructure against multiple Python versions
   - Workflows can be found in [`.github/workflows`](.github/workflows/)
 - [Relevant section in the guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python?id=testing)
 
 ## Documentation
 
-- Documentation should be put in the [`docs/`](docs/) directory. The contents have been generated using `sphinx-quickstart` (Sphinx version 1.6.5).
-- We recommend writing the documentation using Restructured Text (reST) and Google style docstrings.
-  - [Restructured Text (reST) and Sphinx CheatSheet](https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html)
-  - [Google style docstring examples](http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html).
-- The documentation is set up with the ReadTheDocs Sphinx theme.
-  - Check out its [configuration options](https://sphinx-rtd-theme.readthedocs.io/en/latest/).
-- [AutoAPI](https://sphinx-autoapi.readthedocs.io/) is used to generate documentation for the package Python objects.
-- `.readthedocs.yaml` is the ReadTheDocs configuration file. When ReadTheDocs is building the documentation this package and its development dependencies are installed so the API reference can be rendered.
+- Documentation should be put in the [`docs/`](docs/) directory.
+- We recommend writing the documentation using [MkDocs](https://www.mkdocs.org/) and [Google style docstrings](http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html).
 - [Relevant section in the guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python?id=writingdocumentation)
 
 ## Coding style conventions and code quality
@@ -69,7 +50,7 @@ help you decide which tool to use for packaging.
 [Sonarcloud](https://sonarcloud.io/) is used to perform quality analysis and code coverage report
 
 - `sonar-project.properties` is the SonarCloud [configuration](https://docs.sonarqube.org/latest/analysis/analysis-parameters/) file
-- `.github/workflows/sonarcloud.yml` is the GitHub action workflow which performs the SonarCloud analysis
+- `.github/workflows/sonar-cloud.yml` is the GitHub action workflow which performs the SonarCloud analysis
 
 ## Package version number
 
@@ -80,7 +61,6 @@ help you decide which tool to use for packaging.
 ## Logging
 
 - We recommend using the logging module for getting useful information from your module (instead of using print).
-- The project is set up with a logging example.
 - [Relevant section in the guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python?id=logging)
 
 ## CHANGELOG.md
