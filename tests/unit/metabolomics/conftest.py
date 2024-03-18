@@ -11,7 +11,7 @@ def gnps_website_is_down():
     """Check if the GNPS website is down."""
     gnps_url = "https://gnps.ucsd.edu"
     try:
-        r = httpx.get(gnps_url)
+        r = httpx.get(gnps_url, follow_redirects=True)
         if r.is_success:
             return False
         else:
