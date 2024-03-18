@@ -56,6 +56,15 @@ extra_javascript:
 nav:
 - Get Started:
   - Welcome to NPLinker: index.md
+  - Installation: install.md
+  - Quickstart: quickstart.md
+  # - Configuration: config.md
+  # - NPLinker Architecture: architecture.md
+  # - Arranger pipeline: arranger.md
+  # - Loader pipeline: loader.md
+- Concepts:
+  - Working Directory Structure: concepts/working_dir_structure.md
+  - GNPS Data: concepts/gnps_data.md
 - API Documentation:
   - NPLinker: api/nplinker.md
   - Dataset Arranger: api/arranger.md
