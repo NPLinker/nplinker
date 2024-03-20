@@ -62,13 +62,12 @@ root_dir # (1)!
 5. `gnps` directory contains the GNPS data. The files in this directory **must** be named as shown.
     See XXX for more information about the GNPS data.
 6. This file could be `.tsv` or `.csv` format.
-7. `antismash` directory contains a collection of AntiSMASH BGC data. Following the structure of AntiSMASH
-    output, the BGC files (`.gbk` files) must be stored in subdirectories named after genome id
-    (e.g. `GCF_000514975.1`).
+7. `antismash` directory contains a collection of AntiSMASH BGC data. The BGC data (`*.region*.gbk` 
+    files) must be stored in subdirectories named after NCBI accession number (e.g. `GCF_000514975.1`).
 8. `bigscape` directory is optional and contains the output of BigScape. If the directory is not
     provided, NPLinker will run BigScape automatically to generate the data using the AntiSMASH BGC
     data.
-9. `mix_clustering_c0.30.tsv` is an example output of BigScape. The file name must follow the pattern
+9.  `mix_clustering_c0.30.tsv` is an example output of BigScape. The file name must follow the pattern
     `mix_clustering_c{cutoff}.tsv`, where `{cutoff}` is the cutoff value used in the BigScape run.
 10. `downloads` directory is automatically created and managed by NPLinker. It stores the downloaded data
    from the internet. Users can also use it to store their own downloaded data. <br>
