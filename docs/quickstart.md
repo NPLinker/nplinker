@@ -25,6 +25,7 @@ NPLinker allows you to run in two modes:
 
 So, which mode will you use? The answer is important for the next steps.
 
+
 ## 2. Create a working directory
 The working directory is used to store all input and output data for NPLinker. You can name this
 directory as you like, for example `nplinker_quickstart`:
@@ -61,7 +62,6 @@ supported by NPLinker.
     you can find the worklow info at the row "Workflow" of the table "Job Status", for this case,
     it is `METABOLOMICS-SNETS`.
 
-
 ```python title="Download & Extract GNPS data"
 from nplinker.metabolomics.gnps import GNPSDownloader, GNPSExtractor
 
@@ -79,7 +79,7 @@ extractor = GNPSExtractor(downloaded_archive, "gnps") # (2)!
 1. If you already have the downloaded archive of GNPS data, you can skip the download steps.
 2. Replace `downloaded_archive` with the actuall path to your GNPS data archive if you skipped the download steps.
 
-The required data for NPLinker will be extracted to the `gnps` directory.
+The required data for NPLinker will be extracted to the `gnps` subdirectory of the working directory.
 
 !!! info
     Not all GNPS data are required by NPLinker, and only the necessary data will be extracted.
@@ -94,14 +94,30 @@ The required data for NPLinker will be extracted to the `gnps` directory.
     In this case, you must make sure that the data is organized as expected by NPLinker.
     See the page [GNPS Data](./concepts/gnps_data.md) for examples of how to prepare the data.
 
-
 ### AntiSMASH data
+NPLinker requires AntiSMASH BGC data as input, which are organized in the `antismash` subdirectory of 
+the working directory.
+
+For each output of AntiSMASH run, the BGC data must be stored in a subdirectory named after the NCBI
+accession number (e.g. `GCF_000514975.1`). And only the `*.region*.gbk` files are required by NPLinker.
+
+When manually preparing AntiSMASH data for NPLinker, you must make sure that the data is organized as
+expected by NPLinker. See the page [Working Directory Structure](./concepts/working_dir_structure.md)
+for more information.
+
 ### BigScape data (optional)
+It is optional to provide the output of BigScape to NPLinker. If the output of BigScape is not provided,
+NPLinker will run BigScape automatically to generate the data using the AntiSMASH BGC data.
+
+If you have the output of BigScape, you can put its `mix_clustering_c{cutoff}.tsv` file in the
+`bigscape` subdirectory of the NPLinker working directory, where `{cutoff}` is the cutoff value used
+in the BigScape run.
+
 ### Strain mappings file
 
 
-## 4. Prepare confg file
 
+## 4. Prepare confg file
 
 
 === "`local` mode"
