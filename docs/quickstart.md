@@ -115,6 +115,44 @@ in the BigScape run.
 
 ### Strain mappings file
 
+The strain mappings file `strain_mapping.json` is required by NPLinker to map the strain to genomics
+and metabolomics data. 
+
+
+```bash title="`strain_mappings.json` example"
+{
+    "strain_mappings": [
+        {
+            "strain_id": "strain_id_1", # (1)!
+            "strain_alias": ["bgc_id_1", "spectrum_id_1", ...] # (2)!
+        },
+        {
+            "strain_id": "strain_id_2",
+            "strain_alias": ["bgc_id_2", "spectrum_id_2", ...]
+        },
+        ...
+    ],
+    "version": "1.0" # (3)!
+}
+```
+
+1. `strain_id` is the unique identifier of the strain.
+2. `strain_alias` is a list of aliases of the strain, which are the identifiers of the BGCs and
+   spectra of the strain.
+3. `version` is the schema version of this file. It is recommended to use the latest version of the
+   schema. The current latest version is `1.0`. 
+
+The BGC id is same as the name of the BGC file in the `antismash` directory, for example, given a 
+BGC file `xxxx.region001.gbk`, the BGC id is `xxxx.region001`.
+
+The spectrum id is same as the scan number in the `spectra.mgf` file in the `gnps` directory, 
+for example, given a spectrum in the mgf file with a scan `SCANS=1`, the spectrum id is `1`. 
+
+If you labelled the mzXML files (input for GNPS) with the strain id, you may need the function [extract_mappings_ms_filename_spectrum_id][nplinker.metabolomics.utils.extract_mappings_ms_filename_spectrum_id] 
+to extract the mappings from mzXML files to the spectrum ids.
+
+For the `local` mode, you need to create this file manually and put it in the working directory.
+It takes some effort to prepare this file manually, especially when you have a large number of strains.
 
 
 ## 4. Prepare confg file
