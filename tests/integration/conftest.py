@@ -54,7 +54,7 @@ def pytest_sessionfinish(session):
 
     This hook makes sure that temporary directory `nplinker_root_dir` is only removed after all
     tests finish. When running tests in parallel, the deletion operation is done by the master
-    processs, and worker processes are not allowed to do it.
+    process, and worker processes are not allowed to do it.
     """
     workerinput = getattr(session.config, "workerinput", None)
     if workerinput is None:
