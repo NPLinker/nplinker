@@ -5,7 +5,6 @@ site_url: https://nplinker.github.io/nplinker/
 
 theme:
   name: 'material'
-  custom_dir: 'docs/theme' # https://squidfunk.github.io/mkdocs-material/customization/
   palette:
   - media: "(prefers-color-scheme: light)"
     scheme: default
@@ -45,13 +44,6 @@ validation:
   omitted_files: warn
   absolute_links: warn
   unrecognized_links: warn
-
-extra_css:
-  - 'extra/terminal.css'
-  - 'extra/tweaks.css'
-extra_javascript:
-  - 'extra/fluff.js'
-  - 'https://samuelcolvin.github.io/mkdocs-run-code/run_code_main.js'
 
 nav:
 - Get Started:
@@ -105,7 +97,6 @@ plugins:
 - search
 - exclude:
     glob:
-    - theme/*
     - __pycache__/*
 - mkdocstrings:
     handlers:
