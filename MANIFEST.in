@@ -3,3 +3,4 @@ include LICENSE
 include NOTICE
 include requirements.txt
 include requirements.dev.txt
+prune tests

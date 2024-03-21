@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python 3.10
         uses: actions/setup-python@v3
         with:
@@ -47,7 +47,7 @@ jobs:
       - name: Upgrade pip and install dependencies
         run: |
           python3 -m pip install --upgrade pip setuptools
-          pip install build pytest wheel
+          pip install build pytest wheel pytest-xdist
       - name: Build the package
         run: 	python -m build
       - name: Install nplinker
@@ -67,7 +67,7 @@ jobs:
         os: ['ubuntu-latest']
         python-version: ['3.9', '3.11']
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
         with:
@@ -80,7 +80,7 @@ jobs:
       - name: Upgrade pip and install dependencies
         run: |
           python3 -m pip install --upgrade pip setuptools
-          pip install build pytest wheel
+          pip install build pytest wheel pytest-xdist
       - name: Build the package
         run: 	python -m build
       - name: Install nplinker
@@ -95,9 +95,7 @@ jobs:
     needs: smoke_test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v3
         with:

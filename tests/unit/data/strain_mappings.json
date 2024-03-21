@@ -1,0 +1,447 @@
+{
+  "strain_mappings": [
+    {
+      "strain_id": "Salinispora arenicola CNB527",
+      "strain_alias": [
+        "42b.mzXML"
+      ]
+    },
+    {
+      "strain_id": "Salinispora arenicola CNT005",
+      "strain_alias": [
+        "NZ_AZWU01000037",
+        "NZ_KI911492",
+        "NZ_AZWU01000047",
+        "GCF_000514895",
+        "NZ_AZWU01000018",
+        "NZ_AZWU01000036",
+        "NZ_AZWU01000007",
+        "GCF_000514895.1",
+        "NZ_AZWU01000017",
+        "NZ_AZWU01000052",
+        "NZ_AZWU01000030",
+        "NZ_KI911493",
+        "NZ_AZWU01000054",
+        "NZ_AZWU01000031",
+        "NZ_KI911490",
+        "NZ_AZWU01000064",
+        "NZ_AZWU01000029",
+        "NZ_AZWU01000023",
+        "NZ_AZWU01000020",
+        "NZ_AZWU01000039",
+        "NZ_AZWU01000019",
+        "12c.mzXML",
+        "NZ_AZWU01000022",
+        "NZ_KI911494",
+        "NZ_AZWU01000045",
+        "12b.mzXML",
+        "NZ_AZWU01000021",
+        "NZ_AZWU01000038",
+        "NZ_AZWU01000046"
+      ]
+    },
+    {
+      "strain_id": "Salinispora arenicola CNS205",
+      "strain_alias": [
+        "NC_009953",
+        "13a.mzXML",
+        "GCF_000018265",
+        "13b.mzXML",
+        "GCF_000018265.1"
+      ]
+    },
+    {
+      "strain_id": "Salinispora arenicola CNH646",
+      "strain_alias": [
+        "NZ_AZWH01000027",
+        "NZ_AZWH01000004",
+        "NZ_AZWH01000050",
+        "NZ_AZWH01000017",
+        "NZ_AZWH01000001",
+        "NZ_AZWH01000023",
+        "NZ_AZWH01000010",
+        "GCF_000514635",
+        "NZ_AZWH01000005",
+        "NZ_AZWH01000022",
+        "NZ_AZWH01000015",
+        "GCF_000514635.1",
+        "15a.mzXML",
+        "NZ_AZWH01000048",
+        "15b.mzXML",
+        "NZ_AZWH01000019",
+        "NZ_AZWH01000008",
+        "NZ_AZWH01000009",
+        "NZ_AZWH01000024",
+        "NZ_AZWH01000035",
+        "NZ_AZWH01000040",
+        "NZ_AZWH01000016",
+        "NZ_AZWH01000014"
+      ]
+    },
+    {
+      "strain_id": "Salinispora arenicola CNQ748",
+      "strain_alias": [
+        "NZ_AZWY01000070",
+        "NZ_AZWY01000017",
+        "NZ_AZWY01000050",
+        "NZ_AZWY01000016",
+        "NZ_KI911506",
+        "NZ_AZWY01000007",
+        "GCF_000514975.1",
+        "NZ_AZWY01000010",
+        "GCF_000514975",
+        "NZ_AZWY01000055",
+        "NZ_AZWY01000025",
+        "NZ_AZWY01000034",
+        "NZ_AZWY01000041",
+        "16b.mzXML",
+        "NZ_AZWY01000063",
+        "NZ_AZWY01000045",
+        "NZ_AZWY01000048",
+        "NZ_AZWY01000058",
+        "NZ_AZWY01000020",
+        "NZ_AZWY01000032",
+        "NZ_AZWY01000006",
+        "NZ_AZWY01000021",
+        "NZ_AZWY01000040",
+        "NZ_AZWY01000011",
+        "NZ_AZWY01000023",
+        "NZ_AZWY01000009",
+        "NZ_AZWY01000053",
+        "NZ_AZWY01000008",
+        "NZ_AZWY01000005",
+        "16a.mzXML",
+        "NZ_AZWY01000019"
+      ]
+    },
+    {
+      "strain_id": "Salinispora arenicola CNT849",
+      "strain_alias": [
+        "GCF_000373825.1",
+        "NZ_KB892511",
+        "NZ_KB892473",
+        "NZ_KB892499",
+        "NZ_KB892514",
+        "NZ_KB892480",
+        "17a.mzXML",
+        "GCF_000373825",
+        "NZ_KB892479",
+        "NZ_KB892482",
+        "NZ_KB892490",
+        "NZ_KB892476",
+        "NZ_KB892481",
+        "NZ_KB892500",
+        "NZ_KB892485",
+        "NZ_KB892505",
+        "NZ_KB892497",
+        "NZ_KB892501",
+        "NZ_KB892477",
+        "NZ_KB892494",
+        "NZ_KB892475",
+        "NZ_KB892483",
+        "17b.mzXML",
+        "NZ_KB892478",
+        "NZ_KB892474",
+        "NZ_KB892507"
+      ]
+    },
+    {
+      "strain_id": "Salinispora arenicola CNP193",
+      "strain_alias": [
+        "18a.mzXML",
+        "18b.mzXML"
+      ]
+    },
+    {
+      "strain_id": "Salinispora arenicola CNX508",
+      "strain_alias": [
+        "NZ_AZWT01000002",
+        "NZ_AZWT01000016",
+        "NZ_AZWT01000034",
+        "NZ_AZWT01000032",
+        "NZ_AZWT01000018",
+        "GCF_000514875",
+        "NZ_AZWT01000008",
+        "NZ_AZWT01000036",
+        "NZ_AZWT01000004",
+        "NZ_AZWT01000027",
+        "NZ_AZWT01000057",
+        "NZ_AZWT01000001",
+        "NZ_AZWT01000015",
+        "NZ_AZWT01000003",
+        "NZ_AZWT01000009",
+        "NZ_AZWT01000059",
+        "NZ_AZWT01000021",
+        "20a.mzXML",
+        "NZ_AZWT01000005",
+        "GCF_000514875.1",
+        "NZ_AZWT01000010",
+        "NZ_AZWT01000035",
+        "NZ_AZWT01000080",
+        "NZ_AZWT01000047",
+        "NZ_AZWT01000020"
+      ]
+    },
+    {
+      "strain_id": "Salinispora pacifica CNR114",
+      "strain_alias": [
+        "9b.mzXML",
+        "NZ_AZWO01000060",
+        "NZ_AZWO01000029",
+        "GCF_000514775.1",
+        "NZ_AZWO01000016",
+        "NZ_AZWO01000034",
+        "NZ_AZWO01000025",
+        "NZ_AZWO01000036",
+        "NZ_AZWO01000028",
+        "NZ_AZWO01000053",
+        "NZ_AZWO01000038",
+        "NZ_AZWO01000072",
+        "NZ_AZWO01000011",
+        "NZ_AZWO01000056",
+        "NZ_AZWO01000007",
+        "NZ_AZWO01000061",
+        "GCF_000514775",
+        "NZ_KI911467",
+        "NZ_AZWO01000019",
+        "NZ_AZWO01000008",
+        "NZ_AZWO01000004",
+        "NZ_AZWO01000048",
+        "9a.mzXML",
+        "NZ_AZWO01000014",
+        "NZ_KI911468",
+        "NZ_AZWO01000027"
+      ]
+    },
+    {
+      "strain_id": "Salinispora pacifica CNR894",
+      "strain_alias": [
+        "41a.mzXML"
+      ]
+    },
+    {
+      "strain_id": "Salinispora pacifica CNR942",
+      "strain_alias": [
+        "NZ_KB894861",
+        "NZ_KB894873",
+        "NZ_KB894848",
+        "NZ_KB894883",
+        "NZ_KB894871",
+        "NZ_KB894851",
+        "NZ_KB894875",
+        "NZ_KB894863",
+        "GCF_000374665.1",
+        "34c.mzXML",
+        "GCF_000374665",
+        "34b.mzXML",
+        "NZ_KB894878",
+        "NZ_KB894866",
+        "NZ_KB894859",
+        "NZ_KB894850",
+        "NZ_KB894860",
+        "NZ_KB894857",
+        "NZ_KB894856",
+        "NZ_KB894854",
+        "NZ_KB894865"
+      ]
+    },
+    {
+      "strain_id": "Salinispora pacifica CNS055",
+      "strain_alias": [
+        "NZ_KB894967",
+        "NZ_KB894982",
+        "11a.mzXML",
+        "NZ_KB894966",
+        "NZ_KB895001",
+        "NZ_KB894969",
+        "NZ_KB894963",
+        "NZ_KB894993",
+        "NZ_KB894962",
+        "NZ_KB894970",
+        "NZ_KB895000",
+        "NZ_KB894991",
+        "NZ_KB894971",
+        "NZ_KB894979",
+        "NZ_KB894997",
+        "11c.mzXML",
+        "GCF_000374685",
+        "NZ_KB894980",
+        "NZ_KB895006",
+        "NZ_KB894992",
+        "GCF_000374685.1"
+      ]
+    },
+    {
+      "strain_id": "Salinispora pacifica CNS237",
+      "strain_alias": [
+        "NZ_AUGH01000017",
+        "8a.mzXML",
+        "GCF_000424905.1",
+        "NZ_KE384268",
+        "NZ_AUGH01000011",
+        "NZ_AUGH01000032",
+        "NZ_AUGH01000028",
+        "NZ_KE384271",
+        "8b.mzXML",
+        "NZ_AUGH01000045",
+        "NZ_AUGH01000035",
+        "NZ_KE384269",
+        "NZ_AUGH01000027",
+        "NZ_AUGH01000015",
+        "NZ_KE384272",
+        "GCF_000424905",
+        "NZ_AUGH01000030",
+        "NZ_AUGH01000019"
+      ]
+    },
+    {
+      "strain_id": "Salinispora pacifica CNS863",
+      "strain_alias": [
+        "22a.mzXML",
+        "22b.mzXML"
+      ]
+    },
+    {
+      "strain_id": "Salinispora pacifica CNT003",
+      "strain_alias": [
+        "26c.mzXML",
+        "26a.mzXML"
+      ]
+    },
+    {
+      "strain_id": "Salinispora pacifica CNT029",
+      "strain_alias": [
+        "NZ_AZWB01000024",
+        "GCF_000514515.1",
+        "NZ_AZWB01000013",
+        "NZ_AZWB01000012",
+        "NZ_AZWB01000006",
+        "NZ_AZWB01000016",
+        "NZ_KI911413",
+        "NZ_AZWB01000005",
+        "NZ_KI911416",
+        "NZ_KI911414",
+        "NZ_KI911412",
+        "27a.mzXML",
+        "GCF_000514515",
+        "27b.mzXML"
+      ]
+    },
+    {
+      "strain_id": "Salinispora pacifica CNT138",
+      "strain_alias": [
+        "19a.mzXML",
+        "19c.mzXML"
+      ]
+    },
+    {
+      "strain_id": "Salinispora pacifica CNT148",
+      "strain_alias": [
+        "25c.mzXML",
+        "25b.mzXML"
+      ]
+    },
+    {
+      "strain_id": "Salinispora pacifica CNT150",
+      "strain_alias": [
+        "23a.mzXML"
+      ]
+    },
+    {
+      "strain_id": "Salinispora pacifica CNT851",
+      "strain_alias": [
+        "35b.mzXML",
+        "35a.mzXML"
+      ]
+    },
+    {
+      "strain_id": "Salinispora pacifica CNT855",
+      "strain_alias": [
+        "NZ_AZWS01000028",
+        "NZ_AZWS01000004",
+        "29a.mzXML",
+        "NZ_KI911483",
+        "NZ_AZWS01000040",
+        "NZ_AZWS01000038",
+        "NZ_AZWS01000048",
+        "NZ_AZWS01000025",
+        "GCF_000514855",
+        "NZ_AZWS01000012",
+        "NZ_AZWS01000024",
+        "NZ_AZWS01000036",
+        "NZ_AZWS01000051",
+        "GCF_000514855.1",
+        "NZ_AZWS01000008",
+        "NZ_AZWS01000001",
+        "NZ_AZWS01000014",
+        "NZ_AZWS01000053",
+        "NZ_AZWS01000016",
+        "NZ_AZWS01000037",
+        "NZ_AZWS01000015",
+        "NZ_AZWS01000062",
+        "NZ_AZWS01000013",
+        "NZ_AZWS01000034"
+      ]
+    },
+    {
+      "strain_id": "Salinispora pacifica CNY202",
+      "strain_alias": [
+        "7a.mzXML",
+        "7b.mzXML"
+      ]
+    },
+    {
+      "strain_id": "Salinispora pacifica CNY330",
+      "strain_alias": [
+        "10b.mzXML"
+      ]
+    },
+    {
+      "strain_id": "Salinispora tropica CNB536",
+      "strain_alias": [
+        "2a.mzXML",
+        "2b.mzXML"
+      ]
+    },
+    {
+      "strain_id": "Salinispora tropica CNY012",
+      "strain_alias": [
+        "5a.mzXML",
+        "5b.mzXML"
+      ]
+    },
+    {
+      "strain_id": "Salinispora tropica CNS197",
+      "strain_alias": [
+        "NZ_AZWK01000006",
+        "NZ_AZWK01000009",
+        "36a.mzXML",
+        "NZ_AZWK01000061",
+        "NZ_KI911452",
+        "NZ_AZWK01000027",
+        "NZ_AZWK01000038",
+        "GCF_000514695.1",
+        "NZ_AZWK01000002",
+        "NZ_KI911456",
+        "NZ_AZWK01000021",
+        "GCF_000514695",
+        "36b.mzXML",
+        "NZ_AZWK01000022",
+        "NZ_AZWK01000003",
+        "NZ_AZWK01000019",
+        "NZ_KI911458"
+      ]
+    },
+    {
+      "strain_id": "Salinispora tropica CNB440",
+      "strain_alias": [
+        "38b.mzXML",
+        "38a.mzXML",
+        "GCF_000016425",
+        "NC_009380",
+        "GCF_000016425.1"
+      ]
+    }
+  ],
+  "version": "1.0"
+}

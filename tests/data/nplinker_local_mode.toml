@@ -1,7 +1,0 @@
-dynaconf_merge = true # merge with the default settings, provided by the Dynaconf library
-
-root_dir = "@format {env[NPLINKER_ROOT_DIR]}"
-mode = "local"
-
-[log]
-level = "DEBUG"
