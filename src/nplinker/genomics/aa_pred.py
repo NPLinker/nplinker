@@ -3,6 +3,7 @@
 # TODO This module is used in bgc.py, referenced in gcf.py and then in misc.py,
 # NPLinker core business does not use it at all.
 
+from __future__ import annotations
 import argparse
 from Bio import SeqIO
 

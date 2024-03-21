@@ -1,9 +1,14 @@
+from __future__ import annotations
 from os import PathLike
 from pathlib import Path
-from typing_extensions import Self
+from typing import TYPE_CHECKING
 from nplinker.utils import download_url
 from .gnps_format import GNPSFormat
 from .gnps_format import gnps_format_from_task_id
+
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 
 class GNPSDownloader:
@@ -53,7 +58,7 @@ class GNPSDownloader:
         """
         return self._gnps_format
 
-    def download(self) -> Self:
+    def download(self) -> "Self":
         """Execute the downloading process.
 
         Note: GNPS data is downloaded using the POST method (empty payload is OK).

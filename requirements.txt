@@ -3,11 +3,10 @@ biopython
 deprecated
 dynaconf
 httpx
+jsonschema
 numpy
 pandas
-progress
 pyteomics
 scipy
 sortedcontainers
 tqdm
-typing_extensions
