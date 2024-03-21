@@ -26,7 +26,7 @@ def pytest_sessionstart(session):
     """Pytest hook to run before the entire test session starts.
 
     This hook makes sure the temporary directory `nplinker_root_dir` is created before any test
-    starts. When running tests in parallel, the creation operation is done by the master processs,
+    starts. When running tests in parallel, the creation operation is done by the master process,
     and worker processes are not allowed to do it.
 
     For more about this hook, see:
