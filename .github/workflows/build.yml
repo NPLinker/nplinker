@@ -12,9 +12,6 @@ on:
       - setup.py
       - .github/workflows/build.yml
   pull_request:
-    branches:
-      - main
-      - dev
     paths:
       - bin/**
       - src/**
@@ -89,37 +86,3 @@ jobs:
           install-nplinker-deps --run-on-github
       - name: Run unit tests
         run: pytest -v
-
-  sonarcloud:
-    name: SonarCloud
-    needs: smoke_test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.10'
-      - name: Python info
-        shell: bash -l {0}
-        run: |
-          which python3
-          python3 --version
-      - name: Upgrade pip and setuptools
-        run: |
-          python3 -m pip install --upgrade pip setuptools wheel
-      - name: Install nplinker and its dependencies
-        run: |
-          python3 -m pip install .[dev]
-          install-nplinker-deps --run-on-github
-      - name: Check style against standards using ruff
-        run: ruff .
-      - name: Run unit tests with coverage
-        run: pytest --cov --cov-report term --cov-report xml --junitxml=xunit-result.xml tests/
-      - name: Correct coverage paths
-        run: sed -i "s+$PWD/++g" coverage.xml
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{secrets.SONAR_TOKEN }}
