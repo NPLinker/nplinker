@@ -3,7 +3,7 @@
 # see https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
 
 [build-system]
-requires      = ["setuptools", "wheel"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -26,12 +26,47 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+dependencies = [
+    "beautifulsoup4",
+    "biopython",
+    "deprecated",
+    "dynaconf",
+    "httpx",
+    "jsonschema",
+    "numpy",
+    "pandas",
+    "pyteomics",
+    "scipy",
+    "sortedcontainers",
+    "tqdm",
 ]
-dynamic = ["dependencies", "optional-dependencies"]
 
-[tool.setuptools.dynamic]
-dependencies              = { file = ["requirements.txt"] }
-optional-dependencies.dev = { file = ["requirements.dev.txt"] }
+[project.optional-dependencies]
+dev = [
+    # packaging
+    "build",
+    "bump2version",
+    "wheel",
+    # formatting and linting
+    "ruff",
+    # testing
+    "pytest",
+    "pytest-cov",
+    "pytest-xdist",
+    "coverage[toml]",
+    # static typing
+    "mypy",
+    "types-toml",
+    "types-Deprecated",
+    "typing_extensions",
+    # docs
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocs-exclude",
+    "mkdocs-redirects",
+    "mkdocstrings-python",
+    "mike",
+]
 
 [project.urls]
 "Homepage"    = "https://github.com/NPLinker/nplinker"
