@@ -26,6 +26,8 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 dependencies = [
     "beautifulsoup4",
     "biopython",
@@ -69,8 +71,9 @@ dev = [
 ]
 
 [project.urls]
-"Homepage"    = "https://github.com/NPLinker/nplinker"
-"Bug Tracker" = "https://github.com/NPLinker/nplinker/issues"
+"Documentation" = "https://nplinker.github.io/nplinker"
+"Repository" = "https://github.com/NPLinker/nplinker"
+"Issues" = "https://github.com/NPLinker/nplinker/issues"
 
 [tool.setuptools.packages.find]
 where      = ["src"]
