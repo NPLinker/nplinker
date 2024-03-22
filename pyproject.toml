@@ -1,5 +1,3 @@
-# We use setup.cfg to set project metadata and setuptools configs.
-# All the other configs (e.g. pytest, coverage) are set in this file.
 # see https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
 
 [build-system]
@@ -76,30 +74,30 @@ dev = [
 "Issues" = "https://github.com/NPLinker/nplinker/issues"
 
 [tool.setuptools.packages.find]
-where      = ["src"]
-namespaces = true    # enable data directory to be identified
+where = ["src"]
+namespaces = true # enable data directory to be identified
 
 [tool.setuptools.package-data]
-"nplinker.data"    = ["*"]
+"nplinker.data" = ["*"]
 "nplinker.schemas" = ["*"]
 "nplinker" = ["nplinker_default.toml"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts    = "-ra -n auto"   # -ra: show summary info for all test outcomes; -n auto: run tests in parallel
-testpaths  = ["tests/unit"]
+addopts = "-ra -n auto"    # -ra: show summary info for all test outcomes; -n auto: run tests in parallel
+testpaths = ["tests/unit"]
 
 [tool.coverage.run]
-branch       = true
-source       = ["src"]
+branch = true
+source = ["src"]
 command_line = "-m pytest"
 
 # Mypy: to check static type
 # see https://mypy.readthedocs.io/en/stable/config_file.html#example-pyproject-toml
 [tool.mypy]
-python_version         = "3.10"
-warn_return_any        = true
-warn_unused_configs    = true
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
 ignore_missing_imports = true
 
 [tool.ruff]
