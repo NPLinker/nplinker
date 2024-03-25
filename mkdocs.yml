@@ -4,6 +4,7 @@ strict: true
 site_url: https://nplinker.github.io/nplinker/
 
 theme:
+  # https://squidfunk.github.io/mkdocs-material/
   name: 'material'
   palette:
   - media: "(prefers-color-scheme: light)"
@@ -48,6 +49,19 @@ validation:
 nav:
 - Get Started:
   - Welcome to NPLinker: index.md
+  - Installation: install.md
+  - Quickstart: quickstart.md
+  # - Configuration: config.md
+  # - NPLinker Architecture: architecture.md
+  # - Arranger pipeline: arranger.md
+  # - Loader pipeline: loader.md
+- Concepts:
+  - Working Directory Structure: concepts/working_dir_structure.md
+  - Config File: concepts/config_file.md
+  - GNPS Data: concepts/gnps_data.md
+  - BigScape: concepts/bigscape.md
+- Diagrams:
+  - Dataset Arranger: diagrams/arranger.md
 - API Documentation:
   - NPLinker: api/nplinker.md
   - Dataset Arranger: api/arranger.md
@@ -72,20 +86,26 @@ nav:
   - General Utilities: api/utils.md
 
 markdown_extensions:
-- tables
+# https://python-markdown.github.io/extensions/
 - toc:
     permalink: true
-    title: Page contents
 - admonition
+# https://facelessuser.github.io/pymdown-extensions
 - pymdownx.details
-- pymdownx.superfences
 - pymdownx.highlight:
     anchor_linenums: true
     pygments_lang_class: true
-- pymdownx.extra
+- pymdownx.extra:
+    pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
 - pymdownx.tabbed:
     alternate_style: true
 - pymdownx.magiclink
+- pymdownx.snippets: # use files outside of docs folder 
+    base_path: [., ./src/nplinker, ./src/nplinker/data]
 
 watch:
 - docs
