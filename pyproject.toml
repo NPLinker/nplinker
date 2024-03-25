@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nplinker"
-version = "1.3.2"
+version = "2.0.0"
 description = "Natural Products Linker"
 readme = "README.md"
 requires-python = ">=3.9"
