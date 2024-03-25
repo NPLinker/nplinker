@@ -4,9 +4,16 @@ If you're looking for user documentation, go [here](README.md).
 
 ## Code editor
 We use [Visual Studio Code (VS Code)](https://code.visualstudio.com/) as code editor.
-The VS Code settings for this project can be found in [.vscode](.vscode).
-The settings will be automatically loaded and applied when you open the project with VS Code.
-See [the guide](https://code.visualstudio.com/docs/getstarted/settings) for more info about workspace settings of VS Code.
+
+The VS Code Profile for this project is [vscode/nplinker.code-profile](vscode/nplinker.code-profile), 
+which contains the settings, extensions and snippets for the project. To use the profile, you must
+first import it by clicking the following menus: `Code` -> `Settings` -> `Profiles` -> `Import Profile...`. 
+Then select the file [vscode/nplinker.code-profile](vscode/nplinker.code-profile) to import the profile.
+VS Code will take a while to install the extensions and apply the settings. Want more info? See 
+[vscode profiles guide](https://code.visualstudio.com/docs/editor/profiles).
+
+
+If you want to add more settings, you can update the workspace settings, see [the guide](https://code.visualstudio.com/docs/getstarted/settings) for more info.
 
 
 ## Setup
@@ -90,10 +97,6 @@ ruff format .
 # Format a single python file
 ruff format filename.py
 ```
-
-**Note:** We have set `ruff` as linter and formatter in VS Code [settings](vscode/settings.json),
-so if you're using VS Code, you can install VScode extension [ruff](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) and use its shortcut to do sorting and formatting.
-Besides, docstring style is also set, you can use [autoDocString](https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring) to automatically generate docstrings.
 
 ## Static typing
 
