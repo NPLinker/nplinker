@@ -1,3 +1,4 @@
+from __future__ import annotations
 from deprecated import deprecated
 from nplinker.logconfig import LogConfig
 from nplinker.scoring.linking.utils import calc_likelihood_matrix

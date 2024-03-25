@@ -32,24 +32,26 @@ install-nplinker-deps
 
 Afterwards check that the install directory is present in the `PATH` environment variable.
 
+You can also use [conda](https://docs.conda.io/projects/conda/en/stable/) to manage python environments.
+
 ## Running the tests
 
-There are two ways to run tests.
-
-The first way requires an activated virtual environment with the development tools installed:
-
+**Run unit tests with**
 ```shell
-pytest -v
+pytest
+# or
+pytest -n auto tests/unit
 ```
+Parallel testing is supported with `pytest-xdist` plugin. To run tests in parallel, use the `-n`
+option, e.g. `-n auto` to run tests in parallel with the number of CPUs available.
 
-The second is to use `tox`, which can be installed separately (e.g. with `pip install tox`), i.e. not necessarily inside the virtual environment you use for installing `nplinker`, but then builds the necessary virtual environments itself by simply running:
-
+**Run integration tests with**
 ```shell
-tox
+pytest -n 0 tests/integration
 ```
+`-n 0` means no parallel testing.
 
-Testing with `tox` allows for keeping the testing environment separate from your development environment.
-The development environment will typically accumulate (old) packages during development that interfere with testing; this problem is avoided by testing with `tox`.
+
 
 ### Test coverage
 
@@ -117,35 +119,35 @@ For more info about static typing and mypy, see:
 - [Static typing with Python](https://typing.readthedocs.io/en/latest/index.html#)
 - [Mypy doc](https://mypy.readthedocs.io/en/stable/)
 
-## Generating the API docs
+## Docs
+We use [MkDocs](https://www.mkdocs.org/) and its theme [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)
+to generate documentations. The configurations of MkDocs are set in [mkdocs.yml](mkdocs.yml) file.
 
+To watch the changes of current doc in real time, run:
 ```shell
-cd docs
-make html
+mkdocs serve
+# or to watch src and docs directories
+mkdocs serve -w docs -w src
 ```
+Then open your browser and go to [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
 
-The documentation will be in `docs/_build/html`
+### Publishing the docs
+The docs are published on github pages. We use [mike](https://github.com/jimporter/mike)
+to deploy the docs to the `gh-pages` branch and to manage the versions of docs.
 
-If you do not have `make` use
-
+For example, to deploy the version 2.0 of the docs to the `gh-pages` branch and make it the latest
+version, run:
 ```shell
-sphinx-build -b html docs docs/_build/html
+mike deploy -p -u 2.0 latest
 ```
+If you are not happy with the changes you can run `mike delete [version]`.
+All these mike operations will be recorded as git commits of branch `gh-pages`.
 
-To find undocumented Python objects run
+ `mike serve` is used to check all versions committed to branch `gh-pages`, which is for checking
+ the production website. If you have changes but not commit them yet, you should use `mkdocs serve`
+ instead of  `mike serve` to check them.
 
-```shell
-cd docs
-make coverage
-cat _build/coverage/python.txt
-```
 
-To [test snippets](https://www.sphinx-doc.org/en/master/usage/extensions/doctest.html) in documentation run
-
-```shell
-cd docs
-make doctest
-```
 
 ## Versioning
 

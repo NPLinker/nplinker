@@ -62,3 +62,4 @@ tags
 webapp/npapp/static/css/bokeh*.css
 webapp/npapp/static/js/bokeh*.js
 src/nplinker/scoring/iokr/data/SPEC/
+tests/integration/data/nplinker_local_mode_example.zip
