@@ -137,6 +137,9 @@ ignore = [
 fixable = ["A", "B", "C", "D", "E", "F", "I"]
 ignore-init-module-imports = true
 
+[tool.ruff.lint.per-file-ignores]
+# Ignore docstrings in all test files
+"tests/**py" = ["D"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["nplinker"]
