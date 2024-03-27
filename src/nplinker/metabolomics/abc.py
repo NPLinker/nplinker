@@ -12,8 +12,7 @@ if TYPE_CHECKING:
 class SpectrumLoaderBase(ABC):
     @property
     @abstractmethod
-    def spectra(self) -> Sequence["Spectrum"]:
-        ...
+    def spectra(self) -> Sequence["Spectrum"]: ...
 
 
 class MolecularFamilyLoaderBase(ABC):
@@ -27,19 +26,17 @@ class MolecularFamilyLoaderBase(ABC):
                 only one spectrum.
 
         Returns:
-            Sequence[MolecularFamily]: a list of MolecularFamily objects.
+            A list of MolecularFamily objects.
         """
 
 
 class FileMappingLoaderBase(ABC):
     @property
     @abstractmethod
-    def mappings(self) -> dict[str, list[str]]:
-        ...
+    def mappings(self) -> dict[str, list[str]]: ...
 
 
 class AnnotationLoaderBase(ABC):
     @property
     @abstractmethod
-    def annotations(self) -> dict[str, dict]:
-        ...
+    def annotations(self) -> dict[str, dict]: ...
