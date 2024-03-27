@@ -455,5 +455,6 @@ def validate_bigscape(bigscape_dir: Path) -> None:
         raise FileNotFoundError(f"BiG-SCAPE data directory not found at {bigscape_dir}")
 
     clustering_file = bigscape_dir / f"mix_clustering_c{config.bigscape.cutoff}.tsv"
-    if not clustering_file.exists():
-        raise FileNotFoundError(f"BiG-SCAPE clustering file not found: {clustering_file}")
+    database_file = bigscape_dir / "data_sqlite.db"
+    if not clustering_file.exists() and not database_file.exists():
+        raise FileNotFoundError(f"BiG-SCAPE data not found in {clustering_file} or {database_file}")

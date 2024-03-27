@@ -3,7 +3,7 @@ from deprecated import deprecated
 from nplinker import globals
 from nplinker.config import config
 from nplinker.genomics.antismash import AntismashBGCLoader
-from nplinker.genomics.bigscape import BigscapeGCFLoader
+from nplinker.genomics.bigscape import BigscapeGCFLoader, BigscapeV2GCFLoader
 from nplinker.genomics.mibig import MibigLoader
 from nplinker.genomics.utils import add_bgc_to_gcf
 from nplinker.genomics.utils import add_strain_to_bgc
@@ -159,7 +159,24 @@ class DatasetLoader:
         bigscape_cluster_file = (
             globals.BIGSCAPE_DEFAULT_PATH / f"mix_clustering_c{config.bigscape.cutoff}.tsv"
         )
-        raw_gcfs = BigscapeGCFLoader(bigscape_cluster_file).get_gcfs()
+        bigscape_db_file = (
+            globals.BIGSCAPE_DEFAULT_PATH / f"data_sqlite.db"
+        )
+
+        # switch depending on found file. prefer V1 if both are found
+        if bigscape_cluster_file.exists():
+            loader = BigscapeGCFLoader(bigscape_cluster_file)
+            logger.debug(f"Loading BigSCAPE cluster file {bigscape_cluster_file}")
+        elif bigscape_db_file.exists():
+            loader = BigscapeV2GCFLoader(bigscape_db_file)
+            logger.debug(f"Loading BigSCAPE database file {bigscape_db_file}")
+        else:
+            raise FileNotFoundError(
+                f"BigSCAPE cluster file {bigscape_cluster_file} or database file {bigscape_db_file} not found."
+            )
+
+
+        raw_gcfs = loader.get_gcfs()
 
         # Step 5: add BGC objects to GCF
         all_gcfs_with_bgc, _, _ = add_bgc_to_gcf(all_bgcs_with_strain, raw_gcfs)
