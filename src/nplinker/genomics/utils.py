@@ -78,10 +78,11 @@ def add_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]) -> tuple[list[
         bgcs: A list of BGC objects.
 
     Returns:
-        A tuple of two lists of BGC objects. The
-            first list contains BGC objects that are updated with Strain object;
-            the second list contains BGC objects that are not updated with
-            Strain object because no Strain object is found.
+        A tuple of two lists of BGC objects,
+
+            - the first list contains BGC objects that are updated with Strain object;
+            - the second list contains BGC objects that are not updated with
+                Strain object because no Strain object is found.
 
     Raises:
         ValueError: Multiple strain objects found for a BGC id.
@@ -127,11 +128,13 @@ def add_bgc_to_gcf(
         gcfs: A list of GCF objects.
 
     Returns:
-        The first list contains GCF objects that are updated with BGC objects;
-            The second list contains GCF objects that are not updated with BGC objects
-            because no BGC objects are found;
-            The dictionary contains GCF objects as keys and a set of ids of missing
-            BGC objects as values.
+        A tuple of two lists and a dictionary,
+
+            - The first list contains GCF objects that are updated with BGC objects;
+            - The second list contains GCF objects that are not updated with BGC objects
+                because no BGC objects are found;
+            - The dictionary contains GCF objects as keys and a set of ids of missing
+                BGC objects as values.
     """
     bgc_dict = {bgc.bgc_id: bgc for bgc in bgcs}
     gcf_with_bgc = []
@@ -169,9 +172,11 @@ def get_mibig_from_gcf(gcfs: list[GCF]) -> tuple[list[BGC], StrainCollection]:
         gcfs: A list of GCF objects.
 
     Returns:
-        tuple[list[BGC], StrainCollection]: The first is a list of MIBiG BGC
-            objects used in the GCFs; the second is a StrainCollection object
-            that contains all Strain objects used in the GCFs.
+        A tuple of two objects,
+
+            - the first is a list of MIBiG BGC objects used in the GCFs;
+            - the second is a StrainCollection object that contains all Strain objects used in the
+            GCFs.
     """
     mibig_bgcs_in_use = []
     mibig_strains_in_use = StrainCollection()
@@ -189,7 +194,7 @@ def get_mibig_from_gcf(gcfs: list[GCF]) -> tuple[list[BGC], StrainCollection]:
 # strain_id <-> original_geonme_id <-> resolved_genome_id <-> bgc_id
 # ------------------------------------------------------------------------------
 def extract_mappings_strain_id_original_genome_id(
-    podp_project_json_file: str | PathLike
+    podp_project_json_file: str | PathLike,
 ) -> dict[str, set[str]]:
     """Extract mappings "strain id <-> original genome id".
 
@@ -225,7 +230,7 @@ def extract_mappings_strain_id_original_genome_id(
 
 
 def extract_mappings_original_genome_id_resolved_genome_id(
-    genome_status_json_file: str | PathLike
+    genome_status_json_file: str | PathLike,
 ) -> dict[str, str]:
     """Extract mappings "original_genome_id <-> resolved_genome_id".
 
@@ -246,7 +251,7 @@ def extract_mappings_original_genome_id_resolved_genome_id(
 
 
 def extract_mappings_resolved_genome_id_bgc_id(
-    genome_bgc_mappings_file: str | PathLike
+    genome_bgc_mappings_file: str | PathLike,
 ) -> dict[str, set[str]]:
     """Extract mappings "resolved_genome_id <-> bgc_id".
 

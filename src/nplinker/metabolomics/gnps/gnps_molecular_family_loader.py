@@ -54,8 +54,7 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
                 only one spectrum.
 
         Returns:
-            list[MolecularFamily]: A list of MolecularFamily objects with their
-                spectra ids.
+            A list of MolecularFamily objects with their spectra ids.
         """
         mfs = self._mfs
         if not keep_singleton:
