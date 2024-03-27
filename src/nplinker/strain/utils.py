@@ -32,7 +32,7 @@ def load_user_strains(json_file: str | PathLike) -> set[Strain]:
         json_file: Path to the JSON file containing user specified strains.
 
     Returns:
-        set[Strain]: A set of user specified strains.
+        A set of user specified strains.
     """
     with open(json_file, "r") as f:
         json_data = json.load(f)

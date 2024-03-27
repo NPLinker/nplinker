@@ -47,7 +47,7 @@ class Strain:
         """Get the set of strain names including id and aliases.
 
         Returns:
-            set[str]: A set of names associated with the strain.
+            A set of names associated with the strain.
         """
         return self._aliases | {self.id}
 
@@ -56,7 +56,7 @@ class Strain:
         """Get the set of known aliases.
 
         Returns:
-            set[str]: A set of aliases associated with the strain.
+            A set of aliases associated with the strain.
         """
         return self._aliases
 

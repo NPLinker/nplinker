@@ -80,8 +80,8 @@ class GNPSAnnotationLoader(AnnotationLoaderBase):
         """Get annotations.
 
         Returns:
-            dict[str, dict]: Keys are spectrum ids ("#Scan#" in annotation file)
-                and values are the annotations dict for each spectrum.
+            Keys are spectrum ids ("#Scan#" in annotation file) and values are the annotations dict
+            for each spectrum.
         """
         return self._annotations
 
@@ -129,6 +129,6 @@ class GNPSAnnotationLoader(AnnotationLoaderBase):
                 self._annotations[scan_id] = row
                 # insert useful URLs
                 for t in ["png", "json", "svg", "spectrum"]:
-                    self._annotations[scan_id][
-                        f"{t}_url"
-                    ] = GNPS_UNIVERSAL_SPECTRUM_IDENTIFIER_URL.format(t, row["SpectrumID"])
+                    self._annotations[scan_id][f"{t}_url"] = (
+                        GNPS_UNIVERSAL_SPECTRUM_IDENTIFIER_URL.format(t, row["SpectrumID"])
+                    )
