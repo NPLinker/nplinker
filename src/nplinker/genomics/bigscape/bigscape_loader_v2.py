@@ -74,9 +74,9 @@ class BigscapeV2GCFLoader:
 
                 # take the filename of the gbk path as the bgc_id
                 # filename
-                bgc_id = gbk_path.split('/')[-1]
+                bgc_id: str = gbk_path.split('/')[-1]
                 # remove extension
-                bgc_id = bgc_id.split('.')[0]
+                bgc_id = bgc_id.rsplit('.', 1)[0]
 
                 if family_id not in gcf_dict:
                     gcf_dict[family_id] = GCF(family_id)
