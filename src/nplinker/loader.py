@@ -159,9 +159,7 @@ class DatasetLoader:
         bigscape_cluster_file = (
             globals.BIGSCAPE_DEFAULT_PATH / f"mix_clustering_c{config.bigscape.cutoff}.tsv"
         )
-        bigscape_db_file = (
-            globals.BIGSCAPE_DEFAULT_PATH / f"data_sqlite.db"
-        )
+        bigscape_db_file = globals.BIGSCAPE_DEFAULT_PATH / f"data_sqlite.db"
 
         # switch depending on found file. prefer V1 if both are found
         if bigscape_cluster_file.exists():
@@ -174,7 +172,6 @@ class DatasetLoader:
             raise FileNotFoundError(
                 f"BigSCAPE cluster file {bigscape_cluster_file} or database file {bigscape_db_file} not found."
             )
-
 
         raw_gcfs = loader.get_gcfs()
 

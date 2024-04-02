@@ -17,9 +17,7 @@ class TestBigscapelGCFLoader:
         assert isinstance(loader, GCFLoaderBase)
 
     def test_init(self, loader):
-        assert loader.db_file == str(
-            DATA_DIR / "bigscape" / "mix" / "data_sqlite.db"
-        )
+        assert loader.db_file == str(DATA_DIR / "bigscape" / "mix" / "data_sqlite.db")
 
     @pytest.mark.parametrize(
         "keep_mibig_only, keep_singleton, expected",

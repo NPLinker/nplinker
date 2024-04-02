@@ -10,8 +10,8 @@ from ..gcf import GCF
 
 logger = LogConfig.getLogger(__name__)
 
-class BigscapeV2GCFLoader:
 
+class BigscapeV2GCFLoader:
     def __init__(self, db_file: str | PathLike, /) -> None:
         """Build a loader for BiG-SCAPE v2 database file.
 
@@ -44,7 +44,6 @@ class BigscapeV2GCFLoader:
             gcf_list = [gcf for gcf in gcf_list if not gcf.is_singleton()]
         return gcf_list
 
-
     @staticmethod
     def _parse_gcf(db_file: str) -> list[GCF]:
         """Get GCF objects from database
@@ -60,7 +59,6 @@ class BigscapeV2GCFLoader:
         with sqlite3.connect(db_file) as connection:
             cursor = connection.cursor()
 
-
             query = """
             SELECT gbk.path, bgc_record_family.family_id FROM bgc_record_family
             JOIN bgc_record ON bgc_record.id = bgc_record_family.record_id
@@ -74,9 +72,9 @@ class BigscapeV2GCFLoader:
 
                 # take the filename of the gbk path as the bgc_id
                 # filename
-                bgc_id: str = gbk_path.split('/')[-1]
+                bgc_id: str = gbk_path.split("/")[-1]
                 # remove extension
-                bgc_id = bgc_id.rsplit('.', 1)[0]
+                bgc_id = bgc_id.rsplit(".", 1)[0]
 
                 if family_id not in gcf_dict:
                     gcf_dict[family_id] = GCF(family_id)
