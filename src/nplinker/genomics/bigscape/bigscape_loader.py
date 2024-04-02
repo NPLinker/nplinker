@@ -67,11 +67,10 @@ class BigscapeV2GCFLoader:
         """Build a loader for BiG-SCAPE v2 database file.
 
         Args:
-            cluster_file: Path to the BiG-SCAPE v2database file,
-                the filename has a pattern of "data_sqlite.db".
+            db_file: Path to the BiG-SCAPE v2 database file
 
         Attributes:
-            cluster_file: path to the BiG-SCAPE database file.
+            db_file: path to the BiG-SCAPE database file.
         """
         self.db_file = str(db_file)
         self._gcf_list = self._parse_gcf(self.db_file)
@@ -97,7 +96,7 @@ class BigscapeV2GCFLoader:
 
     @staticmethod
     def _parse_gcf(db_file: str) -> list[GCF]:
-        """Get GCF objects from database
+        """Get GCF objects from database.
 
         Args:
             db_file: Path to the sqlite3 database file.
