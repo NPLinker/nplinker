@@ -85,7 +85,7 @@ class BigscapeV2GCFLoader:
                 is a GCF that contains only one BGC.
 
         Returns:
-            list[GCF]: a list of GCF objects.
+            a list of GCF objects.
         """
         gcf_list = self._gcf_list
         if not keep_mibig_only:
@@ -102,7 +102,7 @@ class BigscapeV2GCFLoader:
             db_file: Path to the sqlite3 database file.
 
         Returns:
-            list: A list of GCF objects
+            A list of GCF objects
         """
         gcf_dict: dict[str, GCF] = {}
 
