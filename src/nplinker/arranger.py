@@ -157,10 +157,14 @@ class DatasetArranger:
         Get the GNPS task ID from the PODP project JSON file, then download and extract the GNPS
         data to the default GNPS directory.
         """
-        podp_file = globals.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
+        podp_file = (
+            globals.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
+        )
         with open(podp_file, "r") as f:
             podp_json_data = json.load(f)
-        gnps_task_id = podp_json_data["metabolomics"]["project"].get("molecular_network")
+        gnps_task_id = podp_json_data["metabolomics"]["project"].get(
+            "molecular_network"
+        )
 
         data_archive = (
             GNPSDownloader(gnps_task_id, globals.DOWNLOADS_DEFAULT_PATH)
@@ -214,7 +218,9 @@ class DatasetArranger:
         Get the antiSMASH data from the PODP project JSON file, then download and extract the
         antiSMASH data to the default antiSMASH directory.
         """
-        podp_file = globals.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
+        podp_file = (
+            globals.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
+        )
         with open(podp_file, "r") as f:
             podp_json_data = json.load(f)
         podp_download_and_extract_antismash_data(
@@ -228,14 +234,16 @@ class DatasetArranger:
         If `config.mode` is "podp", run BiG-SCAPE to generate the clustering file if it doesn't
         exist or remove the existing BiG-SCAPE data and re-run BiG-SCAPE if it is invalid.
         The running output of BiG-SCAPE will be saved to the directory "bigscape_running_output"
-        in the default BiG-SCAPE directory, and the clustering file "mix_clustering_c{config.bigscape.cutoff}.tsv"
-        will be copied to the default BiG-SCAPE directory.
+        in the default BiG-SCAPE directory, and the clustering file
+        "mix_clustering_c{config.bigscape.cutoff}.tsv" will be copied to the default BiG-SCAPE
+        directory.
 
         The validation process includes:
 
         - Check if the default BiG-SCAPE data directory exists.
         - Check if the clustering file "mix_clustering_c{config.bigscape.cutoff}.tsv" exists in the
                 BiG-SCAPE data directory.
+        - Check if the 'data_sqlite.db' file exists in the BiG-SCAPE data directory.
         """
         pass_validation = False
         if config.mode == "podp":
@@ -307,7 +315,9 @@ class DatasetArranger:
         strain_mappings_file = config.root_dir / STRAIN_MAPPINGS_FILENAME
 
         if not strain_mappings_file.exists():
-            raise FileNotFoundError(f"Strain mappings file not found at {strain_mappings_file}")
+            raise FileNotFoundError(
+                f"Strain mappings file not found at {strain_mappings_file}"
+            )
 
         with open(strain_mappings_file, "r") as f:
             json_data = json.load(f)
@@ -316,9 +326,15 @@ class DatasetArranger:
 
     def _generate_strain_mappings(self) -> None:
         """Generate the strain mappings file for the PODP mode."""
-        podp_json_file = globals.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
-        genome_status_json_file = globals.DOWNLOADS_DEFAULT_PATH / GENOME_STATUS_FILENAME
-        genome_bgc_mappings_file = globals.ANTISMASH_DEFAULT_PATH / GENOME_BGC_MAPPINGS_FILENAME
+        podp_json_file = (
+            globals.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
+        )
+        genome_status_json_file = (
+            globals.DOWNLOADS_DEFAULT_PATH / GENOME_STATUS_FILENAME
+        )
+        genome_bgc_mappings_file = (
+            globals.ANTISMASH_DEFAULT_PATH / GENOME_BGC_MAPPINGS_FILENAME
+        )
         gnps_file_mapping_file = self.gnps_file_mappings_file
         strain_mappings_file = config.root_dir / STRAIN_MAPPINGS_FILENAME
 
@@ -417,7 +433,9 @@ def validate_antismash(antismash_dir: Path) -> None:
         ValueError: If any sub-directory name contains a space.
     """
     if not antismash_dir.exists():
-        raise FileNotFoundError(f"antiSMASH data directory not found at {antismash_dir}")
+        raise FileNotFoundError(
+            f"antiSMASH data directory not found at {antismash_dir}"
+        )
 
     sub_dirs = list_dirs(antismash_dir)
     if not sub_dirs:
@@ -435,7 +453,9 @@ def validate_antismash(antismash_dir: Path) -> None:
         gbk_files = list_files(sub_dir, suffix=".gbk", keep_parent=False)
         bgc_files = fnmatch.filter(gbk_files, "*.region???.gbk")
         if not bgc_files:
-            raise FileNotFoundError(f"No BGC files found in antiSMASH sub-directory {sub_dir}")
+            raise FileNotFoundError(
+                f"No BGC files found in antiSMASH sub-directory {sub_dir}"
+            )
 
 
 def validate_bigscape(bigscape_dir: Path) -> None:
@@ -444,6 +464,10 @@ def validate_bigscape(bigscape_dir: Path) -> None:
     The BiG-SCAPE data directory must exist and contain the clustering file
     "mix_clustering_c{config.bigscape.cutoff}.tsv" where {config.bigscape.cutoff} is the
     bigscape cutoff value set in the config file.
+
+    Alternatively, the directory can contain the BiG-SCAPE database file generated by BiG-SCAPE v2.
+    At the moment, all the family assignments in the database will be used, so this database should
+    contain results from a single run with the desired cutoff.
 
     Args:
         bigscape_dir: Path to the BiG-SCAPE data directory.
@@ -455,5 +479,8 @@ def validate_bigscape(bigscape_dir: Path) -> None:
         raise FileNotFoundError(f"BiG-SCAPE data directory not found at {bigscape_dir}")
 
     clustering_file = bigscape_dir / f"mix_clustering_c{config.bigscape.cutoff}.tsv"
-    if not clustering_file.exists():
-        raise FileNotFoundError(f"BiG-SCAPE clustering file not found: {clustering_file}")
+    database_file = bigscape_dir / "data_sqlite.db"
+    if not clustering_file.exists() and not database_file.exists():
+        raise FileNotFoundError(
+            f"BiG-SCAPE data not found in {clustering_file} or {database_file}"
+        )
