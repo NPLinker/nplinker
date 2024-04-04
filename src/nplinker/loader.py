@@ -3,7 +3,8 @@ from deprecated import deprecated
 from nplinker import globals
 from nplinker.config import config
 from nplinker.genomics.antismash import AntismashBGCLoader
-from nplinker.genomics.bigscape import BigscapeGCFLoader, BigscapeV2GCFLoader
+from nplinker.genomics.bigscape import BigscapeGCFLoader
+from nplinker.genomics.bigscape import BigscapeV2GCFLoader
 from nplinker.genomics.mibig import MibigLoader
 from nplinker.genomics.utils import add_bgc_to_gcf
 from nplinker.genomics.utils import add_strain_to_bgc
@@ -159,7 +160,7 @@ class DatasetLoader:
         bigscape_cluster_file = (
             globals.BIGSCAPE_DEFAULT_PATH / f"mix_clustering_c{config.bigscape.cutoff}.tsv"
         )
-        bigscape_db_file = globals.BIGSCAPE_DEFAULT_PATH / f"data_sqlite.db"
+        bigscape_db_file = globals.BIGSCAPE_DEFAULT_PATH / "data_sqlite.db"
 
         # switch depending on found file. prefer V1 if both are found
         if bigscape_cluster_file.exists():
