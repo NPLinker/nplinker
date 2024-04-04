@@ -171,7 +171,7 @@ class DatasetLoader:
             logger.debug(f"Loading BigSCAPE database file {bigscape_db_file}")
         else:
             raise FileNotFoundError(
-                f"BigSCAPE cluster file {bigscape_cluster_file} or database file {bigscape_db_file} not found."
+                f"Neither BigSCAPE cluster file {bigscape_cluster_file} nor database file {bigscape_db_file} were found."
             )
 
         raw_gcfs = loader.get_gcfs()
