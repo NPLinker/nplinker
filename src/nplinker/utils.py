@@ -56,7 +56,7 @@ def get_headers(file: str | PathLike) -> list[str]:
         file: Path to the file to read the header from.
 
     Returns:
-        list[str]: list of column names from the header.
+        A list of column names from the header.
     """
     with open(file) as f:
         headers = f.readline().strip()

@@ -21,7 +21,7 @@ class BigscapeGCFLoader:
         Attributes:
             cluster_file: path to the BiG-SCAPE cluster file.
         """
-        self.cluster_file = str(cluster_file)
+        self.cluster_file: str = str(cluster_file)
         self._gcf_list = self._parse_gcf(self.cluster_file)
 
     def get_gcfs(self, keep_mibig_only: bool = False, keep_singleton: bool = False) -> list[GCF]:
@@ -34,7 +34,7 @@ class BigscapeGCFLoader:
                 is a GCF that contains only one BGC.
 
         Returns:
-            list[GCF]: a list of GCF objects.
+            A list of GCF objects.
         """
         gcf_list = self._gcf_list
         if not keep_mibig_only:

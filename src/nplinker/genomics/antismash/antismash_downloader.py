@@ -36,8 +36,8 @@ def download_and_extract_antismash_data(
             it doesn't exist. The files will be extracted to `<extract_root>/antismash/<antismash_id>` directory.
 
     Raises:
-        ValueError: if download_root and extract_root dirs are the same.
-        ValueError: if <extract_root>/antismash/<refseq_assembly_id> dir is not empty.
+        ValueError: if `download_root` and `extract_root` dirs are the same.
+        ValueError: if `<extract_root>/antismash/<refseq_assembly_id>` dir is not empty.
 
     Examples:
         >>> download_and_extract_antismash_metadata("GCF_004339725.1", "/data/download", "/data/extracted")

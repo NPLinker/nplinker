@@ -41,10 +41,11 @@ def add_strains_to_spectrum(
         spectra: A list of Spectrum objects.
 
     Returns:
-        A tuple of two lists of Spectrum
-            objects. The first list contains Spectrum objects that are updated
-            with Strain objects; the second list contains Spectrum objects that
-            are not updated with Strain objects becuase no Strain objects are found.
+        A tuple of two lists of Spectrum objects,
+
+            - the first list contains Spectrum objects that are updated with Strain objects;
+            - the second list contains Spectrum objects that are not updated with Strain objects
+            becuase no Strain objects are found.
     """
     spectra_with_strains = []
     spectra_without_strains = []
@@ -85,12 +86,13 @@ def add_spectrum_to_mf(
         mfs: A list of MolecularFamily objects.
 
     Returns:
-        tuple:
-            The first list contains MolecularFamily objects that are updated with Spectrum objects.
-            The second list contains MolecularFamily objects that are not updated with Spectrum
+        A tuple of three elements,
+
+            - the first list contains MolecularFamily objects that are updated with Spectrum objects
+            - the second list contains MolecularFamily objects that are not updated with Spectrum
             objects (all Spectrum objects are missing).
-            The dictionary contains MolecularFamily objects as keys and a set of ids of missing
-            Spectrum objects as values.
+            - the third is a dictionary containing MolecularFamily objects as keys and a set of ids
+            of missing Spectrum objects as values.
     """
     spec_dict = {spec.spectrum_id: spec for spec in spectra}
     mf_with_spec = []
@@ -126,7 +128,7 @@ def add_spectrum_to_mf(
 # strain_id <-> MS_filename <-> spectrum_id
 # ------------------------------------------------------------------------------
 def extract_mappings_strain_id_ms_filename(
-    podp_project_json_file: str | PathLike
+    podp_project_json_file: str | PathLike,
 ) -> dict[str, set[str]]:
     """Extract mappings "strain_id <-> MS_filename".
 
@@ -161,7 +163,7 @@ def extract_mappings_strain_id_ms_filename(
 
 
 def extract_mappings_ms_filename_spectrum_id(
-    gnps_file_mappings_file: str | PathLike
+    gnps_file_mappings_file: str | PathLike,
 ) -> dict[str, set[str]]:
     """Extract mappings "MS_filename <-> spectrum_id".
 

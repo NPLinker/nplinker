@@ -127,6 +127,7 @@ class LinkFinder:
             List of data frames containing the ids of the linked objects
                 and the score. The data frame has index names of
                 'source', 'target' and 'score':
+
                 - the 'source' row contains the ids of the input/source objects,
                 - the 'target' row contains the ids of the target objects,
                 - the 'score' row contains the scores.

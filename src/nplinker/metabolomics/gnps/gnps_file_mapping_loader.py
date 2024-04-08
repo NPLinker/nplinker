@@ -53,8 +53,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         """Return mapping from spectrum id to files in which this spectrum occurs.
 
         Returns:
-            dict[str, list[str]]: Mapping from spectrum id to names of all
-                files in which this spectrum occurs.
+            Mapping from spectrum id to names of all files in which this spectrum occurs.
         """
         return self._mapping
 
@@ -63,8 +62,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         """Return mapping from file name to all spectra that occur in this file.
 
         Returns:
-            dict[str, set[str]]: Mapping from file name to all spectra ids that
-                occur in this file.
+            Mapping from file name to all spectra ids that occur in this file.
         """
         mapping_reversed = {}
         for spectrum_id, ms_filenames in self._mapping.items():
