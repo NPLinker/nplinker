@@ -6,15 +6,15 @@ on:
       - dev
       - main
     paths:
-      - **.py
-      - .github/workflows/format-typing-check.yml
+      - '**.py'
+      - '.github/workflows/format-typing-check.yml'
   pull_request:
     branches:
       - dev
       - main
     paths:
-      - **.py
-      - .github/workflows/format-typing-check.yml
+      - '**.py'
+      - '.github/workflows/format-typing-check.yml'
     types:
       - opened
       - reopened
