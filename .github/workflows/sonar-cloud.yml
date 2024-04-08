@@ -1,4 +1,4 @@
-name: Check format and coverage, then upload to SonarCloud
+name: Check coverage
 
 on:
   push:
@@ -50,8 +50,6 @@ jobs:
         run: |
           python3 -m pip install .[dev]
           install-nplinker-deps --run-on-github
-      - name: Check style against standards using ruff
-        run: ruff check .
       - name: Run unit tests with coverage
         run: pytest --cov --cov-report term --cov-report xml --junitxml=xunit-result.xml tests/unit
       - name: Correct coverage paths
