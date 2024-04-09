@@ -1,0 +1,50 @@
+name: Check format and static typing
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+    paths:
+      - '**.py'
+      - '.github/workflows/format-typing-check.yml'
+  pull_request:
+    branches:
+      - dev
+      - main
+    paths:
+      - '**.py'
+      - '.github/workflows/format-typing-check.yml'
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+jobs:
+  format-check:
+    name: Check code format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ruff
+        run: |
+          pip install ruff mypy types-toml types-Deprecated typing_extensions
+      - name: Get all changed python files
+        id: changed-python-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+             **.py
+      - name: Check format using ruff
+        if: steps.changed-python-files.outputs.any_changed == 'true'
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-python-files.outputs.all_changed_files }}
+        run: |
+          ruff check ${ALL_CHANGED_FILES}
+      - name: Check static typing using mypy
+        if: steps.changed-python-files.outputs.any_changed == 'true'
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-python-files.outputs.all_changed_files }}
+        run: |
+          mypy ${ALL_CHANGED_FILES}
