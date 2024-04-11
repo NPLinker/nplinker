@@ -115,9 +115,9 @@ select = [
 ]
 ignore = [
     "D100", # Missing module docstring
-    "D101", # Missing class docstring
     "D104", # Missing public package docstring
     "D105", # Missing docstring in magic method
+    "D107", # Missing `__init__` docstring
     # The following list excludes rules irrelevant to the Google style
     "D203",
     "D204",
