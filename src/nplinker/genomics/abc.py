@@ -6,8 +6,10 @@ from .gcf import GCF
 
 
 class BGCLoaderBase(ABC):
+    """Abstract base class for BGC loader."""
+
     def __init__(self, data_dir: str):
-        """Abstract base class for BGC loader.
+        """Initialize the BGC loader.
 
         Args:
             data_dir: Path to directory that contains BGC metadata files
@@ -33,6 +35,8 @@ class BGCLoaderBase(ABC):
 
 
 class GCFLoaderBase(ABC):
+    """Abstract base class for GCF loader."""
+
     @abstractmethod
     def get_gcfs(self, keep_mibig_only: bool, keep_singleton: bool) -> Sequence[GCF]:
         """Get GCF objects.

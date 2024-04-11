@@ -11,15 +11,18 @@ logger = LogConfig.getLogger(__name__)
 
 
 class BigscapeGCFLoader:
+    """Build a loader for BiG-SCAPE GCF cluster file.
+
+    Attributes:
+        cluster_file: path to the BiG-SCAPE cluster file.
+    """
+
     def __init__(self, cluster_file: str | PathLike, /) -> None:
-        """Build a loader for BiG-SCAPE GCF cluster file.
+        """Initialize the BiG-SCAPE GCF loader.
 
         Args:
             cluster_file: Path to the BiG-SCAPE cluster file,
                 the filename has a pattern of "<class>_clustering_c0.xx.tsv".
-
-        Attributes:
-            cluster_file: path to the BiG-SCAPE cluster file.
         """
         self.cluster_file: str = str(cluster_file)
         self._gcf_list = self._parse_gcf(self.cluster_file)
@@ -63,14 +66,17 @@ GCFLoaderBase.register(BigscapeGCFLoader)
 
 
 class BigscapeV2GCFLoader:
+    """Build a loader for BiG-SCAPE v2 database file.
+
+    Attributes:
+        db_file: Path to the BiG-SCAPE database file.
+    """
+
     def __init__(self, db_file: str | PathLike, /) -> None:
-        """Build a loader for BiG-SCAPE v2 database file.
+        """Initialize the BiG-SCAPE v2 GCF loader.
 
         Args:
             db_file: Path to the BiG-SCAPE v2 database file
-
-        Attributes:
-            db_file: path to the BiG-SCAPE database file.
         """
         self.db_file = str(db_file)
         self._gcf_list = self._parse_gcf(self.db_file)

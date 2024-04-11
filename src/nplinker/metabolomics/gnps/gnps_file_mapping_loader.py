@@ -9,21 +9,24 @@ from .gnps_format import gnps_format_from_file_mapping
 
 
 class GNPSFileMappingLoader(FileMappingLoaderBase):
+    """Class to load file mappings from GNPS output file.
+
+    File mappings refers to the mapping from spectrum id to files in which
+    this spectrum occurs.
+
+    The file mappings file is from GNPS output archive, as described below
+    for each GNPS workflow type:
+
+    1. METABOLOMICS-SNETS
+        - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.tsv
+    2. METABOLOMICS-SNETS-V2
+        - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.clustersummary
+    3. FEATURE-BASED-MOLECULAR-NETWORKING
+        - quantification_table*/*.csv
+    """
+
     def __init__(self, file: str | PathLike):
-        """Class to load file mappings from GNPS output file.
-
-        File mappings refers to the mapping from spectrum id to files in which
-        this spectrum occurs.
-
-        The file mappings file is from GNPS output archive, as described below
-        for each GNPS workflow type:
-
-        1. METABOLOMICS-SNETS
-            - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.tsv
-        2. METABOLOMICS-SNETS-V2
-            - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.clustersummary
-        3. FEATURE-BASED-MOLECULAR-NETWORKING
-            - quantification_table*/*.csv
+        """Initialize the GNPSFileMappingLoader.
 
         Args:
             file: Path to the GNPS file mappings file.

@@ -9,15 +9,18 @@ if TYPE_CHECKING:
 
 
 class MolecularFamily:
+    """Class to model molecular family.
+
+    Attributes:
+        family_id: Unique id for the molecular family.
+        spectra_ids: Set of spectrum ids in the molecular family.
+    """
+
     def __init__(self, family_id: str):
-        """Class to model molecular family.
+        """Initialize the MolecularFamily.
 
         Args:
             family_id: Unique id for the molecular family.
-
-        Attributes:
-            family_id: Unique id for the molecular family.
-            spectra_ids: Set of spectrum ids in the molecular family.
         """
         self.family_id: str = family_id
         self.spectra_ids: set[str] = set()

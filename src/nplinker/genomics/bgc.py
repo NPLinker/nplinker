@@ -13,58 +13,58 @@ logger = LogConfig.getLogger(__name__)
 
 
 class BGC:
+    """Class to model BGC (biosynthetic gene cluster) data.
+
+    BGC data include both annotations and sequence data. This class is
+    mainly designed to model the annotations or metadata.
+
+    The raw BGC data is stored in GenBank format (.gbk). Additional
+    [GenBank features](https://www.insdc.org/submitting-standards/feature-table/)
+    could be added to the GenBank file to annotate
+    BGCs, e.g. antiSMASH has some self-defined features (like `region`) in
+    its output GenBank files.
+
+    The annotations of BGC can be stored in JSON format, which is defined
+    and used by MIBiG.
+
+    Attributes:
+        bgc_id: BGC identifier, e.g. MIBiG accession, GenBank accession.
+        product_prediction: A tuple of (predicted) natural
+            products or product classes of the BGC.
+            For antiSMASH's GenBank data, the feature `region /product`
+            gives product information.
+            For MIBiG metadata, its biosynthetic class provides such info.
+        mibig_bgc_class: A tuple of MIBiG biosynthetic
+            classes to which the BGC belongs.
+            Defaults to None.
+            MIBiG defines 6 major biosynthetic classes for natural products,
+            including "NRP", "Polyketide", "RiPP", "Terpene", "Saccharide"
+            and "Alkaloid". Note that natural products created by all other
+            biosynthetic mechanisms fall under the category "Other".
+            More details see the publication: https://doi.org/10.1186/s40793-018-0318-y.
+        description: Brief description of the BGC.
+            Defaults to None.
+        smiles: A tuple of SMILES formulas of the BGC's
+            products.
+            Defaults to None.
+        antismash_file: The path to the antiSMASH GenBank file.
+            Defaults to None.
+        antismash_id: Identifier of the antiSMASH BGC, referring
+            to the feature `VERSION` of GenBank file.
+            Defaults to None.
+        antismash_region: AntiSMASH BGC region number, referring
+            to the feature `region` of GenBank file.
+            Defaults to None.
+        parents: The set of GCFs that contain the BGC.
+        strain: The strain of the BGC.
+    """
+
     def __init__(self, bgc_id: str, /, *product_prediction: str):
-        """Class to model BGC (biosynthetic gene cluster) data.
-
-        BGC data include both annotations and sequence data. This class is
-        mainly designed to model the annotations or metadata.
-
-        The raw BGC data is stored in GenBank format (.gbk). Additional
-        `GenBank features`_ could be added to the GenBank file to annotate
-        BGCs, e.g. antiSMASH has some self-defined features (like "region") in
-        its output GenBank files.
-
-        The annotations of BGC can be stored in JSON format, which is defined
-        and used by MIBiG.
+        """Initialize the BGC object.
 
         Args:
             bgc_id: BGC identifier, e.g. MIBiG accession, GenBank accession.
-            product_prediction: BGC's (predicted) natural products
-                or product classes.
-
-        Attributes:
-            bgc_id: BGC identifier, e.g. MIBiG accession, GenBank accession.
-            product_prediction: A tuple of (predicted) natural
-                products or product classes of the BGC.
-                For antiSMASH's GenBank data, the feature `region /product`
-                gives product information.
-                For MIBiG metadata, its biosynthetic class provides such info.
-            mibig_bgc_class: A tuple of MIBiG biosynthetic
-                classes to which the BGC belongs.
-                Defaults to None.
-                MIBiG defines 6 major biosynthetic classes for natural products,
-                including "NRP", "Polyketide", "RiPP", "Terpene", "Saccharide"
-                and "Alkaloid". Note that natural products created by all other
-                biosynthetic mechanisms fall under the category "Other".
-                More details see the publication: https://doi.org/10.1186/s40793-018-0318-y.
-            description: Brief description of the BGC.
-                Defaults to None.
-            smiles: A tuple of SMILES formulas of the BGC's
-                products.
-                Defaults to None.
-            antismash_file: The path to the antiSMASH GenBank file.
-                Defaults to None.
-            antismash_id: Identifier of the antiSMASH BGC, referring
-                to the feature `VERSION` of GenBank file.
-                Defaults to None.
-            antismash_region: AntiSMASH BGC region number, referring
-                to the feature `region` of GenBank file.
-                Defaults to None.
-            parents: The set of GCFs that contain the BGC.
-            strain: The strain of the BGC.
-
-        .. GenBank features:
-            https://www.insdc.org/submitting-standards/feature-table/
+            product_prediction: BGC's (predicted) natural products or product classes.
         """
         # BGC metadata
         self.bgc_id = bgc_id

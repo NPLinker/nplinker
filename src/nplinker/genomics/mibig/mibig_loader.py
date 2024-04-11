@@ -11,14 +11,17 @@ logger = LogConfig.getLogger(__name__)
 
 
 class MibigLoader:
+    """Parse MIBiG metadata files and return BGC objects.
+
+    MIBiG metadata file (json) contains annotations/metadata information
+    for each BGC. See https://mibig.secondarymetabolites.org/download.
+
+    The MiBIG accession is used as BGC id and strain name. The loaded BGC
+    objects have Strain object as their strain attribute (i.e. `BGC.strain`).
+    """
+
     def __init__(self, data_dir: str):
-        """Parse MIBiG metadata files and return BGC objects.
-
-        MIBiG metadata file (json) contains annotations/metadata information
-        for each BGC. See https://mibig.secondarymetabolites.org/download.
-
-        The MiBIG accession is used as BGC id and strain name. The loaded BGC
-        objects have Strain object as their strain attribute (i.e. `BGC.strain`).
+        """Initialize the MIBiG metatdata loader.
 
         Args:
             data_dir: Path to the directory of MIBiG metadata json files
