@@ -102,7 +102,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
         """Get the precursor charge from the charge list.
 
         Args:
-            charge: list of charge values.
+            charges: list of charge values.
 
         Returns:
             the precursor charge.

@@ -119,6 +119,7 @@ class BGC:
 
     @property
     def strain(self) -> Strain | None:
+        """Get the strain of the BGC."""
         return self._strain
 
     @strain.setter
