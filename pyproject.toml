@@ -56,9 +56,12 @@ dev = [
     "coverage[toml]",
     # static typing
     "mypy",
-    "types-toml",
-    "types-Deprecated",
     "typing_extensions",
+    # stub packages 
+    "types-Deprecated",
+    "types-beautifulsoup4",
+    "types-jsonschema",
+    "pandas-stubs",
     # docs
     "mkdocs",
     "mkdocs-material",
