@@ -1168,6 +1168,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#nplinker.strain.utils.logger" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;logger
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#nplinker.strain.utils.load_user_strains" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;load_user_strains
@@ -1312,6 +1321,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#nplinker.strain.utils.logger" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;logger
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#nplinker.strain.utils.load_user_strains" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;load_user_strains
@@ -1375,6 +1393,27 @@
 
 
 
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="nplinker.strain.utils.logger" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>          <span class="doc doc-object-name doc-attribute-name">logger</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+<a href="#nplinker.strain.utils.logger" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">logger</span> <span class="o">=</span> <span class="n"><span title="nplinker.logconfig.LogConfig.getLogger">getLogger</span></span><span class="p">(</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/reference/import.html#name__">__name__</a></span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
 
 
 
@@ -1448,7 +1487,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>set[Strain]: A set of user specified strains.</p>
+              <p>A set of user specified strains.</p>
             </div>
           </td>
         </tr>
@@ -1497,7 +1536,7 @@
 <a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="sd">        json_file: Path to the JSON file containing user specified strains.</span>
 <a id="__codelineno-0-33" name="__codelineno-0-33"></a>
 <a id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">        set[Strain]: A set of user specified strains.</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">        A set of user specified strains.</span>
 <a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-37" name="__codelineno-0-37"></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 <a id="__codelineno-0-38" name="__codelineno-0-38"></a>        <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
