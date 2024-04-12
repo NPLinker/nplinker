@@ -47,7 +47,7 @@ class GCF:
     def __repr__(self) -> str:
         return str(self)
 
-    def __eq__(self, other: GCF) -> bool:
+    def __eq__(self, other) -> bool:
         if isinstance(other, GCF):
             return self.gcf_id == other.gcf_id and self.bgcs == other.bgcs
         return NotImplemented

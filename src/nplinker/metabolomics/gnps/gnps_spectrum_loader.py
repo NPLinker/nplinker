@@ -98,7 +98,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
             )
             self._spectra.append(spectrum)
 
-    def _get_precursor_charge(self, charges: list) -> int:
+    def _get_precursor_charge(self, charges: list[int]) -> int:
         """Get the precursor charge from the charge list.
 
         Args:

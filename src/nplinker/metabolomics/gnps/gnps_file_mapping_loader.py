@@ -67,7 +67,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         Returns:
             Mapping from file name to all spectra ids that occur in this file.
         """
-        mapping_reversed = {}
+        mapping_reversed: dict[str, set[str]] = {}
         for spectrum_id, ms_filenames in self._mapping.items():
             for filename in ms_filenames:
                 if filename in mapping_reversed:

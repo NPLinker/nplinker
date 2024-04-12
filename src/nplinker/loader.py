@@ -1,4 +1,5 @@
 import os
+from importlib.resources import files
 from deprecated import deprecated
 from nplinker import globals
 from nplinker.config import config
@@ -25,11 +26,6 @@ from nplinker.metabolomics.utils import add_strains_to_spectrum
 from nplinker.strain import StrainCollection
 from nplinker.strain.utils import load_user_strains
 
-
-try:
-    from importlib.resources import files
-except ImportError:
-    from importlib_resources import files
 
 logger = LogConfig.getLogger(__name__)
 

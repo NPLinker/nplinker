@@ -303,7 +303,7 @@ def _resolve_genbank_accession(genbank_id: str) -> str:
     # run a search using the GenBank accession ID
     try:
         dl_element = _ncbi_genbank_search(genbank_id)
-        if dl_element is None:
+        if dl_element is None or isinstance(dl_element, NavigableString):
             raise Exception("Unknown HTML format")
 
         refseq_idx = -1
