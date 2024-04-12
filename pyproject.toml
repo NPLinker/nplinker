@@ -117,6 +117,7 @@ select = [
     "N", # pep8-naming
 ]
 ignore = [
+    "E501", # Line too long
     "D100", # Missing module docstring
     "D104", # Missing public package docstring
     "D105", # Missing docstring in magic method
