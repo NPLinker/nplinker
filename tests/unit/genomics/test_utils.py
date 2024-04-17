@@ -1,6 +1,7 @@
 from __future__ import annotations
 import json
 import pytest
+from nplinker.defaults import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
 from nplinker.genomics.utils import add_bgc_to_gcf
@@ -11,7 +12,6 @@ from nplinker.genomics.utils import extract_mappings_strain_id_original_genome_i
 from nplinker.genomics.utils import generate_mappings_genome_id_bgc_id
 from nplinker.genomics.utils import get_mappings_strain_id_bgc_id
 from nplinker.genomics.utils import get_mibig_from_gcf
-from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.strain import Strain
 from nplinker.strain import StrainCollection
 from .. import DATA_DIR

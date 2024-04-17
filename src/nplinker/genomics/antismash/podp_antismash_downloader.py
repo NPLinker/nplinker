@@ -9,8 +9,8 @@ from bs4 import BeautifulSoup
 from bs4 import NavigableString
 from bs4 import Tag
 from jsonschema import validate
+from nplinker.defaults import GENOME_STATUS_FILENAME
 from nplinker.genomics.antismash import download_and_extract_antismash_data
-from nplinker.globals import GENOME_STATUS_FILENAME
 from nplinker.logconfig import LogConfig
 from nplinker.schemas import GENOME_STATUS_SCHEMA
 
