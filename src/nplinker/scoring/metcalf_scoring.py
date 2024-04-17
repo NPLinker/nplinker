@@ -117,7 +117,8 @@ class MetcalfScoring(ScoringMethod):
 
     # TODO CG: is it needed? remove it if not
     @property
-    def datalinks(self) -> DataLinks:
+    def datalinks(self) -> DataLinks | None:
+        """Get the DataLinks object used for scoring."""
         return MetcalfScoring.DATALINKS
 
     def get_links(
@@ -311,10 +312,12 @@ class MetcalfScoring(ScoringMethod):
 
     # TODO CG: refactor this method
     def format_data(self, data):
+        """Format the data for display."""
         # for metcalf the data will just be a floating point value (i.e. the score)
         return f"{data:.4f}"
 
     # TODO CG: refactor this method
     def sort(self, objects, reverse=True):
+        """Sort the objects based on the score."""
         # sort based on score
         return sorted(objects, key=lambda objlink: objlink[self], reverse=reverse)
