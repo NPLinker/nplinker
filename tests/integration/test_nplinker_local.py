@@ -27,7 +27,7 @@ def npl() -> NPLinker:
     npl.load_data()
     # remove cached score results before running tests
     root_dir = Path(npl.root_dir)
-    score_cache = root_dir / "metcalf" / "metcalf_scores.pckl"
+    score_cache = root_dir / "output" / "cache_metcalf_scoring.pckl"
     score_cache.unlink(missing_ok=True)
     return npl
 
