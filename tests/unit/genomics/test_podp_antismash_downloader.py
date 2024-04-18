@@ -1,9 +1,9 @@
 import json
 from pathlib import Path
 import pytest
+from nplinker.defaults import GENOME_STATUS_FILENAME
 from nplinker.genomics.antismash import GenomeStatus
 from nplinker.genomics.antismash import podp_download_and_extract_antismash_data
-from nplinker.globals import GENOME_STATUS_FILENAME
 from nplinker.utils import list_files
 
 

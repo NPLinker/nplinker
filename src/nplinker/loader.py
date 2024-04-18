@@ -1,8 +1,14 @@
 import os
 from importlib.resources import files
 from deprecated import deprecated
-from nplinker import globals
+from nplinker import defaults
 from nplinker.config import config
+from nplinker.defaults import GNPS_ANNOTATIONS_FILENAME
+from nplinker.defaults import GNPS_DEFAULT_PATH
+from nplinker.defaults import GNPS_MOLECULAR_FAMILY_FILENAME
+from nplinker.defaults import GNPS_SPECTRA_FILENAME
+from nplinker.defaults import STRAIN_MAPPINGS_FILENAME
+from nplinker.defaults import STRAINS_SELECTED_FILENAME
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.bigscape import BigscapeGCFLoader
 from nplinker.genomics.bigscape import BigscapeV2GCFLoader
@@ -10,12 +16,6 @@ from nplinker.genomics.mibig import MibigLoader
 from nplinker.genomics.utils import add_bgc_to_gcf
 from nplinker.genomics.utils import add_strain_to_bgc
 from nplinker.genomics.utils import get_mibig_from_gcf
-from nplinker.globals import GNPS_ANNOTATIONS_FILENAME
-from nplinker.globals import GNPS_DEFAULT_PATH
-from nplinker.globals import GNPS_MOLECULAR_FAMILY_FILENAME
-from nplinker.globals import GNPS_SPECTRA_FILENAME
-from nplinker.globals import STRAIN_MAPPINGS_FILENAME
-from nplinker.globals import STRAINS_SELECTED_FILENAME
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.gnps import GNPSAnnotationLoader
 from nplinker.metabolomics.gnps import GNPSMolecularFamilyLoader
@@ -145,21 +145,21 @@ class DatasetLoader:
 
         # Step 1: load antismash BGC objects & add strain info
         logger.debug("Parsing AntiSMASH directory...")
-        antismash_bgcs = AntismashBGCLoader(str(globals.ANTISMASH_DEFAULT_PATH)).get_bgcs()
+        antismash_bgcs = AntismashBGCLoader(str(defaults.ANTISMASH_DEFAULT_PATH)).get_bgcs()
         antismash_bgcs_with_strain, _ = add_strain_to_bgc(self.strains, antismash_bgcs)
 
         # Step 2: load mibig BGC objects (having strain info)
         if config.mibig.to_use:
-            self.mibig_bgcs = MibigLoader(str(globals.MIBIG_DEFAULT_PATH)).get_bgcs()
+            self.mibig_bgcs = MibigLoader(str(defaults.MIBIG_DEFAULT_PATH)).get_bgcs()
 
         # Step 3: get all BGC objects with strain info
         all_bgcs_with_strain = antismash_bgcs_with_strain + self.mibig_bgcs
 
         # Step 4: load all GCF objects
         bigscape_cluster_file = (
-            globals.BIGSCAPE_DEFAULT_PATH / f"mix_clustering_c{config.bigscape.cutoff}.tsv"
+            defaults.BIGSCAPE_DEFAULT_PATH / f"mix_clustering_c{config.bigscape.cutoff}.tsv"
         )
-        bigscape_db_file = globals.BIGSCAPE_DEFAULT_PATH / "data_sqlite.db"
+        bigscape_db_file = defaults.BIGSCAPE_DEFAULT_PATH / "data_sqlite.db"
 
         # switch depending on found file. prefer V1 if both are found
         if bigscape_cluster_file.exists():

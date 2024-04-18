@@ -4,15 +4,15 @@ import shutil
 from glob import glob
 from pathlib import Path
 from jsonschema import validate
-import nplinker.globals as globals
+import nplinker.defaults as defaults
 from nplinker.config import config
+from nplinker.defaults import GENOME_BGC_MAPPINGS_FILENAME
+from nplinker.defaults import GENOME_STATUS_FILENAME
+from nplinker.defaults import STRAIN_MAPPINGS_FILENAME
 from nplinker.genomics.antismash import podp_download_and_extract_antismash_data
 from nplinker.genomics.bigscape.runbigscape import run_bigscape
 from nplinker.genomics.mibig import download_and_extract_mibig_metadata
 from nplinker.genomics.utils import generate_mappings_genome_id_bgc_id
-from nplinker.globals import GENOME_BGC_MAPPINGS_FILENAME
-from nplinker.globals import GENOME_STATUS_FILENAME
-from nplinker.globals import STRAIN_MAPPINGS_FILENAME
 from nplinker.metabolomics.gnps import GNPSDownloader
 from nplinker.metabolomics.gnps import GNPSExtractor
 from nplinker.schemas import STRAIN_MAPPINGS_SCHEMA
@@ -36,14 +36,14 @@ class DatasetArranger:
     If `config.mode` is "local", the datasets are validated.
     If `config.mode` is "podp", the datasets are downloaded or generated.
 
-    It uses the default downloads directory `globals.DOWNLOADS_DEFAULT_PATH` to store the
+    It uses the default downloads directory `defaults.DOWNLOADS_DEFAULT_PATH` to store the
     downloaded files. Default data paths for MIBiG, GNPS, antiSMASH, and BiG-SCAPE are defined
-    in `nplinker.globals`.
+    in `nplinker.defaults`.
     """
 
     def __init__(self) -> None:
         # Prepare the downloads directory and/or PODP json file which are required for other methods
-        globals.DOWNLOADS_DEFAULT_PATH.mkdir(exist_ok=True)
+        defaults.DOWNLOADS_DEFAULT_PATH.mkdir(exist_ok=True)
         self.arrange_podp_project_json()
 
     def arrange(self) -> None:
@@ -69,11 +69,11 @@ class DatasetArranger:
         """
         if config.mode == "podp":
             file_name = f"paired_datarecord_{config.podp_id}.json"
-            podp_file = globals.DOWNLOADS_DEFAULT_PATH / file_name
+            podp_file = defaults.DOWNLOADS_DEFAULT_PATH / file_name
             if not podp_file.exists():
                 download_url(
                     PODP_PROJECT_URL.format(config.podp_id),
-                    globals.DOWNLOADS_DEFAULT_PATH,
+                    defaults.DOWNLOADS_DEFAULT_PATH,
                     file_name,
                 )
 
@@ -90,12 +90,12 @@ class DatasetArranger:
         default directory.
         """
         if config.mibig.to_use:
-            if globals.MIBIG_DEFAULT_PATH.exists():
+            if defaults.MIBIG_DEFAULT_PATH.exists():
                 # remove existing mibig data
-                shutil.rmtree(globals.MIBIG_DEFAULT_PATH)
+                shutil.rmtree(defaults.MIBIG_DEFAULT_PATH)
             download_and_extract_mibig_metadata(
-                globals.DOWNLOADS_DEFAULT_PATH,
-                globals.MIBIG_DEFAULT_PATH,
+                defaults.DOWNLOADS_DEFAULT_PATH,
+                defaults.MIBIG_DEFAULT_PATH,
                 version=config.mibig.version,
             )
 
@@ -120,16 +120,16 @@ class DatasetArranger:
             # retry downloading at most 3 times if downloaded data has problems
             for _ in range(3):
                 try:
-                    validate_gnps(globals.GNPS_DEFAULT_PATH)
+                    validate_gnps(defaults.GNPS_DEFAULT_PATH)
                     pass_validation = True
                     break
                 except (FileNotFoundError, ValueError):
                     # Don't need to remove downloaded archive, as it'll be overwritten
-                    shutil.rmtree(globals.GNPS_DEFAULT_PATH, ignore_errors=True)
+                    shutil.rmtree(defaults.GNPS_DEFAULT_PATH, ignore_errors=True)
                     self._download_and_extract_gnps()
 
         if not pass_validation:
-            validate_gnps(globals.GNPS_DEFAULT_PATH)
+            validate_gnps(defaults.GNPS_DEFAULT_PATH)
 
         # get the path to file_mappings file (csv or tsv)
         self.gnps_file_mappings_file = self._get_gnps_file_mappings_file()
@@ -143,8 +143,8 @@ class DatasetArranger:
         Returns:
             Path to the GNPS file mappings file.
         """
-        file_mappings_tsv = globals.GNPS_DEFAULT_PATH / globals.GNPS_FILE_MAPPINGS_TSV
-        file_mappings_csv = globals.GNPS_DEFAULT_PATH / globals.GNPS_FILE_MAPPINGS_CSV
+        file_mappings_tsv = defaults.GNPS_DEFAULT_PATH / defaults.GNPS_FILE_MAPPINGS_TSV
+        file_mappings_csv = defaults.GNPS_DEFAULT_PATH / defaults.GNPS_FILE_MAPPINGS_CSV
 
         gnps_file_mappings_file = (
             file_mappings_tsv if file_mappings_tsv.exists() else file_mappings_csv
@@ -158,17 +158,17 @@ class DatasetArranger:
         Get the GNPS task ID from the PODP project JSON file, then download and extract the GNPS
         data to the default GNPS directory.
         """
-        podp_file = globals.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
+        podp_file = defaults.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
         with open(podp_file, "r") as f:
             podp_json_data = json.load(f)
         gnps_task_id = podp_json_data["metabolomics"]["project"].get("molecular_network")
 
         data_archive = (
-            GNPSDownloader(gnps_task_id, globals.DOWNLOADS_DEFAULT_PATH)
+            GNPSDownloader(gnps_task_id, defaults.DOWNLOADS_DEFAULT_PATH)
             .download()
             .get_download_file()
         )
-        GNPSExtractor(data_archive, globals.GNPS_DEFAULT_PATH)
+        GNPSExtractor(data_archive, defaults.GNPS_DEFAULT_PATH)
 
     def arrange_antismash(self) -> None:
         """Arrange the antiSMASH data.
@@ -199,15 +199,15 @@ class DatasetArranger:
         if config.mode == "podp":
             for _ in range(3):
                 try:
-                    validate_antismash(globals.ANTISMASH_DEFAULT_PATH)
+                    validate_antismash(defaults.ANTISMASH_DEFAULT_PATH)
                     pass_validation = True
                     break
                 except FileNotFoundError:
-                    shutil.rmtree(globals.ANTISMASH_DEFAULT_PATH, ignore_errors=True)
+                    shutil.rmtree(defaults.ANTISMASH_DEFAULT_PATH, ignore_errors=True)
                     self._download_and_extract_antismash()
 
         if not pass_validation:
-            validate_antismash(globals.ANTISMASH_DEFAULT_PATH)
+            validate_antismash(defaults.ANTISMASH_DEFAULT_PATH)
 
     def _download_and_extract_antismash(self) -> None:
         """Download and extract the antiSMASH data.
@@ -215,11 +215,11 @@ class DatasetArranger:
         Get the antiSMASH data from the PODP project JSON file, then download and extract the
         antiSMASH data to the default antiSMASH directory.
         """
-        podp_file = globals.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
+        podp_file = defaults.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
         with open(podp_file, "r") as f:
             podp_json_data = json.load(f)
         podp_download_and_extract_antismash_data(
-            podp_json_data["genomes"], globals.DOWNLOADS_DEFAULT_PATH, config.root_dir
+            podp_json_data["genomes"], defaults.DOWNLOADS_DEFAULT_PATH, config.root_dir
         )
 
     def arrange_bigscape(self) -> None:
@@ -244,15 +244,15 @@ class DatasetArranger:
         if config.mode == "podp":
             for _ in range(3):
                 try:
-                    validate_bigscape(globals.BIGSCAPE_DEFAULT_PATH)
+                    validate_bigscape(defaults.BIGSCAPE_DEFAULT_PATH)
                     pass_validation = True
                     break
                 except FileNotFoundError:
-                    shutil.rmtree(globals.BIGSCAPE_DEFAULT_PATH, ignore_errors=True)
+                    shutil.rmtree(defaults.BIGSCAPE_DEFAULT_PATH, ignore_errors=True)
                     self._run_bigscape()
 
         if not pass_validation:
-            validate_bigscape(globals.BIGSCAPE_DEFAULT_PATH)
+            validate_bigscape(defaults.BIGSCAPE_DEFAULT_PATH)
 
     def _run_bigscape(self) -> None:
         """Run BiG-SCAPE to generate the clustering file.
@@ -262,22 +262,22 @@ class DatasetArranger:
         The clustering file "mix_clustering_c{config.bigscape.cutoff}.tsv" will be copied to the
         default BiG-SCAPE directory.
         """
-        globals.BIGSCAPE_RUNNING_OUTPUT_PATH.mkdir(exist_ok=True, parents=True)
+        defaults.BIGSCAPE_RUNNING_OUTPUT_PATH.mkdir(exist_ok=True, parents=True)
         run_bigscape(
-            globals.ANTISMASH_DEFAULT_PATH,
-            globals.BIGSCAPE_RUNNING_OUTPUT_PATH,
+            defaults.ANTISMASH_DEFAULT_PATH,
+            defaults.BIGSCAPE_RUNNING_OUTPUT_PATH,
             config.bigscape.parameters,
         )
         for f in glob(
             str(
-                globals.BIGSCAPE_RUNNING_OUTPUT_PATH
+                defaults.BIGSCAPE_RUNNING_OUTPUT_PATH
                 / "network_files"
                 / "*"
                 / "mix"
                 / "mix_clustering_c*.tsv"
             )
         ):
-            shutil.copy(f, globals.BIGSCAPE_DEFAULT_PATH)
+            shutil.copy(f, defaults.BIGSCAPE_DEFAULT_PATH)
 
     def arrange_strain_mappings(self) -> None:
         """Arrange the strain mappings file.
@@ -319,14 +319,14 @@ class DatasetArranger:
 
     def _generate_strain_mappings(self) -> None:
         """Generate the strain mappings file for the PODP mode."""
-        podp_json_file = globals.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
-        genome_status_json_file = globals.DOWNLOADS_DEFAULT_PATH / GENOME_STATUS_FILENAME
-        genome_bgc_mappings_file = globals.ANTISMASH_DEFAULT_PATH / GENOME_BGC_MAPPINGS_FILENAME
+        podp_json_file = defaults.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
+        genome_status_json_file = defaults.DOWNLOADS_DEFAULT_PATH / GENOME_STATUS_FILENAME
+        genome_bgc_mappings_file = defaults.ANTISMASH_DEFAULT_PATH / GENOME_BGC_MAPPINGS_FILENAME
         gnps_file_mapping_file = self.gnps_file_mappings_file
         strain_mappings_file = config.root_dir / STRAIN_MAPPINGS_FILENAME
 
         # generate the genome_bgc_mappings_file
-        generate_mappings_genome_id_bgc_id(globals.ANTISMASH_DEFAULT_PATH)
+        generate_mappings_genome_id_bgc_id(defaults.ANTISMASH_DEFAULT_PATH)
         # generate the strain_mappings_file
         podp_generate_strain_mappings(
             podp_json_file,
@@ -343,7 +343,7 @@ class DatasetArranger:
         The validation checks if the strains selected file is a valid JSON file according to the
         schema defined in `schemas/user_strains.json`.
         """
-        strains_selected_file = config.root_dir / globals.STRAINS_SELECTED_FILENAME
+        strains_selected_file = config.root_dir / defaults.STRAINS_SELECTED_FILENAME
         if strains_selected_file.exists():
             with open(strains_selected_file, "r") as f:
                 json_data = json.load(f)
@@ -371,8 +371,8 @@ def validate_gnps(gnps_dir: Path) -> None:
     if not gnps_dir.exists():
         raise FileNotFoundError(f"GNPS data directory not found at {gnps_dir}")
 
-    file_mappings_tsv = gnps_dir / globals.GNPS_FILE_MAPPINGS_TSV
-    file_mappings_csv = gnps_dir / globals.GNPS_FILE_MAPPINGS_CSV
+    file_mappings_tsv = gnps_dir / defaults.GNPS_FILE_MAPPINGS_TSV
+    file_mappings_csv = gnps_dir / defaults.GNPS_FILE_MAPPINGS_CSV
     if file_mappings_tsv.exists() and file_mappings_csv.exists():
         raise ValueError(
             f"Both {file_mappings_tsv.name} and {file_mappings_csv.name} found in GNPS directory "
@@ -385,9 +385,9 @@ def validate_gnps(gnps_dir: Path) -> None:
         )
 
     required_files = [
-        gnps_dir / globals.GNPS_SPECTRA_FILENAME,
-        gnps_dir / globals.GNPS_MOLECULAR_FAMILY_FILENAME,
-        gnps_dir / globals.GNPS_ANNOTATIONS_FILENAME,
+        gnps_dir / defaults.GNPS_SPECTRA_FILENAME,
+        gnps_dir / defaults.GNPS_MOLECULAR_FAMILY_FILENAME,
+        gnps_dir / defaults.GNPS_ANNOTATIONS_FILENAME,
     ]
     list_not_found = [f.name for f in required_files if not f.exists()]
     if list_not_found:
