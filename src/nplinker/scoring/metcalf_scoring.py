@@ -3,6 +3,7 @@ import os
 from typing import TYPE_CHECKING
 import numpy as np
 import pandas as pd
+from nplinker.defaults import OUTPUT_DEFAULT_PATH
 from nplinker.genomics import GCF
 from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import MolecularFamily
@@ -31,11 +32,13 @@ class MetcalfScoring(ScoringMethod):
         DATALINKS: The DataLinks object to use for scoring.
         LINKFINDER: The LinkFinder object to use for scoring.
         NAME: The name of the scoring method. This is set to 'metcalf'.
+        CACHE: The name of the cache file to use for storing the MetcalfScoring.
     """
 
     DATALINKS = None
     LINKFINDER = None
     NAME = "metcalf"
+    CACHE = "cache_metcalf_scoring.pckl"
 
     def __init__(self, npl: NPLinker) -> None:
         """Create a MetcalfScoring object.
@@ -69,9 +72,8 @@ class MetcalfScoring(ScoringMethod):
             )
         )
 
-        cache_dir = os.path.join(npl.root_dir, "metcalf")
-        cache_file = os.path.join(cache_dir, "metcalf_scores.pckl")
-        os.makedirs(cache_dir, exist_ok=True)
+        OUTPUT_DEFAULT_PATH.mkdir(exist_ok=True)
+        cache_file = OUTPUT_DEFAULT_PATH / MetcalfScoring.CACHE
 
         # the metcalf preprocessing can take a long time for large datasets, so it's
         # better to cache as the data won't change unless the number of objects does
@@ -115,7 +117,8 @@ class MetcalfScoring(ScoringMethod):
 
     # TODO CG: is it needed? remove it if not
     @property
-    def datalinks(self) -> DataLinks:
+    def datalinks(self) -> DataLinks | None:
+        """Get the DataLinks object used for scoring."""
         return MetcalfScoring.DATALINKS
 
     def get_links(
@@ -309,10 +312,12 @@ class MetcalfScoring(ScoringMethod):
 
     # TODO CG: refactor this method
     def format_data(self, data):
+        """Format the data for display."""
         # for metcalf the data will just be a floating point value (i.e. the score)
         return f"{data:.4f}"
 
     # TODO CG: refactor this method
     def sort(self, objects, reverse=True):
+        """Sort the objects based on the score."""
         # sort based on score
         return sorted(objects, key=lambda objlink: objlink[self], reverse=reverse)
