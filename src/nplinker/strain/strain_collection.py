@@ -12,8 +12,9 @@ logger = LogConfig.getLogger(__name__)
 
 
 class StrainCollection:
+    """A collection of Strain objects."""
+
     def __init__(self):
-        """A collection of Strain objects."""
         # the order of strains is needed for scoring part, so use a list
         self._strains: list[Strain] = []
         self._strain_dict_name: dict[str, list[Strain]] = {}

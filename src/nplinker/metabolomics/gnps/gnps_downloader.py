@@ -12,17 +12,24 @@ if TYPE_CHECKING:
 
 
 class GNPSDownloader:
-    GNPS_DATA_DOWNLOAD_URL = (
+    """Download GNPS zip archive for the given task id.
+
+    Note that only GNPS workflows listed in the GNPSFormat enum are supported.
+
+    Attributes:
+        GNPS_DATA_DOWNLOAD_URL: URL template for downloading GNPS data.
+        GNPS_DATA_DOWNLOAD_URL_FBMN: URL template for downloading GNPS data for FBMN.
+    """
+
+    GNPS_DATA_DOWNLOAD_URL: str = (
         "https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_clustered_spectra"
     )
-    GNPS_DATA_DOWNLOAD_URL_FBMN = (
+    GNPS_DATA_DOWNLOAD_URL_FBMN: str = (
         "https://gnps.ucsd.edu/ProteoSAFe/DownloadResult?task={}&view=download_cytoscape_data"
     )
 
     def __init__(self, task_id: str, download_root: str | PathLike):
-        """Download GNPS zip archive for the given task id.
-
-        Note that only GNPS workflows listed in the GNPSFormat enum are supported.
+        """Initialize the GNPSDownloader.
 
         Args:
             task_id: GNPS task id, identifying the data to be downloaded.

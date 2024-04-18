@@ -52,8 +52,8 @@ def generate_mappings_genome_id_bgc_id(
 
     # sort mappings by genome_id and construct json data
     genome_bgc_mappings = dict(sorted(genome_bgc_mappings.items()))
-    json_data = [{"genome_ID": k, "BGC_ID": v} for k, v in genome_bgc_mappings.items()]
-    json_data = {"mappings": json_data, "version": "1.0"}
+    json_data_mappings = [{"genome_ID": k, "BGC_ID": v} for k, v in genome_bgc_mappings.items()]
+    json_data = {"mappings": json_data_mappings, "version": "1.0"}
 
     # validate json data
     validate(instance=json_data, schema=GENOME_BGC_MAPPINGS_SCHEMA)
@@ -210,7 +210,7 @@ def extract_mappings_strain_id_original_genome_id(
         PODP platform. For example, for project MSV000079284, its json file is
         https://pairedomicsdata.bioinformatics.nl/api/projects/4b29ddc3-26d0-40d7-80c5-44fb6631dbf9.4.
     """
-    mappings_dict = {}
+    mappings_dict: dict[str, set[str]] = {}
     with open(podp_project_json_file, "r") as f:
         json_data = json.load(f)
 

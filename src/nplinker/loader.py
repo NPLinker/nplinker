@@ -1,4 +1,5 @@
 import os
+from importlib.resources import files
 from deprecated import deprecated
 from nplinker import globals
 from nplinker.config import config
@@ -26,17 +27,14 @@ from nplinker.strain import StrainCollection
 from nplinker.strain.utils import load_user_strains
 
 
-try:
-    from importlib.resources import files
-except ImportError:
-    from importlib_resources import files
-
 logger = LogConfig.getLogger(__name__)
 
 NPLINKER_APP_DATA_DIR = files("nplinker").joinpath("data")
 
 
 class DatasetLoader:
+    """Class to load all data."""
+
     RUN_CANOPUS_DEFAULT = False
     EXTRA_CANOPUS_PARAMS_DEFAULT = "--maxmz 600 formula zodiac structure canopus"
 
@@ -56,6 +54,7 @@ class DatasetLoader:
         self.chem_classes = None
 
     def load(self):
+        """Load all data."""
         if not self._load_strain_mappings():
             return False
 
@@ -208,7 +207,7 @@ class DatasetLoader:
         mibig_class_file = NPLINKER_APP_DATA_DIR.joinpath(
             "MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt"
         )
-        self.class_matches = ClassMatches(mibig_class_file)
+        self.class_matches = ClassMatches(mibig_class_file)  # noqa
 
         # run canopus if canopus_dir does not exist
         should_run_canopus = self._config_docker.get("run_canopus", self.RUN_CANOPUS_DEFAULT)
@@ -224,14 +223,14 @@ class DatasetLoader:
                     )
                 )
                 try:
-                    run_canopus(self.gnps_mgf_file, self.canopus_dir, extra_canopus_parameters)
+                    run_canopus(self.gnps_mgf_file, self.canopus_dir, extra_canopus_parameters)  # noqa
                 except Exception as e:
                     logger.warning(
                         'Failed to run CANOPUS on mgf file with docker, error was "{}"'.format(e)
                     )
                     logger.info("Trying to run CANOPUS again using SIRIUS from path")
                     try:
-                        run_canopus(self.gnps_mgf_file, self.canopus_dir, extra_canopus_parameters)
+                        run_canopus(self.gnps_mgf_file, self.canopus_dir, extra_canopus_parameters)  # noqa
                     except Exception as e:
                         logger.warning(
                             'Again failed to run CANOPUS on mgf file using sirius from path, error was "{}"'.format(
@@ -242,7 +241,7 @@ class DatasetLoader:
                 logger.info("Found CANOPUS dir, CANOPUS not run again!")
 
         # load Chem_class_predictions (canopus, molnetenhancer are loaded)
-        chem_classes = ChemClassPredictions(self.canopus_dir, self.molnetenhancer_dir, self._root)
+        chem_classes = ChemClassPredictions(self.canopus_dir, self.molnetenhancer_dir, self._root)  # noqa
         # if no molfam classes transfer them from spectra (due to old style MN)
         if not chem_classes.canopus.molfam_classes and chem_classes.canopus.spectra_classes:
             logger.debug("Added chemical compound classes for MFs")

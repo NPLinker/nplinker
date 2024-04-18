@@ -9,34 +9,37 @@ from .gnps_format import gnps_format_from_archive
 
 
 class GNPSExtractor:
+    """Class to extract files from a GNPS molecular networking archive(.zip).
+
+    Four files are extracted and renamed to the following names:
+
+    - file_mappings(.tsv/.csv)
+    - spectra.mgf
+    - molecular_families.tsv
+    - annotations.tsv
+
+    The files to be extracted are selected based on the GNPS workflow type,
+    as desribed below (in the order of the files above):
+
+    1. METABOLOMICS-SNETS
+        - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.tsv
+        - METABOLOMICS-SNETS*.mgf
+        - networkedges_selfloop/*.pairsinfo
+        - result_specnets_DB/*.tsv
+    2. METABOLOMICS-SNETS-V2
+        - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.clustersummary
+        - METABOLOMICS-SNETS-V2*.mgf
+        - networkedges_selfloop/*.selfloop
+        - result_specnets_DB/.tsv
+    3. FEATURE-BASED-MOLECULAR-NETWORKING
+        - quantification_table*/*.csv
+        - spectra/*.mgf
+        - networkedges_selfloop/*.selfloop
+        - DB_result/*.tsv
+    """
+
     def __init__(self, file: str | PathLike, extract_dir: str | PathLike):
-        """Class to extract files from a GNPS molecular networking archive(.zip).
-
-        Four files are extracted and renamed to the following names:
-
-        - file_mappings(.tsv/.csv)
-        - spectra.mgf
-        - molecular_families.tsv
-        - annotations.tsv
-
-        The files to be extracted are selected based on the GNPS workflow type,
-        as desribed below (in the order of the files above):
-
-        1. METABOLOMICS-SNETS
-            - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.tsv
-            - METABOLOMICS-SNETS*.mgf
-            - networkedges_selfloop/*.pairsinfo
-            - result_specnets_DB/*.tsv
-        2. METABOLOMICS-SNETS-V2
-            - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.clustersummary
-            - METABOLOMICS-SNETS-V2*.mgf
-            - networkedges_selfloop/*.selfloop
-            - result_specnets_DB/.tsv
-        3. FEATURE-BASED-MOLECULAR-NETWORKING
-            - quantification_table*/*.csv
-            - spectra/*.mgf
-            - networkedges_selfloop/*.selfloop
-            - DB_result/*.tsv
+        """Initialize the GNPSExtractor.
 
         Args:
             file: The path to the GNPS zip file.

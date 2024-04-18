@@ -12,22 +12,26 @@ GNPS_UNIVERSAL_SPECTRUM_IDENTIFIER_URL = (
 
 
 class GNPSAnnotationLoader(AnnotationLoaderBase):
-    def __init__(self, file: str | PathLike):
-        """Load annotations from GNPS output file.
+    """Load annotations from GNPS output file.
 
-        The annotation file is a .tsv file from GNPS output archive, as described
-        below for each GNPS workflow type:
-        1. METABOLOMICS-SNETS
-            - result_specnets_DB/*.tsv
-        2. METABOLOMICS-SNETS-V2
-            - result_specnets_DB/.tsv
-        3. FEATURE-BASED-MOLECULAR-NETWORKING
-            - DB_result/*.tsv
+    The annotation file is a .tsv file from GNPS output archive, as described
+    below for each GNPS workflow type:
+
+    1. METABOLOMICS-SNETS
+        - result_specnets_DB/*.tsv
+    2. METABOLOMICS-SNETS-V2
+        - result_specnets_DB/.tsv
+    3. FEATURE-BASED-MOLECULAR-NETWORKING
+        - DB_result/*.tsv
+    """
+
+    def __init__(self, file: str | PathLike):
+        """Initialize the GNPSAnnotationLoader.
 
         Args:
             file: The GNPS annotation file.
 
-        Example:
+        Examples:
             >>> loader = GNPSAnnotationLoader("gnps_annotations.tsv")
             >>> print(loader.annotations["100"])
             {'#Scan#': '100',

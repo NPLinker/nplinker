@@ -10,18 +10,21 @@ logger = LogConfig.getLogger(__name__)
 
 
 class GNPSSpectrumLoader(SpectrumLoaderBase):
+    """Class to load mass spectra from the given GNPS MGF file.
+
+    The file mappings file is from GNPS output archive, as described below
+    for each GNPS workflow type:
+
+    1. METABOLOMICS-SNETS
+        - METABOLOMICS-SNETS*.mgf
+    2. METABOLOMICS-SNETS-V2
+        - METABOLOMICS-SNETS-V2*.mgf
+    3. FEATURE-BASED-MOLECULAR-NETWORKING
+        - spectra/*.mgf
+    """
+
     def __init__(self, file: str | PathLike):
-        """Class to load mass spectra from the given GNPS MGF file.
-
-        The file mappings file is from GNPS output archive, as described below
-        for each GNPS workflow type:
-
-        1. METABOLOMICS-SNETS
-            - METABOLOMICS-SNETS*.mgf
-        2. METABOLOMICS-SNETS-V2
-            - METABOLOMICS-SNETS-V2*.mgf
-        3. FEATURE-BASED-MOLECULAR-NETWORKING
-            - spectra/*.mgf
+        """Initialize the GNPSSpectrumLoader.
 
         Args:
             file: path to the MGF file.
@@ -29,7 +32,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
         Raises:
             ValueError: Raises ValueError if the file is not valid.
 
-        Example:
+        Examples:
             >>> loader = GNPSSpectrumLoader("gnps_spectra.mgf")
             >>> print(loader.spectra[0])
         """
@@ -95,11 +98,11 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
             )
             self._spectra.append(spectrum)
 
-    def _get_precursor_charge(self, charges: list) -> int:
+    def _get_precursor_charge(self, charges: list[int]) -> int:
         """Get the precursor charge from the charge list.
 
         Args:
-            charge: list of charge values.
+            charges: list of charge values.
 
         Returns:
             the precursor charge.

@@ -6,11 +6,14 @@ logger = LogConfig.getLogger(__name__)
 
 
 class Strain:
+    """To model the mapping between strain id and its aliases.
+
+    It's recommended to use NCBI taxonomy strain id or name as the primary
+    id.
+    """
+
     def __init__(self, primary_id: str) -> None:
         """To model the mapping between strain id and its aliases.
-
-        It's recommended to use NCBI taxonomy strain id or name as the primary
-        id.
 
         Args:
             primary_id: the representative id of the strain.

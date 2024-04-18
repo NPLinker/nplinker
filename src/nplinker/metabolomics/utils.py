@@ -144,7 +144,7 @@ def extract_mappings_strain_id_ms_filename(
         PODP platform. For example, for project MSV000079284, its json file is
         https://pairedomicsdata.bioinformatics.nl/api/projects/4b29ddc3-26d0-40d7-80c5-44fb6631dbf9.4.
     """
-    mappings_dict = {}
+    mappings_dict: dict[str, set[str]] = {}
     with open(podp_project_json_file, "r") as f:
         json_data = json.load(f)
 

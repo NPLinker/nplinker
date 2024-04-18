@@ -28,19 +28,20 @@ PODP_PROJECT_URL = "https://pairedomicsdata.bioinformatics.nl/api/projects/{}"
 
 
 class DatasetArranger:
+    """Arrange the dataset required by NPLinker.
+
+    This class is used to arrange the datasets required by NPLinker according to the
+    configuration. The datasets include MIBiG, GNPS, antiSMASH, and BiG-SCAPE.
+
+    If `config.mode` is "local", the datasets are validated.
+    If `config.mode` is "podp", the datasets are downloaded or generated.
+
+    It uses the default downloads directory `globals.DOWNLOADS_DEFAULT_PATH` to store the
+    downloaded files. Default data paths for MIBiG, GNPS, antiSMASH, and BiG-SCAPE are defined
+    in `nplinker.globals`.
+    """
+
     def __init__(self) -> None:
-        """Arrange the dataset required by NPLinker.
-
-        This class is used to arrange the datasets required by NPLinker according to the
-        configuration. The datasets include MIBiG, GNPS, antiSMASH, and BiG-SCAPE.
-
-        If `config.mode` is "local", the datasets are validated.
-        If `config.mode` is "podp", the datasets are downloaded or generated.
-
-        It uses the default downloads directory `globals.DOWNLOADS_DEFAULT_PATH` to store the
-        downloaded files. Default data paths for MIBiG, GNPS, antiSMASH, and BiG-SCAPE are defined
-        in `nplinker.globals`.
-        """
         # Prepare the downloads directory and/or PODP json file which are required for other methods
         globals.DOWNLOADS_DEFAULT_PATH.mkdir(exist_ok=True)
         self.arrange_podp_project_json()
@@ -157,14 +158,10 @@ class DatasetArranger:
         Get the GNPS task ID from the PODP project JSON file, then download and extract the GNPS
         data to the default GNPS directory.
         """
-        podp_file = (
-            globals.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
-        )
+        podp_file = globals.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
         with open(podp_file, "r") as f:
             podp_json_data = json.load(f)
-        gnps_task_id = podp_json_data["metabolomics"]["project"].get(
-            "molecular_network"
-        )
+        gnps_task_id = podp_json_data["metabolomics"]["project"].get("molecular_network")
 
         data_archive = (
             GNPSDownloader(gnps_task_id, globals.DOWNLOADS_DEFAULT_PATH)
@@ -218,9 +215,7 @@ class DatasetArranger:
         Get the antiSMASH data from the PODP project JSON file, then download and extract the
         antiSMASH data to the default antiSMASH directory.
         """
-        podp_file = (
-            globals.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
-        )
+        podp_file = globals.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
         with open(podp_file, "r") as f:
             podp_json_data = json.load(f)
         podp_download_and_extract_antismash_data(
@@ -315,9 +310,7 @@ class DatasetArranger:
         strain_mappings_file = config.root_dir / STRAIN_MAPPINGS_FILENAME
 
         if not strain_mappings_file.exists():
-            raise FileNotFoundError(
-                f"Strain mappings file not found at {strain_mappings_file}"
-            )
+            raise FileNotFoundError(f"Strain mappings file not found at {strain_mappings_file}")
 
         with open(strain_mappings_file, "r") as f:
             json_data = json.load(f)
@@ -326,15 +319,9 @@ class DatasetArranger:
 
     def _generate_strain_mappings(self) -> None:
         """Generate the strain mappings file for the PODP mode."""
-        podp_json_file = (
-            globals.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
-        )
-        genome_status_json_file = (
-            globals.DOWNLOADS_DEFAULT_PATH / GENOME_STATUS_FILENAME
-        )
-        genome_bgc_mappings_file = (
-            globals.ANTISMASH_DEFAULT_PATH / GENOME_BGC_MAPPINGS_FILENAME
-        )
+        podp_json_file = globals.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
+        genome_status_json_file = globals.DOWNLOADS_DEFAULT_PATH / GENOME_STATUS_FILENAME
+        genome_bgc_mappings_file = globals.ANTISMASH_DEFAULT_PATH / GENOME_BGC_MAPPINGS_FILENAME
         gnps_file_mapping_file = self.gnps_file_mappings_file
         strain_mappings_file = config.root_dir / STRAIN_MAPPINGS_FILENAME
 
@@ -433,9 +420,7 @@ def validate_antismash(antismash_dir: Path) -> None:
         ValueError: If any sub-directory name contains a space.
     """
     if not antismash_dir.exists():
-        raise FileNotFoundError(
-            f"antiSMASH data directory not found at {antismash_dir}"
-        )
+        raise FileNotFoundError(f"antiSMASH data directory not found at {antismash_dir}")
 
     sub_dirs = list_dirs(antismash_dir)
     if not sub_dirs:
@@ -453,9 +438,7 @@ def validate_antismash(antismash_dir: Path) -> None:
         gbk_files = list_files(sub_dir, suffix=".gbk", keep_parent=False)
         bgc_files = fnmatch.filter(gbk_files, "*.region???.gbk")
         if not bgc_files:
-            raise FileNotFoundError(
-                f"No BGC files found in antiSMASH sub-directory {sub_dir}"
-            )
+            raise FileNotFoundError(f"No BGC files found in antiSMASH sub-directory {sub_dir}")
 
 
 def validate_bigscape(bigscape_dir: Path) -> None:
@@ -481,6 +464,4 @@ def validate_bigscape(bigscape_dir: Path) -> None:
     clustering_file = bigscape_dir / f"mix_clustering_c{config.bigscape.cutoff}.tsv"
     database_file = bigscape_dir / "data_sqlite.db"
     if not clustering_file.exists() and not database_file.exists():
-        raise FileNotFoundError(
-            f"BiG-SCAPE data not found in {clustering_file} or {database_file}"
-        )
+        raise FileNotFoundError(f"BiG-SCAPE data not found in {clustering_file} or {database_file}")

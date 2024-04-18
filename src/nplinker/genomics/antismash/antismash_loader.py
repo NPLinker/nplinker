@@ -15,21 +15,24 @@ logger = LogConfig.getLogger(__name__)
 
 
 class AntismashBGCLoader:
-    def __init__(self, data_dir: str) -> None:
-        """Build a loader for AntiSMASH BGC genbank (.gbk) files.
+    """Build a loader for AntiSMASH BGC genbank (.gbk) files.
 
-        Note:
-            AntiSMASH BGC directory must follow the structure below:
-            ```
-            antismash
-                ├── genome_id_1 (one AntiSMASH output, e.g. GCF_000514775.1)
-                │  ├── GCF_000514775.1.gbk
-                │  ├── NZ_AZWO01000004.region001.gbk
-                │  └── ...
-                ├── genome_id_2
-                │  ├── ...
-                └── ...
-            ```
+    Note:
+        AntiSMASH BGC directory must follow the structure below:
+        ```
+        antismash
+            ├── genome_id_1 (one AntiSMASH output, e.g. GCF_000514775.1)
+            │  ├── GCF_000514775.1.gbk
+            │  ├── NZ_AZWO01000004.region001.gbk
+            │  └── ...
+            ├── genome_id_2
+            │  ├── ...
+            └── ...
+        ```
+    """
+
+    def __init__(self, data_dir: str) -> None:
+        """Initialize the AntiSMASH BGC loader.
 
         Args:
             data_dir: Path to AntiSMASH directory that contains a

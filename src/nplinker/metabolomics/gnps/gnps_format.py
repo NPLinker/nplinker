@@ -6,7 +6,6 @@ from os import PathLike
 from pathlib import Path
 import httpx
 from bs4 import BeautifulSoup
-from bs4 import Tag
 from nplinker.utils import get_headers
 
 
@@ -46,10 +45,12 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
     """
     task_html = httpx.get(GNPS_TASK_URL.format(task_id))
     soup = BeautifulSoup(task_html.text, features="html.parser")
-    tags = soup.find_all("th")
-    workflow_tag: Tag = list(filter(lambda x: x.contents == ["Workflow"], tags))[0]
-    workflow_format_tag: Tag = workflow_tag.parent.contents[3]
-    workflow_format = workflow_format_tag.contents[0].strip()
+    try:
+        # find the td tag that follows the th tag containing 'Workflow'
+        workflow_tag = soup.find("th", string="Workflow").find_next_sibling("td")  # type: ignore
+        workflow_format = workflow_tag.contents[0].strip()  # type: ignore
+    except AttributeError:
+        return GNPSFormat.Unknown
 
     if workflow_format == GNPSFormat.FBMN.value:
         return GNPSFormat.FBMN

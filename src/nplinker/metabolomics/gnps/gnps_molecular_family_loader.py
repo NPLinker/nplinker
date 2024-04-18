@@ -7,24 +7,28 @@ from ..molecular_family import MolecularFamily
 
 
 class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
+    """Class to load molecular families from GNPS output file.
+
+    The molecular family file is from GNPS output archive, as described below
+    for each GNPS workflow type:
+
+    1. METABOLOMICS-SNETS
+        - networkedges_selfloop/*.pairsinfo
+    2. METABOLOMICS-SNETS-V2
+        - networkedges_selfloop/*.selfloop
+    3. FEATURE-BASED-MOLECULAR-NETWORKING
+        - networkedges_selfloop/*.selfloop
+
+    The "ComponentIndex" column in the GNPS molecular family's file is treated
+    as family id. But for molecular families that have only one member (i.e. spectrum),
+    named singleton molecular families, their files have the same value of
+    "-1" in the "ComponentIndex" column. To make the family id unique,the
+    spectrum id plus a prefix `singleton-` is used as the family id of
+    singleton molecular families.
+    """
+
     def __init__(self, file: str | PathLike):
-        """Class to load molecular families from GNPS output file.
-
-        The molecular family file is from GNPS output archive, as described below
-        for each GNPS workflow type:
-        1. METABOLOMICS-SNETS
-            - networkedges_selfloop/*.pairsinfo
-        2. METABOLOMICS-SNETS-V2
-            - networkedges_selfloop/*.selfloop
-        3. FEATURE-BASED-MOLECULAR-NETWORKING
-            - networkedges_selfloop/*.selfloop
-
-        The "ComponentIndex" column in the GNPS molecular family's file is treated
-        as family id. But for molecular families that have only one member (i.e. spectrum),
-        named singleton molecular families, their files have the same value of
-        "-1" in the "ComponentIndex" column. To make the family id unique,the
-        spectrum id plus a prefix "singleton-" is used as the family id of
-        singleton molecular families.
+        """Initialize the GNPSMolecularFamilyLoader.
 
         Args:
             file: Path to the GNPS molecular family file.
@@ -32,7 +36,7 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
         Raises:
             ValueError: Raises ValueError if the file is not valid.
 
-        Example:
+        Examples:
             >>> loader = GNPSMolecularFamilyLoader("gnps_molecular_families.tsv")
             >>> print(loader.families)
             [<MolecularFamily 1>, <MolecularFamily 2>, ...]
