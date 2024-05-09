@@ -29,7 +29,15 @@ from pathlib import Path
 from typing import IO
 from typing import Callable
 import httpx
-from tqdm import tqdm
+from rich.progress import BarColumn
+from rich.progress import DownloadColumn
+from rich.progress import Progress
+from rich.progress import TextColumn
+from rich.progress import TimeElapsedColumn
+from rich.progress import TimeRemainingColumn
+from rich.progress import TransferSpeedColumn
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -156,12 +164,24 @@ def download_url(
                     f"Failed to download url {url} with status code {response.status_code}"
                 )
             total = int(response.headers.get("Content-Length", 0))
-            with tqdm(total=total, unit_scale=True, unit_divisor=1024, unit="B") as progress:
-                num_bytes_downloaded = response.num_bytes_downloaded
+
+            with Progress(
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(bar_width=None),
+                "[progress.percentage]{task.percentage:>3.1f}%",
+                "•",
+                DownloadColumn(),
+                "•",
+                TransferSpeedColumn(),
+                "•",
+                TimeRemainingColumn(),
+                "•",
+                TimeElapsedColumn(),
+            ) as progress:
+                task = progress.add_task(f"[hot_pink]Downloading {fpath.name}", total=total)
                 for chunk in response.iter_bytes():
                     fh.write(chunk)
-                    progress.update(response.num_bytes_downloaded - num_bytes_downloaded)
-                    num_bytes_downloaded = response.num_bytes_downloaded
+                    progress.update(task, advance=len(chunk))
 
     # check integrity of downloaded file
     if md5 is not None and not check_md5(fpath, md5):
