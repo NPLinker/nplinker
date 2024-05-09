@@ -1,11 +1,8 @@
 import json
-import logging
 from pathlib import Path
 from .utils import PODP_ADAPTED_SCHEMA
 from .utils import validate_podp_json
 
-
-logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 __all__ = [
     "GENOME_STATUS_SCHEMA",
