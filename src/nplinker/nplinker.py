@@ -69,7 +69,7 @@ class NPLinker:
         for name, method in NPLinker.SCORING_METHODS.items():
             if len(config_methods) == 0 or name in config_methods:
                 self._scoring_methods[name] = method
-                logger.debug(f"Enabled scoring method: {name}")
+                logger.info(f"Enabled scoring method: {name}")
 
         self._scoring_methods_setup_complete = {
             name: False for name in self._scoring_methods.keys()
@@ -279,9 +279,9 @@ class NPLinker:
                         if (source, target) in shared_strains:
                             link.shared_strains = shared_strains[(source, target)]
 
-        logger.debug("Finished calculating shared strain information")
+        logger.info("Finished calculating shared strain information")
 
-        logger.debug("Final size of link collection is {}".format(len(link_collection)))
+        logger.info("Final size of link collection is {}".format(len(link_collection)))
         return link_collection
 
     def get_common_strains(

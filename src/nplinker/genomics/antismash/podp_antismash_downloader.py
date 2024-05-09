@@ -248,7 +248,7 @@ def _ncbi_genbank_search(genbank_id: str, retry_times: int = 3) -> Tag | Navigab
     url = NCBI_LOOKUP_URL.format(genbank_id)
     retry = 1
     while retry <= retry_times:
-        logger.debug(f"Looking up GenBank data for {genbank_id} at {url}")
+        logger.info(f"Looking up GenBank data for {genbank_id} at {url}")
         resp = httpx.get(url, follow_redirects=True)
         if resp.status_code == httpx.codes.OK:
             # the page should contain a <dl> element with class "assembly_summary_new". retrieving
@@ -298,7 +298,7 @@ def _resolve_genbank_accession(genbank_id: str) -> str:
 
     # get rid of any extraneous whitespace
     genbank_id = genbank_id.strip()
-    logger.debug(f'Parsed GenBank ID to "{genbank_id}"')
+    logger.info(f'Parsed GenBank ID to "{genbank_id}"')
 
     # run a search using the GenBank accession ID
     try:

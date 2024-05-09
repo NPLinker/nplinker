@@ -86,7 +86,7 @@ class MetcalfScoring(ScoringMethod):
         ]
         datalinks, linkfinder = None, None
         if os.path.exists(cache_file):
-            logger.debug("MetcalfScoring.setup loading cached data")
+            logger.info("MetcalfScoring.setup loading cached data")
             cache_data = load_pickled_data(npl, cache_file)
             cache_ok = True
             if cache_data is not None:
@@ -108,7 +108,7 @@ class MetcalfScoring(ScoringMethod):
             MetcalfScoring.LINKFINDER = LinkFinder()
             MetcalfScoring.LINKFINDER.calc_score(MetcalfScoring.DATALINKS, link_type=LINK_TYPES[0])
             MetcalfScoring.LINKFINDER.calc_score(MetcalfScoring.DATALINKS, link_type=LINK_TYPES[1])
-            logger.debug("MetcalfScoring.setup caching results")
+            logger.info("MetcalfScoring.setup caching results")
             save_pickled_data(
                 (dataset_counts, MetcalfScoring.DATALINKS, MetcalfScoring.LINKFINDER), cache_file
             )
@@ -163,7 +163,7 @@ class MetcalfScoring(ScoringMethod):
                 ("LinkFinder object not found. Have you called `MetcalfScoring.setup(npl)`?")
             )
 
-        logger.debug(f"MetcalfScoring: standardised = {self.standardised}")
+        logger.info(f"MetcalfScoring: standardised = {self.standardised}")
         if not self.standardised:
             scores_list = self.LINKFINDER.get_links(*objects, score_cutoff=self.cutoff)
         # TODO CG: verify the logics of standardised score and add unit tests
@@ -180,14 +180,14 @@ class MetcalfScoring(ScoringMethod):
             GCF | Spectrum | MolecularFamily, dict[GCF | Spectrum | MolecularFamily, ObjectLink]
         ] = {}
         if obj_type == "gcf":
-            logger.debug(
+            logger.info(
                 f"MetcalfScoring: input_type=GCF, result_type=Spec/MolFam, "
                 f"#inputs={len(objects)}."
             )
             for scores in scores_list:
                 # when no links found
                 if scores.shape[1] == 0:
-                    logger.debug(f'MetcalfScoring: found no "{scores.name}" links')
+                    logger.info(f'MetcalfScoring: found no "{scores.name}" links')
                 else:
                     # when links found
                     for col_index in range(scores.shape[1]):
@@ -202,16 +202,16 @@ class MetcalfScoring(ScoringMethod):
                         link_scores[gcf][met] = ObjectLink(
                             gcf, met, self, scores.loc["score", col_index]
                         )
-                    logger.debug(f"MetcalfScoring: found {len(link_scores)} {scores.name} links.")
+                    logger.info(f"MetcalfScoring: found {len(link_scores)} {scores.name} links.")
         else:
-            logger.debug(
+            logger.info(
                 f"MetcalfScoring: input_type=Spec/MolFam, result_type=GCF, "
                 f"#inputs={len(objects)}."
             )
             scores = scores_list[0]
             # when no links found
             if scores.shape[1] == 0:
-                logger.debug(f'MetcalfScoring: found no links "{scores.name}" for input objects')
+                logger.info(f'MetcalfScoring: found no links "{scores.name}" for input objects')
             else:
                 for col_index in range(scores.shape[1]):
                     gcf = self.npl.lookup_gcf(scores.loc["target", col_index])
@@ -224,10 +224,10 @@ class MetcalfScoring(ScoringMethod):
                     link_scores[met][gcf] = ObjectLink(
                         met, gcf, self, scores.loc["score", col_index]
                     )
-                logger.debug(f"MetcalfScoring: found {len(link_scores)} {scores.name} links.")
+                logger.info(f"MetcalfScoring: found {len(link_scores)} {scores.name} links.")
 
         link_collection._add_links_from_method(self, link_scores)
-        logger.debug("MetcalfScoring: completed")
+        logger.info("MetcalfScoring: completed")
         return link_collection
 
     def _calc_standardised_score_met(
@@ -237,7 +237,7 @@ class MetcalfScoring(ScoringMethod):
             raise ValueError(
                 "Metcalf mean and std not found. Have you called `MetcalfScoring.setup(npl)`?"
             )
-        logger.debug("Calculating standardised Metcalf scores (met input)")
+        logger.info("Calculating standardised Metcalf scores (met input)")
         raw_score = results[0]
         z_scores = []
         for col_index in range(raw_score.shape[1]):
@@ -276,7 +276,7 @@ class MetcalfScoring(ScoringMethod):
             raise ValueError(
                 "Metcalf mean and std not found. Have you called `MetcalfScoring.setup(npl)`?"
             )
-        logger.debug("Calculating standardised Metcalf scores (gen input)")
+        logger.info("Calculating standardised Metcalf scores (gen input)")
         postprocessed_scores = []
         for raw_score in results:
             z_scores = []

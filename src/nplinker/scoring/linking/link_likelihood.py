@@ -59,7 +59,7 @@ class LinkLikelihood:
                 "Wrong correlation 'type' given. Must be one of 'spec-gcf', 'mf-gcf'..."
             )
 
-        logger.debug(f"Calculating likelihood matrices of type: {type}")
+        logger.info(f"Calculating likelihood matrices of type: {type}")
         # Calculate likelihood matrices using calc_likelihood_matrix()
         (
             P_type2_given_type1,

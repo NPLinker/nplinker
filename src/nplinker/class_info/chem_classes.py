@@ -263,7 +263,7 @@ class CanopusResults:
 
             # use canopus_treemap to produce NPClassifier classes
             # TODO: probably change when sirius v5 comes out
-            logger.debug("Using canopus_treemap to get NPC classes")
+            logger.info("Using canopus_treemap to get NPC classes")
             canopus_workspace = Canopus(sirius=self._canopus_dir)
             npc_file = os.path.join(self._canopus_dir, "npc_summary.tsv")
             canopus_workspace.npcSummary().to_csv(npc_file, sep=sep)
