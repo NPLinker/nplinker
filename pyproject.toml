@@ -36,6 +36,7 @@ dependencies = [
     "numpy",
     "pandas",
     "pyteomics",
+    "rich",
     "scipy",
     "sortedcontainers",
     "tqdm",
