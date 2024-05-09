@@ -39,7 +39,7 @@ validators = [
     Validator("podp_id", required=True, when=Validator("mode", eq="podp")),
     Validator("podp_id", required=False, when=Validator("mode", eq="local")),
     # Log
-    ## `loglevel` must be a string and must be one of the supported levels. It is transformed to
+    ## `level` must be a string and must be one of the supported levels. It is transformed to
     ## uppercase to avoid case sensitivity.
     Validator(
         "log.level",
@@ -47,8 +47,8 @@ validators = [
         cast=lambda v: v.upper(),
         is_in=["NOTSET", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
     ),
-    Validator("log.file", is_type_of=str, cast=Path),
-    Validator("log.to_stdout", is_type_of=bool),
+    Validator("log.file", is_type_of=str),
+    Validator("log.use_console", is_type_of=bool),
     #  Mibig
     Validator("mibig.to_use", required=True, is_type_of=bool),
     Validator(

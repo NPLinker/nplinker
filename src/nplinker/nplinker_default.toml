@@ -2,7 +2,7 @@
 
 [log]
 level = "INFO"
-to_stdout = true
+use_console = true
 
 [mibig]
 to_use = true
