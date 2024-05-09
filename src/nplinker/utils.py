@@ -17,6 +17,7 @@ import bz2
 import csv
 import gzip
 import hashlib
+import logging
 import lzma
 import os
 import os.path
@@ -29,6 +30,7 @@ from typing import IO
 from typing import Callable
 import httpx
 from tqdm import tqdm
+logger = logging.getLogger(__name__)
 
 
 def find_delimiter(file: str | PathLike) -> str:
@@ -142,7 +144,7 @@ def download_url(
 
     # check if file is already present locally
     if fpath.is_file() and md5 is not None and check_md5(fpath, md5):
-        print("Using downloaded and verified file: " + str(fpath))
+        logger.info("Using downloaded and verified file: " + str(fpath))
         return
 
     # download the file
@@ -376,6 +378,7 @@ def extract_archive(
     # create the extract directory if not exist
     extract_root.mkdir(exist_ok=True)
 
+    logger.info(f"Extracting {from_path} to {extract_root}")
     suffix, archive_type, compression = _detect_file_type(from_path)
     if not archive_type:
         return _decompress(
@@ -429,7 +432,6 @@ def download_and_extract_archive(
     download_url(url, download_root, filename, md5)
 
     archive = download_root / filename
-    print(f"Extracting {archive} to {extract_root}")
     extract_archive(archive, extract_root, remove_finished=remove_finished)
 
 
