@@ -39,7 +39,6 @@ dependencies = [
     "rich",
     "scipy",
     "sortedcontainers",
-    "tqdm",
 ]
 
 [project.optional-dependencies]
