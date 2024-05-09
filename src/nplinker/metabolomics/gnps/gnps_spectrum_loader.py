@@ -1,12 +1,12 @@
 from __future__ import annotations
+import logging
 from os import PathLike
 from pyteomics import mgf
-from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import Spectrum
 from nplinker.metabolomics.abc import SpectrumLoaderBase
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class GNPSSpectrumLoader(SpectrumLoaderBase):

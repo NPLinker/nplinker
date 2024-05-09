@@ -1,5 +1,5 @@
+import logging
 import os.path
-from nplinker.logconfig import LogConfig
 from nplinker.strain import Strain
 from nplinker.utils import list_files
 from ..abc import BGCLoaderBase
@@ -7,7 +7,7 @@ from ..bgc import BGC
 from .mibig_metadata import MibigMetadata
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class MibigLoader:

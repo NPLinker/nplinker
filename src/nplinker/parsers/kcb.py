@@ -11,15 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from __future__ import annotations
 import json
+import logging
 import os
 import re
-from ..logconfig import LogConfig
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 # this will match strings like '...cluster001.gbk' or '...region022.gbk',
 # and allow the number to be extracted easily

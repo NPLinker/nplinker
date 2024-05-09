@@ -1,8 +1,8 @@
 from __future__ import annotations
-from nplinker.logconfig import LogConfig
+import logging
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class Strain:

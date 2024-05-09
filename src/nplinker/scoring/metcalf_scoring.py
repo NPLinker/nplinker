@@ -1,11 +1,11 @@
 from __future__ import annotations
+import logging
 import os
 from typing import TYPE_CHECKING
 import numpy as np
 import pandas as pd
 from nplinker.defaults import OUTPUT_DEFAULT_PATH
 from nplinker.genomics import GCF
-from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import MolecularFamily
 from nplinker.metabolomics import Spectrum
 from nplinker.pickler import load_pickled_data
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from ..nplinker import NPLinker
     from . import LinkCollection
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class MetcalfScoring(ScoringMethod):

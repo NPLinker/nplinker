@@ -1,12 +1,12 @@
 from __future__ import annotations
+import logging
 import os
 import subprocess
 import sys
 from os import PathLike
-from ...logconfig import LogConfig
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 PFAM_PATH = os.path.join(sys.prefix, "nplinker_lib")
 

@@ -1,15 +1,15 @@
 from __future__ import annotations
+import logging
 import os
 import shutil
 from os import PathLike
 from pathlib import Path
-from nplinker.logconfig import LogConfig
 from nplinker.utils import download_and_extract_archive
 from nplinker.utils import list_dirs
 from nplinker.utils import list_files
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 # urls to be given to download antismash data
 ANTISMASH_DB_DOWNLOAD_URL = "https://antismash-db.secondarymetabolites.org/output/{}/{}"

@@ -1,8 +1,8 @@
 import itertools
-from nplinker.logconfig import LogConfig
+import logging
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class LinkCollection:

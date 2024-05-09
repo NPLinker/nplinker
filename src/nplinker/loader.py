@@ -1,3 +1,4 @@
+import logging
 import os
 from importlib.resources import files
 from deprecated import deprecated
@@ -16,7 +17,6 @@ from nplinker.genomics.mibig import MibigLoader
 from nplinker.genomics.utils import add_bgc_to_gcf
 from nplinker.genomics.utils import add_strain_to_bgc
 from nplinker.genomics.utils import get_mibig_from_gcf
-from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.gnps import GNPSAnnotationLoader
 from nplinker.metabolomics.gnps import GNPSMolecularFamilyLoader
 from nplinker.metabolomics.gnps import GNPSSpectrumLoader
@@ -27,7 +27,7 @@ from nplinker.strain import StrainCollection
 from nplinker.strain.utils import load_user_strains
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 NPLINKER_APP_DATA_DIR = files("nplinker").joinpath("data")
 

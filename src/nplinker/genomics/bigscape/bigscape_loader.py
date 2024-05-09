@@ -1,13 +1,13 @@
 from __future__ import annotations
 import csv
+import logging
 import sqlite3
 from os import PathLike
-from nplinker.logconfig import LogConfig
 from ..abc import GCFLoaderBase
 from ..gcf import GCF
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class BigscapeGCFLoader:

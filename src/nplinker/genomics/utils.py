@@ -1,10 +1,10 @@
 from __future__ import annotations
 import json
+import logging
 from os import PathLike
 from pathlib import Path
 from jsonschema import validate
 from nplinker.defaults import GENOME_BGC_MAPPINGS_FILENAME
-from nplinker.logconfig import LogConfig
 from nplinker.schemas import GENOME_BGC_MAPPINGS_SCHEMA
 from nplinker.schemas import validate_podp_json
 from nplinker.strain import StrainCollection
@@ -16,7 +16,7 @@ from .bgc import BGC
 from .gcf import GCF
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def generate_mappings_genome_id_bgc_id(

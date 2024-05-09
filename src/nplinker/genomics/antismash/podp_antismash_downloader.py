@@ -1,5 +1,6 @@
 from __future__ import annotations
 import json
+import logging
 import re
 import time
 from os import PathLike
@@ -11,11 +12,10 @@ from bs4 import Tag
 from jsonschema import validate
 from nplinker.defaults import GENOME_STATUS_FILENAME
 from nplinker.genomics.antismash import download_and_extract_antismash_data
-from nplinker.logconfig import LogConfig
 from nplinker.schemas import GENOME_STATUS_SCHEMA
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 NCBI_LOOKUP_URL = "https://www.ncbi.nlm.nih.gov/assembly/?term={}"
 JGI_GENOME_LOOKUP_URL = (

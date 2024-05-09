@@ -1,10 +1,10 @@
 from __future__ import annotations
+import logging
 from typing import TYPE_CHECKING
 from typing import Sequence
 import numpy as np
 import pandas as pd
 from nplinker.genomics.gcf import GCF
-from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import MolecularFamily
 from nplinker.metabolomics import Spectrum
 from .utils import calc_correlation_matrix
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from nplinker.strain import Strain
     from nplinker.strain import StrainCollection
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 LINK_TYPES = ["spec-gcf", "mf-gcf"]
 
