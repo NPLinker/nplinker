@@ -7,5 +7,5 @@ For a deep understanding of NPLinker, please refer to the [original paper](https
 
 !!! warning "Under Development"
     
-    NPLinker v2 is under active development. The documentation is not complete yet. If you have any 
-    questions, please contact us via [GitHub Issues](https://github.com/NPLinker/nplinker/issues)
+    NPLinker v2 is under active development ([See its pre-releases](https://pypi.org/project/nplinker/#history)). 
+    The documentation is not complete yet. If you have any questions, please contact us via [GitHub Issues](https://github.com/NPLinker/nplinker/issues).
