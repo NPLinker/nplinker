@@ -2,13 +2,13 @@ from __future__ import annotations
 import logging
 import sys
 from typing import TYPE_CHECKING
+from . import setup_logging
 from .arranger import DatasetArranger
 from .config import config
 from .genomics import BGC
 from .genomics import GCF
 from .loader import NPLINKER_APP_DATA_DIR
 from .loader import DatasetLoader
-from .logconfig import LogConfig
 from .metabolomics import MolecularFamily
 from .metabolomics import Spectrum
 from .pickler import save_pickled_data
@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from .strain import Strain
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class NPLinker:
@@ -39,17 +39,11 @@ class NPLinker:
 
     def __init__(self):
         """Initialise an NPLinker instance."""
-        # configure logging based on the supplied config params
-        LogConfig.setLogLevelStr(config.log.level)
-        logfile = config.get("log.file")
-        if logfile:
-            logfile_dest = logging.FileHandler(logfile)
-            # if we want to log to stdout plus logfile, add the new destination
-            if config.get("log.to_stdout"):  # default to True
-                LogConfig.addLogDestination(logfile_dest)
-            else:
-                # otherwise overwrite the default stdout destination
-                LogConfig.setLogDestination(logfile_dest)
+        setup_logging(
+            level=config.log.level,
+            file=config.log.get("file", ""),
+            use_console=config.log.use_console,
+        )
 
         self._loader = DatasetLoader()
 
