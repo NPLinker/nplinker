@@ -31,21 +31,62 @@ Original paper: [Ranking microbial metabolomic and genomic links in the NPLinker
 
 
 ### Installation
-NPLinker is a Python package, you can install it as following:
+NPLinker is a python package, using both pypi packages and non-pypi packages as dependencies. It 
+requires <span style="color:red;">**~4.5GB**</span> of disk space to install all the dependencies. 
+
 ```shell
-# create a new virtual environment
+# Check python version (requiring ≥3.9)
+python --version
+
+# Create a new virtual environment
 python -m venv env
 source env/bin/activate
 
-# install nplinker package
-pip install nplinker
+# install from nplinker releases (requiring ~300MB of disk space)
+pip install nplinker==2.0.0a1
 
-# install nplinker non-pypi dependencies and databases
+# or install the latest from source code
+pip install git+https://github.com/nplinker/nplinker@dev 
+
+# install nplinker non-pypi dependencies and databases (~4GB)
+install-nplinker-deps
+```
+A virtual environment is *required* to install the the non-pypi dependencies. You can also use `conda`
+to manage python environments.
+
+### Testing
+
+To run the tests, you need to clone this repo and install the development dependencies:
+
+```shell
+# Create a new virtual environment
+python -m venv env
+source env/bin/activate
+
+# Clone the repository and install the development dependencies
+git clone https://github.com/NPLinker/nplinker.git
+cd nplinker
+pip install -e ".[dev]"
 install-nplinker-deps
 ```
 
-A virtual environment is *required* to install the the non-pypi dependencies. You can also use `conda`
-to manage python environments.
+#### Unit tests
+
+To run the unit tests, you can use the following command:
+
+```shell
+pytest
+```
+Pytest will use all available CPU cores to run the unit tests in parallel.
+
+#### Integration tests
+
+To run the integration tests, you can use the following command:
+
+```shell
+pytest -n1 tests/integration
+```
+The `-n1` is to use one CPU core to run the tests. Change it to `-n2` if you want to use two CPU cores to run in parallel.
 
 ### Usage
 
