@@ -1,6 +1,7 @@
 from __future__ import annotations
 import logging
 import sys
+from pprint import pformat
 from typing import TYPE_CHECKING
 from . import setup_logging
 from .arranger import DatasetArranger
@@ -44,6 +45,7 @@ class NPLinker:
             file=config.log.get("file", ""),
             use_console=config.log.use_console,
         )
+        logger.info("Configuration:\n %s", pformat(config.as_dict(), width=20, sort_dicts=False))
 
         self._loader = DatasetLoader()
 
