@@ -5,7 +5,9 @@
     - Python version ≥3.9
 
 
-NPLinker is a python package that has both pypi packages and non-pypi packages as dependencies.
+NPLinker is a python package that has both pypi packages and non-pypi packages as dependencies. It 
+requires <span style="color:red;">**~4.5GB**</span> of disk space to install all the dependencies. 
+
 Install `nplinker` package as following:
 
 
@@ -17,10 +19,10 @@ python --version
 python -m venv env          # (1)!
 source env/bin/activate
 
-# install nplinker package
+# install nplinker package (requiring ~300MB of disk space)
 pip install nplinker==2.0.0a1 # (2)! 
 
-# install nplinker non-pypi dependencies and databases
+# install nplinker non-pypi dependencies and databases (~4GB)
 install-nplinker-deps
 ```
 
