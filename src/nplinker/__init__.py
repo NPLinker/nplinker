@@ -23,7 +23,7 @@ def setup_logging(level: str = "INFO", file: str = "", use_console: bool = True)
     from rich.logging import RichHandler
 
     # Get the acncestor logger "nplinker"
-    logger = logging.getLogger(__name__.split(".")[0])
+    logger = logging.getLogger(__name__)
     logger.setLevel(level)
 
     # File handler
