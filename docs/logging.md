@@ -18,7 +18,7 @@ from nplinker import setup_logging
 
 setup_logging(level="DEBUG", file="nplinker.log", use_console=True) # (1)!
 
-# Your busniess code here
+# Your business code here
 # e.g. download and extract nplinker example data
 from nplinker.utils import download_and_extract_archive
 
