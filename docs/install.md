@@ -27,7 +27,7 @@ install-nplinker-deps
 ```
 
 1. A virtual environment is ***required*** to install the the non-pypi dependencies. You can also use `conda` to create a new environment. But NPLinker is not available on conda yet.
-2. NPLinker v2 is still under development and released as [pre-releases](https://pypi.org/project/nplinker/#history). To install the pre-release, you have to explicitly specifiy the version. Using `pip install nplinker` will install the legacy NPLinker (v1.3.2), which is not recommended. 
+2. NPLinker v2 is still under development and released as [pre-release](https://pypi.org/project/nplinker/#history). To install the pre-release, you have to explicitly specifiy the version. The command `pip install nplinker` will install the legacy NPLinker (v1.3.2), which is not recommended. 
 
 ## Install from source code
 
