@@ -1,14 +1,14 @@
 import itertools
+import logging
 from nplinker.genomics.bgc import BGC
 from nplinker.genomics.gcf import GCF
-from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import MolecularFamily
 from nplinker.scoring.methods import ScoringMethod
 from nplinker.scoring.object_link import ObjectLink
 from nplinker.scoring.rosetta.rosetta import Rosetta
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class RosettaScoring(ScoringMethod):

@@ -1,10 +1,10 @@
 from __future__ import annotations
+import logging
 from deprecated import deprecated
-from nplinker.logconfig import LogConfig
 from nplinker.scoring.linking.utils import calc_likelihood_matrix
 
 
-logger = LogConfig.getLogger(__file__)
+logger = logging.getLogger(__file__)
 
 
 @deprecated(version="1.3.3", reason="It's unused and will be removed in 2.0.0")
@@ -59,7 +59,7 @@ class LinkLikelihood:
                 "Wrong correlation 'type' given. Must be one of 'spec-gcf', 'mf-gcf'..."
             )
 
-        logger.debug(f"Calculating likelihood matrices of type: {type}")
+        logger.info(f"Calculating likelihood matrices of type: {type}")
         # Calculate likelihood matrices using calc_likelihood_matrix()
         (
             P_type2_given_type1,

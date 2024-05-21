@@ -11,16 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import glob
+import logging
 import os
 from collections import Counter
 from canopus import Canopus
 from canopus.classifications_to_gnps import analyse_canopus
-from ..logconfig import LogConfig
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 # load Chem_class_predictions (canopus, molnetenhancer are loaded)
@@ -264,7 +263,7 @@ class CanopusResults:
 
             # use canopus_treemap to produce NPClassifier classes
             # TODO: probably change when sirius v5 comes out
-            logger.debug("Using canopus_treemap to get NPC classes")
+            logger.info("Using canopus_treemap to get NPC classes")
             canopus_workspace = Canopus(sirius=self._canopus_dir)
             npc_file = os.path.join(self._canopus_dir, "npc_summary.tsv")
             canopus_workspace.npcSummary().to_csv(npc_file, sep=sep)

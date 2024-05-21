@@ -1,10 +1,10 @@
 from __future__ import annotations
+import logging
 from typing import TYPE_CHECKING
 import numpy as np
 import pandas as pd
 from scipy.stats import hypergeom
 from nplinker.genomics.gcf import GCF
-from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import MolecularFamily
 from nplinker.metabolomics import Spectrum
 from . import LINK_TYPES
@@ -14,7 +14,7 @@ from .utils import isinstance_all
 if TYPE_CHECKING:
     from . import DataLinks
 
-logger = LogConfig.getLogger(__file__)
+logger = logging.getLogger(__file__)
 
 
 # TODO CG: this class could be merged to MetcalfScoring class?

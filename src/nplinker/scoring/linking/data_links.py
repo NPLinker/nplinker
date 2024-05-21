@@ -1,10 +1,10 @@
 from __future__ import annotations
+import logging
 from typing import TYPE_CHECKING
 from typing import Sequence
 import numpy as np
 import pandas as pd
 from nplinker.genomics.gcf import GCF
-from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import MolecularFamily
 from nplinker.metabolomics import Spectrum
 from .utils import calc_correlation_matrix
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from nplinker.strain import Strain
     from nplinker.strain import StrainCollection
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 LINK_TYPES = ["spec-gcf", "mf-gcf"]
 
@@ -74,7 +74,7 @@ class DataLinks:
         """
         self._strains = strains
 
-        logger.debug(
+        logger.info(
             "Create occurrence dataframes: spectra<->strains, gcfs<->strains and mfs<->strains."
         )
         # DataFrame to store occurrence of gcfs/spectra/mfs with respect to strains
@@ -84,14 +84,14 @@ class DataLinks:
         self.occurrence_mf_strain = self._get_occurrence_mf_strain(mfs, strains)
 
         # DataFrame to store co-occurrence of "spectra<->gcf" or "mfs<->gcf"
-        logger.debug("Create correlation matrices: spectra<->gcfs.")
+        logger.info("Create correlation matrices: spectra<->gcfs.")
         (
             self.cooccurrence_spec_gcf,
             self.cooccurrence_spec_notgcf,
             self.cooccurrence_notspec_gcf,
             self.cooccurrence_notspec_notgcf,
         ) = self._get_cooccurrence(link_type="spec-gcf")
-        logger.debug("Create correlation matrices: mol-families<->gcfs.")
+        logger.info("Create correlation matrices: mol-families<->gcfs.")
         (
             self.cooccurrence_mf_gcf,
             self.cooccurrence_mf_notgcf,
@@ -240,7 +240,7 @@ class DataLinks:
             raise ValueError(
                 f"Link type {link_type} is not supported. Use 'spec-gcf' or 'mf-gcf' instead."
             )
-        logger.debug(f"Calculating correlation matrices of type: {link_type}")
+        logger.info(f"Calculating correlation matrices of type: {link_type}")
         m1, m2, m3, m4 = calc_correlation_matrix(met_strain_occurrence, self.occurrence_gcf_strain)
         df_met_gcf = pd.DataFrame(
             m1,

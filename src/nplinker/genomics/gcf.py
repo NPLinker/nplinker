@@ -1,6 +1,6 @@
 from __future__ import annotations
+import logging
 from typing import TYPE_CHECKING
-from nplinker.logconfig import LogConfig
 from nplinker.strain import StrainCollection
 
 
@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from nplinker.strain import Strain
     from .bgc import BGC
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class GCF:

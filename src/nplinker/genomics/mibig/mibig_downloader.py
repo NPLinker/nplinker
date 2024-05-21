@@ -1,14 +1,14 @@
 from __future__ import annotations
+import logging
 import os
 import shutil
 from pathlib import Path
-from nplinker.logconfig import LogConfig
 from nplinker.utils import download_and_extract_archive
 from nplinker.utils import list_dirs
 from nplinker.utils import list_files
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 MIBIG_METADATA_URL = "https://dl.secondarymetabolites.org/mibig/mibig_json_{version}.tar.gz"
 

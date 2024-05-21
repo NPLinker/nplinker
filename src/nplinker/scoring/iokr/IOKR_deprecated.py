@@ -11,16 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
 # CG: these functions are not used by other, could be removed
-
-from nplinker.logconfig import LogConfig
+import logging
 from . import nplinker_iokr
 from .spectrum import MSSpectrum
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def run_iokr_ranking(spec, bgc_list):

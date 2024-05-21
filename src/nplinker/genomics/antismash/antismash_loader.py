@@ -1,17 +1,17 @@
 from __future__ import annotations
 import fnmatch
+import logging
 import os
 from Bio import SeqIO
 from Bio import SeqRecord
 from nplinker.genomics import BGC
-from nplinker.logconfig import LogConfig
 from nplinker.strain import Strain
 from nplinker.utils import list_dirs
 from nplinker.utils import list_files
 from ..abc import BGCLoaderBase
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class AntismashBGCLoader:

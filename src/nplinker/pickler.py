@@ -11,17 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import logging
 import os
 import pickle
 from .genomics import BGC
 from .genomics import GCF
-from .logconfig import LogConfig
 from .metabolomics import MolecularFamily
 from .metabolomics import Spectrum
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 # This is based on the example at https://docs.python.org/3/library/pickle.html#pickle-persistent
 # Normally there are serious problems trying to pickle any object with a __hash__,

@@ -11,12 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import csv
+import logging
 import os
 from nplinker.scoring.rosetta.rosetta_hit import RosettaHit
 from ...genomics import BGC
-from ...logconfig import LogConfig
 from ...parsers.kcb import KCBJSONParser
 from ...parsers.kcb import KCBTextParser
 from ...pickler import load_pickled_data
@@ -24,7 +23,7 @@ from ...pickler import save_pickled_data
 from .spec_lib import SpecLib
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class Rosetta:

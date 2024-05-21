@@ -18,16 +18,17 @@ podp_id = ""
 
 [log]
 # Log level. The available levels are same as the levels in python package `logging`:
-# "NOTSET", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL".
+# "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL".
 # The default value is "INFO".
 level = "INFO"
-# Redirect the log messages from stdout to a log file. If not set, the log messages will only be
-# printed to stdout.
-# The value is optional and must be a full path if set.
+# The log file to append log messages.
+# The value is optional. 
+# If not set or use empty string, log messages will not be written to a file.
+# The file will be created if it does not exist. Log messages will be appended to the file if it exists.
 file = "path/to/logfile"
-# Whether to print log messages to stdout in addition to writing to the logfile.
+# Whether to write log meesages to console.
 # The default value is true.
-to_stdout = true
+use_console = true
 
 
 [mibig]

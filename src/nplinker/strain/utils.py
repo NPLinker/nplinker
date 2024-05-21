@@ -1,8 +1,8 @@
 from __future__ import annotations
 import json
+import logging
 from os import PathLike
 from jsonschema import validate
-from nplinker.logconfig import LogConfig
 from nplinker.schemas import USER_STRAINS_SCHEMA
 from ..genomics.utils import extract_mappings_original_genome_id_resolved_genome_id
 from ..genomics.utils import extract_mappings_resolved_genome_id_bgc_id
@@ -15,7 +15,7 @@ from .strain import Strain
 from .strain_collection import StrainCollection
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def load_user_strains(json_file: str | PathLike) -> set[Strain]:

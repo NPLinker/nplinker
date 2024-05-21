@@ -1,3 +1,4 @@
+import logging
 import os
 from importlib.resources import files
 from deprecated import deprecated
@@ -16,7 +17,6 @@ from nplinker.genomics.mibig import MibigLoader
 from nplinker.genomics.utils import add_bgc_to_gcf
 from nplinker.genomics.utils import add_strain_to_bgc
 from nplinker.genomics.utils import get_mibig_from_gcf
-from nplinker.logconfig import LogConfig
 from nplinker.metabolomics.gnps import GNPSAnnotationLoader
 from nplinker.metabolomics.gnps import GNPSMolecularFamilyLoader
 from nplinker.metabolomics.gnps import GNPSSpectrumLoader
@@ -27,7 +27,7 @@ from nplinker.strain import StrainCollection
 from nplinker.strain.utils import load_user_strains
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 NPLINKER_APP_DATA_DIR = files("nplinker").joinpath("data")
 
@@ -102,7 +102,7 @@ class DatasetLoader:
         Strain objects added (i.e. `MolecularFamily._strains` updated). This means only Spectra
         objects with updated strains (i.e. `self.spectra`) can be added to MolecularFamily objects.
         """
-        logger.debug("\nLoading metabolomics data starts...")
+        logger.info(f"{'='*40}\nLoading metabolomics data starts...")
 
         # Step 1: load all Spectrum objects
         raw_spectra = GNPSSpectrumLoader(GNPS_DEFAULT_PATH / GNPS_SPECTRA_FILENAME).spectra
@@ -127,7 +127,7 @@ class DatasetLoader:
         self.spectra = spectra_with_strains
         self.molfams = mf_with_spec
 
-        logger.debug("Loading metabolomics data completed\n")
+        logger.info("Loading metabolomics data completed\n")
         return True
 
     def _load_genomics(self):
@@ -141,10 +141,10 @@ class DatasetLoader:
         added (i.e. `GCF._strains` updated). This means only BGC objects with updated Strain objects
         (i.e. `self.bgcs`) can be added to GCF objects.
         """
-        logger.debug("\nLoading genomics data starts...")
+        logger.info(f"{'='*40}\nLoading genomics data starts...")
 
         # Step 1: load antismash BGC objects & add strain info
-        logger.debug("Parsing AntiSMASH directory...")
+        logger.info("Parsing AntiSMASH directory...")
         antismash_bgcs = AntismashBGCLoader(str(defaults.ANTISMASH_DEFAULT_PATH)).get_bgcs()
         antismash_bgcs_with_strain, _ = add_strain_to_bgc(self.strains, antismash_bgcs)
 
@@ -164,10 +164,10 @@ class DatasetLoader:
         # switch depending on found file. prefer V1 if both are found
         if bigscape_cluster_file.exists():
             loader = BigscapeGCFLoader(bigscape_cluster_file)
-            logger.debug(f"Loading BigSCAPE cluster file {bigscape_cluster_file}")
+            logger.info(f"Loading BigSCAPE cluster file {bigscape_cluster_file}")
         elif bigscape_db_file.exists():
             loader = BigscapeV2GCFLoader(bigscape_db_file)
-            logger.debug(f"Loading BigSCAPE database file {bigscape_db_file}")
+            logger.info(f"Loading BigSCAPE database file {bigscape_db_file}")
         else:
             raise FileNotFoundError(
                 f"Neither BigSCAPE cluster file {bigscape_cluster_file} nor database file {bigscape_db_file} were found."
@@ -190,7 +190,7 @@ class DatasetLoader:
         self.gcfs = all_gcfs_with_bgc
         self.mibig_strains_in_use = mibig_strains_in_use
 
-        logger.debug("Loading genomics data completed\n")
+        logger.info("Loading genomics data completed\n")
         return True
 
     @deprecated(reason="To be refactored. It was used in the `self.load` method before.")
@@ -244,7 +244,7 @@ class DatasetLoader:
         chem_classes = ChemClassPredictions(self.canopus_dir, self.molnetenhancer_dir, self._root)  # noqa
         # if no molfam classes transfer them from spectra (due to old style MN)
         if not chem_classes.canopus.molfam_classes and chem_classes.canopus.spectra_classes:
-            logger.debug("Added chemical compound classes for MFs")
+            logger.info("Added chemical compound classes for MFs")
             chem_classes.canopus.transfer_spec_classes_to_molfams(self.molfams)
         # include them in loader
         self.chem_classes = chem_classes

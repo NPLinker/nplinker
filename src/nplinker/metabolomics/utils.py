@@ -1,8 +1,8 @@
 from __future__ import annotations
 import json
+import logging
 from os import PathLike
 from pathlib import Path
-from nplinker.logconfig import LogConfig
 from nplinker.schemas import validate_podp_json
 from nplinker.strain import StrainCollection
 from .gnps.gnps_file_mapping_loader import GNPSFileMappingLoader
@@ -10,7 +10,7 @@ from .molecular_family import MolecularFamily
 from .spectrum import Spectrum
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def add_annotation_to_spectrum(annotations: dict[str, dict], spectra: list[Spectrum]) -> None:

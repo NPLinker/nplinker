@@ -11,16 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from __future__ import annotations
+import logging
 from typing import TYPE_CHECKING
-from nplinker.logconfig import LogConfig
 
 
 if TYPE_CHECKING:
     from . import LinkCollection
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 # CG: TODO refactor this class to abstract base class

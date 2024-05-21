@@ -1,7 +1,7 @@
 from __future__ import annotations
+import logging
 from typing import TYPE_CHECKING
 from deprecated import deprecated
-from nplinker.logconfig import LogConfig
 from .aa_pred import predict_aa
 
 
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from ..strain import Strain
     from .gcf import GCF
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class BGC:

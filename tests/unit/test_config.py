@@ -11,7 +11,7 @@ def test_config():
 
     # The following are default values from nplinker_default.toml
     assert config.get("log.file") is None
-    assert config.log.to_stdout is True
+    assert config.log.use_console is True
 
     assert config.mibig.to_use is True
     assert config.mibig.version == "3.1"

@@ -17,6 +17,7 @@ import bz2
 import csv
 import gzip
 import hashlib
+import logging
 import lzma
 import os
 import os.path
@@ -28,7 +29,16 @@ from pathlib import Path
 from typing import IO
 from typing import Callable
 import httpx
-from tqdm import tqdm
+from rich.progress import BarColumn
+from rich.progress import DownloadColumn
+from rich.progress import Progress
+from rich.progress import TextColumn
+from rich.progress import TimeElapsedColumn
+from rich.progress import TimeRemainingColumn
+from rich.progress import TransferSpeedColumn
+
+
+logger = logging.getLogger(__name__)
 
 
 def find_delimiter(file: str | PathLike) -> str:
@@ -142,7 +152,7 @@ def download_url(
 
     # check if file is already present locally
     if fpath.is_file() and md5 is not None and check_md5(fpath, md5):
-        print("Using downloaded and verified file: " + str(fpath))
+        logger.info("Using downloaded and verified file: " + str(fpath))
         return
 
     # download the file
@@ -154,12 +164,24 @@ def download_url(
                     f"Failed to download url {url} with status code {response.status_code}"
                 )
             total = int(response.headers.get("Content-Length", 0))
-            with tqdm(total=total, unit_scale=True, unit_divisor=1024, unit="B") as progress:
-                num_bytes_downloaded = response.num_bytes_downloaded
+
+            with Progress(
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(bar_width=None),
+                "[progress.percentage]{task.percentage:>3.1f}%",
+                "•",
+                DownloadColumn(),
+                "•",
+                TransferSpeedColumn(),
+                "•",
+                TimeRemainingColumn(),
+                "•",
+                TimeElapsedColumn(),
+            ) as progress:
+                task = progress.add_task(f"[hot_pink]Downloading {fpath.name}", total=total)
                 for chunk in response.iter_bytes():
                     fh.write(chunk)
-                    progress.update(response.num_bytes_downloaded - num_bytes_downloaded)
-                    num_bytes_downloaded = response.num_bytes_downloaded
+                    progress.update(task, advance=len(chunk))
 
     # check integrity of downloaded file
     if md5 is not None and not check_md5(fpath, md5):
@@ -376,6 +398,7 @@ def extract_archive(
     # create the extract directory if not exist
     extract_root.mkdir(exist_ok=True)
 
+    logger.info(f"Extracting {from_path} to {extract_root}")
     suffix, archive_type, compression = _detect_file_type(from_path)
     if not archive_type:
         return _decompress(
@@ -429,7 +452,6 @@ def download_and_extract_archive(
     download_url(url, download_root, filename, md5)
 
     archive = download_root / filename
-    print(f"Extracting {archive} to {extract_root}")
     extract_archive(archive, extract_root, remove_finished=remove_finished)
 
 

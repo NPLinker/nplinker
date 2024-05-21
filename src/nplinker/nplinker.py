@@ -1,14 +1,15 @@
 from __future__ import annotations
 import logging
 import sys
+from pprint import pformat
 from typing import TYPE_CHECKING
+from . import setup_logging
 from .arranger import DatasetArranger
 from .config import config
 from .genomics import BGC
 from .genomics import GCF
 from .loader import NPLINKER_APP_DATA_DIR
 from .loader import DatasetLoader
-from .logconfig import LogConfig
 from .metabolomics import MolecularFamily
 from .metabolomics import Spectrum
 from .pickler import save_pickled_data
@@ -23,7 +24,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from .strain import Strain
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class NPLinker:
@@ -39,17 +40,12 @@ class NPLinker:
 
     def __init__(self):
         """Initialise an NPLinker instance."""
-        # configure logging based on the supplied config params
-        LogConfig.setLogLevelStr(config.log.level)
-        logfile = config.get("log.file")
-        if logfile:
-            logfile_dest = logging.FileHandler(logfile)
-            # if we want to log to stdout plus logfile, add the new destination
-            if config.get("log.to_stdout"):  # default to True
-                LogConfig.addLogDestination(logfile_dest)
-            else:
-                # otherwise overwrite the default stdout destination
-                LogConfig.setLogDestination(logfile_dest)
+        setup_logging(
+            level=config.log.level,
+            file=config.log.get("file", ""),
+            use_console=config.log.use_console,
+        )
+        logger.info("Configuration:\n %s", pformat(config.as_dict(), width=20, sort_dicts=False))
 
         self._loader = DatasetLoader()
 
@@ -73,7 +69,7 @@ class NPLinker:
         for name, method in NPLinker.SCORING_METHODS.items():
             if len(config_methods) == 0 or name in config_methods:
                 self._scoring_methods[name] = method
-                logger.debug(f"Enabled scoring method: {name}")
+                logger.info(f"Enabled scoring method: {name}")
 
         self._scoring_methods_setup_complete = {
             name: False for name in self._scoring_methods.keys()
@@ -283,9 +279,9 @@ class NPLinker:
                         if (source, target) in shared_strains:
                             link.shared_strains = shared_strains[(source, target)]
 
-        logger.debug("Finished calculating shared strain information")
+        logger.info("Finished calculating shared strain information")
 
-        logger.debug("Final size of link collection is {}".format(len(link_collection)))
+        logger.info("Final size of link collection is {}".format(len(link_collection)))
         return link_collection
 
     def get_common_strains(

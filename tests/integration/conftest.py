@@ -6,7 +6,7 @@ import zipfile
 from os import PathLike
 from pathlib import Path
 import httpx
-from tqdm import tqdm
+from rich.progress import Progress
 from . import DATA_DIR
 
 
@@ -86,9 +86,9 @@ def download_archive(
             response.raise_for_status()
             print(f"Downloading test dataset {url} to {root}")
             total = int(response.headers.get("Content-Length", 0))
-            with tqdm(total=total, unit_scale=True, unit_divisor=1024, unit="B") as progress:
-                num_bytes_downloaded = response.num_bytes_downloaded
+
+            with Progress() as progress:
+                task = progress.add_task(f"[hot_pink]Downloading {fpath.name}", total=total)
                 for chunk in response.iter_bytes():
                     fh.write(chunk)
-                    progress.update(response.num_bytes_downloaded - num_bytes_downloaded)
-                    num_bytes_downloaded = response.num_bytes_downloaded
+                    progress.update(task, advance=len(chunk))

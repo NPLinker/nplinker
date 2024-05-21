@@ -11,14 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import logging
 import os
 import subprocess
 import sys
-from ..logconfig import LogConfig
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def run_canopus(mgf_file, output_path, extra_params="--maxmz 600 formula zodiac structure canopus"):

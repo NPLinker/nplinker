@@ -11,15 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from __future__ import annotations
 import json
+import logging
 import os
 import re
-from ..logconfig import LogConfig
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 # this will match strings like '...cluster001.gbk' or '...region022.gbk',
 # and allow the number to be extracted easily
@@ -46,14 +45,14 @@ class KCBJSONParser:
             if not os.path.exists(bgc.antismash_file):
                 raise Exception('KCBJSONParser failed to find file "{}"'.format(bgc.antismash_file))
 
-        logger.debug(f"KCBJSONParser({len(bgcs)} BGCs)")
+        logger.info(f"KCBJSONParser({len(bgcs)} BGCs)")
 
         # find the JSON file: TODO is the assumption of there only being a single .json
         # file always going to work? otherwise have to try guessing the name based on
         # genome IDs
         prefix = os.path.dirname(bgcs[0].antismash_file)
         json_files = list(filter(lambda f: f.endswith(".json"), os.listdir(prefix)))
-        logger.debug("Found {} JSON files in {}".format(len(json_files), prefix))
+        logger.info("Found {} JSON files in {}".format(len(json_files), prefix))
 
         if len(json_files) == 0:
             logger.warning("Unable to find an antiSMASH JSON output file in {}".format(prefix))
@@ -61,7 +60,7 @@ class KCBJSONParser:
             return
 
         self.json_filename = os.path.join(prefix, json_files[0])
-        logger.debug(f"Using JSON file {self.json_filename}")
+        logger.info(f"Using JSON file {self.json_filename}")
 
     def parse_hits(self):
         if self.json_filename is None:
@@ -140,7 +139,7 @@ class KCBJSONParser:
             if hits is not None:
                 self.collected_hits.update(hits)
 
-        logger.debug(
+        logger.info(
             "KCBJSONParser: collected {} total hit entries".format(len(self.collected_hits))
         )
 

@@ -1,14 +1,14 @@
 from __future__ import annotations
 import json
+import logging
 from os import PathLike
 from typing import Iterator
 from jsonschema import validate
-from nplinker.logconfig import LogConfig
 from nplinker.schemas import STRAIN_MAPPINGS_SCHEMA
 from .strain import Strain
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class StrainCollection:

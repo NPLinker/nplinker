@@ -11,12 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import logging
 import os
 import time
 import numpy
 from nplinker.genomics import GCF
-from nplinker.logconfig import LogConfig
 from nplinker.metabolomics import MolecularFamily
 from . import iokr_opt
 from . import iokrdata as iokrdataserver
@@ -25,7 +24,7 @@ from . import spectrum
 from . import spectrum_filters
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class NPLinkerIOKR:

@@ -1,8 +1,8 @@
 import itertools
-from nplinker.logconfig import LogConfig
+import logging
 
 
-logger = LogConfig.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class LinkCollection:
@@ -36,14 +36,14 @@ class LinkCollection:
             # only results that appear in both sets
 
             if not self._and_mode:
-                logger.debug(
+                logger.info(
                     "Merging {} results from method {} in OR mode".format(
                         len(object_links), method.name
                     )
                 )
                 self._merge_or_mode(object_links)
             else:
-                logger.debug(
+                logger.info(
                     "Merging {} results from method {} in AND mode".format(
                         len(object_links), method.name
                     )
@@ -98,12 +98,12 @@ class LinkCollection:
     def filter_no_shared_strains(self):
         len_before = len(self._link_data)
         self.filter_links(lambda x: len(x.shared_strains) > 0)
-        logger.debug("filter_no_shared_strains: {} => {}".format(len_before, len(self._link_data)))
+        logger.info("filter_no_shared_strains: {} => {}".format(len_before, len(self._link_data)))
 
     def filter_sources(self, callable_obj):
         len_before = len(self._link_data)
         self._link_data = {k: v for k, v in self._link_data.items() if callable_obj(k)}
-        logger.debug("filter_sources: {} => {}".format(len_before, len(self._link_data)))
+        logger.info("filter_sources: {} => {}".format(len_before, len(self._link_data)))
 
     def filter_targets(self, callable_obj, sources=None):
         to_remove = []
