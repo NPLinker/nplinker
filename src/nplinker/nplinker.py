@@ -1,11 +1,12 @@
 from __future__ import annotations
 import logging
 import sys
+from os import PathLike
 from pprint import pformat
 from typing import TYPE_CHECKING
 from . import setup_logging
 from .arranger import DatasetArranger
-from .config import config
+from .config import load_config
 from .genomics import BGC
 from .genomics import GCF
 from .loader import NPLINKER_APP_DATA_DIR
@@ -28,6 +29,8 @@ logger = logging.getLogger(__name__)
 
 
 class NPLinker:
+    """Main class for the NPLinker application."""
+
     # allowable types for objects to be passed to scoring methods
     OBJ_CLASSES = [Spectrum, MolecularFamily, GCF, BGC]
     # default set of enabled scoring methods
@@ -38,14 +41,18 @@ class NPLinker:
         NPClassScoring.NAME: NPClassScoring,
     }
 
-    def __init__(self):
+    def __init__(self, config_file: str | PathLike):
         """Initialise an NPLinker instance."""
+        self.config = load_config(config_file)
+
         setup_logging(
-            level=config.log.level,
-            file=config.log.get("file", ""),
-            use_console=config.log.use_console,
+            level=self.config.log.level,
+            file=self.config.log.get("file", ""),
+            use_console=self.config.log.use_console,
         )
-        logger.info("Configuration:\n %s", pformat(config.as_dict(), width=20, sort_dicts=False))
+        logger.info(
+            "Configuration:\n %s", pformat(self.config.as_dict(), width=20, sort_dicts=False)
+        )
 
         self._loader = DatasetLoader()
 
@@ -65,7 +72,7 @@ class NPLinker:
         self._mf_lookup = {}
 
         self._scoring_methods = {}
-        config_methods = config.get("scoring_methods", [])
+        config_methods = self.config.get("scoring_methods", [])
         for name, method in NPLinker.SCORING_METHODS.items():
             if len(config_methods) == 0 or name in config_methods:
                 self._scoring_methods[name] = method
@@ -78,7 +85,7 @@ class NPLinker:
         self._datalinks = None
 
         self._repro_data = {}
-        repro_file = config.get("repro_file")
+        repro_file = self.config.get("repro_file")
         if repro_file:
             self.save_repro_data(repro_file)
 
@@ -122,7 +129,7 @@ class NPLinker:
         Returns:
             The path to the dataset root directory currently in use
         """
-        return config.root_dir
+        return self.config.root_dir
 
     @property
     def data_dir(self):
@@ -132,7 +139,7 @@ class NPLinker:
     @property
     def bigscape_cutoff(self):
         """Returns the current BiGSCAPE clustering cutoff value."""
-        return config.bigscape.cutoff
+        return self.config.bigscape.cutoff
 
     def load_data(self):
         """Loads the basic components of a dataset."""
