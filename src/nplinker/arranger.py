@@ -263,7 +263,7 @@ class DatasetArranger:
         if self.config.mode == "podp":
             for _ in range(3):
                 try:
-                    validate_bigscape(self.bigscape_dir)
+                    validate_bigscape(self.bigscape_dir, self.config.bigscape.cutoff)
                     pass_validation = True
                     break
                 except FileNotFoundError:
@@ -271,7 +271,7 @@ class DatasetArranger:
                     self._run_bigscape()
 
         if not pass_validation:
-            validate_bigscape(self.bigscape_dir)
+            validate_bigscape(self.bigscape_dir, self.config.bigscape.cutoff)
 
     def _run_bigscape(self) -> None:
         """Run BiG-SCAPE to generate the clustering file.
@@ -460,7 +460,7 @@ def validate_antismash(antismash_dir: Path) -> None:
             raise FileNotFoundError(f"No BGC files found in antiSMASH sub-directory {sub_dir}")
 
 
-def validate_bigscape(bigscape_dir: Path) -> None:
+def validate_bigscape(bigscape_dir: Path, cutoff: str) -> None:
     """Validate the BiG-SCAPE data directory and its contents.
 
     The BiG-SCAPE data directory must exist and contain the clustering file
@@ -473,6 +473,7 @@ def validate_bigscape(bigscape_dir: Path) -> None:
 
     Args:
         bigscape_dir: Path to the BiG-SCAPE data directory.
+        cutoff: The BiG-SCAPE cutoff value.
 
     Raises:
         FileNotFoundError: If the BiG-SCAPE data directory or the clustering file is not found.
@@ -480,7 +481,7 @@ def validate_bigscape(bigscape_dir: Path) -> None:
     if not bigscape_dir.exists():
         raise FileNotFoundError(f"BiG-SCAPE data directory not found at {bigscape_dir}")
 
-    clustering_file = bigscape_dir / f"mix_clustering_c{self.config.bigscape.cutoff}.tsv"
+    clustering_file = bigscape_dir / f"mix_clustering_c{cutoff}.tsv"
     database_file = bigscape_dir / "data_sqlite.db"
     if not clustering_file.exists() and not database_file.exists():
         raise FileNotFoundError(f"BiG-SCAPE data not found in {clustering_file} or {database_file}")

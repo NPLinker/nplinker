@@ -46,8 +46,6 @@ def pytest_sessionstart(session):
             zip_ref.extractall(temp_dir)
     # NPLinker setting `root_dir` must be a path that exists, so setting it to a temporary directory.
     os.environ["NPLINKER_ROOT_DIR"] = nplinker_root_dir
-    # # Specify the config file via environment variable before importing nplinker in any test.
-    os.environ["NPLINKER_CONFIG_FILE"] = str(DATA_DIR / "nplinker_local_mode.toml")
 
 
 def pytest_sessionfinish(session):
