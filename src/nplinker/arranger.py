@@ -267,6 +267,7 @@ class DatasetArranger:
             defaults.ANTISMASH_DEFAULT_PATH,
             defaults.BIGSCAPE_RUNNING_OUTPUT_PATH,
             config.bigscape.parameters,
+            config.bigscape.version,
         )
         for f in glob(
             str(

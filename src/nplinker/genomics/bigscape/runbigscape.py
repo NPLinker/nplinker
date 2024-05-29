@@ -15,8 +15,14 @@ def run_bigscape(
     antismash_path: str | PathLike,
     output_path: str | PathLike,
     extra_params: str,
+    version: int = 1,
 ):
-    bigscape_py_path = "bigscape.py"
+    # switch to correct version of BiG-SCAPE
+    if version == 1:
+        bigscape_py_path = "bigscape.py"
+    elif version == 2:
+        bigscape_py_path = "bigscape-v2.py"
+
     logger.info(
         f'run_bigscape: input="{antismash_path}", output="{output_path}", extra_params={extra_params}"'
     )
@@ -24,13 +30,25 @@ def run_bigscape(
     try:
         subprocess.run([bigscape_py_path, "-h"], capture_output=True, check=True)
     except Exception as e:
-        raise Exception(f"Failed to find/run bigscape.py (path={bigscape_py_path}, err={e})") from e
+        raise Exception(
+            f"Failed to find/run bigscape.py (path={bigscape_py_path}, err={e})"
+        ) from e
 
     if not os.path.exists(antismash_path):
         raise Exception(f'antismash_path "{antismash_path}" does not exist!')
 
-    # configure the IO-related parameters, including pfam_dir
-    args = [bigscape_py_path, "-i", antismash_path, "-o", output_path, "--pfam_dir", PFAM_PATH]
+    # assemble arguments. first argument is the python file
+    args = [bigscape_py_path]
+
+    # version 2 points to specific Pfam file, version 1 points to directory
+    # version 2 also requires the cluster subcommand
+    if version == 1:
+        args.extend(["--pfam_dir", PFAM_PATH])
+    elif version == 2:
+        args.extend(["cluster", "--pfam_path", PFAM_PATH + "/Pfam-A.hmm"])
+
+    # add input and output paths. these are unchanged
+    args.extend(["-i", antismash_path, "-o", output_path])
 
     # append the user supplied params, if any
     if len(extra_params) > 0:
