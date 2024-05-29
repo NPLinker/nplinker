@@ -313,8 +313,8 @@ class NPClassScoring(ScoringMethod):
             )
         return spec_like_classes, spec_like_classes_names_inds
 
-    @staticmethod
-    def setup(npl):
+    @classmethod
+    def setup(cls, npl):
         """Perform any one-off initialisation required (will only be called once)."""
         logger.info("Set up NPClassScore scoring")
         met_options = npl.chem_classes.class_predict_options

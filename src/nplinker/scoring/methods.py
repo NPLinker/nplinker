@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
+    from nplinker import NPLinker
     from . import LinkCollection
 
 logger = logging.getLogger(__name__)
@@ -28,12 +29,12 @@ class ScoringMethod:
 
     NAME = "ScoringMethod"
 
-    def __init__(self, npl):
+    def __init__(self, npl: NPLinker):
         self.npl = npl
         self.name = self.__class__.NAME
 
-    @staticmethod
-    def setup(npl):
+    @classmethod
+    def setup(cls, npl: NPLinker):
         """Perform any one-off initialisation required (will only be called once)."""
         pass
 
