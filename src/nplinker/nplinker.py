@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from . import setup_logging
 from .arranger import DatasetArranger
 from .config import load_config
+from .defaults import OUTPUT_DIRNAME
 from .genomics import BGC
 from .genomics import GCF
 from .loader import NPLINKER_APP_DATA_DIR
@@ -42,7 +43,11 @@ class NPLinker:
     }
 
     def __init__(self, config_file: str | PathLike):
-        """Initialise an NPLinker instance."""
+        """Initialise an NPLinker instance.
+
+        Args:
+            config_file: Path to the configuration file to use.
+        """
         self.config = load_config(config_file)
 
         setup_logging(
@@ -54,7 +59,8 @@ class NPLinker:
             "Configuration:\n %s", pformat(self.config.as_dict(), width=20, sort_dicts=False)
         )
 
-        self._loader = DatasetLoader()
+        self.output_dir = self.config.root_dir / OUTPUT_DIRNAME
+        self.output_dir.mkdir(exist_ok=True)
 
         self._spectra = []
         self._bgcs = []
@@ -143,19 +149,20 @@ class NPLinker:
 
     def load_data(self):
         """Loads the basic components of a dataset."""
-        arranger = DatasetArranger()
+        arranger = DatasetArranger(self.config)
         arranger.arrange()
-        self._loader.load()
+        loader = DatasetLoader(self.config)
+        loader.load()
 
-        self._spectra = self._loader.spectra
-        self._molfams = self._loader.molfams
-        self._bgcs = self._loader.bgcs
-        self._gcfs = self._loader.gcfs
-        self._mibig_bgcs = self._loader.mibig_bgcs
-        self._strains = self._loader.strains
-        self._product_types = self._loader.product_types
-        self._chem_classes = self._loader.chem_classes
-        self._class_matches = self._loader.class_matches
+        self._spectra = loader.spectra
+        self._molfams = loader.molfams
+        self._bgcs = loader.bgcs
+        self._gcfs = loader.gcfs
+        self._mibig_bgcs = loader.mibig_bgcs
+        self._strains = loader.strains
+        self._product_types = loader.product_types
+        self._chem_classes = loader.chem_classes
+        self._class_matches = loader.class_matches
 
     # TODO CG: refactor this method and update its unit tests
     def get_links(

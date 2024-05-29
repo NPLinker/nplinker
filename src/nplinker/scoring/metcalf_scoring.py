@@ -4,7 +4,6 @@ import os
 from typing import TYPE_CHECKING
 import numpy as np
 import pandas as pd
-from nplinker.defaults import OUTPUT_DEFAULT_PATH
 from nplinker.genomics import GCF
 from nplinker.metabolomics import MolecularFamily
 from nplinker.metabolomics import Spectrum
@@ -72,8 +71,7 @@ class MetcalfScoring(ScoringMethod):
             )
         )
 
-        OUTPUT_DEFAULT_PATH.mkdir(exist_ok=True)
-        cache_file = OUTPUT_DEFAULT_PATH / MetcalfScoring.CACHE
+        cache_file = npl.output_dir / MetcalfScoring.CACHE
 
         # the metcalf preprocessing can take a long time for large datasets, so it's
         # better to cache as the data won't change unless the number of objects does

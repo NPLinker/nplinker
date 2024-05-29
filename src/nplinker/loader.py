@@ -2,14 +2,8 @@ import logging
 import os
 from importlib.resources import files
 from deprecated import deprecated
+from dynaconf import Dynaconf
 from nplinker import defaults
-from nplinker.config import config
-from nplinker.defaults import GNPS_ANNOTATIONS_FILENAME
-from nplinker.defaults import GNPS_DEFAULT_PATH
-from nplinker.defaults import GNPS_MOLECULAR_FAMILY_FILENAME
-from nplinker.defaults import GNPS_SPECTRA_FILENAME
-from nplinker.defaults import STRAIN_MAPPINGS_FILENAME
-from nplinker.defaults import STRAINS_SELECTED_FILENAME
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.bigscape import BigscapeGCFLoader
 from nplinker.genomics.bigscape import BigscapeV2GCFLoader
@@ -33,7 +27,22 @@ NPLINKER_APP_DATA_DIR = files("nplinker").joinpath("data")
 
 
 class DatasetLoader:
-    """Class to load all data."""
+    """Class to load all data.
+
+    Attributes:
+        config: A Dynaconf object that contains the configuration settings. Check the
+            `nplinker.config` module for more information.
+        bgcs: A list of BGC objects.
+        gcfs: A list of GCF objects.
+        spectra: A list of Spectrum objects.
+        molfams: A list of MolecularFamily objects.
+        mibig_bgcs: A list of MIBiG BGC objects.
+        mibig_strains_in_use: A StrainCollection object that contains the strains in use from MIBiG.
+        product_types: A list of product types.
+        strains: A StrainCollection object that contains all strains.
+        class_matches: A ClassMatches object that contains class match info.
+        chem_classes: A ChemClassPredictions object that contains chemical class predictions
+    """
 
     RUN_CANOPUS_DEFAULT = False
     EXTRA_CANOPUS_PARAMS_DEFAULT = "--maxmz 600 formula zodiac structure canopus"
@@ -42,8 +51,15 @@ class DatasetLoader:
     OR_CANOPUS = "canopus_dir"
     OR_MOLNETENHANCER = "molnetenhancer_dir"
 
-    def __init__(self):
-        # set public attributes
+    def __init__(self, config: Dynaconf):
+        """Initialize the DatasetLoader.
+
+        Args:
+            config: A Dynaconf object that contains the configuration settings. Check the
+                `nplinker.config` module for more information.
+        """
+        self.config = config
+
         self.bgcs, self.gcfs, self.spectra, self.molfams = [], [], [], []
         self.mibig_bgcs = []
         self.mibig_strains_in_use = StrainCollection()
@@ -74,14 +90,14 @@ class DatasetLoader:
 
     def _load_strain_mappings(self):
         # 1. load strain mappings
-        sc = StrainCollection.read_json(config.root_dir / STRAIN_MAPPINGS_FILENAME)
+        sc = StrainCollection.read_json(self.config.root_dir / defaults.STRAIN_MAPPINGS_FILENAME)
         for strain in sc:
             self.strains.add(strain)
         logger.info("Loaded {} non-MiBIG Strain objects".format(len(self.strains)))
 
         # 2. filter user specificied strains (remove all that are not specified by user).
         # It's not allowed to specify empty list of strains, otherwise validation will fail.
-        user_strains_file = config.root_dir / STRAINS_SELECTED_FILENAME
+        user_strains_file = self.config.root_dir / defaults.STRAINS_SELECTED_FILENAME
         if user_strains_file.exists():
             logger.info(f"Loading user specified strains from file {user_strains_file}.")
             user_strains = load_user_strains(user_strains_file)
@@ -104,15 +120,17 @@ class DatasetLoader:
         """
         logger.info(f"{'='*40}\nLoading metabolomics data starts...")
 
+        gnps_dir = self.config.root_dir / defaults.GNPS_DIRNAME
+
         # Step 1: load all Spectrum objects
-        raw_spectra = GNPSSpectrumLoader(GNPS_DEFAULT_PATH / GNPS_SPECTRA_FILENAME).spectra
+        raw_spectra = GNPSSpectrumLoader(gnps_dir / defaults.GNPS_SPECTRA_FILENAME).spectra
         # Step 2: load all GNPS annotations
         raw_annotations = GNPSAnnotationLoader(
-            GNPS_DEFAULT_PATH / GNPS_ANNOTATIONS_FILENAME
+            gnps_dir / defaults.GNPS_ANNOTATIONS_FILENAME
         ).annotations
         # Step 3: load all MolecularFamily objects
         raw_molfams = GNPSMolecularFamilyLoader(
-            GNPS_DEFAULT_PATH / GNPS_MOLECULAR_FAMILY_FILENAME
+            gnps_dir / defaults.GNPS_MOLECULAR_FAMILY_FILENAME
         ).get_mfs(keep_singleton=False)
 
         # Step 4: add GNPS annotations to Spectrum.gnps_annotations
@@ -145,21 +163,27 @@ class DatasetLoader:
 
         # Step 1: load antismash BGC objects & add strain info
         logger.info("Parsing AntiSMASH directory...")
-        antismash_bgcs = AntismashBGCLoader(str(defaults.ANTISMASH_DEFAULT_PATH)).get_bgcs()
+        antismash_bgcs = AntismashBGCLoader(
+            str(self.config.root_dir / defaults.ANTISMASH_DIRNAME)
+        ).get_bgcs()
         antismash_bgcs_with_strain, _ = add_strain_to_bgc(self.strains, antismash_bgcs)
 
         # Step 2: load mibig BGC objects (having strain info)
-        if config.mibig.to_use:
-            self.mibig_bgcs = MibigLoader(str(defaults.MIBIG_DEFAULT_PATH)).get_bgcs()
+        if self.config.mibig.to_use:
+            self.mibig_bgcs = MibigLoader(
+                str(self.config.root_dir / defaults.MIBIG_DIRNAME)
+            ).get_bgcs()
 
         # Step 3: get all BGC objects with strain info
         all_bgcs_with_strain = antismash_bgcs_with_strain + self.mibig_bgcs
 
         # Step 4: load all GCF objects
         bigscape_cluster_file = (
-            defaults.BIGSCAPE_DEFAULT_PATH / f"mix_clustering_c{config.bigscape.cutoff}.tsv"
+            self.config.root_dir
+            / defaults.BIGSCAPE_DIRNAME
+            / f"mix_clustering_c{self.config.bigscape.cutoff}.tsv"
         )
-        bigscape_db_file = defaults.BIGSCAPE_DEFAULT_PATH / "data_sqlite.db"
+        bigscape_db_file = self.config.root_dir / defaults.BIGSCAPE_DIRNAME / "data_sqlite.db"
 
         # switch depending on found file. prefer V1 if both are found
         if bigscape_cluster_file.exists():
@@ -180,7 +204,7 @@ class DatasetLoader:
 
         # Step 6: get mibig bgcs and strains in use from GCFs
         mibig_strains_in_use = StrainCollection()
-        if config.mibig.to_use:
+        if self.config.mibig.to_use:
             mibig_bgcs_in_use, mibig_strains_in_use = get_mibig_from_gcf(all_gcfs_with_bgc)
         else:
             mibig_bgcs_in_use = []

@@ -6,7 +6,7 @@ from dynaconf import Validator
 from nplinker.utils import transform_to_full_path
 
 
-def load_config(config_file: str | PathLike):
+def load_config(config_file: str | PathLike) -> Dynaconf:
     """Load and validate the configuration file.
 
     Args:
