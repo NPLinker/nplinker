@@ -15,9 +15,9 @@ from .loader import DatasetLoader
 from .metabolomics import MolecularFamily
 from .metabolomics import Spectrum
 from .pickler import save_pickled_data
+from .scoring.abc import ScoringBase
 from .scoring.link_collection import LinkCollection
 from .scoring.metcalf_scoring import MetcalfScoring
-from .scoring.methods import ScoringMethod
 from .scoring.np_class_scoring import NPClassScoring
 from .scoring.rosetta_scoring import RosettaScoring
 
@@ -37,9 +37,9 @@ class NPLinker:
     # default set of enabled scoring methods
     # TODO: ideally these shouldn't be hardcoded like this
     SCORING_METHODS = {
-        MetcalfScoring.NAME: MetcalfScoring,
-        RosettaScoring.NAME: RosettaScoring,
-        NPClassScoring.NAME: NPClassScoring,
+        MetcalfScoring.name: MetcalfScoring,
+        RosettaScoring.name: RosettaScoring,
+        NPClassScoring.name: NPClassScoring,
     }
 
     def __init__(self, config_file: str | PathLike):
@@ -266,7 +266,7 @@ class NPLinker:
 
         if not self._datalinks:
             logger.debug("Creating internal datalinks object")
-            self._datalinks = self.scoring_method(MetcalfScoring.NAME).datalinks
+            self._datalinks = self.scoring_method(MetcalfScoring.name).datalinks
             logger.debug("Created internal datalinks object")
 
         if len(link_collection) == 0:
@@ -318,7 +318,7 @@ class NPLinker:
             and values are a list of shared Strain objects.
         """
         if not self._datalinks:
-            self._datalinks = self.scoring_method(MetcalfScoring.NAME).datalinks
+            self._datalinks = self.scoring_method(MetcalfScoring.name).datalinks
         common_strains = self._datalinks.get_common_strains(met, gcfs, filter_no_shared)
         return common_strains
 
@@ -401,7 +401,7 @@ class NPLinker:
         """ClassMatches with the matched classes and scoring tables from MIBiG."""
         return self._class_matches
 
-    def scoring_method(self, name: str) -> ScoringMethod | None:
+    def scoring_method(self, name: str) -> ScoringBase | None:
         """Return an instance of a scoring method.
 
         Args:

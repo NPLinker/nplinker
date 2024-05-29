@@ -9,11 +9,11 @@ from nplinker.metabolomics import MolecularFamily
 from nplinker.metabolomics import Spectrum
 from nplinker.pickler import load_pickled_data
 from nplinker.pickler import save_pickled_data
+from .abc import ScoringBase
 from .linking import LINK_TYPES
 from .linking import DataLinks
 from .linking import LinkFinder
 from .linking import isinstance_all
-from .methods import ScoringMethod
 from .object_link import ObjectLink
 
 
@@ -24,19 +24,19 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class MetcalfScoring(ScoringMethod):
+class MetcalfScoring(ScoringBase):
     """Metcalf scoring method.
 
     Attributes:
+        name: The name of this scoring method, set to a fixed value `metcalf`.
         DATALINKS: The DataLinks object to use for scoring.
         LINKFINDER: The LinkFinder object to use for scoring.
-        NAME: The name of the scoring method. This is set to 'metcalf'.
         CACHE: The name of the cache file to use for storing the MetcalfScoring.
     """
 
+    name = "metcalf"
     DATALINKS = None
     LINKFINDER = None
-    NAME = "metcalf"
     CACHE = "cache_metcalf_scoring.pckl"
 
     def __init__(self, npl: NPLinker) -> None:

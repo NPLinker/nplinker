@@ -3,7 +3,7 @@ import logging
 from nplinker.genomics.bgc import BGC
 from nplinker.genomics.gcf import GCF
 from nplinker.metabolomics import MolecularFamily
-from nplinker.scoring.methods import ScoringMethod
+from nplinker.scoring.abc import ScoringBase
 from nplinker.scoring.object_link import ObjectLink
 from nplinker.scoring.rosetta.rosetta import Rosetta
 
@@ -11,8 +11,8 @@ from nplinker.scoring.rosetta.rosetta import Rosetta
 logger = logging.getLogger(__name__)
 
 
-class RosettaScoring(ScoringMethod):
-    NAME = "rosetta"
+class RosettaScoring(ScoringBase):
+    name = "rosetta"
     ROSETTA_OBJ = None
 
     def __init__(self, npl):
