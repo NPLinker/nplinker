@@ -9,7 +9,12 @@ to_use = true
 version = "3.1"
 
 [bigscape]
+verison = 1
 parameters = "--mibig --clans-off --mix --include_singletons --cutoffs 0.30"
+
+# for version 2, use the following parameters string:
+# parameters = "cluster --mibig_version 3.1 --include_singletons --gcf_cutoffs 0.30"
+
 cutoff = "0.30"
 
 [scoring]
