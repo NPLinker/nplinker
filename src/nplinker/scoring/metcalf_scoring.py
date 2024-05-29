@@ -31,7 +31,6 @@ class MetcalfScoring(ScoringBase):
         name: The name of this scoring method, set to a fixed value `metcalf`.
         DATALINKS: The DataLinks object to use for scoring.
         CACHE: The name of the cache file to use for storing the MetcalfScoring.
-
         raw_score_spec_gcf: The raw Metcalf scores for spectrum-GCF links.
         raw_score_mf_gcf: The raw Metcalf scores for molecular family-GCF links.
         metcalf_mean: The mean value used for standardising Metcalf scores.
@@ -39,13 +38,13 @@ class MetcalfScoring(ScoringBase):
     """
 
     name = "metcalf"
-    DATALINKS = None
-    CACHE = "cache_metcalf_scoring.pckl"
+    DATALINKS: datalinks | None = None
+    CACHE: str = "cache_metcalf_scoring.pckl"
 
-    raw_score_spec_gcf = pd.DataFrame()
-    raw_score_mf_gcf = pd.DataFrame()
-    metcalf_mean = None
-    metcalf_std = None
+    raw_score_spec_gcf: pd.DataFrame = pd.DataFrame()
+    raw_score_mf_gcf: pd.DataFrame = pd.DataFrame()
+    metcalf_mean: np.ndarray | None = None
+    metcalf_std: np.ndarray = None
 
     def __init__(self, npl: NPLinker) -> None:
         """Create a MetcalfScoring object.
@@ -58,12 +57,10 @@ class MetcalfScoring(ScoringBase):
                 this value will be discarded. Defaults to 1.0.
             standardised: Whether to use standardised scores. Defaults
                 to True.
-            name: The name of the scoring method. It's set to a fixed value
-                'metcalf'.
         """
         super().__init__(npl)
-        self.cutoff = 1.0
-        self.standardised = True
+        self.cutoff: float = 1.0
+        self.standardised: bool = True
 
     # TODO CG: refactor this method and extract code for cache file to a separate method
     @classmethod
