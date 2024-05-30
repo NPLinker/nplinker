@@ -62,7 +62,7 @@ def mfs(spectra) -> tuple[MolecularFamily, MolecularFamily, MolecularFamily]:
     return mf1, mf2, mf3
 
 
-@fixture(scope="module")
+@fixture(scope="session")
 def datalinks(gcfs, spectra, mfs, strains) -> DataLinks:
     """DataLinks object. See `test_data_links.py` for its values."""
     return DataLinks(gcfs, spectra, mfs, strains)
@@ -90,7 +90,7 @@ def npl(gcfs, spectra, mfs, strains, tmp_path) -> NPLinker:
     return npl
 
 
-@fixture(scope="module")
+@fixture(scope="function")
 def mc(npl) -> MetcalfScoring:
     """MetcalfScoring object."""
     mc = MetcalfScoring(npl)
