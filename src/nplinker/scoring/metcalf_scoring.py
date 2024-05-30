@@ -11,17 +11,21 @@ from nplinker.metabolomics import Spectrum
 from nplinker.pickler import load_pickled_data
 from nplinker.pickler import save_pickled_data
 from .abc import ScoringBase
-from .linking import LINK_TYPES
-from .linking import DataLinks
-from .linking import isinstance_all
 from .object_link import ObjectLink
+from .utils import get_presence_gcf_strain
+from .utils import get_presence_mf_strain
+from .utils import get_presence_spec_strain
+from .utils import isinstance_all
 
 
 if TYPE_CHECKING:
     from ..nplinker import NPLinker
     from . import LinkCollection
 
+
 logger = logging.getLogger(__name__)
+
+LINK_TYPES = ["spec-gcf", "mf-gcf"]
 
 
 class MetcalfScoring(ScoringBase):
@@ -29,8 +33,10 @@ class MetcalfScoring(ScoringBase):
 
     Attributes:
         name: The name of this scoring method, set to a fixed value `metcalf`.
-        DATALINKS: The DataLinks object to use for scoring.
         CACHE: The name of the cache file to use for storing the MetcalfScoring.
+        presence_gcf_strain: A DataFrame to store presence of gcfs with respect to strains.
+        presence_spec_strain: A DataFrame to store presence of spectra with respect to strains.
+        presence_mf_strain: A DataFrame to store presence of molecular families with respect to strains.
         raw_score_spec_gcf: The raw Metcalf scores for spectrum-GCF links.
         raw_score_mf_gcf: The raw Metcalf scores for molecular family-GCF links.
         metcalf_mean: The mean value used for standardising Metcalf scores.
@@ -38,13 +44,18 @@ class MetcalfScoring(ScoringBase):
     """
 
     name = "metcalf"
-    DATALINKS: datalinks | None = None
     CACHE: str = "cache_metcalf_scoring.pckl"
+
+    # DataFrame to store presence of gcfs/spectra/mfs with respect to strains
+    # values = 1 where gcf/spec/fam occur in strain, 0 otherwise
+    presence_gcf_strain: pd.DataFrame = pd.DataFrame()
+    presence_spec_strain: pd.DataFrame = pd.DataFrame()
+    presence_mf_strain: pd.DataFrame = pd.DataFrame()
 
     raw_score_spec_gcf: pd.DataFrame = pd.DataFrame()
     raw_score_mf_gcf: pd.DataFrame = pd.DataFrame()
     metcalf_mean: np.ndarray | None = None
-    metcalf_std: np.ndarray = None
+    metcalf_std: np.ndarray | None = None
 
     def __init__(self, npl: NPLinker) -> None:
         """Create a MetcalfScoring object.
@@ -65,9 +76,9 @@ class MetcalfScoring(ScoringBase):
     # TODO CG: refactor this method and extract code for cache file to a separate method
     @classmethod
     def setup(cls, npl: NPLinker):
-        """Setup the DataLinks object.
+        """Setup the MetcalfScoring object.
 
-        This method is only called once to setup the DataLinks object.
+        This method is only called once to setup the MetcalfScoring object.
         """
         logger.info(
             "MetcalfScoring.setup (bgcs={}, gcfs={}, spectra={}, molfams={}, strains={})".format(
@@ -86,13 +97,13 @@ class MetcalfScoring(ScoringBase):
             len(npl.molfams),
             len(npl.strains),
         ]
-        datalinks = None
         if os.path.exists(cache_file):
             logger.info("MetcalfScoring.setup loading cached data")
             cache_data = load_pickled_data(npl, cache_file)
             cache_ok = True
+            # TODO: wrap it as a validation method
             if cache_data is not None:
-                (counts, datalinks) = cache_data
+                (counts, metcalf_mean) = cache_data
                 # need to invalidate this if dataset appears to have changed
                 for i in range(len(counts)):
                     if counts[i] != dataset_counts[i]:
@@ -101,23 +112,23 @@ class MetcalfScoring(ScoringBase):
                         break
 
             if cache_ok:
-                cls.DATALINKS = datalinks
+                cls.metcalf_mean = metcalf_mean
 
-        if cls.DATALINKS is None:
+        if cls.metcalf_mean is None:
             logger.info("MetcalfScoring.setup preprocessing dataset (this may take some time)")
-            cls.DATALINKS = DataLinks(npl.gcfs, npl.spectra, npl.molfams, npl.strains)
-            cls.calc_score(cls.DATALINKS, link_type=LINK_TYPES[0])
-            cls.calc_score(cls.DATALINKS, link_type=LINK_TYPES[1])
+            cls.presence_gcf_strain = get_presence_gcf_strain(npl.gcfs, npl.strains)
+            cls.presence_spec_strain = get_presence_spec_strain(npl.spectra, npl.strains)
+            cls.presence_mf_strain = get_presence_mf_strain(npl.molfams, npl.strains)
+            cls.calc_score(link_type=LINK_TYPES[0])
+            cls.calc_score(link_type=LINK_TYPES[1])
             logger.info("MetcalfScoring.setup caching results")
-            # TODO: save the score values 2024-05-29
-            save_pickled_data((dataset_counts, cls.DATALINKS), cache_file)
+            save_pickled_data((dataset_counts, cls.metcalf_mean), cache_file)
 
         logger.info("MetcalfScoring.setup completed")
 
     @classmethod
     def calc_score(
         cls,
-        data_links: DataLinks,
         link_type: str = "spec-gcf",
         scoring_weights: tuple[int, int, int, int] = (10, -10, 0, 1),
     ) -> None:
@@ -127,7 +138,6 @@ class MetcalfScoring(ScoringBase):
         `metcalf_std` attributes.
 
         Args:
-            data_links: The DataLinks object to use for scoring.
             link_type: The type of link to score. Must be 'spec-gcf' or
                 'mf-gcf'. Defaults to 'spec-gcf'.
             scoring_weights: The weights to
@@ -142,30 +152,19 @@ class MetcalfScoring(ScoringBase):
             raise ValueError(f"Invalid link type: {link_type}. Must be one of {LINK_TYPES}")
 
         if link_type == "spec-gcf":
-            cls.raw_score_spec_gcf = (
-                data_links.cooccurrence_spec_gcf * scoring_weights[0]
-                + data_links.cooccurrence_spec_notgcf * scoring_weights[1]
-                + data_links.cooccurrence_notspec_gcf * scoring_weights[2]
-                + data_links.cooccurrence_notspec_notgcf * scoring_weights[3]
+            logger.info("Create correlation matrices: spectra<->gcfs.")
+            cls.raw_score_spec_gcf = cls._calc_raw_score(
+                cls.presence_spec_strain, cls.presence_gcf_strain, scoring_weights
             )
-
         if link_type == "mf-gcf":
-            cls.raw_score_mf_gcf = (
-                data_links.cooccurrence_mf_gcf * scoring_weights[0]
-                + data_links.cooccurrence_mf_notgcf * scoring_weights[1]
-                + data_links.cooccurrence_notmf_gcf * scoring_weights[2]
-                + data_links.cooccurrence_notmf_notgcf * scoring_weights[3]
+            logger.info("Create correlation matrices: mol-families<->gcfs.")
+            cls.raw_score_mf_gcf = cls._calc_raw_score(
+                cls.presence_mf_strain, cls.presence_gcf_strain, scoring_weights
             )
 
         if cls.metcalf_mean is None or cls.metcalf_std is None:
-            n_strains = data_links.occurrence_gcf_strain.shape[1]
+            n_strains = cls.presence_gcf_strain.shape[1]
             cls.metcalf_mean, cls.metcalf_std = cls._calc_mean_std(n_strains, scoring_weights)
-
-    # TODO CG: is it needed? remove it if not
-    @property
-    def datalinks(self) -> DataLinks | None:
-        """Get the DataLinks object used for scoring."""
-        return self.DATALINKS
 
     def get_links(
         self, *objects: GCF | Spectrum | MolecularFamily, link_collection: LinkCollection
@@ -280,6 +279,39 @@ class MetcalfScoring(ScoringBase):
         """Sort the objects based on the score."""
         # sort based on score
         return sorted(objects, key=lambda objlink: objlink[self], reverse=reverse)
+
+    @staticmethod
+    def _calc_raw_score(
+        p1: pd.DataFrame, p2: pd.DataFrame, weights: tuple[int, int, int, int]
+    ) -> pd.DataFrame:
+        """Calculate non-standardised Metcalf scores.
+
+        Args:
+            p1: A DataFrame containing the presence of objects in strains.
+            p2: A DataFrame containing the presence of objects in strains.
+            weights: The weights to use for Metcalf scoring.
+
+        Returns:
+            A DataFrame containing the non-standardised Metcalf scores.
+        """
+        nop1 = 1 - p1
+        nop2 = 1 - p2
+
+        # calculate co-presence
+        p1_p2 = p1.dot(p2.T)
+        p1_nop2 = p1.dot(nop2.T)
+        nop1_p2 = nop1.dot(p2.T)
+        nop1_nop2 = nop1.dot(nop2.T)
+
+        # calculate weighted sum
+        score = (
+            p1_p2 * weights[0]
+            + p1_nop2 * weights[1]
+            + nop1_p2 * weights[2]
+            + nop1_nop2 * weights[3]
+        )
+
+        return score
 
     @staticmethod
     def _calc_mean_std(

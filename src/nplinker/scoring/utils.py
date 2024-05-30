@@ -1,21 +1,16 @@
-# Copyright 2021 The NPLinker Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-# functions
-
+from __future__ import annotations
 import math
+from typing import TYPE_CHECKING
+from typing import Sequence
 import numpy as np
+import pandas as pd
+
+
+if TYPE_CHECKING:
+    from nplinker.genomics import GCF
+    from nplinker.metabolomics import MolecularFamily
+    from nplinker.metabolomics import Spectrum
+    from nplinker.strain import StrainCollection
 
 
 def isinstance_all(*objects, objtype) -> bool:
@@ -23,33 +18,74 @@ def isinstance_all(*objects, objtype) -> bool:
     return all(isinstance(x, objtype) for x in objects)
 
 
-def calc_correlation_matrix(M_type1_cond, M_type2_cond):
-    """Calculate correlation matrices from co-occurence matrices
-    Input:
-    M_type1_cond(x,y) is 1 if type1_x IS observed under condition_y
-    M_type1_cond(x,y) is 0 if type1_x IS NOT observed under condition_y.
+def get_presence_gcf_strain(gcfs: Sequence[GCF], strains: StrainCollection) -> pd.DataFrame:
+    """Get the occurence of strains in gcfs.
 
-    Outputs three correlation matrices:
-    M_type1_type2(x,y) --- number of conditions where type1_x and type2_y co-occur
-    M_type1_nottype2(x,y) --- number of conditions where type1_x and NOT-type2_y co-occur
-    M_nottype1_type2(x,y) --- number of conditions where NOT-type1_x and type2_y co-occur
+    The occurence is a DataFrame with gcfs as rows and strains as columns,
+    where index is `gcf.gcf_id` and column name is `strain.id`. The values
+    are 1 if the gcf contains the strain and 0 otherwise.
     """
-    # Quick computation of sum both present
-    testA = np.dot(M_type1_cond, M_type2_cond.T)
-    # Present in type1 and not in type 2
-    testB = np.dot(M_type1_cond, 1 - M_type2_cond.T)
-    # Not in type 1 and in type 2
-    testC = np.dot(1 - M_type1_cond, M_type2_cond.T)
-    # Not in either
-    testD = np.dot(1 - M_type1_cond, 1 - M_type2_cond.T)
-    # print(np.abs((testA - M_type1_type2)).sum())
-    # print(np.abs((testB - M_type1_nottype2)).sum())
-    # print(np.abs((testC - M_nottype1_type2)).sum())
-    M_type1_type2 = testA
-    M_type1_nottype2 = testB
-    M_nottype1_type2 = testC
-    M_nottype1_nottype2 = testD
-    return M_type1_type2, M_type1_nottype2, M_nottype1_type2, M_nottype1_nottype2
+    df_gcf_strain = pd.DataFrame(
+        np.zeros((len(gcfs), len(strains))),
+        index=[gcf.gcf_id for gcf in gcfs],
+        columns=[strain.id for strain in strains],
+        dtype=int,
+    )
+    for gcf in gcfs:
+        for strain in strains:
+            if gcf.has_strain(strain):
+                df_gcf_strain.loc[gcf.gcf_id, strain.id] = 1
+    return df_gcf_strain
+
+
+def get_presence_spec_strain(
+    spectra: Sequence[Spectrum], strains: StrainCollection
+) -> pd.DataFrame:
+    """Get the occurence of strains in spectra.
+
+    The occurence is a DataFrame with spectra as rows and strains as columns,
+    where index is `spectrum.spectrum_id` and column name is `strain.id`.
+    The values are 1 if the spectrum contains the strain and 0 otherwise.
+    """
+    df_spec_strain = pd.DataFrame(
+        np.zeros((len(spectra), len(strains))),
+        index=[spectrum.spectrum_id for spectrum in spectra],
+        columns=[strain.id for strain in strains],
+        dtype=int,
+    )
+    for spectrum in spectra:
+        for strain in strains:
+            if spectrum.has_strain(strain):
+                df_spec_strain.loc[spectrum.spectrum_id, strain.id] = 1
+    return df_spec_strain
+
+
+def get_presence_mf_strain(
+    mfs: Sequence[MolecularFamily], strains: StrainCollection
+) -> pd.DataFrame:
+    """Get the occurence of strains in molecular families.
+
+    The occurence is a DataFrame with molecular families as rows and
+    strains as columns, where index is `mf.family_id` and column name is
+    `strain.id`. The values are 1 if the molecular family contains the
+    strain and 0 otherwise.
+    """
+    df_mf_strain = pd.DataFrame(
+        np.zeros((len(mfs), len(strains))),
+        index=[mf.family_id for mf in mfs],
+        columns=[strain.id for strain in strains],
+        dtype=int,
+    )
+    for mf in mfs:
+        for strain in strains:
+            if mf.has_strain(strain):
+                df_mf_strain.loc[mf.family_id, strain.id] = 1
+    return df_mf_strain
+
+
+def isinstance_all(*objects, objtype) -> bool:
+    """Check if all objects are of the given type."""
+    return all(isinstance(x, objtype) for x in objects)
 
 
 def calc_likelihood_matrix(
