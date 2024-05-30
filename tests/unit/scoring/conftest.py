@@ -1,3 +1,4 @@
+import os
 from pytest import fixture
 from nplinker.genomics import GCF
 from nplinker.metabolomics import MolecularFamily
@@ -67,8 +68,8 @@ def datalinks(gcfs, spectra, mfs, strains) -> DataLinks:
     return DataLinks(gcfs, spectra, mfs, strains)
 
 
-@fixture(scope="module")
-def npl(gcfs, spectra, mfs, strains, tmp_path_factory) -> NPLinker:
+@fixture(scope="function")
+def npl(gcfs, spectra, mfs, strains, tmp_path) -> NPLinker:
     """Constructed NPLinker object.
 
     This NPLinker object does not do loading `npl.load_data()`, instead we
@@ -77,6 +78,7 @@ def npl(gcfs, spectra, mfs, strains, tmp_path_factory) -> NPLinker:
     The config file `nplinker_demo1.toml` does not affect the tests, just
     making sure the NPLinker object can be created succesfully.
     """
+    os.environ["NPLINKER_ROOT_DIR"] = str(tmp_path)  # Create a tmporary root dir for NPLinker
     npl = NPLinker(CONFIG_FILE_LOCAL_MODE)
     npl._gcfs = gcfs
     npl._spectra = spectra
