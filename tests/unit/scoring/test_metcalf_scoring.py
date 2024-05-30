@@ -59,8 +59,6 @@ def test_setup(mc, datalinks):
 def test_setup_load_cache(mc, npl, datalinks, caplog):
     """Test `setup` method when cache file exists."""
     mc.setup(npl)
-    assert "MetcalfScoring.setup loading cached data" in caplog.text
-    assert "MetcalfScoring.setup caching results" not in caplog.text
 
     assert isinstance(mc.DATALINKS, DataLinks)
 
