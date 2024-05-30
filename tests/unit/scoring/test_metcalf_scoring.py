@@ -5,7 +5,6 @@ from pandas.testing import assert_frame_equal
 from nplinker.scoring import LinkCollection
 from nplinker.scoring import MetcalfScoring
 from nplinker.scoring import ObjectLink
-from nplinker.scoring.linking import DataLinks
 
 
 def test_init(npl):
@@ -14,7 +13,9 @@ def test_init(npl):
     assert mc.name == "metcalf"
     assert mc.cutoff == 1.0
     assert mc.standardised is True
-    assert mc.DATALINKS is None
+    assert_frame_equal(mc.presence_gcf_strain, pd.DataFrame())
+    assert_frame_equal(mc.presence_spec_strain, pd.DataFrame())
+    assert_frame_equal(mc.presence_mf_strain, pd.DataFrame())
     assert_frame_equal(mc.raw_score_spec_gcf, pd.DataFrame())
     assert_frame_equal(mc.raw_score_mf_gcf, pd.DataFrame())
     assert mc.metcalf_mean is None
@@ -26,12 +27,29 @@ def test_init(npl):
 #
 
 
-def test_setup(mc, datalinks):
+def test_setup(mc):
     """Test `setup` method when cache file does not exist."""
-    assert isinstance(mc.DATALINKS, DataLinks)
-
-    assert_frame_equal(mc.DATALINKS.occurrence_gcf_strain, datalinks.occurrence_gcf_strain)
-    assert_frame_equal(mc.DATALINKS.cooccurrence_spec_gcf, datalinks.cooccurrence_spec_gcf)
+    col_names = ["strain1", "strain2", "strain3"]
+    assert_frame_equal(
+        mc.presence_gcf_strain,
+        pd.DataFrame(
+            [[1, 0, 0], [0, 1, 0], [1, 1, 0]], index=["gcf1", "gcf2", "gcf3"], columns=col_names
+        ),
+    )
+    assert_frame_equal(
+        mc.presence_spec_strain,
+        pd.DataFrame(
+            [[1, 0, 0], [0, 1, 0], [1, 1, 0]],
+            index=["spectrum1", "spectrum2", "spectrum3"],
+            columns=col_names,
+        ),
+    )
+    assert_frame_equal(
+        mc.presence_mf_strain,
+        pd.DataFrame(
+            [[1, 0, 0], [0, 1, 0], [1, 1, 0]], index=["mf1", "mf2", "mf3"], columns=col_names
+        ),
+    )
 
     assert_frame_equal(
         mc.raw_score_spec_gcf,
@@ -56,14 +74,31 @@ def test_setup(mc, datalinks):
     assert mc.metcalf_std.shape == (4, 4)
 
 
-def test_setup_load_cache(mc, npl, datalinks, caplog):
+def test_setup_load_cache(mc, npl):
     """Test `setup` method when cache file exists."""
     mc.setup(npl)
 
-    assert isinstance(mc.DATALINKS, DataLinks)
-
-    assert_frame_equal(mc.DATALINKS.occurrence_gcf_strain, datalinks.occurrence_gcf_strain)
-    assert_frame_equal(mc.DATALINKS.cooccurrence_spec_gcf, datalinks.cooccurrence_spec_gcf)
+    col_names = ["strain1", "strain2", "strain3"]
+    assert_frame_equal(
+        mc.presence_gcf_strain,
+        pd.DataFrame(
+            [[1, 0, 0], [0, 1, 0], [1, 1, 0]], index=["gcf1", "gcf2", "gcf3"], columns=col_names
+        ),
+    )
+    assert_frame_equal(
+        mc.presence_spec_strain,
+        pd.DataFrame(
+            [[1, 0, 0], [0, 1, 0], [1, 1, 0]],
+            index=["spectrum1", "spectrum2", "spectrum3"],
+            columns=col_names,
+        ),
+    )
+    assert_frame_equal(
+        mc.presence_mf_strain,
+        pd.DataFrame(
+            [[1, 0, 0], [0, 1, 0], [1, 1, 0]], index=["mf1", "mf2", "mf3"], columns=col_names
+        ),
+    )
 
     assert_frame_equal(
         mc.raw_score_spec_gcf,
@@ -93,14 +128,14 @@ def test_setup_load_cache(mc, npl, datalinks, caplog):
 #
 
 
-def test_calc_score_raw_score(mc, datalinks):
+def test_calc_score_raw_score(mc):
     """Test `calc_score` method for `raw_score_spec_gcf` and `raw_score_mf_gcf`.
 
     The expected values are calculated manually by using values from `test_init`
     of `test_data_links.py` and the default scoring weights.
     """
     # link type = 'spec-gcf'
-    mc.calc_score(datalinks, link_type="spec-gcf")
+    mc.calc_score(link_type="spec-gcf")
     assert_frame_equal(
         mc.raw_score_spec_gcf,
         pd.DataFrame(
@@ -110,7 +145,7 @@ def test_calc_score_raw_score(mc, datalinks):
         ),
     )
     # link type = 'mf-gcf'
-    mc.calc_score(datalinks, link_type="mf-gcf")
+    mc.calc_score(link_type="mf-gcf")
     assert_frame_equal(
         mc.raw_score_mf_gcf,
         pd.DataFrame(
@@ -121,9 +156,9 @@ def test_calc_score_raw_score(mc, datalinks):
     )
 
 
-def test_calc_score_mean_std(mc, datalinks):
+def test_calc_score_mean_std(mc):
     """Test `calc_score` method for `metcalf_mean` and `metcalf_std`."""
-    mc.calc_score(datalinks, link_type="spec-gcf")
+    mc.calc_score(link_type="spec-gcf")
     assert isinstance(mc.metcalf_mean, np.ndarray)
     assert isinstance(mc.metcalf_std, np.ndarray)
     assert mc.metcalf_mean.shape == (4, 4)  # (n_strains+1 , n_strains+1)
@@ -285,10 +320,10 @@ def test_get_links_invalid_mixed_types(mc, spectra, mfs):
 #
 
 
-def test__get_links_gcf(mc, datalinks, gcfs):
+def test__get_links_gcf(mc, gcfs):
     """Test `get_links` method for input GCF objects."""
-    mc.calc_score(datalinks, link_type="spec-gcf")
-    mc.calc_score(datalinks, link_type="mf-gcf")
+    mc.calc_score(link_type="spec-gcf")
+    mc.calc_score(link_type="mf-gcf")
     index_names = ["source", "target", "score"]
 
     # cutoff = negative infinity (float)
@@ -361,10 +396,10 @@ def test__get_links_gcf(mc, datalinks, gcfs):
     )
 
 
-def test__get_links_spec(mc, datalinks, spectra):
+def test__get_links_spec(mc, spectra):
     """Test `get_links` method for input Spectrum objects."""
-    mc.calc_score(datalinks, link_type="spec-gcf")
-    mc.calc_score(datalinks, link_type="mf-gcf")
+    mc.calc_score(link_type="spec-gcf")
+    mc.calc_score(link_type="mf-gcf")
     index_names = ["source", "target", "score"]
     # cutoff = negative infinity (float)
     links = mc._get_links(*spectra, score_cutoff=np.NINF)
@@ -403,10 +438,10 @@ def test__get_links_spec(mc, datalinks, spectra):
     )
 
 
-def test__get_links_mf(mc, datalinks, mfs):
+def test__get_links_mf(mc, mfs):
     """Test `get_links` method for input MolecularFamily objects."""
-    mc.calc_score(datalinks, link_type="spec-gcf")
-    mc.calc_score(datalinks, link_type="mf-gcf")
+    mc.calc_score(link_type="spec-gcf")
+    mc.calc_score(link_type="mf-gcf")
     index_names = ["source", "target", "score"]
     # cutoff = negative infinity (float)
     links = mc._get_links(*mfs, score_cutoff=np.NINF)

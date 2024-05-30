@@ -5,7 +5,6 @@ from nplinker.metabolomics import MolecularFamily
 from nplinker.metabolomics import Spectrum
 from nplinker.nplinker import NPLinker
 from nplinker.scoring import MetcalfScoring
-from nplinker.scoring.linking import DataLinks
 from nplinker.strain import Strain
 from nplinker.strain import StrainCollection
 from .. import CONFIG_FILE_LOCAL_MODE
@@ -60,12 +59,6 @@ def mfs(spectra) -> tuple[MolecularFamily, MolecularFamily, MolecularFamily]:
     mf3 = MolecularFamily("mf3")
     mf3.add_spectrum(spectra[2])
     return mf1, mf2, mf3
-
-
-@fixture(scope="session")
-def datalinks(gcfs, spectra, mfs, strains) -> DataLinks:
-    """DataLinks object. See `test_data_links.py` for its values."""
-    return DataLinks(gcfs, spectra, mfs, strains)
 
 
 @fixture(scope="function")
