@@ -129,11 +129,7 @@ def test_setup_load_cache(mc, npl):
 
 
 def test_calc_score_raw_score(mc):
-    """Test `calc_score` method for `raw_score_spec_gcf` and `raw_score_mf_gcf`.
-
-    The expected values are calculated manually by using values from `test_init`
-    of `test_data_links.py` and the default scoring weights.
-    """
+    """Test `calc_score` method for `raw_score_spec_gcf` and `raw_score_mf_gcf`."""
     # link type = 'spec-gcf'
     mc.calc_score(link_type="spec-gcf")
     assert_frame_equal(
@@ -185,7 +181,6 @@ def test_get_links_gcf_standardised_false(mc, gcfs, spectra, mfs):
     assert len(links) == 3
     assert {i.gcf_id for i in links.keys()} == {"gcf1", "gcf2", "gcf3"}
     assert isinstance(links[gcfs[0]][spectra[0]], ObjectLink)
-    # expected values are from `test_get_links_gcf` of test_link_finder.py
     assert links[gcfs[0]][spectra[0]].data(mc) == 12
     assert links[gcfs[1]][spectra[0]].data(mc) == -9
     assert links[gcfs[2]][spectra[0]].data(mc) == 11
