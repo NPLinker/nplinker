@@ -125,6 +125,7 @@ pip install -q -U pip setuptools
 echo "🔥 Start installing BigScape ..."
     [[ -d BiG-SCAPE ]] || git clone https://github.com/medema-group/BiG-SCAPE.git
     cd BiG-SCAPE
+    git reset --hard
     git config --add advice.detachedHead false  # disable advice
     git config pull.ff only
     git checkout master
@@ -139,11 +140,15 @@ echo "🔥 Start installing BigScape ..."
     # blob size limit to remove large files left in history
     [[ -d BiG-SCAPE-v2 ]] || git clone -b dev --filter=blob:limit=10m https://github.com/medema-group/BiG-SCAPE.git BiG-SCAPE-v2
     cd BiG-SCAPE-v2
+    git config --ad advice.detatchedHead false
+    git checkout dfb0d78427e020aab2c72cc741327ccd102470a1 # specific commit that includes important fixes to v2
     pip install click
     pip install sqlalchemy
     pip install pyhmmer
     chmod 754 bigscape.py
     ln -sf $LIB_PATH/BiG-SCAPE-v2/bigscape.py $PY_PATH/bin/bigscape-v2.py
+    ln -sf $LIB_PATH/BiG-SCAPE-v2/config.ini $PY_PATH/bin # new system of configuration needs default config file
+    ln -sf $LIB_PATH/BiG-SCAPE-v2/big_scape $PY_PATH/bin # folder is needed for some files
     cd ..
 
 
