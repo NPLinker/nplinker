@@ -17,6 +17,12 @@ def run_bigscape(
     extra_params: str,
     version: int = 1,
 ):
+    """Runs BiG-SCAPE to cluster BGCs.
+
+    The behavior of this function is slightly different depending on the version of
+    BiG-SCAPE that is set to run using the configuration file.
+    Mostly this means a different set of parameters is used between the two versions.
+    """
     # switch to correct version of BiG-SCAPE
     if version == 1:
         bigscape_py_path = "bigscape.py"
@@ -30,7 +36,9 @@ def run_bigscape(
     try:
         subprocess.run([bigscape_py_path, "-h"], capture_output=True, check=True)
     except Exception as e:
-        raise Exception(f"Failed to find/run bigscape.py (path={bigscape_py_path}, err={e})") from e
+        raise Exception(
+            f"Failed to find/run bigscape.py (path={bigscape_py_path}, err={e})"
+        ) from e
 
     if not os.path.exists(antismash_path):
         raise Exception(f'antismash_path "{antismash_path}" does not exist!')
