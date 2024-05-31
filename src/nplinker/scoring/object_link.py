@@ -1,3 +1,15 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from nplinker.genomics import GCF
+    from nplinker.metabolomics import MolecularFamily
+    from nplinker.metabolomics import Spectrum
+    from nplinker.scoring import ScoringBase
+    from nplinker.strain import StrainCollection
+
+
 class ObjectLink:
     """Class which stores information about a single link between two objects.
 
@@ -15,10 +27,15 @@ class ObjectLink:
      - the output of the scoring method(s) used for this link (e.g. a metcalf score)
     """
 
-    def __init__(self, source, target, method, data=None, common_strains=[]):
+    def __init__(
+        self,
+        source: GCF | Spectrum | MolecularFamily,
+        target: GCF | Spectrum | MolecularFamily,
+        method: ScoringBase,
+        data=None,
+    ):
         self.source = source
         self.target = target
-        self.common_strains = common_strains
         self._method_data = {method: data}
 
     def _merge(self, other_link):
@@ -27,6 +44,11 @@ class ObjectLink:
 
     def set_data(self, method, newdata):
         self._method_data[method] = newdata
+
+    @property
+    def common_strains(self) -> StrainCollection:
+        """Get the strains common to both source and target."""
+        return self.source.strains(self.target.strains)
 
     @property
     def method_count(self):
