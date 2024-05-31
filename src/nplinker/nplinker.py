@@ -283,15 +283,15 @@ class NPLinker:
             targets = list(filter(lambda x: not isinstance(x, BGC), link_data.keys()))
             if len(targets) > 0:
                 if isinstance(source, GCF):
-                    shared_strains = self._datalinks.get_common_strains(targets, [source], True)
+                    common_strains = self._datalinks.get_common_strains(targets, [source], True)
                     for target, link in link_data.items():
-                        if (target, source) in shared_strains:
-                            link.shared_strains = shared_strains[(target, source)]
+                        if (target, source) in common_strains:
+                            link.common_strains = common_strains[(target, source)]
                 else:
-                    shared_strains = self._datalinks.get_common_strains([source], targets, True)
+                    common_strains = self._datalinks.get_common_strains([source], targets, True)
                     for target, link in link_data.items():
-                        if (source, target) in shared_strains:
-                            link.shared_strains = shared_strains[(source, target)]
+                        if (source, target) in common_strains:
+                            link.common_strains = common_strains[(source, target)]
 
         logger.info("Finished calculating shared strain information")
 

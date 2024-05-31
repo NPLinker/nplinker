@@ -15,10 +15,10 @@ class ObjectLink:
      - the output of the scoring method(s) used for this link (e.g. a metcalf score)
     """
 
-    def __init__(self, source, target, method, data=None, shared_strains=[]):
+    def __init__(self, source, target, method, data=None, common_strains=[]):
         self.source = source
         self.target = target
-        self.shared_strains = shared_strains
+        self.common_strains = common_strains
         self._method_data = {method: data}
 
     def _merge(self, other_link):
