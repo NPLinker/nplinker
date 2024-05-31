@@ -263,22 +263,34 @@ class DatasetArranger:
         default BiG-SCAPE directory.
         """
         defaults.BIGSCAPE_RUNNING_OUTPUT_PATH.mkdir(exist_ok=True, parents=True)
+
+        version = config.bigscape.version
+
         run_bigscape(
             defaults.ANTISMASH_DEFAULT_PATH,
             defaults.BIGSCAPE_RUNNING_OUTPUT_PATH,
             config.bigscape.parameters,
-            config.bigscape.version,
+            version,
         )
-        for f in glob(
-            str(
-                defaults.BIGSCAPE_RUNNING_OUTPUT_PATH
-                / "network_files"
-                / "*"
-                / "mix"
-                / "mix_clustering_c*.tsv"
+
+        if version == 1:
+            for f in glob(
+                str(
+                    defaults.BIGSCAPE_RUNNING_OUTPUT_PATH
+                    / "network_files"
+                    / "*"
+                    / "mix"
+                    / "mix_clustering_c*.tsv"
+                )
+            ):
+                shutil.copy(f, defaults.BIGSCAPE_DEFAULT_PATH)
+        elif version == 2:
+            shutil.copy(
+                defaults.BIGSCAPE_RUNNING_OUTPUT_PATH / "data_sqlite.db",
+                defaults.BIGSCAPE_DEFAULT_PATH,
             )
-        ):
-            shutil.copy(f, defaults.BIGSCAPE_DEFAULT_PATH)
+        else:
+            raise ValueError(f"Invalid BiG-SCAPE version: {version}")
 
     def arrange_strain_mappings(self) -> None:
         """Arrange the strain mappings file.
