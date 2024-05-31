@@ -332,7 +332,9 @@ class DatasetArranger:
 
     def _generate_strain_mappings(self) -> None:
         """Generate the strain mappings file for the PODP mode."""
-        podp_json_file = defaults.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
+        podp_json_file = (
+            defaults.DOWNLOADS_DEFAULT_PATH / f"paired_datarecord_{config.podp_id}.json"
+        )
         genome_status_json_file = defaults.DOWNLOADS_DEFAULT_PATH / GENOME_STATUS_FILENAME
         genome_bgc_mappings_file = defaults.ANTISMASH_DEFAULT_PATH / GENOME_BGC_MAPPINGS_FILENAME
         gnps_file_mapping_file = self.gnps_file_mappings_file
