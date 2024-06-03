@@ -54,7 +54,7 @@ def run_bigscape(
         args.extend(["cluster", "--pfam_path", PFAM_PATH + "/Pfam-A.hmm"])
 
     # add input and output paths. these are unchanged
-    args.extend(["-i", antismash_path, "-o", output_path])
+    args.extend(["-i", str(antismash_path), "-o", str(output_path)])
 
     # append the user supplied params, if any
     if len(extra_params) > 0:
