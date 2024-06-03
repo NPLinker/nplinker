@@ -11,7 +11,8 @@ from nplinker.metabolomics import Spectrum
 from nplinker.pickler import load_pickled_data
 from nplinker.pickler import save_pickled_data
 from .abc import ScoringBase
-from .object_link import ObjectLink
+from .link_graph import LinkGraph
+from .link_graph import Score
 from .utils import get_presence_gcf_strain
 from .utils import get_presence_mf_strain
 from .utils import get_presence_spec_strain
@@ -20,7 +21,6 @@ from .utils import isinstance_all
 
 if TYPE_CHECKING:
     from ..nplinker import NPLinker
-    from . import LinkCollection
 
 
 logger = logging.getLogger(__name__)
@@ -70,8 +70,6 @@ class MetcalfScoring(ScoringBase):
                 to True.
         """
         super().__init__(npl)
-        self.cutoff: float = 1.0
-        self.standardised: bool = True
 
     # TODO CG: refactor this method and extract code for cache file to a separate method
     @classmethod
@@ -166,29 +164,32 @@ class MetcalfScoring(ScoringBase):
             n_strains = cls.presence_gcf_strain.shape[1]
             cls.metcalf_mean, cls.metcalf_std = cls._calc_mean_std(n_strains, scoring_weights)
 
-    def get_links(
-        self, *objects: GCF | Spectrum | MolecularFamily, link_collection: LinkCollection
-    ) -> LinkCollection:
-        """Get links for the given objects and add them to the given LinkCollection.
+    def get_links(self, *objects: GCF | Spectrum | MolecularFamily, **parameters) -> LinkGraph:
+        """Get links for the given objects.
 
-        The given objects are treated as input or source objects, which must
-        be GCF, Spectrum or MolecularFamily objects.
+        The given objects are treated as input or source objects, which must be GCF, Spectrum or
+        MolecularFamily objects.
 
         Args:
-            objects: The objects to get links for. Must be GCF, Spectrum
-                or MolecularFamily objects.
-            link_collection: The LinkCollection object to add the links to.
+            objects: The objects to get links for. Must be GCF, Spectrum or MolecularFamily objects.
+            parameters: The scoring parameters to use for the links. The parameters are:
+
+                    - cutoff: The minimum score to consider a link (≥cutoff). Default is 0.
+                    - standardised: Whether to use standardised scores. Default is False.
 
         Returns:
-            The LinkCollection object with the new links added.
+            The LinkGraph object containing the links involving the input objects.
 
         Raises:
             ValueError: If the input objects are empty.
             TypeError: If the input objects are not of the correct type.
         """
+        # validate input objects
+        # if the input objects are empty, use all objects
         if len(objects) == 0:
-            raise ValueError("Empty input objects.")
+            objects = self.npl.gcfs
 
+        # TODO: allow mixed input types?
         if isinstance_all(*objects, objtype=GCF):
             obj_type = "gcf"
         elif isinstance_all(*objects, objtype=Spectrum):
@@ -201,9 +202,14 @@ class MetcalfScoring(ScoringBase):
                 f"Invalid type {set(types)}. Input objects must be GCF, Spectrum or MolecularFamily objects."
             )
 
-        logger.info(f"MetcalfScoring: standardised = {self.standardised}")
-        if not self.standardised:
-            scores_list = self._get_links(*objects, score_cutoff=self.cutoff)
+        # validate scoring parameters
+        self._cutoff: float = parameters.get("cutoff", 0)
+        self._standardised: bool = parameters.get("standardised", False)
+        parameters.update({"cutoff": self._cutoff, "standardised": self._standardised})
+
+        logger.info(f"MetcalfScoring: standardised = {self._standardised}")
+        if not self._standardised:
+            scores_list = self._get_links(*objects, score_cutoff=self._cutoff)
         # TODO CG: verify the logics of standardised score and add unit tests
         else:
             # use negative infinity as the score cutoff to ensure we get all links
@@ -214,14 +220,13 @@ class MetcalfScoring(ScoringBase):
             else:
                 scores_list = self._calc_standardised_score_met(scores_list)
 
-        link_scores: dict[
-            GCF | Spectrum | MolecularFamily, dict[GCF | Spectrum | MolecularFamily, ObjectLink]
-        ] = {}
+        links = LinkGraph()
         if obj_type == "gcf":
             logger.info(
                 f"MetcalfScoring: input_type=GCF, result_type=Spec/MolFam, "
                 f"#inputs={len(objects)}."
             )
+            # scores is the DataFrame with index "source", "target", "score"
             for scores in scores_list:
                 # when no links found
                 if scores.shape[1] == 0:
@@ -234,13 +239,12 @@ class MetcalfScoring(ScoringBase):
                             met = self.npl.lookup_spectrum(scores.loc["target", col_index])
                         else:
                             met = self.npl.lookup_mf(scores.loc["target", col_index])
-                        if gcf not in link_scores:
-                            link_scores[gcf] = {}
-                        # TODO CG: use id instead of object for gcf, met and self?
-                        link_scores[gcf][met] = ObjectLink(
-                            gcf, met, self, scores.loc["score", col_index]
+                        links.add_link(
+                            gcf,
+                            met,
+                            metcalf=Score(self.name, scores.loc["score", col_index], parameters),
                         )
-                    logger.info(f"MetcalfScoring: found {len(link_scores)} {scores.name} links.")
+                    logger.info(f"MetcalfScoring: found {len(links)} {scores.name} links.")
         else:
             logger.info(
                 f"MetcalfScoring: input_type=Spec/MolFam, result_type=GCF, "
@@ -257,16 +261,15 @@ class MetcalfScoring(ScoringBase):
                         met = self.npl.lookup_spectrum(scores.loc["source", col_index])
                     else:
                         met = self.npl.lookup_mf(scores.loc["source", col_index])
-                    if met not in link_scores:
-                        link_scores[met] = {}
-                    link_scores[met][gcf] = ObjectLink(
-                        met, gcf, self, scores.loc["score", col_index]
+                    links.add_link(
+                        met,
+                        gcf,
+                        metcalf=Score(self.name, scores.loc["score", col_index], parameters),
                     )
-                logger.info(f"MetcalfScoring: found {len(link_scores)} {scores.name} links.")
+                logger.info(f"MetcalfScoring: found {len(links)} {scores.name} links.")
 
-        link_collection._add_links_from_method(self, link_scores)
         logger.info("MetcalfScoring: completed")
-        return link_collection
+        return links
 
     # TODO CG: refactor this method
     def format_data(self, data):
@@ -345,15 +348,14 @@ class MetcalfScoring(ScoringBase):
     def _get_links(
         self,
         *objects: tuple[GCF, ...] | tuple[Spectrum, ...] | tuple[MolecularFamily, ...],
-        score_cutoff: float = 0.5,
+        score_cutoff: float = 0,
     ) -> list[pd.DataFrame]:
         """Get links and scores for given objects.
 
         Args:
             objects: A list of GCF, Spectrum or MolecularFamily objects
                 and all objects must be of the same type.
-            score_cutoff: Minimum score to consider a link (≥score_cutoff).
-                Default is 0.5.
+            score_cutoff: Minimum score to consider a link (≥score_cutoff). Default is 0.
 
         Returns:
             List of data frames containing the ids of the linked objects
@@ -457,7 +459,7 @@ class MetcalfScoring(ScoringBase):
             z_scores.append(z_score)
 
         z_scores = np.array(z_scores)
-        mask = z_scores >= self.cutoff
+        mask = z_scores >= self._cutoff
 
         scores_df = pd.DataFrame(
             [
@@ -495,7 +497,7 @@ class MetcalfScoring(ScoringBase):
                 z_scores.append(z_score)
 
             z_scores = np.array(z_scores)
-            mask = z_scores >= self.cutoff
+            mask = z_scores >= self._cutoff
 
             scores_df = pd.DataFrame(
                 [

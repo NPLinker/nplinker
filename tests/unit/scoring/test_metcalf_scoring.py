@@ -2,17 +2,13 @@ import numpy as np
 import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
-from nplinker.scoring import LinkCollection
 from nplinker.scoring import MetcalfScoring
-from nplinker.scoring import ObjectLink
 
 
 def test_init(npl):
     mc = MetcalfScoring(npl)
     assert mc.npl == npl
     assert mc.name == "metcalf"
-    assert mc.cutoff == 1.0
-    assert mc.standardised is True
     assert_frame_equal(mc.presence_gcf_strain, pd.DataFrame())
     assert_frame_equal(mc.presence_spec_strain, pd.DataFrame())
     assert_frame_equal(mc.presence_mf_strain, pd.DataFrame())
@@ -168,123 +164,79 @@ def test_calc_score_mean_std(mc):
 #
 
 
+def test_get_links_default(mc, gcfs, spectra, mfs):
+    lg = mc.get_links()
+    assert lg[gcfs[0]][spectra[0]][mc.name].value == 12
+    assert lg[gcfs[1]].get(spectra[0]) is None
+    assert lg[gcfs[2]][spectra[0]][mc.name].value == 11
+    assert lg[gcfs[0]][mfs[0]][mc.name].value == 12
+    assert lg[gcfs[1]][mfs[1]][mc.name].value == 12
+    assert lg[gcfs[2]][mfs[2]][mc.name].value == 21
+
+
 def test_get_links_gcf_standardised_false(mc, gcfs, spectra, mfs):
     """Test `get_links` method when input is GCF objects and `standardised` is False."""
-    # test raw scores (no standardisation)
-    mc.standardised = False
-
     # when cutoff is negative infinity, i.e. taking all scores
-    mc.cutoff = np.NINF
-    links = mc.get_links(*gcfs, link_collection=LinkCollection())
-    assert isinstance(links, LinkCollection)
-    links = links.links  # dict of link values
-    assert len(links) == 3
-    assert {i.gcf_id for i in links.keys()} == {"gcf1", "gcf2", "gcf3"}
-    assert isinstance(links[gcfs[0]][spectra[0]], ObjectLink)
-    assert links[gcfs[0]][spectra[0]].data(mc) == 12
-    assert links[gcfs[1]][spectra[0]].data(mc) == -9
-    assert links[gcfs[2]][spectra[0]].data(mc) == 11
-    assert links[gcfs[0]][mfs[0]].data(mc) == 12
-    assert links[gcfs[1]][mfs[1]].data(mc) == 12
-    assert links[gcfs[2]][mfs[2]].data(mc) == 21
+    lg = mc.get_links(*gcfs, cutoff=np.NINF, standardised=False)
+    assert lg[gcfs[0]][spectra[0]][mc.name].value == 12
+    assert lg[gcfs[1]][spectra[0]][mc.name].value == -9
+    assert lg[gcfs[2]][spectra[0]][mc.name].value == 11
+    assert lg[gcfs[0]][mfs[0]][mc.name].value == 12
+    assert lg[gcfs[1]][mfs[1]][mc.name].value == 12
+    assert lg[gcfs[2]][mfs[2]][mc.name].value == 21
 
     # when test cutoff is 0, i.e. taking scores >= 0
-    mc.cutoff = 0
-    links = mc.get_links(*gcfs, link_collection=LinkCollection())
-    assert isinstance(links, LinkCollection)
-    links = links.links
-    assert {i.gcf_id for i in links.keys()} == {"gcf1", "gcf2", "gcf3"}
-    assert isinstance(links[gcfs[0]][spectra[0]], ObjectLink)
-    assert links[gcfs[0]][spectra[0]].data(mc) == 12
-    assert links[gcfs[1]].get(spectra[0]) is None
-    assert links[gcfs[2]][spectra[0]].data(mc) == 11
-    assert links[gcfs[0]][mfs[0]].data(mc) == 12
-    assert links[gcfs[1]][mfs[1]].data(mc) == 12
-    assert links[gcfs[2]][mfs[2]].data(mc) == 21
+    lg = mc.get_links(*gcfs, cutoff=0, standardised=False)
+    assert lg[gcfs[0]][spectra[0]][mc.name].value == 12
+    assert lg[gcfs[1]].get(spectra[0]) is None
+    assert lg[gcfs[2]][spectra[0]][mc.name].value == 11
+    assert lg[gcfs[0]][mfs[0]][mc.name].value == 12
+    assert lg[gcfs[1]][mfs[1]][mc.name].value == 12
+    assert lg[gcfs[2]][mfs[2]][mc.name].value == 21
 
 
 @pytest.mark.skip(reason="To add after refactoring relevant code.")
 def test_get_links_gcf_standardised_true(mc, gcfs, spectra, mfs):
     """Test `get_links` method when input is GCF objects and `standardised` is True."""
-    mc.standardised = True
     ...
 
 
 def test_get_links_spec_standardised_false(mc, gcfs, spectra):
     """Test `get_links` method when input is Spectrum objects and `standardised` is False."""
-    mc.standardised = False
+    lg = mc.get_links(*spectra, cutoff=np.NINF, standardised=False)
+    assert lg[spectra[0]][gcfs[0]][mc.name].value == 12
+    assert lg[spectra[0]][gcfs[1]][mc.name].value == -9
+    assert lg[spectra[0]][gcfs[2]][mc.name].value == 11
 
-    mc.cutoff = np.NINF
-    links = mc.get_links(*spectra, link_collection=LinkCollection())
-    assert isinstance(links, LinkCollection)
-    links = links.links  # dict of link values
-    assert len(links) == 3
-    assert {i.spectrum_id for i in links.keys()} == {"spectrum1", "spectrum2", "spectrum3"}
-    assert isinstance(links[spectra[0]][gcfs[0]], ObjectLink)
-    assert links[spectra[0]][gcfs[0]].data(mc) == 12
-    assert links[spectra[0]][gcfs[1]].data(mc) == -9
-    assert links[spectra[0]][gcfs[2]].data(mc) == 11
-
-    mc.cutoff = 0
-    links = mc.get_links(*spectra, link_collection=LinkCollection())
-    assert isinstance(links, LinkCollection)
-    links = links.links  # dict of link values
-    assert len(links) == 3
-    assert {i.spectrum_id for i in links.keys()} == {"spectrum1", "spectrum2", "spectrum3"}
-    assert isinstance(links[spectra[0]][gcfs[0]], ObjectLink)
-    assert links[spectra[0]][gcfs[0]].data(mc) == 12
-    assert links[spectra[0]].get(gcfs[1]) is None
-    assert links[spectra[0]][gcfs[2]].data(mc) == 11
+    lg = mc.get_links(*spectra, cutoff=0, standardised=False)
+    assert lg[spectra[0]][gcfs[0]][mc.name].value == 12
+    assert lg[spectra[0]].get(gcfs[1]) is None
+    assert lg[spectra[0]][gcfs[2]][mc.name].value == 11
 
 
 @pytest.mark.skip(reason="To add after refactoring relevant code.")
 def test_get_links_spec_standardised_true(mc, gcfs, spectra):
     """Test `get_links` method when input is Spectrum objects and `standardised` is True."""
-    mc.standardised = True
     ...
 
 
 def test_get_links_mf_standardised_false(mc, gcfs, mfs):
     """Test `get_links` method when input is MolecularFamily objects and `standardised` is False."""
-    mc.standardised = False
+    lg = mc.get_links(*mfs, cutoff=np.NINF, standardised=False)
+    assert lg[mfs[0]][gcfs[0]][mc.name].value == 12
+    assert lg[mfs[0]][gcfs[1]][mc.name].value == -9
+    assert lg[mfs[0]][gcfs[2]][mc.name].value == 11
 
-    mc.cutoff = np.NINF
-    links = mc.get_links(*mfs, link_collection=LinkCollection())
-    assert isinstance(links, LinkCollection)
-    links = links.links
-    assert len(links) == 3
-    assert {i.family_id for i in links.keys()} == {"mf1", "mf2", "mf3"}
-    assert isinstance(links[mfs[0]][gcfs[0]], ObjectLink)
-    assert links[mfs[0]][gcfs[0]].data(mc) == 12
-    assert links[mfs[0]][gcfs[1]].data(mc) == -9
-    assert links[mfs[0]][gcfs[2]].data(mc) == 11
-
-    mc.cutoff = 0
-    links = mc.get_links(*mfs, link_collection=LinkCollection())
-    assert isinstance(links, LinkCollection)
-    links = links.links
-    assert len(links) == 3
-    assert {i.family_id for i in links.keys()} == {"mf1", "mf2", "mf3"}
-    assert isinstance(links[mfs[0]][gcfs[0]], ObjectLink)
-    assert links[mfs[0]][gcfs[0]].data(mc) == 12
-    assert links[mfs[0]].get(gcfs[1]) is None
-    assert links[mfs[0]][gcfs[2]].data(mc) == 11
+    lg = mc.get_links(*mfs, cutoff=0, standardised=False)
+    assert lg[mfs[0]][gcfs[0]][mc.name].value == 12
+    assert lg[mfs[0]].get(gcfs[1]) is None
+    assert lg[mfs[0]][gcfs[2]][mc.name].value == 11
 
 
 @pytest.mark.skip(reason="To add after refactoring relevant code.")
 def test_get_links_mf_standardised_true(mc, gcfs, mfs):
     """Test `get_links` method when input is MolecularFamily objects and `standardised` is True."""
-    mc.standardised = True
     ...
-
-
-@pytest.mark.parametrize(
-    "objects, expected", [([], "Empty input objects"), ("", "Empty input objects")]
-)
-def test_get_links_invalid_input_value(mc, objects, expected):
-    with pytest.raises(ValueError) as e:
-        mc.get_links(*objects, link_collection=LinkCollection())
-    assert expected in str(e.value)
 
 
 @pytest.mark.parametrize(
@@ -297,14 +249,14 @@ def test_get_links_invalid_input_value(mc, objects, expected):
 )
 def test_get_links_invalid_input_type(mc, objects, expected):
     with pytest.raises(TypeError) as e:
-        mc.get_links(*objects, link_collection=LinkCollection())
+        mc.get_links(*objects)
     assert expected in str(e.value)
 
 
 def test_get_links_invalid_mixed_types(mc, spectra, mfs):
     objects = (*spectra, *mfs)
     with pytest.raises(TypeError) as e:
-        mc.get_links(*objects, link_collection=LinkCollection())
+        mc.get_links(*objects)
     assert "Invalid type" in str(e.value)
     assert ".MolecularFamily" in str(e.value)
     assert ".Spectrum" in str(e.value)
