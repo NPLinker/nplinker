@@ -3,9 +3,10 @@ import time
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
 from nplinker.metabolomics import Spectrum
-from nplinker.scoring.abc import ScoringBase
-from nplinker.scoring.metcalf_scoring import MetcalfScoring
-from nplinker.scoring.object_link import ObjectLink
+from nplinker.strain import StrainCollection
+from .abc import ScoringBase
+from .link_graph import LinkGraph
+from .score import Score
 
 
 logger = logging.getLogger(__name__)
@@ -329,7 +330,8 @@ class NPClassScoring(ScoringBase):
             logger.info(f"Currently the method '{met_options[0]}' is selected")
         # todo: give info about parameters
 
-    def get_links(self, objects, link_collection):
+    def get_links(self, *objects, **parameters):
+        # TODO: replace some attributes with parameters
         """Given a set of objects, return link information."""
         # todo: pickle results
         logger.info("Running NPClassScore...")
@@ -344,14 +346,9 @@ class NPClassScoring(ScoringBase):
         else:
             targets_classes = [self._get_gen_classes(target) for target in targets]
 
-        logger.info("Using Metcalf scoring to get shared strains")
-        # get mapping of shared strains
-        if not self.npl._datalinks:
-            self.npl._datalinks = self.npl.scoring_method(MetcalfScoring.name).datalinks
-        if obj_is_gen:
-            common_strains = self.npl.get_common_strains(targets, objects)
-        else:
-            common_strains = self.npl.get_common_strains(objects, targets)
+        # TODO: implement the computation of common strains between objects and targets
+        common_strains = StrainCollection()
+
         logger.info(
             f"Calculating NPClassScore for {len(objects)} objects to "
             f"{len(targets)} targets ({len(common_strains)} pairwise "
@@ -359,6 +356,7 @@ class NPClassScoring(ScoringBase):
             f"take a while."
         )
 
+        lg = LinkGraph()
         results = {}
         for obj in objects:
             results[obj] = {}
@@ -370,7 +368,14 @@ class NPClassScoring(ScoringBase):
 
             for target, target_classes in zip(targets, targets_classes):
                 self._create_object_link(
-                    obj_is_gen, common_strains, results, obj, obj_classes, target, target_classes
+                    obj_is_gen,
+                    common_strains,
+                    lg,
+                    obj,
+                    obj_classes,
+                    target,
+                    target_classes,
+                    parameters,
                 )
 
         # info about spectra/MFs with missing scoring
@@ -387,11 +392,10 @@ class NPClassScoring(ScoringBase):
             )
 
         logger.info(f"NPClassScore completed in {time.time() - begin:.1f}s")
-        link_collection._add_links_from_method(self, results)
-        return link_collection
+        return lg
 
     def _create_object_link(
-        self, obj_is_gen, common_strains, results, obj, obj_classes, target, target_classes
+        self, obj_is_gen, common_strains, lg, obj, obj_classes, target, target_classes, parameters
     ):
         # only consider targets that have shared strains
         common_tup = (obj, target)
@@ -408,10 +412,10 @@ class NPClassScoring(ScoringBase):
                 # no score is found due to missing classes for spectra
                 self._target_no_scores.add(target)  # keep track
                 if not self.filter_missing_scores:
-                    results[obj][target] = ObjectLink(obj, target, self, full_score)
+                    lg.add_link(obj, target, Score(self.name, full_score, parameters))
             else:
                 if npclassscore > self.cutoff:
-                    results[obj][target] = ObjectLink(obj, target, self, full_score)
+                    lg.add_link(obj, target, Score(self.name, full_score, parameters))
 
     def format_data(self, data):
         """Given whatever output data the method produces, return a readable string version."""

@@ -15,7 +15,6 @@ from .metabolomics import MolecularFamily
 from .metabolomics import Spectrum
 from .pickler import save_pickled_data
 from .scoring.abc import ScoringBase
-from .scoring.link_collection import LinkCollection
 from .scoring.metcalf_scoring import MetcalfScoring
 from .scoring.np_class_scoring import NPClassScoring
 from .scoring.rosetta_scoring import RosettaScoring
