@@ -45,6 +45,7 @@ class MetcalfScoring(ScoringBase):
 
     name = "metcalf"
     CACHE: str = "cache_metcalf_scoring.pckl"
+    metcalf_weights: tuple[int, int, int, int] = (10, -10, 0, 1)
 
     # DataFrame to store presence of gcfs/spectra/mfs with respect to strains
     # values = 1 where gcf/spec/fam occur in strain, 0 otherwise
@@ -62,12 +63,6 @@ class MetcalfScoring(ScoringBase):
 
         Args:
             npl: The NPLinker object to use for scoring.
-
-        Attributes:
-            cutoff: The cutoff value to use for scoring. Scores below
-                this value will be discarded. Defaults to 1.0.
-            standardised: Whether to use standardised scores. Defaults
-                to True.
         """
         super().__init__(npl)
 
@@ -117,52 +112,19 @@ class MetcalfScoring(ScoringBase):
             cls.presence_gcf_strain = get_presence_gcf_strain(npl.gcfs, npl.strains)
             cls.presence_spec_strain = get_presence_spec_strain(npl.spectra, npl.strains)
             cls.presence_mf_strain = get_presence_mf_strain(npl.molfams, npl.strains)
-            cls.calc_score(link_type=LINK_TYPES[0])
-            cls.calc_score(link_type=LINK_TYPES[1])
+            cls.raw_score_spec_gcf = cls._calc_raw_score(
+                cls.presence_spec_strain, cls.presence_gcf_strain, cls.metcalf_weights
+            )
+            cls.raw_score_mf_gcf = cls._calc_raw_score(
+                cls.presence_mf_strain, cls.presence_gcf_strain, cls.metcalf_weights
+            )
+            n_strains = cls.presence_gcf_strain.shape[1]
+            cls.metcalf_mean, cls.metcalf_std = cls._calc_mean_std(n_strains, cls.metcalf_weights)
+
             logger.info("MetcalfScoring.setup caching results")
             save_pickled_data((dataset_counts, cls.metcalf_mean), cache_file)
 
         logger.info("MetcalfScoring.setup completed")
-
-    @classmethod
-    def calc_score(
-        cls,
-        link_type: str = "spec-gcf",
-        scoring_weights: tuple[int, int, int, int] = (10, -10, 0, 1),
-    ) -> None:
-        """Calculate Metcalf scores.
-
-        This method calculates the `raw_score_spec_gcf`, `raw_score_mf_gcf`, `metcalf_mean`, and
-        `metcalf_std` attributes.
-
-        Args:
-            link_type: The type of link to score. Must be 'spec-gcf' or
-                'mf-gcf'. Defaults to 'spec-gcf'.
-            scoring_weights: The weights to
-                use for Metcalf scoring. The weights are applied to
-                '(met_gcf, met_not_gcf, gcf_not_met, not_met_not_gcf)'.
-                Defaults to (10, -10, 0, 1).
-
-        Raises:
-            ValueError: If an invalid link type is provided.
-        """
-        if link_type not in LINK_TYPES:
-            raise ValueError(f"Invalid link type: {link_type}. Must be one of {LINK_TYPES}")
-
-        if link_type == "spec-gcf":
-            logger.info("Create correlation matrices: spectra<->gcfs.")
-            cls.raw_score_spec_gcf = cls._calc_raw_score(
-                cls.presence_spec_strain, cls.presence_gcf_strain, scoring_weights
-            )
-        if link_type == "mf-gcf":
-            logger.info("Create correlation matrices: mol-families<->gcfs.")
-            cls.raw_score_mf_gcf = cls._calc_raw_score(
-                cls.presence_mf_strain, cls.presence_gcf_strain, scoring_weights
-            )
-
-        if cls.metcalf_mean is None or cls.metcalf_std is None:
-            n_strains = cls.presence_gcf_strain.shape[1]
-            cls.metcalf_mean, cls.metcalf_std = cls._calc_mean_std(n_strains, scoring_weights)
 
     def get_links(self, *objects: GCF | Spectrum | MolecularFamily, **parameters) -> LinkGraph:
         """Get links for the given objects.
