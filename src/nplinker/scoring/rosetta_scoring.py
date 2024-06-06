@@ -3,7 +3,7 @@ import logging
 from nplinker.genomics.bgc import BGC
 from nplinker.genomics.gcf import GCF
 from nplinker.metabolomics import MolecularFamily
-from nplinker.scoring.methods import ScoringMethod
+from nplinker.scoring.abc import ScoringBase
 from nplinker.scoring.object_link import ObjectLink
 from nplinker.scoring.rosetta.rosetta import Rosetta
 
@@ -11,8 +11,8 @@ from nplinker.scoring.rosetta.rosetta import Rosetta
 logger = logging.getLogger(__name__)
 
 
-class RosettaScoring(ScoringMethod):
-    NAME = "rosetta"
+class RosettaScoring(ScoringBase):
+    name = "rosetta"
     ROSETTA_OBJ = None
 
     def __init__(self, npl):
@@ -22,10 +22,14 @@ class RosettaScoring(ScoringMethod):
         self.spec_score_cutoff = 0.0
         self.bgc_score_cutoff = 0.0
 
-    @staticmethod
-    def setup(npl):
+    @classmethod
+    def setup(cls, npl):
+        """Setup the Rosetta object and run the scoring algorithm.
+
+        This method is only called once to setup the Rosetta object.
+        """
         logger.info("RosettaScoring setup")
-        RosettaScoring.ROSETTA_OBJ = Rosetta(npl, ignore_genomic_cache=False)
+        cls.ROSETTA_OBJ = Rosetta(npl, ignore_genomic_cache=False)
         ms1_tol = Rosetta.DEF_MS1_TOL
         ms2_tol = Rosetta.DEF_MS2_TOL
         score_thresh = Rosetta.DEF_SCORE_THRESH
@@ -35,9 +39,7 @@ class RosettaScoring(ScoringMethod):
             npl.config
         )
 
-        RosettaScoring.ROSETTA_OBJ.run(
-            npl.spectra, npl.bgcs, ms1_tol, ms2_tol, score_thresh, min_match_peaks
-        )
+        cls.ROSETTA_OBJ.run(npl.spectra, npl.bgcs, ms1_tol, ms2_tol, score_thresh, min_match_peaks)
         logger.info("RosettaScoring setup completed")
 
     @staticmethod

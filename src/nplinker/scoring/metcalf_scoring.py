@@ -9,11 +9,11 @@ from nplinker.metabolomics import MolecularFamily
 from nplinker.metabolomics import Spectrum
 from nplinker.pickler import load_pickled_data
 from nplinker.pickler import save_pickled_data
+from .abc import ScoringBase
 from .linking import LINK_TYPES
 from .linking import DataLinks
 from .linking import LinkFinder
 from .linking import isinstance_all
-from .methods import ScoringMethod
 from .object_link import ObjectLink
 
 
@@ -24,19 +24,19 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class MetcalfScoring(ScoringMethod):
+class MetcalfScoring(ScoringBase):
     """Metcalf scoring method.
 
     Attributes:
+        name: The name of this scoring method, set to a fixed value `metcalf`.
         DATALINKS: The DataLinks object to use for scoring.
         LINKFINDER: The LinkFinder object to use for scoring.
-        NAME: The name of the scoring method. This is set to 'metcalf'.
         CACHE: The name of the cache file to use for storing the MetcalfScoring.
     """
 
+    name = "metcalf"
     DATALINKS = None
     LINKFINDER = None
-    NAME = "metcalf"
     CACHE = "cache_metcalf_scoring.pckl"
 
     def __init__(self, npl: NPLinker) -> None:
@@ -57,13 +57,12 @@ class MetcalfScoring(ScoringMethod):
         self.cutoff = 1.0
         self.standardised = True
 
-    # TODO CG: not sure why using staticmethod here. Check later and refactor if possible
     # TODO CG: refactor this method and extract code for cache file to a separate method
-    @staticmethod
-    def setup(npl: NPLinker):
-        """Setup the MetcalfScoring object.
+    @classmethod
+    def setup(cls, npl: NPLinker):
+        """Setup the DataLinks and LinkFinder objects.
 
-        DataLinks and LinkFinder objects are created and cached for later use.
+        This method is only called once to setup the DataLinks and LinkFinder objects.
         """
         logger.info(
             "MetcalfScoring.setup (bgcs={}, gcfs={}, spectra={}, molfams={}, strains={})".format(
@@ -71,7 +70,7 @@ class MetcalfScoring(ScoringMethod):
             )
         )
 
-        cache_file = npl.output_dir / MetcalfScoring.CACHE
+        cache_file = npl.output_dir / cls.CACHE
 
         # the metcalf preprocessing can take a long time for large datasets, so it's
         # better to cache as the data won't change unless the number of objects does
@@ -97,19 +96,17 @@ class MetcalfScoring(ScoringMethod):
                         break
 
             if cache_ok:
-                MetcalfScoring.DATALINKS = datalinks
-                MetcalfScoring.LINKFINDER = linkfinder
+                cls.DATALINKS = datalinks
+                cls.LINKFINDER = linkfinder
 
-        if MetcalfScoring.DATALINKS is None:
+        if cls.DATALINKS is None:
             logger.info("MetcalfScoring.setup preprocessing dataset (this may take some time)")
-            MetcalfScoring.DATALINKS = DataLinks(npl.gcfs, npl.spectra, npl.molfams, npl.strains)
-            MetcalfScoring.LINKFINDER = LinkFinder()
-            MetcalfScoring.LINKFINDER.calc_score(MetcalfScoring.DATALINKS, link_type=LINK_TYPES[0])
-            MetcalfScoring.LINKFINDER.calc_score(MetcalfScoring.DATALINKS, link_type=LINK_TYPES[1])
+            cls.DATALINKS = DataLinks(npl.gcfs, npl.spectra, npl.molfams, npl.strains)
+            cls.LINKFINDER = LinkFinder()
+            cls.LINKFINDER.calc_score(MetcalfScoring.DATALINKS, link_type=LINK_TYPES[0])
+            cls.LINKFINDER.calc_score(MetcalfScoring.DATALINKS, link_type=LINK_TYPES[1])
             logger.info("MetcalfScoring.setup caching results")
-            save_pickled_data(
-                (dataset_counts, MetcalfScoring.DATALINKS, MetcalfScoring.LINKFINDER), cache_file
-            )
+            save_pickled_data((dataset_counts, cls.DATALINKS, cls.LINKFINDER), cache_file)
 
         logger.info("MetcalfScoring.setup completed")
 
@@ -117,7 +114,7 @@ class MetcalfScoring(ScoringMethod):
     @property
     def datalinks(self) -> DataLinks | None:
         """Get the DataLinks object used for scoring."""
-        return MetcalfScoring.DATALINKS
+        return self.DATALINKS
 
     def get_links(
         self, *objects: GCF | Spectrum | MolecularFamily, link_collection: LinkCollection
