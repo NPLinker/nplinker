@@ -1,3 +1,4 @@
+import os
 from pytest import fixture
 from nplinker.genomics import GCF
 from nplinker.metabolomics import MolecularFamily
@@ -5,7 +6,6 @@ from nplinker.metabolomics import Spectrum
 from nplinker.nplinker import NPLinker
 from nplinker.scoring import MetcalfScoring
 from nplinker.scoring.linking import DataLinks
-from nplinker.scoring.linking import LinkFinder
 from nplinker.strain import Strain
 from nplinker.strain import StrainCollection
 from .. import CONFIG_FILE_LOCAL_MODE
@@ -62,23 +62,14 @@ def mfs(spectra) -> tuple[MolecularFamily, MolecularFamily, MolecularFamily]:
     return mf1, mf2, mf3
 
 
-@fixture(scope="module")
+@fixture(scope="session")
 def datalinks(gcfs, spectra, mfs, strains) -> DataLinks:
     """DataLinks object. See `test_data_links.py` for its values."""
     return DataLinks(gcfs, spectra, mfs, strains)
 
 
-@fixture(scope="module")
-def linkfinder(datalinks) -> LinkFinder:
-    """LinkFinder object. See `test_link_finder.py` for its values."""
-    linkfinder = LinkFinder()
-    linkfinder.calc_score(datalinks, link_type="spec-gcf")
-    linkfinder.calc_score(datalinks, link_type="mf-gcf")
-    return linkfinder
-
-
-@fixture(scope="module")
-def npl(gcfs, spectra, mfs, strains, tmp_path_factory) -> NPLinker:
+@fixture(scope="function")
+def npl(gcfs, spectra, mfs, strains, tmp_path) -> NPLinker:
     """Constructed NPLinker object.
 
     This NPLinker object does not do loading `npl.load_data()`, instead we
@@ -87,6 +78,7 @@ def npl(gcfs, spectra, mfs, strains, tmp_path_factory) -> NPLinker:
     The config file `nplinker_demo1.toml` does not affect the tests, just
     making sure the NPLinker object can be created succesfully.
     """
+    os.environ["NPLINKER_ROOT_DIR"] = str(tmp_path)  # Create a tmporary root dir for NPLinker
     npl = NPLinker(CONFIG_FILE_LOCAL_MODE)
     npl._gcfs = gcfs
     npl._spectra = spectra
@@ -98,7 +90,7 @@ def npl(gcfs, spectra, mfs, strains, tmp_path_factory) -> NPLinker:
     return npl
 
 
-@fixture(scope="module")
+@fixture(scope="function")
 def mc(npl) -> MetcalfScoring:
     """MetcalfScoring object."""
     mc = MetcalfScoring(npl)
