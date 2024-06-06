@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 import pytest
+from nplinker import setup_logging
 from nplinker.defaults import GENOME_STATUS_FILENAME
 from nplinker.genomics.antismash import GenomeStatus
 from nplinker.genomics.antismash import podp_download_and_extract_antismash_data
@@ -196,6 +197,9 @@ def test_empty_id(download_root, extract_root, genome_status_file):
 # Test `podp_download_and_extract_antismash_data` function
 # when a genome record has already been downloaded and extracted
 def test_caching(download_root, extract_root, genome_status_file, caplog):
+    # Enable logging to capture log messages
+    setup_logging()
+
     genome_records = [
         {
             "genome_ID": {
