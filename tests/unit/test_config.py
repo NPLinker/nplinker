@@ -1,9 +1,11 @@
-from nplinker.config import config
+from nplinker.config import load_config
+from . import CONFIG_FILE_LOCAL_MODE
 
 
 def test_config():
     """Test loading the default config file."""
-    # The default config file is set in "./conftest.py", which is "data/nplinker_local_mode.toml"
+    config = load_config(CONFIG_FILE_LOCAL_MODE)
+
     assert config.mode == "local"
     assert config.log.level == "DEBUG"
     assert config["log.level"] == "DEBUG"

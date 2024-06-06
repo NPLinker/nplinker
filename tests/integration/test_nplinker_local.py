@@ -2,6 +2,7 @@ import hashlib
 from pathlib import Path
 import pytest
 from nplinker.nplinker import NPLinker
+from . import DATA_DIR
 
 
 # Only tests related to data arranging and loading should be put here.
@@ -23,7 +24,7 @@ def get_file_hash(file_path):
 
 @pytest.fixture(scope="module")
 def npl() -> NPLinker:
-    npl = NPLinker()
+    npl = NPLinker(DATA_DIR / "nplinker_local_mode.toml")
     npl.load_data()
     # remove cached score results before running tests
     root_dir = Path(npl.root_dir)
