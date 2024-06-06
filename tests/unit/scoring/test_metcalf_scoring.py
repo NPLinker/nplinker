@@ -53,7 +53,7 @@ def test_setup(mc, datalinks):
     assert isinstance(mc.metcalf_mean, np.ndarray)
     assert isinstance(mc.metcalf_std, np.ndarray)
     assert mc.metcalf_mean.shape == (4, 4)  # (n_strains+1 , n_strains+1)
-    assert mc.metcalf_mean.shape == (4, 4)
+    assert mc.metcalf_std.shape == (4, 4)
 
 
 def test_setup_load_cache(mc, npl, datalinks, caplog):
@@ -85,7 +85,7 @@ def test_setup_load_cache(mc, npl, datalinks, caplog):
     assert isinstance(mc.metcalf_mean, np.ndarray)
     assert isinstance(mc.metcalf_std, np.ndarray)
     assert mc.metcalf_mean.shape == (4, 4)  # (n_strains+1 , n_strains+1)
-    assert mc.metcalf_mean.shape == (4, 4)
+    assert mc.metcalf_std.shape == (4, 4)
 
 
 #
@@ -127,7 +127,7 @@ def test_calc_score_mean_std(mc, datalinks):
     assert isinstance(mc.metcalf_mean, np.ndarray)
     assert isinstance(mc.metcalf_std, np.ndarray)
     assert mc.metcalf_mean.shape == (4, 4)  # (n_strains+1 , n_strains+1)
-    assert mc.metcalf_mean.shape == (4, 4)
+    assert mc.metcalf_std.shape == (4, 4)
     # TODO CG: add tests for values after refactoring _calc_mean_std method
     # assert mc.metcalf_mean == expected_array
 
