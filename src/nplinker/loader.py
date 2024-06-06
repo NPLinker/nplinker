@@ -41,7 +41,7 @@ class DatasetLoader:
         product_types: A list of product types.
         strains: A StrainCollection object that contains all strains.
         class_matches: A ClassMatches object that contains class match info.
-        chem_classes: A ChemClassPredictions object that contains chemical class predictions
+        chem_classes: A ChemClassPredictions object that contains chemical class predictions.
     """
 
     RUN_CANOPUS_DEFAULT = False
