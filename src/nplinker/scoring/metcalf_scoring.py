@@ -1,6 +1,5 @@
 from __future__ import annotations
 import logging
-import os
 from typing import TYPE_CHECKING
 import numpy as np
 import pandas as pd
@@ -8,8 +7,6 @@ from scipy.stats import hypergeom
 from nplinker.genomics import GCF
 from nplinker.metabolomics import MolecularFamily
 from nplinker.metabolomics import Spectrum
-from nplinker.pickler import load_pickled_data
-from nplinker.pickler import save_pickled_data
 from .abc import ScoringBase
 from .link_graph import LinkGraph
 from .link_graph import Score
@@ -44,6 +41,7 @@ class MetcalfScoring(ScoringBase):
     """
 
     name = "metcalf"
+    npl: NPLinker | None = None
     CACHE: str = "cache_metcalf_scoring.pckl"
     metcalf_weights: tuple[int, int, int, int] = (10, -10, 0, 1)
 
@@ -58,71 +56,35 @@ class MetcalfScoring(ScoringBase):
     metcalf_mean: np.ndarray | None = None
     metcalf_std: np.ndarray | None = None
 
-    def __init__(self, npl: NPLinker) -> None:
-        """Create a MetcalfScoring object.
-
-        Args:
-            npl: The NPLinker object to use for scoring.
-        """
-        super().__init__(npl)
-
-    # TODO CG: refactor this method and extract code for cache file to a separate method
     @classmethod
     def setup(cls, npl: NPLinker):
         """Setup the MetcalfScoring object.
 
         This method is only called once to setup the MetcalfScoring object.
         """
+        if cls.npl is not None:
+            logger.info("MetcalfScoring.setup already called, skipping.")
+            return
+
         logger.info(
-            "MetcalfScoring.setup (bgcs={}, gcfs={}, spectra={}, molfams={}, strains={})".format(
-                len(npl.bgcs), len(npl.gcfs), len(npl.spectra), len(npl.molfams), len(npl.strains)
-            )
+            f"MetcalfScoring.setup starts: #bgcs={len(npl.bgcs)}, #gcfs={len(npl.gcfs)}, "
+            f"#spectra={len(np.spectra)}, #molfams={len(npl.molfams)}, #strains={npl.strains}"
+        )
+        cls.npl = npl
+
+        cls.presence_gcf_strain = get_presence_gcf_strain(npl.gcfs, npl.strains)
+        cls.presence_spec_strain = get_presence_spec_strain(npl.spectra, npl.strains)
+        cls.presence_mf_strain = get_presence_mf_strain(npl.molfams, npl.strains)
+
+        cls.raw_score_spec_gcf = cls._calc_raw_score(
+            cls.presence_spec_strain, cls.presence_gcf_strain, cls.metcalf_weights
+        )
+        cls.raw_score_mf_gcf = cls._calc_raw_score(
+            cls.presence_mf_strain, cls.presence_gcf_strain, cls.metcalf_weights
         )
 
-        cache_file = npl.output_dir / cls.CACHE
-
-        # the metcalf preprocessing can take a long time for large datasets, so it's
-        # better to cache as the data won't change unless the number of objects does
-        dataset_counts = [
-            len(npl.bgcs),
-            len(npl.gcfs),
-            len(npl.spectra),
-            len(npl.molfams),
-            len(npl.strains),
-        ]
-        if os.path.exists(cache_file):
-            logger.info("MetcalfScoring.setup loading cached data")
-            cache_data = load_pickled_data(npl, cache_file)
-            cache_ok = True
-            # TODO: wrap it as a validation method
-            if cache_data is not None:
-                (counts, metcalf_mean) = cache_data
-                # need to invalidate this if dataset appears to have changed
-                for i in range(len(counts)):
-                    if counts[i] != dataset_counts[i]:
-                        logger.info("MetcalfScoring.setup invalidating cached data!")
-                        cache_ok = False
-                        break
-
-            if cache_ok:
-                cls.metcalf_mean = metcalf_mean
-
-        if cls.metcalf_mean is None:
-            logger.info("MetcalfScoring.setup preprocessing dataset (this may take some time)")
-            cls.presence_gcf_strain = get_presence_gcf_strain(npl.gcfs, npl.strains)
-            cls.presence_spec_strain = get_presence_spec_strain(npl.spectra, npl.strains)
-            cls.presence_mf_strain = get_presence_mf_strain(npl.molfams, npl.strains)
-            cls.raw_score_spec_gcf = cls._calc_raw_score(
-                cls.presence_spec_strain, cls.presence_gcf_strain, cls.metcalf_weights
-            )
-            cls.raw_score_mf_gcf = cls._calc_raw_score(
-                cls.presence_mf_strain, cls.presence_gcf_strain, cls.metcalf_weights
-            )
-            n_strains = cls.presence_gcf_strain.shape[1]
-            cls.metcalf_mean, cls.metcalf_std = cls._calc_mean_std(n_strains, cls.metcalf_weights)
-
-            logger.info("MetcalfScoring.setup caching results")
-            save_pickled_data((dataset_counts, cls.metcalf_mean), cache_file)
+        n_strains = cls.presence_gcf_strain.shape[1]
+        cls.metcalf_mean, cls.metcalf_std = cls._calc_mean_std(n_strains, cls.metcalf_weights)
 
         logger.info("MetcalfScoring.setup completed")
 
