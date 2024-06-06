@@ -87,7 +87,10 @@ namespaces = true # enable data directory to be identified
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -n auto"    # -ra: show summary info for all test outcomes; -n auto: run tests in parallel
+# -ra: show summary info for all test outcomes; 
+# -n auto: run tests in parallel; 
+# --dist loadgroup: sends tests marked with 'xdist_group' to the same worker
+addopts = "-ra -n auto --dist loadgroup"    
 testpaths = ["tests/unit"]
 
 [tool.coverage.run]

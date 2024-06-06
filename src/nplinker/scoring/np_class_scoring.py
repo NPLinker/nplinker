@@ -3,16 +3,16 @@ import time
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
 from nplinker.metabolomics import Spectrum
+from nplinker.scoring.abc import ScoringBase
 from nplinker.scoring.metcalf_scoring import MetcalfScoring
-from nplinker.scoring.methods import ScoringMethod
 from nplinker.scoring.object_link import ObjectLink
 
 
 logger = logging.getLogger(__name__)
 
 
-class NPClassScoring(ScoringMethod):
-    NAME = "npclassscore"
+class NPClassScoring(ScoringBase):
+    name = "npclassscore"
 
     def __init__(self, npl):
         super().__init__(npl)
@@ -313,8 +313,8 @@ class NPClassScoring(ScoringMethod):
             )
         return spec_like_classes, spec_like_classes_names_inds
 
-    @staticmethod
-    def setup(npl):
+    @classmethod
+    def setup(cls, npl):
         """Perform any one-off initialisation required (will only be called once)."""
         logger.info("Set up NPClassScore scoring")
         met_options = npl.chem_classes.class_predict_options
@@ -347,7 +347,7 @@ class NPClassScoring(ScoringMethod):
         logger.info("Using Metcalf scoring to get shared strains")
         # get mapping of shared strains
         if not self.npl._datalinks:
-            self.npl._datalinks = self.npl.scoring_method(MetcalfScoring.NAME).datalinks
+            self.npl._datalinks = self.npl.scoring_method(MetcalfScoring.name).datalinks
         if obj_is_gen:
             common_strains = self.npl.get_common_strains(targets, objects)
         else:

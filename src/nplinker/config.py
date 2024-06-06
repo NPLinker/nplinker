@@ -1,34 +1,44 @@
-import os
+from __future__ import annotations
+from os import PathLike
 from pathlib import Path
 from dynaconf import Dynaconf
 from dynaconf import Validator
 from nplinker.utils import transform_to_full_path
 
 
-# The Dynaconf library is used for loading NPLinker config file.
-# Users can set the config file location via the NPLINKER_CONFIG_FILE environment variable before
-# running/importing NPLinker. If not set, we default to 'nplinker.toml' file in the current working
-# directory.
-# The loaded config data is available by importing this module and accessing the 'config' variable.
+def load_config(config_file: str | PathLike) -> Dynaconf:
+    """Load and validate the configuration file.
 
-__all__ = ["config"]
+    Args:
+        config_file: Path to the configuration file.
 
-# Locate the user's config file
-user_config_file = os.environ.get("NPLINKER_CONFIG_FILE", "nplinker.toml")
-if not os.path.exists(user_config_file):
-    raise FileNotFoundError(f"Config file '{user_config_file}' not found")
+    Returns:
+        Dynaconf: A Dynaconf object containing the configuration settings.
 
-# Locate the default config file
-default_config_file = Path(__file__).resolve().parent / "nplinker_default.toml"
+    Raises:
+        FileNotFoundError: If the configuration file does not exist.
+    """
+    config_file = transform_to_full_path(config_file)
+    if not config_file.exists():
+        raise FileNotFoundError(f"Config file '{config_file}' not found")
 
-# Load config files
-config = Dynaconf(settings_files=[user_config_file], preload=[default_config_file])
+    # Locate the default config file
+    default_config_file = Path(__file__).resolve().parent / "nplinker_default.toml"
 
-# Validate config
+    # Load config files
+    config = Dynaconf(settings_files=[config_file], preload=[default_config_file])
+
+    # Validate configs
+    config.validators.register(*CONFIG_VALIDATORS)
+    config.validators.validate()
+
+    return config
+
+
 # Note:
 # Validataor parameter `required=False` means the setting (e.g. "loglevel") must not exist rather
 # than being optional. So don't set the parameter `required` if the key is optional.
-validators = [
+CONFIG_VALIDATORS = [
     # General settings
     ## `root_dir` value is transformed to a `pathlib.Path` object and must be a directory.
     Validator(
@@ -72,5 +82,3 @@ validators = [
         condition=lambda v: set(v).issubset({"metcalf", "rosetta"}),
     ),
 ]
-config.validators.register(*validators)
-config.validators.validate()
