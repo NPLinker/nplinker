@@ -51,6 +51,7 @@ class MetcalfScoring(ScoringBase):
     presence_spec_strain: pd.DataFrame = pd.DataFrame()
     presence_mf_strain: pd.DataFrame = pd.DataFrame()
 
+    # a DataFrame with columns "spec", "gcf", "score" or "mf", "gcf", "score
     raw_score_spec_gcf: pd.DataFrame = pd.DataFrame()
     raw_score_mf_gcf: pd.DataFrame = pd.DataFrame()
     metcalf_mean: np.ndarray | None = None
@@ -68,27 +69,30 @@ class MetcalfScoring(ScoringBase):
 
         logger.info(
             f"MetcalfScoring.setup starts: #bgcs={len(npl.bgcs)}, #gcfs={len(npl.gcfs)}, "
-            f"#spectra={len(np.spectra)}, #molfams={len(npl.molfams)}, #strains={npl.strains}"
+            f"#spectra={len(npl.spectra)}, #molfams={len(npl.molfams)}, #strains={npl.strains}"
         )
         cls.npl = npl
 
+        # calculate presence of gcfs/spectra/mfs with respect to strains
         cls.presence_gcf_strain = get_presence_gcf_strain(npl.gcfs, npl.strains)
         cls.presence_spec_strain = get_presence_spec_strain(npl.spectra, npl.strains)
         cls.presence_mf_strain = get_presence_mf_strain(npl.molfams, npl.strains)
 
+        # calculate raw Metcalf scores for spec-gcf links
         raw_score_spec_gcf = cls._calc_raw_score(
             cls.presence_spec_strain, cls.presence_gcf_strain, cls.metcalf_weights
         )
         cls.raw_score_spec_gcf = raw_score_spec_gcf.reset_index().melt(id_vars="index")
         cls.raw_score_spec_gcf.columns = ["spec", "gcf", "score"]
-        # a DataFrame with columns "source", "target", "score"
 
+        # calculate raw Metcalf scores for spec-gcf links
         raw_score_mf_gcf = cls._calc_raw_score(
             cls.presence_mf_strain, cls.presence_gcf_strain, cls.metcalf_weights
         )
         cls.raw_score_mf_gcf = raw_score_mf_gcf.reset_index().melt(id_vars="index")
         cls.raw_score_mf_gcf.columns = ["mf", "gcf", "score"]
 
+        # calculate mean and std for standardising Metcalf scores
         n_strains = cls.presence_gcf_strain.shape[1]
         cls.metcalf_mean, cls.metcalf_std = cls._calc_mean_std(n_strains, cls.metcalf_weights)
 
@@ -158,23 +162,19 @@ class MetcalfScoring(ScoringBase):
             )
             # scores is the DataFrame with index "source", "target", "score"
             for scores in scores_list:
-                # when no links found
                 if scores.shape[1] == 0:
                     logger.info(f'MetcalfScoring: found no "{scores.name}" links')
                 else:
-                    # when links found
-                    for col_index in range(scores.shape[1]):
-                        # TODO: CG to update the the logics to use the new raw score df format
-                        # former index "source", "target", "score" changed to columns "spec", "gcf", "score" or "mf", "gcf", "score"
-                        gcf = self.npl.lookup_gcf(scores.loc["source", col_index])
+                    for row in scores.itertuples(index=False):
+                        gcf = self.npl.lookup_gcf(row.gcf)
                         if scores.name == LINK_TYPES[0]:
-                            met = self.npl.lookup_spectrum(scores.loc["target", col_index])
+                            met = self.npl.lookup_spectrum(row.spec)
                         else:
-                            met = self.npl.lookup_mf(scores.loc["target", col_index])
+                            met = self.npl.lookup_mf(row.mf)
                         links.add_link(
                             gcf,
                             met,
-                            metcalf=Score(self.name, scores.loc["score", col_index], parameters),
+                            metcalf=Score(self.name, row.score, parameters),
                         )
                     logger.info(f"MetcalfScoring: found {len(links)} {scores.name} links.")
         else:
@@ -182,23 +182,22 @@ class MetcalfScoring(ScoringBase):
                 f"MetcalfScoring: input_type=Spec/MolFam, result_type=GCF, "
                 f"#inputs={len(objects)}."
             )
-            scores = scores_list[0]
-            # when no links found
-            if scores.shape[1] == 0:
-                logger.info(f'MetcalfScoring: found no links "{scores.name}" for input objects')
-            else:
-                for col_index in range(scores.shape[1]):
-                    gcf = self.npl.lookup_gcf(scores.loc["target", col_index])
-                    if scores.name == LINK_TYPES[0]:
-                        met = self.npl.lookup_spectrum(scores.loc["source", col_index])
-                    else:
-                        met = self.npl.lookup_mf(scores.loc["source", col_index])
-                    links.add_link(
-                        met,
-                        gcf,
-                        metcalf=Score(self.name, scores.loc["score", col_index], parameters),
-                    )
-                logger.info(f"MetcalfScoring: found {len(links)} {scores.name} links.")
+            for scores in scores_list:
+                if scores.shape[1] == 0:
+                    logger.info(f'MetcalfScoring: found no links "{scores.name}" for input objects')
+                else:
+                    for row in scores.itertuples(index=False):
+                        gcf = self.npl.lookup_gcf(row.gcf)
+                        if scores.name == LINK_TYPES[0]:
+                            met = self.npl.lookup_spectrum(row.spec)
+                        else:
+                            met = self.npl.lookup_mf(row.mf)
+                        links.add_link(
+                            met,
+                            gcf,
+                            metcalf=Score(self.name, row.score, parameters),
+                        )
+                    logger.info(f"MetcalfScoring: found {len(links)} {scores.name} links.")
 
         logger.info("MetcalfScoring: completed")
         return links
