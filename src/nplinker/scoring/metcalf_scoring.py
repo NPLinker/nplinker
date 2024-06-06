@@ -76,12 +76,18 @@ class MetcalfScoring(ScoringBase):
         cls.presence_spec_strain = get_presence_spec_strain(npl.spectra, npl.strains)
         cls.presence_mf_strain = get_presence_mf_strain(npl.molfams, npl.strains)
 
-        cls.raw_score_spec_gcf = cls._calc_raw_score(
+        raw_score_spec_gcf = cls._calc_raw_score(
             cls.presence_spec_strain, cls.presence_gcf_strain, cls.metcalf_weights
         )
-        cls.raw_score_mf_gcf = cls._calc_raw_score(
+        cls.raw_score_spec_gcf = raw_score_spec_gcf.reset_index().melt(id_vars="index")
+        cls.raw_score_spec_gcf.columns = ["spec", "gcf", "score"]
+        # a DataFrame with columns "source", "target", "score"
+
+        raw_score_mf_gcf = cls._calc_raw_score(
             cls.presence_mf_strain, cls.presence_gcf_strain, cls.metcalf_weights
         )
+        cls.raw_score_mf_gcf = raw_score_mf_gcf.reset_index().melt(id_vars="index")
+        cls.raw_score_mf_gcf.columns = ["mf", "gcf", "score"]
 
         n_strains = cls.presence_gcf_strain.shape[1]
         cls.metcalf_mean, cls.metcalf_std = cls._calc_mean_std(n_strains, cls.metcalf_weights)
@@ -109,7 +115,6 @@ class MetcalfScoring(ScoringBase):
             TypeError: If the input objects are not of the correct type.
         """
         # validate input objects
-        # if the input objects are empty, use all objects
         if len(objects) == 0:
             objects = self.npl.gcfs
 
@@ -133,13 +138,14 @@ class MetcalfScoring(ScoringBase):
 
         logger.info(f"MetcalfScoring: standardised = {self._standardised}")
         if not self._standardised:
-            scores_list = self._get_links(*objects, score_cutoff=self._cutoff)
+            scores_list = self._get_links(*objects, obj_type=obj_type, score_cutoff=self._cutoff)
         # TODO CG: verify the logics of standardised score and add unit tests
         else:
             # use negative infinity as the score cutoff to ensure we get all links
             # the self.cutoff will be applied later in the postprocessing step
-            scores_list = self._get_links(*objects, score_cutoff=np.NINF)
+            scores_list = self._get_links(*objects, obj_type=obj_type, score_cutoff=np.NINF)
             if obj_type == "gcf":
+                # TODO: CG to update the private methods to use new format of raw score df
                 scores_list = self._calc_standardised_score_gen(scores_list)
             else:
                 scores_list = self._calc_standardised_score_met(scores_list)
@@ -158,6 +164,8 @@ class MetcalfScoring(ScoringBase):
                 else:
                     # when links found
                     for col_index in range(scores.shape[1]):
+                        # TODO: CG to update the the logics to use the new raw score df format
+                        # former index "source", "target", "score" changed to columns "spec", "gcf", "score" or "mf", "gcf", "score"
                         gcf = self.npl.lookup_gcf(scores.loc["source", col_index])
                         if scores.name == LINK_TYPES[0]:
                             met = self.npl.lookup_spectrum(scores.loc["target", col_index])
@@ -272,6 +280,7 @@ class MetcalfScoring(ScoringBase):
     def _get_links(
         self,
         *objects: tuple[GCF, ...] | tuple[Spectrum, ...] | tuple[MolecularFamily, ...],
+        obj_type: str,
         score_cutoff: float = 0,
     ) -> list[pd.DataFrame]:
         """Get links and scores for given objects.
@@ -294,69 +303,42 @@ class MetcalfScoring(ScoringBase):
             ValueError: If input objects are empty.
             TypeError: If input objects are not GCF, Spectrum or MolecularFamily objects.
         """
-        if len(objects) == 0:
-            raise ValueError("Empty input objects.")
-
-        if isinstance_all(*objects, type=GCF):
-            obj_type = "gcf"
-        elif isinstance_all(*objects, type=Spectrum):
-            obj_type = "spec"
-        elif isinstance_all(*objects, type=MolecularFamily):
-            obj_type = "mf"
-        else:
-            types = [type(i) for i in objects]
-            raise TypeError(
-                f"Invalid type {set(types)}. Input objects must be GCF, Spectrum or MolecularFamily objects."
-            )
-
         links = []
         if obj_type == "gcf":
             obj_ids = [gcf.id for gcf in objects]
             # spec-gcf
-            scores = self.raw_score_spec_gcf.loc[:, obj_ids]
-            df = self._get_scores_source_gcf(scores, score_cutoff)
+            df = self.raw_score_spec_gcf[
+                self.raw_score_spec_gcf["gcf"].isin(obj_ids)
+                & (self.raw_score_spec_gcf["score"] >= score_cutoff)
+            ]
             df.name = LINK_TYPES[0]
             links.append(df)
             # mf-gcf
-            scores = self.raw_score_mf_gcf.loc[:, obj_ids]
-            df = self._get_scores_source_gcf(scores, score_cutoff)
+            df = self.raw_score_mf_gcf[
+                self.raw_score_mf_gcf["gcf"].isin(obj_ids)
+                & (self.raw_score_mf_gcf["score"] >= score_cutoff)
+            ]
             df.name = LINK_TYPES[1]
             links.append(df)
 
         if obj_type == "spec":
             obj_ids = [spec.id for spec in objects]
-            scores = self.raw_score_spec_gcf.loc[obj_ids, :]
-            df = self._get_scores_source_met(scores, score_cutoff)
+            df = self.raw_score_spec_gcf[
+                self.raw_score_spec_gcf["spec"].isin(obj_ids)
+                & (self.raw_score_spec_gcf["score"] >= score_cutoff)
+            ]
             df.name = LINK_TYPES[0]
             links.append(df)
 
         if obj_type == "mf":
             obj_ids = [mf.id for mf in objects]
-            scores = self.raw_score_mf_gcf.loc[obj_ids, :]
-            df = self._get_scores_source_met(scores, score_cutoff)
+            df = self.raw_score_mf_gcf[
+                self.raw_score_mf_gcf["mf"].isin(obj_ids)
+                & (self.raw_score_mf_gcf["score"] >= score_cutoff)
+            ]
             df.name = LINK_TYPES[1]
             links.append(df)
         return links
-
-    @staticmethod
-    def _get_scores_source_gcf(scores: pd.DataFrame, score_cutoff: float) -> pd.DataFrame:
-        row_indexes, col_indexes = np.where(scores >= score_cutoff)
-        src_obj_ids = scores.columns[col_indexes].to_list()
-        target_obj_ids = scores.index[row_indexes].to_list()
-        scores_candidate = scores.values[row_indexes, col_indexes].tolist()
-        return pd.DataFrame(
-            [src_obj_ids, target_obj_ids, scores_candidate], index=["source", "target", "score"]
-        )
-
-    @staticmethod
-    def _get_scores_source_met(scores: pd.DataFrame, score_cutoff: float) -> pd.DataFrame:
-        row_indexes, col_indexes = np.where(scores >= score_cutoff)
-        src_obj_ids = scores.index[row_indexes].to_list()
-        target_obj_ids = scores.columns[col_indexes].to_list()
-        scores_candidate = scores.values[row_indexes, col_indexes].tolist()
-        return pd.DataFrame(
-            [src_obj_ids, target_obj_ids, scores_candidate], index=["source", "target", "score"]
-        )
 
     def _calc_standardised_score_met(self, results: list) -> list[pd.DataFrame]:
         if self.metcalf_mean is None or self.metcalf_std is None:
