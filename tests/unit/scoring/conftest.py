@@ -86,6 +86,6 @@ def npl(gcfs, spectra, mfs, strains, tmp_path) -> NPLinker:
 @fixture(scope="function")
 def mc(npl) -> MetcalfScoring:
     """MetcalfScoring object."""
-    mc = MetcalfScoring(npl)
+    mc = MetcalfScoring()
     mc.setup(npl)
     return mc
