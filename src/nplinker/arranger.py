@@ -281,7 +281,7 @@ class DatasetArranger:
         The clustering file "mix_clustering_c{self.config.bigscape.cutoff}.tsv" will be copied to the
         default BiG-SCAPE directory.
         """
-        defaults.BIGSCAPE_RUNNING_OUTPUT_PATH.mkdir(exist_ok=True, parents=True)
+        self.bigscape_running_output_dir.mkdir(exist_ok=True, parents=True)
 
         version = self.config.bigscape.version
 
