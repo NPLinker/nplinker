@@ -41,23 +41,29 @@ class MetcalfScoring(ScoringBase):
         name: The name of this scoring method, set to a fixed value `metcalf`.
         npl: The NPLinker object.
         CACHE: The name of the cache file to use for storing the MetcalfScoring.
+
         presence_gcf_strain: A DataFrame to store presence of gcfs with respect to strains.
-            The index of the DataFrame are the gcf ids and the columns are the strain ids.
-            The values are 1 where the GCF occurs in the strain, 0 otherwise.
+            The index of the DataFrame are the GCF objects and the columns are Strain objects.
+            The values are 1 where the gcf occurs in the strain, 0 otherwise.
         presence_spec_strain: A DataFrame to store presence of spectra with respect to strains.
-            The index of the DataFrame are the spectrum ids and the columns are the strain ids.
+            The index of the DataFrame are the Spectrum objects and the columns are Strain objects.
             The values are 1 where the spectrum occurs in the strain, 0 otherwise.
         presence_mf_strain: A DataFrame to store presence of molecular families with respect to strains.
-            The index of the DataFrame are the molecular family ids and the columns are the strain ids.
+            The index of the DataFrame are the MolecularFamily objects and the columns are Strain objects.
             The values are 1 where the molecular family occurs in the strain, 0 otherwise.
+
         raw_score_spec_gcf: A DataFrame to store the raw Metcalf scores for spectrum-gcf links.
-            The columns are "spec", "gcf" and "score". The "spec" and "gcf" columns contain the ids
-            of the spectrum and gcf objects respectively. The "score" column contains the raw Metcalf
-            scores.
+            The columns are "spec", "gcf" and "score":
+
+            - The "spec" and "gcf" columns contain the Spectrum and GCF objects respectively,
+            - The "score" column contains the raw Metcalf scores.
+
         raw_score_mf_gcf: A DataFrame to store the raw Metcalf scores for molecular family-gcf links.
-            The columns are "mf", "gcf" and "score". The "mf" and "gcf" columns contain the ids
-            of the molecular family and gcf objects respectively. The "score" column contains the raw
-            Metcalf scores.
+            The columns are "mf", "gcf" and "score":
+
+            - The "mf" and "gcf" columns contain the MolecularFamily and GCF objects respectively,
+            - the "score" column contains the raw Metcalf scores.
+
         metcalf_mean: The mean value used for standardising Metcalf scores.
         metcalf_std: The standard deviation value used for standardising Metcalf scores.
     """
@@ -177,13 +183,9 @@ class MetcalfScoring(ScoringBase):
         links = LinkGraph()
         for score_df in scores_list:
             for row in score_df.itertuples(index=False):  # row has attributes: spec/mf, gcf, score
-                gcf = self.npl.lookup_gcf(row.gcf)
-                if score_df.name == LinkType.SPEC_GCF:
-                    met = self.npl.lookup_spectrum(row.spec)
-                else:
-                    met = self.npl.lookup_mf(row.mf)
+                met = row.spec if score_df.name == LinkType.SPEC_GCF else row.mf
                 links.add_link(
-                    gcf,
+                    row.gcf,
                     met,
                     metcalf=Score(self.name, row.score, parameters),
                 )
@@ -283,13 +285,12 @@ class MetcalfScoring(ScoringBase):
             List of data frames containing the ids of the linked objects and the score.
 
             The data frame is named by link types, see `LinkType`. It has column names of
-            ['spec', 'gcf', 'score'] or ['mf', 'gcf', 'score'] depending on the link type.
+            ['spec', 'gcf', 'score'] or ['mf', 'gcf', 'score'] depending on the link type:
 
-                - the 'spec', 'mf' or 'gcf' column contains the ids of the objects,
-                - the 'score' column contains the scores.
+            - the 'spec', 'mf' or 'gcf' column contains the Spectrum, MolecularFamily or GCF objects,
+            - the 'score' column contains the scores.
         """
         links = []
-        obj_ids = [obj.id for obj in objects]
         col_name = (
             "spec" if obj_type == Spectrum else "mf" if obj_type == MolecularFamily else "gcf"
         )
@@ -297,7 +298,7 @@ class MetcalfScoring(ScoringBase):
         # spec-gcf link
         if obj_type in (GCF, Spectrum):
             df = self.raw_score_spec_gcf[
-                self.raw_score_spec_gcf[col_name].isin(obj_ids)
+                self.raw_score_spec_gcf[col_name].isin(objects)
                 & (self.raw_score_spec_gcf["score"] >= score_cutoff)
             ]
             df.name = LinkType.SPEC_GCF
@@ -306,7 +307,7 @@ class MetcalfScoring(ScoringBase):
         # mf-gcf link
         if obj_type in (GCF, MolecularFamily):
             df = self.raw_score_mf_gcf[
-                self.raw_score_mf_gcf[col_name].isin(obj_ids)
+                self.raw_score_mf_gcf[col_name].isin(objects)
                 & (self.raw_score_mf_gcf["score"] >= score_cutoff)
             ]
             df.name = LinkType.MF_GCF
