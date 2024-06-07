@@ -1,6 +1,8 @@
 from __future__ import annotations
 import logging
+from enum import Enum
 from typing import TYPE_CHECKING
+from typing import TypeVar
 import numpy as np
 import pandas as pd
 from scipy.stats import hypergeom
@@ -22,7 +24,12 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-LINK_TYPES = ["spec-gcf", "mf-gcf"]
+
+class LinkType(Enum):
+    """An enumeration of the link types for Metcalf scoring."""
+
+    SPEC_GCF = "spec-gcf"
+    MF_GCF = "mf-gcf"
 
 
 class MetcalfScoring(ScoringBase):
@@ -164,7 +171,7 @@ class MetcalfScoring(ScoringBase):
             else:
                 for row in scores.itertuples(index=False):
                     gcf = self.npl.lookup_gcf(row.gcf)
-                    if scores.name == LINK_TYPES[0]:
+                    if scores.name == LinkType.SPEC_GCF:
                         met = self.npl.lookup_spectrum(row.spec)
                     else:
                         met = self.npl.lookup_mf(row.mf)
@@ -302,7 +309,7 @@ class MetcalfScoring(ScoringBase):
                 self.raw_score_spec_gcf["spec"].isin(obj_ids)
                 & (self.raw_score_spec_gcf["score"] >= score_cutoff)
             ]
-            df.name = LINK_TYPES[0]
+            df.name = LinkType.SPEC_GCF
             links.append(df)
 
         if obj_type == "mf":
@@ -311,7 +318,7 @@ class MetcalfScoring(ScoringBase):
                 self.raw_score_mf_gcf["mf"].isin(obj_ids)
                 & (self.raw_score_mf_gcf["score"] >= score_cutoff)
             ]
-            df.name = LINK_TYPES[1]
+            df.name = LinkType.MF_GCF
             links.append(df)
         return links
 
@@ -325,7 +332,7 @@ class MetcalfScoring(ScoringBase):
         z_scores = []
         for col_index in range(raw_score.shape[1]):
             gcf = self.npl.lookup_gcf(raw_score.loc["target", col_index])
-            if raw_score.name == LINK_TYPES[0]:
+            if raw_score.name == LinkType.SPEC_GCF:
                 met = self.npl.lookup_spectrum(raw_score.at["source", col_index])
             else:
                 met = self.npl.lookup_mf(raw_score.at["source", col_index])
@@ -363,7 +370,7 @@ class MetcalfScoring(ScoringBase):
             z_scores = []
             for col_index in range(raw_score.shape[1]):
                 gcf = self.npl.lookup_gcf(raw_score.loc["source", col_index])
-                if raw_score.name == LINK_TYPES[0]:
+                if raw_score.name == LinkType.SPEC_GCF:
                     met = self.npl.lookup_spectrum(raw_score.at["target", col_index])
                 else:
                     met = self.npl.lookup_mf(raw_score.at["target", col_index])
