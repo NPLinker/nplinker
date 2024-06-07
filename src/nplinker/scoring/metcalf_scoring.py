@@ -64,8 +64,11 @@ class MetcalfScoring(ScoringBase):
             - The "mf" and "gcf" columns contain the MolecularFamily and GCF objects respectively,
             - the "score" column contains the raw Metcalf scores.
 
-        metcalf_mean: The mean value used for standardising Metcalf scores.
-        metcalf_std: The standard deviation value used for standardising Metcalf scores.
+        metcalf_mean: A numpy array to store the mean value used for standardising Metcalf scores.
+            The array has shape (n_strains+1, n_strains+1), where n_strains is the number of strains.
+        metcalf_std: A numpy array to store the standard deviation value used for standardising
+            Metcalf scores. The array has shape (n_strains+1, n_strains+1), where n_strains is the
+            number of strains.
     """
 
     name = "metcalf"
@@ -123,8 +126,9 @@ class MetcalfScoring(ScoringBase):
         cls.raw_score_mf_gcf.columns = ["mf", "gcf", "score"]
 
         # calculate mean and std for standardising Metcalf scores
-        n_strains = cls.presence_gcf_strain.shape[1]
-        cls.metcalf_mean, cls.metcalf_std = cls._calc_mean_std(n_strains, cls.metcalf_weights)
+        cls.metcalf_mean, cls.metcalf_std = cls._calc_mean_std(
+            len(npl.strains), cls.metcalf_weights
+        )
 
         logger.info("MetcalfScoring.setup completed")
 
@@ -173,12 +177,13 @@ class MetcalfScoring(ScoringBase):
         if not self._standardised:
             scores_list = self._get_links(*objects, obj_type=obj_type, score_cutoff=self._cutoff)
         else:
+            if self.metcalf_mean is None or self.metcalf_std is None:
+                raise ValueError(
+                    "MetcalfScoring.metcalf_mean and metcalf_std are not set. Run MetcalfScoring.setup first."
+                )
             # use negative infinity as the score cutoff to ensure we get all links
             scores_list = self._get_links(*objects, obj_type=obj_type, score_cutoff=np.NINF)
-            if obj_type == GCF:
-                scores_list = self._calc_standardised_score_gen(scores_list)
-            else:
-                scores_list = self._calc_standardised_score_met(scores_list)
+            scores_list = self._calc_standardised_score(scores_list)
 
         links = LinkGraph()
         for score_df in scores_list:
@@ -240,8 +245,18 @@ class MetcalfScoring(ScoringBase):
 
     @staticmethod
     def _calc_mean_std(
-        n_strains: int, scoring_weights: tuple[int, int, int, int]
+        n_strains: int, weights: tuple[int, int, int, int]
     ) -> tuple[np.ndarray, np.ndarray]:
+        """Calculate the mean and standard deviation for Metcalf scoring.
+
+        Args:
+            n_strains: The number of strains.
+            weights: The weights to use for Metcalf scoring.
+
+        Returns:
+            Two numpy arrays containing the mean and standard deviation values for Metcalf scoring.
+            The arrays have shape (n_strains+1, n_strains+1).
+        """
         sz = (n_strains + 1, n_strains + 1)
         mean = np.zeros(sz)
         variance = np.zeros(sz)
@@ -254,10 +269,10 @@ class MetcalfScoring(ScoringBase):
                 for o in range(min_overlap, max_overlap + 1):
                     o_prob = hypergeom.pmf(o, n_strains, n, m)
                     # compute metcalf for n strains in type 1 and m in gcf
-                    score = o * scoring_weights[0]
-                    score += scoring_weights[1] * (n - o)
-                    score += scoring_weights[2] * (m - o)
-                    score += scoring_weights[3] * (n_strains - (n + m - o))
+                    score = o * weights[0]
+                    score += weights[1] * (n - o)
+                    score += weights[2] * (m - o)
+                    score += weights[3] * (n_strains - (n + m - o))
                     expected_value += o_prob * score
                     expected_sq += o_prob * (score**2)
                 mean[n, m] = expected_value
@@ -315,78 +330,43 @@ class MetcalfScoring(ScoringBase):
 
         return links
 
-    def _calc_standardised_score_met(self, results: list) -> list[pd.DataFrame]:
-        if self.metcalf_mean is None or self.metcalf_std is None:
-            raise ValueError(
-                "Metcalf mean and std not found. Have you called `MetcalfScoring.setup(npl)`?"
-            )
-        logger.info("Calculating standardised Metcalf scores (met input)")
-        raw_score = results[0]
-        z_scores = []
-        for col_index in range(raw_score.shape[1]):
-            gcf = self.npl.lookup_gcf(raw_score.loc["target", col_index])
-            if raw_score.name == LinkType.SPEC_GCF:
-                met = self.npl.lookup_spectrum(raw_score.at["source", col_index])
-            else:
-                met = self.npl.lookup_mf(raw_score.at["source", col_index])
+    def _calc_standardised_score(self, raw_scores: list[pd.DataFrame]) -> list[pd.DataFrame]:
+        """Calculate standardised Metcalf scores.
 
-            num_gcf_strains = len(gcf.strains)
-            num_met_strains = len(met.strains)
-            mean = self.metcalf_mean[num_met_strains][num_gcf_strains]
-            sqrt = self.metcalf_std[num_met_strains][num_gcf_strains]
-            z_score = (raw_score.at["score", col_index] - mean) / sqrt
-            z_scores.append(z_score)
+        Args:
+            raw_scores: A list of DataFrames containing the raw Metcalf scores.
 
-        z_scores = np.array(z_scores)
-        mask = z_scores >= self._cutoff
+        Returns:
+            A list of DataFrames containing the standardised Metcalf scores.
+        """
+        standardised_scores = []
+        for raw_score_df in raw_scores:
+            # create a new DataFrame to store the standardised scores, with the same columns
+            # and name as the raw score DataFrame
+            standardised_score_df = pd.DataFrame(columns=raw_score_df.columns)
 
-        scores_df = pd.DataFrame(
-            [
-                raw_score.loc["source"].values[mask],
-                raw_score.loc["target"].values[mask],
-                z_scores[mask],
-            ],
-            index=raw_score.index,
-        )
-        scores_df.name = raw_score.name
+            for row in raw_score_df.itertuples(index=False):
+                met = row.spec if raw_score_df.name == LinkType.SPEC_GCF else row.mf
+                n_gcf_strains = len(row.gcf.strains)
+                n_met_strains = len(met.strains)
 
-        return [scores_df]
+                mean = self.metcalf_mean[n_met_strains][n_gcf_strains]
+                sqrt = self.metcalf_std[n_met_strains][n_gcf_strains]
 
-    def _calc_standardised_score_gen(self, results: list) -> list[pd.DataFrame]:
-        if self.metcalf_mean is None or self.metcalf_std is None:
-            raise ValueError(
-                "Metcalf mean and std not found. Have you called `MetcalfScoring.setup(npl)`?"
-            )
-        logger.info("Calculating standardised Metcalf scores (gen input)")
-        postprocessed_scores = []
-        for raw_score in results:
-            z_scores = []
-            for col_index in range(raw_score.shape[1]):
-                gcf = self.npl.lookup_gcf(raw_score.loc["source", col_index])
-                if raw_score.name == LinkType.SPEC_GCF:
-                    met = self.npl.lookup_spectrum(raw_score.at["target", col_index])
+                z_score = (row.score - mean) / sqrt
+
+                if z_score >= self._cutoff:
+                    # add the row to the standardised score DataFrame with the z-score as score value
+                    data = {col_name: getattr(row, col_name) for col_name in raw_score_df.columns}
+                    data["score"] = z_score
+                    new_row = pd.DataFrame(data, index=[0])
+                    standardised_score_df = pd.concat(
+                        (standardised_score_df, new_row), ignore_index=True
+                    )
                 else:
-                    met = self.npl.lookup_mf(raw_score.at["target", col_index])
+                    continue
 
-                num_gcf_strains = len(gcf.strains)
-                num_met_strains = len(met.strains)
-                mean = self.metcalf_mean[num_met_strains][num_gcf_strains]
-                sqrt = self.metcalf_std[num_met_strains][num_gcf_strains]
-                z_score = (raw_score.at["score", col_index] - mean) / sqrt
-                z_scores.append(z_score)
+            standardised_score_df.name = raw_score_df.name
+            standardised_scores.append(standardised_score_df)
 
-            z_scores = np.array(z_scores)
-            mask = z_scores >= self._cutoff
-
-            scores_df = pd.DataFrame(
-                [
-                    raw_score.loc["source"].values[mask],
-                    raw_score.loc["target"].values[mask],
-                    z_scores[mask],
-                ],
-                index=raw_score.index,
-            )
-            scores_df.name = raw_score.name
-            postprocessed_scores.append(scores_df)
-
-        return postprocessed_scores
+        return standardised_scores
