@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 class LinkType(Enum):
-    """An enumeration of the link types for Metcalf scoring."""
+    """Enum class for link types."""
 
     SPEC_GCF = "spec-gcf"
     MF_GCF = "mf-gcf"
@@ -39,12 +39,25 @@ class MetcalfScoring(ScoringBase):
 
     Attributes:
         name: The name of this scoring method, set to a fixed value `metcalf`.
+        npl: The NPLinker object.
         CACHE: The name of the cache file to use for storing the MetcalfScoring.
         presence_gcf_strain: A DataFrame to store presence of gcfs with respect to strains.
+            The index of the DataFrame are the gcf ids and the columns are the strain ids.
+            The values are 1 where the GCF occurs in the strain, 0 otherwise.
         presence_spec_strain: A DataFrame to store presence of spectra with respect to strains.
+            The index of the DataFrame are the spectrum ids and the columns are the strain ids.
+            The values are 1 where the spectrum occurs in the strain, 0 otherwise.
         presence_mf_strain: A DataFrame to store presence of molecular families with respect to strains.
-        raw_score_spec_gcf: The raw Metcalf scores for spectrum-GCF links.
-        raw_score_mf_gcf: The raw Metcalf scores for molecular family-GCF links.
+            The index of the DataFrame are the molecular family ids and the columns are the strain ids.
+            The values are 1 where the molecular family occurs in the strain, 0 otherwise.
+        raw_score_spec_gcf: A DataFrame to store the raw Metcalf scores for spectrum-gcf links.
+            The columns are "spec", "gcf" and "score". The "spec" and "gcf" columns contain the ids
+            of the spectrum and gcf objects respectively. The "score" column contains the raw Metcalf
+            scores.
+        raw_score_mf_gcf: A DataFrame to store the raw Metcalf scores for molecular family-gcf links.
+            The columns are "mf", "gcf" and "score". The "mf" and "gcf" columns contain the ids
+            of the molecular family and gcf objects respectively. The "score" column contains the raw
+            Metcalf scores.
         metcalf_mean: The mean value used for standardising Metcalf scores.
         metcalf_std: The standard deviation value used for standardising Metcalf scores.
     """
@@ -54,15 +67,14 @@ class MetcalfScoring(ScoringBase):
     CACHE: str = "cache_metcalf_scoring.pckl"
     metcalf_weights: tuple[int, int, int, int] = (10, -10, 0, 1)
 
-    # DataFrame to store presence of gcfs/spectra/mfs with respect to strains
-    # values = 1 where gcf/spec/fam occur in strain, 0 otherwise
+    # index: gcf/spec/mf ids, columns: strain ids, value: 0/1
     presence_gcf_strain: pd.DataFrame = pd.DataFrame()
     presence_spec_strain: pd.DataFrame = pd.DataFrame()
     presence_mf_strain: pd.DataFrame = pd.DataFrame()
 
-    # a DataFrame with columns "spec", "gcf", "score" or "mf", "gcf", "score
-    raw_score_spec_gcf: pd.DataFrame = pd.DataFrame()
-    raw_score_mf_gcf: pd.DataFrame = pd.DataFrame()
+    raw_score_spec_gcf: pd.DataFrame = pd.DataFrame(columns=["spec", "gcf", "score"])
+    raw_score_mf_gcf: pd.DataFrame = pd.DataFrame(columns=["mf", "gcf", "score"])
+
     metcalf_mean: np.ndarray | None = None
     metcalf_std: np.ndarray | None = None
 
@@ -71,6 +83,9 @@ class MetcalfScoring(ScoringBase):
         """Setup the MetcalfScoring object.
 
         This method is only called once to setup the MetcalfScoring object.
+
+        Args:
+            npl: The NPLinker object.
         """
         if cls.npl is not None:
             logger.info("MetcalfScoring.setup already called, skipping.")
