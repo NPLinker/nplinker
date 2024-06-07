@@ -3,13 +3,6 @@ from pandas.testing import assert_frame_equal
 from nplinker.scoring.utils import get_presence_gcf_strain
 from nplinker.scoring.utils import get_presence_mf_strain
 from nplinker.scoring.utils import get_presence_spec_strain
-from nplinker.scoring.utils import isinstance_all
-
-
-def test_isinstance_all():
-    assert isinstance_all(1, 2, 3, type=int)
-    assert not isinstance_all(1, 2, 3, type=str)
-    assert not isinstance_all(1, 2, "3", type=int)
 
 
 #

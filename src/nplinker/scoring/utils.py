@@ -12,11 +12,6 @@ if TYPE_CHECKING:
     from nplinker.strain import StrainCollection
 
 
-def isinstance_all(*objects, type) -> bool:
-    """Check if all objects are of the given type."""
-    return all(isinstance(x, type) for x in objects)
-
-
 def get_presence_gcf_strain(gcfs: Sequence[GCF], strains: StrainCollection) -> pd.DataFrame:
     """Get the occurrence of strains in gcfs.
 
