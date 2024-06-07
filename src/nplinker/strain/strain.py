@@ -12,13 +12,13 @@ class Strain:
     id.
     """
 
-    def __init__(self, primary_id: str) -> None:
+    def __init__(self, id: str) -> None:
         """To model the mapping between strain id and its aliases.
 
         Args:
-            primary_id: the representative id of the strain.
+            id: the representative id of the strain.
         """
-        self.id: str = primary_id
+        self.id: str = id
         self._aliases: set[str] = set()
 
     def __repr__(self) -> str:
