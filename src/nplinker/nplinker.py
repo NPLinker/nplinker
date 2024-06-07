@@ -270,9 +270,9 @@ class NPLinker:
         """If BGC ``id`` exists, return it. Otherwise return None."""
         return self._bgc_lookup.get(id, None)
 
-    def lookup_gcf(self, gcf_id):
-        """If GCF ``gcf_id`` exists, return it. Otherwise return None."""
-        return self._gcf_lookup.get(gcf_id, None)
+    def lookup_gcf(self, id):
+        """If GCF ``id`` exists, return it. Otherwise return None."""
+        return self._gcf_lookup.get(id, None)
 
     def lookup_spectrum(self, id):
         """If Spectrum ``name`` exists, return it. Otherwise return None."""

@@ -21,19 +21,19 @@ def get_presence_gcf_strain(gcfs: Sequence[GCF], strains: StrainCollection) -> p
     """Get the occurence of strains in gcfs.
 
     The occurence is a DataFrame with gcfs as rows and strains as columns,
-    where index is `gcf.gcf_id` and column name is `strain.id`. The values
+    where index is `gcf.id` and column name is `strain.id`. The values
     are 1 if the gcf contains the strain and 0 otherwise.
     """
     df_gcf_strain = pd.DataFrame(
         np.zeros((len(gcfs), len(strains))),
-        index=[gcf.gcf_id for gcf in gcfs],
+        index=[gcf.id for gcf in gcfs],
         columns=[strain.id for strain in strains],
         dtype=int,
     )
     for gcf in gcfs:
         for strain in strains:
             if gcf.has_strain(strain):
-                df_gcf_strain.loc[gcf.gcf_id, strain.id] = 1
+                df_gcf_strain.loc[gcf.id, strain.id] = 1
     return df_gcf_strain
 
 

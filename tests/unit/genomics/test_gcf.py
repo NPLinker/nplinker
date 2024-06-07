@@ -23,7 +23,7 @@ def bgc_without_strain():
 def test_init():
     """Test the initialization of GCF."""
     gcf = GCF("1")
-    assert gcf.gcf_id == "1"
+    assert gcf.id == "1"
     assert gcf.bgcs == set()
     assert isinstance(gcf.strains, StrainCollection)
     assert len(gcf.strains) == 0
@@ -77,7 +77,7 @@ def test_add_bgc_wo_strain(bgc_without_strain, caplog):
     """Test add_bgc method with a BGC that does have strain."""
     gcf = GCF("1")
     gcf.add_bgc(bgc_without_strain)
-    assert gcf.gcf_id == "1"
+    assert gcf.id == "1"
     assert gcf.bgcs == {bgc_without_strain}
     assert len(gcf.strains) == 0
     assert "No strain specified for the BGC" in caplog.text
