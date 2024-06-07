@@ -32,6 +32,9 @@ class LinkType(Enum):
     MF_GCF = "mf-gcf"
 
 
+ObjectType = TypeVar("ObjectType", GCF, Spectrum, MolecularFamily)
+
+
 class MetcalfScoring(ScoringBase):
     """Metcalf scoring method.
 
@@ -105,7 +108,7 @@ class MetcalfScoring(ScoringBase):
 
         logger.info("MetcalfScoring.setup completed")
 
-    def get_links(self, *objects: GCF | Spectrum | MolecularFamily, **parameters) -> LinkGraph:
+    def get_links(self, *objects: ObjectType, **parameters) -> LinkGraph:
         """Get links for the given objects.
 
         The given objects are treated as input or source objects, which must be GCF, Spectrum or
@@ -260,8 +263,8 @@ class MetcalfScoring(ScoringBase):
 
     def _get_links(
         self,
-        *objects: tuple[GCF, ...] | tuple[Spectrum, ...] | tuple[MolecularFamily, ...],
         obj_type: str,
+        *objects: ObjectType,
         score_cutoff: float = 0,
     ) -> list[pd.DataFrame]:
         """Get links and scores for given objects.
