@@ -77,9 +77,9 @@ def npl(gcfs, spectra, mfs, strains, tmp_path) -> NPLinker:
     npl._spectra = spectra
     npl._molfams = mfs
     npl._strains = strains
-    npl._gcf_lookup = {gcf.gcf_id: gcf for gcf in gcfs}
-    npl._mf_lookup = {mf.family_id: mf for mf in mfs}
-    npl._spec_lookup = {spec.spectrum_id: spec for spec in spectra}
+    npl._gcf_lookup = {gcf.id: gcf for gcf in gcfs}
+    npl._mf_lookup = {mf.id: mf for mf in mfs}
+    npl._spec_lookup = {spec.id: spec for spec in spectra}
     return npl
 
 

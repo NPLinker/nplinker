@@ -396,7 +396,7 @@ class CanopusResults:
         molfam_classes = {}
 
         for molfam in molfams:
-            fid = molfam.family_id  # the key
+            fid = molfam.id  # the key
             spectra = molfam.spectra
             # if singleton family, format like 'fid_spectrum-id'
             if fid.startswith("singleton-"):

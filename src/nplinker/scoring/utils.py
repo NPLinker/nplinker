@@ -65,18 +65,18 @@ def get_presence_mf_strain(
     """Get the occurence of strains in molecular families.
 
     The occurence is a DataFrame with molecular families as rows and
-    strains as columns, where index is `mf.family_id` and column name is
+    strains as columns, where index is `mf.id` and column name is
     `strain.id`. The values are 1 if the molecular family contains the
     strain and 0 otherwise.
     """
     df_mf_strain = pd.DataFrame(
         np.zeros((len(mfs), len(strains))),
-        index=[mf.family_id for mf in mfs],
+        index=[mf.id for mf in mfs],
         columns=[strain.id for strain in strains],
         dtype=int,
     )
     for mf in mfs:
         for strain in strains:
             if mf.has_strain(strain):
-                df_mf_strain.loc[mf.family_id, strain.id] = 1
+                df_mf_strain.loc[mf.id, strain.id] = 1
     return df_mf_strain

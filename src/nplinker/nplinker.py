@@ -278,9 +278,9 @@ class NPLinker:
         """If Spectrum ``name`` exists, return it. Otherwise return None."""
         return self._spec_lookup.get(spectrum_id, None)
 
-    def lookup_mf(self, mf_id):
-        """If MolecularFamily `family_id` exists, return it. Otherwise return None."""
-        return self._mf_lookup.get(mf_id, None)
+    def lookup_mf(self, id):
+        """If MolecularFamily `id` exists, return it. Otherwise return None."""
+        return self._mf_lookup.get(id, None)
 
     @property
     def strains(self):

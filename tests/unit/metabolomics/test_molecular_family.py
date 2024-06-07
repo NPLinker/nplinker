@@ -26,7 +26,7 @@ def spectrum2():
 def test_init():
     """Test MolecularFamily class initialization."""
     mf = MolecularFamily("mf001")
-    assert mf.family_id == "mf001"
+    assert mf.id == "mf001"
     assert mf.spectra_ids == set()
     assert mf.spectra == set()
     assert mf.strains == StrainCollection()
@@ -35,10 +35,7 @@ def test_init():
 def test_str_repr():
     """Test __str__ and __repr__ methods."""
     mf = MolecularFamily("mf001")
-    assert (
-        str(mf)
-        == "MolecularFamily(family_id=mf001, #Spectrum_objects=0, #spectrum_ids=0, #strains=0)"
-    )
+    assert str(mf) == "MolecularFamily(id=mf001, #Spectrum_objects=0, #spectrum_ids=0, #strains=0)"
     assert repr(mf) == str(mf)
 
 

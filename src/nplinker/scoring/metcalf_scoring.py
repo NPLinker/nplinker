@@ -409,7 +409,7 @@ class MetcalfScoring(ScoringBase):
             links.append(df)
 
         if obj_type == "mf":
-            obj_ids = [mf.family_id for mf in objects]
+            obj_ids = [mf.id for mf in objects]
             scores = self.raw_score_mf_gcf.loc[obj_ids, :]
             df = self._get_scores_source_met(scores, score_cutoff)
             df.name = LINK_TYPES[1]

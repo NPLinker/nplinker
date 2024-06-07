@@ -12,24 +12,24 @@ class MolecularFamily:
     """Class to model molecular family.
 
     Attributes:
-        family_id: Unique id for the molecular family.
+        id: Unique id for the molecular family.
         spectra_ids: Set of spectrum ids in the molecular family.
     """
 
-    def __init__(self, family_id: str):
+    def __init__(self, id: str):
         """Initialize the MolecularFamily.
 
         Args:
-            family_id: Unique id for the molecular family.
+            id: Unique id for the molecular family.
         """
-        self.family_id: str = family_id
+        self.id: str = id
         self.spectra_ids: set[str] = set()
         self._spectra: set[Spectrum] = set()
         self._strains: StrainCollection = StrainCollection()
 
     def __str__(self) -> str:
         return (
-            f"MolecularFamily(family_id={self.family_id}, #Spectrum_objects={len(self._spectra)}, "
+            f"MolecularFamily(id={self.id}, #Spectrum_objects={len(self._spectra)}, "
             f"#spectrum_ids={len(self.spectra_ids)}, #strains={len(self._strains)})"
         )
 
@@ -38,11 +38,11 @@ class MolecularFamily:
 
     def __eq__(self, other) -> bool:
         if isinstance(other, MolecularFamily):
-            return self.family_id == other.family_id
+            return self.id == other.id
         return NotImplemented
 
     def __hash__(self) -> int:
-        return hash(self.family_id)
+        return hash(self.id)
 
     @property
     def spectra(self) -> set[Spectrum]:

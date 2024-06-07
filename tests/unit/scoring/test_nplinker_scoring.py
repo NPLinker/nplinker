@@ -91,7 +91,7 @@ def test_get_links_mf_standardised_false(npl, mc, gcfs, mfs, strains_list):
     assert isinstance(links, LinkCollection)
     links = links.links
     assert len(links) == 3
-    assert {i.family_id for i in links.keys()} == {"mf1", "mf2", "mf3"}
+    assert {i.id for i in links.keys()} == {"mf1", "mf2", "mf3"}
     assert isinstance(links[mfs[0]][gcfs[0]], ObjectLink)
     assert links[mfs[0]][gcfs[0]].data(mc) == 12
     assert links[mfs[0]][gcfs[1]].data(mc) == -9
@@ -102,7 +102,7 @@ def test_get_links_mf_standardised_false(npl, mc, gcfs, mfs, strains_list):
     assert isinstance(links, LinkCollection)
     links = links.links
     assert len(links) == 3
-    assert {i.family_id for i in links.keys()} == {"mf1", "mf2", "mf3"}
+    assert {i.id for i in links.keys()} == {"mf1", "mf2", "mf3"}
     assert isinstance(links[mfs[0]][gcfs[0]], ObjectLink)
     assert links[mfs[0]][gcfs[0]].data(mc) == 12
     assert links[mfs[0]].get(gcfs[1]) is None
