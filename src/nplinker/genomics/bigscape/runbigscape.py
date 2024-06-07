@@ -51,7 +51,7 @@ def run_bigscape(
     if version == 1:
         args.extend(["--pfam_dir", PFAM_PATH])
     elif version == 2:
-        args.extend(["cluster", "--pfam_path", PFAM_PATH + "/Pfam-A.hmm"])
+        args.extend(["cluster", "--pfam_path", os.path.join(PFAM_PATH, "Pfam-A.hmm")])
 
     # add input and output paths. these are unchanged
     args.extend(["-i", str(antismash_path), "-o", str(output_path)])
