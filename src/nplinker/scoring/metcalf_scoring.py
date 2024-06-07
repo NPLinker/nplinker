@@ -145,7 +145,10 @@ class MetcalfScoring(ScoringBase):
         self._standardised: bool = parameters.get("standardised", False)
         parameters.update({"cutoff": self._cutoff, "standardised": self._standardised})
 
-        logger.info(f"MetcalfScoring: standardised = {self._standardised}")
+        logger.info(
+            f"MetcalfScoring: #objects={len(objects)}, type={obj_type}, cutoff={self._cutoff}, "
+            f"standardised={self._standardised}"
+        )
         if not self._standardised:
             scores_list = self._get_links(*objects, obj_type=obj_type, score_cutoff=self._cutoff)
         else:
@@ -157,27 +160,20 @@ class MetcalfScoring(ScoringBase):
                 scores_list = self._calc_standardised_score_met(scores_list)
 
         links = LinkGraph()
-        logger.info(
-            f"MetcalfScoring: input_type=GCF, result_type=Spec/MolFam, " f"#inputs={len(objects)}."
-        )
-        for scores in scores_list:
-            if scores.shape[1] == 0:
-                logger.info(f'MetcalfScoring: found no "{scores.name}" links')
-            else:
-                for row in scores.itertuples(index=False):
-                    gcf = self.npl.lookup_gcf(row.gcf)
-                    if scores.name == LinkType.SPEC_GCF:
-                        met = self.npl.lookup_spectrum(row.spec)
-                    else:
-                        met = self.npl.lookup_mf(row.mf)
-                    links.add_link(
-                        gcf,
-                        met,
-                        metcalf=Score(self.name, row.score, parameters),
-                    )
-                logger.info(f"MetcalfScoring: found {len(links)} {scores.name} links.")
+        for score_df in scores_list:
+            for row in score_df.itertuples(index=False):  # row has attributes: spec/mf, gcf, score
+                gcf = self.npl.lookup_gcf(row.gcf)
+                if score_df.name == LinkType.SPEC_GCF:
+                    met = self.npl.lookup_spectrum(row.spec)
+                else:
+                    met = self.npl.lookup_mf(row.mf)
+                links.add_link(
+                    gcf,
+                    met,
+                    metcalf=Score(self.name, row.score, parameters),
+                )
 
-        logger.info("MetcalfScoring: completed")
+        logger.info(f"MetcalfScoring: completed! Found {len(links.links)} links in total.")
         return links
 
     # TODO CG: refactor this method
