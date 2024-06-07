@@ -28,7 +28,7 @@ class BGC:
     and used by MIBiG.
 
     Attributes:
-        bgc_id: BGC identifier, e.g. MIBiG accession, GenBank accession.
+        id: BGC identifier, e.g. MIBiG accession, GenBank accession.
         product_prediction: A tuple of (predicted) natural
             products or product classes of the BGC.
             For antiSMASH's GenBank data, the feature `region /product`
@@ -59,15 +59,15 @@ class BGC:
         strain: The strain of the BGC.
     """
 
-    def __init__(self, bgc_id: str, /, *product_prediction: str):
+    def __init__(self, id: str, /, *product_prediction: str):
         """Initialize the BGC object.
 
         Args:
-            bgc_id: BGC identifier, e.g. MIBiG accession, GenBank accession.
+            id: BGC identifier, e.g. MIBiG accession, GenBank accession.
             product_prediction: BGC's (predicted) natural products or product classes.
         """
         # BGC metadata
-        self.bgc_id = bgc_id
+        self.id = id
         self.product_prediction = product_prediction
 
         self.mibig_bgc_class: tuple[str] | None = None
@@ -87,9 +87,9 @@ class BGC:
         return str(self)
 
     def __str__(self):
-        return "{}(bgc_id={}, strain={}, asid={}, region={})".format(
+        return "{}(id={}, strain={}, asid={}, region={})".format(
             self.__class__.__name__,
-            self.bgc_id,
+            self.id,
             self.strain,
             self.antismash_id,
             self.antismash_region,
@@ -97,13 +97,11 @@ class BGC:
 
     def __eq__(self, other) -> bool:
         if isinstance(other, BGC):
-            return (
-                self.bgc_id == other.bgc_id and self.product_prediction == other.product_prediction
-            )
+            return self.id == other.id and self.product_prediction == other.product_prediction
         return NotImplemented
 
     def __hash__(self) -> int:
-        return hash((self.bgc_id, self.product_prediction))
+        return hash((self.id, self.product_prediction))
 
     def add_parent(self, gcf: GCF) -> None:
         """Add a parent GCF to the BGC.
@@ -146,7 +144,7 @@ class BGC:
         Returns:
             True if it's MIBiG reference BGC
         """
-        return self.bgc_id.startswith("BGC")
+        return self.id.startswith("BGC")
 
     # CG: why not providing whole product but only amino acid as product monomer?
     # this property is not used in NPLinker core business.

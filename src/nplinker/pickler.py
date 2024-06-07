@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 class NPLinkerPickler(pickle.Pickler):
     def persistent_id(self, obj):
         if isinstance(obj, BGC):
-            return ("BGC", obj.bgc_id)
+            return ("BGC", obj.id)
         elif isinstance(obj, GCF):
             return ("GCF", obj.gcf_id)
         elif isinstance(obj, Spectrum):

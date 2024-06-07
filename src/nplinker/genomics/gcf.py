@@ -74,17 +74,17 @@ class GCF:
         """Add a BGC object to the GCF."""
         bgc.parents.add(self)
         self._bgcs.add(bgc)
-        self.bgc_ids.add(bgc.bgc_id)
+        self.bgc_ids.add(bgc.id)
         if bgc.strain is not None:
             self._strains.add(bgc.strain)
         else:
-            logger.warning("No strain specified for the BGC %s", bgc.bgc_id)
+            logger.warning("No strain specified for the BGC %s", bgc.id)
 
     def detach_bgc(self, bgc: BGC) -> None:
         """Remove a child BGC object."""
         bgc.parents.remove(self)
         self._bgcs.remove(bgc)
-        self.bgc_ids.remove(bgc.bgc_id)
+        self.bgc_ids.remove(bgc.id)
         if bgc.strain is not None:
             for other_bgc in self._bgcs:
                 if other_bgc.strain == bgc.strain:

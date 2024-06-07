@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Initial code for NPClassScore."""
+
 import glob
 import os
 import sys
@@ -777,4 +778,4 @@ class NPLinker_classes(NPLinker):
         return bgc_like_classes_dict
 
     def _get_bgc_like_gcf(self, bgc_like):
-        return [gcf for gcf in self.gcfs if bgc_like.bgc_id in [b.bgc_id for b in gcf.bgcs]][0]
+        return [gcf for gcf in self.gcfs if bgc_like.bgc_id in [b.id for b in gcf.bgcs]][0]

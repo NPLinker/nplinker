@@ -262,13 +262,13 @@ class NPLinker:
         logger.info("Final size of link collection is {}".format(len(link_collection)))
         return link_collection
 
-    def has_bgc(self, bgc_id):
-        """Returns True if BGC ``bgc_id`` exists in the dataset."""
-        return bgc_id in self._bgc_lookup
+    def has_bgc(self, id):
+        """Returns True if BGC ``id`` exists in the dataset."""
+        return id in self._bgc_lookup
 
-    def lookup_bgc(self, bgc_id):
-        """If BGC ``bgc_id`` exists, return it. Otherwise return None."""
-        return self._bgc_lookup.get(bgc_id, None)
+    def lookup_bgc(self, id):
+        """If BGC ``id`` exists, return it. Otherwise return None."""
+        return self._bgc_lookup.get(id, None)
 
     def lookup_gcf(self, gcf_id):
         """If GCF ``gcf_id`` exists, return it. Otherwise return None."""
