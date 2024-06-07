@@ -155,49 +155,25 @@ class MetcalfScoring(ScoringBase):
                 scores_list = self._calc_standardised_score_met(scores_list)
 
         links = LinkGraph()
-        if obj_type == "gcf":
-            logger.info(
-                f"MetcalfScoring: input_type=GCF, result_type=Spec/MolFam, "
-                f"#inputs={len(objects)}."
-            )
-            # scores is the DataFrame with index "source", "target", "score"
-            for scores in scores_list:
-                if scores.shape[1] == 0:
-                    logger.info(f'MetcalfScoring: found no "{scores.name}" links')
-                else:
-                    for row in scores.itertuples(index=False):
-                        gcf = self.npl.lookup_gcf(row.gcf)
-                        if scores.name == LINK_TYPES[0]:
-                            met = self.npl.lookup_spectrum(row.spec)
-                        else:
-                            met = self.npl.lookup_mf(row.mf)
-                        links.add_link(
-                            gcf,
-                            met,
-                            metcalf=Score(self.name, row.score, parameters),
-                        )
-                    logger.info(f"MetcalfScoring: found {len(links)} {scores.name} links.")
-        else:
-            logger.info(
-                f"MetcalfScoring: input_type=Spec/MolFam, result_type=GCF, "
-                f"#inputs={len(objects)}."
-            )
-            for scores in scores_list:
-                if scores.shape[1] == 0:
-                    logger.info(f'MetcalfScoring: found no links "{scores.name}" for input objects')
-                else:
-                    for row in scores.itertuples(index=False):
-                        gcf = self.npl.lookup_gcf(row.gcf)
-                        if scores.name == LINK_TYPES[0]:
-                            met = self.npl.lookup_spectrum(row.spec)
-                        else:
-                            met = self.npl.lookup_mf(row.mf)
-                        links.add_link(
-                            met,
-                            gcf,
-                            metcalf=Score(self.name, row.score, parameters),
-                        )
-                    logger.info(f"MetcalfScoring: found {len(links)} {scores.name} links.")
+        logger.info(
+            f"MetcalfScoring: input_type=GCF, result_type=Spec/MolFam, " f"#inputs={len(objects)}."
+        )
+        for scores in scores_list:
+            if scores.shape[1] == 0:
+                logger.info(f'MetcalfScoring: found no "{scores.name}" links')
+            else:
+                for row in scores.itertuples(index=False):
+                    gcf = self.npl.lookup_gcf(row.gcf)
+                    if scores.name == LINK_TYPES[0]:
+                        met = self.npl.lookup_spectrum(row.spec)
+                    else:
+                        met = self.npl.lookup_mf(row.mf)
+                    links.add_link(
+                        gcf,
+                        met,
+                        metcalf=Score(self.name, row.score, parameters),
+                    )
+                logger.info(f"MetcalfScoring: found {len(links)} {scores.name} links.")
 
         logger.info("MetcalfScoring: completed")
         return links
