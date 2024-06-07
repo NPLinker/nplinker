@@ -15,7 +15,6 @@ from .link_graph import Score
 from .utils import get_presence_gcf_strain
 from .utils import get_presence_mf_strain
 from .utils import get_presence_spec_strain
-from .utils import isinstance_all
 
 
 if TYPE_CHECKING:
@@ -111,37 +110,34 @@ class MetcalfScoring(ScoringBase):
     def get_links(self, *objects: ObjectType, **parameters) -> LinkGraph:
         """Get links for the given objects.
 
-        The given objects are treated as input or source objects, which must be GCF, Spectrum or
-        MolecularFamily objects.
-
         Args:
-            objects: The objects to get links for. Must be GCF, Spectrum or MolecularFamily objects.
+            objects: The objects to get links for. All objects must be of the same type, i.e. `GCF`,
+              `Spectrum` or `MolecularFamily` type.
+               If no objects are provided, all detected objects (`npl.gcfs`) will be used.
             parameters: The scoring parameters to use for the links. The parameters are:
 
                     - cutoff: The minimum score to consider a link (≥cutoff). Default is 0.
                     - standardised: Whether to use standardised scores. Default is False.
 
         Returns:
-            The LinkGraph object containing the links involving the input objects.
+            The `LinkGraph` object containing the links involving the input objects with the Metcalf
+            scores.
 
         Raises:
-            ValueError: If the input objects are empty.
-            TypeError: If the input objects are not of the correct type.
+            TypeError: If the input objects are not of the same type or the object type is invalid.
         """
         # validate input objects
         if len(objects) == 0:
             objects = self.npl.gcfs
-
-        if isinstance_all(*objects, type=GCF):
-            obj_type = "gcf"
-        elif isinstance_all(*objects, type=Spectrum):
-            obj_type = "spec"
-        elif isinstance_all(*objects, type=MolecularFamily):
-            obj_type = "mf"
-        else:
-            types = [type(i) for i in objects]
+        # check if all objects are of the same type
+        types = {type(i) for i in objects}
+        if len(types) > 1:
+            raise TypeError("Input objects must be of the same type.")
+        # check if the object type is valid
+        obj_type = next(iter(types))
+        if obj_type not in (GCF, Spectrum, MolecularFamily):
             raise TypeError(
-                f"Invalid type {set(types)}. Input objects must be GCF, Spectrum or MolecularFamily objects."
+                f"Invalid type {obj_type}. Input objects must be GCF, Spectrum or MolecularFamily objects."
             )
 
         # validate scoring parameters
@@ -152,13 +148,10 @@ class MetcalfScoring(ScoringBase):
         logger.info(f"MetcalfScoring: standardised = {self._standardised}")
         if not self._standardised:
             scores_list = self._get_links(*objects, obj_type=obj_type, score_cutoff=self._cutoff)
-        # TODO CG: verify the logics of standardised score and add unit tests
         else:
             # use negative infinity as the score cutoff to ensure we get all links
-            # the self.cutoff will be applied later in the postprocessing step
             scores_list = self._get_links(*objects, obj_type=obj_type, score_cutoff=np.NINF)
-            if obj_type == "gcf":
-                # TODO: CG to update the private methods to use new format of raw score df
+            if obj_type == GCF:
                 scores_list = self._calc_standardised_score_gen(scores_list)
             else:
                 scores_list = self._calc_standardised_score_met(scores_list)
@@ -263,46 +256,46 @@ class MetcalfScoring(ScoringBase):
 
     def _get_links(
         self,
-        obj_type: str,
         *objects: ObjectType,
+        obj_type: GCF | Spectrum | MolecularFamily,
         score_cutoff: float = 0,
     ) -> list[pd.DataFrame]:
-        """Get links and scores for given objects.
+        """Get links and scores for the given objects.
 
         Args:
-            objects: A list of GCF, Spectrum or MolecularFamily objects
-                and all objects must be of the same type.
+            objects: A list of GCF, Spectrum or MolecularFamily objects and all objects must be of
+                the same type.
+            obj_type: The type of the objects.
             score_cutoff: Minimum score to consider a link (≥score_cutoff). Default is 0.
 
         Returns:
-            List of data frames containing the ids of the linked objects
-                and the score. The data frame has index names of
-                'source', 'target' and 'score':
+            List of data frames containing the ids of the linked objects and the score.
 
-                - the 'source' row contains the ids of the input/source objects,
-                - the 'target' row contains the ids of the target objects,
-                - the 'score' row contains the scores.
+            The data frame is named by link types, see `LinkType`. It has column names of
+            ['spec', 'gcf', 'score'] or ['mf', 'gcf', 'score'] depending on the link type.
 
-        Raises:
-            ValueError: If input objects are empty.
-            TypeError: If input objects are not GCF, Spectrum or MolecularFamily objects.
+                - the 'spec', 'mf' or 'gcf' column contains the ids of the objects,
+                - the 'score' column contains the scores.
         """
         links = []
         obj_ids = [obj.id for obj in objects]
+        col_name = (
+            "spec" if obj_type == Spectrum else "mf" if obj_type == MolecularFamily else "gcf"
+        )
 
-        # spec-gcf
-        if obj_type == "gcf" or obj_type == "spec":
+        # spec-gcf link
+        if obj_type in (GCF, Spectrum):
             df = self.raw_score_spec_gcf[
-                self.raw_score_spec_gcf[obj_type].isin(obj_ids)
+                self.raw_score_spec_gcf[col_name].isin(obj_ids)
                 & (self.raw_score_spec_gcf["score"] >= score_cutoff)
             ]
             df.name = LinkType.SPEC_GCF
             links.append(df)
 
-        # mf-gcf
-        if obj_type == "gcf" or obj_type == "mf":
+        # mf-gcf link
+        if obj_type in (GCF, MolecularFamily):
             df = self.raw_score_mf_gcf[
-                self.raw_score_mf_gcf[obj_type].isin(obj_ids)
+                self.raw_score_mf_gcf[col_name].isin(obj_ids)
                 & (self.raw_score_mf_gcf["score"] >= score_cutoff)
             ]
             df.name = LinkType.MF_GCF
