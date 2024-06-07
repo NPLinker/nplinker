@@ -12,15 +12,15 @@ if TYPE_CHECKING:
     from nplinker.strain import StrainCollection
 
 
-def isinstance_all(*objects, objtype) -> bool:
+def isinstance_all(*objects, type) -> bool:
     """Check if all objects are of the given type."""
-    return all(isinstance(x, objtype) for x in objects)
+    return all(isinstance(x, type) for x in objects)
 
 
 def get_presence_gcf_strain(gcfs: Sequence[GCF], strains: StrainCollection) -> pd.DataFrame:
-    """Get the occurence of strains in gcfs.
+    """Get the occurrence of strains in gcfs.
 
-    The occurence is a DataFrame with gcfs as rows and strains as columns,
+    The occurrence is a DataFrame with gcfs as rows and strains as columns,
     where index is `gcf.id` and column name is `strain.id`. The values
     are 1 if the gcf contains the strain and 0 otherwise.
     """
@@ -40,9 +40,9 @@ def get_presence_gcf_strain(gcfs: Sequence[GCF], strains: StrainCollection) -> p
 def get_presence_spec_strain(
     spectra: Sequence[Spectrum], strains: StrainCollection
 ) -> pd.DataFrame:
-    """Get the occurence of strains in spectra.
+    """Get the occurrence of strains in spectra.
 
-    The occurence is a DataFrame with spectra as rows and strains as columns,
+    The occurrence is a DataFrame with spectra as rows and strains as columns,
     where index is `spectrum.id` and column name is `strain.id`.
     The values are 1 if the spectrum contains the strain and 0 otherwise.
     """
@@ -62,9 +62,9 @@ def get_presence_spec_strain(
 def get_presence_mf_strain(
     mfs: Sequence[MolecularFamily], strains: StrainCollection
 ) -> pd.DataFrame:
-    """Get the occurence of strains in molecular families.
+    """Get the occurrence of strains in molecular families.
 
-    The occurence is a DataFrame with molecular families as rows and
+    The occurrence is a DataFrame with molecular families as rows and
     strains as columns, where index is `mf.id` and column name is
     `strain.id`. The values are 1 if the molecular family contains the
     strain and 0 otherwise.

@@ -114,11 +114,11 @@ class MetcalfScoring(ScoringBase):
             objects = self.npl.gcfs
 
         # TODO: allow mixed input types?
-        if isinstance_all(*objects, objtype=GCF):
+        if isinstance_all(*objects, type=GCF):
             obj_type = "gcf"
-        elif isinstance_all(*objects, objtype=Spectrum):
+        elif isinstance_all(*objects, type=Spectrum):
             obj_type = "spec"
-        elif isinstance_all(*objects, objtype=MolecularFamily):
+        elif isinstance_all(*objects, type=MolecularFamily):
             obj_type = "mf"
         else:
             types = [type(i) for i in objects]
@@ -297,11 +297,11 @@ class MetcalfScoring(ScoringBase):
         if len(objects) == 0:
             raise ValueError("Empty input objects.")
 
-        if isinstance_all(*objects, objtype=GCF):
+        if isinstance_all(*objects, type=GCF):
             obj_type = "gcf"
-        elif isinstance_all(*objects, objtype=Spectrum):
+        elif isinstance_all(*objects, type=Spectrum):
             obj_type = "spec"
-        elif isinstance_all(*objects, objtype=MolecularFamily):
+        elif isinstance_all(*objects, type=MolecularFamily):
             obj_type = "mf"
         else:
             types = [type(i) for i in objects]

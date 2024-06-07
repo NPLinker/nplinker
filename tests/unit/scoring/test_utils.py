@@ -7,9 +7,9 @@ from nplinker.scoring.utils import isinstance_all
 
 
 def test_isinstance_all():
-    assert isinstance_all(1, 2, 3, objtype=int)
-    assert not isinstance_all(1, 2, 3, objtype=str)
-    assert not isinstance_all(1, 2, "3", objtype=int)
+    assert isinstance_all(1, 2, 3, type=int)
+    assert not isinstance_all(1, 2, 3, type=str)
+    assert not isinstance_all(1, 2, "3", type=int)
 
 
 #
