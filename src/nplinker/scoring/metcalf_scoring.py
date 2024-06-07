@@ -129,7 +129,6 @@ class MetcalfScoring(ScoringBase):
         if len(objects) == 0:
             objects = self.npl.gcfs
 
-        # TODO: allow mixed input types?
         if isinstance_all(*objects, type=GCF):
             obj_type = "gcf"
         elif isinstance_all(*objects, type=Spectrum):
@@ -286,40 +285,26 @@ class MetcalfScoring(ScoringBase):
             TypeError: If input objects are not GCF, Spectrum or MolecularFamily objects.
         """
         links = []
-        if obj_type == "gcf":
-            obj_ids = [gcf.id for gcf in objects]
-            # spec-gcf
-            df = self.raw_score_spec_gcf[
-                self.raw_score_spec_gcf["gcf"].isin(obj_ids)
-                & (self.raw_score_spec_gcf["score"] >= score_cutoff)
-            ]
-            df.name = LINK_TYPES[0]
-            links.append(df)
-            # mf-gcf
-            df = self.raw_score_mf_gcf[
-                self.raw_score_mf_gcf["gcf"].isin(obj_ids)
-                & (self.raw_score_mf_gcf["score"] >= score_cutoff)
-            ]
-            df.name = LINK_TYPES[1]
-            links.append(df)
+        obj_ids = [obj.id for obj in objects]
 
-        if obj_type == "spec":
-            obj_ids = [spec.id for spec in objects]
+        # spec-gcf
+        if obj_type == "gcf" or obj_type == "spec":
             df = self.raw_score_spec_gcf[
-                self.raw_score_spec_gcf["spec"].isin(obj_ids)
+                self.raw_score_spec_gcf[obj_type].isin(obj_ids)
                 & (self.raw_score_spec_gcf["score"] >= score_cutoff)
             ]
             df.name = LinkType.SPEC_GCF
             links.append(df)
 
-        if obj_type == "mf":
-            obj_ids = [mf.id for mf in objects]
+        # mf-gcf
+        if obj_type == "gcf" or obj_type == "mf":
             df = self.raw_score_mf_gcf[
-                self.raw_score_mf_gcf["mf"].isin(obj_ids)
+                self.raw_score_mf_gcf[obj_type].isin(obj_ids)
                 & (self.raw_score_mf_gcf["score"] >= score_cutoff)
             ]
             df.name = LinkType.MF_GCF
             links.append(df)
+
         return links
 
     def _calc_standardised_score_met(self, results: list) -> list[pd.DataFrame]:
