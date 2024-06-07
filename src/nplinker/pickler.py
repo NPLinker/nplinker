@@ -43,7 +43,7 @@ class NPLinkerPickler(pickle.Pickler):
         elif isinstance(obj, GCF):
             return ("GCF", obj.gcf_id)
         elif isinstance(obj, Spectrum):
-            return ("Spectrum", obj.spectrum_id)
+            return ("Spectrum", obj.id)
         elif isinstance(obj, MolecularFamily):
             return ("MolecularFamily", obj.id)
         else:

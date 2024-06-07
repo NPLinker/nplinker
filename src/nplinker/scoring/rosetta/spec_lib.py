@@ -39,7 +39,7 @@ class SpecLib:
         return len(self.spectra)
 
     def get_ids(self):
-        return list(s.spectrum_id for s in self.spectra)
+        return list(s.id for s in self.spectra)
 
     def get_n_peaks(self):
         return [len(s.peaks) for s in self.spectra]

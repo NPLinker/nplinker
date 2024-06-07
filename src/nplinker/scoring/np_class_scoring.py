@@ -269,9 +269,7 @@ class NPClassScoring(ScoringBase):
             if is_spectrum:
                 # list of list of tuples/None - todo: add to spectrum object?
                 # take only 'best' (first) classification per ontology level
-                all_classes = self.npl.chem_classes.canopus.spectra_classes.get(
-                    spec_like.spectrum_id
-                )
+                all_classes = self.npl.chem_classes.canopus.spectra_classes.get(spec_like.id)
                 if all_classes:
                     spec_like_classes = [
                         cls_per_lvl
@@ -285,7 +283,7 @@ class NPClassScoring(ScoringBase):
             else:  # molfam
                 fam_id = spec_like.family.id
                 if fam_id.startswith("singleton-"):  # account for singleton families
-                    fam_id += f"_{spec_like.spectra[0].spectrum_id}"
+                    fam_id += f"_{spec_like.spectra[0].id}"
                 all_classes = self.npl.chem_classes.canopus.molfam_classes.get(fam_id)
                 if all_classes:
                     spec_like_classes = [
@@ -301,12 +299,12 @@ class NPClassScoring(ScoringBase):
             # if mne or when main/canopus does not get classes
             if is_spectrum:
                 spec_like_classes = self.npl.chem_classes.molnetenhancer.spectra_classes(
-                    spec_like.spectrum_id
+                    spec_like.id
                 )
             else:  # molfam
                 fam_id = spec_like.family.id
                 if fam_id.startswith("singleton"):  # account for singleton families
-                    fam_id += f"_{spec_like.spectra[0].spectrum_id}"
+                    fam_id += f"_{spec_like.spectra[0].id}"
                 spec_like_classes = self.npl.chem_classes.molnetenhancer.molfam_classes.get(fam_id)
             # classes are same for molfam and spectrum so names are irrespective of is_spectrum
             spec_like_classes_names_inds = (

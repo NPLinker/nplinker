@@ -402,7 +402,7 @@ class MetcalfScoring(ScoringBase):
             links.append(df)
 
         if obj_type == "spec":
-            obj_ids = [spec.spectrum_id for spec in objects]
+            obj_ids = [spec.id for spec in objects]
             scores = self.raw_score_spec_gcf.loc[obj_ids, :]
             df = self._get_scores_source_met(scores, score_cutoff)
             df.name = LINK_TYPES[0]

@@ -8,7 +8,7 @@ from nplinker.strain import StrainCollection
 @pytest.fixture()
 def spectrum1():
     """Return a Spectrum object."""
-    spec = Spectrum(spectrum_id="spec001", mz=[1.0], intensity=[1.0], precursor_mz=100.0)
+    spec = Spectrum(id="spec001", mz=[1.0], intensity=[1.0], precursor_mz=100.0)
     spec.strains = StrainCollection()
     spec.strains.add(Strain("strain001"))
     yield spec
@@ -17,7 +17,7 @@ def spectrum1():
 @pytest.fixture()
 def spectrum2():
     """Return a Spectrum object."""
-    spec = Spectrum(spectrum_id="spec002", mz=[1.0], intensity=[1.0], precursor_mz=100.0)
+    spec = Spectrum(id="spec002", mz=[1.0], intensity=[1.0], precursor_mz=100.0)
     spec.strains = StrainCollection()
     spec.strains.add(Strain("strain002"))
     yield spec
@@ -77,11 +77,11 @@ def test_add_spectrum(spectrum1, spectrum2):
     mf = MolecularFamily("mf001")
     mf.add_spectrum(spectrum1)
     assert spectrum1 in mf.spectra
-    assert spectrum1.spectrum_id in mf.spectra_ids
+    assert spectrum1.id in mf.spectra_ids
     assert Strain("strain001") in mf.strains
     mf.add_spectrum(spectrum2)
     assert spectrum2 in mf.spectra
-    assert spectrum2.spectrum_id in mf.spectra_ids
+    assert spectrum2.id in mf.spectra_ids
     assert Strain("strain002") in mf.strains
     assert len(mf.spectra) == 2
     assert len(mf.spectra_ids) == 2
@@ -95,12 +95,12 @@ def test_detach_spectrum(spectrum1, spectrum2):
     mf.add_spectrum(spectrum2)
     mf.detach_spectrum(spectrum1)
     assert spectrum1 not in mf.spectra
-    assert spectrum1.spectrum_id not in mf.spectra_ids
+    assert spectrum1.id not in mf.spectra_ids
     assert Strain("strain001") not in mf.strains
     assert Strain("strain002") in mf.strains
     mf.detach_spectrum(spectrum2)
     assert spectrum2 not in mf.spectra
-    assert spectrum2.spectrum_id not in mf.spectra_ids
+    assert spectrum2.id not in mf.spectra_ids
     assert Strain("strain002") not in mf.strains
     assert len(mf.spectra) == 0
     assert len(mf.spectra_ids) == 0

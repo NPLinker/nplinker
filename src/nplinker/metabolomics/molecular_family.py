@@ -61,7 +61,7 @@ class MolecularFamily:
             spectrum: `Spectrum` object to add to the molecular family.
         """
         self._spectra.add(spectrum)
-        self.spectra_ids.add(spectrum.spectrum_id)
+        self.spectra_ids.add(spectrum.id)
         self._strains = self._strains + spectrum.strains
         # add the molecular family to the spectrum
         spectrum.family = self
@@ -73,7 +73,7 @@ class MolecularFamily:
             spectrum: `Spectrum` object to remove from the molecular family.
         """
         self._spectra.remove(spectrum)
-        self.spectra_ids.remove(spectrum.spectrum_id)
+        self.spectra_ids.remove(spectrum.id)
         self._strains = self._update_strains()
         # remove the molecular family from the spectrum
         spectrum.family = None

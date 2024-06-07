@@ -274,9 +274,9 @@ class NPLinker:
         """If GCF ``gcf_id`` exists, return it. Otherwise return None."""
         return self._gcf_lookup.get(gcf_id, None)
 
-    def lookup_spectrum(self, spectrum_id):
+    def lookup_spectrum(self, id):
         """If Spectrum ``name`` exists, return it. Otherwise return None."""
-        return self._spec_lookup.get(spectrum_id, None)
+        return self._spec_lookup.get(id, None)
 
     def lookup_mf(self, id):
         """If MolecularFamily `id` exists, return it. Otherwise return None."""

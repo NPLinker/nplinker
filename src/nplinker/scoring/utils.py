@@ -43,19 +43,19 @@ def get_presence_spec_strain(
     """Get the occurence of strains in spectra.
 
     The occurence is a DataFrame with spectra as rows and strains as columns,
-    where index is `spectrum.spectrum_id` and column name is `strain.id`.
+    where index is `spectrum.id` and column name is `strain.id`.
     The values are 1 if the spectrum contains the strain and 0 otherwise.
     """
     df_spec_strain = pd.DataFrame(
         np.zeros((len(spectra), len(strains))),
-        index=[spectrum.spectrum_id for spectrum in spectra],
+        index=[spectrum.id for spectrum in spectra],
         columns=[strain.id for strain in strains],
         dtype=int,
     )
     for spectrum in spectra:
         for strain in strains:
             if spectrum.has_strain(strain):
-                df_spec_strain.loc[spectrum.spectrum_id, strain.id] = 1
+                df_spec_strain.loc[spectrum.id, strain.id] = 1
     return df_spec_strain
 
 

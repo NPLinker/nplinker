@@ -14,7 +14,7 @@ class Spectrum:
     """Class to model MS/MS Spectrum.
 
     Attributes:
-        spectrum_id: the spectrum ID.
+        id: the spectrum ID.
         mz: the list of m/z values.
         intensity: the list of intensity values.
         precursor_mz: the m/z value of the precursor.
@@ -30,7 +30,7 @@ class Spectrum:
 
     def __init__(
         self,
-        spectrum_id: str,
+        id: str,
         mz: list[float],
         intensity: list[float],
         precursor_mz: float,
@@ -40,7 +40,7 @@ class Spectrum:
         """Initialize the Spectrum.
 
         Args:
-            spectrum_id: the spectrum ID.
+            id: the spectrum ID.
             mz: the list of m/z values.
             intensity: the list of intensity values.
             precursor_mz: the precursor m/z.
@@ -48,7 +48,7 @@ class Spectrum:
             metadata: the metadata of the spectrum, i.e. the header infomation
                 in the MGF file.
         """
-        self.spectrum_id = spectrum_id
+        self.id = id
         self.mz = mz
         self.intensity = intensity
         self.precursor_mz = precursor_mz
@@ -61,18 +61,18 @@ class Spectrum:
         self.family: MolecularFamily | None = None
 
     def __str__(self) -> str:
-        return f"Spectrum(spectrum_id={self.spectrum_id}, #strains={len(self.strains)})"
+        return f"Spectrum(id={self.id}, #strains={len(self.strains)})"
 
     def __repr__(self) -> str:
         return str(self)
 
     def __eq__(self, other) -> bool:
         if isinstance(other, Spectrum):
-            return self.spectrum_id == other.spectrum_id and self.precursor_mz == other.precursor_mz
+            return self.id == other.id and self.precursor_mz == other.precursor_mz
         return NotImplemented
 
     def __hash__(self) -> int:
-        return hash((self.spectrum_id, self.precursor_mz))
+        return hash((self.id, self.precursor_mz))
 
     @cached_property
     def peaks(self) -> np.ndarray:

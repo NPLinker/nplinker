@@ -57,7 +57,7 @@ def test_get_links_spec_standardised_false(npl, mc, gcfs, spectra, strains_list)
     assert isinstance(links, LinkCollection)
     links = links.links  # dict of link values
     assert len(links) == 3
-    assert {i.spectrum_id for i in links.keys()} == {"spectrum1", "spectrum2", "spectrum3"}
+    assert {i.id for i in links.keys()} == {"spectrum1", "spectrum2", "spectrum3"}
     assert isinstance(links[spectra[0]][gcfs[0]], ObjectLink)
     assert links[spectra[0]][gcfs[0]].data(mc) == 12
     assert links[spectra[0]][gcfs[1]].data(mc) == -9
@@ -68,7 +68,7 @@ def test_get_links_spec_standardised_false(npl, mc, gcfs, spectra, strains_list)
     assert isinstance(links, LinkCollection)
     links = links.links  # dict of link values
     assert len(links) == 3
-    assert {i.spectrum_id for i in links.keys()} == {"spectrum1", "spectrum2", "spectrum3"}
+    assert {i.id for i in links.keys()} == {"spectrum1", "spectrum2", "spectrum3"}
     assert isinstance(links[spectra[0]][gcfs[0]], ObjectLink)
     assert links[spectra[0]][gcfs[0]].data(mc) == 12
     assert links[spectra[0]].get(gcfs[1]) is None

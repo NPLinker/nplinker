@@ -25,8 +25,8 @@ def add_annotation_to_spectrum(annotations: dict[str, dict], spectra: list[Spect
         spectra: A list of Spectrum objects.
     """
     for spec in spectra:
-        if spec.spectrum_id in annotations:
-            spec.gnps_annotations = annotations[spec.spectrum_id]
+        if spec.id in annotations:
+            spec.gnps_annotations = annotations[spec.id]
 
 
 def add_strains_to_spectrum(
@@ -51,7 +51,7 @@ def add_strains_to_spectrum(
     spectra_without_strains = []
     for spec in spectra:
         try:
-            strain_list = strains.lookup(spec.spectrum_id)
+            strain_list = strains.lookup(spec.id)
         except ValueError:
             spectra_without_strains.append(spec)
             continue
@@ -94,7 +94,7 @@ def add_spectrum_to_mf(
             - the third is a dictionary containing MolecularFamily objects as keys and a set of ids
             of missing Spectrum objects as values.
     """
-    spec_dict = {spec.spectrum_id: spec for spec in spectra}
+    spec_dict = {spec.id: spec for spec in spectra}
     mf_with_spec = []
     mf_without_spec = []
     mf_missing_spec: dict[MolecularFamily, set[str]] = {}
