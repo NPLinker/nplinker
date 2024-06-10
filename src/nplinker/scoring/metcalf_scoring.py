@@ -3,6 +3,7 @@ import logging
 from enum import Enum
 from typing import TYPE_CHECKING
 from typing import TypeVar
+from typing import overload
 import numpy as np
 import pandas as pd
 from scipy.stats import hypergeom
@@ -133,7 +134,14 @@ class MetcalfScoring(ScoringBase):
 
         logger.info("MetcalfScoring.setup completed")
 
-    def get_links(self, *objects: ObjectType, **parameters) -> LinkGraph:
+    @overload
+    def get_links(self, *objects: GCF, **parameters) -> LinkGraph: ...
+    @overload
+    def get_links(self, *objects: Spectrum, **parameters) -> LinkGraph: ...
+    @overload
+    def get_links(self, *objects: MolecularFamily, **parameters) -> LinkGraph: ...
+
+    def get_links(self, *objects, **parameters):
         """Get links for the given objects.
 
         Args:
