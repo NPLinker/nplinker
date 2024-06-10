@@ -1,5 +1,7 @@
+from __future__ import annotations
 import logging
 import os
+from typing import TYPE_CHECKING
 from deprecated import deprecated
 from dynaconf import Dynaconf
 from nplinker import NPLINKER_APP_DATA_DIR
@@ -20,6 +22,12 @@ from nplinker.metabolomics.utils import add_strains_to_spectrum
 from nplinker.strain import StrainCollection
 from nplinker.strain.utils import load_user_strains
 
+
+if TYPE_CHECKING:
+    from nplinker.genomics import BGC
+    from nplinker.genomics import GCF
+    from nplinker.metabolomics import MolecularFamily
+    from nplinker.metabolomics import Spectrum
 
 logger = logging.getLogger(__name__)
 
@@ -58,11 +66,14 @@ class DatasetLoader:
         """
         self.config = config
 
-        self.bgcs, self.gcfs, self.spectra, self.mfs = [], [], [], []
-        self.mibig_bgcs = []
-        self.mibig_strains_in_use = StrainCollection()
-        self.product_types = []
-        self.strains = StrainCollection()
+        self.bgcs: list[BGC] = []
+        self.gcfs: list[GCF] = []
+        self.spectra: list[Spectrum] = []
+        self.mfs: list[MolecularFamily] = []
+        self.mibig_bgcs: list[BGC] = []
+        self.mibig_strains_in_use: StrainCollection = StrainCollection()
+        self.product_types: list = []
+        self.strains: StrainCollection = StrainCollection()
 
         self.class_matches = None
         self.chem_classes = None

@@ -83,7 +83,7 @@ class LinkGraph:
     """
 
     def __init__(self) -> None:
-        self._g = Graph()
+        self._g: Graph = Graph()
 
     def __str__(self) -> str:
         """Get a short summary of the LinkGraph."""
@@ -113,7 +113,7 @@ class LinkGraph:
         except KeyError:
             raise KeyError(f"{u} not found in the link graph.")
 
-        return {**links}
+        return {**links}  # type: ignore
 
     @property
     def links(
@@ -191,4 +191,4 @@ class LinkGraph:
             A dictionary of scoring methods and their data for the link between the two objects, or
             None if there is no link between the two objects.
         """
-        return self._g.get_edge_data(u, v)
+        return self._g.get_edge_data(u, v)  # type: ignore

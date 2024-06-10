@@ -171,7 +171,7 @@ class DatasetArranger:
             file_mappings_tsv if file_mappings_tsv.exists() else file_mappings_csv
         )
 
-        return gnps_file_mappings_file
+        return gnps_file_mappings_file  # type: ignore
 
     def _download_and_extract_gnps(self) -> None:
         """Download and extract the GNPS data.
