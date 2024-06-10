@@ -1,8 +1,8 @@
 import logging
 import os
-from importlib.resources import files
 from deprecated import deprecated
 from dynaconf import Dynaconf
+from nplinker import NPLINKER_APP_DATA_DIR
 from nplinker import defaults
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.bigscape import BigscapeGCFLoader
@@ -22,8 +22,6 @@ from nplinker.strain.utils import load_user_strains
 
 
 logger = logging.getLogger(__name__)
-
-NPLINKER_APP_DATA_DIR = files("nplinker").joinpath("data")
 
 
 class DatasetLoader:
@@ -228,9 +226,10 @@ class DatasetLoader:
             True if everything completes
         """
         # load Class_matches with mibig info from data
-        mibig_class_file = NPLINKER_APP_DATA_DIR.joinpath(
-            "MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt"
+        mibig_class_file = (
+            NPLINKER_APP_DATA_DIR / "MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt"
         )
+
         self.class_matches = ClassMatches(mibig_class_file)  # noqa
 
         # run canopus if canopus_dir does not exist

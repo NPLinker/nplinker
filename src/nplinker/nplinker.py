@@ -9,7 +9,6 @@ from .config import load_config
 from .defaults import OUTPUT_DIRNAME
 from .genomics import BGC
 from .genomics import GCF
-from .loader import NPLINKER_APP_DATA_DIR
 from .loader import DatasetLoader
 from .metabolomics import MolecularFamily
 from .metabolomics import Spectrum
@@ -85,11 +84,6 @@ class NPLinker:
             The path to the dataset root directory currently in use
         """
         return self.config.root_dir
-
-    @property
-    def data_dir(self):
-        """Returns path to nplinker/data directory (files packaged with the app itself)."""
-        return NPLINKER_APP_DATA_DIR
 
     @property
     def bigscape_cutoff(self):
