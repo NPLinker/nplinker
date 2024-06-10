@@ -12,6 +12,7 @@ from nplinker.metabolomics import Spectrum
 from .abc import ScoringBase
 from .link_graph import LinkGraph
 from .link_graph import Score
+from .scoring_method import ScoringMethod
 from .utils import get_presence_gcf_strain
 from .utils import get_presence_mf_strain
 from .utils import get_presence_spec_strain
@@ -71,7 +72,7 @@ class MetcalfScoring(ScoringBase):
             number of strains.
     """
 
-    name = "metcalf"
+    name = ScoringMethod.METCALF.value
     npl: NPLinker | None = None
     CACHE: str = "cache_metcalf_scoring.pckl"
     metcalf_weights: tuple[int, int, int, int] = (10, -10, 0, 1)

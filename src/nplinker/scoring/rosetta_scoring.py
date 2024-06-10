@@ -7,13 +7,14 @@ from nplinker.scoring.abc import ScoringBase
 from nplinker.scoring.rosetta.rosetta import Rosetta
 from .link_graph import LinkGraph
 from .score import Score
+from .scoring_method import ScoringMethod
 
 
 logger = logging.getLogger(__name__)
 
 
 class RosettaScoring(ScoringBase):
-    name = "rosetta"
+    name = ScoringMethod.ROSETTA.value
     ROSETTA_OBJ = None
 
     def __init__(self, npl):

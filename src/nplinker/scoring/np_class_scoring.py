@@ -7,13 +7,14 @@ from nplinker.strain import StrainCollection
 from .abc import ScoringBase
 from .link_graph import LinkGraph
 from .score import Score
+from .scoring_method import ScoringMethod
 
 
 logger = logging.getLogger(__name__)
 
 
 class NPClassScoring(ScoringBase):
-    name = "npclassscore"
+    name = ScoringMethod.NPLCLASS.value
 
     def __init__(self, npl):
         super().__init__(npl)
