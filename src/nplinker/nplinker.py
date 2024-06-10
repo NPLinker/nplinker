@@ -29,7 +29,41 @@ ObjectType = TypeVar("ObjectType", BGC, GCF, Spectrum, MolecularFamily)
 
 
 class NPLinker:
-    """Main class for the NPLinker application."""
+    """Main class for the NPLinker application.
+
+    Attributes:
+        config: The configuration object for the current NPLinker application.
+        root_dir: The path to the root directory of the current NPLinker application.
+        output_dir: The path to the output directory of the current NPLinker application.
+        bgcs: A list of all BGC objects.
+        gcfs: A list of all GCF objects.
+        spectra: A list of all Spectrum objects.
+        mfs: A list of all MolecularFamily objects.
+        mibig_bgcs: A list of all MiBIG BGC objects.
+        strains: A StrainCollection object containing all Strain objects.
+        product_types: A list of all BiGSCAPE product types.
+        scoring_methods: A list of all valid scoring methods.
+
+
+    Examples:
+        To start a NPLinker application:
+        >>> from nplinker import NPLinker
+        >>> npl = NPLinker("path/to/config.toml")
+
+        To load all data into memory:
+        >>> npl.load_data()
+
+        To check the number of GCF objects:
+        >>> len(npl.gcfs)
+
+        To get the links for all GCF objects using the Metcalf scoring method, the result is a
+        LinkGraph object:
+        >>> lg = npl.get_links(npl.gcfs, "metcalf")
+
+        To get the link data between two objects:
+        >>> link_data = lg.get_link_data(npl.gcfs[0], npl.spectra[0])
+        {"metcalf": Score("metcalf", 1.0, {"cutoff": 0, "standardised": False})}
+    """
 
     # Valid scoring methods
     _valid_scoring_methods = {
@@ -69,8 +103,8 @@ class NPLinker:
         self._mibig_bgcs = []
         self._strains = StrainCollection()
         self._product_types = []
-        self._chem_classes = None
-        self._class_matches = None
+        self._chem_classes = None  # TODO: to be refactored
+        self._class_matches = None  # TODO: to be refactored
 
         # Flags to keep track of whether the scoring methods have been set up
         self._scoring_methods_setup_done = {name: False for name in self._valid_scoring_methods}
@@ -84,6 +118,56 @@ class NPLinker:
     def output_dir(self) -> str:
         """Get the path to the output directory of the current NPLinker instance."""
         return self._output_dir
+
+    @property
+    def bgcs(self) -> list[BGC]:
+        """Get all BGC objects."""
+        return self._bgc_dict.values()
+
+    @property
+    def gcfs(self) -> list[GCF]:
+        """Get all GCF objects."""
+        return self._gcf_dict.values()
+
+    @property
+    def spectra(self) -> list[Spectrum]:
+        """Get all Spectrum objects."""
+        return self._spec_dict.values()
+
+    @property
+    def mfs(self) -> list[MolecularFamily]:
+        """Get all MolecularFamily objects."""
+        return self._mf_dict.values()
+
+    @property
+    def mibig_bgcs(self) -> list[BGC]:
+        """Get all MiBIG BGC objects."""
+        return self._mibig_bgcs
+
+    @property
+    def strains(self) -> StrainCollection:
+        """Get all Strain objects."""
+        return self._strains
+
+    @property
+    def product_types(self) -> list[str]:
+        """Get all BiGSCAPE product types."""
+        return self._product_types
+
+    @property
+    def chem_classes(self):
+        """Returns loaded ChemClassPredictions with the class predictions."""
+        return self._chem_classes
+
+    @property
+    def class_matches(self):
+        """ClassMatches with the matched classes and scoring tables from MIBiG."""
+        return self._class_matches
+
+    @property
+    def scoring_methods(self) -> list[str]:
+        """Get names of all valid scoring methods."""
+        return list(self._valid_scoring_methods.keys())
 
     def load_data(self):
         """Load all data from local files into memory.
@@ -217,53 +301,3 @@ class NPLinker:
             The MolecularFamily object with the given ID, or None if no such object exists.
         """
         return self._mf_dict.get(id, None)
-
-    @property
-    def strains(self) -> StrainCollection:
-        """Get all Strain objects."""
-        return self._strains
-
-    @property
-    def bgcs(self) -> list[BGC]:
-        """Get all BGC objects."""
-        return self._bgc_dict.values()
-
-    @property
-    def gcfs(self) -> list[GCF]:
-        """Get all GCF objects."""
-        return self._gcf_dict.values()
-
-    @property
-    def spectra(self) -> list[Spectrum]:
-        """Get all Spectrum objects."""
-        return self._spec_dict.values()
-
-    @property
-    def mfs(self) -> list[MolecularFamily]:
-        """Get all MolecularFamily objects."""
-        return self._mf_dict.values()
-
-    @property
-    def mibig_bgcs(self) -> list[BGC]:
-        """Get all MiBIG BGC objects."""
-        return self._mibig_bgcs
-
-    @property
-    def product_types(self) -> list[str]:
-        """Get all BiGSCAPE product types."""
-        return self._product_types
-
-    @property
-    def chem_classes(self):
-        """Returns loaded ChemClassPredictions with the class predictions."""
-        return self._chem_classes
-
-    @property
-    def class_matches(self):
-        """ClassMatches with the matched classes and scoring tables from MIBiG."""
-        return self._class_matches
-
-    @property
-    def scoring_methods(self) -> list[str]:
-        """Get names of all valid scoring methods."""
-        return list(self._valid_scoring_methods.keys())
