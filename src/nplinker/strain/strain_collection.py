@@ -121,6 +121,21 @@ class StrainCollection:
             if strain not in strain_set:
                 self.remove(strain)
 
+    def intersection(self, other: StrainCollection) -> StrainCollection:
+        """Get the intersection of two strain collections.
+
+        Args:
+            other: The other strain collection to compare.
+
+        Returns:
+            StrainCollection object containing the strains that are in both collections.
+        """
+        intersection = StrainCollection()
+        for strain in self:
+            if strain in other:
+                intersection.add(strain)
+        return intersection
+
     def has_name(self, name: str) -> bool:
         """Check if the strain collection contains the given strain name (id or alias).
 

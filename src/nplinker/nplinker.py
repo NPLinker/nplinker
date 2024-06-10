@@ -3,7 +3,6 @@ import logging
 import sys
 from os import PathLike
 from pprint import pformat
-from typing import TYPE_CHECKING
 from . import setup_logging
 from .arranger import DatasetArranger
 from .config import load_config
@@ -21,10 +20,6 @@ from .scoring.metcalf_scoring import MetcalfScoring
 from .scoring.np_class_scoring import NPClassScoring
 from .scoring.rosetta_scoring import RosettaScoring
 
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-    from .strain import Strain
 
 logger = logging.getLogger(__name__)
 
@@ -87,8 +82,6 @@ class NPLinker:
         self._scoring_methods_setup_complete = {
             name: False for name in self._scoring_methods.keys()
         }
-
-        self._datalinks = None
 
         self._repro_data = {}
         repro_file = self.config.get("repro_file")
@@ -264,63 +257,11 @@ class NPLinker:
             )
             link_collection = method.get_links(*objects_for_method, link_collection=link_collection)
 
-        if not self._datalinks:
-            logger.debug("Creating internal datalinks object")
-            self._datalinks = self.scoring_method(MetcalfScoring.name).datalinks
-            logger.debug("Created internal datalinks object")
-
         if len(link_collection) == 0:
             logger.debug("No links found or remaining after merging all method results!")
 
-        # populate shared strain info
-        logger.debug("Calculating shared strain information...")
-        # TODO more efficient version?
-        for source, link_data in link_collection.links.items():
-            if isinstance(source, BGC):
-                logger.debug("Cannot determine shared strains for BGC input!")
-                break
-
-            targets = list(filter(lambda x: not isinstance(x, BGC), link_data.keys()))
-            if len(targets) > 0:
-                if isinstance(source, GCF):
-                    shared_strains = self._datalinks.get_common_strains(targets, [source], True)
-                    for target, link in link_data.items():
-                        if (target, source) in shared_strains:
-                            link.shared_strains = shared_strains[(target, source)]
-                else:
-                    shared_strains = self._datalinks.get_common_strains([source], targets, True)
-                    for target, link in link_data.items():
-                        if (source, target) in shared_strains:
-                            link.shared_strains = shared_strains[(source, target)]
-
-        logger.info("Finished calculating shared strain information")
-
         logger.info("Final size of link collection is {}".format(len(link_collection)))
         return link_collection
-
-    def get_common_strains(
-        self,
-        met: Sequence[Spectrum] | Sequence[MolecularFamily],
-        gcfs: Sequence[GCF],
-        filter_no_shared: bool = True,
-    ) -> dict[tuple[Spectrum | MolecularFamily, GCF], list[Strain]]:
-        """Get common strains between given spectra/molecular families and GCFs.
-
-        Args:
-            met:
-                A list of Spectrum or MolecularFamily objects.
-            gcfs: A list of GCF objects.
-            filter_no_shared: If True, the pairs of spectrum/mf and GCF
-                without common strains will be removed from the returned dict;
-
-        Returns:
-            A dict where the keys are tuples of (Spectrum/MolecularFamily, GCF)
-            and values are a list of shared Strain objects.
-        """
-        if not self._datalinks:
-            self._datalinks = self.scoring_method(MetcalfScoring.name).datalinks
-        common_strains = self._datalinks.get_common_strains(met, gcfs, filter_no_shared)
-        return common_strains
 
     def has_bgc(self, bgc_id):
         """Returns True if BGC ``bgc_id`` exists in the dataset."""
