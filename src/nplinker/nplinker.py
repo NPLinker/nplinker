@@ -112,7 +112,7 @@ class NPLinker:
     @property
     def root_dir(self) -> str:
         """Get the path to the root directory of the current NPLinker instance."""
-        return self.config.root_dir
+        return str(self.config.root_dir)
 
     @property
     def output_dir(self) -> str:
@@ -122,22 +122,22 @@ class NPLinker:
     @property
     def bgcs(self) -> list[BGC]:
         """Get all BGC objects."""
-        return self._bgc_dict.values()
+        return list(self._bgc_dict.values())
 
     @property
     def gcfs(self) -> list[GCF]:
         """Get all GCF objects."""
-        return self._gcf_dict.values()
+        return list(self._gcf_dict.values())
 
     @property
     def spectra(self) -> list[Spectrum]:
         """Get all Spectrum objects."""
-        return self._spec_dict.values()
+        return list(self._spec_dict.values())
 
     @property
     def mfs(self) -> list[MolecularFamily]:
         """Get all MolecularFamily objects."""
-        return self._mf_dict.values()
+        return list(self._mf_dict.values())
 
     @property
     def mibig_bgcs(self) -> list[BGC]:
