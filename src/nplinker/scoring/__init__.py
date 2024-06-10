@@ -1,7 +1,14 @@
 from .abc import ScoringBase
-from .link_collection import LinkCollection
+from .link_graph import LinkGraph
 from .metcalf_scoring import MetcalfScoring
-from .object_link import ObjectLink
+from .score import Score
+from .scoring_method import ScoringMethod
 
 
-__all__ = ["LinkCollection", "MetcalfScoring", "ScoringBase", "ObjectLink"]
+__all__ = [
+    "LinkGraph",
+    "MetcalfScoring",
+    "Score",
+    "ScoringBase",
+    "ScoringMethod",
+]

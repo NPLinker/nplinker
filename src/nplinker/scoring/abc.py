@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
-    from nplinker import NPLinker
-    from . import LinkCollection
+    from nplinker.nplinker import NPLinker
+    from .link_graph import LinkGraph
 
 logger = logging.getLogger(__name__)
 
@@ -36,15 +36,19 @@ class ScoringBase(ABC):
         """Setup class level attributes."""
 
     @abstractmethod
-    def get_links(self, *objects, link_collection: LinkCollection) -> LinkCollection:
+    def get_links(
+        self,
+        *objects,
+        **parameters,
+    ) -> LinkGraph:
         """Get links information for the given objects.
 
         Args:
-            objects: A set of objects.
-            link_collection: The LinkCollection object.
+            objects: A list of objects to get links for.
+            parameters: The parameters used for scoring.
 
         Returns:
-            The LinkCollection object.
+            The LinkGraph object.
         """
 
     @abstractmethod
