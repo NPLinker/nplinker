@@ -3,6 +3,7 @@ import logging
 import sys
 from os import PathLike
 from pprint import pformat
+from nplinker.strain.strain_collection import StrainCollection
 from . import setup_logging
 from .arranger import DatasetArranger
 from .config import load_config
@@ -56,19 +57,16 @@ class NPLinker:
         self.output_dir = self.config.root_dir / OUTPUT_DIRNAME
         self.output_dir.mkdir(exist_ok=True)
 
-        self._spectra = []
-        self._bgcs = []
-        self._gcfs = []
-        self._strains = None
-        self._mfs = []
+        # data containers that will be populated by the `load_data` method
+        self._bgc_dict = {}
+        self._gcf_dict = {}
+        self._spec_dict = {}
+        self._mf_dict = {}
         self._mibig_bgcs = []
+        self._strains = StrainCollection()
+        self._product_types = []
         self._chem_classes = None
         self._class_matches = None
-
-        self._bgc_lookup = {}
-        self._gcf_lookup = {}
-        self._spec_lookup = {}
-        self._mf_lookup = {}
 
         self._scoring_methods = {}
         config_methods = self.config.get("scoring_methods", [])
@@ -139,16 +137,22 @@ class NPLinker:
         return self.config.bigscape.cutoff
 
     def load_data(self):
-        """Loads the basic components of a dataset."""
+        """Load all data from local files into memory.
+
+        This method is a convenience function that calls the `DatasetArranger` and `DatasetLoader`
+        classes to load all data from the local filesystem into memory. The loaded data is then
+        stored in various private data containers for easy access.
+        """
         arranger = DatasetArranger(self.config)
         arranger.arrange()
         loader = DatasetLoader(self.config)
         loader.load()
 
-        self._spectra = loader.spectra
-        self._mfs = loader.mfs
-        self._bgcs = loader.bgcs
-        self._gcfs = loader.gcfs
+        self._bgc_dict = {bgc.id: bgc for bgc in loader.bgcs}
+        self._gcf_dict = {gcf.id: gcf for gcf in loader.gcfs}
+        self._spec_dict = {spec.id: spec for spec in loader.spectra}
+        self._mf_dict = {mf.id: mf for mf in loader.mfs}
+
         self._mibig_bgcs = loader.mibig_bgcs
         self._strains = loader.strains
         self._product_types = loader.product_types
@@ -261,70 +265,84 @@ class NPLinker:
         logger.info("Final size of link collection is {}".format(len(link_collection)))
         return link_collection
 
-    def has_bgc(self, id):
-        """Returns True if BGC ``id`` exists in the dataset."""
-        return id in self._bgc_lookup
+    def lookup_bgc(self, id: str) -> BGC | None:
+        """Get the BGC object with the given ID.
 
-    def lookup_bgc(self, id):
-        """If BGC ``id`` exists, return it. Otherwise return None."""
-        return self._bgc_lookup.get(id, None)
+        Args:
+            id: the ID of the BGC to look up.
 
-    def lookup_gcf(self, id):
-        """If GCF ``id`` exists, return it. Otherwise return None."""
-        return self._gcf_lookup.get(id, None)
+        Returns:
+            The BGC object with the given ID, or None if no such object exists.
+        """
+        return self._bgc_dict.get(id, None)
 
-    def lookup_spectrum(self, id):
-        """If Spectrum ``name`` exists, return it. Otherwise return None."""
-        return self._spec_lookup.get(id, None)
+    def lookup_gcf(self, id: str) -> GCF | None:
+        """Get the GCF object with the given ID.
 
-    def lookup_mf(self, id):
-        """If MolecularFamily `id` exists, return it. Otherwise return None."""
-        return self._mf_lookup.get(id, None)
+        Args:
+            id: the ID of the GCF to look up.
+
+        Returns:
+            The GCF object with the given ID, or None if no such object exists.
+        """
+        return self._gcf_dict.get(id, None)
+
+    def lookup_spectrum(self, id: str) -> Spectrum | None:
+        """Get the Spectrum object with the given ID.
+
+        Args:
+            id: the ID of the Spectrum to look up.
+
+        Returns:
+            The Spectrum object with the given ID, or None if no such object exists.
+        """
+        return self._spec_dict.get(id, None)
+
+    def lookup_mf(self, id: str) -> MolecularFamily | None:
+        """Get the MolecularFamily object with the given ID.
+
+        Args:
+            id: the ID of the MolecularFamily to look up.
+
+        Returns:
+            The MolecularFamily object with the given ID, or None if no such object exists.
+        """
+        return self._mf_dict.get(id, None)
 
     @property
-    def strains(self):
-        """Returns a list of all the strains in the dataset."""
+    def strains(self) -> StrainCollection:
+        """Get all Strain objects."""
         return self._strains
 
     @property
-    def bgcs(self):
-        """Returns a list of all the BGCs in the dataset."""
-        return self._bgcs
+    def bgcs(self) -> list[BGC]:
+        """Get all BGC objects."""
+        return self._bgc_dict.values()
 
     @property
-    def gcfs(self):
-        """Returns a list of all the GCFs in the dataset."""
-        return self._gcfs
+    def gcfs(self) -> list[GCF]:
+        """Get all GCF objects."""
+        return self._gcf_dict.values()
 
     @property
-    def spectra(self):
-        """Returns a list of all the Spectra in the dataset."""
-        return self._spectra
+    def spectra(self) -> list[Spectrum]:
+        """Get all Spectrum objects."""
+        return self._spec_dict.values()
 
     @property
-    def mfs(self):
-        """Returns a list of all the MolecularFamilies in the dataset."""
-        return self._mfs
+    def mfs(self) -> list[MolecularFamily]:
+        """Get all MolecularFamily objects."""
+        return self._mf_dict.values()
 
     @property
-    def mibig_bgcs(self):
-        """Get a list of all the MIBiG BGCs in the dataset."""
+    def mibig_bgcs(self) -> list[BGC]:
+        """Get all MiBIG BGC objects."""
         return self._mibig_bgcs
 
     @property
-    def product_types(self):
-        """Returns a list of the available BiGSCAPE product types in current dataset."""
+    def product_types(self) -> list[str]:
+        """Get all BiGSCAPE product types."""
         return self._product_types
-
-    @property
-    def repro_data(self):
-        """Returns the dict containing reproducibility data."""
-        return self._repro_data
-
-    @property
-    def scoring_methods(self):
-        """Returns a list of available scoring method names."""
-        return list(self._scoring_methods.keys())
 
     @property
     def chem_classes(self):
@@ -335,6 +353,16 @@ class NPLinker:
     def class_matches(self):
         """ClassMatches with the matched classes and scoring tables from MIBiG."""
         return self._class_matches
+
+    @property
+    def repro_data(self):
+        """Returns the dict containing reproducibility data."""
+        return self._repro_data
+
+    @property
+    def scoring_methods(self):
+        """Returns a list of available scoring method names."""
+        return list(self._scoring_methods.keys())
 
     def scoring_method(self, name: str) -> ScoringBase | None:
         """Return an instance of a scoring method.
