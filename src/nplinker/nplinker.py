@@ -96,13 +96,13 @@ class NPLinker:
         self._output_dir.mkdir(exist_ok=True)
 
         # Initialise data containers that will be populated by the `load_data` method
-        self._bgc_dict = {}
-        self._gcf_dict = {}
-        self._spec_dict = {}
-        self._mf_dict = {}
-        self._mibig_bgcs = []
-        self._strains = StrainCollection()
-        self._product_types = []
+        self._bgc_dict: dict[str, BGC] = {}
+        self._gcf_dict: dict[str, GCF] = {}
+        self._spec_dict: dict[str, Spectrum] = {}
+        self._mf_dict: dict[str, MolecularFamily] = {}
+        self._mibig_bgcs: list[BGC] = []
+        self._strains: StrainCollection = StrainCollection()
+        self._product_types: list = []
         self._chem_classes = None  # TODO: to be refactored
         self._class_matches = None  # TODO: to be refactored
 
@@ -117,7 +117,7 @@ class NPLinker:
     @property
     def output_dir(self) -> str:
         """Get the path to the output directory of the current NPLinker instance."""
-        return self._output_dir
+        return str(self._output_dir)
 
     @property
     def bgcs(self) -> list[BGC]:
@@ -209,9 +209,7 @@ class NPLinker:
         self, objects: Sequence[MolecularFamily], scoring_method: str, **scoring_params
     ) -> LinkGraph: ...
 
-    def get_links(
-        self, objects: Sequence[ObjectType], scoring_method: str, **scoring_params
-    ) -> LinkGraph:
+    def get_links(self, objects, scoring_method, **scoring_params):
         """Get the links for the given objects using the specified scoring method and parameters.
 
         Args:
