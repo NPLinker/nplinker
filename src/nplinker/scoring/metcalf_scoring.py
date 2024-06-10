@@ -102,14 +102,14 @@ class MetcalfScoring(ScoringBase):
 
         logger.info(
             f"MetcalfScoring.setup starts: #bgcs={len(npl.bgcs)}, #gcfs={len(npl.gcfs)}, "
-            f"#spectra={len(npl.spectra)}, #molfams={len(npl.molfams)}, #strains={npl.strains}"
+            f"#spectra={len(npl.spectra)}, #mfs={len(npl.mfs)}, #strains={npl.strains}"
         )
         cls.npl = npl
 
         # calculate presence of gcfs/spectra/mfs with respect to strains
         cls.presence_gcf_strain = get_presence_gcf_strain(npl.gcfs, npl.strains)
         cls.presence_spec_strain = get_presence_spec_strain(npl.spectra, npl.strains)
-        cls.presence_mf_strain = get_presence_mf_strain(npl.molfams, npl.strains)
+        cls.presence_mf_strain = get_presence_mf_strain(npl.mfs, npl.strains)
 
         # calculate raw Metcalf scores for spec-gcf links
         raw_score_spec_gcf = cls._calc_raw_score(

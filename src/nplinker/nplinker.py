@@ -61,7 +61,7 @@ class NPLinker:
         self._gcfs = []
         self._strains = None
         self._metadata = {}
-        self._molfams = []
+        self._mfs = []
         self._mibig_bgcs = []
         self._chem_classes = None
         self._class_matches = None
@@ -147,7 +147,7 @@ class NPLinker:
         loader.load()
 
         self._spectra = loader.spectra
-        self._molfams = loader.molfams
+        self._mfs = loader.mfs
         self._bgcs = loader.bgcs
         self._gcfs = loader.gcfs
         self._mibig_bgcs = loader.mibig_bgcs
@@ -160,7 +160,7 @@ class NPLinker:
     def get_links(
         self, input_objects: list, scoring_methods: list, and_mode: bool = True
     ) -> LinkCollection:
-        """Find links for a set of input objects (BGCs/GCFs/Spectra/MolFams).
+        """Find links for a set of input objects (BGCs/GCFs/Spectra/mfs).
 
         The input objects can be any mix of the following NPLinker types:
 
@@ -303,9 +303,9 @@ class NPLinker:
         return self._spectra
 
     @property
-    def molfams(self):
+    def mfs(self):
         """Returns a list of all the MolecularFamilies in the dataset."""
-        return self._molfams
+        return self._mfs
 
     @property
     def metadata(self):

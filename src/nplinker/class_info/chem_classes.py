@@ -45,7 +45,7 @@ class ChemClassPredictions:
         class_predict_options = []
         if self._canopus.spectra_classes:
             class_predict_options.append("canopus")
-        if self._molnetenhancer.spectra2molfam:
+        if self._molnetenhancer.spectra2mf:
             class_predict_options.append("molnetenhancer")
         if class_predict_options:
             class_predict_options = ["mix", "main"] + class_predict_options
@@ -70,7 +70,7 @@ class CanopusResults:
 
     The results from the canopus dir are read and combined with the MN from GNPS
     using canopus_treemap: github.com/louwenjjr/canopus_treemap/tree/master/canopus
-    This creates the two files that are read for the spectra and molfams:
+    This creates the two files that are read for the spectra and mfs:
         -cluster_index_classifications.txt
         -component_index_classifications.txt
 
@@ -91,7 +91,7 @@ class CanopusResults:
         """
         self._canopus_dir = canopus_dir
         self._gnps_dir = gnps_dir
-        self._molfam_classes, self._molfam_classes_names, self._molfam_classes_names_inds = (
+        self._mf_classes, self._mf_classes_names, self._mf_classes_names_inds = (
             None,
             None,
             None,
@@ -163,12 +163,10 @@ class CanopusResults:
             spectra_classes_names, spectra_classes = self._read_spectra_classes(ci_file)
 
             if os.path.isfile(compi_file):
-                molfam_classes_names, molfam_classes = self._read_molfam_classes(compi_file)
-                self._molfam_classes = molfam_classes
-                self._molfam_classes_names = molfam_classes_names
-                self._molfam_classes_names_inds = {
-                    elem: i for i, elem in enumerate(molfam_classes_names)
-                }
+                mf_classes_names, mf_classes = self._read_mf_classes(compi_file)
+                self._mf_classes = mf_classes
+                self._mf_classes_names = mf_classes_names
+                self._mf_classes_names_inds = {elem: i for i, elem in enumerate(mf_classes_names)}
         else:
             # use canopus output correctly (only for spectra)
             logger.info(
@@ -176,8 +174,8 @@ class CanopusResults:
                 "canopus_dir (canopus_summary.tsv)"
             )
             spectra_classes_names, spectra_classes = self._read_spectra_classes_directly()
-            # molfams have to be added later with info about molfam <- spectra
-            # this happens with transfer_spec_classes_to_molfams() in loader.py
+            # mfs have to be added later with info about mf <- spectra
+            # this happens with transfer_spec_classes_to_mfs() in loader.py
 
         self._spectra_classes = spectra_classes
         self._spectra_classes_names = spectra_classes_names
@@ -331,15 +329,15 @@ class CanopusResults:
                     outf.write("\t".join(output_l) + "\n")
         return can_classes_names, can_classes
 
-    def _read_molfam_classes(self, input_file):
-        """Read canopus classes for molfams, return classes_names, classes.
+    def _read_mf_classes(self, input_file):
+        """Read canopus classes for mfs, return classes_names, classes.
 
         Args:
             input_file: str, component_index_classifications.txt
         Returns:
             Tuple of:
             - compi_classes_names: list of str - the names of each different level
-            - compi_classes: dict of {str: lists of tuple(str, float)} - per molfam index (key) the classes for each level
+            - compi_classes: dict of {str: lists of tuple(str, float)} - per mf index (key) the classes for each level
                 where each level is a list of (class_name, fraction) sorted on best choice so index 0 is the best
                 class prediction for a level. When no class is present, instead of Tuple it will be None for that level.
         """
@@ -376,33 +374,33 @@ class CanopusResults:
             ]
         return compi_classes_names, compi_classes
 
-    def transfer_spec_classes_to_molfams(self, molfams, fraction_cutoff=0.0):
-        """Set _molfam_classes(_names) from spectra_classes and return classes.
+    def transfer_spec_classes_to_mfs(self, mfs, fraction_cutoff=0.0):
+        """Set _mf_classes(_names) from spectra_classes and return classes.
 
-        This can be used in the _loader to get molfam classes when the GNPS MN
+        This can be used in the _loader to get mf classes when the GNPS MN
         version is too old and canopus_treemap fails to work directly.
 
         Args:
-            molfams: list of MolecularFamily from the NPLinker space
+            mfs: list of MolecularFamily from the NPLinker space
             fraction_cutoff: float, cut-off for the fraction of class terms
-                needed to be included in the molfam
+                needed to be included in the mf
         Returns:
-            dict of {str: lists of tuple(str, float)} - per molfam (key) the classes for each level
+            dict of {str: lists of tuple(str, float)} - per mf (key) the classes for each level
                 where each level is a list of (class_name, fraction) sorted on best choice so index 0 is the best
                 class prediction for a level. When no class is present, instead of Tuple it will be None for that level.
         """
-        self._molfam_classes_names = self._spectra_classes_names
-        self._molfam_classes_names_inds = self._spectra_classes_names_inds
-        molfam_classes = {}
+        self._mf_classes_names = self._spectra_classes_names
+        self._mf_classes_names_inds = self._spectra_classes_names_inds
+        mf_classes = {}
 
-        for molfam in molfams:
-            fid = molfam.id  # the key
-            spectra = molfam.spectra
+        for mf in mfs:
+            fid = mf.id  # the key
+            spectra = mf.spectra
             # if singleton family, format like 'fid_spectrum-id'
             if fid.startswith("singleton-"):
                 spec_id = spectra[0].id
                 fid += f"_{spec_id}"
-            len_molfam = len(spectra)
+            len_mf = len(spectra)
 
             classes_per_spectra = []
             for spec in spectra:
@@ -411,10 +409,10 @@ class CanopusResults:
                     classes_per_spectra.append(spec_classes)
 
             if not classes_per_spectra:
-                continue  # no spectra with classes for this molfam
+                continue  # no spectra with classes for this mf
 
             sorted_classes = []
-            for i, class_level in enumerate(self._molfam_classes_names):
+            for i, class_level in enumerate(self._mf_classes_names):
                 # 1. aggregate classes from all spectra for this class level
                 classes_cur_level = []
                 for spec_classes in classes_per_spectra:
@@ -423,7 +421,7 @@ class CanopusResults:
                             if class_tup:
                                 classes_cur_level.append(class_tup[0])
                     except IndexError:
-                        print(self._molfam_classes_names)
+                        print(self._mf_classes_names)
                         print(i, class_level)
                         print(classes_per_spectra)
                         print(spec_classes)
@@ -433,9 +431,9 @@ class CanopusResults:
                 # 3. calculate fraction and sort high to low, filter out Nones
                 fraction_tups = sorted(
                     (
-                        (cls, count / len_molfam)
+                        (cls, count / len_mf)
                         for cls, count in counts_cur_level.most_common()
-                        if count / len_molfam >= fraction_cutoff
+                        if count / len_mf >= fraction_cutoff
                     ),
                     key=lambda x: x[1],
                     reverse=True,
@@ -443,10 +441,10 @@ class CanopusResults:
                 if not fraction_tups:
                     fraction_tups = [None]
                 sorted_classes.append(fraction_tups)
-            molfam_classes[fid] = sorted_classes
+            mf_classes[fid] = sorted_classes
 
-        self._molfam_classes = molfam_classes
-        return molfam_classes
+        self._mf_classes = mf_classes
+        return mf_classes
 
     def show(self, objects):
         """Show a table of predicted chemical compound classes for spectrum/MF.
@@ -471,16 +469,16 @@ class CanopusResults:
         return self._spectra_classes_names_inds
 
     @property
-    def molfam_classes(self):
-        return self._molfam_classes
+    def mf_classes(self):
+        return self._mf_classes
 
     @property
-    def molfam_classes_names(self):
-        return self._molfam_classes_names
+    def mf_classes_names(self):
+        return self._mf_classes_names
 
     @property
-    def molfam_classes_names_inds(self):
-        return self._molfam_classes_names_inds
+    def mf_classes_names_inds(self):
+        return self._mf_classes_names_inds
 
 
 class MolNetEnhancerResults:
@@ -496,9 +494,9 @@ class MolNetEnhancerResults:
         Args:
             mne_dir: str, mne_dir found in root_dir of nplinker project
         """
-        cf_classes_names, molfam_classes, spectra2molfam = self._read_cf_classes(mne_dir)
-        self._spectra2molfam = spectra2molfam
-        self._molfam_classes = molfam_classes
+        cf_classes_names, mf_classes, spectra2mf = self._read_cf_classes(mne_dir)
+        self._spectra2mf = spectra2mf
+        self._mf_classes = mf_classes
         self._spectra_classes_names = cf_classes_names  # if NPC gets implemented, add here
         self._spectra_classes_names_inds = {elem: i for i, elem in enumerate(cf_classes_names)}
 
@@ -510,9 +508,9 @@ class MolNetEnhancerResults:
         Returns:
             tuple of:
             -list of str - names of the classes in order
-            -dict of {str: [(str, float)]} - linking molfams to (classes, scores) in order of names,
+            -dict of {str: [(str, float)]} - linking mfs to (classes, scores) in order of names,
                 singleton families are denoted with S[\d]+
-            -dict of {str:str} - linking spectra to molfams
+            -dict of {str:str} - linking spectra to mfs
         """
         columns = []
         mne_component_dict = {}
@@ -579,7 +577,7 @@ class MolNetEnhancerResults:
         return columns, mne_component_dict, mne_cluster2component
 
     def spectra_classes(self, spectrum_id):
-        """Return classes by relating spectrum_id in the molfam_classes.
+        """Return classes by relating spectrum_id in the mf_classes.
 
         Args:
             spectrum_id: int/str, spectrum_id - ints will be converted to str
@@ -587,14 +585,14 @@ class MolNetEnhancerResults:
         classes = []
         if isinstance(spectrum_id, int):
             spectrum_id = str(spectrum_id)
-        molfam_id = self.spectra2molfam.get(spectrum_id)
-        if molfam_id:
-            classes = self.molfam_classes.get(molfam_id)
+        mf_id = self.spectra2mf.get(spectrum_id)
+        if mf_id:
+            classes = self.mf_classes.get(mf_id)
         return classes
 
     @property
-    def spectra2molfam(self):
-        return self._spectra2molfam
+    def spectra2mf(self):
+        return self._spectra2mf
 
     @property
     def spectra_classes_names(self):
@@ -605,5 +603,5 @@ class MolNetEnhancerResults:
         return self._spectra_classes_names_inds
 
     @property
-    def molfam_classes(self):
-        return self._molfam_classes
+    def mf_classes(self):
+        return self._mf_classes

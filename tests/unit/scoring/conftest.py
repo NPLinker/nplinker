@@ -75,7 +75,7 @@ def npl(gcfs, spectra, mfs, strains, tmp_path) -> NPLinker:
     npl = NPLinker(CONFIG_FILE_LOCAL_MODE)
     npl._gcfs = gcfs
     npl._spectra = spectra
-    npl._molfams = mfs
+    npl._mfs = mfs
     npl._strains = strains
     npl._gcf_lookup = {gcf.id: gcf for gcf in gcfs}
     npl._mf_lookup = {mf.id: mf for mf in mfs}
