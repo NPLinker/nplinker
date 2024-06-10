@@ -60,7 +60,6 @@ class NPLinker:
         self._bgcs = []
         self._gcfs = []
         self._strains = None
-        self._metadata = {}
         self._mfs = []
         self._mibig_bgcs = []
         self._chem_classes = None
@@ -306,10 +305,6 @@ class NPLinker:
     def mfs(self):
         """Returns a list of all the MolecularFamilies in the dataset."""
         return self._mfs
-
-    @property
-    def metadata(self):
-        return self._metadata
 
     @property
     def mibig_bgcs(self):
