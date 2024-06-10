@@ -40,8 +40,10 @@ class NPLinker:
         Args:
             config_file: Path to the configuration file to use.
         """
+        # Load the configuration file
         self.config = load_config(config_file)
 
+        # Setup logging for the application
         setup_logging(
             level=self.config.log.level,
             file=self.config.log.get("file", ""),
@@ -51,10 +53,11 @@ class NPLinker:
             "Configuration:\n %s", pformat(self.config.as_dict(), width=20, sort_dicts=False)
         )
 
-        self.output_dir = self.config.root_dir / OUTPUT_DIRNAME
-        self.output_dir.mkdir(exist_ok=True)
+        # Setup the output directory
+        self._output_dir = self.config.root_dir / OUTPUT_DIRNAME
+        self._output_dir.mkdir(exist_ok=True)
 
-        # data containers that will be populated by the `load_data` method
+        # Initialise data containers that will be populated by the `load_data` method
         self._bgc_dict = {}
         self._gcf_dict = {}
         self._spec_dict = {}
@@ -78,17 +81,13 @@ class NPLinker:
 
     @property
     def root_dir(self) -> str:
-        """Returns path to the current dataset root directory.
-
-        Returns:
-            The path to the dataset root directory currently in use
-        """
+        """Get the path to the root directory of the current NPLinker instance."""
         return self.config.root_dir
 
     @property
-    def bigscape_cutoff(self):
-        """Returns the current BiGSCAPE clustering cutoff value."""
-        return self.config.bigscape.cutoff
+    def output_dir(self) -> str:
+        """Get the path to the output directory of the current NPLinker instance."""
+        return self._output_dir
 
     def load_data(self):
         """Load all data from local files into memory.
