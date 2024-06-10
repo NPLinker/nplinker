@@ -1,6 +1,5 @@
 from __future__ import annotations
 import logging
-import sys
 from os import PathLike
 from pprint import pformat
 from nplinker.strain.strain_collection import StrainCollection
@@ -14,7 +13,6 @@ from .loader import NPLINKER_APP_DATA_DIR
 from .loader import DatasetLoader
 from .metabolomics import MolecularFamily
 from .metabolomics import Spectrum
-from .pickler import save_pickled_data
 from .scoring.abc import ScoringBase
 from .scoring.metcalf_scoring import MetcalfScoring
 from .scoring.np_class_scoring import NPClassScoring
@@ -78,44 +76,6 @@ class NPLinker:
         self._scoring_methods_setup_complete = {
             name: False for name in self._scoring_methods.keys()
         }
-
-        self._repro_data = {}
-        repro_file = self.config.get("repro_file")
-        if repro_file:
-            self.save_repro_data(repro_file)
-
-    def _collect_repro_data(self):
-        """Creates a dict containing data to aid reproducible runs of nplinker.
-
-        This method creates a dict containing various bits of information about
-        the current execution of nplinker. This data will typically be saved to
-        a file in order to aid reproducibility using :func:`save_repro_data`.
-
-        TODO describe contents
-
-        Returns:
-            A dict containing the information described above
-        """
-        self._repro_data = {}
-        # TODO best way to embed latest git commit hash? probably with a packaging script...
-        # TODO versions of all Python dependencies used (just rely on
-        # Pipfile.lock here?)
-
-        # insert command line arguments
-        self._repro_data["args"] = {}
-        for i, arg in enumerate(sys.argv):
-            self._repro_data["args"][i] = arg
-
-        # TODO anything else to include here?
-
-        return self._repro_data
-
-    def save_repro_data(self, filename):
-        self._collect_repro_data()
-        with open(filename, "wb") as repro_file:
-            # TODO is pickle the best format to use?
-            save_pickled_data(self._repro_data, repro_file)
-            logger.info(f"Saving reproducibility data to {filename}")
 
     @property
     def root_dir(self) -> str:
@@ -353,11 +313,6 @@ class NPLinker:
     def class_matches(self):
         """ClassMatches with the matched classes and scoring tables from MIBiG."""
         return self._class_matches
-
-    @property
-    def repro_data(self):
-        """Returns the dict containing reproducibility data."""
-        return self._repro_data
 
     @property
     def scoring_methods(self):
