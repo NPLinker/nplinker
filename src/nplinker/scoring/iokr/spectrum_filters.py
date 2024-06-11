@@ -16,6 +16,7 @@ import json
 import os
 import pickle
 import numpy
+
 # import sys
 # sys.path.append('/home/grimur/git/lda')
 # from lda.code.formula import Formula
