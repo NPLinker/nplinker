@@ -47,7 +47,7 @@ data_invalid_version = {
 }
 
 
-# Test schema aginast invalid data
+# Test schema against invalid data
 @pytest.mark.parametrize(
     "data, expected",
     [
@@ -72,7 +72,7 @@ def test_invalid_data(data, expected):
     assert e.value.message == expected
 
 
-# Test schema aginast valid data
+# Test schema against valid data
 def test_valid_data():
     data = {
         "mappings": [

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def add_annotation_to_spectrum(annotations: dict[str, dict], spectra: list[Spectrum]) -> None:
-    """Add GNPS annotations to the `Spectrum.gnps_annotaions` attribute for input spectra.
+    """Add GNPS annotations to the `Spectrum.gnps_annotations` attribute for input spectra.
 
     It is possible that some spectra don't have annotations.
     Note that the input `spectra` list is changed in place.
@@ -45,7 +45,7 @@ def add_strains_to_spectrum(
 
             - the first list contains Spectrum objects that are updated with Strain objects;
             - the second list contains Spectrum objects that are not updated with Strain objects
-            becuase no Strain objects are found.
+            because no Strain objects are found.
     """
     spectra_with_strains = []
     spectra_without_strains = []

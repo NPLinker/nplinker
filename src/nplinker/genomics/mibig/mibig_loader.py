@@ -21,7 +21,7 @@ class MibigLoader:
     """
 
     def __init__(self, data_dir: str):
-        """Initialize the MIBiG metatdata loader.
+        """Initialize the MIBiG metadata loader.
 
         Args:
             data_dir: Path to the directory of MIBiG metadata json files

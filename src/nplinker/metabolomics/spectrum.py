@@ -19,7 +19,7 @@ class Spectrum:
         intensity: the list of intensity values.
         precursor_mz: the m/z value of the precursor.
         rt: the retention time in seconds.
-        metadata: the metadata of the spectrum, i.e. the header infomation in the MGF
+        metadata: the metadata of the spectrum, i.e. the header information in the MGF
             file.
         gnps_annotations: the GNPS annotations of the spectrum.
         gnps_id: the GNPS ID of the spectrum.
@@ -45,7 +45,7 @@ class Spectrum:
             intensity: the list of intensity values.
             precursor_mz: the precursor m/z.
             rt: the retention time in seconds. Defaults to 0.
-            metadata: the metadata of the spectrum, i.e. the header infomation
+            metadata: the metadata of the spectrum, i.e. the header information
                 in the MGF file.
         """
         self.id = id

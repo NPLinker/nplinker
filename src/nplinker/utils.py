@@ -398,7 +398,7 @@ def extract_archive(
             If omitted, the directory of the archive file is used.
         members: Optional selection of members to extract. If not specified,
             all members are extracted.
-            Memers must be a subset of the list returned by
+            Members must be a subset of the list returned by
             - `zipfile.ZipFile.namelist()` or a list of strings for zip file
             - `tarfile.TarFile.getmembers()` for tar file
         remove_finished: If `True`, remove the file after the extraction.

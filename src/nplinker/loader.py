@@ -101,7 +101,7 @@ class DatasetLoader:
             self.strains.add(strain)
         logger.info("Loaded {} non-MiBIG Strain objects".format(len(self.strains)))
 
-        # 2. filter user specificied strains (remove all that are not specified by user).
+        # 2. filter user specified strains (remove all that are not specified by user).
         # It's not allowed to specify empty list of strains, otherwise validation will fail.
         user_strains_file = self.config.root_dir / defaults.STRAINS_SELECTED_FILENAME
         if user_strains_file.exists():

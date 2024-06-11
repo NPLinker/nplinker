@@ -88,7 +88,7 @@ class GNPSDownloader:
         return self._task_id
 
     def get_url(self) -> str:
-        """Get the full URL linking to GNPS data to be dowloaded.
+        """Get the full URL linking to GNPS data to be downloaded.
 
         Returns:
             URL pointing to the GNPS data to be downloaded.
