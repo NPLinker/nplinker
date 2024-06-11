@@ -1,11 +1,12 @@
 from __future__ import annotations
 import logging
 import os
-from typing import TYPE_CHECKING
 from deprecated import deprecated
 from dynaconf import Dynaconf
 from nplinker import NPLINKER_APP_DATA_DIR
 from nplinker import defaults
+from nplinker.genomics import BGC
+from nplinker.genomics import GCF
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.bigscape import BigscapeGCFLoader
 from nplinker.genomics.bigscape import BigscapeV2GCFLoader
@@ -13,6 +14,8 @@ from nplinker.genomics.mibig import MibigLoader
 from nplinker.genomics.utils import add_bgc_to_gcf
 from nplinker.genomics.utils import add_strain_to_bgc
 from nplinker.genomics.utils import get_mibig_from_gcf
+from nplinker.metabolomics import MolecularFamily
+from nplinker.metabolomics import Spectrum
 from nplinker.metabolomics.gnps import GNPSAnnotationLoader
 from nplinker.metabolomics.gnps import GNPSMolecularFamilyLoader
 from nplinker.metabolomics.gnps import GNPSSpectrumLoader
@@ -22,12 +25,6 @@ from nplinker.metabolomics.utils import add_strains_to_spectrum
 from nplinker.strain import StrainCollection
 from nplinker.strain.utils import load_user_strains
 
-
-if TYPE_CHECKING:
-    from nplinker.genomics import BGC
-    from nplinker.genomics import GCF
-    from nplinker.metabolomics import MolecularFamily
-    from nplinker.metabolomics import Spectrum
 
 logger = logging.getLogger(__name__)
 

@@ -1,14 +1,10 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
 from typing import Sequence
 import pandas as pd
-
-
-if TYPE_CHECKING:
-    from nplinker.genomics import GCF
-    from nplinker.metabolomics import MolecularFamily
-    from nplinker.metabolomics import Spectrum
-    from nplinker.strain import StrainCollection
+from nplinker.genomics import GCF
+from nplinker.metabolomics import MolecularFamily
+from nplinker.metabolomics import Spectrum
+from nplinker.strain import StrainCollection
 
 
 def get_presence_gcf_strain(gcfs: Sequence[GCF], strains: StrainCollection) -> pd.DataFrame:

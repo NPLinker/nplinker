@@ -1,7 +1,8 @@
 from __future__ import annotations
 import logging
+from os import PathLike
 from pprint import pformat
-from typing import TYPE_CHECKING
+from typing import Sequence
 from typing import TypeVar
 from typing import overload
 from . import setup_logging
@@ -13,14 +14,9 @@ from .genomics import GCF
 from .loader import DatasetLoader
 from .metabolomics import MolecularFamily
 from .metabolomics import Spectrum
+from .scoring.link_graph import LinkGraph
 from .scoring.metcalf_scoring import MetcalfScoring
 from .strain import StrainCollection
-
-
-if TYPE_CHECKING:
-    from os import PathLike
-    from typing import Sequence
-    from nplinker.scoring.link_graph import LinkGraph
 
 
 logger = logging.getLogger(__name__)

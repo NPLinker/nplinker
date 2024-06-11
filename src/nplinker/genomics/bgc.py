@@ -2,11 +2,11 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 from deprecated import deprecated
+from nplinker.strain import Strain
 from .aa_pred import predict_aa
 
 
 if TYPE_CHECKING:
-    from ..strain import Strain
     from .gcf import GCF
 
 logger = logging.getLogger(__name__)

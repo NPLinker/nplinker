@@ -1,11 +1,11 @@
 from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
+from nplinker.strain import Strain
 from nplinker.strain import StrainCollection
 
 
 if TYPE_CHECKING:
-    from nplinker.strain import Strain
     from .bgc import BGC
 
 logger = logging.getLogger(__name__)

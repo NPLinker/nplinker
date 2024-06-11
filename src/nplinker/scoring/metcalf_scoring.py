@@ -20,7 +20,7 @@ from .utils import get_presence_spec_strain
 
 
 if TYPE_CHECKING:
-    from ..nplinker import NPLinker
+    from nplinker.nplinker import NPLinker
 
 
 logger = logging.getLogger(__name__)
