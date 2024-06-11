@@ -1,11 +1,11 @@
 from abc import ABC
 from abc import abstractmethod
 from typing import TYPE_CHECKING
+from typing import Mapping
+from typing import Sequence
 
 
 if TYPE_CHECKING:
-    from typing import Mapping
-    from typing import Sequence
     from .molecular_family import MolecularFamily
     from .spectrum import Spectrum
 
