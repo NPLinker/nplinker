@@ -27,7 +27,7 @@ import zipfile
 from os import PathLike
 from pathlib import Path
 from typing import IO
-from typing import Callable
+from typing import Callable, Sequence
 import httpx
 from rich.progress import BarColumn
 from rich.progress import DownloadColumn
@@ -256,7 +256,7 @@ def list_files(
 def _extract_tar(
     from_path: str | PathLike,
     to_path: str | PathLike,
-    members: list[tarfile.TarInfo] | None,
+    members: Sequence[tarfile.TarInfo] | None,
     compression: str | None,
 ) -> None:
     with tarfile.open(from_path, f"r:{compression[1:]}" if compression else "r") as tar:
@@ -272,7 +272,7 @@ _ZIP_COMPRESSION_MAP: dict[str, int] = {
 def _extract_zip(
     from_path: str | PathLike,
     to_path: str | PathLike,
-    members: list[str | zipfile.ZipInfo] | None,
+    members: Sequence[str | zipfile.ZipInfo] | None,
     compression: str | None,
 ) -> None:
     with zipfile.ZipFile(

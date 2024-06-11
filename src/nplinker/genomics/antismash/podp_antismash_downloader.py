@@ -5,6 +5,8 @@ import re
 import time
 from os import PathLike
 from pathlib import Path
+from typing import Mapping
+from typing import Sequence
 import httpx
 from bs4 import BeautifulSoup
 from bs4 import NavigableString
@@ -82,7 +84,7 @@ class GenomeStatus:
 
     @staticmethod
     def to_json(
-        genome_status_dict: dict[str, "GenomeStatus"], file: str | PathLike | None = None
+        genome_status_dict: Mapping[str, "GenomeStatus"], file: str | PathLike | None = None
     ) -> str | None:
         """Convert the genome status dictionary to a JSON string.
 
@@ -122,7 +124,7 @@ class GenomeStatus:
 
 
 def podp_download_and_extract_antismash_data(
-    genome_records: list[dict[str, dict[str, str]]],
+    genome_records: Sequence[Mapping[str, Mapping[str, str]]],
     project_download_root: str | PathLike,
     project_extract_root: str | PathLike,
 ):
@@ -220,7 +222,7 @@ def podp_download_and_extract_antismash_data(
         raise ValueError("No antiSMASH data found for any genome")
 
 
-def get_best_available_genome_id(genome_id_data: dict[str, str]) -> str | None:
+def get_best_available_genome_id(genome_id_data: Mapping[str, str]) -> str | None:
     """Get the best available ID from genome_id_data dict.
 
     Args:
@@ -359,7 +361,7 @@ def _resolve_jgi_accession(jgi_id: str) -> str:
     return _resolve_genbank_accession(link.text)
 
 
-def _resolve_refseq_id(genome_id_data: dict[str, str]) -> str:
+def _resolve_refseq_id(genome_id_data: Mapping[str, str]) -> str:
     """Get the RefSeq ID to which the genome accession is linked.
 
     Check https://pairedomicsdata.bioinformatics.nl/schema.json.

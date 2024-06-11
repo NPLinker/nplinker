@@ -1,6 +1,7 @@
 from abc import ABC
 from abc import abstractmethod
-from collections.abc import Sequence
+from typing import Mapping
+from typing import Sequence
 from .bgc import BGC
 from .gcf import GCF
 
@@ -18,7 +19,7 @@ class BGCLoaderBase(ABC):
         self.data_dir = data_dir
 
     @abstractmethod
-    def get_files(self) -> dict[str, str]:
+    def get_files(self) -> Mapping[str, str]:
         """Get path to BGC files.
 
         Returns:
