@@ -109,6 +109,15 @@ def is_file_format(file: str | PathLike, format: str = "tsv") -> bool:
 
 
 def calculate_md5(fpath: str | PathLike, chunk_size: int = 1024 * 1024) -> str:
+    """Calculate the MD5 checksum of a file.
+
+    Args:
+        fpath: Path to the file.
+        chunk_size: Chunk size for reading the file. Defaults to 1024*1024.
+
+    Returns:
+        MD5 checksum of the file.
+    """
     if sys.version_info >= (3, 9):
         md5 = hashlib.md5(usedforsecurity=False)
     else:
@@ -120,6 +129,15 @@ def calculate_md5(fpath: str | PathLike, chunk_size: int = 1024 * 1024) -> str:
 
 
 def check_md5(fpath: str | PathLike, md5: str) -> bool:
+    """Verify the MD5 checksum of a file.
+
+    Args:
+        fpath: Path to the file.
+        md5: MD5 checksum to verify.
+
+    Returns:
+        True if the MD5 checksum matches, False otherwise.
+    """
     return md5 == calculate_md5(fpath)
 
 
