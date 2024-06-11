@@ -48,13 +48,13 @@ class TestMibigBGCLoader:
         assert isinstance(files["BGC0000001"], str)
         assert os.path.exists(files["BGC0000001"])
 
-    def test_get_metadatas(self, loader):
-        metadatas = loader.get_metadatas()
-        assert isinstance(metadatas, dict)
-        assert len(metadatas) == 2502  # MIBiG v3.1 has 2502 BGCs
-        assert "BGC0000001" in metadatas
-        assert "BGC0000246" not in metadatas
-        assert isinstance(metadatas["BGC0000001"], MibigMetadata)
+    def test_get_metadata(self, loader):
+        metadata = loader.get_metadata()
+        assert isinstance(metadata, dict)
+        assert len(metadata) == 2502  # MIBiG v3.1 has 2502 BGCs
+        assert "BGC0000001" in metadata
+        assert "BGC0000246" not in metadata
+        assert isinstance(metadata["BGC0000001"], MibigMetadata)
 
     def test_get_bgcs(self, loader):
         bgcs = loader.get_bgcs()

@@ -28,7 +28,7 @@ class MibigLoader:
         """
         self.data_dir = data_dir
         self._file_dict = self.parse_data_dir(self.data_dir)
-        self._metadata_dict = self._parse_metadatas()
+        self._metadata_dict = self._parse_metadata()
         self._bgcs = self._parse_bgcs()
 
     def get_files(self) -> dict[str, str]:
@@ -58,7 +58,7 @@ class MibigLoader:
             file_dict[fname] = file
         return file_dict
 
-    def get_metadatas(self) -> dict[str, MibigMetadata]:
+    def get_metadata(self) -> dict[str, MibigMetadata]:
         """Get MibigMetadata objects.
 
         Returns:
@@ -66,7 +66,7 @@ class MibigLoader:
         """
         return self._metadata_dict
 
-    def _parse_metadatas(self) -> dict[str, MibigMetadata]:
+    def _parse_metadata(self) -> dict[str, MibigMetadata]:
         """Parse all metadata files and return MibigMetadata objects.
 
         Returns:
