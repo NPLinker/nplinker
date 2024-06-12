@@ -97,6 +97,7 @@ testpaths = ["tests/unit"]
 [tool.coverage.run]
 branch = true
 source = ["src"]
+relative_files = true # show relative path in report, important for sonarcloud
 
 [tool.coverage.report]
 omit = [
