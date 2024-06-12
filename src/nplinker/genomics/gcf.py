@@ -18,7 +18,7 @@ class GCF:
     tools such as BiG-SCAPE and BiG-SLICE.
 
     Attributes:
-        gcf_id: id of the GCF object.
+        id: id of the GCF object.
         bgc_ids: a set of BGC ids that belongs to the GCF.
         bigscape_class: BiG-SCAPE's BGC class.
             BiG-SCAPE's BGC classes are similar to those defined in MiBIG
@@ -26,13 +26,13 @@ class GCF:
             https://doi.org/10.1038%2Fs41589-019-0400-9.
     """
 
-    def __init__(self, gcf_id: str, /) -> None:
+    def __init__(self, id: str, /) -> None:
         """Initialize the GCF object.
 
         Args:
-            gcf_id: id of the GCF object.
+            id: id of the GCF object.
         """
-        self.gcf_id = gcf_id
+        self.id = id
         self.bgc_ids: set[str] = set()
         self.bigscape_class: str | None = None
         self._bgcs: set[BGC] = set()
@@ -40,7 +40,7 @@ class GCF:
 
     def __str__(self) -> str:
         return (
-            f"GCF(id={self.gcf_id}, #BGC_objects={len(self.bgcs)}, #bgc_ids={len(self.bgc_ids)},"
+            f"GCF(id={self.id}, #BGC_objects={len(self.bgcs)}, #bgc_ids={len(self.bgc_ids)},"
             f"#strains={len(self._strains)})."
         )
 
@@ -49,7 +49,7 @@ class GCF:
 
     def __eq__(self, other) -> bool:
         if isinstance(other, GCF):
-            return self.gcf_id == other.gcf_id and self.bgcs == other.bgcs
+            return self.id == other.id and self.bgcs == other.bgcs
         return NotImplemented
 
     def __hash__(self) -> int:
@@ -58,7 +58,7 @@ class GCF:
         Note that GCF class is a mutable container. We only hash the GCF id to
         avoid the hash value changes when `self._bgcs` is updated.
         """
-        return hash(self.gcf_id)
+        return hash(self.id)
 
     @property
     def bgcs(self) -> set[BGC]:
@@ -74,17 +74,17 @@ class GCF:
         """Add a BGC object to the GCF."""
         bgc.parents.add(self)
         self._bgcs.add(bgc)
-        self.bgc_ids.add(bgc.bgc_id)
+        self.bgc_ids.add(bgc.id)
         if bgc.strain is not None:
             self._strains.add(bgc.strain)
         else:
-            logger.warning("No strain specified for the BGC %s", bgc.bgc_id)
+            logger.warning("No strain specified for the BGC %s", bgc.id)
 
     def detach_bgc(self, bgc: BGC) -> None:
         """Remove a child BGC object."""
         bgc.parents.remove(self)
         self._bgcs.remove(bgc)
-        self.bgc_ids.remove(bgc.bgc_id)
+        self.bgc_ids.remove(bgc.id)
         if bgc.strain is not None:
             for other_bgc in self._bgcs:
                 if other_bgc.strain == bgc.strain:

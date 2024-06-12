@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Initial code for NPClassScore."""
+
 import glob
 import os
 import sys
@@ -541,7 +542,7 @@ class NPLinker_classes(NPLinker):
 
         if is_spectrum:
             # list of list of tuples/None - todo: add to spectrum object
-            spec_like_classes = self.canopus.spectra_classes.get(str(spec_like.spectrum_id))
+            spec_like_classes = self.canopus.spectra_classes.get(str(spec_like.id))
             spec_like_classes_names_inds = self.canopus.spectra_classes_names_inds
         else:  # molfam
             spec_like_classes = self.canopus.molfam_classes.get(str(spec_like.family_id))
@@ -654,7 +655,7 @@ class NPLinker_classes(NPLinker):
             if is_spectrum:
                 # list of list of tuples/None - todo: add to spectrum object
                 # take only 'best' (first) classification per ontology level
-                all_classes = self.canopus.spectra_classes.get(str(spec_like.spectrum_id))
+                all_classes = self.canopus.spectra_classes.get(str(spec_like.id))
                 if all_classes:
                     spec_like_classes = [
                         cls_per_lvl
@@ -675,7 +676,7 @@ class NPLinker_classes(NPLinker):
                 spec_like_classes_names_inds = self.canopus.molfam_classes_names_inds
         if use_mne and not spec_like_classes:  # if mne or when main/canopus does not get classes
             if is_spectrum:
-                spec_like_classes = self.molnetenhancer.spectra_classes(spec_like.spectrum_id)
+                spec_like_classes = self.molnetenhancer.spectra_classes(spec_like.id)
             else:  # molfam
                 spec_like_classes = self.molnetenhancer.molfam_classes.get(str(spec_like.family_id))
             # classes are same for molfam and spectrum so names are irrespective of is_spectrum
@@ -777,4 +778,4 @@ class NPLinker_classes(NPLinker):
         return bgc_like_classes_dict
 
     def _get_bgc_like_gcf(self, bgc_like):
-        return [gcf for gcf in self.gcfs if bgc_like.bgc_id in [b.bgc_id for b in gcf.bgcs]][0]
+        return [gcf for gcf in self.gcfs if bgc_like.bgc_id in [b.id for b in gcf.bgcs]][0]

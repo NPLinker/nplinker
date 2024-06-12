@@ -16,7 +16,7 @@ def test_get_links_gcf_standardised_false(npl, mc, gcfs, spectra, mfs, strains_l
     assert isinstance(links, LinkCollection)
     links = links.links  # dict of link values
     assert len(links) == 3
-    assert {i.gcf_id for i in links.keys()} == {"gcf1", "gcf2", "gcf3"}
+    assert {i.id for i in links.keys()} == {"gcf1", "gcf2", "gcf3"}
     assert isinstance(links[gcfs[0]][spectra[0]], ObjectLink)
     assert links[gcfs[0]][spectra[0]].data(mc) == 12
     assert links[gcfs[1]][spectra[0]].data(mc) == -9
@@ -30,7 +30,7 @@ def test_get_links_gcf_standardised_false(npl, mc, gcfs, spectra, mfs, strains_l
     links = npl.get_links(list(gcfs), mc, and_mode=True)
     assert isinstance(links, LinkCollection)
     links = links.links
-    assert {i.gcf_id for i in links.keys()} == {"gcf1", "gcf2", "gcf3"}
+    assert {i.id for i in links.keys()} == {"gcf1", "gcf2", "gcf3"}
     assert isinstance(links[gcfs[0]][spectra[0]], ObjectLink)
     # test scores
     assert links[gcfs[0]][spectra[0]].data(mc) == 12
@@ -57,7 +57,7 @@ def test_get_links_spec_standardised_false(npl, mc, gcfs, spectra, strains_list)
     assert isinstance(links, LinkCollection)
     links = links.links  # dict of link values
     assert len(links) == 3
-    assert {i.spectrum_id for i in links.keys()} == {"spectrum1", "spectrum2", "spectrum3"}
+    assert {i.id for i in links.keys()} == {"spectrum1", "spectrum2", "spectrum3"}
     assert isinstance(links[spectra[0]][gcfs[0]], ObjectLink)
     assert links[spectra[0]][gcfs[0]].data(mc) == 12
     assert links[spectra[0]][gcfs[1]].data(mc) == -9
@@ -68,7 +68,7 @@ def test_get_links_spec_standardised_false(npl, mc, gcfs, spectra, strains_list)
     assert isinstance(links, LinkCollection)
     links = links.links  # dict of link values
     assert len(links) == 3
-    assert {i.spectrum_id for i in links.keys()} == {"spectrum1", "spectrum2", "spectrum3"}
+    assert {i.id for i in links.keys()} == {"spectrum1", "spectrum2", "spectrum3"}
     assert isinstance(links[spectra[0]][gcfs[0]], ObjectLink)
     assert links[spectra[0]][gcfs[0]].data(mc) == 12
     assert links[spectra[0]].get(gcfs[1]) is None
@@ -91,7 +91,7 @@ def test_get_links_mf_standardised_false(npl, mc, gcfs, mfs, strains_list):
     assert isinstance(links, LinkCollection)
     links = links.links
     assert len(links) == 3
-    assert {i.family_id for i in links.keys()} == {"mf1", "mf2", "mf3"}
+    assert {i.id for i in links.keys()} == {"mf1", "mf2", "mf3"}
     assert isinstance(links[mfs[0]][gcfs[0]], ObjectLink)
     assert links[mfs[0]][gcfs[0]].data(mc) == 12
     assert links[mfs[0]][gcfs[1]].data(mc) == -9
@@ -102,7 +102,7 @@ def test_get_links_mf_standardised_false(npl, mc, gcfs, mfs, strains_list):
     assert isinstance(links, LinkCollection)
     links = links.links
     assert len(links) == 3
-    assert {i.family_id for i in links.keys()} == {"mf1", "mf2", "mf3"}
+    assert {i.id for i in links.keys()} == {"mf1", "mf2", "mf3"}
     assert isinstance(links[mfs[0]][gcfs[0]], ObjectLink)
     assert links[mfs[0]][gcfs[0]].data(mc) == 12
     assert links[mfs[0]].get(gcfs[1]) is None

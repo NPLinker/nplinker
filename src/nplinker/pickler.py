@@ -39,13 +39,13 @@ logger = logging.getLogger(__name__)
 class NPLinkerPickler(pickle.Pickler):
     def persistent_id(self, obj):
         if isinstance(obj, BGC):
-            return ("BGC", obj.bgc_id)
+            return ("BGC", obj.id)
         elif isinstance(obj, GCF):
-            return ("GCF", obj.gcf_id)
+            return ("GCF", obj.id)
         elif isinstance(obj, Spectrum):
-            return ("Spectrum", obj.spectrum_id)
+            return ("Spectrum", obj.id)
         elif isinstance(obj, MolecularFamily):
-            return ("MolecularFamily", obj.family_id)
+            return ("MolecularFamily", obj.id)
         else:
             # TODO: ideally should use isinstance(obj, ScoringMethod) here
             # but it's currently a problem because it creates a circular

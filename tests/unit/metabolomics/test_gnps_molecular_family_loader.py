@@ -22,5 +22,5 @@ def test_gnps_molecular_family_loader(
     actual = loader.get_mfs(keep_singleton=keep_singleton)
     assert len(actual) == num_families
     # test molecular family with id "1" has correct number of spectra ids
-    mf = [mf for mf in actual if mf.family_id == "1"][0]
+    mf = [mf for mf in actual if mf.id == "1"][0]
     assert len(mf.spectra_ids) == num_spectra

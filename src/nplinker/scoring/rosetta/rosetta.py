@@ -547,10 +547,10 @@ class Rosetta:
             for hit in self._rosetta_hits:
                 csvwriter.writerow(
                     [
-                        hit.spec.spectrum_id,
+                        hit.spec.id,
                         hit.gnps_id,
                         hit.spec_match_score,
-                        hit.bgc.bgc_id,
+                        hit.bgc.id,
                         hit.mibig_id,
                         hit.bgc_match_score,
                     ]

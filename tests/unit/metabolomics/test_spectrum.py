@@ -16,7 +16,7 @@ def test_init(rt, metadata, expected_metadata):
     """Test the initialization of the Spectrum class."""
     spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150, rt, metadata)
 
-    assert spec.spectrum_id == "spec1"
+    assert spec.id == "spec1"
     assert spec.mz == [100, 200]
     assert spec.intensity == [0.1, 0.2]
     assert spec.precursor_mz == 150
@@ -33,8 +33,8 @@ def test_init(rt, metadata, expected_metadata):
 def test_str_repr():
     """Test the __str__ and __repr__ methods."""
     spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150)
-    assert str(spec) == "Spectrum(spectrum_id=spec1, #strains=0)"
-    assert repr(spec) == "Spectrum(spectrum_id=spec1, #strains=0)"
+    assert str(spec) == "Spectrum(id=spec1, #strains=0)"
+    assert repr(spec) == "Spectrum(id=spec1, #strains=0)"
 
 
 def test_eq():

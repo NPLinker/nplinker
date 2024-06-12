@@ -387,9 +387,7 @@ class MetcalfScoring(ScoringBase):
 
         links = []
         if obj_type == "gcf":
-            # TODO CG: the hint and mypy warnings will be gone after renaming all
-            # string ids to `.id`
-            obj_ids = [gcf.gcf_id for gcf in objects]
+            obj_ids = [gcf.id for gcf in objects]
             # spec-gcf
             scores = self.raw_score_spec_gcf.loc[:, obj_ids]
             df = self._get_scores_source_gcf(scores, score_cutoff)
@@ -402,14 +400,14 @@ class MetcalfScoring(ScoringBase):
             links.append(df)
 
         if obj_type == "spec":
-            obj_ids = [spec.spectrum_id for spec in objects]
+            obj_ids = [spec.id for spec in objects]
             scores = self.raw_score_spec_gcf.loc[obj_ids, :]
             df = self._get_scores_source_met(scores, score_cutoff)
             df.name = LINK_TYPES[0]
             links.append(df)
 
         if obj_type == "mf":
-            obj_ids = [mf.family_id for mf in objects]
+            obj_ids = [mf.id for mf in objects]
             scores = self.raw_score_mf_gcf.loc[obj_ids, :]
             df = self._get_scores_source_met(scores, score_cutoff)
             df.name = LINK_TYPES[1]

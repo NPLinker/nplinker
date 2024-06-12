@@ -396,17 +396,17 @@ class CanopusResults:
         molfam_classes = {}
 
         for molfam in molfams:
-            fid = molfam.family_id  # the key
+            fid = molfam.id  # the key
             spectra = molfam.spectra
             # if singleton family, format like 'fid_spectrum-id'
             if fid.startswith("singleton-"):
-                spec_id = spectra[0].spectrum_id
+                spec_id = spectra[0].id
                 fid += f"_{spec_id}"
             len_molfam = len(spectra)
 
             classes_per_spectra = []
             for spec in spectra:
-                spec_classes = self.spectra_classes.get(spec.spectrum_id)
+                spec_classes = self.spectra_classes.get(spec.id)
                 if spec_classes:  # account for spectra without prediction
                     classes_per_spectra.append(spec_classes)
 

@@ -91,13 +91,13 @@ def add_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]) -> tuple[list[
     bgc_without_strain = []
     for bgc in bgcs:
         try:
-            strain_list = strains.lookup(bgc.bgc_id)
+            strain_list = strains.lookup(bgc.id)
         except ValueError:
             bgc_without_strain.append(bgc)
             continue
         if len(strain_list) > 1:
             raise ValueError(
-                f"Multiple strain objects found for BGC id '{bgc.bgc_id}'."
+                f"Multiple strain objects found for BGC id '{bgc.id}'."
                 f"BGC object accept only one strain."
             )
         bgc.strain = strain_list[0]
@@ -136,7 +136,7 @@ def add_bgc_to_gcf(
             - The dictionary contains GCF objects as keys and a set of ids of missing
                 BGC objects as values.
     """
-    bgc_dict = {bgc.bgc_id: bgc for bgc in bgcs}
+    bgc_dict = {bgc.id: bgc for bgc in bgcs}
     gcf_with_bgc = []
     gcf_without_bgc = []
     gcf_missing_bgc: dict[GCF, set[str]] = {}
