@@ -42,7 +42,7 @@ jobs:
           python-version: '3.10'
       - name: Install nplinker and its dependencies
         run: |
-          python3 -m pip install .[dev]
+          python3 -m pip install -e .[dev]
           install-nplinker-deps --run-on-github
       - name: Run unit tests with coverage
         run: pytest --cov=nplinker --cov-report=xml --cov-report=term tests/unit
