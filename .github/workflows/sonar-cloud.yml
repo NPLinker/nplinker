@@ -45,7 +45,7 @@ jobs:
           python3 -m pip install .[dev]
           install-nplinker-deps --run-on-github
       - name: Run unit tests with coverage
-        run: pytest --cov=nplinker --cov-report=xml tests/unit
+        run: pytest --cov=nplinker --cov-report=xml --cov-report=term tests/unit
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
