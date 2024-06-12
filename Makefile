@@ -26,7 +26,8 @@ clean-pyc:
 	find . -name '*_cache' -exec rm -fr {} +
 
 clean-test:
-	rm -f .coverage
+	rm -f .coverage*
+	rm -f coverage.xml
 
 build: clean
 	python -m build

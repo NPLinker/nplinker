@@ -97,7 +97,20 @@ testpaths = ["tests/unit"]
 [tool.coverage.run]
 branch = true
 source = ["src"]
-command_line = "-m pytest"
+
+[tool.coverage.report]
+omit = [
+    "src/nplinker/class_info/*",
+    "src/nplinker/data/*",
+    "src/nplinker/genomics/aa_pred.py",
+    "src/nplinker/parsers/*",
+    "src/nplinker/scoring/iokr/*",
+    "src/nplinker/scoring/rosetta/*",
+    "src/nplinker/scoring/np_class_scoring.py",
+    "src/nplinker/scoring/rosetta_scoring.py",
+    "src/nplinker/spec_clustering.py",
+    "src/nplinker/pickler.py"
+    ]
 
 # Mypy: to check static type
 # see https://mypy.readthedocs.io/en/stable/config_file.html#example-pyproject-toml
