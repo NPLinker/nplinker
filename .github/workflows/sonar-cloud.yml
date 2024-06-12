@@ -10,7 +10,7 @@ on:
       - src/**
       - tests/**
       - setup.py
-      - .github/workflows/build.yml
+      - .github/workflows/**
   pull_request:
     branches:
       - main
@@ -20,7 +20,7 @@ on:
       - src/**
       - tests/**
       - setup.py
-      - .github/workflows/build.yml
+      - .github/workflows/**
     types:
       - opened
       - reopened
