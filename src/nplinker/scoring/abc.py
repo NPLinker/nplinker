@@ -21,14 +21,7 @@ class ScoringBase(ABC):
     """
 
     name: str = "ScoringBase"
-
-    def __init__(self, npl: NPLinker):
-        """Initialize the scoring method.
-
-        Args:
-            npl: The NPLinker object.
-        """
-        self.npl = npl
+    npl: NPLinker | None = None
 
     @classmethod
     @abstractmethod
