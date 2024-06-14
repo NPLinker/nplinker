@@ -145,6 +145,7 @@ echo "🔥 Start installing BigScape ..."
     pip install click
     pip install sqlalchemy
     pip install pyhmmer
+    pip install tqdm
     chmod 754 bigscape.py
     ln -sf $LIB_PATH/BiG-SCAPE-v2/bigscape.py $PY_PATH/bin/bigscape-v2.py
     cd ..
