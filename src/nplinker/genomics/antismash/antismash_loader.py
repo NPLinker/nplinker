@@ -34,14 +34,14 @@ class AntismashBGCLoader:
         ```
     """
 
-    def __init__(self, data_dir: str) -> None:
+    def __init__(self, data_dir: str | PathLike) -> None:
         """Initialize the AntiSMASH BGC loader.
 
         Args:
             data_dir: Path to AntiSMASH directory that contains a
                 collection of AntiSMASH outputs.
         """
-        self.data_dir = data_dir
+        self.data_dir = str(data_dir)
         self._file_dict = self._parse_data_dir(self.data_dir)
         self._bgcs = self._parse_bgcs(self._file_dict)
 

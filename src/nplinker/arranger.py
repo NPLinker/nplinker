@@ -2,6 +2,7 @@ import fnmatch
 import json
 import shutil
 from glob import glob
+from os import PathLike
 from pathlib import Path
 from dynaconf import Dynaconf
 from jsonschema import validate
@@ -369,7 +370,7 @@ class DatasetArranger:
             validate(instance=json_data, schema=USER_STRAINS_SCHEMA)
 
 
-def validate_gnps(gnps_dir: Path) -> None:
+def validate_gnps(gnps_dir: str | PathLike) -> None:
     """Validate the GNPS data directory and its contents.
 
     The GNPS data directory must contain the following files:
@@ -387,6 +388,7 @@ def validate_gnps(gnps_dir: Path) -> None:
             is not found.
         ValueError: If both file_mappings.tsv and file_mapping.csv are found.
     """
+    gnps_dir = Path(gnps_dir)
     if not gnps_dir.exists():
         raise FileNotFoundError(f"GNPS data directory not found at {gnps_dir}")
 
@@ -415,7 +417,7 @@ def validate_gnps(gnps_dir: Path) -> None:
         )
 
 
-def validate_antismash(antismash_dir: Path) -> None:
+def validate_antismash(antismash_dir: str | PathLike) -> None:
     """Validate the antiSMASH data directory and its contents.
 
     The validation only checks the structure of the antiSMASH data directory and file names.
@@ -438,6 +440,7 @@ def validate_antismash(antismash_dir: Path) -> None:
             sub-directory.
         ValueError: If any sub-directory name contains a space.
     """
+    antismash_dir = Path(antismash_dir)
     if not antismash_dir.exists():
         raise FileNotFoundError(f"antiSMASH data directory not found at {antismash_dir}")
 
@@ -460,7 +463,7 @@ def validate_antismash(antismash_dir: Path) -> None:
             raise FileNotFoundError(f"No BGC files found in antiSMASH sub-directory {sub_dir}")
 
 
-def validate_bigscape(bigscape_dir: Path, cutoff: str) -> None:
+def validate_bigscape(bigscape_dir: str | PathLike, cutoff: str) -> None:
     """Validate the BiG-SCAPE data directory and its contents.
 
     The BiG-SCAPE data directory must exist and contain the clustering file
@@ -478,6 +481,7 @@ def validate_bigscape(bigscape_dir: Path, cutoff: str) -> None:
     Raises:
         FileNotFoundError: If the BiG-SCAPE data directory or the clustering file is not found.
     """
+    bigscape_dir = Path(bigscape_dir)
     if not bigscape_dir.exists():
         raise FileNotFoundError(f"BiG-SCAPE data directory not found at {bigscape_dir}")
 

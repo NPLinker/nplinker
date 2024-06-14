@@ -1,6 +1,6 @@
 import logging
-import os.path
 from os import PathLike
+from pathlib import Path
 from nplinker.strain import Strain
 from nplinker.utils import list_files
 from ..abc import BGCLoaderBase
@@ -21,13 +21,13 @@ class MibigLoader:
     objects have Strain object as their strain attribute (i.e. `BGC.strain`).
     """
 
-    def __init__(self, data_dir: str):
+    def __init__(self, data_dir: str | PathLike):
         """Initialize the MIBiG metadata loader.
 
         Args:
             data_dir: Path to the directory of MIBiG metadata json files
         """
-        self.data_dir = data_dir
+        self.data_dir = str(data_dir)
         self._file_dict = self.parse_data_dir(self.data_dir)
         self._metadata_dict = self._parse_metadata()
         self._bgcs = self._parse_bgcs()
@@ -42,7 +42,7 @@ class MibigLoader:
         return self._file_dict
 
     @staticmethod
-    def parse_data_dir(data_dir: str) -> dict[str, str]:
+    def parse_data_dir(data_dir: str | PathLike) -> dict[str, str]:
         """Parse metadata directory and return paths to all metadata json files.
 
         Args:
@@ -55,7 +55,7 @@ class MibigLoader:
         file_dict = {}
         json_files = list_files(data_dir, prefix="BGC", suffix=".json")
         for file in json_files:
-            fname = os.path.splitext(os.path.basename(file))[0]
+            fname = Path(file).stem
             file_dict[fname] = file
         return file_dict
 
