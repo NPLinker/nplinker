@@ -16,7 +16,7 @@ def get_presence_gcf_strain(gcfs: Sequence[GCF], strains: StrainCollection) -> p
     """Get the occurrence of strains in gcfs.
 
     The occurrence is a DataFrame with GCF objects as index and Strain objects as columns, and the
-    values are 1 if the gcf occur in the strain,  0 otherwise.
+    values are 1 if the gcf occurs in the strain,  0 otherwise.
     """
     df_gcf_strain = pd.DataFrame(
         np.zeros((len(gcfs), len(strains))),
@@ -37,7 +37,7 @@ def get_presence_spec_strain(
     """Get the occurrence of strains in spectra.
 
     The occurrence is a DataFrame with Spectrum objects as index and Strain objects as columns, and
-    the values are 1 if the spectrum occur in the strain, 0 otherwise.
+    the values are 1 if the spectrum occurs in the strain, 0 otherwise.
     """
     df_spec_strain = pd.DataFrame(
         np.zeros((len(spectra), len(strains))),
@@ -58,7 +58,7 @@ def get_presence_mf_strain(
     """Get the occurrence of strains in molecular families.
 
     The occurrence is a DataFrame with MolecularFamily objects as index and Strain objects as
-    columns, and the values are 1 if the molecular family occur in the strain, 0 otherwise.
+    columns, and the values are 1 if the molecular family occurs in the strain, 0 otherwise.
     """
     df_mf_strain = pd.DataFrame(
         np.zeros((len(mfs), len(strains))),
