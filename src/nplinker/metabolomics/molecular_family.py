@@ -44,6 +44,10 @@ class MolecularFamily:
     def __hash__(self) -> int:
         return hash(self.id)
 
+    def __reduce__(self) -> tuple:
+        """Reduce function for pickling."""
+        return (self.__class__, (self.id,), self.__dict__)
+
     @property
     def spectra(self) -> set[Spectrum]:
         """Get Spectrum objects in the molecular family."""

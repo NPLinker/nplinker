@@ -103,6 +103,10 @@ class BGC:
     def __hash__(self) -> int:
         return hash((self.id, self.product_prediction))
 
+    def __reduce__(self) -> tuple:
+        """Reduce function for pickling."""
+        return (self.__class__, (self.id, *self.product_prediction), self.__dict__)
+
     def add_parent(self, gcf: GCF) -> None:
         """Add a parent GCF to the BGC.
 
