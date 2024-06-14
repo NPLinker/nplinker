@@ -1,5 +1,6 @@
 from __future__ import annotations
 from functools import wraps
+from typing import Union
 from networkx import Graph
 from nplinker.genomics import GCF
 from nplinker.metabolomics import MolecularFamily
@@ -8,11 +9,17 @@ from .score import Score
 from .scoring_method import ScoringMethod
 
 
+# Type aliases
+Entity = Union[GCF, Spectrum, MolecularFamily]  # using Union to ensure python 3.9 compatibility
+LINK_DATA = dict[str, Score]
+LINK = tuple[Entity, Entity, LINK_DATA]
+
+
 def validate_u(func):
     """A decorator to validate the type of the u object."""
 
     @wraps(func)
-    def wrapper(self, u: GCF | Spectrum | MolecularFamily, *args, **kwargs):
+    def wrapper(self, u: Entity, *args, **kwargs):
         if not isinstance(u, (GCF, Spectrum, MolecularFamily)):
             raise TypeError(f"{u} is not a GCF, Spectrum, or MolecularFamily object.")
 
@@ -27,8 +34,8 @@ def validate_uv(func):
     @wraps(func)
     def wrapper(
         self,
-        u: GCF | Spectrum | MolecularFamily,
-        v: GCF | Spectrum | MolecularFamily,
+        u: Entity,
+        v: Entity,
         *args,
         **kwargs,
     ):
@@ -94,9 +101,7 @@ class LinkGraph:
         return len(self._g)
 
     @validate_u
-    def __getitem__(
-        self, u: GCF | Spectrum | MolecularFamily
-    ) -> dict[GCF | Spectrum | MolecularFamily, dict[str, Score]]:
+    def __getitem__(self, u: Entity) -> dict[Entity, LINK_DATA]:
         """Get all links for a given object.
 
         Args:
@@ -118,9 +123,7 @@ class LinkGraph:
     @property
     def links(
         self,
-    ) -> list[
-        tuple[GCF | Spectrum | MolecularFamily, GCF | Spectrum | MolecularFamily, dict[str, Score]]
-    ]:
+    ) -> list[LINK]:
         """Get all links.
 
         Returns:
@@ -131,8 +134,8 @@ class LinkGraph:
     @validate_uv
     def add_link(
         self,
-        u: GCF | Spectrum | MolecularFamily,
-        v: GCF | Spectrum | MolecularFamily,
+        u: Entity,
+        v: Entity,
         **data: Score,
     ) -> None:
         """Add a link between two objects.
@@ -161,9 +164,7 @@ class LinkGraph:
         self._g.add_edge(u, v, **data)
 
     @validate_uv
-    def has_link(
-        self, u: GCF | Spectrum | MolecularFamily, v: GCF | Spectrum | MolecularFamily
-    ) -> bool:
+    def has_link(self, u: Entity, v: Entity) -> bool:
         """Check if there is a link between two objects.
 
         Args:
@@ -178,9 +179,9 @@ class LinkGraph:
     @validate_uv
     def get_link_data(
         self,
-        u: GCF | Spectrum | MolecularFamily,
-        v: GCF | Spectrum | MolecularFamily,
-    ) -> dict[str, Score] | None:
+        u: Entity,
+        v: Entity,
+    ) -> LINK_DATA | None:
         """Get the data for a link between two objects.
 
         Args:
