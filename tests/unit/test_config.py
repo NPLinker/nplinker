@@ -25,5 +25,6 @@ def test_config(tmp_path):
         == "--mibig --clans-off --mix --include_singletons --cutoffs 0.30"
     )
     assert config.bigscape.cutoff == "0.30"
+    assert config.bigscape.version == 1
 
     assert config.scoring.methods == ["metcalf"]
