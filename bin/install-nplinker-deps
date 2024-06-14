@@ -141,14 +141,12 @@ echo "🔥 Start installing BigScape ..."
     [[ -d BiG-SCAPE-v2 ]] || git clone -b dev --filter=blob:limit=10m https://github.com/medema-group/BiG-SCAPE.git BiG-SCAPE-v2
     cd BiG-SCAPE-v2
     git config --ad advice.detatchedHead false
-    git checkout dfb0d78427e020aab2c72cc741327ccd102470a1 # specific commit that includes important fixes to v2
+    git checkout 99a4c2e4923bb50e175b2e619c2cee0a14918789 # Commits on Jun 14, 2024
     pip install click
     pip install sqlalchemy
     pip install pyhmmer
     chmod 754 bigscape.py
     ln -sf $LIB_PATH/BiG-SCAPE-v2/bigscape.py $PY_PATH/bin/bigscape-v2.py
-    ln -sf $LIB_PATH/BiG-SCAPE-v2/config.ini $PY_PATH/bin # new system of configuration needs default config file
-    ln -sf $LIB_PATH/BiG-SCAPE-v2/big_scape $PY_PATH/bin # folder is needed for some files
     cd ..
 
 
