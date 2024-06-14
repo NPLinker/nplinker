@@ -1,5 +1,6 @@
 import logging
 import os.path
+from os import PathLike
 from nplinker.strain import Strain
 from nplinker.utils import list_files
 from ..abc import BGCLoaderBase
@@ -99,7 +100,7 @@ class MibigLoader:
         return [parse_bgc_metadata_json(file) for file in self._file_dict.values()]
 
 
-def parse_bgc_metadata_json(file: str) -> BGC:
+def parse_bgc_metadata_json(file: str | PathLike) -> BGC:
     """Parse MIBiG metadata file and return BGC object.
 
     Note that the MiBIG accession is used as the BGC id and strain name. The BGC
@@ -111,7 +112,7 @@ def parse_bgc_metadata_json(file: str) -> BGC:
     Returns:
         BGC object
     """
-    metadata = MibigMetadata(file)
+    metadata = MibigMetadata(str(file))
     mibig_bgc = BGC(metadata.mibig_accession, *metadata.biosyn_class)
     mibig_bgc.mibig_bgc_class = metadata.biosyn_class
     mibig_bgc.strain = Strain(metadata.mibig_accession)

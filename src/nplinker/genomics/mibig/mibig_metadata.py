@@ -1,4 +1,5 @@
 import json
+from os import PathLike
 
 
 class MibigMetadata:
@@ -9,7 +10,7 @@ class MibigMetadata:
     https://mibig.secondarymetabolites.org/download.
     """
 
-    def __init__(self, file: str) -> None:
+    def __init__(self, file: str | PathLike) -> None:
         """Initialize the MIBiG metadata object.
 
         Args:
@@ -18,7 +19,7 @@ class MibigMetadata:
         Examples:
             >>> metadata = MibigMetadata("/data/BGC0000001.json")
         """
-        self.file = file
+        self.file = str(file)
         with open(self.file, "rb") as f:
             self.metadata = json.load(f)
 

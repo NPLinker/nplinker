@@ -2,6 +2,8 @@ from __future__ import annotations
 import fnmatch
 import logging
 import os
+from os import PathLike
+from pathlib import Path
 from typing import Mapping
 from Bio import SeqIO
 from Bio import SeqRecord
@@ -111,7 +113,7 @@ class AntismashBGCLoader:
         return [parse_bgc_genbank(file) for file in bgc_files.values()]
 
 
-def parse_bgc_genbank(file: str) -> BGC:
+def parse_bgc_genbank(file: str | PathLike) -> BGC:
     """Parse a single BGC gbk file to BGC object.
 
     Args:
@@ -124,7 +126,8 @@ def parse_bgc_genbank(file: str) -> BGC:
         >>> bgc = AntismashBGCLoader.parse_bgc(
         ...    "/data/antismash/GCF_000016425.1/NC_009380.1.region001.gbk")
     """
-    fname = os.path.splitext(os.path.basename(file))[0]
+    file = Path(file)
+    fname = file.stem
 
     record = SeqIO.read(file, format="genbank")
     description = record.description  # "DEFINITION" in gbk file
@@ -138,7 +141,7 @@ def parse_bgc_genbank(file: str) -> BGC:
     bgc = BGC(fname, *product_prediction)
     bgc.description = description
     bgc.antismash_id = antismash_id
-    bgc.antismash_file = file
+    bgc.antismash_file = str(file)
     bgc.antismash_region = features.get("region_number")
     bgc.smiles = features.get("smiles")
     bgc.strain = Strain(fname)
