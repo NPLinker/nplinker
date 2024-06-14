@@ -75,7 +75,7 @@ class NPLinkerUnpickler(pickle.Unpickler):
         elif obj_type == "Spectrum":
             return self.nplinker.spectra[obj_id]
         elif obj_type == "MolecularFamily":
-            return self.nplinker.molfams[obj_id]
+            return self.nplinker.mfs[obj_id]
         elif obj_type == "ScoringMethod":
             return self.nplinker.scoring_method(obj_id)
 

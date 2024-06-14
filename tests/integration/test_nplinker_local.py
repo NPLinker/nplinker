@@ -61,5 +61,5 @@ def test_load_data(npl: NPLinker):
     assert len(npl.bgcs) == 390
     assert len(npl.gcfs) == 64
     assert len(npl.spectra) == 24652
-    assert len(npl.molfams) == 29
+    assert len(npl.mfs) == 29
     assert len(npl.strains) == 46

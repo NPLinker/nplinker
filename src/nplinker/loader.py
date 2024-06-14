@@ -35,7 +35,7 @@ class DatasetLoader:
         bgcs: A list of BGC objects.
         gcfs: A list of GCF objects.
         spectra: A list of Spectrum objects.
-        molfams: A list of MolecularFamily objects.
+        mfs: A list of MolecularFamily objects.
         mibig_bgcs: A list of MIBiG BGC objects.
         mibig_strains_in_use: A StrainCollection object that contains the strains in use from MIBiG.
         product_types: A list of product types.
@@ -60,7 +60,7 @@ class DatasetLoader:
         """
         self.config = config
 
-        self.bgcs, self.gcfs, self.spectra, self.molfams = [], [], [], []
+        self.bgcs, self.gcfs, self.spectra, self.mfs = [], [], [], []
         self.mibig_bgcs = []
         self.mibig_strains_in_use = StrainCollection()
         self.product_types = []
@@ -114,7 +114,7 @@ class DatasetLoader:
         objects added (i.e. `Spectrum.strains` updated). If a Spectrum object does not have Strain
         objects, it is not added to `self.spectra`.
 
-        The attribute of `self.molfams` is set to the loaded MolecularFamily objects that have
+        The attribute of `self.mfs` is set to the loaded MolecularFamily objects that have
         Strain objects added (i.e. `MolecularFamily._strains` updated). This means only Spectra
         objects with updated strains (i.e. `self.spectra`) can be added to MolecularFamily objects.
         """
@@ -129,7 +129,7 @@ class DatasetLoader:
             gnps_dir / defaults.GNPS_ANNOTATIONS_FILENAME
         ).annotations
         # Step 3: load all MolecularFamily objects
-        raw_molfams = GNPSMolecularFamilyLoader(
+        raw_mfs = GNPSMolecularFamilyLoader(
             gnps_dir / defaults.GNPS_MOLECULAR_FAMILY_FILENAME
         ).get_mfs(keep_singleton=False)
 
@@ -139,11 +139,11 @@ class DatasetLoader:
         spectra_with_strains, _ = add_strains_to_spectrum(self.strains, raw_spectra)
 
         # Step 6: add Spectrum objects to MolecularFamily
-        mf_with_spec, _, _ = add_spectrum_to_mf(spectra_with_strains, raw_molfams)
+        mf_with_spec, _, _ = add_spectrum_to_mf(spectra_with_strains, raw_mfs)
 
-        # Step 7: set attributes of self.spectra and self.molfams with valid objects
+        # Step 7: set attributes of self.spectra and self.mfs with valid objects
         self.spectra = spectra_with_strains
-        self.molfams = mf_with_spec
+        self.mfs = mf_with_spec
 
         logger.info("Loading metabolomics data completed\n")
         return True
@@ -266,10 +266,10 @@ class DatasetLoader:
 
         # load Chem_class_predictions (canopus, molnetenhancer are loaded)
         chem_classes = ChemClassPredictions(self.canopus_dir, self.molnetenhancer_dir, self._root)  # noqa
-        # if no molfam classes transfer them from spectra (due to old style MN)
-        if not chem_classes.canopus.molfam_classes and chem_classes.canopus.spectra_classes:
+        # if no mf classes transfer them from spectra (due to old style MN)
+        if not chem_classes.canopus.mf_classes and chem_classes.canopus.spectra_classes:
             logger.info("Added chemical compound classes for MFs")
-            chem_classes.canopus.transfer_spec_classes_to_molfams(self.molfams)
+            chem_classes.canopus.transfer_spec_classes_to_mfs(self.mfs)
         # include them in loader
         self.chem_classes = chem_classes
         return True

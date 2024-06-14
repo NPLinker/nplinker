@@ -44,7 +44,7 @@ class NPClassScoring(ScoringBase):
         target (if obj is BGC then  obj_classes should be classes for the BGC).
         Can be:
             - BGC/GCF classes: {'as_classes': list(str), 'bigscape_class': str}
-            - Spectrum/Molfam classes: tuple of (classes, class_names_indices),
+            - Spectrum/mf classes: tuple of (classes, class_names_indices),
             where classes is a list of list of tuples/None, where each
             tuple is a class and a score (str, float), and class_names_indices
             is a list of ints that relate to the name of a class ontology lvl
@@ -157,7 +157,7 @@ class NPClassScoring(ScoringBase):
         """Get the targets based upon instance of test_id, returns list of targets.
 
         Args:
-            test_id: one of the NPLinker objects: BGC, GCF, Spectrum, Molfam
+            test_id: one of the NPLinker objects: BGC, GCF, Spectrum, mf
         Returns:
             List of one or more of one of the NPLinker objects
         """
@@ -174,7 +174,7 @@ class NPClassScoring(ScoringBase):
                 targets = self.npl.bgcs
             else:
                 targets = self.npl.gcfs
-        else:  # obj are molfam
+        else:  # obj are mf
             if self.equal_targets:
                 targets = self.npl.gcfs
             else:
@@ -183,15 +183,15 @@ class NPClassScoring(ScoringBase):
 
     def _get_targets_genomics(self, test_id):
         if self.both_targets:  # no matter BGC or GCF take both spec and MF
-            targets = self.npl.spectra + self.npl.molfams
+            targets = self.npl.spectra + self.npl.mfs
         elif isinstance(test_id, BGC):  # obj are BGC
             if self.equal_targets:  # take
                 targets = self.npl.spectra
             else:
-                targets = self.npl.molfams
+                targets = self.npl.mfs
         else:  # obj are GCF
             if self.equal_targets:
-                targets = self.npl.molfams
+                targets = self.npl.mfs
             else:
                 targets = self.npl.spectra
         return targets
@@ -236,10 +236,10 @@ class NPClassScoring(ScoringBase):
         return bgc_like_classes_dict
 
     def _get_met_classes(self, spec_like, method="mix"):
-        """Get chemical classes for a Spectrum or MolFam based on method.
+        """Get chemical classes for a Spectrum or mf based on method.
 
         Args:
-            spec_like: Spectrum or MolFam, one of the NPLinker input types
+            spec_like: Spectrum or mf, one of the NPLinker input types
             method: str, one of the appropriate methods for chemical class
                 predictions (mix, canopus...), default='mix'
         Returns:
@@ -248,7 +248,7 @@ class NPClassScoring(ScoringBase):
             tuple is a class and a score (str, float), and class_names_indices
             is a list of ints that relate to the name of a class ontology lvl
         """
-        # assess if spectrum or molfam
+        # assess if spectrum or mf
         is_spectrum = isinstance(spec_like, Spectrum)
 
         # gather classes for spectra, using right method
@@ -280,11 +280,11 @@ class NPClassScoring(ScoringBase):
                 spec_like_classes_names_inds = (
                     self.npl.chem_classes.canopus.spectra_classes_names_inds
                 )
-            else:  # molfam
+            else:  # mf
                 fam_id = spec_like.family.id
                 if fam_id.startswith("singleton-"):  # account for singleton families
                     fam_id += f"_{spec_like.spectra[0].id}"
-                all_classes = self.npl.chem_classes.canopus.molfam_classes.get(fam_id)
+                all_classes = self.npl.chem_classes.canopus.mf_classes.get(fam_id)
                 if all_classes:
                     spec_like_classes = [
                         cls_per_lvl
@@ -292,21 +292,19 @@ class NPClassScoring(ScoringBase):
                         for i, cls_per_lvl in enumerate(lvl)
                         if i == 0
                     ]
-                spec_like_classes_names_inds = (
-                    self.npl.chem_classes.canopus.molfam_classes_names_inds
-                )
+                spec_like_classes_names_inds = self.npl.chem_classes.canopus.mf_classes_names_inds
         if use_mne and not spec_like_classes:
             # if mne or when main/canopus does not get classes
             if is_spectrum:
                 spec_like_classes = self.npl.chem_classes.molnetenhancer.spectra_classes(
                     spec_like.id
                 )
-            else:  # molfam
+            else:  # mf
                 fam_id = spec_like.family.id
                 if fam_id.startswith("singleton"):  # account for singleton families
                     fam_id += f"_{spec_like.spectra[0].id}"
-                spec_like_classes = self.npl.chem_classes.molnetenhancer.molfam_classes.get(fam_id)
-            # classes are same for molfam and spectrum so names are irrespective of is_spectrum
+                spec_like_classes = self.npl.chem_classes.molnetenhancer.mf_classes.get(fam_id)
+            # classes are same for mf and spectrum so names are irrespective of is_spectrum
             spec_like_classes_names_inds = (
                 self.npl.chem_classes.molnetenhancer.spectra_classes_names_inds
             )
