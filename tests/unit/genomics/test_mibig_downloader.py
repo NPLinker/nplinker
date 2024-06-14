@@ -2,7 +2,7 @@ import pytest
 from nplinker.genomics import mibig
 
 
-class TestDownloadAndExtractMibigMetadatas:
+class TestDownloadAndExtractMibigMetadata:
     def test_default(self, tmp_path):
         download_path = tmp_path / "download"
         extract_path = tmp_path / "metadata"

@@ -1,9 +1,12 @@
+from __future__ import annotations
 import logging
 import os
 from deprecated import deprecated
 from dynaconf import Dynaconf
 from nplinker import NPLINKER_APP_DATA_DIR
 from nplinker import defaults
+from nplinker.genomics import BGC
+from nplinker.genomics import GCF
 from nplinker.genomics.antismash import AntismashBGCLoader
 from nplinker.genomics.bigscape import BigscapeGCFLoader
 from nplinker.genomics.bigscape import BigscapeV2GCFLoader
@@ -11,6 +14,8 @@ from nplinker.genomics.mibig import MibigLoader
 from nplinker.genomics.utils import add_bgc_to_gcf
 from nplinker.genomics.utils import add_strain_to_bgc
 from nplinker.genomics.utils import get_mibig_from_gcf
+from nplinker.metabolomics import MolecularFamily
+from nplinker.metabolomics import Spectrum
 from nplinker.metabolomics.gnps import GNPSAnnotationLoader
 from nplinker.metabolomics.gnps import GNPSMolecularFamilyLoader
 from nplinker.metabolomics.gnps import GNPSSpectrumLoader
@@ -58,11 +63,14 @@ class DatasetLoader:
         """
         self.config = config
 
-        self.bgcs, self.gcfs, self.spectra, self.mfs = [], [], [], []
-        self.mibig_bgcs = []
-        self.mibig_strains_in_use = StrainCollection()
-        self.product_types = []
-        self.strains = StrainCollection()
+        self.bgcs: list[BGC] = []
+        self.gcfs: list[GCF] = []
+        self.spectra: list[Spectrum] = []
+        self.mfs: list[MolecularFamily] = []
+        self.mibig_bgcs: list[BGC] = []
+        self.mibig_strains_in_use: StrainCollection = StrainCollection()
+        self.product_types: list = []
+        self.strains: StrainCollection = StrainCollection()
 
         self.class_matches = None
         self.chem_classes = None
@@ -93,7 +101,7 @@ class DatasetLoader:
             self.strains.add(strain)
         logger.info("Loaded {} non-MiBIG Strain objects".format(len(self.strains)))
 
-        # 2. filter user specificied strains (remove all that are not specified by user).
+        # 2. filter user specified strains (remove all that are not specified by user).
         # It's not allowed to specify empty list of strains, otherwise validation will fail.
         user_strains_file = self.config.root_dir / defaults.STRAINS_SELECTED_FILENAME
         if user_strains_file.exists():

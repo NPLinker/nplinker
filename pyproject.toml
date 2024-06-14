@@ -62,6 +62,7 @@ dev = [
     "types-Deprecated",
     "types-beautifulsoup4",
     "types-jsonschema",
+    "types-networkx",
     "pandas-stubs",
     # docs
     "mkdocs",

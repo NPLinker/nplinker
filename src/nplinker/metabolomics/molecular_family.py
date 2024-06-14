@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from ..strain.strain import Strain
-from ..strain.strain_collection import StrainCollection
+from nplinker.strain import Strain
+from nplinker.strain import StrainCollection
 
 
 if TYPE_CHECKING:

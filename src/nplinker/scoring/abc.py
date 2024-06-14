@@ -3,11 +3,11 @@ import logging
 from abc import ABC
 from abc import abstractmethod
 from typing import TYPE_CHECKING
+from .link_graph import LinkGraph
 
 
 if TYPE_CHECKING:
     from nplinker.nplinker import NPLinker
-    from .link_graph import LinkGraph
 
 logger = logging.getLogger(__name__)
 

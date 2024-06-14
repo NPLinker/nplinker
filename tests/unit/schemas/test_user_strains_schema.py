@@ -4,10 +4,15 @@ from jsonschema.exceptions import ValidationError
 from nplinker.schemas import USER_STRAINS_SCHEMA
 
 
-# Test schema aginast invalid data
+# Test schema against invalid data
 data_no_strain_ids = {"version": "1.0"}
 data_empty_strain_ids = {"strain_ids": [], "version": "1.0"}
-data_invalid_strain_ids = {"strain_ids": [1, ], "version": "1.0"}
+data_invalid_strain_ids = {
+    "strain_ids": [
+        1,
+    ],
+    "version": "1.0",
+}
 data_empty_version = {"strain_ids": ["strain1", "strain2"], "version": ""}
 data_invalid_version = {"strain_ids": ["strain1", "strain2"], "version": "1.0.0"}
 
@@ -29,7 +34,7 @@ def test_invalid_data(data, expected):
     assert e.value.message == expected
 
 
-# Test schema aginast valid data
+# Test schema against valid data
 data = {"strain_ids": ["strain1", "strain2"], "version": "1.0"}
 data_no_version = {"strain_ids": ["strain1", "strain2"]}
 

@@ -3,6 +3,7 @@ import logging
 from enum import Enum
 from typing import TYPE_CHECKING
 from typing import TypeVar
+from typing import overload
 import numpy as np
 import pandas as pd
 from scipy.stats import hypergeom
@@ -19,7 +20,7 @@ from .utils import get_presence_spec_strain
 
 
 if TYPE_CHECKING:
-    from ..nplinker import NPLinker
+    from nplinker.nplinker import NPLinker
 
 
 logger = logging.getLogger(__name__)
@@ -117,14 +118,14 @@ class MetcalfScoring(ScoringBase):
             cls.presence_spec_strain, cls.presence_gcf_strain, cls.metcalf_weights
         )
         cls.raw_score_spec_gcf = raw_score_spec_gcf.reset_index().melt(id_vars="index")
-        cls.raw_score_spec_gcf.columns = ["spec", "gcf", "score"]
+        cls.raw_score_spec_gcf.columns = ["spec", "gcf", "score"]  # type: ignore
 
         # calculate raw Metcalf scores for spec-gcf links
         raw_score_mf_gcf = cls._calc_raw_score(
             cls.presence_mf_strain, cls.presence_gcf_strain, cls.metcalf_weights
         )
         cls.raw_score_mf_gcf = raw_score_mf_gcf.reset_index().melt(id_vars="index")
-        cls.raw_score_mf_gcf.columns = ["mf", "gcf", "score"]
+        cls.raw_score_mf_gcf.columns = ["mf", "gcf", "score"]  # type: ignore
 
         # calculate mean and std for standardising Metcalf scores
         cls.metcalf_mean, cls.metcalf_std = cls._calc_mean_std(
@@ -133,7 +134,14 @@ class MetcalfScoring(ScoringBase):
 
         logger.info("MetcalfScoring.setup completed")
 
-    def get_links(self, *objects: ObjectType, **parameters) -> LinkGraph:
+    @overload
+    def get_links(self, *objects: GCF, **parameters) -> LinkGraph: ...
+    @overload
+    def get_links(self, *objects: Spectrum, **parameters) -> LinkGraph: ...
+    @overload
+    def get_links(self, *objects: MolecularFamily, **parameters) -> LinkGraph: ...
+
+    def get_links(self, *objects, **parameters):
         """Get links for the given objects.
 
         Args:
@@ -348,11 +356,11 @@ class MetcalfScoring(ScoringBase):
 
             for row in raw_score_df.itertuples(index=False):
                 met = row.spec if raw_score_df.name == LinkType.SPEC_GCF else row.mf
-                n_gcf_strains = len(row.gcf.strains)
-                n_met_strains = len(met.strains)
+                n_gcf_strains = len(row.gcf.strains)  # type: ignore
+                n_met_strains = len(met.strains)  # type: ignore
 
-                mean = self.metcalf_mean[n_met_strains][n_gcf_strains]
-                sqrt = self.metcalf_std[n_met_strains][n_gcf_strains]
+                mean = self.metcalf_mean[n_met_strains][n_gcf_strains]  # type: ignore
+                sqrt = self.metcalf_std[n_met_strains][n_gcf_strains]  # type: ignore
 
                 z_score = (row.score - mean) / sqrt
 

@@ -3,6 +3,8 @@ import json
 import logging
 from os import PathLike
 from pathlib import Path
+from typing import Mapping
+from typing import Sequence
 from jsonschema import validate
 from nplinker.defaults import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.schemas import GENOME_BGC_MAPPINGS_SCHEMA
@@ -65,7 +67,9 @@ def generate_mappings_genome_id_bgc_id(
     logger.info("Generated genome-BGC mappings file: %s", output_file)
 
 
-def add_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]) -> tuple[list[BGC], list[BGC]]:
+def add_strain_to_bgc(
+    strains: StrainCollection, bgcs: Sequence[BGC]
+) -> tuple[list[BGC], list[BGC]]:
     """Assign a Strain object to `BGC.strain` for input BGCs.
 
     BGC id is used to find the corresponding Strain object. It's possible that
@@ -111,7 +115,7 @@ def add_strain_to_bgc(strains: StrainCollection, bgcs: list[BGC]) -> tuple[list[
 
 
 def add_bgc_to_gcf(
-    bgcs: list[BGC], gcfs: list[GCF]
+    bgcs: Sequence[BGC], gcfs: Sequence[GCF]
 ) -> tuple[list[GCF], list[GCF], dict[GCF, set[str]]]:
     """Add BGC objects to GCF object based on GCF's BGC ids.
 
@@ -165,7 +169,7 @@ def add_bgc_to_gcf(
     return gcf_with_bgc, gcf_without_bgc, gcf_missing_bgc
 
 
-def get_mibig_from_gcf(gcfs: list[GCF]) -> tuple[list[BGC], StrainCollection]:
+def get_mibig_from_gcf(gcfs: Sequence[GCF]) -> tuple[list[BGC], StrainCollection]:
     """Get MIBiG BGCs and strains from GCF objects.
 
     Args:
@@ -277,9 +281,9 @@ def extract_mappings_resolved_genome_id_bgc_id(
 
 
 def get_mappings_strain_id_bgc_id(
-    mappings_strain_id_original_genome_id: dict[str, set[str]],
-    mappings_original_genome_id_resolved_genome_id: dict[str, str],
-    mappings_resolved_genome_id_bgc_id: dict[str, set[str]],
+    mappings_strain_id_original_genome_id: Mapping[str, set[str]],
+    mappings_original_genome_id_resolved_genome_id: Mapping[str, str],
+    mappings_resolved_genome_id_bgc_id: Mapping[str, set[str]],
 ) -> dict[str, set[str]]:
     """Get mappings "strain_id <-> bgc_id".
 

@@ -13,7 +13,7 @@ def validate_podp_json(json_data: dict) -> None:
     All validation error messages are collected and raised as a single
     ValueError.
 
-    Parameters:
+    Args:
         json_data: The JSON data to validate.
 
     Raises:

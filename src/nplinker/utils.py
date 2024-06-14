@@ -27,7 +27,7 @@ import zipfile
 from os import PathLike
 from pathlib import Path
 from typing import IO
-from typing import Callable
+from typing import Callable, Sequence
 import httpx
 from rich.progress import BarColumn
 from rich.progress import DownloadColumn
@@ -109,6 +109,15 @@ def is_file_format(file: str | PathLike, format: str = "tsv") -> bool:
 
 
 def calculate_md5(fpath: str | PathLike, chunk_size: int = 1024 * 1024) -> str:
+    """Calculate the MD5 checksum of a file.
+
+    Args:
+        fpath: Path to the file.
+        chunk_size: Chunk size for reading the file. Defaults to 1024*1024.
+
+    Returns:
+        MD5 checksum of the file.
+    """
     if sys.version_info >= (3, 9):
         md5 = hashlib.md5(usedforsecurity=False)
     else:
@@ -120,6 +129,15 @@ def calculate_md5(fpath: str | PathLike, chunk_size: int = 1024 * 1024) -> str:
 
 
 def check_md5(fpath: str | PathLike, md5: str) -> bool:
+    """Verify the MD5 checksum of a file.
+
+    Args:
+        fpath: Path to the file.
+        md5: MD5 checksum to verify.
+
+    Returns:
+        True if the MD5 checksum matches, False otherwise.
+    """
     return md5 == calculate_md5(fpath)
 
 
@@ -238,7 +256,7 @@ def list_files(
 def _extract_tar(
     from_path: str | PathLike,
     to_path: str | PathLike,
-    members: list[tarfile.TarInfo] | None,
+    members: Sequence[tarfile.TarInfo] | None,
     compression: str | None,
 ) -> None:
     with tarfile.open(from_path, f"r:{compression[1:]}" if compression else "r") as tar:
@@ -254,7 +272,7 @@ _ZIP_COMPRESSION_MAP: dict[str, int] = {
 def _extract_zip(
     from_path: str | PathLike,
     to_path: str | PathLike,
-    members: list[str | zipfile.ZipInfo] | None,
+    members: Sequence[str | zipfile.ZipInfo] | None,
     compression: str | None,
 ) -> None:
     with zipfile.ZipFile(
@@ -380,7 +398,7 @@ def extract_archive(
             If omitted, the directory of the archive file is used.
         members: Optional selection of members to extract. If not specified,
             all members are extracted.
-            Memers must be a subset of the list returned by
+            Members must be a subset of the list returned by
             - `zipfile.ZipFile.namelist()` or a list of strings for zip file
             - `tarfile.TarFile.getmembers()` for tar file
         remove_finished: If `True`, remove the file after the extraction.
