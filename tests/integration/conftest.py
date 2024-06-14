@@ -1,11 +1,11 @@
 from __future__ import annotations
 import os
 import shutil
-import tempfile
 import zipfile
 from os import PathLike
 from pathlib import Path
 import httpx
+import pytest
 from rich.progress import Progress
 from . import DATA_DIR
 
@@ -18,46 +18,27 @@ dataset_url = (
     f"https://zenodo.org/records/{dataset_doi.split('.')[-1]}/files/nplinker_local_mode_example.zip"
 )
 
-# The temporary directory for the test session
-temp_dir = tempfile.gettempdir()
-nplinker_root_dir = os.path.join(temp_dir, "nplinker_local_mode_example")
 
+@pytest.fixture(scope="module")
+def root_dir(tmp_path_factory):
+    """Set up the NPLinker root directory for the local mode example dataset."""
+    temp_dir = tmp_path_factory.mktemp("nplinker_integration_test")
+    nplinker_root_dir = temp_dir / "nplinker_local_mode_example"
 
-def pytest_sessionstart(session):
-    """Pytest hook to run before the entire test session starts.
-
-    This hook makes sure the temporary directory `nplinker_root_dir` is created before any test
-    starts. When running tests in parallel, the creation operation is done by the master process,
-    and worker processes are not allowed to do it.
-
-    For more about this hook, see:
-    1. https://docs.pytest.org/en/stable/reference.html#_pytest.hookspec.pytest_sessionstart
-    2. https://github.com/pytest-dev/pytest-xdist/issues/271#issuecomment-826396320
-    """
-    workerinput = getattr(session.config, "workerinput", None)
-    # It's master process or not running in parallell when `workerinput` is None.
-    if workerinput is None:
-        if os.path.exists(nplinker_root_dir):
-            shutil.rmtree(nplinker_root_dir)
-        dataset = DATA_DIR / "nplinker_local_mode_example.zip"
-        if not dataset.exists():
-            download_archive(dataset_url, DATA_DIR)
-        with zipfile.ZipFile(dataset, "r") as zip_ref:
-            zip_ref.extractall(temp_dir)
-    # NPLinker setting `root_dir` must be a path that exists, so setting it to a temporary directory.
-    os.environ["NPLINKER_ROOT_DIR"] = nplinker_root_dir
-
-
-def pytest_sessionfinish(session):
-    """Pytest hook to run after the entire test session finishes.
-
-    This hook makes sure that temporary directory `nplinker_root_dir` is only removed after all
-    tests finish. When running tests in parallel, the deletion operation is done by the master
-    process, and worker processes are not allowed to do it.
-    """
-    workerinput = getattr(session.config, "workerinput", None)
-    if workerinput is None:
+    # Download the dataset and extract it
+    if os.path.exists(nplinker_root_dir):
         shutil.rmtree(nplinker_root_dir)
+    dataset = DATA_DIR / "nplinker_local_mode_example.zip"
+    if not dataset.exists():
+        download_archive(dataset_url, DATA_DIR)
+    # the extracted directory is named "nplinker_local_mode_example"
+    with zipfile.ZipFile(dataset, "r") as zip_ref:
+        zip_ref.extractall(temp_dir)
+
+    # Return the root directory
+    yield str(nplinker_root_dir)
+
+    shutil.rmtree(nplinker_root_dir)
 
 
 def download_archive(
