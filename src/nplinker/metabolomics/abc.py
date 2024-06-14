@@ -1,7 +1,5 @@
 from abc import ABC
 from abc import abstractmethod
-from typing import Mapping
-from typing import Sequence
 from .molecular_family import MolecularFamily
 from .spectrum import Spectrum
 
@@ -11,7 +9,7 @@ class SpectrumLoaderBase(ABC):
 
     @property
     @abstractmethod
-    def spectra(self) -> Sequence["Spectrum"]:
+    def spectra(self) -> list["Spectrum"]:
         """Get Spectrum objects.
 
         Returns:
@@ -23,7 +21,7 @@ class MolecularFamilyLoaderBase(ABC):
     """Abstract base class for MolecularFamilyLoader."""
 
     @abstractmethod
-    def get_mfs(self, keep_singleton: bool) -> Sequence["MolecularFamily"]:
+    def get_mfs(self, keep_singleton: bool) -> list["MolecularFamily"]:
         """Get MolecularFamily objects.
 
         Args:
@@ -41,7 +39,7 @@ class FileMappingLoaderBase(ABC):
 
     @property
     @abstractmethod
-    def mappings(self) -> Mapping[str, Sequence[str]]:
+    def mappings(self) -> dict[str, list[str]]:
         """Get file mappings.
 
         Returns:
@@ -54,7 +52,7 @@ class AnnotationLoaderBase(ABC):
 
     @property
     @abstractmethod
-    def annotations(self) -> Mapping[str, Mapping]:
+    def annotations(self) -> dict[str, dict]:
         """Get annotations.
 
         Returns:

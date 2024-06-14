@@ -1,7 +1,5 @@
 from abc import ABC
 from abc import abstractmethod
-from typing import Mapping
-from typing import Sequence
 from .bgc import BGC
 from .gcf import GCF
 
@@ -9,7 +7,7 @@ from .gcf import GCF
 class BGCLoaderBase(ABC):
     """Abstract base class for BGC loader."""
 
-    def __init__(self, data_dir: str):
+    def __init__(self, data_dir: str) -> None:
         """Initialize the BGC loader.
 
         Args:
@@ -19,7 +17,7 @@ class BGCLoaderBase(ABC):
         self.data_dir = data_dir
 
     @abstractmethod
-    def get_files(self) -> Mapping[str, str]:
+    def get_files(self) -> dict[str, str]:
         """Get path to BGC files.
 
         Returns:
@@ -27,7 +25,7 @@ class BGCLoaderBase(ABC):
         """
 
     @abstractmethod
-    def get_bgcs(self) -> Sequence[BGC]:
+    def get_bgcs(self) -> list[BGC]:
         """Get BGC objects.
 
         Returns:
@@ -39,7 +37,7 @@ class GCFLoaderBase(ABC):
     """Abstract base class for GCF loader."""
 
     @abstractmethod
-    def get_gcfs(self, keep_mibig_only: bool, keep_singleton: bool) -> Sequence[GCF]:
+    def get_gcfs(self, keep_mibig_only: bool, keep_singleton: bool) -> list[GCF]:
         """Get GCF objects.
 
         Args:
