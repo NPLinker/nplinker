@@ -8,7 +8,7 @@ class TestMibigMetadata:
     @pytest.fixture
     def json_file(self, version):
         json_file = DATA_DIR / "mibig" / f"BGC0000001_{version}.json"
-        yield json_file
+        yield str(json_file)
 
     @pytest.fixture
     def metadata(self, json_file):
