@@ -2,7 +2,7 @@ from __future__ import annotations
 import logging
 from enum import Enum
 from typing import TYPE_CHECKING
-from typing import TypeVar
+from typing import Union
 from typing import overload
 import numpy as np
 import pandas as pd
@@ -33,7 +33,8 @@ class LinkType(Enum):
     MF_GCF = "mf-gcf"
 
 
-ObjectType = TypeVar("ObjectType", GCF, Spectrum, MolecularFamily)
+Entity = Union[GCF, Spectrum, MolecularFamily]
+# Entity = GCF | Spectrum | MolecularFamily
 
 
 class MetcalfScoring(ScoringBase):
@@ -293,8 +294,8 @@ class MetcalfScoring(ScoringBase):
 
     def _get_links(
         self,
-        *objects: ObjectType,
-        obj_type: GCF | Spectrum | MolecularFamily,
+        *objects: Entity,
+        obj_type: Entity,
         score_cutoff: float = 0,
     ) -> list[pd.DataFrame]:
         """Get links and scores for the given objects.
