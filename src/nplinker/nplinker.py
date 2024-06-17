@@ -4,7 +4,6 @@ import pickle
 from os import PathLike
 from pprint import pformat
 from typing import Sequence
-from typing import TypeVar
 from typing import overload
 from . import setup_logging
 from .arranger import DatasetArranger
@@ -21,8 +20,6 @@ from .strain import StrainCollection
 
 
 logger = logging.getLogger(__name__)
-
-ObjectType = TypeVar("ObjectType", BGC, GCF, Spectrum, MolecularFamily)
 
 
 class NPLinker:
