@@ -74,6 +74,14 @@ class Spectrum:
     def __hash__(self) -> int:
         return hash((self.id, self.precursor_mz))
 
+    def __reduce__(self) -> tuple:
+        """Reduce function for pickling."""
+        return (
+            self.__class__,
+            (self.id, self.mz, self.intensity, self.precursor_mz, self.rt, self.metadata),
+            self.__dict__,
+        )
+
     @cached_property
     def peaks(self) -> np.ndarray:
         """Get the peaks, a 2D array with each row containing the values of (m/z, intensity)."""

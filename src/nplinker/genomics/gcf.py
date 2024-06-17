@@ -60,6 +60,10 @@ class GCF:
         """
         return hash(self.id)
 
+    def __reduce__(self) -> tuple:
+        """Reduce function for pickling."""
+        return (self.__class__, (self.id,), self.__dict__)
+
     @property
     def bgcs(self) -> set[BGC]:
         """Get the BGC objects."""

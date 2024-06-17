@@ -1,5 +1,6 @@
 from __future__ import annotations
 import logging
+import pickle
 from os import PathLike
 from pprint import pformat
 from typing import Sequence
@@ -295,3 +296,22 @@ class NPLinker:
             The MolecularFamily object with the given ID, or None if no such object exists.
         """
         return self._mf_dict.get(id, None)
+
+    def save_data(
+        self,
+        file: str | PathLike,
+        links: LinkGraph | None = None,
+    ) -> None:
+        """Pickle data to a file.
+
+        The data to be pickled is a tuple containing the BGCs, GCFs, Spectra, MolecularFamilies,
+        StrainCollection and links, i.e. `(bgcs, gcfs, spectra, mfs, strains, links)`. If the links
+        are not provided, `None` will be used.
+
+        Args:
+            file: The path to the pickle file to save the data to.
+            links: The LinkGraph object to save.
+        """
+        data = (self.bgcs, self.gcfs, self.spectra, self.mfs, self.strains, links)
+        with open(file, "wb") as f:
+            pickle.dump(data, f)

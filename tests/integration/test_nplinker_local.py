@@ -1,5 +1,9 @@
 import os
+import pickle
 import pytest
+from nplinker.genomics import GCF
+from nplinker.metabolomics import MolecularFamily
+from nplinker.metabolomics import Spectrum
 from nplinker.nplinker import NPLinker
 from . import DATA_DIR
 
@@ -70,3 +74,35 @@ def test_get_links(npl):
     for _, _, scores in lg.links:
         score = scores[scoring_method]
         assert score.value >= 0
+
+
+def test_save_data(npl):
+    scoring_method = "metcalf"
+    links = npl.get_links(npl.gcfs[:3], scoring_method)
+
+    pickle_file = os.path.join(npl.output_dir, "npl.pkl")
+    npl.save_data(pickle_file, links)
+
+    with open(pickle_file, "rb") as f:
+        bgcs, gcfs, spectra, mfs, strains, lg = pickle.load(f)
+
+    # tests from `test_load_data`
+    assert len(bgcs) == 390
+    assert len(gcfs) == 64
+    assert len(spectra) == 24652
+    assert len(mfs) == 29
+    assert len(strains) == 46
+
+    # tests from `test_get_links`
+    for obj1, obj2, scores in lg.links:
+        score = scores[scoring_method]
+        assert score.value >= 0
+
+        if isinstance(obj1, GCF):
+            assert obj1 in gcfs
+        elif isinstance(obj1, Spectrum):
+            assert obj1 in spectra
+        elif isinstance(obj1, MolecularFamily):
+            assert obj1 in mfs
+        else:
+            assert False
