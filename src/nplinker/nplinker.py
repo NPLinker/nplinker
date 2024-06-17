@@ -1,9 +1,9 @@
 from __future__ import annotations
 import logging
 import pickle
+from collections.abc import Sequence
 from os import PathLike
 from pprint import pformat
-from typing import Sequence
 from typing import overload
 from . import setup_logging
 from .arranger import DatasetArranger

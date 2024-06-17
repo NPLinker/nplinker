@@ -2,9 +2,9 @@ from __future__ import annotations
 import fnmatch
 import logging
 import os
+from collections.abc import Mapping
 from os import PathLike
 from pathlib import Path
-from typing import Mapping
 from Bio import SeqIO
 from Bio import SeqRecord
 from nplinker.genomics import BGC

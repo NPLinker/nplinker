@@ -1,10 +1,10 @@
 from __future__ import annotations
 import json
 import logging
+from collections.abc import Mapping
+from collections.abc import Sequence
 from os import PathLike
 from pathlib import Path
-from typing import Mapping
-from typing import Sequence
 from jsonschema import validate
 from nplinker.defaults import GENOME_BGC_MAPPINGS_FILENAME
 from nplinker.schemas import GENOME_BGC_MAPPINGS_SCHEMA

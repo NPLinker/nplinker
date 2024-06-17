@@ -1,10 +1,10 @@
 from __future__ import annotations
 import json
 import logging
+from collections.abc import Mapping
+from collections.abc import Sequence
 from os import PathLike
 from pathlib import Path
-from typing import Mapping
-from typing import Sequence
 from nplinker.schemas import validate_podp_json
 from nplinker.strain import StrainCollection
 from .gnps.gnps_file_mapping_loader import GNPSFileMappingLoader
