@@ -17,7 +17,7 @@ from ..abc import BGCLoaderBase
 logger = logging.getLogger(__name__)
 
 
-class AntismashBGCLoader:
+class AntismashBGCLoader(BGCLoaderBase):
     """Build a loader for AntiSMASH BGC genbank (.gbk) files.
 
     Note:
@@ -163,7 +163,3 @@ def _parse_antismash_genbank(record: SeqRecord.SeqRecord) -> dict:
                 smiles = tuple(i.replace(" ", "") for i in smiles)
             features["smiles"] = smiles
     return features
-
-
-# register as virtual class to prevent metaclass conflicts
-BGCLoaderBase.register(AntismashBGCLoader)

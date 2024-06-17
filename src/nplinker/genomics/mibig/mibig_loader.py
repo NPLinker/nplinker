@@ -12,7 +12,7 @@ from .mibig_metadata import MibigMetadata
 logger = logging.getLogger(__name__)
 
 
-class MibigLoader:
+class MibigLoader(BGCLoaderBase):
     """Parse MIBiG metadata files and return BGC objects.
 
     MIBiG metadata file (json) contains annotations/metadata information
@@ -118,7 +118,3 @@ def parse_bgc_metadata_json(file: str | PathLike) -> BGC:
     mibig_bgc.mibig_bgc_class = metadata.biosyn_class
     mibig_bgc.strain = Strain(metadata.mibig_accession)
     return mibig_bgc
-
-
-# register as virtual class to prevent metaclass conflicts
-BGCLoaderBase.register(MibigLoader)
