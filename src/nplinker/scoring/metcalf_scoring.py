@@ -191,7 +191,7 @@ class MetcalfScoring(ScoringBase):
                     "MetcalfScoring.metcalf_mean and metcalf_std are not set. Run MetcalfScoring.setup first."
                 )
             # use negative infinity as the score cutoff to ensure we get all links
-            scores_list = self._get_links(*objects, obj_type=obj_type, score_cutoff=np.NINF)
+            scores_list = self._get_links(*objects, obj_type=obj_type, score_cutoff=-np.inf)
             scores_list = self._calc_standardised_score(scores_list)
 
         links = LinkGraph()

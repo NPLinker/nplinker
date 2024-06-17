@@ -101,7 +101,7 @@ def test_get_links_invalid_mixed_types(mc, spectra, mfs):
 def test_get_links_gcf_standardised_false(mc, gcfs, spectra, mfs):
     """Test `get_links` method when input is GCF objects and `standardised` is False."""
     # when cutoff is negative infinity, i.e. taking all scores
-    lg = mc.get_links(*gcfs, cutoff=np.NINF, standardised=False)
+    lg = mc.get_links(*gcfs, cutoff=-np.inf, standardised=False)
     assert lg[gcfs[0]][spectra[0]][mc.name].value == 12
     assert lg[gcfs[1]][spectra[0]][mc.name].value == -9
     assert lg[gcfs[2]][spectra[0]][mc.name].value == 11
@@ -121,7 +121,7 @@ def test_get_links_gcf_standardised_false(mc, gcfs, spectra, mfs):
 
 def test_get_links_gcf_standardised_true(mc, gcfs):
     """Test `get_links` method when input is GCF objects and `standardised` is True."""
-    lg = mc.get_links(*gcfs, cutoff=np.NINF, standardised=True)
+    lg = mc.get_links(*gcfs, cutoff=-np.inf, standardised=True)
     assert len(lg.links) == 18
 
     lg = mc.get_links(*gcfs, cutoff=0, standardised=True)
@@ -130,7 +130,7 @@ def test_get_links_gcf_standardised_true(mc, gcfs):
 
 def test_get_links_spec_standardised_false(mc, gcfs, spectra):
     """Test `get_links` method when input is Spectrum objects and `standardised` is False."""
-    lg = mc.get_links(*spectra, cutoff=np.NINF, standardised=False)
+    lg = mc.get_links(*spectra, cutoff=-np.inf, standardised=False)
     assert lg[spectra[0]][gcfs[0]][mc.name].value == 12
     assert lg[spectra[0]][gcfs[1]][mc.name].value == -9
     assert lg[spectra[0]][gcfs[2]][mc.name].value == 11
@@ -143,7 +143,7 @@ def test_get_links_spec_standardised_false(mc, gcfs, spectra):
 
 def test_get_links_spec_standardised_true(mc, gcfs, spectra):
     """Test `get_links` method when input is Spectrum objects and `standardised` is True."""
-    lg = mc.get_links(*spectra, cutoff=np.NINF, standardised=True)
+    lg = mc.get_links(*spectra, cutoff=-np.inf, standardised=True)
     assert len(lg.links) == 9
 
     lg = mc.get_links(*spectra, cutoff=0, standardised=True)
@@ -152,7 +152,7 @@ def test_get_links_spec_standardised_true(mc, gcfs, spectra):
 
 def test_get_links_mf_standardised_false(mc, gcfs, mfs):
     """Test `get_links` method when input is MolecularFamily objects and `standardised` is False."""
-    lg = mc.get_links(*mfs, cutoff=np.NINF, standardised=False)
+    lg = mc.get_links(*mfs, cutoff=-np.inf, standardised=False)
     assert lg[mfs[0]][gcfs[0]][mc.name].value == 12
     assert lg[mfs[0]][gcfs[1]][mc.name].value == -9
     assert lg[mfs[0]][gcfs[2]][mc.name].value == 11
@@ -165,7 +165,7 @@ def test_get_links_mf_standardised_false(mc, gcfs, mfs):
 
 def test_get_links_mf_standardised_true(mc, gcfs, mfs):
     """Test `get_links` method when input is MolecularFamily objects and `standardised` is True."""
-    lg = mc.get_links(*mfs, cutoff=np.NINF, standardised=True)
+    lg = mc.get_links(*mfs, cutoff=-np.inf, standardised=True)
     assert len(lg.links) == 9
 
     lg = mc.get_links(*mfs, cutoff=0, standardised=True)
