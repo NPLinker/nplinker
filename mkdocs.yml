@@ -68,21 +68,25 @@ nav:
   - Dataset Arranger: api/arranger.md
   - Dataset Loader: api/loader.md
   - Genomics Data:
+    - Abstract Base Classes: api/genomics_abc.md
     - Data Models: api/genomics.md
-    - Base Classes: api/genomics_abc.md
     - MiBIG: api/mibig.md
     - AntiSMASH: api/antismash.md
     - BigScape: api/bigscape.md
     - Utilities: api/genomics_utils.md
   - Metabolomics Data:
+    - Abstract Base Classes: api/metabolomics_abc.md
     - Data Models: api/metabolomics.md
-    - Base Classes: api/metabolomics_abc.md
     - GNPS: api/gnps.md
     - Utilities: api/metabolomics_utils.md
   - Strain Data:
     - Data Models: api/strain.md
     - Utilities: api/strain_utils.md
-  - Scoring: api/scoring.md
+  - Scoring: 
+    - Abstract Base Classes: api/scoring_abc.md
+    - Scoring Methods: api/scoring_methods.md
+    - Data Models: api/scoring.md
+    - Utilities: api/scoring_utils.md
   - Schemas: api/schema.md
   - General Utilities: api/utils.md
 
