@@ -304,19 +304,14 @@ class NPLinker:
     ) -> None:
         """Pickle data to a file.
 
-        The data to be pickled is a tuple containing the BGCs, GCFs, Spectra, MolecularFamilies and
-        StrainCollection objects, i.e. `(bgcs, gcfs, spectra, mfs, strains)`.
-
-        If the `links` argument is provided, the LinkGraph object is also included in the tuple, i.e.
-        `(bgcs, gcfs, spectra, mfs, strains, links)`.
+        The data to be pickled is a tuple containing the BGCs, GCFs, Spectra, MolecularFamilies,
+        StrainCollection and links, i.e. `(bgcs, gcfs, spectra, mfs, strains, links)`. If the links
+        are not provided, `None` will be used.
 
         Args:
             file: The path to the pickle file to save the data to.
             links: The LinkGraph object to save.
         """
-        if links is None:
-            data = (self.bgcs, self.gcfs, self.spectra, self.mfs, self.strains)
-        else:
-            data = (self.bgcs, self.gcfs, self.spectra, self.mfs, self.strains, links)
+        data = (self.bgcs, self.gcfs, self.spectra, self.mfs, self.strains, links)
         with open(file, "wb") as f:
             pickle.dump(data, f)
