@@ -3,8 +3,8 @@ import logging
 import os
 from deprecated import deprecated
 from dynaconf import Dynaconf
-from nplinker import NPLINKER_APP_DATA_DIR
 from nplinker import defaults
+from nplinker.defaults import NPLINKER_APP_DATA_DIR
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
 from nplinker.genomics.antismash import AntismashBGCLoader

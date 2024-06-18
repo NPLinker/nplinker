@@ -1,4 +1,9 @@
+from pathlib import Path
 from typing import Final
+
+
+# The path to the NPLinker application database directory
+NPLINKER_APP_DATA_DIR: Final = Path(__file__).parent / "data"
 
 
 STRAIN_MAPPINGS_FILENAME: Final = "strain_mappings.json"
