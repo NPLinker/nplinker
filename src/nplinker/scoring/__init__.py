@@ -1,4 +1,3 @@
-from .abc import ScoringBase
 from .link_graph import LinkGraph
 from .metcalf_scoring import MetcalfScoring
 from .score import Score
@@ -9,6 +8,5 @@ __all__ = [
     "LinkGraph",
     "MetcalfScoring",
     "Score",
-    "ScoringBase",
     "ScoringMethod",
 ]
