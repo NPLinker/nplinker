@@ -4,6 +4,7 @@ import pickle
 from collections.abc import Sequence
 from os import PathLike
 from pprint import pformat
+from typing import Any
 from typing import overload
 from . import setup_logging
 from .arranger import DatasetArranger
@@ -188,19 +189,19 @@ class NPLinker:
 
     @overload
     def get_links(
-        self, objects: Sequence[BGC], scoring_method: str, **scoring_params
+        self, objects: Sequence[BGC], scoring_method: str, **scoring_params: Any
     ) -> LinkGraph: ...
     @overload
     def get_links(
-        self, objects: Sequence[GCF], scoring_method: str, **scoring_params
+        self, objects: Sequence[GCF], scoring_method: str, **scoring_params: Any
     ) -> LinkGraph: ...
     @overload
     def get_links(
-        self, objects: Sequence[Spectrum], scoring_method: str, **scoring_params
+        self, objects: Sequence[Spectrum], scoring_method: str, **scoring_params: Any
     ) -> LinkGraph: ...
     @overload
     def get_links(
-        self, objects: Sequence[MolecularFamily], scoring_method: str, **scoring_params
+        self, objects: Sequence[MolecularFamily], scoring_method: str, **scoring_params: Any
     ) -> LinkGraph: ...
 
     def get_links(self, objects, scoring_method, **scoring_params):
