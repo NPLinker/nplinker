@@ -80,7 +80,7 @@ root_dir # (1)!
 14. It's flexible to extend NPLinker by adding other types of data.
 
 !!! tip
-    - `[F]` means the file or directory name is fixed and must be named as shown.
+    - `[F]` means the file or directory name is fixed and must be named as shown. The names are defined in the [defaults](../api/nplinker.md#nplinker.defaults) module.
     - `[O]` means the file or directory is optional for users to provide. It does not mean the file
     or directory is optional for NPLinker to use. If it's not provided by the user, NPLinker may generate
     it.

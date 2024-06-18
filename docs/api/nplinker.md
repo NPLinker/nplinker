@@ -1,1 +1,3 @@
-::: nplinker.nplinker
+::: nplinker
+::: nplinker.defaults
+::: nplinker.config
