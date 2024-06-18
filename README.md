@@ -4,17 +4,16 @@
 | :-- | :--  |
 | (1/5) code repository              | [![github repo badge](https://img.shields.io/badge/github-nplinker-000.svg?color=blue)](https://github.com/NPLinker/nplinker) |
 | (2/5) license                      | [![github license badge](https://img.shields.io/github/license/NPLinker/nplinker)](https://github.com/NPLinker/nplinker) |
-| (3/5) community registry           | [![pypi badge](https://img.shields.io/pypi/v/nplinker.svg?color=blue)](https://pypi.python.org/project/nplinker/) ![Docker Image Version (latest by date)](https://img.shields.io/docker/v/nlesc/nplinker?arch=amd64&label=docker&sort=date)|
+| (3/5) community registry           | [![pypi badge](https://img.shields.io/pypi/v/nplinker.svg?color=blue)](https://pypi.python.org/project/nplinker/) |
 | (4/5) citation                     | [![Zenodo](https://zenodo.org/badge/DOI/10.5281/zenodo.4680218.svg)](https://doi.org/10.5281/zenodo.4680218) |
 | (5/5) checklist                    | ![Static Badge](https://img.shields.io/badge/Coming_Soon-lightgrey) |
-| how FAIR is                          | [![fair-software badge](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu) |
+| how FAIR is                        | [![fair-software badge](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu) |
 | **Other best practices**           |  |
 | Documentation                      | [![Static Badge](https://img.shields.io/badge/Docs_Available-lightgreen)](https://nplinker.github.io/nplinker) [🔗](https://nplinker.github.io/nplinker)|
 | Build & Test                       | [![build](https://github.com/NPLinker/nplinker/actions/workflows/build.yml/badge.svg)](https://github.com/NPLinker/nplinker/actions/workflows/build.yml) |
 | Static analysis                    | [![workflow scq badge](https://sonarcloud.io/api/project_badges/measure?project=NPLinker_nplinker&metric=alert_status)](https://sonarcloud.io/dashboard?id=NPLinker_nplinker) |
 | Coverage                           | [![workflow scc badge](https://sonarcloud.io/api/project_badges/measure?project=NPLinker_nplinker&metric=coverage)](https://sonarcloud.io/dashboard?id=NPLinker_nplinker) |
 | Citation data consistency          | [![cffconvert](https://github.com/NPLinker/nplinker/actions/workflows/cffconvert.yml/badge.svg)](https://github.com/NPLinker/nplinker/actions/workflows/cffconvert.yml) |
-| **Downloads** | ![Docker Pulls](https://img.shields.io/docker/pulls/nlesc/nplinker?color=green&label=docker%20pulls) |
 
 
 # Natural Products Linker (NPLinker)
@@ -25,8 +24,7 @@ Original paper: [Ranking microbial metabolomic and genomic links in the NPLinker
 ## Setup and usage
 
 ### Requirement
-- Linux, MacOS, or Windows with WSL ([Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/about)) enabled
-  - For Windows without WSL, please use the [docker image](https://hub.docker.com/r/nlesc/nplinker)
+- Linux or MacOS
 - Python version ≥3.9
 
 

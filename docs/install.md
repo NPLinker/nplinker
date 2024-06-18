@@ -1,7 +1,6 @@
 
 ???- Note "Requirements"
-    - Linux, MacOS, or [WSL on Windows](https://learn.microsoft.com/en-us/windows/wsl/about)
-        - For Windows without WSL enabled, please use NPLinker [docker image](https://hub.docker.com/r/nlesc/nplinker)
+    - Linux or MacOS
     - Python version ≥3.9
 
 
