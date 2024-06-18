@@ -15,7 +15,7 @@ def setup_logging(level: str = "INFO", file: str = "", use_console: bool = True)
         use_console: Whether to log to the console.
     """
     # Get the ancestor logger "nplinker"
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger("nplinker")
     logger.setLevel(level)
 
     # File handler
