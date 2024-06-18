@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from .logging import setup_logging
+from .logger import setup_logging
 from .nplinker import NPLinker
 
 

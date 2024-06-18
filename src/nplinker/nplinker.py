@@ -6,13 +6,13 @@ from os import PathLike
 from pprint import pformat
 from typing import Any
 from typing import overload
-from . import setup_logging
 from .arranger import DatasetArranger
 from .config import load_config
 from .defaults import OUTPUT_DIRNAME
 from .genomics import BGC
 from .genomics import GCF
 from .loader import DatasetLoader
+from .logger import setup_logging
 from .metabolomics import MolecularFamily
 from .metabolomics import Spectrum
 from .scoring.link_graph import LinkGraph
