@@ -204,7 +204,12 @@ class NPLinker:
         self, objects: Sequence[MolecularFamily], scoring_method: str, **scoring_params: Any
     ) -> LinkGraph: ...
 
-    def get_links(self, objects, scoring_method, **scoring_params):
+    def get_links(
+        self,
+        objects: Sequence[BGC] | Sequence[GCF] | Sequence[Spectrum] | Sequence[MolecularFamily],
+        scoring_method: str,
+        **scoring_params: Any,
+    ) -> LinkGraph:
         """Get the links for the given objects using the specified scoring method and parameters.
 
         Args:
@@ -212,7 +217,7 @@ class NPLinker:
                 type, i.e. `BGC`, `GCF`, `Spectrum` or `MolecularFamily` type.
                 For scoring method `metcalf`, the BGC objects are not supported.
             scoring_method: The scoring method to use. Must be one of the valid scoring methods
-                `self.scoring_methods`.
+                `self.scoring_methods`, such as "metcalf".
             scoring_params: Parameters to pass to the scoring method. If not provided, the default
                 parameters for the scoring method will be used.
 
