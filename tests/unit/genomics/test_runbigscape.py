@@ -1,3 +1,4 @@
+import pytest
 from nplinker.genomics.bigscape.runbigscape import run_bigscape
 from .. import DATA_DIR
 
@@ -22,3 +23,14 @@ class TestRunBigscape:
         )
 
         assert result is True
+
+    def test_input_path_not_exist(self, tmp_path):
+        with pytest.raises(Exception) as e:
+            run_bigscape(
+                antismash_path=tmp_path / "not_exist",
+                output_path=tmp_path,
+                extra_params="",
+                version=1,
+            )
+
+            assert "antismash_path" in e.value.args[0]
