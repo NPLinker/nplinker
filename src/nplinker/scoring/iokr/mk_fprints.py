@@ -101,7 +101,3 @@ def fingerprint_from_inchi(inchi, fingerprint_type=None):
     for fp_bit in range(fp_size):
         fp_array[fp_bit] = fp.get(fp_bit)
     return fp_array
-
-
-if __name__ == "__main__":
-    main()

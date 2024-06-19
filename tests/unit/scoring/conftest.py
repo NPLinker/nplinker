@@ -5,7 +5,6 @@ from nplinker.metabolomics import MolecularFamily
 from nplinker.metabolomics import Spectrum
 from nplinker.nplinker import NPLinker
 from nplinker.scoring import MetcalfScoring
-from nplinker.scoring.linking import DataLinks
 from nplinker.strain import Strain
 from nplinker.strain import StrainCollection
 from .. import CONFIG_FILE_LOCAL_MODE
@@ -62,12 +61,6 @@ def mfs(spectra) -> tuple[MolecularFamily, MolecularFamily, MolecularFamily]:
     return mf1, mf2, mf3
 
 
-@fixture(scope="session")
-def datalinks(gcfs, spectra, mfs, strains) -> DataLinks:
-    """DataLinks object. See `test_data_links.py` for its values."""
-    return DataLinks(gcfs, spectra, mfs, strains)
-
-
 @fixture(scope="function")
 def npl(gcfs, spectra, mfs, strains, tmp_path) -> NPLinker:
     """Constructed NPLinker object.
@@ -76,23 +69,20 @@ def npl(gcfs, spectra, mfs, strains, tmp_path) -> NPLinker:
     manually set its attributes to the values we want to test.
 
     The config file `nplinker_demo1.toml` does not affect the tests, just
-    making sure the NPLinker object can be created succesfully.
+    making sure the NPLinker object can be created successfully.
     """
-    os.environ["NPLINKER_ROOT_DIR"] = str(tmp_path)  # Create a tmporary root dir for NPLinker
+    os.environ["NPLINKER_ROOT_DIR"] = str(tmp_path)  # Create a temporary root dir for NPLinker
     npl = NPLinker(CONFIG_FILE_LOCAL_MODE)
-    npl._gcfs = gcfs
-    npl._spectra = spectra
-    npl._molfams = mfs
     npl._strains = strains
-    npl._gcf_lookup = {gcf.gcf_id: gcf for gcf in gcfs}
-    npl._mf_lookup = {mf.family_id: mf for mf in mfs}
-    npl._spec_lookup = {spec.spectrum_id: spec for spec in spectra}
+    npl._gcf_dict = {gcf.id: gcf for gcf in gcfs}
+    npl._mf_dict = {mf.id: mf for mf in mfs}
+    npl._spec_dict = {spec.id: spec for spec in spectra}
     return npl
 
 
 @fixture(scope="function")
 def mc(npl) -> MetcalfScoring:
     """MetcalfScoring object."""
-    mc = MetcalfScoring(npl)
+    mc = MetcalfScoring()
     mc.setup(npl)
     return mc

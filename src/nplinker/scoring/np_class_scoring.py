@@ -3,16 +3,18 @@ import time
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
 from nplinker.metabolomics import Spectrum
-from nplinker.scoring.abc import ScoringBase
-from nplinker.scoring.metcalf_scoring import MetcalfScoring
-from nplinker.scoring.object_link import ObjectLink
+from nplinker.strain import StrainCollection
+from .abc import ScoringBase
+from .link_graph import LinkGraph
+from .score import Score
+from .scoring_method import ScoringMethod
 
 
 logger = logging.getLogger(__name__)
 
 
 class NPClassScoring(ScoringBase):
-    name = "npclassscore"
+    name = ScoringMethod.NPLCLASS.value
 
     def __init__(self, npl):
         super().__init__(npl)
@@ -43,7 +45,7 @@ class NPClassScoring(ScoringBase):
         target (if obj is BGC then  obj_classes should be classes for the BGC).
         Can be:
             - BGC/GCF classes: {'as_classes': list(str), 'bigscape_class': str}
-            - Spectrum/Molfam classes: tuple of (classes, class_names_indices),
+            - Spectrum/mf classes: tuple of (classes, class_names_indices),
             where classes is a list of list of tuples/None, where each
             tuple is a class and a score (str, float), and class_names_indices
             is a list of ints that relate to the name of a class ontology lvl
@@ -156,7 +158,7 @@ class NPClassScoring(ScoringBase):
         """Get the targets based upon instance of test_id, returns list of targets.
 
         Args:
-            test_id: one of the NPLinker objects: BGC, GCF, Spectrum, Molfam
+            test_id: one of the NPLinker objects: BGC, GCF, Spectrum, mf
         Returns:
             List of one or more of one of the NPLinker objects
         """
@@ -173,7 +175,7 @@ class NPClassScoring(ScoringBase):
                 targets = self.npl.bgcs
             else:
                 targets = self.npl.gcfs
-        else:  # obj are molfam
+        else:  # obj are mf
             if self.equal_targets:
                 targets = self.npl.gcfs
             else:
@@ -182,15 +184,15 @@ class NPClassScoring(ScoringBase):
 
     def _get_targets_genomics(self, test_id):
         if self.both_targets:  # no matter BGC or GCF take both spec and MF
-            targets = self.npl.spectra + self.npl.molfams
+            targets = self.npl.spectra + self.npl.mfs
         elif isinstance(test_id, BGC):  # obj are BGC
             if self.equal_targets:  # take
                 targets = self.npl.spectra
             else:
-                targets = self.npl.molfams
+                targets = self.npl.mfs
         else:  # obj are GCF
             if self.equal_targets:
-                targets = self.npl.molfams
+                targets = self.npl.mfs
             else:
                 targets = self.npl.spectra
         return targets
@@ -212,7 +214,7 @@ class NPClassScoring(ScoringBase):
         if is_bgc:
             # get parent gcf for bgc
             bgc_like_gcf = [
-                gcf for gcf in self.npl.gcfs if bgc_like.bgc_id in [b.bgc_id for b in gcf.bgcs]
+                gcf for gcf in self.npl.gcfs if bgc_like.id in [b.id for b in gcf.bgcs]
             ][0]
             # gather AS classes and convert to names in scoring dict
             as_classes = self.npl.class_matches.convert_as_classes(
@@ -235,10 +237,10 @@ class NPClassScoring(ScoringBase):
         return bgc_like_classes_dict
 
     def _get_met_classes(self, spec_like, method="mix"):
-        """Get chemical classes for a Spectrum or MolFam based on method.
+        """Get chemical classes for a Spectrum or mf based on method.
 
         Args:
-            spec_like: Spectrum or MolFam, one of the NPLinker input types
+            spec_like: Spectrum or mf, one of the NPLinker input types
             method: str, one of the appropriate methods for chemical class
                 predictions (mix, canopus...), default='mix'
         Returns:
@@ -247,7 +249,7 @@ class NPClassScoring(ScoringBase):
             tuple is a class and a score (str, float), and class_names_indices
             is a list of ints that relate to the name of a class ontology lvl
         """
-        # assess if spectrum or molfam
+        # assess if spectrum or mf
         is_spectrum = isinstance(spec_like, Spectrum)
 
         # gather classes for spectra, using right method
@@ -268,9 +270,7 @@ class NPClassScoring(ScoringBase):
             if is_spectrum:
                 # list of list of tuples/None - todo: add to spectrum object?
                 # take only 'best' (first) classification per ontology level
-                all_classes = self.npl.chem_classes.canopus.spectra_classes.get(
-                    spec_like.spectrum_id
-                )
+                all_classes = self.npl.chem_classes.canopus.spectra_classes.get(spec_like.id)
                 if all_classes:
                     spec_like_classes = [
                         cls_per_lvl
@@ -281,11 +281,11 @@ class NPClassScoring(ScoringBase):
                 spec_like_classes_names_inds = (
                     self.npl.chem_classes.canopus.spectra_classes_names_inds
                 )
-            else:  # molfam
-                fam_id = spec_like.family_id
+            else:  # mf
+                fam_id = spec_like.family.id
                 if fam_id.startswith("singleton-"):  # account for singleton families
-                    fam_id += f"_{spec_like.spectra[0].spectrum_id}"
-                all_classes = self.npl.chem_classes.canopus.molfam_classes.get(fam_id)
+                    fam_id += f"_{spec_like.spectra[0].id}"
+                all_classes = self.npl.chem_classes.canopus.mf_classes.get(fam_id)
                 if all_classes:
                     spec_like_classes = [
                         cls_per_lvl
@@ -293,21 +293,19 @@ class NPClassScoring(ScoringBase):
                         for i, cls_per_lvl in enumerate(lvl)
                         if i == 0
                     ]
-                spec_like_classes_names_inds = (
-                    self.npl.chem_classes.canopus.molfam_classes_names_inds
-                )
+                spec_like_classes_names_inds = self.npl.chem_classes.canopus.mf_classes_names_inds
         if use_mne and not spec_like_classes:
             # if mne or when main/canopus does not get classes
             if is_spectrum:
                 spec_like_classes = self.npl.chem_classes.molnetenhancer.spectra_classes(
-                    spec_like.spectrum_id
+                    spec_like.id
                 )
-            else:  # molfam
-                fam_id = spec_like.family_id
+            else:  # mf
+                fam_id = spec_like.family.id
                 if fam_id.startswith("singleton"):  # account for singleton families
-                    fam_id += f"_{spec_like.spectra[0].spectrum_id}"
-                spec_like_classes = self.npl.chem_classes.molnetenhancer.molfam_classes.get(fam_id)
-            # classes are same for molfam and spectrum so names are irrespective of is_spectrum
+                    fam_id += f"_{spec_like.spectra[0].id}"
+                spec_like_classes = self.npl.chem_classes.molnetenhancer.mf_classes.get(fam_id)
+            # classes are same for mf and spectrum so names are irrespective of is_spectrum
             spec_like_classes_names_inds = (
                 self.npl.chem_classes.molnetenhancer.spectra_classes_names_inds
             )
@@ -329,7 +327,8 @@ class NPClassScoring(ScoringBase):
             logger.info(f"Currently the method '{met_options[0]}' is selected")
         # todo: give info about parameters
 
-    def get_links(self, objects, link_collection):
+    def get_links(self, *objects, **parameters):
+        # TODO: replace some attributes with parameters
         """Given a set of objects, return link information."""
         # todo: pickle results
         logger.info("Running NPClassScore...")
@@ -344,14 +343,9 @@ class NPClassScoring(ScoringBase):
         else:
             targets_classes = [self._get_gen_classes(target) for target in targets]
 
-        logger.info("Using Metcalf scoring to get shared strains")
-        # get mapping of shared strains
-        if not self.npl._datalinks:
-            self.npl._datalinks = self.npl.scoring_method(MetcalfScoring.name).datalinks
-        if obj_is_gen:
-            common_strains = self.npl.get_common_strains(targets, objects)
-        else:
-            common_strains = self.npl.get_common_strains(objects, targets)
+        # TODO: implement the computation of common strains between objects and targets
+        common_strains = StrainCollection()
+
         logger.info(
             f"Calculating NPClassScore for {len(objects)} objects to "
             f"{len(targets)} targets ({len(common_strains)} pairwise "
@@ -359,6 +353,7 @@ class NPClassScoring(ScoringBase):
             f"take a while."
         )
 
+        lg = LinkGraph()
         results = {}
         for obj in objects:
             results[obj] = {}
@@ -370,7 +365,14 @@ class NPClassScoring(ScoringBase):
 
             for target, target_classes in zip(targets, targets_classes):
                 self._create_object_link(
-                    obj_is_gen, common_strains, results, obj, obj_classes, target, target_classes
+                    obj_is_gen,
+                    common_strains,
+                    lg,
+                    obj,
+                    obj_classes,
+                    target,
+                    target_classes,
+                    parameters,
                 )
 
         # info about spectra/MFs with missing scoring
@@ -387,11 +389,10 @@ class NPClassScoring(ScoringBase):
             )
 
         logger.info(f"NPClassScore completed in {time.time() - begin:.1f}s")
-        link_collection._add_links_from_method(self, results)
-        return link_collection
+        return lg
 
     def _create_object_link(
-        self, obj_is_gen, common_strains, results, obj, obj_classes, target, target_classes
+        self, obj_is_gen, common_strains, lg, obj, obj_classes, target, target_classes, parameters
     ):
         # only consider targets that have shared strains
         common_tup = (obj, target)
@@ -408,10 +409,10 @@ class NPClassScoring(ScoringBase):
                 # no score is found due to missing classes for spectra
                 self._target_no_scores.add(target)  # keep track
                 if not self.filter_missing_scores:
-                    results[obj][target] = ObjectLink(obj, target, self, full_score)
+                    lg.add_link(obj, target, Score(self.name, full_score, parameters))
             else:
                 if npclassscore > self.cutoff:
-                    results[obj][target] = ObjectLink(obj, target, self, full_score)
+                    lg.add_link(obj, target, Score(self.name, full_score, parameters))
 
     def format_data(self, data):
         """Given whatever output data the method produces, return a readable string version."""

@@ -4,15 +4,17 @@ from nplinker.genomics.bgc import BGC
 from nplinker.genomics.gcf import GCF
 from nplinker.metabolomics import MolecularFamily
 from nplinker.scoring.abc import ScoringBase
-from nplinker.scoring.object_link import ObjectLink
 from nplinker.scoring.rosetta.rosetta import Rosetta
+from .link_graph import LinkGraph
+from .score import Score
+from .scoring_method import ScoringMethod
 
 
 logger = logging.getLogger(__name__)
 
 
 class RosettaScoring(ScoringBase):
-    name = "rosetta"
+    name = ScoringMethod.ROSETTA.value
     ROSETTA_OBJ = None
 
     def __init__(self, npl):
@@ -66,32 +68,31 @@ class RosettaScoring(ScoringBase):
     def _insert_result_gen(self, results, src, hit):
         if src not in results:
             results[src] = {}
-        # Rosetta can produce multiple "hits" per link, need to
-        # ensure the ObjectLink contains all the RosettaHit objects
-        # in these cases
+        # Rosetta can produce multiple "hits" per link
         if hit.spec in results[src]:
             original_data = results[src][hit.spec].data(self)
             results[src][hit.spec].set_data(self, original_data + [hit])
         else:
-            results[src][hit.spec] = ObjectLink(src, hit.spec, self, data=[hit])
+            results[src][hit.spec] = Score(name=self.name, value=[hit], parameter=self._params)
 
         return results
 
     def _insert_result_met(self, results, spec, target, hit):
         if spec not in results:
             results[spec] = {}
-        # Rosetta can produce multiple "hits" per link, need to
-        # ensure the ObjectLink contains all the RosettaHit objects
-        # in these cases
+        # Rosetta can produce multiple "hits" per link
         if target in results[spec]:
             original_data = results[spec][target].data(self)
             results[spec][target].set_data(self, original_data + [hit])
         else:
-            results[spec][target] = ObjectLink(spec, target, self, data=[hit])
+            results[spec][target] = Score(name=self.name, value=[hit], parameter=self._params)
 
         return results
 
-    def get_links(self, objects, link_collection):
+    def get_links(self, *objects, **parameters):
+        # TODO: replace some attributes with parameters
+        self._params = parameters
+
         self._validate_inputs(objects)
 
         if isinstance(objects[0], GCF):
@@ -115,15 +116,18 @@ class RosettaScoring(ScoringBase):
             results = self._collect_results_bgc(objects, ro_hits, results)
         else:  # Spectrum
             results = self._collect_results_spectra(objects, ro_hits, results)
-
-        link_collection._add_links_from_method(self, results)
         logger.debug(f"RosettaScoring found {len(results)} results")
-        return link_collection
+
+        lg = LinkGraph()
+        for src, links in results.items():
+            for target, score in links.items():
+                lg.add_link(src, target, score)
+        return lg
 
     def _collect_results_spectra(self, objects, ro_hits, results):
         for spec in objects:
             for hit in ro_hits:
-                if spec.spectrum_id == hit.spec.spectrum_id:
+                if spec.id == hit.spec.id:
                     if not self.bgc_to_gcf:
                         # can use the BGC directly
                         results = self._insert_result_met(results, spec, hit.bgc, hit)
@@ -138,7 +142,7 @@ class RosettaScoring(ScoringBase):
     def _collect_results_bgc(self, objects, ro_hits, results):
         for bgc in objects:
             for hit in ro_hits:
-                if bgc.bgc_id == hit.bgc.bgc_id:
+                if bgc.id == hit.bgc.id:
                     if not self.bgc_to_gcf:
                         # can use the BGC directly
                         results = self._insert_result_gen(results, bgc, hit)

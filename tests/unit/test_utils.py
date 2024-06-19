@@ -17,7 +17,7 @@ def test_find_delimiter(filename, expected):
 
 
 BGC_GBK_URL = "https://mibig.secondarymetabolites.org/repository/BGC0000001/BGC0000001.gbk"
-MIBIG_METADATAS_URL = "https://dl.secondarymetabolites.org/mibig/mibig_json_3.1.tar.gz"
+MIBIG_METADATA_URL = "https://dl.secondarymetabolites.org/mibig/mibig_json_3.1.tar.gz"
 ROOT = Path(__file__).parent
 
 
@@ -47,7 +47,7 @@ class TestExtractArchive:
     @pytest.fixture
     def archive(self):
         temppath = mkdtemp()
-        utils.download_url(MIBIG_METADATAS_URL, temppath)
+        utils.download_url(MIBIG_METADATA_URL, temppath)
         archive = Path(temppath) / "mibig_json_3.1.tar.gz"
         yield archive
 
@@ -82,7 +82,7 @@ class TestDownloadAndExtractArchive:
         rmtree(temppath)
 
     def test_defaults(self, temppath1):
-        utils.download_and_extract_archive(url=MIBIG_METADATAS_URL, download_root=temppath1)
+        utils.download_and_extract_archive(url=MIBIG_METADATA_URL, download_root=temppath1)
 
         fdownload = Path(temppath1) / "mibig_json_3.1.tar.gz"
         fextract = Path(temppath1) / "mibig_json_3.1"
@@ -92,7 +92,7 @@ class TestDownloadAndExtractArchive:
 
     def test_optional_args(self, temppath1, temppath2):
         utils.download_and_extract_archive(
-            url=MIBIG_METADATAS_URL,
+            url=MIBIG_METADATA_URL,
             download_root=temppath1,
             extract_root=temppath2,
             filename="example.tar.gz",
@@ -108,7 +108,7 @@ class TestDownloadAndExtractArchive:
 
     def test_arg_remove_finished(self, temppath1):
         utils.download_and_extract_archive(
-            url=MIBIG_METADATAS_URL, download_root=temppath1, remove_finished=True
+            url=MIBIG_METADATA_URL, download_root=temppath1, remove_finished=True
         )
 
         fdownload = Path(temppath1) / "mibig_json_3.1.tar.gz"

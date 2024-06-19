@@ -171,7 +171,7 @@ class DatasetArranger:
             file_mappings_tsv if file_mappings_tsv.exists() else file_mappings_csv
         )
 
-        return gnps_file_mappings_file
+        return gnps_file_mappings_file  # type: ignore
 
     def _download_and_extract_gnps(self) -> None:
         """Download and extract the GNPS data.
@@ -317,7 +317,7 @@ class DatasetArranger:
         If `self.config.mode` is "local", validate the strain mappings file.
         If `self.config.mode` is "podp", always generate the strain mappings file and validate it.
 
-        The valiation checks if the strain mappings file exists and if it is a valid JSON file
+        The validation checks if the strain mappings file exists and if it is a valid JSON file
         according to the schema defined in `schemas/strain_mappings_schema.json`.
         """
         if self.config.mode == "podp":

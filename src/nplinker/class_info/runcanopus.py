@@ -81,7 +81,3 @@ def run_canopus(mgf_file, output_path, extra_params="--maxmz 600 formula zodiac 
     open(os.path.join(output_path, "completed"), "w").close()
 
     return True
-
-
-if __name__ == "__main__":
-    run_canopus(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])

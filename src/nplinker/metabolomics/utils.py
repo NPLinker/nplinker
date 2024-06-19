@@ -3,6 +3,8 @@ import json
 import logging
 from os import PathLike
 from pathlib import Path
+from typing import Mapping
+from typing import Sequence
 from nplinker.schemas import validate_podp_json
 from nplinker.strain import StrainCollection
 from .gnps.gnps_file_mapping_loader import GNPSFileMappingLoader
@@ -13,8 +15,10 @@ from .spectrum import Spectrum
 logger = logging.getLogger(__name__)
 
 
-def add_annotation_to_spectrum(annotations: dict[str, dict], spectra: list[Spectrum]) -> None:
-    """Add GNPS annotations to the `Spectrum.gnps_annotaions` attribute for input spectra.
+def add_annotation_to_spectrum(
+    annotations: Mapping[str, dict], spectra: Sequence[Spectrum]
+) -> None:
+    """Add GNPS annotations to the `Spectrum.gnps_annotations` attribute for input spectra.
 
     It is possible that some spectra don't have annotations.
     Note that the input `spectra` list is changed in place.
@@ -25,12 +29,12 @@ def add_annotation_to_spectrum(annotations: dict[str, dict], spectra: list[Spect
         spectra: A list of Spectrum objects.
     """
     for spec in spectra:
-        if spec.spectrum_id in annotations:
-            spec.gnps_annotations = annotations[spec.spectrum_id]
+        if spec.id in annotations:
+            spec.gnps_annotations = annotations[spec.id]
 
 
 def add_strains_to_spectrum(
-    strains: StrainCollection, spectra: list[Spectrum]
+    strains: StrainCollection, spectra: Sequence[Spectrum]
 ) -> tuple[list[Spectrum], list[Spectrum]]:
     """Add `Strain` objects to the `Spectrum.strains` attribute for input spectra.
 
@@ -45,13 +49,13 @@ def add_strains_to_spectrum(
 
             - the first list contains Spectrum objects that are updated with Strain objects;
             - the second list contains Spectrum objects that are not updated with Strain objects
-            becuase no Strain objects are found.
+            because no Strain objects are found.
     """
     spectra_with_strains = []
     spectra_without_strains = []
     for spec in spectra:
         try:
-            strain_list = strains.lookup(spec.spectrum_id)
+            strain_list = strains.lookup(spec.id)
         except ValueError:
             spectra_without_strains.append(spec)
             continue
@@ -69,7 +73,7 @@ def add_strains_to_spectrum(
 
 
 def add_spectrum_to_mf(
-    spectra: list[Spectrum], mfs: list[MolecularFamily]
+    spectra: Sequence[Spectrum], mfs: Sequence[MolecularFamily]
 ) -> tuple[list[MolecularFamily], list[MolecularFamily], dict[MolecularFamily, set[str]]]:
     """Add Spectrum objects to MolecularFamily objects.
 
@@ -94,7 +98,7 @@ def add_spectrum_to_mf(
             - the third is a dictionary containing MolecularFamily objects as keys and a set of ids
             of missing Spectrum objects as values.
     """
-    spec_dict = {spec.spectrum_id: spec for spec in spectra}
+    spec_dict = {spec.id: spec for spec in spectra}
     mf_with_spec = []
     mf_without_spec = []
     mf_missing_spec: dict[MolecularFamily, set[str]] = {}
@@ -186,8 +190,8 @@ def extract_mappings_ms_filename_spectrum_id(
 
 
 def get_mappings_strain_id_spectrum_id(
-    mappings_strain_id_ms_filename: dict[str, set[str]],
-    mappings_ms_filename_spectrum_id: dict[str, set[str]],
+    mappings_strain_id_ms_filename: Mapping[str, set[str]],
+    mappings_ms_filename_spectrum_id: Mapping[str, set[str]],
 ) -> dict[str, set[str]]:
     """Get mappings "strain_id <-> spectrum_id".
 

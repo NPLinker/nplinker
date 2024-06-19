@@ -21,6 +21,7 @@ from ...parsers.kcb import KCBTextParser
 from ...pickler import load_pickled_data
 from ...pickler import save_pickled_data
 from .spec_lib import SpecLib
+from nplinker import NPLINKER_APP_DATA_DIR
 
 
 logger = logging.getLogger(__name__)
@@ -38,9 +39,9 @@ class Rosetta:
         self._nplinker = nplinker
         self._mgf_data = {}
         self._csv_data = {}
-        self._mgf_path = os.path.join(nplinker.data_dir, "matched_mibig_gnps_update.mgf")
-        self._csv_path = os.path.join(nplinker.data_dir, "matched_mibig_gnps_update.csv")
-        self._data_path = nplinker.data_dir
+        self._mgf_path = os.path.join(NPLINKER_APP_DATA_DIR, "matched_mibig_gnps_update.mgf")
+        self._csv_path = os.path.join(NPLINKER_APP_DATA_DIR, "matched_mibig_gnps_update.csv")
+        self._data_path = NPLINKER_APP_DATA_DIR
         self._root_path = nplinker.root_dir
         self._dataset_id = nplinker.dataset_id
         self._ignore_genomic_cache = ignore_genomic_cache
@@ -547,10 +548,10 @@ class Rosetta:
             for hit in self._rosetta_hits:
                 csvwriter.writerow(
                     [
-                        hit.spec.spectrum_id,
+                        hit.spec.id,
                         hit.gnps_id,
                         hit.spec_match_score,
-                        hit.bgc.bgc_id,
+                        hit.bgc.id,
                         hit.mibig_id,
                         hit.bgc_match_score,
                     ]

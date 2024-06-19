@@ -89,7 +89,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
             rt = spec["params"].get("rtinseconds", 0)
 
             spectrum = Spectrum(
-                spectrum_id=spectrum_id,
+                id=spectrum_id,
                 mz=list(spec["m/z array"]),
                 intensity=list(spec["intensity array"]),
                 precursor_mz=precursor_mz,

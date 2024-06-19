@@ -5,7 +5,7 @@ from . import CONFIG_FILE_LOCAL_MODE
 
 def test_config(tmp_path):
     """Test loading the default config file."""
-    os.environ["NPLINKER_ROOT_DIR"] = str(tmp_path)  # Create a tmporary root dir for NPLinker
+    os.environ["NPLINKER_ROOT_DIR"] = str(tmp_path)  # Create a temporary root dir for NPLinker
     config = load_config(CONFIG_FILE_LOCAL_MODE)
 
     assert config.mode == "local"

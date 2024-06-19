@@ -62,7 +62,7 @@ def test_parse_bgc_genbank():
     gbk_file = str(DATA_DIR / "antismash" / "GCF_000514515.1" / "NZ_AZWB01000005.region001.gbk")
     bgc = parse_bgc_genbank(gbk_file)
     assert isinstance(bgc, BGC)
-    assert bgc.bgc_id == "NZ_AZWB01000005.region001"
+    assert bgc.id == "NZ_AZWB01000005.region001"
     assert bgc.product_prediction == ("NRPS", "lanthipeptide")
     assert "Salinispora pacifica CNT029 B170DRAFT_scaffold" in bgc.description
     assert bgc.antismash_id == "NZ_AZWB01000005"

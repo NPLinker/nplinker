@@ -3,11 +3,11 @@ import logging
 from abc import ABC
 from abc import abstractmethod
 from typing import TYPE_CHECKING
+from .link_graph import LinkGraph
 
 
 if TYPE_CHECKING:
-    from nplinker import NPLinker
-    from . import LinkCollection
+    from nplinker.nplinker import NPLinker
 
 logger = logging.getLogger(__name__)
 
@@ -21,14 +21,7 @@ class ScoringBase(ABC):
     """
 
     name: str = "ScoringBase"
-
-    def __init__(self, npl: NPLinker):
-        """Initialize the scoring method.
-
-        Args:
-            npl: The NPLinker object.
-        """
-        self.npl = npl
+    npl: NPLinker | None = None
 
     @classmethod
     @abstractmethod
@@ -36,15 +29,19 @@ class ScoringBase(ABC):
         """Setup class level attributes."""
 
     @abstractmethod
-    def get_links(self, *objects, link_collection: LinkCollection) -> LinkCollection:
+    def get_links(
+        self,
+        *objects,
+        **parameters,
+    ) -> LinkGraph:
         """Get links information for the given objects.
 
         Args:
-            objects: A set of objects.
-            link_collection: The LinkCollection object.
+            objects: A list of objects to get links for.
+            parameters: The parameters used for scoring.
 
         Returns:
-            The LinkCollection object.
+            The LinkGraph object.
         """
 
     @abstractmethod

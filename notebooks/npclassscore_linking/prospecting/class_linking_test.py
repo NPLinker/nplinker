@@ -35,8 +35,8 @@ if __name__ == "__main__":
     # 2. check chemical compound predictions from canopus and molnetenhancer
     test_spec = list(npl.spectra)[500]
 
-    print(npl.canopus.spectra_classes.get(str(test_spec.spectrum_id)))
-    print(npl.molnetenhancer.spectra_classes(str(test_spec.spectrum_id)))
+    print(npl.canopus.spectra_classes.get(str(test_spec.id)))
+    print(npl.molnetenhancer.spectra_classes(str(test_spec.id)))
 
     # 3. example of a good score, (predicted) NRP linking to a (predicted) peptide like spectrum
     print(npl.class_linking_score(list(npl.gcfs)[0], test_spec))

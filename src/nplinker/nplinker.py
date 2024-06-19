@@ -1,45 +1,72 @@
 from __future__ import annotations
 import logging
-import sys
+import pickle
 from os import PathLike
 from pprint import pformat
-from typing import TYPE_CHECKING
+from typing import Sequence
+from typing import TypeVar
+from typing import overload
 from . import setup_logging
 from .arranger import DatasetArranger
 from .config import load_config
 from .defaults import OUTPUT_DIRNAME
 from .genomics import BGC
 from .genomics import GCF
-from .loader import NPLINKER_APP_DATA_DIR
 from .loader import DatasetLoader
 from .metabolomics import MolecularFamily
 from .metabolomics import Spectrum
-from .pickler import save_pickled_data
-from .scoring.abc import ScoringBase
-from .scoring.link_collection import LinkCollection
+from .scoring.link_graph import LinkGraph
 from .scoring.metcalf_scoring import MetcalfScoring
-from .scoring.np_class_scoring import NPClassScoring
-from .scoring.rosetta_scoring import RosettaScoring
+from .strain import StrainCollection
 
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-    from .strain import Strain
 
 logger = logging.getLogger(__name__)
 
+ObjectType = TypeVar("ObjectType", BGC, GCF, Spectrum, MolecularFamily)
+
 
 class NPLinker:
-    """Main class for the NPLinker application."""
+    """Main class for the NPLinker application.
 
-    # allowable types for objects to be passed to scoring methods
-    OBJ_CLASSES = [Spectrum, MolecularFamily, GCF, BGC]
-    # default set of enabled scoring methods
-    # TODO: ideally these shouldn't be hardcoded like this
-    SCORING_METHODS = {
+    Attributes:
+        config: The configuration object for the current NPLinker application.
+        root_dir: The path to the root directory of the current NPLinker application.
+        output_dir: The path to the output directory of the current NPLinker application.
+        bgcs: A list of all BGC objects.
+        gcfs: A list of all GCF objects.
+        spectra: A list of all Spectrum objects.
+        mfs: A list of all MolecularFamily objects.
+        mibig_bgcs: A list of all MiBIG BGC objects.
+        strains: A StrainCollection object containing all Strain objects.
+        product_types: A list of all BiGSCAPE product types.
+        scoring_methods: A list of all valid scoring methods.
+
+
+    Examples:
+        To start a NPLinker application:
+        >>> from nplinker import NPLinker
+        >>> npl = NPLinker("path/to/config.toml")
+
+        To load all data into memory:
+        >>> npl.load_data()
+
+        To check the number of GCF objects:
+        >>> len(npl.gcfs)
+
+        To get the links for all GCF objects using the Metcalf scoring method, the result is a
+        LinkGraph object:
+        >>> lg = npl.get_links(npl.gcfs, "metcalf")
+
+        To get the link data between two objects:
+        >>> link_data = lg.get_link_data(npl.gcfs[0], npl.spectra[0])
+        {"metcalf": Score("metcalf", 1.0, {"cutoff": 0, "standardised": False})}
+    """
+
+    # Valid scoring methods
+    _valid_scoring_methods = {
         MetcalfScoring.name: MetcalfScoring,
-        RosettaScoring.name: RosettaScoring,
-        NPClassScoring.name: NPClassScoring,
+        # RosettaScoring.name: RosettaScoring, # To be refactored
+        # NPClassScoring.name: NPClassScoring, # To be refactored
     }
 
     def __init__(self, config_file: str | PathLike):
@@ -48,8 +75,10 @@ class NPLinker:
         Args:
             config_file: Path to the configuration file to use.
         """
+        # Load the configuration file
         self.config = load_config(config_file)
 
+        # Setup logging for the application
         setup_logging(
             level=self.config.log.level,
             file=self.config.log.get("file", ""),
@@ -59,337 +88,68 @@ class NPLinker:
             "Configuration:\n %s", pformat(self.config.as_dict(), width=20, sort_dicts=False)
         )
 
-        self.output_dir = self.config.root_dir / OUTPUT_DIRNAME
-        self.output_dir.mkdir(exist_ok=True)
+        # Setup the output directory
+        self._output_dir = self.config.root_dir / OUTPUT_DIRNAME
+        self._output_dir.mkdir(exist_ok=True)
 
-        self._spectra = []
-        self._bgcs = []
-        self._gcfs = []
-        self._strains = None
-        self._metadata = {}
-        self._molfams = []
-        self._mibig_bgcs = []
-        self._chem_classes = None
-        self._class_matches = None
+        # Initialise data containers that will be populated by the `load_data` method
+        self._bgc_dict: dict[str, BGC] = {}
+        self._gcf_dict: dict[str, GCF] = {}
+        self._spec_dict: dict[str, Spectrum] = {}
+        self._mf_dict: dict[str, MolecularFamily] = {}
+        self._mibig_bgcs: list[BGC] = []
+        self._strains: StrainCollection = StrainCollection()
+        self._product_types: list = []
+        self._chem_classes = None  # TODO: to be refactored
+        self._class_matches = None  # TODO: to be refactored
 
-        self._bgc_lookup = {}
-        self._gcf_lookup = {}
-        self._spec_lookup = {}
-        self._mf_lookup = {}
-
-        self._scoring_methods = {}
-        config_methods = self.config.get("scoring_methods", [])
-        for name, method in NPLinker.SCORING_METHODS.items():
-            if len(config_methods) == 0 or name in config_methods:
-                self._scoring_methods[name] = method
-                logger.info(f"Enabled scoring method: {name}")
-
-        self._scoring_methods_setup_complete = {
-            name: False for name in self._scoring_methods.keys()
-        }
-
-        self._datalinks = None
-
-        self._repro_data = {}
-        repro_file = self.config.get("repro_file")
-        if repro_file:
-            self.save_repro_data(repro_file)
-
-    def _collect_repro_data(self):
-        """Creates a dict containing data to aid reproducible runs of nplinker.
-
-        This method creates a dict containing various bits of information about
-        the current execution of nplinker. This data will typically be saved to
-        a file in order to aid reproducibility using :func:`save_repro_data`.
-
-        TODO describe contents
-
-        Returns:
-            A dict containing the information described above
-        """
-        self._repro_data = {}
-        # TODO best way to embed latest git commit hash? probably with a packaging script...
-        # TODO versions of all Python dependencies used (just rely on
-        # Pipfile.lock here?)
-
-        # insert command line arguments
-        self._repro_data["args"] = {}
-        for i, arg in enumerate(sys.argv):
-            self._repro_data["args"][i] = arg
-
-        # TODO anything else to include here?
-
-        return self._repro_data
-
-    def save_repro_data(self, filename):
-        self._collect_repro_data()
-        with open(filename, "wb") as repro_file:
-            # TODO is pickle the best format to use?
-            save_pickled_data(self._repro_data, repro_file)
-            logger.info(f"Saving reproducibility data to {filename}")
+        # Flags to keep track of whether the scoring methods have been set up
+        self._scoring_methods_setup_done = {name: False for name in self._valid_scoring_methods}
 
     @property
     def root_dir(self) -> str:
-        """Returns path to the current dataset root directory.
-
-        Returns:
-            The path to the dataset root directory currently in use
-        """
-        return self.config.root_dir
+        """Get the path to the root directory of the current NPLinker instance."""
+        return str(self.config.root_dir)
 
     @property
-    def data_dir(self):
-        """Returns path to nplinker/data directory (files packaged with the app itself)."""
-        return NPLINKER_APP_DATA_DIR
+    def output_dir(self) -> str:
+        """Get the path to the output directory of the current NPLinker instance."""
+        return str(self._output_dir)
 
     @property
-    def bigscape_cutoff(self):
-        """Returns the current BiGSCAPE clustering cutoff value."""
-        return self.config.bigscape.cutoff
-
-    def load_data(self):
-        """Loads the basic components of a dataset."""
-        arranger = DatasetArranger(self.config)
-        arranger.arrange()
-        loader = DatasetLoader(self.config)
-        loader.load()
-
-        self._spectra = loader.spectra
-        self._molfams = loader.molfams
-        self._bgcs = loader.bgcs
-        self._gcfs = loader.gcfs
-        self._mibig_bgcs = loader.mibig_bgcs
-        self._strains = loader.strains
-        self._product_types = loader.product_types
-        self._chem_classes = loader.chem_classes
-        self._class_matches = loader.class_matches
-
-    # TODO CG: refactor this method and update its unit tests
-    def get_links(
-        self, input_objects: list, scoring_methods: list, and_mode: bool = True
-    ) -> LinkCollection:
-        """Find links for a set of input objects (BGCs/GCFs/Spectra/MolFams).
-
-        The input objects can be any mix of the following NPLinker types:
-
-            - BGC
-            - GCF
-            - Spectrum
-            - MolecularFamily
-
-        TODO longer description here
-
-        Args:
-            input_objects: objects to be passed to the scoring method(s).
-                This may be either a flat list of a uniform type (one of the 4
-                types above), or a list of such lists
-            scoring_methods: a list of one or more scoring methods to use
-            and_mode: determines how results from multiple methods are combined.
-                This is ignored if a single method is supplied. If multiple methods
-                are used and ``and_mode`` is True, the results will only contain
-                links found by ALL methods. If False, results will contain links
-                found by ANY method.
-
-        Returns:
-            An instance of ``nplinker.scoring.methods.LinkCollection``
-        """
-        if isinstance(input_objects, list) and len(input_objects) == 0:
-            raise Exception("input_objects length must be > 0")
-
-        if isinstance(scoring_methods, list) and len(scoring_methods) == 0:
-            raise Exception("scoring_methods length must be > 0")
-
-        # for convenience convert a single scoring object into a single entry
-        # list
-        if not isinstance(scoring_methods, list):
-            scoring_methods = [scoring_methods]
-
-        # check if input_objects is a list of lists. if so there should be one
-        # entry for each supplied method for it to be a valid parameter
-        if isinstance(input_objects[0], list):
-            if len(input_objects) != len(scoring_methods):
-                raise Exception(
-                    "Number of input_objects lists must match number of scoring_methods (found: {}, expected: {})".format(
-                        len(input_objects), len(scoring_methods)
-                    )
-                )
-
-        # TODO check scoring_methods only contains ScoringMethod-derived
-        # instances
-
-        # want everything to be in lists of lists
-        if not isinstance(input_objects, list) or (
-            isinstance(input_objects, list) and not isinstance(input_objects[0], list)
-        ):
-            input_objects = [input_objects]
-
-        logger.debug(
-            "get_links: {} object sets, {} methods".format(len(input_objects), len(scoring_methods))
-        )
-
-        # copy the object set if required to make up the numbers
-        if len(input_objects) != len(scoring_methods):
-            if len(scoring_methods) < len(input_objects):
-                raise Exception("Number of scoring methods must be >= number of input object sets")
-            elif (len(scoring_methods) > len(input_objects)) and len(input_objects) != 1:
-                raise Exception(
-                    "Mismatch between number of scoring methods and input objects ({} vs {})".format(
-                        len(scoring_methods), len(input_objects)
-                    )
-                )
-            elif len(scoring_methods) > len(input_objects):
-                # this is a special case for convenience: pass in 1 set of objects and multiple methods,
-                # result is that set is used for all methods
-                logger.debug("Duplicating input object set")
-                while len(input_objects) < len(scoring_methods):
-                    input_objects.append(input_objects[0])
-                    logger.debug("Duplicating input object set")
-
-        link_collection = LinkCollection(and_mode)
-
-        for i, method in enumerate(scoring_methods):
-            # do any one-off initialisation required by this method
-            if not self._scoring_methods_setup_complete[method.name]:
-                logger.debug(f"Doing one-time setup for {method.name}")
-                self._scoring_methods[method.name].setup(self)
-                self._scoring_methods_setup_complete[method.name] = True
-
-            # should construct a dict of {object_with_link: <link_data>}
-            # entries
-            objects_for_method = input_objects[i]
-            logger.debug(
-                "Calling scoring method {} on {} objects".format(
-                    method.name, len(objects_for_method)
-                )
-            )
-            link_collection = method.get_links(*objects_for_method, link_collection=link_collection)
-
-        if not self._datalinks:
-            logger.debug("Creating internal datalinks object")
-            self._datalinks = self.scoring_method(MetcalfScoring.name).datalinks
-            logger.debug("Created internal datalinks object")
-
-        if len(link_collection) == 0:
-            logger.debug("No links found or remaining after merging all method results!")
-
-        # populate shared strain info
-        logger.debug("Calculating shared strain information...")
-        # TODO more efficient version?
-        for source, link_data in link_collection.links.items():
-            if isinstance(source, BGC):
-                logger.debug("Cannot determine shared strains for BGC input!")
-                break
-
-            targets = list(filter(lambda x: not isinstance(x, BGC), link_data.keys()))
-            if len(targets) > 0:
-                if isinstance(source, GCF):
-                    shared_strains = self._datalinks.get_common_strains(targets, [source], True)
-                    for target, link in link_data.items():
-                        if (target, source) in shared_strains:
-                            link.shared_strains = shared_strains[(target, source)]
-                else:
-                    shared_strains = self._datalinks.get_common_strains([source], targets, True)
-                    for target, link in link_data.items():
-                        if (source, target) in shared_strains:
-                            link.shared_strains = shared_strains[(source, target)]
-
-        logger.info("Finished calculating shared strain information")
-
-        logger.info("Final size of link collection is {}".format(len(link_collection)))
-        return link_collection
-
-    def get_common_strains(
-        self,
-        met: Sequence[Spectrum] | Sequence[MolecularFamily],
-        gcfs: Sequence[GCF],
-        filter_no_shared: bool = True,
-    ) -> dict[tuple[Spectrum | MolecularFamily, GCF], list[Strain]]:
-        """Get common strains between given spectra/molecular families and GCFs.
-
-        Args:
-            met:
-                A list of Spectrum or MolecularFamily objects.
-            gcfs: A list of GCF objects.
-            filter_no_shared: If True, the pairs of spectrum/mf and GCF
-                without common strains will be removed from the returned dict;
-
-        Returns:
-            A dict where the keys are tuples of (Spectrum/MolecularFamily, GCF)
-            and values are a list of shared Strain objects.
-        """
-        if not self._datalinks:
-            self._datalinks = self.scoring_method(MetcalfScoring.name).datalinks
-        common_strains = self._datalinks.get_common_strains(met, gcfs, filter_no_shared)
-        return common_strains
-
-    def has_bgc(self, bgc_id):
-        """Returns True if BGC ``bgc_id`` exists in the dataset."""
-        return bgc_id in self._bgc_lookup
-
-    def lookup_bgc(self, bgc_id):
-        """If BGC ``bgc_id`` exists, return it. Otherwise return None."""
-        return self._bgc_lookup.get(bgc_id, None)
-
-    def lookup_gcf(self, gcf_id):
-        """If GCF ``gcf_id`` exists, return it. Otherwise return None."""
-        return self._gcf_lookup.get(gcf_id, None)
-
-    def lookup_spectrum(self, spectrum_id):
-        """If Spectrum ``name`` exists, return it. Otherwise return None."""
-        return self._spec_lookup.get(spectrum_id, None)
-
-    def lookup_mf(self, mf_id):
-        """If MolecularFamily `family_id` exists, return it. Otherwise return None."""
-        return self._mf_lookup.get(mf_id, None)
+    def bgcs(self) -> list[BGC]:
+        """Get all BGC objects."""
+        return list(self._bgc_dict.values())
 
     @property
-    def strains(self):
-        """Returns a list of all the strains in the dataset."""
-        return self._strains
+    def gcfs(self) -> list[GCF]:
+        """Get all GCF objects."""
+        return list(self._gcf_dict.values())
 
     @property
-    def bgcs(self):
-        """Returns a list of all the BGCs in the dataset."""
-        return self._bgcs
+    def spectra(self) -> list[Spectrum]:
+        """Get all Spectrum objects."""
+        return list(self._spec_dict.values())
 
     @property
-    def gcfs(self):
-        """Returns a list of all the GCFs in the dataset."""
-        return self._gcfs
+    def mfs(self) -> list[MolecularFamily]:
+        """Get all MolecularFamily objects."""
+        return list(self._mf_dict.values())
 
     @property
-    def spectra(self):
-        """Returns a list of all the Spectra in the dataset."""
-        return self._spectra
-
-    @property
-    def molfams(self):
-        """Returns a list of all the MolecularFamilies in the dataset."""
-        return self._molfams
-
-    @property
-    def metadata(self):
-        return self._metadata
-
-    @property
-    def mibig_bgcs(self):
-        """Get a list of all the MIBiG BGCs in the dataset."""
+    def mibig_bgcs(self) -> list[BGC]:
+        """Get all MiBIG BGC objects."""
         return self._mibig_bgcs
 
     @property
-    def product_types(self):
-        """Returns a list of the available BiGSCAPE product types in current dataset."""
+    def strains(self) -> StrainCollection:
+        """Get all Strain objects."""
+        return self._strains
+
+    @property
+    def product_types(self) -> list[str]:
+        """Get all BiGSCAPE product types."""
         return self._product_types
-
-    @property
-    def repro_data(self):
-        """Returns the dict containing reproducibility data."""
-        return self._repro_data
-
-    @property
-    def scoring_methods(self):
-        """Returns a list of available scoring method names."""
-        return list(self._scoring_methods.keys())
 
     @property
     def chem_classes(self):
@@ -401,20 +161,157 @@ class NPLinker:
         """ClassMatches with the matched classes and scoring tables from MIBiG."""
         return self._class_matches
 
-    def scoring_method(self, name: str) -> ScoringBase | None:
-        """Return an instance of a scoring method.
+    @property
+    def scoring_methods(self) -> list[str]:
+        """Get names of all valid scoring methods."""
+        return list(self._valid_scoring_methods.keys())
+
+    def load_data(self):
+        """Load all data from local files into memory.
+
+        This method is a convenience function that calls the `DatasetArranger` and `DatasetLoader`
+        classes to load all data from the local filesystem into memory. The loaded data is then
+        stored in various private data containers for easy access.
+        """
+        arranger = DatasetArranger(self.config)
+        arranger.arrange()
+        loader = DatasetLoader(self.config)
+        loader.load()
+
+        self._bgc_dict = {bgc.id: bgc for bgc in loader.bgcs}
+        self._gcf_dict = {gcf.id: gcf for gcf in loader.gcfs}
+        self._spec_dict = {spec.id: spec for spec in loader.spectra}
+        self._mf_dict = {mf.id: mf for mf in loader.mfs}
+
+        self._mibig_bgcs = loader.mibig_bgcs
+        self._strains = loader.strains
+        self._product_types = loader.product_types
+        self._chem_classes = loader.chem_classes
+        self._class_matches = loader.class_matches
+
+    @overload
+    def get_links(
+        self, objects: Sequence[BGC], scoring_method: str, **scoring_params
+    ) -> LinkGraph: ...
+    @overload
+    def get_links(
+        self, objects: Sequence[GCF], scoring_method: str, **scoring_params
+    ) -> LinkGraph: ...
+    @overload
+    def get_links(
+        self, objects: Sequence[Spectrum], scoring_method: str, **scoring_params
+    ) -> LinkGraph: ...
+    @overload
+    def get_links(
+        self, objects: Sequence[MolecularFamily], scoring_method: str, **scoring_params
+    ) -> LinkGraph: ...
+
+    def get_links(self, objects, scoring_method, **scoring_params):
+        """Get the links for the given objects using the specified scoring method and parameters.
 
         Args:
-            name: the name of the method (see :func:`scoring_methods`)
+            objects: A sequence of objects to get the links for. The objects must be of the same
+                type, i.e. `BGC`, `GCF`, `Spectrum` or `MolecularFamily` type.
+                For scoring method `metcalf`, the BGC objects are not supported.
+            scoring_method: The scoring method to use. Must be one of the valid scoring methods
+                `self.scoring_methods`.
+            scoring_params: Parameters to pass to the scoring method. If not provided, the default
+                parameters for the scoring method will be used.
 
         Returns:
-            An instance of the named scoring method class, or None if the name is invalid
+            A LinkGraph object containing the links for the given objects.
+
+        Raises:
+            ValueError: If input objects are empty or if the scoring method is invalid.
+            TypeError: If the input objects are not of the same type or if the object type is invalid.
         """
-        if name not in self._scoring_methods_setup_complete:
-            return None
+        # Validate objects
+        if len(objects) == 0:
+            raise ValueError("No objects provided to get links for")
+        # check if all objects are of the same type
+        types = {type(i) for i in objects}
+        if len(types) > 1:
+            raise TypeError("Input objects must be of the same type.")
+        # check if the object type is valid
+        obj_type = next(iter(types))
+        if obj_type not in (BGC, GCF, Spectrum, MolecularFamily):
+            raise TypeError(
+                f"Invalid type {obj_type}. Input objects must be BGC, GCF, Spectrum or MolecularFamily objects."
+            )
 
-        if not self._scoring_methods_setup_complete[name]:
-            self._scoring_methods[name].setup(self)
-            self._scoring_methods_setup_complete[name] = True
+        # Validate scoring method
+        if scoring_method not in self._valid_scoring_methods:
+            raise ValueError(f"Invalid scoring method {scoring_method}.")
 
-        return self._scoring_methods.get(name, None)(self)
+        # Check if the scoring method has been set up
+        if not self._scoring_methods_setup_done[scoring_method]:
+            self._valid_scoring_methods[scoring_method].setup(self)
+            self._scoring_methods_setup_done[scoring_method] = True
+
+        # Initialise the scoring method
+        scoring = self._valid_scoring_methods[scoring_method]()
+
+        return scoring.get_links(*objects, **scoring_params)
+
+    def lookup_bgc(self, id: str) -> BGC | None:
+        """Get the BGC object with the given ID.
+
+        Args:
+            id: the ID of the BGC to look up.
+
+        Returns:
+            The BGC object with the given ID, or None if no such object exists.
+        """
+        return self._bgc_dict.get(id, None)
+
+    def lookup_gcf(self, id: str) -> GCF | None:
+        """Get the GCF object with the given ID.
+
+        Args:
+            id: the ID of the GCF to look up.
+
+        Returns:
+            The GCF object with the given ID, or None if no such object exists.
+        """
+        return self._gcf_dict.get(id, None)
+
+    def lookup_spectrum(self, id: str) -> Spectrum | None:
+        """Get the Spectrum object with the given ID.
+
+        Args:
+            id: the ID of the Spectrum to look up.
+
+        Returns:
+            The Spectrum object with the given ID, or None if no such object exists.
+        """
+        return self._spec_dict.get(id, None)
+
+    def lookup_mf(self, id: str) -> MolecularFamily | None:
+        """Get the MolecularFamily object with the given ID.
+
+        Args:
+            id: the ID of the MolecularFamily to look up.
+
+        Returns:
+            The MolecularFamily object with the given ID, or None if no such object exists.
+        """
+        return self._mf_dict.get(id, None)
+
+    def save_data(
+        self,
+        file: str | PathLike,
+        links: LinkGraph | None = None,
+    ) -> None:
+        """Pickle data to a file.
+
+        The data to be pickled is a tuple containing the BGCs, GCFs, Spectra, MolecularFamilies,
+        StrainCollection and links, i.e. `(bgcs, gcfs, spectra, mfs, strains, links)`. If the links
+        are not provided, `None` will be used.
+
+        Args:
+            file: The path to the pickle file to save the data to.
+            links: The LinkGraph object to save.
+        """
+        data = (self.bgcs, self.gcfs, self.spectra, self.mfs, self.strains, links)
+        with open(file, "wb") as f:
+            pickle.dump(data, f)

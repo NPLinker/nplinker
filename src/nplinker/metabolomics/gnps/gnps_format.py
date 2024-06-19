@@ -105,7 +105,7 @@ def gnps_format_from_archive(zip_file: str | PathLike) -> GNPSFormat:
 def gnps_format_from_file_mapping(file: str | PathLike) -> GNPSFormat:
     """Detect GNPS format from the given file mapping file.
 
-    The GNSP file mapping file is located in different folders depending on the
+    The GNPS file mapping file is located in different folders depending on the
     GNPS workflow. Here are the locations in corresponding GNPS zip archives:
 
     - METABOLOMICS-SNETS workflow: the .tsv file under folder "clusterinfosummarygroup_attributes_withIDs_withcomponentID"

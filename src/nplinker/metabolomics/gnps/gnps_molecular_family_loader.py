@@ -98,15 +98,15 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
             for row in reader:
                 spec1_id = row["CLUSTERID1"]
                 spec2_id = row["CLUSTERID2"]
-                family_id = row["ComponentIndex"]
-                if family_id not in family_dict:
-                    family_dict[family_id] = set([spec1_id, spec2_id])
+                mf_id = row["ComponentIndex"]
+                if mf_id not in family_dict:
+                    family_dict[mf_id] = set([spec1_id, spec2_id])
                 else:
-                    family_dict[family_id].add(spec1_id)
-                    family_dict[family_id].add(spec2_id)
+                    family_dict[mf_id].add(spec1_id)
+                    family_dict[mf_id].add(spec2_id)
         # convert dict to list of MolecularFamily objects
-        for family_id, spectra_ids in family_dict.items():
-            if family_id == "-1":  # "-1" is from GNPS, it means the singleton molecular family
+        for mf_id, spectra_ids in family_dict.items():
+            if mf_id == "-1":  # "-1" is from GNPS, it means the singleton molecular family
                 for spectrum_id in spectra_ids:
                     # family id must be unique, so using "singleton-" + spectrum id as family id
                     family = MolecularFamily("singleton-" + str(spectrum_id))
@@ -114,6 +114,6 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
                     self._mfs.append(family)
             else:
                 # for regular molecular families, use the value of "ComponentIndex" as family id
-                family = MolecularFamily(family_id)
+                family = MolecularFamily(mf_id)
                 family.spectra_ids = spectra_ids
                 self._mfs.append(family)

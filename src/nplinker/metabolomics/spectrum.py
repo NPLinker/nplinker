@@ -14,12 +14,12 @@ class Spectrum:
     """Class to model MS/MS Spectrum.
 
     Attributes:
-        spectrum_id: the spectrum ID.
+        id: the spectrum ID.
         mz: the list of m/z values.
         intensity: the list of intensity values.
         precursor_mz: the m/z value of the precursor.
         rt: the retention time in seconds.
-        metadata: the metadata of the spectrum, i.e. the header infomation in the MGF
+        metadata: the metadata of the spectrum, i.e. the header information in the MGF
             file.
         gnps_annotations: the GNPS annotations of the spectrum.
         gnps_id: the GNPS ID of the spectrum.
@@ -30,7 +30,7 @@ class Spectrum:
 
     def __init__(
         self,
-        spectrum_id: str,
+        id: str,
         mz: list[float],
         intensity: list[float],
         precursor_mz: float,
@@ -40,15 +40,15 @@ class Spectrum:
         """Initialize the Spectrum.
 
         Args:
-            spectrum_id: the spectrum ID.
+            id: the spectrum ID.
             mz: the list of m/z values.
             intensity: the list of intensity values.
             precursor_mz: the precursor m/z.
             rt: the retention time in seconds. Defaults to 0.
-            metadata: the metadata of the spectrum, i.e. the header infomation
+            metadata: the metadata of the spectrum, i.e. the header information
                 in the MGF file.
         """
-        self.spectrum_id = spectrum_id
+        self.id = id
         self.mz = mz
         self.intensity = intensity
         self.precursor_mz = precursor_mz
@@ -61,18 +61,26 @@ class Spectrum:
         self.family: MolecularFamily | None = None
 
     def __str__(self) -> str:
-        return f"Spectrum(spectrum_id={self.spectrum_id}, #strains={len(self.strains)})"
+        return f"Spectrum(id={self.id}, #strains={len(self.strains)})"
 
     def __repr__(self) -> str:
         return str(self)
 
     def __eq__(self, other) -> bool:
         if isinstance(other, Spectrum):
-            return self.spectrum_id == other.spectrum_id and self.precursor_mz == other.precursor_mz
+            return self.id == other.id and self.precursor_mz == other.precursor_mz
         return NotImplemented
 
     def __hash__(self) -> int:
-        return hash((self.spectrum_id, self.precursor_mz))
+        return hash((self.id, self.precursor_mz))
+
+    def __reduce__(self) -> tuple:
+        """Reduce function for pickling."""
+        return (
+            self.__class__,
+            (self.id, self.mz, self.intensity, self.precursor_mz, self.rt, self.metadata),
+            self.__dict__,
+        )
 
     @cached_property
     def peaks(self) -> np.ndarray:

@@ -10,7 +10,8 @@ on:
       - src/**
       - tests/**
       - setup.py
-      - .github/workflows/build.yml
+      - pyproject.toml
+      - .github/workflows/**
   pull_request:
     branches:
       - main
@@ -20,7 +21,8 @@ on:
       - src/**
       - tests/**
       - setup.py
-      - .github/workflows/build.yml
+      - pyproject.toml
+      - .github/workflows/**
     types:
       - opened
       - reopened
@@ -34,26 +36,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
           python-version: '3.10'
-      - name: Python info
-        shell: bash -l {0}
-        run: |
-          which python3
-          python3 --version
-      - name: Upgrade pip and setuptools
-        run: |
-          python3 -m pip install --upgrade pip setuptools wheel
       - name: Install nplinker and its dependencies
         run: |
-          python3 -m pip install .[dev]
+          python3 -m pip install -e .[dev]
           install-nplinker-deps --run-on-github
       - name: Run unit tests with coverage
-        run: pytest --cov --cov-report term --cov-report xml --junitxml=xunit-result.xml tests/unit
-      - name: Correct coverage paths
-        run: sed -i "s+$PWD/++g" coverage.xml
+        run: pytest --cov=nplinker --cov-report=xml --cov-report=term tests/unit
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:

@@ -19,7 +19,7 @@ class GNPSExtractor:
     - annotations.tsv
 
     The files to be extracted are selected based on the GNPS workflow type,
-    as desribed below (in the order of the files above):
+    as described below (in the order of the files above):
 
     1. METABOLOMICS-SNETS
         - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.tsv

@@ -2,6 +2,7 @@ from __future__ import annotations
 import fnmatch
 import logging
 import os
+from typing import Mapping
 from Bio import SeqIO
 from Bio import SeqRecord
 from nplinker.genomics import BGC
@@ -97,7 +98,7 @@ class AntismashBGCLoader:
         return self._bgcs
 
     @staticmethod
-    def _parse_bgcs(bgc_files: dict[str, str]) -> list[BGC]:
+    def _parse_bgcs(bgc_files: Mapping[str, str]) -> list[BGC]:
         """Load given BGC files as BGC objects.
 
         Args:

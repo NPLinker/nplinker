@@ -33,7 +33,7 @@ python3 -m pip install --upgrade pip setuptools
 # install development dependencies
 pip install --no-cache-dir --editable ".[dev]"
 
-# install non-pypi dependecies
+# install non-pypi dependencies
 install-nplinker-deps
 ```
 

@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
@@ -6,6 +7,11 @@ logging.getLogger(__name__).addHandler(logging.NullHandler())
 __author__ = "Cunliang Geng"
 __email__ = "c.geng@esciencecenter.nl"
 __version__ = "2.0.0-alpha.1"
+
+
+# The path to the NPLinker application database directory
+NPLINKER_APP_DATA_DIR = Path(__file__).parent / "data"
+del Path
 
 
 def setup_logging(level: str = "INFO", file: str = "", use_console: bool = True) -> None:
@@ -22,7 +28,7 @@ def setup_logging(level: str = "INFO", file: str = "", use_console: bool = True)
     from rich.console import Console
     from rich.logging import RichHandler
 
-    # Get the acncestor logger "nplinker"
+    # Get the ancestor logger "nplinker"
     logger = logging.getLogger(__name__)
     logger.setLevel(level)
 

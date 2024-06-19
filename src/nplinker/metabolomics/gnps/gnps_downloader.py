@@ -1,14 +1,10 @@
 from __future__ import annotations
 from os import PathLike
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing_extensions import Self
 from nplinker.utils import download_url
 from .gnps_format import GNPSFormat
 from .gnps_format import gnps_format_from_task_id
-
-
-if TYPE_CHECKING:
-    from typing_extensions import Self
 
 
 class GNPSDownloader:
@@ -92,7 +88,7 @@ class GNPSDownloader:
         return self._task_id
 
     def get_url(self) -> str:
-        """Get the full URL linking to GNPS data to be dowloaded.
+        """Get the full URL linking to GNPS data to be downloaded.
 
         Returns:
             URL pointing to the GNPS data to be downloaded.

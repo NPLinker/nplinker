@@ -97,7 +97,7 @@ def podp_generate_strain_mappings(
             "MS_filename <-> spectrum_id".
         - `get_mappings_strain_id_spectrum_id`: Get mappings "strain_id <-> spectrum_id".
     """
-    # Get mappings strain_id <-> original_geonme_id <-> resolved_genome_id <-> bgc_id
+    # Get mappings strain_id <-> original_genome_id <-> resolved_genome_id <-> bgc_id
     mappings_strain_id_bgc_id = get_mappings_strain_id_bgc_id(
         extract_mappings_strain_id_original_genome_id(podp_project_json_file),
         extract_mappings_original_genome_id_resolved_genome_id(genome_status_json_file),

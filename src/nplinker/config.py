@@ -36,7 +36,7 @@ def load_config(config_file: str | PathLike) -> Dynaconf:
 
 
 # Note:
-# Validataor parameter `required=False` means the setting (e.g. "loglevel") must not exist rather
+# Validator parameter `required=False` means the setting (e.g. "loglevel") must not exist rather
 # than being optional. So don't set the parameter `required` if the key is optional.
 CONFIG_VALIDATORS = [
     # General settings

@@ -136,7 +136,7 @@ class IOKRWrapper:
         candidates = iokr_opt.preprocess_candidates(candidate_fps, latent, latent_basis, gamma)
 
         for ms_index, ms in enumerate(ms_list):
-            logger.debug("Rank spectrum {} ({}/{})".format(ms.spectrum_id, ms_index, len(ms_list)))
+            logger.debug("Rank spectrum {} ({}/{})".format(ms.id, ms_index, len(ms_list)))
             ms.filter = spectrum_filters.filter_by_frozen_dag
             logger.debug("kernel vector")
             t0 = time.time()

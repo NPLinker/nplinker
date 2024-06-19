@@ -165,6 +165,27 @@ def test_filter(collection: StrainCollection, strain: Strain):
     assert len(collection) == 1
 
 
+def test_intersection(collection: StrainCollection, strain: Strain):
+    # test empty collection
+    other = StrainCollection()
+    actual = collection.intersection(other)
+    assert len(actual) == 0
+
+    # test no intersection
+    other = StrainCollection()
+    other.add(Strain("strain_2"))
+    actual = collection.intersection(other)
+    assert len(actual) == 0
+
+    # test intersection
+    other = StrainCollection()
+    other.add(strain)
+    other.add(Strain("strain_2"))
+    actual = collection.intersection(other)
+    assert len(actual) == 1
+    assert strain in actual
+
+
 def test_has_name(collection: StrainCollection):
     assert collection.has_name("strain_1")
     assert collection.has_name("strain_1_a")

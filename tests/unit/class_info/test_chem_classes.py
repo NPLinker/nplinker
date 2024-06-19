@@ -13,9 +13,9 @@ from .. import DATA_DIR
 #     def test_running(self):
 #         for i, elem in enumerate([
 #                 self._cr.spectra_classes, self._cr.spectra_classes_names,
-#                 self._cr.spectra_classes_names_inds, self._cr.molfam_classes,
-#                 self._cr.molfam_classes_names,
-#                 self._cr.molfam_classes_names_inds]):
+#                 self._cr.spectra_classes_names_inds, self._cr.mf_classes,
+#                 self._cr.mf_classes_names,
+#                 self._cr.mf_classes_names_inds]):
 #             self.assertTrue(len(elem) != 0, f"Element {i} failed to load")
 
 #     def test_can_treemap(self):
@@ -32,10 +32,10 @@ class TestMolNetEnhancerResults(unittest.TestCase):
     def test_running(self):
         for i, elem in enumerate(
             [
-                self._mr.spectra2molfam,
+                self._mr.spectra2mf,
                 self._mr.spectra_classes_names,
                 self._mr.spectra_classes_names_inds,
-                self._mr.molfam_classes,
+                self._mr.mf_classes,
             ]
         ):
             self.assertTrue(len(elem) != 0, f"Element {i} failed to load")
