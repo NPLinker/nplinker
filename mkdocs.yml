@@ -1,6 +1,6 @@
 site_name: NPLinker
 site_description: Natural Products Linker
-strict: true
+strict: false
 site_url: https://nplinker.github.io/nplinker/
 
 theme:
