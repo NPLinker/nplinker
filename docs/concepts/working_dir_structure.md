@@ -8,7 +8,7 @@ data.
 root_dir # (1)!
     │
     ├── nplinker.toml                           # (2)!
-    ├── strain_mappings.JSON                [F] # (3)!
+    ├── strain_mappings.json                [F] # (3)!
     ├── strains_selected.json               [F][O] # (4)!
     │
     ├── gnps                                [F] # (5)!
