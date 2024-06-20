@@ -34,13 +34,6 @@ jobs:
     if:  ${{ inputs.current_version != inputs.new_version }}
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: '3.10'
-    - name: Upgrade pip and install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
     - name: Update package version and change log
       run: |
         make update-version CURRENT_VERSION=${{ inputs.current_version }} NEW_VERSION=${{ inputs.new_version }} 

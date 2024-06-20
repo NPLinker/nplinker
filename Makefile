@@ -68,8 +68,14 @@ endif
 	@echo "Updating version from $(CURRENT_VERSION) to $(NEW_VERSION) for following files:"
 	@for file in $(FILES); do \
 		echo "  $$file"; \
-		sed -i '' -e 's/__version__ = "$(CURRENT_VERSION)"/__version__ = "$(NEW_VERSION)"/' $$file; \
-		sed -i '' -e 's/version = "$(CURRENT_VERSION)"/version = "$(NEW_VERSION)"/' $$file; \
-		sed -i '' -e 's/version: "$(CURRENT_VERSION)"/version: "$(NEW_VERSION)"/' $$file; \
+		if [ "$(shell uname)" = "Darwin" ]; then \
+			sed -i '' -e 's/__version__ = "$(CURRENT_VERSION)"/__version__ = "$(NEW_VERSION)"/' \
+				-e 's/version = "$(CURRENT_VERSION)"/version = "$(NEW_VERSION)"/' \
+				-e 's/version: "$(CURRENT_VERSION)"/version: "$(NEW_VERSION)"/' $$file; \
+		else \
+			sed -i'' -e 's/__version__ = "$(CURRENT_VERSION)"/__version__ = "$(NEW_VERSION)"/' \
+				-e 's/version = "$(CURRENT_VERSION)"/version = "$(NEW_VERSION)"/' \
+				-e 's/version: "$(CURRENT_VERSION)"/version: "$(NEW_VERSION)"/' $$file; \
+		fi; \
 	done
 	@echo "Version update complete."
