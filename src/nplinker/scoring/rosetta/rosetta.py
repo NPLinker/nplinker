@@ -14,6 +14,7 @@
 import csv
 import logging
 import os
+from nplinker.defaults import NPLINKER_APP_DATA_DIR
 from nplinker.scoring.rosetta.rosetta_hit import RosettaHit
 from ...genomics import BGC
 from ...parsers.kcb import KCBJSONParser
@@ -21,7 +22,6 @@ from ...parsers.kcb import KCBTextParser
 from ...pickler import load_pickled_data
 from ...pickler import save_pickled_data
 from .spec_lib import SpecLib
-from nplinker import NPLINKER_APP_DATA_DIR
 
 
 logger = logging.getLogger(__name__)

@@ -1,5 +1,7 @@
+from __future__ import annotations
 from abc import ABC
 from abc import abstractmethod
+from os import PathLike
 from .bgc import BGC
 from .gcf import GCF
 
@@ -7,14 +9,14 @@ from .gcf import GCF
 class BGCLoaderBase(ABC):
     """Abstract base class for BGC loader."""
 
-    def __init__(self, data_dir: str) -> None:
+    def __init__(self, data_dir: str | PathLike) -> None:
         """Initialize the BGC loader.
 
         Args:
             data_dir: Path to directory that contains BGC metadata files
                 (.json) or full data genbank files (.gbk).
         """
-        self.data_dir = data_dir
+        self.data_dir = str(data_dir)
 
     @abstractmethod
     def get_files(self) -> dict[str, str]:

@@ -10,7 +10,7 @@ from ..gcf import GCF
 logger = logging.getLogger(__name__)
 
 
-class BigscapeGCFLoader:
+class BigscapeGCFLoader(GCFLoaderBase):
     """Build a loader for BiG-SCAPE GCF cluster file.
 
     Attributes:
@@ -61,11 +61,7 @@ class BigscapeGCFLoader:
         return list(gcf_dict.values())
 
 
-# register as virtual class to prevent metaclass conflicts
-GCFLoaderBase.register(BigscapeGCFLoader)
-
-
-class BigscapeV2GCFLoader:
+class BigscapeV2GCFLoader(GCFLoaderBase):
     """Build a loader for BiG-SCAPE v2 database file.
 
     Attributes:
@@ -137,7 +133,3 @@ class BigscapeV2GCFLoader:
                 gcf_dict[family_id].bgc_ids.add(bgc_id)
 
         return list(gcf_dict.values())
-
-
-# register as virtual class to prevent metaclass conflicts
-GCFLoaderBase.register(BigscapeV2GCFLoader)

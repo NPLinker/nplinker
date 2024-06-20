@@ -2,7 +2,9 @@ from __future__ import annotations
 import fnmatch
 import logging
 import os
-from typing import Mapping
+from collections.abc import Mapping
+from os import PathLike
+from pathlib import Path
 from Bio import SeqIO
 from Bio import SeqRecord
 from nplinker.genomics import BGC
@@ -15,7 +17,7 @@ from ..abc import BGCLoaderBase
 logger = logging.getLogger(__name__)
 
 
-class AntismashBGCLoader:
+class AntismashBGCLoader(BGCLoaderBase):
     """Build a loader for AntiSMASH BGC genbank (.gbk) files.
 
     Note:
@@ -32,14 +34,14 @@ class AntismashBGCLoader:
         ```
     """
 
-    def __init__(self, data_dir: str) -> None:
+    def __init__(self, data_dir: str | PathLike) -> None:
         """Initialize the AntiSMASH BGC loader.
 
         Args:
             data_dir: Path to AntiSMASH directory that contains a
                 collection of AntiSMASH outputs.
         """
-        self.data_dir = data_dir
+        self.data_dir = str(data_dir)
         self._file_dict = self._parse_data_dir(self.data_dir)
         self._bgcs = self._parse_bgcs(self._file_dict)
 
@@ -111,7 +113,7 @@ class AntismashBGCLoader:
         return [parse_bgc_genbank(file) for file in bgc_files.values()]
 
 
-def parse_bgc_genbank(file: str) -> BGC:
+def parse_bgc_genbank(file: str | PathLike) -> BGC:
     """Parse a single BGC gbk file to BGC object.
 
     Args:
@@ -124,7 +126,8 @@ def parse_bgc_genbank(file: str) -> BGC:
         >>> bgc = AntismashBGCLoader.parse_bgc(
         ...    "/data/antismash/GCF_000016425.1/NC_009380.1.region001.gbk")
     """
-    fname = os.path.splitext(os.path.basename(file))[0]
+    file = Path(file)
+    fname = file.stem
 
     record = SeqIO.read(file, format="genbank")
     description = record.description  # "DEFINITION" in gbk file
@@ -138,7 +141,7 @@ def parse_bgc_genbank(file: str) -> BGC:
     bgc = BGC(fname, *product_prediction)
     bgc.description = description
     bgc.antismash_id = antismash_id
-    bgc.antismash_file = file
+    bgc.antismash_file = str(file)
     bgc.antismash_region = features.get("region_number")
     bgc.smiles = features.get("smiles")
     bgc.strain = Strain(fname)
@@ -160,7 +163,3 @@ def _parse_antismash_genbank(record: SeqRecord.SeqRecord) -> dict:
                 smiles = tuple(i.replace(" ", "") for i in smiles)
             features["smiles"] = smiles
     return features
-
-
-# register as virtual class to prevent metaclass conflicts
-BGCLoaderBase.register(AntismashBGCLoader)

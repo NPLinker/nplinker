@@ -1,18 +1,18 @@
 from __future__ import annotations
 import logging
 import pickle
+from collections.abc import Sequence
 from os import PathLike
 from pprint import pformat
-from typing import Sequence
-from typing import TypeVar
+from typing import Any
 from typing import overload
-from . import setup_logging
 from .arranger import DatasetArranger
 from .config import load_config
 from .defaults import OUTPUT_DIRNAME
 from .genomics import BGC
 from .genomics import GCF
 from .loader import DatasetLoader
+from .logger import setup_logging
 from .metabolomics import MolecularFamily
 from .metabolomics import Spectrum
 from .scoring.link_graph import LinkGraph
@@ -21,8 +21,6 @@ from .strain import StrainCollection
 
 
 logger = logging.getLogger(__name__)
-
-ObjectType = TypeVar("ObjectType", BGC, GCF, Spectrum, MolecularFamily)
 
 
 class NPLinker:
@@ -191,22 +189,27 @@ class NPLinker:
 
     @overload
     def get_links(
-        self, objects: Sequence[BGC], scoring_method: str, **scoring_params
+        self, objects: Sequence[BGC], scoring_method: str, **scoring_params: Any
     ) -> LinkGraph: ...
     @overload
     def get_links(
-        self, objects: Sequence[GCF], scoring_method: str, **scoring_params
+        self, objects: Sequence[GCF], scoring_method: str, **scoring_params: Any
     ) -> LinkGraph: ...
     @overload
     def get_links(
-        self, objects: Sequence[Spectrum], scoring_method: str, **scoring_params
+        self, objects: Sequence[Spectrum], scoring_method: str, **scoring_params: Any
     ) -> LinkGraph: ...
     @overload
     def get_links(
-        self, objects: Sequence[MolecularFamily], scoring_method: str, **scoring_params
+        self, objects: Sequence[MolecularFamily], scoring_method: str, **scoring_params: Any
     ) -> LinkGraph: ...
 
-    def get_links(self, objects, scoring_method, **scoring_params):
+    def get_links(
+        self,
+        objects: Sequence[BGC] | Sequence[GCF] | Sequence[Spectrum] | Sequence[MolecularFamily],
+        scoring_method: str,
+        **scoring_params: Any,
+    ) -> LinkGraph:
         """Get the links for the given objects using the specified scoring method and parameters.
 
         Args:
@@ -214,7 +217,7 @@ class NPLinker:
                 type, i.e. `BGC`, `GCF`, `Spectrum` or `MolecularFamily` type.
                 For scoring method `metcalf`, the BGC objects are not supported.
             scoring_method: The scoring method to use. Must be one of the valid scoring methods
-                `self.scoring_methods`.
+                `self.scoring_methods`, such as "metcalf".
             scoring_params: Parameters to pass to the scoring method. If not provided, the default
                 parameters for the scoring method will be used.
 

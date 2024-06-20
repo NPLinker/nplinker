@@ -1,3 +1,4 @@
+from __future__ import annotations
 from abc import ABC
 from abc import abstractmethod
 from .molecular_family import MolecularFamily
@@ -9,7 +10,7 @@ class SpectrumLoaderBase(ABC):
 
     @property
     @abstractmethod
-    def spectra(self) -> list["Spectrum"]:
+    def spectra(self) -> list[Spectrum]:
         """Get Spectrum objects.
 
         Returns:
@@ -21,7 +22,7 @@ class MolecularFamilyLoaderBase(ABC):
     """Abstract base class for MolecularFamilyLoader."""
 
     @abstractmethod
-    def get_mfs(self, keep_singleton: bool) -> list["MolecularFamily"]:
+    def get_mfs(self, keep_singleton: bool) -> list[MolecularFamily]:
         """Get MolecularFamily objects.
 
         Args:

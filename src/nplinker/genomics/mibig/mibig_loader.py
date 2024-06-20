@@ -1,5 +1,7 @@
+from __future__ import annotations
 import logging
-import os.path
+from os import PathLike
+from pathlib import Path
 from nplinker.strain import Strain
 from nplinker.utils import list_files
 from ..abc import BGCLoaderBase
@@ -10,7 +12,7 @@ from .mibig_metadata import MibigMetadata
 logger = logging.getLogger(__name__)
 
 
-class MibigLoader:
+class MibigLoader(BGCLoaderBase):
     """Parse MIBiG metadata files and return BGC objects.
 
     MIBiG metadata file (json) contains annotations/metadata information
@@ -20,13 +22,13 @@ class MibigLoader:
     objects have Strain object as their strain attribute (i.e. `BGC.strain`).
     """
 
-    def __init__(self, data_dir: str):
+    def __init__(self, data_dir: str | PathLike):
         """Initialize the MIBiG metadata loader.
 
         Args:
             data_dir: Path to the directory of MIBiG metadata json files
         """
-        self.data_dir = data_dir
+        self.data_dir = str(data_dir)
         self._file_dict = self.parse_data_dir(self.data_dir)
         self._metadata_dict = self._parse_metadata()
         self._bgcs = self._parse_bgcs()
@@ -41,7 +43,7 @@ class MibigLoader:
         return self._file_dict
 
     @staticmethod
-    def parse_data_dir(data_dir: str) -> dict[str, str]:
+    def parse_data_dir(data_dir: str | PathLike) -> dict[str, str]:
         """Parse metadata directory and return paths to all metadata json files.
 
         Args:
@@ -54,7 +56,7 @@ class MibigLoader:
         file_dict = {}
         json_files = list_files(data_dir, prefix="BGC", suffix=".json")
         for file in json_files:
-            fname = os.path.splitext(os.path.basename(file))[0]
+            fname = Path(file).stem
             file_dict[fname] = file
         return file_dict
 
@@ -99,7 +101,7 @@ class MibigLoader:
         return [parse_bgc_metadata_json(file) for file in self._file_dict.values()]
 
 
-def parse_bgc_metadata_json(file: str) -> BGC:
+def parse_bgc_metadata_json(file: str | PathLike) -> BGC:
     """Parse MIBiG metadata file and return BGC object.
 
     Note that the MiBIG accession is used as the BGC id and strain name. The BGC
@@ -111,12 +113,8 @@ def parse_bgc_metadata_json(file: str) -> BGC:
     Returns:
         BGC object
     """
-    metadata = MibigMetadata(file)
+    metadata = MibigMetadata(str(file))
     mibig_bgc = BGC(metadata.mibig_accession, *metadata.biosyn_class)
     mibig_bgc.mibig_bgc_class = metadata.biosyn_class
     mibig_bgc.strain = Strain(metadata.mibig_accession)
     return mibig_bgc
-
-
-# register as virtual class to prevent metaclass conflicts
-BGCLoaderBase.register(MibigLoader)

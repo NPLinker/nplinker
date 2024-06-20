@@ -3,10 +3,10 @@ import json
 import logging
 import re
 import time
+from collections.abc import Mapping
+from collections.abc import Sequence
 from os import PathLike
 from pathlib import Path
-from typing import Mapping
-from typing import Sequence
 import httpx
 from bs4 import BeautifulSoup
 from bs4 import NavigableString

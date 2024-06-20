@@ -2,7 +2,8 @@ from __future__ import annotations
 import logging
 from enum import Enum
 from typing import TYPE_CHECKING
-from typing import TypeVar
+from typing import Union
+from typing import Any
 from typing import overload
 import numpy as np
 import pandas as pd
@@ -33,7 +34,7 @@ class LinkType(Enum):
     MF_GCF = "mf-gcf"
 
 
-ObjectType = TypeVar("ObjectType", GCF, Spectrum, MolecularFamily)
+Entity = Union[GCF, Spectrum, MolecularFamily]
 
 
 class MetcalfScoring(ScoringBase):
@@ -135,19 +136,19 @@ class MetcalfScoring(ScoringBase):
         logger.info("MetcalfScoring.setup completed")
 
     @overload
-    def get_links(self, *objects: GCF, **parameters) -> LinkGraph: ...
+    def get_links(self, *objects: GCF, **parameters: Any) -> LinkGraph: ...
     @overload
-    def get_links(self, *objects: Spectrum, **parameters) -> LinkGraph: ...
+    def get_links(self, *objects: Spectrum, **parameters: Any) -> LinkGraph: ...
     @overload
-    def get_links(self, *objects: MolecularFamily, **parameters) -> LinkGraph: ...
+    def get_links(self, *objects: MolecularFamily, **parameters: Any) -> LinkGraph: ...
 
     def get_links(self, *objects, **parameters):
         """Get links for the given objects.
 
         Args:
             objects: The objects to get links for. All objects must be of the same type, i.e. `GCF`,
-              `Spectrum` or `MolecularFamily` type.
-               If no objects are provided, all detected objects (`npl.gcfs`) will be used.
+                `Spectrum` or `MolecularFamily` type.
+                If no objects are provided, all detected objects (`npl.gcfs`) will be used.
             parameters: The scoring parameters to use for the links. The parameters are:
 
                     - cutoff: The minimum score to consider a link (≥cutoff). Default is 0.
@@ -155,7 +156,7 @@ class MetcalfScoring(ScoringBase):
 
         Returns:
             The `LinkGraph` object containing the links involving the input objects with the Metcalf
-            scores.
+                scores.
 
         Raises:
             TypeError: If the input objects are not of the same type or the object type is invalid.
@@ -293,8 +294,8 @@ class MetcalfScoring(ScoringBase):
 
     def _get_links(
         self,
-        *objects: ObjectType,
-        obj_type: GCF | Spectrum | MolecularFamily,
+        *objects: Entity,
+        obj_type: Entity,
         score_cutoff: float = 0,
     ) -> list[pd.DataFrame]:
         """Get links and scores for the given objects.

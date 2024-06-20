@@ -24,10 +24,11 @@ import os.path
 import sys
 import tarfile
 import zipfile
+from collections.abc import Callable
+from collections.abc import Sequence
 from os import PathLike
 from pathlib import Path
 from typing import IO
-from typing import Callable, Sequence
 import httpx
 from rich.progress import BarColumn
 from rich.progress import DownloadColumn
