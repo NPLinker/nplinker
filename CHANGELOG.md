@@ -1,5 +1,41 @@
 # Changelog
 
+## [v2.0.0-alpha.2](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.2) (2024-06-20)
+
+[Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.1...v2.0.0-alpha.2)
+
+**Closed issues:**
+
+- improvement on docs [\#232](https://github.com/NPLinker/nplinker/issues/232)
+- writing tutorials and docs for preparing data [\#204](https://github.com/NPLinker/nplinker/issues/204)
+
+**Merged pull requests:**
+
+- update docs [\#260](https://github.com/NPLinker/nplinker/pull/260) ([CunliangGeng](https://github.com/CunliangGeng))
+- improving type hints and usage of abc [\#259](https://github.com/NPLinker/nplinker/pull/259) ([CunliangGeng](https://github.com/CunliangGeng))
+- add pickling [\#258](https://github.com/NPLinker/nplinker/pull/258) ([CunliangGeng](https://github.com/CunliangGeng))
+- fix mypy and ruff errors [\#257](https://github.com/NPLinker/nplinker/pull/257) ([CunliangGeng](https://github.com/CunliangGeng))
+- refactor NPLinker class [\#256](https://github.com/NPLinker/nplinker/pull/256) ([CunliangGeng](https://github.com/CunliangGeng))
+- rename `molfam` to `mf` to uniform the abbreviation for MolecularFamily [\#255](https://github.com/NPLinker/nplinker/pull/255) ([CunliangGeng](https://github.com/CunliangGeng))
+- refactor MetcalfScoring methods [\#254](https://github.com/NPLinker/nplinker/pull/254) ([CunliangGeng](https://github.com/CunliangGeng))
+- use uniformed attribute name `id`  [\#253](https://github.com/NPLinker/nplinker/pull/253) ([CunliangGeng](https://github.com/CunliangGeng))
+- Add LinkGraph to replace ObjectLink and LinkCollection [\#252](https://github.com/NPLinker/nplinker/pull/252) ([CunliangGeng](https://github.com/CunliangGeng))
+- merge DataLinks `get_common_strains` to ObjectLink [\#250](https://github.com/NPLinker/nplinker/pull/250) ([CunliangGeng](https://github.com/CunliangGeng))
+- merge DataLinks to MetcalfScoring class [\#249](https://github.com/NPLinker/nplinker/pull/249) ([CunliangGeng](https://github.com/CunliangGeng))
+- merge LinkFinder to MetcalfScoring class [\#248](https://github.com/NPLinker/nplinker/pull/248) ([CunliangGeng](https://github.com/CunliangGeng))
+- add abstract base class for scoring methods [\#247](https://github.com/NPLinker/nplinker/pull/247) ([CunliangGeng](https://github.com/CunliangGeng))
+- Specify config file explicitly for initializing NPLinker [\#246](https://github.com/NPLinker/nplinker/pull/246) ([CunliangGeng](https://github.com/CunliangGeng))
+- fix empty caplog [\#245](https://github.com/NPLinker/nplinker/pull/245) ([CunliangGeng](https://github.com/CunliangGeng))
+- update docs and readme [\#244](https://github.com/NPLinker/nplinker/pull/244) ([CunliangGeng](https://github.com/CunliangGeng))
+- refactor logging control [\#243](https://github.com/NPLinker/nplinker/pull/243) ([CunliangGeng](https://github.com/CunliangGeng))
+- add default output path [\#241](https://github.com/NPLinker/nplinker/pull/241) ([CunliangGeng](https://github.com/CunliangGeng))
+- rename globals.py to defaults.py [\#240](https://github.com/NPLinker/nplinker/pull/240) ([CunliangGeng](https://github.com/CunliangGeng))
+- Fix locations of attributes docstrings [\#239](https://github.com/NPLinker/nplinker/pull/239) ([CunliangGeng](https://github.com/CunliangGeng))
+- check format and typing only on changed files [\#238](https://github.com/NPLinker/nplinker/pull/238) ([CunliangGeng](https://github.com/CunliangGeng))
+- remove static typings from Returns in docstrings [\#236](https://github.com/NPLinker/nplinker/pull/236) ([CunliangGeng](https://github.com/CunliangGeng))
+- set ruff to not check docstrings of test files [\#235](https://github.com/NPLinker/nplinker/pull/235) ([CunliangGeng](https://github.com/CunliangGeng))
+- Support Bigscape v2 data [\#234](https://github.com/NPLinker/nplinker/pull/234) ([adraismawur](https://github.com/adraismawur))
+
 ## [v2.0.0-alpha.1](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.1) (2024-03-25)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v1.3.2...v2.0.0-alpha.1)

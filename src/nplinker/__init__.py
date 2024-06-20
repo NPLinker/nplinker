@@ -7,7 +7,7 @@ logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 __author__ = "Cunliang Geng"
 __email__ = "c.geng@esciencecenter.nl"
-__version__ = "2.0.0-alpha.1"
+__version__ = "2.0.0-alpha.2"
 
 
 __all__ = ["NPLinker", "setup_logging"]
