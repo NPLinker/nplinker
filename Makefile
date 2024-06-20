@@ -1,4 +1,4 @@
-.PHONY: clean clean-build clean-pyc clean-test release build
+.PHONY: clean clean-build clean-pyc clean-test release build update-version
 
 help:
 	@echo "clean - remove all build, test, coverage and Python artifacts"
@@ -8,6 +8,7 @@ help:
 	@echo "release - upload package to pypi"
 	@echo "build - build package"
 	@echo "update - update pip, build, twine packages"
+	@echo "update-version - update NPLinker version. Usage: make update-version CURRENT_VERSION=0.1.0 NEW_VERSION=0.2.0"
 
 clean: clean-build clean-pyc clean-test
 
@@ -44,3 +45,32 @@ venv:
 
 clean-venv:
 	rm -rf venv
+
+
+# Define the files to update version
+FILES := src/nplinker/__init__.py pyproject.toml CITATION.cff
+
+# Rule to update the version in the specified files
+update-version:
+ifndef CURRENT_VERSION
+	$(error CURRENT_VERSION is not provided. Usage: make update-version CURRENT_VERSION=0.1.0 NEW_VERSION=0.2.0)
+endif
+ifndef NEW_VERSION
+	$(error NEW_VERSION is not provided. Usage: make update-version CURRENT_VERSION=0.1.0 NEW_VERSION=0.2.0)
+endif
+	@for file in $(FILES); do \
+		if ! grep -qE "__version__ = \"$(CURRENT_VERSION)\"|version = \"$(CURRENT_VERSION)\"|version: \"$(CURRENT_VERSION)\"" $$file; then \
+			echo "Error: Current version $(CURRENT_VERSION) not found in $$file"; \
+			exit 1; \
+		fi; \
+	done
+
+	@echo "Updating version from $(CURRENT_VERSION) to $(NEW_VERSION) for following files:"
+	@for file in $(FILES); do \
+		echo "  $$file"; \
+		sed -i '' 's/__version__ = "$(CURRENT_VERSION)"/__version__ = "$(NEW_VERSION)"/' $$file; \
+		sed -i '' 's/version = "$(CURRENT_VERSION)"/version = "$(NEW_VERSION)"/' $$file; \
+		sed -i '' 's/version: "$(CURRENT_VERSION)"/version: "$(NEW_VERSION)"/' $$file; \
+	done
+	@echo "Version update complete."
+	@find . -name "*.bak" -type f -delete

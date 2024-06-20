@@ -41,10 +41,9 @@ jobs:
     - name: Upgrade pip and install dependencies
       run: |
         python3 -m pip install --upgrade pip
-        pip install bump2version
     - name: Update package version and change log
       run: |
-        bumpversion --current-version ${{ inputs.current_version }}  --new-version ${{ inputs.new_version }} fake
+        make update-version CURRENT_VERSION=${{ inputs.current_version }} NEW_VERSION=${{ inputs.new_version }} 
         docker run --rm -v "$(pwd)":/usr/local/src/your-app \
           githubchangeloggenerator/github-changelog-generator \
           -u ${{ github.repository_owner }} \

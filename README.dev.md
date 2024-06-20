@@ -154,14 +154,10 @@ All these mike operations will be recorded as git commits of branch `gh-pages`.
 
 ## Versioning
 
-Bumping the version across all files is done with [bumpversion](https://github.com/c4urself/bump2version), e.g.
+Updating the version of the NPLinker package is done with make command `update-version`, e.g.
 
 ```shell
-bumpversion major
-bumpversion minor
-bumpversion patch
-
-bumpversion --current-version 2.0.0 --new-version 2.1.0 fakepart
+make update-version CURRENT_VERSION=0.0.1 NEW_VERSION=0.0.2
 ```
 
 ## Making a release

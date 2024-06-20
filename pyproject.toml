@@ -46,7 +46,6 @@ dependencies = [
 dev = [
     # packaging
     "build",
-    "bump2version",
     "wheel",
     # formatting and linting
     "ruff",
