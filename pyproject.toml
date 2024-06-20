@@ -65,6 +65,7 @@ dev = [
     "types-networkx",
     "pandas-stubs",
     # docs
+    "black",
     "mkdocs",
     "mkdocs-material",
     "mkdocs-exclude",
