@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://nplinker.github.io/nplinker/latest/concepts/gnps_data/">
+        <link rel="canonical" href="https://nplinker.github.io/nplinker/latest/api/scoring_abc/">
       
       
-        <link rel="prev" href="../config_file/">
+        <link rel="prev" href="../strain_utils/">
       
       
-        <link rel="next" href="../bigscape/">
+        <link rel="next" href="../scoring_methods/">
       
       
       <link rel="icon" href="../../favicon.png">
@@ -24,7 +24,7 @@
     
     
       
-        <title>GNPS Data - NPLinker</title>
+        <title>Abstract Base Classes - NPLinker</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#mappings-from-gnps-data-to-nplinker-input" class="md-skip">
+        <a href="#nplinker.scoring.abc" class="md-skip">
           Skip to content
         </a>
       
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              GNPS Data
+              Abstract Base Classes
             
           </span>
         </div>
@@ -239,13 +239,11 @@
         
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../working_dir_structure/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../concepts/working_dir_structure/" class="md-tabs__link">
           
   
   Concepts
@@ -277,11 +275,13 @@
         
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../api/nplinker/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../nplinker/" class="md-tabs__link">
           
   
   API Documentation
@@ -470,28 +470,23 @@
       
   
   
-    
   
   
-  
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -502,7 +497,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Concepts
@@ -516,7 +511,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../working_dir_structure/" class="md-nav__link">
+      <a href="../../concepts/working_dir_structure/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -537,7 +532,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../config_file/" class="md-nav__link">
+      <a href="../../concepts/config_file/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -555,28 +550,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    GNPS Data
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../concepts/gnps_data/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -585,33 +562,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#mappings-from-gnps-data-to-nplinker-input" class="md-nav__link">
-    <span class="md-ellipsis">
-      Mappings from GNPS data to NPLinker input
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -624,7 +574,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../bigscape/" class="md-nav__link">
+      <a href="../../concepts/bigscape/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -715,23 +665,28 @@
       
   
   
+    
   
   
+  
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -742,7 +697,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             API Documentation
@@ -756,7 +711,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/nplinker/" class="md-nav__link">
+      <a href="../nplinker/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -777,7 +732,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/arranger/" class="md-nav__link">
+      <a href="../arranger/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -798,7 +753,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/loader/" class="md-nav__link">
+      <a href="../loader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -857,7 +812,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/genomics_abc/" class="md-nav__link">
+      <a href="../genomics_abc/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -878,7 +833,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/genomics/" class="md-nav__link">
+      <a href="../genomics/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -899,7 +854,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/mibig/" class="md-nav__link">
+      <a href="../mibig/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -920,7 +875,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/antismash/" class="md-nav__link">
+      <a href="../antismash/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -941,7 +896,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/bigscape/" class="md-nav__link">
+      <a href="../bigscape/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -962,7 +917,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/genomics_utils/" class="md-nav__link">
+      <a href="../genomics_utils/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1029,7 +984,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/metabolomics_abc/" class="md-nav__link">
+      <a href="../metabolomics_abc/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1050,7 +1005,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/metabolomics/" class="md-nav__link">
+      <a href="../metabolomics/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1071,7 +1026,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/gnps/" class="md-nav__link">
+      <a href="../gnps/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1092,7 +1047,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/metabolomics_utils/" class="md-nav__link">
+      <a href="../metabolomics_utils/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1159,7 +1114,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/strain/" class="md-nav__link">
+      <a href="../strain/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1180,7 +1135,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/strain_utils/" class="md-nav__link">
+      <a href="../strain_utils/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1206,6 +1161,8 @@
                 
   
   
+    
+  
   
   
     
@@ -1215,11 +1172,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" checked>
         
           
           <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
@@ -1233,7 +1190,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4_7">
             <span class="md-nav__icon md-icon"></span>
             Scoring
@@ -1244,10 +1201,28 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../api/scoring_abc/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Abstract Base Classes
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -1256,6 +1231,117 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;abc
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" abc">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc.logger" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;logger
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc.ScoringBase" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ScoringBase
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" ScoringBase">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc.ScoringBase.name" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;name
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc.ScoringBase.npl" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;npl
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc.ScoringBase.setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;setup
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc.ScoringBase.get_links" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get_links
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc.ScoringBase.format_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;format_data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc.ScoringBase.sort" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;sort
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1268,7 +1354,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/scoring_methods/" class="md-nav__link">
+      <a href="../scoring_methods/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1289,7 +1375,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/scoring/" class="md-nav__link">
+      <a href="../scoring/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1310,7 +1396,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/scoring_utils/" class="md-nav__link">
+      <a href="../scoring_utils/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1339,7 +1425,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/schema/" class="md-nav__link">
+      <a href="../schema/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1360,7 +1446,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/utils/" class="md-nav__link">
+      <a href="../utils/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1406,11 +1492,95 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#mappings-from-gnps-data-to-nplinker-input" class="md-nav__link">
+  <a href="#nplinker.scoring.abc" class="md-nav__link">
     <span class="md-ellipsis">
-      Mappings from GNPS data to NPLinker input
+      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;abc
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label=" abc">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc.logger" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;logger
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc.ScoringBase" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ScoringBase
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" ScoringBase">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc.ScoringBase.name" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;name
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc.ScoringBase.npl" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;npl
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc.ScoringBase.setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;setup
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc.ScoringBase.get_links" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get_links
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc.ScoringBase.format_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;format_data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.abc.ScoringBase.sort" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;sort
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1432,108 +1602,397 @@
   
 
 
-  <h1>GNPS Data</h1>
+  <h1>Abstract Base Classes</h1>
 
-<p>NPLinker requires GNPS molecular networking data as input. It currently accepts data from the following 
-GNPS workflows:</p>
-<ul>
-<li><code>METABOLOMICS-SNETS</code> (data should be downloaded from the option <code>Download Clustered Spectra as MGF</code>)</li>
-<li><code>METABOLOMICS-SNETS-V2</code> (<code>Download Clustered Spectra as MGF</code>)</li>
-<li><code>FEATURE-BASED-MOLECULAR-NETWORKING</code> (<code>Download Cytoscape Data</code>)</li>
-</ul>
-<h2 id="mappings-from-gnps-data-to-nplinker-input">Mappings from GNPS data to NPLinker input<a class="headerlink" href="#mappings-from-gnps-data-to-nplinker-input" title="Permanent link">&para;</a></h2>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1"><code>METABOLOMICS-SNETS</code> workflow</label><label for="__tabbed_1_2"><code>METABOLOMICS-SNETS-V2</code></label><label for="__tabbed_1_3"><code>FEATURE-BASED-MOLECULAR-NETWORKING</code></label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<table>
-<thead>
-<tr>
-<th>NPLinker input</th>
-<th>GNPS file in the archive of <code>Download Clustered Spectra as MGF</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>spectra.mgf</td>
-<td>METABOLOMICS-SNETS*.mgf</td>
-</tr>
-<tr>
-<td>molecular_families.tsv</td>
-<td>networkedges_selfloop/*.pairsinfo</td>
-</tr>
-<tr>
-<td>annotations.tsv</td>
-<td>result_specnets_DB/*.tsv</td>
-</tr>
-<tr>
-<td>file_mappings.tsv</td>
-<td>clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.tsv</td>
-</tr>
-</tbody>
-</table>
-<p>For example, the file <code>METABOLOMICS-SNETS*.mgf</code> from the downloaded zip archive is used as 
-the <code>spectra.mgf</code> input file of NPLinker. </p>
-<p>When manually preparing GNPS data for NPLinker, the <code>METABOLOMICS-SNETS*.mgf</code> must be renamed to
-<code>spectra.mgf</code> and placed in the <code>gnps</code> sub-directory of the NPLinker working directory.</p>
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="nplinker.scoring.abc" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">abc</span>
+
+
+<a href="#nplinker.scoring.abc" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents first">
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="nplinker.scoring.abc.logger" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">logger</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+<a href="#nplinker.scoring.abc.logger" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">logger</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="logging.getLogger" href="https://docs.python.org/3/library/logging.html#logging.getLogger">getLogger</a></span><span class="p">(</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/reference/import.html#name__">__name__</a></span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
 </div>
-<div class="tabbed-block">
-<table>
-<thead>
-<tr>
-<th>NPLinker input</th>
-<th>GNPS file in the archive of <code>Download Clustered Spectra as MGF</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>spectra.mgf</td>
-<td>METABOLOMICS-SNETS-V2*.mgf</td>
-</tr>
-<tr>
-<td>molecular_families.tsv</td>
-<td>networkedges_selfloop/*.selfloop</td>
-</tr>
-<tr>
-<td>annotations.tsv</td>
-<td>result_specnets_DB/*.tsv</td>
-</tr>
-<tr>
-<td>file_mappings.tsv</td>
-<td>clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.clustersummary</td>
-</tr>
-</tbody>
-</table>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="nplinker.scoring.abc.ScoringBase" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ScoringBase</span>
+
+
+<a href="#nplinker.scoring.abc.ScoringBase" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
+
+
+      <p>Abstract base class of scoring methods.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="nplinker.scoring.abc.ScoringBase.name" href="#nplinker.scoring.abc.ScoringBase.name">name</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the scoring method.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="nplinker.scoring.abc.ScoringBase.npl" href="#nplinker.scoring.abc.ScoringBase.npl">npl</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="nplinker.nplinker.NPLinker" href="../nplinker/#nplinker.NPLinker">NPLinker</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The NPLinker object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="nplinker.scoring.abc.ScoringBase.name" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">name</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#nplinker.scoring.abc.ScoringBase.name" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="s1">&#39;ScoringBase&#39;</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
 </div>
-<div class="tabbed-block">
-<table>
-<thead>
-<tr>
-<th>NPLinker input</th>
-<th>GNPS file in the archive of <code>Download Cytoscape Data</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>spectra.mgf</td>
-<td>spectra/*.mgf</td>
-</tr>
-<tr>
-<td>molecular_families.tsv</td>
-<td>networkedges_selfloop/*.selfloop</td>
-</tr>
-<tr>
-<td>annotations.tsv</td>
-<td>DB_result/*.tsv</td>
-</tr>
-<tr>
-<td>file_mappings.csv</td>
-<td>quantification_table/*.csv</td>
-</tr>
-</tbody>
-</table>
-<p>Note that <code>file_mappings.csv</code> is a CSV file, not a TSV file, different from the other workflows.</p>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="nplinker.scoring.abc.ScoringBase.npl" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">npl</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#nplinker.scoring.abc.ScoringBase.npl" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">npl</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="nplinker.nplinker.NPLinker" href="../nplinker/#nplinker.NPLinker">NPLinker</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
 </div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="nplinker.scoring.abc.ScoringBase.setup" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">setup</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#nplinker.scoring.abc.ScoringBase.setup" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">setup</span><span class="p">(</span><span class="n">npl</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="nplinker.nplinker.NPLinker" href="../nplinker/#nplinker.NPLinker">NPLinker</a></span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Setup class level attributes.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/nplinker/scoring/abc.py</code></summary>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-26">26</a></span>
+<span class="normal"><a href="#__codelineno-0-27">27</a></span>
+<span class="normal"><a href="#__codelineno-0-28">28</a></span>
+<span class="normal"><a href="#__codelineno-0-29">29</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-26" name="__codelineno-0-26"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27"></a><span class="nd">@abstractmethod</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28"></a><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">npl</span><span class="p">:</span> <span class="n">NPLinker</span><span class="p">):</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Setup class level attributes.&quot;&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
 </div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="nplinker.scoring.abc.ScoringBase.get_links" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_links</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#nplinker.scoring.abc.ScoringBase.get_links" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_links</span><span class="p">(</span><span class="o">*</span><span class="n">objects</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="nplinker.scoring.link_graph.LinkGraph" href="../scoring/#nplinker.scoring.LinkGraph">LinkGraph</a></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Get links information for the given objects.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>objects</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A list of objects to get links for.</p>
+              </div>
+            </td>
+            <td>
+                  <code>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>parameters</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The parameters used for scoring.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="nplinker.scoring.link_graph.LinkGraph" href="../scoring/#nplinker.scoring.LinkGraph">LinkGraph</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The LinkGraph object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>src/nplinker/scoring/abc.py</code></summary>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-31">31</a></span>
+<span class="normal"><a href="#__codelineno-0-32">32</a></span>
+<span class="normal"><a href="#__codelineno-0-33">33</a></span>
+<span class="normal"><a href="#__codelineno-0-34">34</a></span>
+<span class="normal"><a href="#__codelineno-0-35">35</a></span>
+<span class="normal"><a href="#__codelineno-0-36">36</a></span>
+<span class="normal"><a href="#__codelineno-0-37">37</a></span>
+<span class="normal"><a href="#__codelineno-0-38">38</a></span>
+<span class="normal"><a href="#__codelineno-0-39">39</a></span>
+<span class="normal"><a href="#__codelineno-0-40">40</a></span>
+<span class="normal"><a href="#__codelineno-0-41">41</a></span>
+<span class="normal"><a href="#__codelineno-0-42">42</a></span>
+<span class="normal"><a href="#__codelineno-0-43">43</a></span>
+<span class="normal"><a href="#__codelineno-0-44">44</a></span>
+<span class="normal"><a href="#__codelineno-0-45">45</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="nd">@abstractmethod</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="k">def</span> <span class="nf">get_links</span><span class="p">(</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-34" name="__codelineno-0-34"></a>    <span class="o">*</span><span class="n">objects</span><span class="p">,</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35"></a>    <span class="o">**</span><span class="n">parameters</span><span class="p">,</span>
+<a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinkGraph</span><span class="p">:</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get links information for the given objects.</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38"></a>
+<a id="__codelineno-0-39" name="__codelineno-0-39"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="sd">        objects: A list of objects to get links for.</span>
+<a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="sd">        parameters: The parameters used for scoring.</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42"></a>
+<a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">        The LinkGraph object.</span>
+<a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">    &quot;&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="nplinker.scoring.abc.ScoringBase.format_data" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">format_data</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#nplinker.scoring.abc.ScoringBase.format_data" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">format_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Format the scoring data to a string.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/nplinker/scoring/abc.py</code></summary>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-47">47</a></span>
+<span class="normal"><a href="#__codelineno-0-48">48</a></span>
+<span class="normal"><a href="#__codelineno-0-49">49</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="nd">@abstractmethod</span>
+<a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="k">def</span> <span class="nf">format_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Format the scoring data to a string.&quot;&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="nplinker.scoring.abc.ScoringBase.sort" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">sort</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#nplinker.scoring.abc.ScoringBase.sort" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">sort</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Sort the given objects based on the scoring data.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/nplinker/scoring/abc.py</code></summary>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-51">51</a></span>
+<span class="normal"><a href="#__codelineno-0-52">52</a></span>
+<span class="normal"><a href="#__codelineno-0-53">53</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="nd">@abstractmethod</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="k">def</span> <span class="nf">sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objects</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sort the given objects based on the scoring data.&quot;&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
 </div>
 
 
