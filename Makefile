@@ -68,9 +68,8 @@ endif
 	@echo "Updating version from $(CURRENT_VERSION) to $(NEW_VERSION) for following files:"
 	@for file in $(FILES); do \
 		echo "  $$file"; \
-		sed -i '' 's/__version__ = "$(CURRENT_VERSION)"/__version__ = "$(NEW_VERSION)"/' $$file; \
-		sed -i '' 's/version = "$(CURRENT_VERSION)"/version = "$(NEW_VERSION)"/' $$file; \
-		sed -i '' 's/version: "$(CURRENT_VERSION)"/version: "$(NEW_VERSION)"/' $$file; \
+		sed -i '' -e 's/__version__ = "$(CURRENT_VERSION)"/__version__ = "$(NEW_VERSION)"/' $$file; \
+		sed -i '' -e 's/version = "$(CURRENT_VERSION)"/version = "$(NEW_VERSION)"/' $$file; \
+		sed -i '' -e 's/version: "$(CURRENT_VERSION)"/version: "$(NEW_VERSION)"/' $$file; \
 	done
 	@echo "Version update complete."
-	@find . -name "*.bak" -type f -delete
