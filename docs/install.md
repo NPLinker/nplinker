@@ -19,7 +19,7 @@ python -m venv env          # (1)!
 source env/bin/activate
 
 # install nplinker package (requiring ~300MB of disk space)
-pip install nplinker==2.0.0a1 # (2)! 
+pip install nplinker==2.0.0a2 # (2)! 
 
 # install nplinker non-pypi dependencies and databases (~4GB)
 install-nplinker-deps
