@@ -63,6 +63,7 @@ nav:
   - BigScape: concepts/bigscape.md
 - Diagrams:
   - Dataset Arranger: diagrams/arranger.md
+  - Dataset Loader: diagrams/loader.md
 - API Documentation:
   - NPLinker: api/nplinker.md
   - Dataset Arranger: api/arranger.md
