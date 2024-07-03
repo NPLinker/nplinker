@@ -3,6 +3,7 @@ import json
 import logging
 import re
 import time
+import warnings
 from collections.abc import Mapping
 from collections.abc import Sequence
 from os import PathLike
@@ -207,16 +208,19 @@ def podp_download_and_extract_antismash_data(
         except Exception:
             gs_obj.bgc_path = ""
 
-    missing = len([gs for gs in gs_dict.values() if not gs.bgc_path])
-    logger.info(
-        f"Dataset has {missing} missing sets of antiSMASH data "
-        f" (from a total of {len(genome_records)})."
-    )
+    # raise and log warning for failed downloads
+    failed_ids = [gs.original_id for gs in gs_dict.values() if not gs.bgc_path]
+    if failed_ids:
+        warning_message = (
+            f"Failed to download antiSMASH data for the following genome IDs: {failed_ids}"
+        )
+        logger.warning(warning_message)
+        warnings.warn(warning_message, UserWarning)
 
     # save updated genome status to json file
     GenomeStatus.to_json(gs_dict, gs_file)
 
-    if missing == len(genome_records):
+    if len(failed_ids) == len(genome_records):
         raise ValueError("No antiSMASH data found for any genome")
 
 
