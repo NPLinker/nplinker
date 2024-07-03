@@ -221,7 +221,10 @@ def test_caching(download_root, extract_root, genome_status_file, caplog):
         f"Genome ID {genome_obj.original_id} already downloaded to {genome_obj.bgc_path}"
         in caplog.text
     )
-    assert f"Genome ID {genome_obj.original_id} skipped due to previous failure" not in caplog.text
+    assert (
+        f"Genome ID {genome_obj.original_id} skipped due to previous failed attempt"
+        not in caplog.text
+    )
     genome_status_new = GenomeStatus.read_json(genome_status_file)
     assert len(genome_status_old) == len(genome_status_new)
 
@@ -235,8 +238,10 @@ def test_failed_lookup_ncbi(download_root, extract_root):
         }
     ]
     with pytest.raises(ValueError) as e:
-        podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
+        with pytest.warns(UserWarning) as w:
+            podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
     assert str(e.value) == "No antiSMASH data found for any genome"
+    assert "Failed to download antiSMASH data" in str(w[0].message)
 
 
 # Test `podp_download_and_extract_antismash_data` function
@@ -249,10 +254,13 @@ def test_failed_lookup_antismash(download_root, extract_root):
             "genome_ID": {"genome_type": "genome", "RefSeq_accession": broken_id},
         }
     ]
+
     with pytest.raises(ValueError) as e:
-        podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
+        with pytest.warns(UserWarning) as w:
+            podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
     assert "No antiSMASH data found for any genome" == str(e.value)
     assert str(e.value) == "No antiSMASH data found for any genome"
+    assert "Failed to download antiSMASH data" in str(w[0].message)
 
 
 # Test `podp_download_and_extract_antismash_data` function
