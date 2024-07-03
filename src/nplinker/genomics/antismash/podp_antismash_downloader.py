@@ -157,9 +157,7 @@ def podp_download_and_extract_antismash_data(
         genome_id_data = genome_record["genome_ID"]
         raw_genome_id = get_best_available_genome_id(genome_id_data)
         if raw_genome_id is None or len(raw_genome_id) == 0:
-            logger.warning(
-                f'Ignoring genome record "{genome_record}" due to missing genome ID field'
-            )
+            logger.warning(f'Invalid input genome record "{genome_record}"')
             continue
 
         # check if genome ID exist in the genome status file
@@ -178,12 +176,12 @@ def podp_download_and_extract_antismash_data(
             continue
         # second, check if lookup attempted previously
         if gs_obj.resolve_attempted:
-            logger.info(f"Genome ID {raw_genome_id} skipped due to previous failure")
+            logger.info(f"Genome ID {raw_genome_id} skipped due to previous failed attempt")
             continue
 
         # if not downloaded or lookup attempted, then try to resolve the ID
         # and download
-        logger.info(f"Beginning lookup process for genome ID {raw_genome_id}")
+        logger.info(f"Start lookup process for genome ID {raw_genome_id}")
         gs_obj.resolved_refseq_id = _resolve_refseq_id(genome_id_data)
         gs_obj.resolve_attempted = True
 
