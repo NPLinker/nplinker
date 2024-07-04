@@ -237,11 +237,9 @@ def test_failed_lookup_ncbi(download_root, extract_root):
             "genome_ID": {"genome_type": "genome", "JGI_Genome_ID": "non_existing_ID"},
         }
     ]
-    with pytest.raises(ValueError) as e:
-        with pytest.warns(UserWarning) as w:
+    with pytest.raises(ValueError, match="No antiSMASH data found for any genome"):
+        with pytest.warns(UserWarning, match="Failed to download antiSMASH data"):
             podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
-    assert str(e.value) == "No antiSMASH data found for any genome"
-    assert "Failed to download antiSMASH data" in str(w[0].message)
 
 
 # Test `podp_download_and_extract_antismash_data` function
@@ -255,12 +253,9 @@ def test_failed_lookup_antismash(download_root, extract_root):
         }
     ]
 
-    with pytest.raises(ValueError) as e:
-        with pytest.warns(UserWarning) as w:
+    with pytest.raises(ValueError, match="No antiSMASH data found for any genome"):
+        with pytest.warns(UserWarning, match="Failed to download antiSMASH data"):
             podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
-    assert "No antiSMASH data found for any genome" == str(e.value)
-    assert str(e.value) == "No antiSMASH data found for any genome"
-    assert "Failed to download antiSMASH data" in str(w[0].message)
 
 
 # Test `podp_download_and_extract_antismash_data` function
