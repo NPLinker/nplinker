@@ -108,7 +108,7 @@ class StrainCollection:
                     else:
                         self._strain_dict_name[name] = new_strain_list
         else:
-            raise ValueError(f"Strain {strain} not found in strain collection.")
+            raise ValueError(f"Strain {strain} not found in the strain collection.")
 
     def filter(self, strain_set: set[Strain]):
         """Remove all strains that are not in strain_set from the strain collection.
