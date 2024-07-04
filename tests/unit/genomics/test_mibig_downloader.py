@@ -30,14 +30,14 @@ class TestDownloadAndExtractMibigMetadata:
         assert metadata.is_file()
 
     def test_error_same_path(self, tmp_path):
-        with pytest.raises(ValueError) as e:
+        with pytest.raises(
+            ValueError, match="Identical path of download directory and extract directory"
+        ):
             mibig.download_and_extract_mibig_metadata(tmp_path, tmp_path)
-        assert e.value.args[0] == "Identical path of download directory and extract directory"
 
     def test_error_nonempty_path(self, tmp_path):
         nonempty_path = tmp_path / "metadata" / "subdir"
         nonempty_path.mkdir(parents=True)
 
-        with pytest.raises(ValueError) as e:
+        with pytest.raises(ValueError, match="Nonempty directory"):
             mibig.download_and_extract_mibig_metadata(tmp_path, nonempty_path.parent)
-        assert "Nonempty directory" in e.value.args[0]

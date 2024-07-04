@@ -13,9 +13,8 @@ def setup_with_fixture(gnps_website_is_down):
 
 
 def test_unknown_workflow(tmpdir):
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError, match="Unknown workflow type for GNPS task .*"):
         GNPSDownloader("0ad6535e34d449788f297e712f43068a", tmpdir)
-    assert "Unknown workflow type for GNPS task" in str(e.value)
 
 
 @pytest.mark.parametrize(
