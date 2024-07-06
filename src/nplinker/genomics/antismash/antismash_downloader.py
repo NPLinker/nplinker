@@ -36,7 +36,6 @@ def download_and_extract_antismash_data(
             it doesn't exist. The files will be extracted to `<extract_root>/antismash/<antismash_id>` directory.
 
     Raises:
-        ValueError: if `download_root` and `extract_root` dirs are the same.
         ValueError: if `<extract_root>/antismash/<refseq_assembly_id>` dir is not empty.
 
     Examples:
@@ -45,7 +44,6 @@ def download_and_extract_antismash_data(
     download_root = Path(download_root)
     extract_root = Path(extract_root)
     extract_path = extract_root / "antismash" / antismash_id
-    _check_roots(download_root, extract_root)
 
     try:
         if extract_path.exists():
@@ -74,11 +72,6 @@ def download_and_extract_antismash_data(
         shutil.rmtree(extract_path)
         logger.warning(e)
         raise e
-
-
-def _check_roots(download_root: Path, extract_root: Path):
-    if download_root == extract_root:
-        raise ValueError("Identical path of download directory and extract directory")
 
 
 def _check_extract_path(extract_path: Path):

@@ -193,6 +193,7 @@ def download_url(
         return
 
     # download the file
+    logger.info(f"Downloading {filename} to {root}")
     with open(fpath, "wb") as fh:
         with httpx.stream(http_method, url, follow_redirects=allow_http_redirect) as response:
             if not response.is_success:

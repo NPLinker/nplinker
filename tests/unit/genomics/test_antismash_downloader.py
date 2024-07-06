@@ -28,11 +28,6 @@ class TestDownloadAndExtractAntismashData:
         assert extracted_folder.exists()
         assert extracted_files.sort() == original_expected_files.sort()
 
-    def test_error_same_path(self, tmp_path):
-        with pytest.raises(ValueError) as e:
-            download_and_extract_antismash_data(self.antismash_id, tmp_path, tmp_path)
-        assert e.value.args[0] == "Identical path of download directory and extract directory"
-
     def test_error_nonempty_path(self, tmp_path):
         nonempty_path = tmp_path / "extracted" / "antismash" / f"{self.antismash_id}" / "subdir"
         nonempty_path.mkdir(parents=True)
