@@ -1,28 +1,17 @@
-# Copyright 2021 The NPLinker Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 from __future__ import annotations
 import bz2
 import csv
+import functools
 import gzip
 import hashlib
 import logging
 import lzma
 import os
 import os.path
+import shutil
 import sys
 import tarfile
+import warnings
 import zipfile
 from collections.abc import Callable
 from collections.abc import Sequence
@@ -40,6 +29,34 @@ from rich.progress import TransferSpeedColumn
 
 
 logger = logging.getLogger(__name__)
+
+#
+# Decorators
+#
+
+
+def check_disk_space(func):
+    """A decorator to check available disk space.
+
+    If the available disk space is less than 500GB, a warning is logged and a warning is raised.
+    """
+
+    @functools.wraps(func)
+    def wrapper_check_disk_space(*args, **kwargs):
+        _, _, free = shutil.disk_usage("/")
+        free_gb = free // (2**30)
+        if free_gb < 50:
+            warning_message = f"Available disk space is {free_gb}GB. Is it enough for your project?"
+            logger.warning(warning_message)
+            warnings.warn(warning_message, UserWarning)
+        return func(*args, **kwargs)
+
+    return wrapper_check_disk_space
+
+
+#
+# Other utility functions
+#
 
 
 def find_delimiter(file: str | PathLike) -> str:
@@ -142,6 +159,7 @@ def check_md5(fpath: str | PathLike, md5: str) -> bool:
     return md5 == calculate_md5(fpath)
 
 
+@check_disk_space
 def download_url(
     url: str,
     root: str | PathLike,
