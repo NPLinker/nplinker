@@ -130,7 +130,7 @@ def test_add_different_id_different_alias(strain: Strain, collection: StrainColl
 
 def test_remove(strain: Strain):
     sc = StrainCollection()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Strain .* not found in the strain collection"):
         sc.remove(strain)
     assert strain not in sc
 
@@ -151,7 +151,7 @@ def test_remove_same_id_different_alias(collection: StrainCollection):
 
 def test_remove_different_id(collection: StrainCollection):
     strain = Strain("strain_2")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Strain .* not found in the strain collection"):
         collection.remove(strain)
     assert len(collection) == 1
     assert strain not in collection
@@ -195,7 +195,7 @@ def test_has_name(collection: StrainCollection):
 def test_lookup(collection: StrainCollection, strain: Strain):
     for name in strain.names:
         assert collection.lookup(name) == [strain]
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Strain .* not found in the strain collection"):
         collection.lookup("strain_not_exist")
 
 

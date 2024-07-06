@@ -6,9 +6,8 @@ from nplinker.metabolomics.gnps import GNPSFormat
 
 
 def test_unknown_workflow(gnps_zip_files, tmpdir):
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError, match="Unknown workflow type for GNPS archive .*"):
         GNPSExtractor(gnps_zip_files[GNPSFormat.Unknown], tmpdir)
-    assert "Unknown workflow type for GNPS archive" in str(e.value)
 
 
 @pytest.mark.parametrize("workflow", [GNPSFormat.FBMN, GNPSFormat.SNETS, GNPSFormat.SNETSV2])

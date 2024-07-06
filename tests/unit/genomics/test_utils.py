@@ -113,10 +113,8 @@ def test_add_strain_to_bgc_error(bgcs):
     strains.add(strain1)
     strains.add(strain2)
 
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError, match="Multiple strain objects found .*"):
         add_strain_to_bgc(strains, bgcs)
-
-    assert "Multiple strain objects found for BGC id 'BGC_01'" in e.value.args[0]
 
 
 def test_add_bgc_to_gcf(bgcs):

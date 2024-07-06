@@ -31,9 +31,8 @@ class TestDownloadAndExtractAntismashData:
     def test_error_nonempty_path(self, tmp_path):
         nonempty_path = tmp_path / "extracted" / "antismash" / f"{self.antismash_id}" / "subdir"
         nonempty_path.mkdir(parents=True)
-        with pytest.raises(ValueError) as e:
+        with pytest.raises(ValueError, match="Nonempty directory"):
             download_and_extract_antismash_data(self.antismash_id, tmp_path, tmp_path / "extracted")
-        assert "Nonempty directory" in e.value.args[0]
 
     # test a non-existent ID, which can be either a fake ID, non-existent in NCBI
     # or a valid NCBI genome ID but it does not have BGC data in antismash database

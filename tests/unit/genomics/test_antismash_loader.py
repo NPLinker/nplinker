@@ -73,6 +73,5 @@ def test_parse_bgc_genbank():
 
 def test_parse_bgc_genbank_error():
     gbk_file = str(DATA_DIR / "fake_antismash.region001.gbk")
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError, match="Not found product prediction in antiSMASH Genbank file"):
         parse_bgc_genbank(gbk_file)
-    assert "Not found product prediction in antiSMASH Genbank file" in e.value.args[0]
