@@ -30,11 +30,17 @@ logger = logging.getLogger(__name__)
 
 
 class DatasetLoader:
-    """Class to load all data.
+    """Load datasets from the working directory with the given configuration.
+
+    ??? info "Concept and Diagram"
+        [Working Directory Structure][working-directory-structure]
+
+        [Dataset Loading Pipeline][dataset-loading-pipeline]
+
+    Loaded data are stored in the data containers (attributes), e.g. `self.bgcs`, `self.gcfs`, etc.
 
     Attributes:
-        config: A Dynaconf object that contains the configuration settings. Check the
-            `nplinker.config` module for more information.
+        config: A Dynaconf object that contains the configuration settings.
         bgcs: A list of BGC objects.
         gcfs: A list of GCF objects.
         spectra: A list of Spectrum objects.
@@ -54,12 +60,22 @@ class DatasetLoader:
     OR_CANOPUS = "canopus_dir"
     OR_MOLNETENHANCER = "molnetenhancer_dir"
 
-    def __init__(self, config: Dynaconf):
+    def __init__(self, config: Dynaconf) -> None:
         """Initialize the DatasetLoader.
 
         Args:
-            config: A Dynaconf object that contains the configuration settings. Check the
-                `nplinker.config` module for more information.
+            config: A Dynaconf object that contains the configuration settings.
+
+        Examples:
+            >>> from nplinker.config import load_config
+            >>> from nplinker.loader import DatasetLoader
+            >>> config = load_config("nplinker.toml")
+            >>> loader = DatasetLoader(config)
+            >>> loader.load()
+
+        See Also:
+            [DatasetArranger][nplinker.arranger.DatasetArranger]: Download, generate and/or validate
+                datasets to ensure they are ready for loading.
         """
         self.config = config
 
@@ -75,8 +91,14 @@ class DatasetLoader:
         self.class_matches = None
         self.chem_classes = None
 
-    def load(self):
-        """Load all data."""
+    def load(self) -> bool:
+        """Load all data from data files in the working directory.
+
+        See [Dataset Loading Pipeline][dataset-loading-pipeline] for the detailed steps.
+
+        Returns:
+            True if all data are loaded successfully.
+        """
         if not self._load_strain_mappings():
             return False
 

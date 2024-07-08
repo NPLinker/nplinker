@@ -31,6 +31,11 @@ class GCF:
 
         Args:
             id: id of the GCF object.
+
+        Examples:
+            >>> gcf = GCF("Unique_GCF_ID")
+            >>> gcf.id
+            'Unique_GCF_ID'
         """
         self.id = id
         self.bgc_ids: set[str] = set()

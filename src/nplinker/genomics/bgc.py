@@ -25,7 +25,7 @@ class BGC:
     its output GenBank files.
 
     The annotations of BGC can be stored in JSON format, which is defined
-    and used by MIBiG.
+    and used by [MIBiG](https://mibig.secondarymetabolites.org/).
 
     Attributes:
         id: BGC identifier, e.g. MIBiG accession, GenBank accession.
@@ -34,14 +34,14 @@ class BGC:
             For antiSMASH's GenBank data, the feature `region /product`
             gives product information.
             For MIBiG metadata, its biosynthetic class provides such info.
-        mibig_bgc_class: A tuple of MIBiG biosynthetic
-            classes to which the BGC belongs.
+        mibig_bgc_class: A tuple of MIBiG biosynthetic classes to which the BGC belongs.
             Defaults to None.
+
             MIBiG defines 6 major biosynthetic classes for natural products,
-            including "NRP", "Polyketide", "RiPP", "Terpene", "Saccharide"
-            and "Alkaloid". Note that natural products created by all other
-            biosynthetic mechanisms fall under the category "Other".
-            More details see the publication: https://doi.org/10.1186/s40793-018-0318-y.
+            including `NRP`, `Polyketide`, `RiPP`, `Terpene`, `Saccharide`
+            and `Alkaloid`. Note that natural products created by the other
+            biosynthetic mechanisms fall under the category `Other`. For more details
+            see [the paper](https://doi.org/10.1186/s40793-018-0318-y).
         description: Brief description of the BGC.
             Defaults to None.
         smiles: A tuple of SMILES formulas of the BGC's
@@ -65,6 +65,15 @@ class BGC:
         Args:
             id: BGC identifier, e.g. MIBiG accession, GenBank accession.
             product_prediction: BGC's (predicted) natural products or product classes.
+
+        Examples:
+            >>> bgc = BGC("Unique_BGC_ID", "Polyketide", "NRP")
+            >>> bgc.id
+            'Unique_BGC_ID'
+            >>> bgc.product_prediction
+            ('Polyketide', 'NRP')
+            >>> bgc.is_mibig()
+            False
         """
         # BGC metadata
         self.id = id
@@ -139,9 +148,9 @@ class BGC:
         return {p.bigscape_class for p in self.parents}
 
     def is_mibig(self) -> bool:
-        """Check if the BGC is MIBiG reference BGC or not.
+        """Check if the BGC is a MIBiG reference BGC or not.
 
-        Note:
+        Warning:
             This method evaluates MIBiG BGC based on the pattern that MIBiG
             BGC names start with "BGC". It might give false positive result.
 

@@ -2,8 +2,8 @@ from __future__ import annotations
 import logging
 from enum import Enum
 from typing import TYPE_CHECKING
-from typing import Union
 from typing import Any
+from typing import Union
 from typing import overload
 import numpy as np
 import pandas as pd
@@ -91,7 +91,7 @@ class MetcalfScoring(ScoringBase):
     metcalf_std: np.ndarray | None = None
 
     @classmethod
-    def setup(cls, npl: NPLinker):
+    def setup(cls, npl: NPLinker) -> None:
         """Setup the MetcalfScoring object.
 
         This method is only called once to setup the MetcalfScoring object.
@@ -149,14 +149,15 @@ class MetcalfScoring(ScoringBase):
             objects: The objects to get links for. All objects must be of the same type, i.e. `GCF`,
                 `Spectrum` or `MolecularFamily` type.
                 If no objects are provided, all detected objects (`npl.gcfs`) will be used.
-            parameters: The scoring parameters to use for the links. The parameters are:
+            parameters: The scoring parameters to use for the links.
+                The parameters are:
 
-                    - cutoff: The minimum score to consider a link (≥cutoff). Default is 0.
-                    - standardised: Whether to use standardised scores. Default is False.
+                - `cutoff`: The minimum score to consider a link (≥cutoff). Default is 0.
+                - `standardised`: Whether to use standardised scores. Default is False.
 
         Returns:
-            The `LinkGraph` object containing the links involving the input objects with the Metcalf
-                scores.
+            The [`LinkGraph`][nplinker.scoring.LinkGraph] object containing the links involving the
+                input objects with the Metcalf scores.
 
         Raises:
             TypeError: If the input objects are not of the same type or the object type is invalid.

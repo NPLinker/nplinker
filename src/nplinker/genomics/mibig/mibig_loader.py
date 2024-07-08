@@ -27,6 +27,13 @@ class MibigLoader(BGCLoaderBase):
 
         Args:
             data_dir: Path to the directory of MIBiG metadata json files
+
+        Examples:
+            >>> loader = MibigLoader("path/to/mibig/data/dir")
+            >>> loader.data_dir
+            'path/to/mibig/data/dir'
+            >>> loader.get_bgcs()
+            [BGC('BGC000001', 'NRP'), BGC('BGC000002', 'Polyketide')]
         """
         self.data_dir = str(data_dir)
         self._file_dict = self.parse_data_dir(self.data_dir)

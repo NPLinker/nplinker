@@ -11,6 +11,9 @@ from .gnps_format import gnps_format_from_file_mapping
 class GNPSFileMappingLoader(FileMappingLoaderBase):
     """Class to load file mappings from GNPS output file.
 
+    ??? info "Concept"
+        [GNPS data][gnps-data]
+
     File mappings refers to the mapping from spectrum id to files in which
     this spectrum occurs.
 
@@ -25,7 +28,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         - quantification_table*/*.csv
     """
 
-    def __init__(self, file: str | PathLike):
+    def __init__(self, file: str | PathLike) -> None:
         """Initialize the GNPSFileMappingLoader.
 
         Args:
@@ -175,7 +178,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
                 samples = row["UniqueFileSources"].split("|")
                 self._mapping[spectrum_id] = samples
 
-    def _load_fbmn(self):
+    def _load_fbmn(self) -> None:
         """Load file mapping from output of GNPS FBMN workflow.
 
         The column "row ID" is loaded as spectrum id.

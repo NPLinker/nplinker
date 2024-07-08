@@ -40,11 +40,11 @@ class MibigMetadata:
         The 'biosyn_class' is biosynthetic class(es), namely the type of
         natural product or secondary metabolite.
 
-        MIBiG defines 6 major biosynthetic classes, including
-        "NRP", "Polyketide", "RiPP", "Terpene", "Saccharide" and "Alkaloid".
-        Note that natural products created by all other biosynthetic
-        mechanisms fall under the category "Other". More details see
-        the publication: https://doi.org/10.1186/s40793-018-0318-y.
+        MIBiG defines 6 major biosynthetic classes for natural products,
+        including `NRP`, `Polyketide`, `RiPP`, `Terpene`, `Saccharide`
+        and `Alkaloid`. Note that natural products created by the other
+        biosynthetic mechanisms fall under the category `Other`. For more details
+        see [the paper](https://doi.org/10.1186/s40793-018-0318-y).
         """
         return self._biosyn_class
 

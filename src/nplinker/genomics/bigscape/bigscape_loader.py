@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class BigscapeGCFLoader(GCFLoaderBase):
-    """Build a loader for BiG-SCAPE GCF cluster file.
+    """Data loader for BiG-SCAPE GCF cluster file.
 
     Attributes:
         cluster_file: path to the BiG-SCAPE cluster file.
@@ -22,7 +22,7 @@ class BigscapeGCFLoader(GCFLoaderBase):
 
         Args:
             cluster_file: Path to the BiG-SCAPE cluster file,
-                the filename has a pattern of "<class>_clustering_c0.xx.tsv".
+                the filename has a pattern of `<class>_clustering_c0.xx.tsv`.
         """
         self.cluster_file: str = str(cluster_file)
         self._gcf_list = self._parse_gcf(self.cluster_file)
@@ -62,7 +62,7 @@ class BigscapeGCFLoader(GCFLoaderBase):
 
 
 class BigscapeV2GCFLoader(GCFLoaderBase):
-    """Build a loader for BiG-SCAPE v2 database file.
+    """Data loader for BiG-SCAPE v2 database file.
 
     Attributes:
         db_file: Path to the BiG-SCAPE database file.
@@ -81,10 +81,9 @@ class BigscapeV2GCFLoader(GCFLoaderBase):
         """Get all GCF objects.
 
         Args:
-            keep_mibig_only: True to keep GCFs that contain only MIBiG
-                BGCs.
-            keep_singleton: True to keep singleton GCFs. A singleton GCF
-                is a GCF that contains only one BGC.
+            keep_mibig_only: True to keep GCFs that contain only MIBiG BGCs.
+            keep_singleton: True to keep singleton GCFs.
+                A singleton GCF is a GCF that contains only one BGC.
 
         Returns:
             a list of GCF objects.
