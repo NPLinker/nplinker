@@ -69,9 +69,12 @@ nav:
   - Dataset Arranger: diagrams/arranger.md
   - Dataset Loader: diagrams/loader.md
 - API Documentation:
-  - NPLinker: api/nplinker.md
-  - Dataset Arranger: api/arranger.md
-  - Dataset Loader: api/loader.md
+  - NPLinker Core:
+    - NPLinker: api/nplinker.md
+    - Dataset Arranger: api/arranger.md
+    - Dataset Loader: api/loader.md
+    - Schemas: api/schema.md
+    - Utilities: api/utils.md
   - Genomics Data:
     - Abstract Base Classes: api/genomics_abc.md
     - Data Models: api/genomics.md
@@ -92,8 +95,6 @@ nav:
     - Scoring Methods: api/scoring_methods.md
     - Data Models: api/scoring.md
     - Utilities: api/scoring_utils.md
-  - Schemas: api/schema.md
-  - General Utilities: api/utils.md
 
 markdown_extensions:
 # https://python-markdown.github.io/extensions/
@@ -140,16 +141,20 @@ plugins:
           - https://docs.scipy.org/doc/scipy/objects.inv
           - https://pandas.pydata.org/docs/objects.inv
         options:
+          # Members options
           members_order: source
           filters: ["!^_"]
+          # Docstrings options
           docstring_options:
             ignore_init_summary: true
           merge_init_into_class: true
           show_if_no_docstring: true
           show_root_heading: true
           show_root_full_path: false
+          # Signatures/annotations options
           show_signature_annotations: true
           signature_crossrefs: true
           separate_signature: true
+          # Headings options
           show_symbol_type_heading: true
           show_symbol_type_toc: true
