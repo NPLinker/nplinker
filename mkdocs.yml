@@ -145,6 +145,7 @@ plugins:
           members_order: source
           filters: ["!^_"]
           # Docstrings options
+          docstring_section_style: list
           docstring_options:
             ignore_init_summary: true
           merge_init_into_class: true
