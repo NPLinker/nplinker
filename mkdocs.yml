@@ -27,6 +27,10 @@ theme:
     - content.code.copy
     - announce.dismiss
     - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.suggest
   icon:
     logo: 'material/library-outline'
     previous: fontawesome/solid/angle-left
@@ -110,6 +114,7 @@ markdown_extensions:
 - pymdownx.tabbed:
     alternate_style: true
 - pymdownx.magiclink
+- pymdownx.keys
 - pymdownx.snippets: # use files outside of docs folder 
     base_path: [., ./src/nplinker, ./src/nplinker/data]
 
@@ -121,6 +126,7 @@ plugins:
     alias_type: symlink
     canonical_version: latest
 - search
+- autorefs # https://mkdocstrings.github.io/usage/#cross-references-to-any-markdown-heading
 - exclude:
     glob:
     - __pycache__/*
