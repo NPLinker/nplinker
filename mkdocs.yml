@@ -134,6 +134,7 @@ plugins:
 - mkdocstrings:
     handlers:
       python:
+        # https://mkdocstrings.github.io/python/usage/#configuration
         paths: [src]
         import:
           - https://docs.python.org/3/objects.inv
@@ -141,21 +142,21 @@ plugins:
           - https://docs.scipy.org/doc/scipy/objects.inv
           - https://pandas.pydata.org/docs/objects.inv
         options:
+          # NOTE: some options are not available for free, e.g. `show_inheritance_diagram` and `summary`. 
           # Members options
           members_order: source
-          filters: ["!^_"]
+          filters: ["!^_[^_]", "!^__all__$", "!^logger$"] # exclude private objects, "__all__" and "logger" 
           # Docstrings options
           docstring_section_style: list
           docstring_options:
             ignore_init_summary: true
           merge_init_into_class: true
           show_if_no_docstring: true
-          show_root_heading: true
-          show_root_full_path: false
           # Signatures/annotations options
           show_signature_annotations: true
           signature_crossrefs: true
           separate_signature: true
           # Headings options
+          show_root_heading: true
           show_symbol_type_heading: true
           show_symbol_type_toc: true
