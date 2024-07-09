@@ -116,8 +116,8 @@ markdown_extensions:
     alternate_style: true
 - pymdownx.magiclink
 - pymdownx.keys
-- pymdownx.snippets: # use files outside of docs folder 
-    base_path: [., ./src/nplinker, ./src/nplinker/data]
+- pymdownx.snippets: # use files outside of docs folder, syntax is `--8<-- "path/to/file"`
+    base_path: [.]
 
 watch:
 - docs
