@@ -1,4 +1,5 @@
 from __future__ import annotations
+import re
 import zipfile
 from enum import Enum
 from enum import unique
@@ -6,7 +7,6 @@ from os import PathLike
 from pathlib import Path
 import httpx
 from bs4 import BeautifulSoup
-from nplinker.utils import get_headers
 
 
 GNPS_TASK_URL = "https://gnps.ucsd.edu/ProteoSAFe/status.jsp?task={}"
@@ -118,11 +118,13 @@ def gnps_format_from_file_mapping(file: str | PathLike) -> GNPSFormat:
     Returns:
         GNPS format identified in the file.
     """
-    headers = get_headers(file)
-    if "AllFiles" in headers:
+    with open(file, "r") as f:
+        header = f.readline().strip()
+
+    if re.search(r"\bAllFiles\b", header):
         return GNPSFormat.SNETS
-    if "UniqueFileSources" in headers:
+    if re.search(r"\bUniqueFileSources\b", header):
         return GNPSFormat.SNETSV2
-    if "row ID" in headers:
+    if re.search(r"\b{}\b".format(re.escape("row ID")), header):
         return GNPSFormat.FBMN
     return GNPSFormat.Unknown
