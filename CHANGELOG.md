@@ -1,5 +1,28 @@
 # Changelog
 
+## [v2.0.0-alpha.3](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.3) (2024-07-11)
+
+[Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.2...v2.0.0-alpha.3)
+
+**Implemented enhancements:**
+
+- Data size warnings / checks when installing and using nplinker package [\#237](https://github.com/NPLinker/nplinker/issues/237)
+
+**Closed issues:**
+
+- Podp: not all genome IDs are in antismashDB [\#242](https://github.com/NPLinker/nplinker/issues/242)
+- refactoring scoring \(tracker issue\) [\#205](https://github.com/NPLinker/nplinker/issues/205)
+- ensure that IDs are unique [\#146](https://github.com/NPLinker/nplinker/issues/146)
+- refactor `__eq__` and `__hash__` methods [\#136](https://github.com/NPLinker/nplinker/issues/136)
+- Missing mibig BGC [\#86](https://github.com/NPLinker/nplinker/issues/86)
+
+**Merged pull requests:**
+
+- fix tabular file header detection [\#264](https://github.com/NPLinker/nplinker/pull/264) ([CunliangGeng](https://github.com/CunliangGeng))
+- simplify error check in unit tests [\#263](https://github.com/NPLinker/nplinker/pull/263) ([CunliangGeng](https://github.com/CunliangGeng))
+- add warning for failed antismash downloads [\#262](https://github.com/NPLinker/nplinker/pull/262) ([CunliangGeng](https://github.com/CunliangGeng))
+- check disk space before downloading [\#261](https://github.com/NPLinker/nplinker/pull/261) ([CunliangGeng](https://github.com/CunliangGeng))
+
 ## [v2.0.0-alpha.2](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.2) (2024-06-20)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.1...v2.0.0-alpha.2)
