@@ -2232,8 +2232,7 @@ the genome. Defaults to "".</p>
 
                   <details class="quote">
                     <summary>Source code in <code>src/nplinker/genomics/antismash/podp_antismash_downloader.py</code></summary>
-                    <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-36">36</a></span>
-<span class="normal"><a href="#__codelineno-0-37">37</a></span>
+                    <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-37">37</a></span>
 <span class="normal"><a href="#__codelineno-0-38">38</a></span>
 <span class="normal"><a href="#__codelineno-0-39">39</a></span>
 <span class="normal"><a href="#__codelineno-0-40">40</a></span>
@@ -2253,28 +2252,29 @@ the genome. Defaults to "".</p>
 <span class="normal"><a href="#__codelineno-0-54">54</a></span>
 <span class="normal"><a href="#__codelineno-0-55">55</a></span>
 <span class="normal"><a href="#__codelineno-0-56">56</a></span>
-<span class="normal"><a href="#__codelineno-0-57">57</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-<a id="__codelineno-0-37" name="__codelineno-0-37"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38"></a>    <span class="n">original_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="n">resolved_refseq_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="n">resolve_attempted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-41" name="__codelineno-0-41"></a>    <span class="n">bgc_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="p">):</span>
-<a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize a GenomeStatus object for the given genome.</span>
-<a id="__codelineno-0-44" name="__codelineno-0-44"></a>
-<a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">        original_id: The original ID of the genome.</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">        resolved_refseq_id: The resolved RefSeq ID of the</span>
-<a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="sd">            genome. Defaults to &quot;&quot;.</span>
-<a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">        resolve_attempted: A flag indicating whether an</span>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">            attempt to resolve the RefSeq ID has been made. Defaults to False.</span>
-<a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">        bgc_path: The path to the downloaded BGC file for</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">            the genome. Defaults to &quot;&quot;.</span>
-<a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">original_id</span> <span class="o">=</span> <span class="n">original_id</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">resolved_refseq_id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">resolved_refseq_id</span> <span class="o">==</span> <span class="s2">&quot;None&quot;</span> <span class="k">else</span> <span class="n">resolved_refseq_id</span>
-<a id="__codelineno-0-56" name="__codelineno-0-56"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">resolve_attempted</span> <span class="o">=</span> <span class="n">resolve_attempted</span>
-<a id="__codelineno-0-57" name="__codelineno-0-57"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">bgc_path</span> <span class="o">=</span> <span class="n">bgc_path</span>
+<span class="normal"><a href="#__codelineno-0-57">57</a></span>
+<span class="normal"><a href="#__codelineno-0-58">58</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="n">original_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="n">resolved_refseq_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-41" name="__codelineno-0-41"></a>    <span class="n">resolve_attempted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42"></a>    <span class="n">bgc_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="p">):</span>
+<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize a GenomeStatus object for the given genome.</span>
+<a id="__codelineno-0-45" name="__codelineno-0-45"></a>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">        original_id: The original ID of the genome.</span>
+<a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="sd">        resolved_refseq_id: The resolved RefSeq ID of the</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">            genome. Defaults to &quot;&quot;.</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">        resolve_attempted: A flag indicating whether an</span>
+<a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">            attempt to resolve the RefSeq ID has been made. Defaults to False.</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">        bgc_path: The path to the downloaded BGC file for</span>
+<a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">            the genome. Defaults to &quot;&quot;.</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">original_id</span> <span class="o">=</span> <span class="n">original_id</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">resolved_refseq_id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">resolved_refseq_id</span> <span class="o">==</span> <span class="s2">&quot;None&quot;</span> <span class="k">else</span> <span class="n">resolved_refseq_id</span>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">resolve_attempted</span> <span class="o">=</span> <span class="n">resolve_attempted</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">bgc_path</span> <span class="o">=</span> <span class="n">bgc_path</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -2455,8 +2455,7 @@ objects. An empty dict is returned if the given file doesn't exist.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/nplinker/genomics/antismash/podp_antismash_downloader.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-59">59</a></span>
-<span class="normal"><a href="#__codelineno-0-60">60</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-60">60</a></span>
 <span class="normal"><a href="#__codelineno-0-61">61</a></span>
 <span class="normal"><a href="#__codelineno-0-62">62</a></span>
 <span class="normal"><a href="#__codelineno-0-63">63</a></span>
@@ -2479,31 +2478,32 @@ objects. An empty dict is returned if the given file doesn't exist.</p>
 <span class="normal"><a href="#__codelineno-0-80">80</a></span>
 <span class="normal"><a href="#__codelineno-0-81">81</a></span>
 <span class="normal"><a href="#__codelineno-0-82">82</a></span>
-<span class="normal"><a href="#__codelineno-0-83">83</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="nd">@staticmethod</span>
-<a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;GenomeStatus&quot;</span><span class="p">]:</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a dict of GenomeStatus objects by loading given genome status file.</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    Note that an empty dict is returned if the given file doesn&#39;t exist.</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        file: Path to genome status file.</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">        Dict keys are genome original id and values are GenomeStatus</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">            objects. An empty dict is returned if the given file doesn&#39;t exist.</span>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a>    <span class="n">genome_status_dict</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a>    <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-74" name="__codelineno-0-74"></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a>            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a>        <span class="c1"># validate json data before using it</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a>        <span class="n">validate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">GENOME_STATUS_SCHEMA</span><span class="p">)</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a>        <span class="n">genome_status_dict</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a>            <span class="n">gs</span><span class="p">[</span><span class="s2">&quot;original_id&quot;</span><span class="p">]:</span> <span class="n">GenomeStatus</span><span class="p">(</span><span class="o">**</span><span class="n">gs</span><span class="p">)</span> <span class="k">for</span> <span class="n">gs</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;genome_status&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a>        <span class="p">}</span>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a>    <span class="k">return</span> <span class="n">genome_status_dict</span>
+<span class="normal"><a href="#__codelineno-0-83">83</a></span>
+<span class="normal"><a href="#__codelineno-0-84">84</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="nd">@staticmethod</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;GenomeStatus&quot;</span><span class="p">]:</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a dict of GenomeStatus objects by loading given genome status file.</span>
+<a id="__codelineno-0-63" name="__codelineno-0-63"></a>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">    Note that an empty dict is returned if the given file doesn&#39;t exist.</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">        file: Path to genome status file.</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">        Dict keys are genome original id and values are GenomeStatus</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">            objects. An empty dict is returned if the given file doesn&#39;t exist.</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a>    <span class="n">genome_status_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-74" name="__codelineno-0-74"></a>    <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a>            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a>        <span class="c1"># validate json data before using it</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a>        <span class="n">validate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">GENOME_STATUS_SCHEMA</span><span class="p">)</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a>        <span class="n">genome_status_dict</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a>            <span class="n">gs</span><span class="p">[</span><span class="s2">&quot;original_id&quot;</span><span class="p">]:</span> <span class="n">GenomeStatus</span><span class="p">(</span><span class="o">**</span><span class="n">gs</span><span class="p">)</span> <span class="k">for</span> <span class="n">gs</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;genome_status&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a>        <span class="p">}</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a>    <span class="k">return</span> <span class="n">genome_status_dict</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -2605,8 +2605,7 @@ If None, the JSON string is returned but not written to a file.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/nplinker/genomics/antismash/podp_antismash_downloader.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-85"> 85</a></span>
-<span class="normal"><a href="#__codelineno-0-86"> 86</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-86"> 86</a></span>
 <span class="normal"><a href="#__codelineno-0-87"> 87</a></span>
 <span class="normal"><a href="#__codelineno-0-88"> 88</a></span>
 <span class="normal"><a href="#__codelineno-0-89"> 89</a></span>
@@ -2634,36 +2633,37 @@ If None, the JSON string is returned but not written to a file.</p>
 <span class="normal"><a href="#__codelineno-0-111">111</a></span>
 <span class="normal"><a href="#__codelineno-0-112">112</a></span>
 <span class="normal"><a href="#__codelineno-0-113">113</a></span>
-<span class="normal"><a href="#__codelineno-0-114">114</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="nd">@staticmethod</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a>    <span class="n">genome_status_dict</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;GenomeStatus&quot;</span><span class="p">],</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert the genome status dictionary to a JSON string.</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a>
-<a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    If a file path is provided, the JSON string is written to the file. If</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">    the file already exists, it is overwritten.</span>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">        genome_status_dict: A dictionary of genome</span>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">            status objects. The keys are the original genome IDs and the values</span>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">            are GenomeStatus objects.</span>
-<a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">        file: The path to the output JSON file.</span>
-<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">            If None, the JSON string is returned but not written to a file.</span>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">        The JSON string if `file` is None, otherwise None.</span>
-<a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-104" name="__codelineno-0-104"></a>    <span class="n">gs_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">gs</span><span class="o">.</span><span class="n">_to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">gs</span> <span class="ow">in</span> <span class="n">genome_status_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="n">json_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;genome_status&quot;</span><span class="p">:</span> <span class="n">gs_list</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0&quot;</span><span class="p">}</span>
-<a id="__codelineno-0-106" name="__codelineno-0-106"></a>
-<a id="__codelineno-0-107" name="__codelineno-0-107"></a>    <span class="c1"># validate json object before dumping</span>
-<a id="__codelineno-0-108" name="__codelineno-0-108"></a>    <span class="n">validate</span><span class="p">(</span><span class="n">json_data</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">GENOME_STATUS_SCHEMA</span><span class="p">)</span>
-<a id="__codelineno-0-109" name="__codelineno-0-109"></a>
-<a id="__codelineno-0-110" name="__codelineno-0-110"></a>    <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-<a id="__codelineno-0-112" name="__codelineno-0-112"></a>            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">json_data</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a>        <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-114" name="__codelineno-0-114"></a>    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_data</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-114">114</a></span>
+<span class="normal"><a href="#__codelineno-0-115">115</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="nd">@staticmethod</span>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a>    <span class="n">genome_status_dict</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;GenomeStatus&quot;</span><span class="p">],</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert the genome status dictionary to a JSON string.</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">    If a file path is provided, the JSON string is written to the file. If</span>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">    the file already exists, it is overwritten.</span>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">        genome_status_dict: A dictionary of genome</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">            status objects. The keys are the original genome IDs and the values</span>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">            are GenomeStatus objects.</span>
+<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">        file: The path to the output JSON file.</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">            If None, the JSON string is returned but not written to a file.</span>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">        The JSON string if `file` is None, otherwise None.</span>
+<a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="n">gs_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">gs</span><span class="o">.</span><span class="n">_to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">gs</span> <span class="ow">in</span> <span class="n">genome_status_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+<a id="__codelineno-0-106" name="__codelineno-0-106"></a>    <span class="n">json_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;genome_status&quot;</span><span class="p">:</span> <span class="n">gs_list</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-107" name="__codelineno-0-107"></a>
+<a id="__codelineno-0-108" name="__codelineno-0-108"></a>    <span class="c1"># validate json object before dumping</span>
+<a id="__codelineno-0-109" name="__codelineno-0-109"></a>    <span class="n">validate</span><span class="p">(</span><span class="n">json_data</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">GENOME_STATUS_SCHEMA</span><span class="p">)</span>
+<a id="__codelineno-0-110" name="__codelineno-0-110"></a>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a>    <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-112" name="__codelineno-0-112"></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a>            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">json_data</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a>        <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-115" name="__codelineno-0-115"></a>    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_data</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -2778,16 +2778,6 @@ it doesn't exist. The files will be extracted to <code>&lt;extract_root&gt;/anti
             </td>
             <td>
               <div class="doc-md-description">
-                <p>if <code>download_root</code> and <code>extract_root</code> dirs are the same.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
                 <p>if <code>&lt;extract_root&gt;/antismash/&lt;refseq_assembly_id&gt;</code> dir is not empty.</p>
               </div>
             </td>
@@ -2856,9 +2846,7 @@ it doesn't exist. The files will be extracted to <code>&lt;extract_root&gt;/anti
 <span class="normal"><a href="#__codelineno-0-71">71</a></span>
 <span class="normal"><a href="#__codelineno-0-72">72</a></span>
 <span class="normal"><a href="#__codelineno-0-73">73</a></span>
-<span class="normal"><a href="#__codelineno-0-74">74</a></span>
-<span class="normal"><a href="#__codelineno-0-75">75</a></span>
-<span class="normal"><a href="#__codelineno-0-76">76</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="k">def</span> <span class="nf">download_and_extract_antismash_data</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-74">74</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="k">def</span> <span class="nf">download_and_extract_antismash_data</span><span class="p">(</span>
 <a id="__codelineno-0-21" name="__codelineno-0-21"></a>    <span class="n">antismash_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">download_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span><span class="p">,</span> <span class="n">extract_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span>
 <a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Download and extract antiSMASH BGC archive for a specified genome.</span>
@@ -2877,44 +2865,42 @@ it doesn't exist. The files will be extracted to <code>&lt;extract_root&gt;/anti
 <a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="sd">            it doesn&#39;t exist. The files will be extracted to `&lt;extract_root&gt;/antismash/&lt;antismash_id&gt;` directory.</span>
 <a id="__codelineno-0-37" name="__codelineno-0-37"></a>
 <a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39"></a><span class="sd">        ValueError: if `download_root` and `extract_root` dirs are the same.</span>
-<a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="sd">        ValueError: if `&lt;extract_root&gt;/antismash/&lt;refseq_assembly_id&gt;` dir is not empty.</span>
-<a id="__codelineno-0-41" name="__codelineno-0-41"></a>
-<a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">        &gt;&gt;&gt; download_and_extract_antismash_metadata(&quot;GCF_004339725.1&quot;, &quot;/data/download&quot;, &quot;/data/extracted&quot;)</span>
-<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-45" name="__codelineno-0-45"></a>    <span class="n">download_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">download_root</span><span class="p">)</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a>    <span class="n">extract_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">extract_root</span><span class="p">)</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a>    <span class="n">extract_path</span> <span class="o">=</span> <span class="n">extract_root</span> <span class="o">/</span> <span class="s2">&quot;antismash&quot;</span> <span class="o">/</span> <span class="n">antismash_id</span>
-<a id="__codelineno-0-48" name="__codelineno-0-48"></a>    <span class="n">_check_roots</span><span class="p">(</span><span class="n">download_root</span><span class="p">,</span> <span class="n">extract_root</span><span class="p">)</span>
-<a id="__codelineno-0-49" name="__codelineno-0-49"></a>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-51" name="__codelineno-0-51"></a>        <span class="k">if</span> <span class="n">extract_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a>            <span class="n">_check_extract_path</span><span class="p">(</span><span class="n">extract_path</span><span class="p">)</span>
-<a id="__codelineno-0-53" name="__codelineno-0-53"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a>            <span class="n">extract_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a>
-<a id="__codelineno-0-56" name="__codelineno-0-56"></a>        <span class="k">for</span> <span class="n">base_url</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ANTISMASH_DB_DOWNLOAD_URL</span><span class="p">,</span> <span class="n">ANTISMASH_DBV2_DOWNLOAD_URL</span><span class="p">]:</span>
-<a id="__codelineno-0-57" name="__codelineno-0-57"></a>            <span class="n">url</span> <span class="o">=</span> <span class="n">base_url</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">antismash_id</span><span class="p">,</span> <span class="n">antismash_id</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-58" name="__codelineno-0-58"></a>            <span class="n">download_and_extract_archive</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">download_root</span><span class="p">,</span> <span class="n">extract_path</span><span class="p">,</span> <span class="n">antismash_id</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-59" name="__codelineno-0-59"></a>            <span class="k">break</span>
-<a id="__codelineno-0-60" name="__codelineno-0-60"></a>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a>        <span class="c1"># delete subdirs</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a>        <span class="k">for</span> <span class="n">subdir_path</span> <span class="ow">in</span> <span class="n">list_dirs</span><span class="p">(</span><span class="n">extract_path</span><span class="p">):</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a>            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">subdir_path</span><span class="p">)</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a>        <span class="c1"># delete unnecessary files</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a>        <span class="n">files_to_keep</span> <span class="o">=</span> <span class="n">list_files</span><span class="p">(</span><span class="n">extract_path</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">,</span> <span class="s2">&quot;.gbk&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a>        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">list_files</span><span class="p">(</span><span class="n">extract_path</span><span class="p">):</span>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a>            <span class="k">if</span> <span class="n">file</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">files_to_keep</span><span class="p">:</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a>                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+<a id="__codelineno-0-39" name="__codelineno-0-39"></a><span class="sd">        ValueError: if `&lt;extract_root&gt;/antismash/&lt;refseq_assembly_id&gt;` dir is not empty.</span>
+<a id="__codelineno-0-40" name="__codelineno-0-40"></a>
+<a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="sd">        &gt;&gt;&gt; download_and_extract_antismash_metadata(&quot;GCF_004339725.1&quot;, &quot;/data/download&quot;, &quot;/data/extracted&quot;)</span>
+<a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-44" name="__codelineno-0-44"></a>    <span class="n">download_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">download_root</span><span class="p">)</span>
+<a id="__codelineno-0-45" name="__codelineno-0-45"></a>    <span class="n">extract_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">extract_root</span><span class="p">)</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a>    <span class="n">extract_path</span> <span class="o">=</span> <span class="n">extract_root</span> <span class="o">/</span> <span class="s2">&quot;antismash&quot;</span> <span class="o">/</span> <span class="n">antismash_id</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a>
+<a id="__codelineno-0-48" name="__codelineno-0-48"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a>        <span class="k">if</span> <span class="n">extract_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a>            <span class="n">_check_extract_path</span><span class="p">(</span><span class="n">extract_path</span><span class="p">)</span>
+<a id="__codelineno-0-51" name="__codelineno-0-51"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a>            <span class="n">extract_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-53" name="__codelineno-0-53"></a>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a>        <span class="k">for</span> <span class="n">base_url</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ANTISMASH_DB_DOWNLOAD_URL</span><span class="p">,</span> <span class="n">ANTISMASH_DBV2_DOWNLOAD_URL</span><span class="p">]:</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a>            <span class="n">url</span> <span class="o">=</span> <span class="n">base_url</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">antismash_id</span><span class="p">,</span> <span class="n">antismash_id</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a>            <span class="n">download_and_extract_archive</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">download_root</span><span class="p">,</span> <span class="n">extract_path</span><span class="p">,</span> <span class="n">antismash_id</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a>            <span class="k">break</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a>        <span class="c1"># delete subdirs</span>
+<a id="__codelineno-0-60" name="__codelineno-0-60"></a>        <span class="k">for</span> <span class="n">subdir_path</span> <span class="ow">in</span> <span class="n">list_dirs</span><span class="p">(</span><span class="n">extract_path</span><span class="p">):</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a>            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">subdir_path</span><span class="p">)</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a>
+<a id="__codelineno-0-63" name="__codelineno-0-63"></a>        <span class="c1"># delete unnecessary files</span>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a>        <span class="n">files_to_keep</span> <span class="o">=</span> <span class="n">list_files</span><span class="p">(</span><span class="n">extract_path</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">,</span> <span class="s2">&quot;.gbk&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a>        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">list_files</span><span class="p">(</span><span class="n">extract_path</span><span class="p">):</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a>            <span class="k">if</span> <span class="n">file</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">files_to_keep</span><span class="p">:</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a>                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;antiSMASH BGC data of </span><span class="si">%s</span><span class="s2"> is downloaded and extracted.&quot;</span><span class="p">,</span> <span class="n">antismash_id</span><span class="p">)</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;antiSMASH BGC data of </span><span class="si">%s</span><span class="s2"> is downloaded and extracted.&quot;</span><span class="p">,</span> <span class="n">antismash_id</span><span class="p">)</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a>    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-0-74" name="__codelineno-0-74"></a>        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">extract_path</span><span class="p">)</span>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a>        <span class="k">raise</span> <span class="n">e</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a>    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a>        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">extract_path</span><span class="p">)</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<a id="__codelineno-0-74" name="__codelineno-0-74"></a>        <span class="k">raise</span> <span class="n">e</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3138,9 +3124,7 @@ it doesn't exist. The files will be extracted to <code>&lt;extract_root&gt;/anti
 
             <details class="quote">
               <summary>Source code in <code>src/nplinker/genomics/antismash/podp_antismash_downloader.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-225">225</a></span>
-<span class="normal"><a href="#__codelineno-0-226">226</a></span>
-<span class="normal"><a href="#__codelineno-0-227">227</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-227">227</a></span>
 <span class="normal"><a href="#__codelineno-0-228">228</a></span>
 <span class="normal"><a href="#__codelineno-0-229">229</a></span>
 <span class="normal"><a href="#__codelineno-0-230">230</a></span>
@@ -3159,28 +3143,30 @@ it doesn't exist. The files will be extracted to <code>&lt;extract_root&gt;/anti
 <span class="normal"><a href="#__codelineno-0-243">243</a></span>
 <span class="normal"><a href="#__codelineno-0-244">244</a></span>
 <span class="normal"><a href="#__codelineno-0-245">245</a></span>
-<span class="normal"><a href="#__codelineno-0-246">246</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="k">def</span> <span class="nf">get_best_available_genome_id</span><span class="p">(</span><span class="n">genome_id_data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the best available ID from genome_id_data dict.</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">        genome_id_data: dictionary containing information for each genome record present.</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        ID for the genome, if present, otherwise None.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>    <span class="k">if</span> <span class="s2">&quot;RefSeq_accession&quot;</span> <span class="ow">in</span> <span class="n">genome_id_data</span><span class="p">:</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="n">best_id</span> <span class="o">=</span> <span class="n">genome_id_data</span><span class="p">[</span><span class="s2">&quot;RefSeq_accession&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="k">elif</span> <span class="s2">&quot;GenBank_accession&quot;</span> <span class="ow">in</span> <span class="n">genome_id_data</span><span class="p">:</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>        <span class="n">best_id</span> <span class="o">=</span> <span class="n">genome_id_data</span><span class="p">[</span><span class="s2">&quot;GenBank_accession&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="k">elif</span> <span class="s2">&quot;JGI_Genome_ID&quot;</span> <span class="ow">in</span> <span class="n">genome_id_data</span><span class="p">:</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>        <span class="n">best_id</span> <span class="o">=</span> <span class="n">genome_id_data</span><span class="p">[</span><span class="s2">&quot;JGI_Genome_ID&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>        <span class="n">best_id</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>    <span class="k">if</span> <span class="n">best_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">best_id</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get valid genome ID in genome data: </span><span class="si">{</span><span class="n">genome_id_data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>        <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">return</span> <span class="n">best_id</span>
+<span class="normal"><a href="#__codelineno-0-246">246</a></span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="k">def</span> <span class="nf">get_best_available_genome_id</span><span class="p">(</span><span class="n">genome_id_data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the best available ID from genome_id_data dict.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        genome_id_data: dictionary containing information for each genome record present.</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        ID for the genome, if present, otherwise None.</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="k">if</span> <span class="s2">&quot;RefSeq_accession&quot;</span> <span class="ow">in</span> <span class="n">genome_id_data</span><span class="p">:</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>        <span class="n">best_id</span> <span class="o">=</span> <span class="n">genome_id_data</span><span class="p">[</span><span class="s2">&quot;RefSeq_accession&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="k">elif</span> <span class="s2">&quot;GenBank_accession&quot;</span> <span class="ow">in</span> <span class="n">genome_id_data</span><span class="p">:</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>        <span class="n">best_id</span> <span class="o">=</span> <span class="n">genome_id_data</span><span class="p">[</span><span class="s2">&quot;GenBank_accession&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>    <span class="k">elif</span> <span class="s2">&quot;JGI_Genome_ID&quot;</span> <span class="ow">in</span> <span class="n">genome_id_data</span><span class="p">:</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>        <span class="n">best_id</span> <span class="o">=</span> <span class="n">genome_id_data</span><span class="p">[</span><span class="s2">&quot;JGI_Genome_ID&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>        <span class="n">best_id</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>    <span class="k">if</span> <span class="n">best_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">best_id</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get valid genome ID in genome data: </span><span class="si">{</span><span class="n">genome_id_data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>        <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>    <span class="k">return</span> <span class="n">best_id</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3276,8 +3262,7 @@ Note that an <code>antismash</code> directory will be created in the specified
 
             <details class="quote">
               <summary>Source code in <code>src/nplinker/genomics/antismash/podp_antismash_downloader.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-126">126</a></span>
-<span class="normal"><a href="#__codelineno-0-127">127</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-127">127</a></span>
 <span class="normal"><a href="#__codelineno-0-128">128</a></span>
 <span class="normal"><a href="#__codelineno-0-129">129</a></span>
 <span class="normal"><a href="#__codelineno-0-130">130</a></span>
@@ -3372,103 +3357,106 @@ Note that an <code>antismash</code> directory will be created in the specified
 <span class="normal"><a href="#__codelineno-0-219">219</a></span>
 <span class="normal"><a href="#__codelineno-0-220">220</a></span>
 <span class="normal"><a href="#__codelineno-0-221">221</a></span>
-<span class="normal"><a href="#__codelineno-0-222">222</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="k">def</span> <span class="nf">podp_download_and_extract_antismash_data</span><span class="p">(</span>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a>    <span class="n">genome_records</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]],</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a>    <span class="n">project_download_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span><span class="p">,</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a>    <span class="n">project_extract_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span><span class="p">,</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="p">):</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Download and extract antiSMASH BGC archive for the given genome records.</span>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">        genome_records: list of dicts</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">            representing genome records. The dict of each genome record contains</span>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">                - key(str): &quot;genome_ID&quot;</span>
-<a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="sd">                - value(dict[str, str]): a dict containing information about genome</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">                type, label and accession ids (RefSeq, GenBank, and/or JGI).</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">        project_download_root: Path to the directory to place</span>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">            downloaded archive in.</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">        project_extract_root: Path to the directory downloaded archive</span>
-<a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">            will be extracted to.</span>
-<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">            Note that an `antismash` directory will be created in the specified</span>
-<a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">            `extract_root` if it doesn&#39;t exist. The files will be extracted to</span>
-<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">            `&lt;extract_root&gt;/antismash/&lt;antismash_id&gt;` directory.</span>
-<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="n">project_download_root</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a>        <span class="c1"># otherwise in case of failed first download, the folder doesn&#39;t exist and</span>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a>        <span class="c1"># genome_status_file can&#39;t be written</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a>        <span class="n">Path</span><span class="p">(</span><span class="n">project_download_root</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a>    <span class="n">gs_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">project_download_root</span><span class="p">,</span> <span class="n">GENOME_STATUS_FILENAME</span><span class="p">)</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a>    <span class="n">gs_dict</span> <span class="o">=</span> <span class="n">GenomeStatus</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">gs_file</span><span class="p">)</span>
-<a id="__codelineno-0-154" name="__codelineno-0-154"></a>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a>    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">genome_record</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">genome_records</span><span class="p">):</span>
-<a id="__codelineno-0-156" name="__codelineno-0-156"></a>        <span class="c1"># get the best available ID from the dict</span>
-<a id="__codelineno-0-157" name="__codelineno-0-157"></a>        <span class="n">genome_id_data</span> <span class="o">=</span> <span class="n">genome_record</span><span class="p">[</span><span class="s2">&quot;genome_ID&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a>        <span class="n">raw_genome_id</span> <span class="o">=</span> <span class="n">get_best_available_genome_id</span><span class="p">(</span><span class="n">genome_id_data</span><span class="p">)</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a>        <span class="k">if</span> <span class="n">raw_genome_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw_genome_id</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a>                <span class="sa">f</span><span class="s1">&#39;Ignoring genome record &quot;</span><span class="si">{</span><span class="n">genome_record</span><span class="si">}</span><span class="s1">&quot; due to missing genome ID field&#39;</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a>            <span class="p">)</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a>            <span class="k">continue</span>
-<a id="__codelineno-0-164" name="__codelineno-0-164"></a>
-<a id="__codelineno-0-165" name="__codelineno-0-165"></a>        <span class="c1"># check if genome ID exist in the genome status file</span>
-<a id="__codelineno-0-166" name="__codelineno-0-166"></a>        <span class="k">if</span> <span class="n">raw_genome_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gs_dict</span><span class="p">:</span>
-<a id="__codelineno-0-167" name="__codelineno-0-167"></a>            <span class="n">gs_dict</span><span class="p">[</span><span class="n">raw_genome_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">GenomeStatus</span><span class="p">(</span><span class="n">raw_genome_id</span><span class="p">)</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a>        <span class="n">gs_obj</span> <span class="o">=</span> <span class="n">gs_dict</span><span class="p">[</span><span class="n">raw_genome_id</span><span class="p">]</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a>            <span class="sa">f</span><span class="s2">&quot;Checking for antismash data </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">genome_records</span><span class="p">)</span><span class="si">}</span><span class="s2">, &quot;</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a>            <span class="sa">f</span><span class="s2">&quot;current genome ID=</span><span class="si">{</span><span class="n">raw_genome_id</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a>        <span class="p">)</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a>        <span class="c1"># first, check if BGC data is downloaded</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a>        <span class="k">if</span> <span class="n">gs_obj</span><span class="o">.</span><span class="n">bgc_path</span> <span class="ow">and</span> <span class="n">Path</span><span class="p">(</span><span class="n">gs_obj</span><span class="o">.</span><span class="n">bgc_path</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Genome ID </span><span class="si">{</span><span class="n">raw_genome_id</span><span class="si">}</span><span class="s2"> already downloaded to </span><span class="si">{</span><span class="n">gs_obj</span><span class="o">.</span><span class="n">bgc_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a>            <span class="k">continue</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a>        <span class="c1"># second, check if lookup attempted previously</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a>        <span class="k">if</span> <span class="n">gs_obj</span><span class="o">.</span><span class="n">resolve_attempted</span><span class="p">:</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Genome ID </span><span class="si">{</span><span class="n">raw_genome_id</span><span class="si">}</span><span class="s2"> skipped due to previous failure&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a>            <span class="k">continue</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a>        <span class="c1"># if not downloaded or lookup attempted, then try to resolve the ID</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a>        <span class="c1"># and download</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Beginning lookup process for genome ID </span><span class="si">{</span><span class="n">raw_genome_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a>        <span class="n">gs_obj</span><span class="o">.</span><span class="n">resolved_refseq_id</span> <span class="o">=</span> <span class="n">_resolve_refseq_id</span><span class="p">(</span><span class="n">genome_id_data</span><span class="p">)</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a>        <span class="n">gs_obj</span><span class="o">.</span><span class="n">resolve_attempted</span> <span class="o">=</span> <span class="kc">True</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>        <span class="k">if</span> <span class="n">gs_obj</span><span class="o">.</span><span class="n">resolved_refseq_id</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a>            <span class="c1"># give up on this one</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed lookup for genome ID </span><span class="si">{</span><span class="n">raw_genome_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a>            <span class="k">continue</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a>        <span class="c1"># if resolved id is valid, try to download and extract antismash data</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a>            <span class="n">download_and_extract_antismash_data</span><span class="p">(</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a>                <span class="n">gs_obj</span><span class="o">.</span><span class="n">resolved_refseq_id</span><span class="p">,</span> <span class="n">project_download_root</span><span class="p">,</span> <span class="n">project_extract_root</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>            <span class="p">)</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a>            <span class="n">gs_obj</span><span class="o">.</span><span class="n">bgc_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a>                <span class="n">Path</span><span class="p">(</span><span class="n">project_download_root</span><span class="p">,</span> <span class="n">gs_obj</span><span class="o">.</span><span class="n">resolved_refseq_id</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a>            <span class="p">)</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a>            <span class="n">output_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">project_extract_root</span><span class="p">,</span> <span class="s2">&quot;antismash&quot;</span><span class="p">,</span> <span class="n">gs_obj</span><span class="o">.</span><span class="n">resolved_refseq_id</span><span class="p">)</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a>            <span class="k">if</span> <span class="n">output_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a>                <span class="n">Path</span><span class="o">.</span><span class="n">touch</span><span class="p">(</span><span class="n">output_path</span> <span class="o">/</span> <span class="s2">&quot;completed&quot;</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>            <span class="n">gs_obj</span><span class="o">.</span><span class="n">bgc_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>    <span class="n">missing</span> <span class="o">=</span> <span class="nb">len</span><span class="p">([</span><span class="n">gs</span> <span class="k">for</span> <span class="n">gs</span> <span class="ow">in</span> <span class="n">gs_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">gs</span><span class="o">.</span><span class="n">bgc_path</span><span class="p">])</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>        <span class="sa">f</span><span class="s2">&quot;Dataset has </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2"> missing sets of antiSMASH data &quot;</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="sa">f</span><span class="s2">&quot; (from a total of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">genome_records</span><span class="p">)</span><span class="si">}</span><span class="s2">).&quot;</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="p">)</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="c1"># save updated genome status to json file</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="n">GenomeStatus</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">gs_dict</span><span class="p">,</span> <span class="n">gs_file</span><span class="p">)</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="k">if</span> <span class="n">missing</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">genome_records</span><span class="p">):</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No antiSMASH data found for any genome&quot;</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-222">222</a></span>
+<span class="normal"><a href="#__codelineno-0-223">223</a></span>
+<span class="normal"><a href="#__codelineno-0-224">224</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="k">def</span> <span class="nf">podp_download_and_extract_antismash_data</span><span class="p">(</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a>    <span class="n">genome_records</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]],</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a>    <span class="n">project_download_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span><span class="p">,</span>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a>    <span class="n">project_extract_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span><span class="p">,</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="p">):</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Download and extract antiSMASH BGC archive for the given genome records.</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">        genome_records: list of dicts</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">            representing genome records. The dict of each genome record contains</span>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="sd">                - key(str): &quot;genome_ID&quot;</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">                - value(dict[str, str]): a dict containing information about genome</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">                type, label and accession ids (RefSeq, GenBank, and/or JGI).</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">        project_download_root: Path to the directory to place</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">            downloaded archive in.</span>
+<a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">        project_extract_root: Path to the directory downloaded archive</span>
+<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">            will be extracted to.</span>
+<a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">            Note that an `antismash` directory will be created in the specified</span>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">            `extract_root` if it doesn&#39;t exist. The files will be extracted to</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">            `&lt;extract_root&gt;/antismash/&lt;antismash_id&gt;` directory.</span>
+<a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="n">project_download_root</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a>        <span class="c1"># otherwise in case of failed first download, the folder doesn&#39;t exist and</span>
+<a id="__codelineno-0-150" name="__codelineno-0-150"></a>        <span class="c1"># genome_status_file can&#39;t be written</span>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a>        <span class="n">Path</span><span class="p">(</span><span class="n">project_download_root</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-152" name="__codelineno-0-152"></a>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a>    <span class="n">gs_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">project_download_root</span><span class="p">,</span> <span class="n">GENOME_STATUS_FILENAME</span><span class="p">)</span>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a>    <span class="n">gs_dict</span> <span class="o">=</span> <span class="n">GenomeStatus</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">gs_file</span><span class="p">)</span>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a>    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">genome_record</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">genome_records</span><span class="p">):</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a>        <span class="c1"># get the best available ID from the dict</span>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a>        <span class="n">genome_id_data</span> <span class="o">=</span> <span class="n">genome_record</span><span class="p">[</span><span class="s2">&quot;genome_ID&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a>        <span class="n">raw_genome_id</span> <span class="o">=</span> <span class="n">get_best_available_genome_id</span><span class="p">(</span><span class="n">genome_id_data</span><span class="p">)</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a>        <span class="k">if</span> <span class="n">raw_genome_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw_genome_id</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid input genome record &quot;</span><span class="si">{</span><span class="n">genome_record</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a>            <span class="k">continue</span>
+<a id="__codelineno-0-163" name="__codelineno-0-163"></a>
+<a id="__codelineno-0-164" name="__codelineno-0-164"></a>        <span class="c1"># check if genome ID exist in the genome status file</span>
+<a id="__codelineno-0-165" name="__codelineno-0-165"></a>        <span class="k">if</span> <span class="n">raw_genome_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gs_dict</span><span class="p">:</span>
+<a id="__codelineno-0-166" name="__codelineno-0-166"></a>            <span class="n">gs_dict</span><span class="p">[</span><span class="n">raw_genome_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">GenomeStatus</span><span class="p">(</span><span class="n">raw_genome_id</span><span class="p">)</span>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a>        <span class="n">gs_obj</span> <span class="o">=</span> <span class="n">gs_dict</span><span class="p">[</span><span class="n">raw_genome_id</span><span class="p">]</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a>            <span class="sa">f</span><span class="s2">&quot;Checking for antismash data </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">genome_records</span><span class="p">)</span><span class="si">}</span><span class="s2">, &quot;</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a>            <span class="sa">f</span><span class="s2">&quot;current genome ID=</span><span class="si">{</span><span class="n">raw_genome_id</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a>        <span class="p">)</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a>        <span class="c1"># first, check if BGC data is downloaded</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a>        <span class="k">if</span> <span class="n">gs_obj</span><span class="o">.</span><span class="n">bgc_path</span> <span class="ow">and</span> <span class="n">Path</span><span class="p">(</span><span class="n">gs_obj</span><span class="o">.</span><span class="n">bgc_path</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Genome ID </span><span class="si">{</span><span class="n">raw_genome_id</span><span class="si">}</span><span class="s2"> already downloaded to </span><span class="si">{</span><span class="n">gs_obj</span><span class="o">.</span><span class="n">bgc_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a>            <span class="k">continue</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a>        <span class="c1"># second, check if lookup attempted previously</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a>        <span class="k">if</span> <span class="n">gs_obj</span><span class="o">.</span><span class="n">resolve_attempted</span><span class="p">:</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Genome ID </span><span class="si">{</span><span class="n">raw_genome_id</span><span class="si">}</span><span class="s2"> skipped due to previous failed attempt&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a>            <span class="k">continue</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a>        <span class="c1"># if not downloaded or lookup attempted, then try to resolve the ID</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a>        <span class="c1"># and download</span>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start lookup process for genome ID </span><span class="si">{</span><span class="n">raw_genome_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a>        <span class="n">gs_obj</span><span class="o">.</span><span class="n">resolved_refseq_id</span> <span class="o">=</span> <span class="n">_resolve_refseq_id</span><span class="p">(</span><span class="n">genome_id_data</span><span class="p">)</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a>        <span class="n">gs_obj</span><span class="o">.</span><span class="n">resolve_attempted</span> <span class="o">=</span> <span class="kc">True</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a>        <span class="k">if</span> <span class="n">gs_obj</span><span class="o">.</span><span class="n">resolved_refseq_id</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a>            <span class="c1"># give up on this one</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed lookup for genome ID </span><span class="si">{</span><span class="n">raw_genome_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a>            <span class="k">continue</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a>        <span class="c1"># if resolved id is valid, try to download and extract antismash data</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a>            <span class="n">download_and_extract_antismash_data</span><span class="p">(</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a>                <span class="n">gs_obj</span><span class="o">.</span><span class="n">resolved_refseq_id</span><span class="p">,</span> <span class="n">project_download_root</span><span class="p">,</span> <span class="n">project_extract_root</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a>            <span class="p">)</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>            <span class="n">gs_obj</span><span class="o">.</span><span class="n">bgc_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a>                <span class="n">Path</span><span class="p">(</span><span class="n">project_download_root</span><span class="p">,</span> <span class="n">gs_obj</span><span class="o">.</span><span class="n">resolved_refseq_id</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>            <span class="p">)</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>            <span class="n">output_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">project_extract_root</span><span class="p">,</span> <span class="s2">&quot;antismash&quot;</span><span class="p">,</span> <span class="n">gs_obj</span><span class="o">.</span><span class="n">resolved_refseq_id</span><span class="p">)</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a>            <span class="k">if</span> <span class="n">output_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a>                <span class="n">Path</span><span class="o">.</span><span class="n">touch</span><span class="p">(</span><span class="n">output_path</span> <span class="o">/</span> <span class="s2">&quot;completed&quot;</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a>            <span class="n">gs_obj</span><span class="o">.</span><span class="n">bgc_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a>    <span class="c1"># raise and log warning for failed downloads</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>    <span class="n">failed_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">gs</span><span class="o">.</span><span class="n">original_id</span> <span class="k">for</span> <span class="n">gs</span> <span class="ow">in</span> <span class="n">gs_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">gs</span><span class="o">.</span><span class="n">bgc_path</span><span class="p">]</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>    <span class="k">if</span> <span class="n">failed_ids</span><span class="p">:</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>        <span class="n">warning_message</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>            <span class="sa">f</span><span class="s2">&quot;Failed to download antiSMASH data for the following genome IDs: </span><span class="si">{</span><span class="n">failed_ids</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="p">)</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">warning_message</span><span class="p">)</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">warning_message</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="c1"># save updated genome status to json file</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="n">GenomeStatus</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">gs_dict</span><span class="p">,</span> <span class="n">gs_file</span><span class="p">)</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">failed_ids</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">genome_records</span><span class="p">):</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No antiSMASH data found for any genome&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
