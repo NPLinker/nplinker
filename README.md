@@ -6,7 +6,7 @@
 | (2/5) license                      | [![github license badge](https://img.shields.io/github/license/NPLinker/nplinker)](https://github.com/NPLinker/nplinker) |
 | (3/5) community registry           | [![pypi badge](https://img.shields.io/pypi/v/nplinker.svg?color=blue)](https://pypi.python.org/project/nplinker/) |
 | (4/5) citation                     | [![Zenodo](https://zenodo.org/badge/DOI/10.5281/zenodo.4680218.svg)](https://doi.org/10.5281/zenodo.4680218) |
-| (5/5) checklist                    | ![Static Badge](https://img.shields.io/badge/Coming_Soon-lightgrey) |
+| (5/5) checklist                    | [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/nplinker/nplinker/badge)](https://scorecard.dev/viewer/?uri=github.com/nplinker/nplinker) |
 | how FAIR is                        | [![fair-software badge](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu) |
 | **Other best practices**           |  |
 | Documentation                      | [![Static Badge](https://img.shields.io/badge/Docs_Available-lightgreen)](https://nplinker.github.io/nplinker) [🔗](https://nplinker.github.io/nplinker)|
