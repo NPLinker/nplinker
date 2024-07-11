@@ -3,17 +3,6 @@ from shutil import rmtree
 from tempfile import mkdtemp
 import pytest
 from nplinker import utils
-from nplinker.utils import find_delimiter
-from . import GNPS_DATA_DIR
-
-
-@pytest.mark.parametrize(
-    "filename, expected",
-    [[GNPS_DATA_DIR / "nodes.tsv", "\t"], [GNPS_DATA_DIR / "nodes_mwe.csv", ","]],
-)
-def test_find_delimiter(filename, expected):
-    actual = find_delimiter(filename)
-    assert actual == expected
 
 
 BGC_GBK_URL = "https://mibig.secondarymetabolites.org/repository/BGC0000001/BGC0000001.gbk"

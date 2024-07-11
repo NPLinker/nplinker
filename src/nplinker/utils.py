@@ -59,39 +59,6 @@ def check_disk_space(func):
 #
 
 
-def find_delimiter(file: str | PathLike) -> str:
-    """Detect the delimiter for the given tabular file.
-
-    Args:
-        file: Path to tabular file.
-
-    Returns:
-        Detected delimiter character.
-
-    Examples:
-        >>> delim = find_delimiter("~/table.csv")
-    """
-    sniffer = csv.Sniffer()
-    with open(file, mode="rt", encoding="utf-8") as fp:
-        delimiter = sniffer.sniff(fp.read(5000)).delimiter
-    return delimiter
-
-
-def get_headers(file: str | PathLike) -> list[str]:
-    """Read headers from the given tabular file.
-
-    Args:
-        file: Path to the file to read the header from.
-
-    Returns:
-        A list of column names from the header.
-    """
-    with open(file) as f:
-        headers = f.readline().strip()
-        dl = find_delimiter(file)
-        return headers.split(dl)
-
-
 def is_file_format(file: str | PathLike, format: str = "tsv") -> bool:
     """Check if the file is in the given format.
 
