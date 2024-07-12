@@ -83,3 +83,32 @@ def test_has_link(lg, gcfs, spectra):
 def test_get_link_data(lg, gcfs, spectra, score):
     assert lg.get_link_data(gcfs[0], spectra[0]) == {"metcalf": score}
     assert lg.get_link_data(gcfs[0], spectra[1]) is None
+
+
+def test_filter(gcfs, spectra, score):
+    lg = LinkGraph()
+    lg.add_link(gcfs[0], spectra[0], metcalf=score)
+    lg.add_link(gcfs[1], spectra[1], metcalf=score)
+
+    u_nodes = [gcfs[0], gcfs[1]]
+    v_nodes = [spectra[0], spectra[1]]
+
+    # test filtering with GCFs
+    lg_filtered = lg.filter(u_nodes)
+    assert len(lg_filtered) == 4  # number of nodes
+
+    # test filtering with Spectra
+    lg_filtered = lg.filter(v_nodes)
+    assert len(lg_filtered) == 4
+
+    # test empty `u_nodes` argument
+    lg_filtered = lg.filter([], v_nodes)
+    assert len(lg_filtered) == 4
+
+    # test empty `u_nodes` and `v_nodes` arguments
+    lg_filtered = lg.filter([], [])
+    assert len(lg_filtered) == 0
+
+    # test filtering with GCFs and Spectra
+    lg_filtered = lg.filter(u_nodes, v_nodes)
+    assert len(lg_filtered) == 4
