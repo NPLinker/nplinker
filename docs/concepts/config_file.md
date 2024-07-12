@@ -1,7 +1,7 @@
 ## Configuration Template
 
 ```toml
---8<-- "nplinker.toml"
+--8<-- "src/nplinker/data/nplinker.toml"
 ```
 
 
@@ -9,7 +9,7 @@
 The default configurations are automatically used by NPLinker if you don't set them in your config file.
 
 ```toml
---8<-- "nplinker_default.toml"
+--8<-- "src/nplinker/nplinker_default.toml"
 ```
 
 ## Config loader

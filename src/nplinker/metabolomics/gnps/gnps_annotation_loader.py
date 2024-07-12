@@ -14,7 +14,10 @@ GNPS_UNIVERSAL_SPECTRUM_IDENTIFIER_URL = (
 class GNPSAnnotationLoader(AnnotationLoaderBase):
     """Load annotations from GNPS output file.
 
-    The annotation file is a .tsv file from GNPS output archive, as described
+    ??? info "Concept"
+        [GNPS data][gnps-data]
+
+    The annotation file is a `.tsv` file from GNPS output archive, as described
     below for each GNPS workflow type:
 
     1. METABOLOMICS-SNETS
@@ -25,7 +28,7 @@ class GNPSAnnotationLoader(AnnotationLoaderBase):
         - DB_result/*.tsv
     """
 
-    def __init__(self, file: str | PathLike):
+    def __init__(self, file: str | PathLike) -> None:
         """Initialize the GNPSAnnotationLoader.
 
         Args:

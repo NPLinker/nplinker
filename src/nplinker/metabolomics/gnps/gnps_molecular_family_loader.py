@@ -7,7 +7,10 @@ from ..molecular_family import MolecularFamily
 
 
 class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
-    """Class to load molecular families from GNPS output file.
+    """Load molecular families from GNPS data.
+
+    ??? info "Concept"
+        [GNPS data][gnps-data]
 
     The molecular family file is from GNPS output archive, as described below
     for each GNPS workflow type:
@@ -19,15 +22,17 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
     3. FEATURE-BASED-MOLECULAR-NETWORKING
         - networkedges_selfloop/*.selfloop
 
-    The "ComponentIndex" column in the GNPS molecular family's file is treated
-    as family id. But for molecular families that have only one member (i.e. spectrum),
+    The `ComponentIndex` column in the GNPS molecular family file is treated
+    as family id.
+
+    But for molecular families that have only one member (i.e. spectrum),
     named singleton molecular families, their files have the same value of
-    "-1" in the "ComponentIndex" column. To make the family id unique,the
+    `-1` in the `ComponentIndex` column. To make the family id unique,the
     spectrum id plus a prefix `singleton-` is used as the family id of
     singleton molecular families.
     """
 
-    def __init__(self, file: str | PathLike):
+    def __init__(self, file: str | PathLike) -> None:
         """Initialize the GNPSMolecularFamilyLoader.
 
         Args:
@@ -65,7 +70,7 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
             mfs = [mf for mf in mfs if not mf.is_singleton()]
         return mfs
 
-    def _validate(self):
+    def _validate(self) -> None:
         """Validate the GNPS molecular family file."""
         # validate file format
         if not is_file_format(self._file, "tsv"):

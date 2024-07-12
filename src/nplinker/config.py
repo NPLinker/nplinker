@@ -9,6 +9,9 @@ from nplinker.utils import transform_to_full_path
 def load_config(config_file: str | PathLike) -> Dynaconf:
     """Load and validate the configuration file.
 
+    ??? info "Usage Documentation"
+        [Config Loader][config-loader]
+
     Args:
         config_file: Path to the configuration file.
 

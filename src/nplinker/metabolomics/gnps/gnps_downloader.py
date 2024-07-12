@@ -10,11 +10,15 @@ from .gnps_format import gnps_format_from_task_id
 class GNPSDownloader:
     """Download GNPS zip archive for the given task id.
 
+    ??? info "Concept"
+        [GNPS data][gnps-data]
+
     Note that only GNPS workflows listed in the GNPSFormat enum are supported.
 
     Attributes:
         GNPS_DATA_DOWNLOAD_URL: URL template for downloading GNPS data.
         GNPS_DATA_DOWNLOAD_URL_FBMN: URL template for downloading GNPS data for FBMN.
+        gnps_format: GNPS workflow type.
     """
 
     GNPS_DATA_DOWNLOAD_URL: str = (
@@ -61,8 +65,8 @@ class GNPSDownloader:
         """
         return self._gnps_format
 
-    def download(self) -> "Self":
-        """Execute the downloading process.
+    def download(self) -> Self:
+        """Download GNPS data.
 
         Note: GNPS data is downloaded using the POST method (empty payload is OK).
         """
@@ -72,7 +76,7 @@ class GNPSDownloader:
         return self
 
     def get_download_file(self) -> str:
-        """Get the path to the zip file.
+        """Get the path to the downloaded file.
 
         Returns:
             Download path as string
@@ -88,7 +92,7 @@ class GNPSDownloader:
         return self._task_id
 
     def get_url(self) -> str:
-        """Get the full URL linking to GNPS data to be downloaded.
+        """Get the download URL.
 
         Returns:
             URL pointing to the GNPS data to be downloaded.

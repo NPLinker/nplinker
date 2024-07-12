@@ -54,7 +54,7 @@ def validate_uv(func):
 
 
 class LinkGraph:
-    """A class to represent the links between objects in NPLinker.
+    """Class to represent the links between objects in NPLinker.
 
     This class wraps the `networkx.Graph` class to provide a more user-friendly interface for
     working with the links.
@@ -63,33 +63,34 @@ class LinkGraph:
     stored as nodes.
 
     The scoring data for each link (or link data) is stored as the key/value attributes of the edge.
-
-
-    Examples:
-        Create a LinkGraph object:
-        >>> lg = LinkGraph()
-
-        Add a link between a GCF and a Spectrum object:
-        >>> lg.add_link(gcf, spectrum, metcalf=Score("metcalf", 1.0, {"cutoff": 0.5}))
-
-        Get all links for a given object:
-        >>> lg[gcf]
-        {spectrum: {"metcalf": Score("metcalf", 1.0, {"cutoff": 0.5})}}
-
-        Get all links:
-        >>> lg.links
-        [(gcf, spectrum, {"metcalf": Score("metcalf", 1.0, {"cutoff": 0.5})})]
-
-        Check if there is a link between two objects:
-        >>> lg.has_link(gcf, spectrum)
-        True
-
-        Get the link data between two objects:
-        >>> lg.get_link_data(gcf, spectrum)
-        {"metcalf": Score("metcalf", 1.0, {"cutoff": 0.5})}
     """
 
     def __init__(self) -> None:
+        """Initialize a LinkGraph object.
+
+        Examples:
+            Create a LinkGraph object:
+            >>> lg = LinkGraph()
+
+            Add a link between a GCF and a Spectrum object:
+            >>> lg.add_link(gcf, spectrum, metcalf=Score("metcalf", 1.0, {"cutoff": 0.5}))
+
+            Get all links for a given object:
+            >>> lg[gcf]
+            {spectrum: {"metcalf": Score("metcalf", 1.0, {"cutoff": 0.5})}}
+
+            Get all links:
+            >>> lg.links
+            [(gcf, spectrum, {"metcalf": Score("metcalf", 1.0, {"cutoff": 0.5})})]
+
+            Check if there is a link between two objects:
+            >>> lg.has_link(gcf, spectrum)
+            True
+
+            Get the link data between two objects:
+            >>> lg.get_link_data(gcf, spectrum)
+            {"metcalf": Score("metcalf", 1.0, {"cutoff": 0.5})}
+        """
         self._g: Graph = Graph()
 
     def __str__(self) -> str:

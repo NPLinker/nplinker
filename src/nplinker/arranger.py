@@ -27,17 +27,23 @@ PODP_PROJECT_URL = "https://pairedomicsdata.bioinformatics.nl/api/projects/{}"
 
 
 class DatasetArranger:
-    """Arrange the dataset required by NPLinker.
+    """Arrange datasets based on the fixed working directory structure with the given configuration.
 
-    This class is used to arrange the datasets required by NPLinker according to the
-    configuration. The datasets include MIBiG, GNPS, antiSMASH, and BiG-SCAPE.
+    ??? info "Concept and Diagram"
+        [Working Directory Structure][working-directory-structure]
 
-    If `self.config.mode` is "local", the datasets are validated.
-    If `self.config.mode` is "podp", the datasets are downloaded or generated.
+        [Dataset Arranging Pipeline][dataset-arranging-pipeline]
+
+    "Arrange datasets" means:
+
+    - For `local` mode (`config.mode` is `local`), the datasets provided by users are validated.
+    - For `podp` mode (`config.mode` is `podp`), the datasets are automatically downloaded or
+        generated, then validated.
+
+    The datasets include MIBiG, GNPS, antiSMASH, and BiG-SCAPE data.
 
     Attributes:
-        config: A Dynaconf object that contains the configuration settings. Check `nplinker.config`
-            module for more details.
+        config: A Dynaconf object that contains the configuration settings.
         root_dir: The root directory of the datasets.
         downloads_dir: The directory to store downloaded files.
         mibig_dir: The directory to store MIBiG metadata.
@@ -51,8 +57,18 @@ class DatasetArranger:
         """Initialize the DatasetArranger.
 
         Args:
-            config: A Dynaconf object that contains the configuration settings. Check `nplinker.config`
-                module for more details.
+            config: A Dynaconf object that contains the configuration settings.
+
+
+        Examples:
+            >>> from nplinker.config import load_config
+            >>> from nplinker.arranger import DatasetArranger
+            >>> config = load_config("nplinker.toml")
+            >>> arranger = DatasetArranger(config)
+            >>> arranger.arrange()
+
+        See Also:
+            [DatasetLoader][nplinker.loader.DatasetLoader]: Load all data from files to memory.
         """
         self.config = config
         self.root_dir = config.root_dir
@@ -70,7 +86,7 @@ class DatasetArranger:
         self.arrange_podp_project_json()
 
     def arrange(self) -> None:
-        """Arrange the datasets according to the configuration.
+        """Arrange all datasets according to the configuration.
 
         The datasets include MIBiG, GNPS, antiSMASH, and BiG-SCAPE.
         """
@@ -85,10 +101,9 @@ class DatasetArranger:
     def arrange_podp_project_json(self) -> None:
         """Arrange the PODP project JSON file.
 
-        If `self.config.mode` is "podp", download the PODP project JSON file if it doesn't exist. Then
-        validate the PODP project JSON file if it exists or is downloaded.
-
-        The validation is controlled by the json schema `schemas/podp_adapted_schema.json`.
+        This method only works for the `podp` mode. If the JSON file does not exist, download it
+        first; then the downloaded or existing JSON file will be validated according to the
+        [PODP_ADAPTED_SCHEMA][nplinker.schemas.PODP_ADAPTED_SCHEMA].
         """
         if self.config.mode == "podp":
             file_name = f"paired_datarecord_{self.config.podp_id}.json"
@@ -107,10 +122,9 @@ class DatasetArranger:
     def arrange_mibig(self) -> None:
         """Arrange the MIBiG metadata.
 
-        Always download and extract the MIBiG metadata if `self.config.mibig.to_use` is True.
-        If the default directory has already existed, it will be removed and re-downloaded to ensure
-        the latest version is used. So it's not allowed to manually put MIBiG metadata in the
-        default directory.
+        If `config.mibig.to_use` is `True`, download and extract the MIBiG metadata and override
+        the existing MIBiG metadata if it exists. This ensures that the MIBiG metadata is always
+        up-to-date to the specified version in the configuration.
         """
         if self.config.mibig.to_use:
             if self.mibig_dir.exists():
@@ -125,18 +139,19 @@ class DatasetArranger:
     def arrange_gnps(self) -> None:
         """Arrange the GNPS data.
 
-        If `self.config.mode` is "local", validate the GNPS data directory.
-        If `self.config.mode` is "podp", download the GNPS data if it doesn't exist or remove the
-        existing GNPS data and re-download it if it is invalid.
+        For `local` mode, validate the GNPS data directory.
+
+        For `podp` mode, if the GNPS data does not exist, download it; if it exists but not valid,
+        remove the data and re-downloads it.
 
         The validation process includes:
 
         - Check if the GNPS data directory exists.
         - Check if the required files exist in the GNPS data directory, including:
-            - file_mappings.tsv or file_mappings.csv
-            - spectra.mgf
-            - molecular_families.tsv
-            - annotations.tsv
+            - `file_mappings.tsv` or `file_mappings.csv`
+            - `spectra.mgf`
+            - `molecular_families.tsv`
+            - `annotations.tsv`
         """
         pass_validation = False
         if self.config.mode == "podp":
@@ -194,15 +209,17 @@ class DatasetArranger:
     def arrange_antismash(self) -> None:
         """Arrange the antiSMASH data.
 
-        If `self.config.mode` is "local", validate the antiSMASH data directory.
-        If `self.config.mode` is "podp", download the antiSMASH data if it doesn't exist or remove the
-        existing antiSMASH data and re-download it if it is invalid.
+        For `local` mode, validate the antiSMASH data.
+
+        For `podp` mode, if the antiSMASH data does not exist, download it; if it exists but not
+        valid, remove the data and re-download it.
 
         The validation process includes:
+
         - Check if the antiSMASH data directory exists.
         - Check if the antiSMASH data directory contains at least one sub-directory, and each
-            sub-directory contains at least one BGC file (with the suffix ".region???.gbk" where ???
-            is a number).
+            sub-directory contains at least one BGC file (with the suffix `.region???.gbk` where
+            `???` is a number).
 
         AntiSMASH BGC directory must follow the structure below:
         ```
@@ -246,20 +263,23 @@ class DatasetArranger:
     def arrange_bigscape(self) -> None:
         """Arrange the BiG-SCAPE data.
 
-        If `self.config.mode` is "local", validate the BiG-SCAPE data directory.
-        If `self.config.mode` is "podp", run BiG-SCAPE to generate the clustering file if it doesn't
-        exist or remove the existing BiG-SCAPE data and re-run BiG-SCAPE if it is invalid.
-        The running output of BiG-SCAPE will be saved to the directory "bigscape_running_output"
+        For `local` mode, validate the BiG-SCAPE data.
+
+        For `podp` mode, if the BiG-SCAPE data does not exist, run BiG-SCAPE to generate the
+        clustering file; if it exists but not valid, remove the data and re-run BiG-SCAPE to generate
+        the data.
+
+        The running output of BiG-SCAPE will be saved to the directory `bigscape_running_output`
         in the default BiG-SCAPE directory, and the clustering file
-        "mix_clustering_c{self.config.bigscape.cutoff}.tsv" will be copied to the default BiG-SCAPE
+        `mix_clustering_c{self.config.bigscape.cutoff}.tsv` will be copied to the default BiG-SCAPE
         directory.
 
         The validation process includes:
 
         - Check if the default BiG-SCAPE data directory exists.
-        - Check if the clustering file "mix_clustering_c{self.config.bigscape.cutoff}.tsv" exists in the
+        - Check if the clustering file `mix_clustering_c{self.config.bigscape.cutoff}.tsv` exists in the
                 BiG-SCAPE data directory.
-        - Check if the 'data_sqlite.db' file exists in the BiG-SCAPE data directory.
+        - Check if the `data_sqlite.db` file exists in the BiG-SCAPE data directory.
         """
         pass_validation = False
         if self.config.mode == "podp":
@@ -303,11 +323,12 @@ class DatasetArranger:
     def arrange_strain_mappings(self) -> None:
         """Arrange the strain mappings file.
 
-        If `self.config.mode` is "local", validate the strain mappings file.
-        If `self.config.mode` is "podp", always generate the strain mappings file and validate it.
+        For `local` mode, validate the strain mappings file.
+
+        For `podp` mode, always generate the new strain mappings file and validate it.
 
         The validation checks if the strain mappings file exists and if it is a valid JSON file
-        according to the schema defined in `schemas/strain_mappings_schema.json`.
+        according to [STRAIN_MAPPINGS_SCHEMA][nplinker.schemas.STRAIN_MAPPINGS_SCHEMA].
         """
         if self.config.mode == "podp":
             self._generate_strain_mappings()
@@ -320,8 +341,8 @@ class DatasetArranger:
         The validation process includes:
 
         - Check if the strain mappings file exists.
-        - Check if the strain mappings file is a valid JSON file according to the schema defined in
-            `schemas/strain_mappings_schema.json`.
+        - Check if the strain mappings file is a valid JSON file according to
+            [STRAIN_MAPPINGS_SCHEMA][nplinker.schemas.STRAIN_MAPPINGS_SCHEMA].
 
         Raises:
             FileNotFoundError: If the strain mappings file is not found.
@@ -360,9 +381,7 @@ class DatasetArranger:
     def arrange_strains_selected(self) -> None:
         """Arrange the strains selected file.
 
-        Validate the strains selected file if it exists.
-        The validation checks if the strains selected file is a valid JSON file according to the
-        schema defined in `schemas/user_strains.json`.
+        If the file exists, validate it according to the schema defined in `user_strains.json`.
         """
         strains_selected_file = self.root_dir / defaults.STRAINS_SELECTED_FILENAME
         if strains_selected_file.exists():
@@ -376,10 +395,10 @@ def validate_gnps(gnps_dir: str | PathLike) -> None:
 
     The GNPS data directory must contain the following files:
 
-    - file_mappings.tsv or file_mappings.csv
-    - spectra.mgf
-    - molecular_families.tsv
-    - annotations.tsv
+    - `file_mappings.tsv` or `file_mappings.csv`
+    - `spectra.mgf`
+    - `molecular_families.tsv`
+    - `annotations.tsv`
 
     Args:
         gnps_dir: Path to the GNPS data directory.
@@ -425,12 +444,11 @@ def validate_antismash(antismash_dir: str | PathLike) -> None:
     It does not check
 
     - the content of the BGC files
-    - the consistency between the antiSMASH data and the PODP project JSON file for the PODP
-        mode
+    - the consistency between the antiSMASH data and the PODP project JSON file for the `podp` mode
 
     The antiSMASH data directory must exist and contain at least one sub-directory. The name of the
     sub-directories must not contain any space. Each sub-directory must contain at least one BGC
-    file (with the suffix ".region???.gbk" where ??? is the region number).
+    file (with the suffix `.region???.gbk` where `???` is the region number).
 
     Args:
         antismash_dir: Path to the antiSMASH data directory.
@@ -468,7 +486,7 @@ def validate_bigscape(bigscape_dir: str | PathLike, cutoff: str) -> None:
     """Validate the BiG-SCAPE data directory and its contents.
 
     The BiG-SCAPE data directory must exist and contain the clustering file
-    "mix_clustering_c{self.config.bigscape.cutoff}.tsv" where {self.config.bigscape.cutoff} is the
+    `mix_clustering_c{self.config.bigscape.cutoff}.tsv` where `{self.config.bigscape.cutoff}` is the
     bigscape cutoff value set in the config file.
 
     Alternatively, the directory can contain the BiG-SCAPE database file generated by BiG-SCAPE v2.

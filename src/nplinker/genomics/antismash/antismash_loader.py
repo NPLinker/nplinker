@@ -18,28 +18,26 @@ logger = logging.getLogger(__name__)
 
 
 class AntismashBGCLoader(BGCLoaderBase):
-    """Build a loader for AntiSMASH BGC genbank (.gbk) files.
-
-    Note:
-        AntiSMASH BGC directory must follow the structure below:
-        ```
-        antismash
-            ├── genome_id_1 (one AntiSMASH output, e.g. GCF_000514775.1)
-            │  ├── GCF_000514775.1.gbk
-            │  ├── NZ_AZWO01000004.region001.gbk
-            │  └── ...
-            ├── genome_id_2
-            │  ├── ...
-            └── ...
-        ```
-    """
+    """Data loader for AntiSMASH BGC genbank (.gbk) files."""
 
     def __init__(self, data_dir: str | PathLike) -> None:
         """Initialize the AntiSMASH BGC loader.
 
         Args:
-            data_dir: Path to AntiSMASH directory that contains a
-                collection of AntiSMASH outputs.
+            data_dir: Path to AntiSMASH directory that contains a collection of AntiSMASH outputs.
+
+        Notes:
+            The input `data_dir` must follow the structure defined in the
+            [Working Directory Structure][working-directory-structure] for AntiSMASH data, e.g.:
+            ```shell
+            antismash
+                ├── genome_id_1                  # one AntiSMASH output, e.g. GCF_000514775.1
+                │  ├── NZ_AZWO01000004.region001.gbk
+                │  └── ...
+                ├── genome_id_2
+                │  ├── ...
+                └── ...
+            ```
         """
         self.data_dir = str(data_dir)
         self._file_dict = self._parse_data_dir(self.data_dir)
@@ -48,7 +46,8 @@ class AntismashBGCLoader(BGCLoaderBase):
     def get_bgc_genome_mapping(self) -> dict[str, str]:
         """Get the mapping from BGC to genome.
 
-        Note that the directory name of the gbk file is treated as genome id.
+        !!! info
+            The directory name of the gbk files is treated as genome id.
 
         Returns:
             The key is BGC name (gbk file name) and value is genome id (the directory name of the

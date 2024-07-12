@@ -28,10 +28,10 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 
 
 
 class GenomeStatus:
-    """A class to represent the status of a single genome.
+    """Class to represent the status of a single genome.
 
-    The status of genomes is tracked in a JSON file which has a name defined
-    in variable `GENOME_STATUS_FILENAME`.
+    The status of genomes is tracked in the file
+    [GENOME_STATUS_FILENAME][nplinker.defaults.GENOME_STATUS_FILENAME].
     """
 
     def __init__(
@@ -132,18 +132,21 @@ def podp_download_and_extract_antismash_data(
     """Download and extract antiSMASH BGC archive for the given genome records.
 
     Args:
-        genome_records: list of dicts
-            representing genome records. The dict of each genome record contains
-                - key(str): "genome_ID"
-                - value(dict[str, str]): a dict containing information about genome
-                type, label and accession ids (RefSeq, GenBank, and/or JGI).
+        genome_records: list of dicts representing genome records.
+
+            The dict of each genome record contains a key of genome ID with a value
+            of another dict containing information about genome type, label and
+            accession ids (RefSeq, GenBank, and/or JGI).
         project_download_root: Path to the directory to place
             downloaded archive in.
-        project_extract_root: Path to the directory downloaded archive
-            will be extracted to.
+        project_extract_root: Path to the directory downloaded archive will be extracted to.
+
             Note that an `antismash` directory will be created in the specified
             `extract_root` if it doesn't exist. The files will be extracted to
             `<extract_root>/antismash/<antismash_id>` directory.
+
+    Warnings:
+        UserWarning: when no antiSMASH data is found for some genomes.
     """
     if not Path(project_download_root).exists():
         # otherwise in case of failed first download, the folder doesn't exist and

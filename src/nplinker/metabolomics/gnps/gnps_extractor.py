@@ -9,7 +9,10 @@ from .gnps_format import gnps_format_from_archive
 
 
 class GNPSExtractor:
-    """Class to extract files from a GNPS molecular networking archive(.zip).
+    """Extract files from a GNPS molecular networking archive (.zip).
+
+    ??? info "Concept"
+        [GNPS data][gnps-data]
 
     Four files are extracted and renamed to the following names:
 
@@ -36,6 +39,10 @@ class GNPSExtractor:
         - spectra/*.mgf
         - networkedges_selfloop/*.selfloop
         - DB_result/*.tsv
+
+    Attributes:
+        gnps_format: The GNPS workflow type.
+        extract_dir: The path where to extract the files to.
     """
 
     def __init__(self, file: str | PathLike, extract_dir: str | PathLike):

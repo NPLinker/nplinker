@@ -6,10 +6,16 @@ logger = logging.getLogger(__name__)
 
 
 class Strain:
-    """To model the mapping between strain id and its aliases.
+    """Class to model the mapping between strain id and its aliases.
 
     It's recommended to use NCBI taxonomy strain id or name as the primary
     id.
+
+
+    Attributes:
+        id: The representative id of the strain.
+        names: A set of names associated with the strain.
+        aliases: A set of aliases associated with the strain.
     """
 
     def __init__(self, id: str) -> None:
@@ -64,10 +70,10 @@ class Strain:
         return self._aliases
 
     def add_alias(self, alias: str) -> None:
-        """Add an alias to the list of known aliases.
+        """Add an alias for the strain.
 
         Args:
-            alias: The alias to add to the list of known aliases.
+            alias: The alias to add for the strain.
         """
         if not isinstance(alias, str):
             raise TypeError(f"Expected str, got {type(alias)}")

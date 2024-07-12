@@ -27,6 +27,10 @@ theme:
     - content.code.copy
     - announce.dismiss
     - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.suggest
   icon:
     logo: 'material/library-outline'
     previous: fontawesome/solid/angle-left
@@ -65,9 +69,12 @@ nav:
   - Dataset Arranger: diagrams/arranger.md
   - Dataset Loader: diagrams/loader.md
 - API Documentation:
-  - NPLinker: api/nplinker.md
-  - Dataset Arranger: api/arranger.md
-  - Dataset Loader: api/loader.md
+  - NPLinker Core:
+    - NPLinker: api/nplinker.md
+    - Dataset Arranger: api/arranger.md
+    - Dataset Loader: api/loader.md
+    - Schemas: api/schema.md
+    - Utilities: api/utils.md
   - Genomics Data:
     - Abstract Base Classes: api/genomics_abc.md
     - Data Models: api/genomics.md
@@ -88,8 +95,6 @@ nav:
     - Scoring Methods: api/scoring_methods.md
     - Data Models: api/scoring.md
     - Utilities: api/scoring_utils.md
-  - Schemas: api/schema.md
-  - General Utilities: api/utils.md
 
 markdown_extensions:
 # https://python-markdown.github.io/extensions/
@@ -110,8 +115,9 @@ markdown_extensions:
 - pymdownx.tabbed:
     alternate_style: true
 - pymdownx.magiclink
-- pymdownx.snippets: # use files outside of docs folder 
-    base_path: [., ./src/nplinker, ./src/nplinker/data]
+- pymdownx.keys
+- pymdownx.snippets: # use files outside of docs folder, syntax is `--8<-- "path/to/file"`
+    base_path: [.]
 
 watch:
 - docs
@@ -121,12 +127,14 @@ plugins:
     alias_type: symlink
     canonical_version: latest
 - search
+- autorefs # https://mkdocstrings.github.io/usage/#cross-references-to-any-markdown-heading
 - exclude:
     glob:
     - __pycache__/*
 - mkdocstrings:
     handlers:
       python:
+        # https://mkdocstrings.github.io/python/usage/#configuration
         paths: [src]
         import:
           - https://docs.python.org/3/objects.inv
@@ -134,16 +142,21 @@ plugins:
           - https://docs.scipy.org/doc/scipy/objects.inv
           - https://pandas.pydata.org/docs/objects.inv
         options:
+          # NOTE: some options are not available for free, e.g. `show_inheritance_diagram` and `summary`. 
+          # Members options
           members_order: source
-          filters: ["!^_"]
+          filters: ["!^_[^_]", "!^__all__$", "!^logger$"] # exclude private objects, "__all__" and "logger" 
+          # Docstrings options
+          docstring_section_style: list
           docstring_options:
             ignore_init_summary: true
           merge_init_into_class: true
           show_if_no_docstring: true
-          show_root_heading: true
-          show_root_full_path: false
+          # Signatures/annotations options
           show_signature_annotations: true
           signature_crossrefs: true
           separate_signature: true
+          # Headings options
+          show_root_heading: true
           show_symbol_type_heading: true
           show_symbol_type_toc: true

@@ -1,3 +1,4 @@
+# How to setup logging
 NPLinker uses the standard library [logging](https://docs.python.org/3/library/logging.html#module-logging) 
 module for managing log messages and the python library [rich](https://rich.readthedocs.io/en/latest/logging.html) 
 to colorize the log messages. Depending on how you use NPLinker, you can set up logging in different ways.

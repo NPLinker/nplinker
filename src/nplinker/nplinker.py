@@ -6,6 +6,7 @@ from os import PathLike
 from pprint import pformat
 from typing import Any
 from typing import overload
+from dynaconf import Dynaconf
 from .arranger import DatasetArranger
 from .config import load_config
 from .defaults import OUTPUT_DIRNAME
@@ -24,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 class NPLinker:
-    """Main class for the NPLinker application.
+    """The central class of NPLinker application.
 
     Attributes:
         config: The configuration object for the current NPLinker application.
@@ -38,26 +39,6 @@ class NPLinker:
         strains: A StrainCollection object containing all Strain objects.
         product_types: A list of all BiGSCAPE product types.
         scoring_methods: A list of all valid scoring methods.
-
-
-    Examples:
-        To start a NPLinker application:
-        >>> from nplinker import NPLinker
-        >>> npl = NPLinker("path/to/config.toml")
-
-        To load all data into memory:
-        >>> npl.load_data()
-
-        To check the number of GCF objects:
-        >>> len(npl.gcfs)
-
-        To get the links for all GCF objects using the Metcalf scoring method, the result is a
-        LinkGraph object:
-        >>> lg = npl.get_links(npl.gcfs, "metcalf")
-
-        To get the link data between two objects:
-        >>> link_data = lg.get_link_data(npl.gcfs[0], npl.spectra[0])
-        {"metcalf": Score("metcalf", 1.0, {"cutoff": 0, "standardised": False})}
     """
 
     # Valid scoring methods
@@ -72,9 +53,32 @@ class NPLinker:
 
         Args:
             config_file: Path to the configuration file to use.
+
+
+        Examples:
+            Starting the NPLinker application:
+            >>> from nplinker import NPLinker
+            >>> npl = NPLinker("path/to/config.toml")
+
+            Loading data from files to python objects:
+            >>> npl.load_data()
+
+            Checking the number of GCF objects:
+            >>> len(npl.gcfs)
+
+            Getting the links for all GCF objects using the Metcalf scoring method, and the result
+            is stored in a [LinkGraph][nplinker.scoring.LinkGraph] object:
+            >>> lg = npl.get_links(npl.gcfs, "metcalf")
+
+            Getting the link data between two objects:
+            >>> link_data = lg.get_link_data(npl.gcfs[0], npl.spectra[0])
+            {"metcalf": Score("metcalf", 1.0, {"cutoff": 0, "standardised": False})}
+
+            Saving the data to a pickle file:
+            >>> npl.save_data("path/to/output.pkl", lg)
         """
         # Load the configuration file
-        self.config = load_config(config_file)
+        self.config: Dynaconf = load_config(config_file)
 
         # Setup logging for the application
         setup_logging(
@@ -165,11 +169,17 @@ class NPLinker:
         return list(self._valid_scoring_methods.keys())
 
     def load_data(self):
-        """Load all data from local files into memory.
+        """Load all data from files into memory.
 
-        This method is a convenience function that calls the `DatasetArranger` and `DatasetLoader`
-        classes to load all data from the local filesystem into memory. The loaded data is then
-        stored in various private data containers for easy access.
+        This method is a convenience function that calls the
+        [`DatasetArranger`][nplinker.arranger.DatasetArranger] class to arrange data files
+        (download, generate and/or validate data) in the [correct directory structure][working-directory-structure],
+        and then calls the [`DatasetLoader`][nplinker.loader.DatasetLoader] class to load all data
+        from the files into memory.
+
+        The loaded data is stored in various data containers for easy access, e.g.
+        [`self.bgcs`][nplinker.NPLinker.bgcs] for all BGC objects,
+        [`self.strains`][nplinker.NPLinker.strains] for all Strain objects, etc.
         """
         arranger = DatasetArranger(self.config)
         arranger.arrange()
@@ -210,16 +220,24 @@ class NPLinker:
         scoring_method: str,
         **scoring_params: Any,
     ) -> LinkGraph:
-        """Get the links for the given objects using the specified scoring method and parameters.
+        """Get links for the given objects using the specified scoring method and parameters.
 
         Args:
-            objects: A sequence of objects to get the links for. The objects must be of the same
+            objects: A sequence of objects to get links for. The objects must be of the same
                 type, i.e. `BGC`, `GCF`, `Spectrum` or `MolecularFamily` type.
-                For scoring method `metcalf`, the BGC objects are not supported.
+                !!! Warning
+                    For scoring method `metcalf`, the `BGC` objects are not supported.
             scoring_method: The scoring method to use. Must be one of the valid scoring methods
-                `self.scoring_methods`, such as "metcalf".
-            scoring_params: Parameters to pass to the scoring method. If not provided, the default
-                parameters for the scoring method will be used.
+                [`self.scoring_methods`][nplinker.NPLinker.scoring_methods], such as `metcalf`.
+            scoring_params: Parameters to pass to the scoring method. If not given, the default
+                parameters of the specified scoring method will be used.
+
+                Check the `get_links` method of the scoring method class for the available
+                parameters and their default values.
+
+                | Scoring Method | Scoring Parameters |
+                | -------------- | ------------------ |
+                | `metcalf` | [`cutoff`, `standardised`][nplinker.scoring.MetcalfScoring.get_links] |
 
         Returns:
             A LinkGraph object containing the links for the given objects.
@@ -227,6 +245,13 @@ class NPLinker:
         Raises:
             ValueError: If input objects are empty or if the scoring method is invalid.
             TypeError: If the input objects are not of the same type or if the object type is invalid.
+
+        Examples:
+            Using default scoring parameters:
+            >>> lg = npl.get_links(npl.gcfs, "metcalf")
+
+            Scoring parameters provided:
+            >>> lg = npl.get_links(npl.gcfs, "metcalf", cutoff=0.5, standardised=True)
         """
         # Validate objects
         if len(objects) == 0:
@@ -264,6 +289,11 @@ class NPLinker:
 
         Returns:
             The BGC object with the given ID, or None if no such object exists.
+
+        Examples:
+            >>> bgc = npl.lookup_bgc("BGC000001")
+            >>> bgc
+            BGC(id="BGC000001", ...)
         """
         return self._bgc_dict.get(id, None)
 
@@ -307,13 +337,20 @@ class NPLinker:
     ) -> None:
         """Pickle data to a file.
 
-        The data to be pickled is a tuple containing the BGCs, GCFs, Spectra, MolecularFamilies,
-        StrainCollection and links, i.e. `(bgcs, gcfs, spectra, mfs, strains, links)`. If the links
-        are not provided, `None` will be used.
+        The  pickled data is a tuple of BGCs, GCFs, Spectra, MolecularFamilies, StrainCollection and
+        links, i.e. `(bgcs, gcfs, spectra, mfs, strains, links)`.
 
         Args:
             file: The path to the pickle file to save the data to.
             links: The LinkGraph object to save.
+
+        Examples:
+            Saving the data to a pickle file, links data is `None`:
+            >>> npl.save_data("path/to/output.pkl")
+
+            Also saving the links data:
+            >>> lg = npl.get_links(npl.gcfs, "metcalf")
+            >>> npl.save_data("path/to/output.pkl", lg)
         """
         data = (self.bgcs, self.gcfs, self.spectra, self.mfs, self.strains, links)
         with open(file, "wb") as f:

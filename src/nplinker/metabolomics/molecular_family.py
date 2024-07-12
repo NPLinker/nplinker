@@ -14,6 +14,8 @@ class MolecularFamily:
     Attributes:
         id: Unique id for the molecular family.
         spectra_ids: Set of spectrum ids in the molecular family.
+        spectra: Set of Spectrum objects in the molecular family.
+        strains: StrainCollection object that contains strains in the molecular family.
     """
 
     def __init__(self, id: str):
@@ -97,7 +99,7 @@ class MolecularFamily:
         """Check if the molecular family contains only one spectrum.
 
         Returns:
-            True when `MolecularFamily.spectra_ids` contains only one spectrum id.
+            True when the molecular family has only one spectrum.
         """
         return len(self.spectra_ids) == 1
 

@@ -10,7 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 class GNPSSpectrumLoader(SpectrumLoaderBase):
-    """Class to load mass spectra from the given GNPS MGF file.
+    """Load mass spectra from the given GNPS MGF file.
+
+    ??? info "Concept"
+        [GNPS data][gnps-data]
 
     The file mappings file is from GNPS output archive, as described below
     for each GNPS workflow type:
@@ -23,7 +26,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
         - spectra/*.mgf
     """
 
-    def __init__(self, file: str | PathLike):
+    def __init__(self, file: str | PathLike) -> None:
         """Initialize the GNPSSpectrumLoader.
 
         Args:
@@ -51,7 +54,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
         """
         return self._spectra
 
-    def _validate(self):
+    def _validate(self) -> None:
         """Validate GNPS MGF file.
 
         Raises:
@@ -70,7 +73,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
                         f"but got '{spec['params']}'."
                     )
 
-    def _load(self):
+    def _load(self) -> None:
         """Load the MGF file into Spectrum objects."""
         for spec in mgf.MGF(self._file):
             # Skip if m/z array is empty, as this is an invalid spectrum.

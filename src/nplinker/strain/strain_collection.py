@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class StrainCollection:
-    """A collection of Strain objects."""
+    """A collection of `Strain` objects."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         # the order of strains is needed for scoring part, so use a list
         self._strains: list[Strain] = []
         self._strain_dict_name: dict[str, list[Strain]] = {}
@@ -84,11 +84,11 @@ class StrainCollection:
                 else:
                     self._strain_dict_name[name].append(strain)
 
-    def remove(self, strain: Strain):
+    def remove(self, strain: Strain) -> None:
         """Remove a strain from the collection.
 
         It removes the given strain object from the collection by strain id.
-        If the strain id is not found, raise ValueError.
+        If the strain id is not found, raise `ValueError`.
 
         Args:
             strain: The strain to remove.
@@ -111,7 +111,7 @@ class StrainCollection:
             raise ValueError(f"Strain {strain} not found in the strain collection.")
 
     def filter(self, strain_set: set[Strain]):
-        """Remove all strains that are not in strain_set from the strain collection.
+        """Remove all strains that are not in `strain_set` from the strain collection.
 
         Args:
             strain_set: Set of strains to keep.
@@ -164,14 +164,14 @@ class StrainCollection:
         raise ValueError(f"Strain {name} not found in the strain collection.")
 
     @staticmethod
-    def read_json(file: str | PathLike) -> "StrainCollection":
-        """Read a strain mappings JSON file and return a StrainCollection object.
+    def read_json(file: str | PathLike) -> StrainCollection:
+        """Read a strain mappings JSON file and return a `StrainCollection` object.
 
         Args:
             file: Path to the strain mappings JSON file.
 
         Returns:
-            StrainCollection object.
+            `StrainCollection` object.
         """
         with open(file, "r") as f:
             json_data = json.load(f)
@@ -188,14 +188,13 @@ class StrainCollection:
         return strain_collection
 
     def to_json(self, file: str | PathLike | None = None) -> str | None:
-        """Convert the StrainCollection object to a JSON string.
+        """Convert the `StrainCollection` object to a JSON string.
 
         Args:
-            file: Path to output JSON file. If None,
-                return the JSON string instead.
+            file: Path to output JSON file. If None, return the JSON string instead.
 
         Returns:
-            If `file` is None, return the JSON string. Otherwise, write the JSON string to the given
+            If input `file` is None, return the JSON string. Otherwise, write the JSON string to the given
             file.
         """
         data_list = [

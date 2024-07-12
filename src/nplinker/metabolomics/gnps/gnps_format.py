@@ -14,11 +14,13 @@ GNPS_TASK_URL = "https://gnps.ucsd.edu/ProteoSAFe/status.jsp?task={}"
 
 @unique
 class GNPSFormat(Enum):
-    """Enum class for GNPS format (workflow).
+    """Enum class for GNPS formats or workflows.
 
-    The GNPS format refers to the GNPS workflow. The name of the enum is a
-    simple short name for the workflow, and the value of the enum is the actual
-    name of the workflow in the GNPS website.
+    ??? info "Concept"
+        [GNPS data][gnps-data]
+
+    The name of the enum is a short name for the workflow, and the value of the enum is the workflow
+    name used on the GNPS website.
     """
 
     # Format: ShortName = "GNPSWorkflowName"
@@ -38,10 +40,14 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
         The format identified in the GNPS task.
 
     Examples:
-        >>> gnps_format_from_task_id("c22f44b14a3d450eb836d607cb9521bb") == GNPSFormat.SNETS
-        >>> gnps_format_from_task_id("189e8bf16af145758b0a900f1c44ff4a") == GNPSFormat.SNETSV2
-        >>> gnps_format_from_task_id("92036537c21b44c29e509291e53f6382") == GNPSFormat.FBMN
-        >>> gnps_format_from_task_id("0ad6535e34d449788f297e712f43068a") == GNPSFormat.Unknown
+        >>> gnps_format_from_task_id("c22f44b14a3d450eb836d607cb9521bb")
+        <GNPSFormat.SNETS: 'METABOLOMICS-SNETS'>
+        >>> gnps_format_from_task_id("189e8bf16af145758b0a900f1c44ff4a")
+        <GNPSFormat.SNETSV2: 'METABOLOMICS-SNETS-V2'>
+        >>> gnps_format_from_task_id("92036537c21b44c29e509291e53f6382")
+        <GNPSFormat.FBMN: 'FEATURE-BASED-MOLECULAR-NETWORKING'>
+        >>> gnps_format_from_task_id("0ad6535e34d449788f297e712f43068a")
+        <GNPSFormat.Unknown: 'Unknown-GNPS-Workflow'>
     """
     task_html = httpx.get(GNPS_TASK_URL.format(task_id))
     soup = BeautifulSoup(task_html.text, features="html.parser")
@@ -62,21 +68,24 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
 
 
 def gnps_format_from_archive(zip_file: str | PathLike) -> GNPSFormat:
-    """Detect GNPS format from a downloaded GNPS zip archive.
+    """Detect GNPS format from GNPS zip archive.
 
     The detection is based on the filename of the zip file and the names of the
     files contained in the zip file.
 
     Args:
-        zip_file: Path to the downloaded GNPS zip file.
+        zip_file: Path to the GNPS zip file.
 
     Returns:
         The format identified in the GNPS zip file.
 
     Examples:
-        >>> gnps_format_from_archive("downloads/ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip") == GNPSFormat.SNETS
-        >>> gnps_format_from_archive("downloads/ProteoSAFe-METABOLOMICS-SNETS-V2-189e8bf1-download_clustered_spectra.zip") == GNPSFormat.SNETSV2
-        >>> gnps_format_from_archive("downloads/ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-672d0a53-download_cytoscape_data.zip") == GNPSFormat.FBMN
+        >>> gnps_format_from_archive("ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip")
+        <GNPSFormat.SNETS: 'METABOLOMICS-SNETS'>
+        >>> gnps_format_from_archive("ProteoSAFe-METABOLOMICS-SNETS-V2-189e8bf1-download_clustered_spectra.zip")
+        <GNPSFormat.SNETSV2: 'METABOLOMICS-SNETS-V2'>
+        >>> gnps_format_from_archive("ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-672d0a53-download_cytoscape_data.zip")
+        <GNPSFormat.FBMN: 'FEATURE-BASED-MOLECULAR-NETWORKING'>
     """
     file = Path(zip_file)
     # Guess the format from the filename of the zip file
@@ -108,9 +117,12 @@ def gnps_format_from_file_mapping(file: str | PathLike) -> GNPSFormat:
     The GNPS file mapping file is located in different folders depending on the
     GNPS workflow. Here are the locations in corresponding GNPS zip archives:
 
-    - METABOLOMICS-SNETS workflow: the .tsv file under folder "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
-    - METABOLOMICS-SNETS-V2 workflow: the .clustersummary file (tsv) under folder "clusterinfosummarygroup_attributes_withIDs_withcomponentID"
-    - FEATURE-BASED-MOLECULAR-NETWORKING workflow: the .csv file under folder "quantification_table"
+    - `METABOLOMICS-SNETS` workflow: the `.tsv` file in the folder
+        `clusterinfosummarygroup_attributes_withIDs_withcomponentID`
+    - `METABOLOMICS-SNETS-V2` workflow: the `.clustersummary` file (tsv) in the folder
+        `clusterinfosummarygroup_attributes_withIDs_withcomponentID`
+    - `FEATURE-BASED-MOLECULAR-NETWORKING` workflow: the `.csv` file in the folder
+        `quantification_table`
 
     Args:
         file: Path to the file to peek the format for.

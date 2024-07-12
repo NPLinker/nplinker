@@ -38,7 +38,10 @@ logger = logging.getLogger(__name__)
 def check_disk_space(func):
     """A decorator to check available disk space.
 
-    If the available disk space is less than 500GB, a warning is logged and a warning is raised.
+    If the available disk space is less than 500GB, raise and log a warning.
+
+    Warnings:
+        UserWarning: If the available disk space is less than 500GB.
     """
 
     @functools.wraps(func)
@@ -336,7 +339,7 @@ def _detect_file_type(file: str | Path) -> tuple[str, str | None, str | None]:
 def _decompress(
     from_path: Path | str, to_path: Path | str | None = None, remove_finished: bool = False
 ) -> str:
-    r"""Decompress a file.
+    """Decompress a file.
 
     The compression is automatically detected from the file name.
 
@@ -375,8 +378,9 @@ def extract_archive(
     """Extract an archive.
 
     The archive type and a possible compression is automatically detected from
-    the file name. If the file is compressed but not an archive the call is
-    dispatched to :func:`decompress`.
+    the file name.
+
+    If the file is compressed but not an archive, the call is dispatched to `_decompress` function.
 
     Args:
         from_path: Path to the file to be extracted.
@@ -429,9 +433,10 @@ def download_and_extract_archive(
     md5: str | None = None,
     remove_finished: bool = False,
 ) -> None:
-    """Download a file from url and extract it.
+    """Download an archive file and then extract it.
 
-       This method is a wrapper of `download_url` and `extract_archive` methods.
+    This method is a wrapper of [`download_url`][nplinker.utils.download_url] and
+    [`extract_archive`][nplinker.utils.extract_archive] functions.
 
     Args:
         url: URL to download file from
