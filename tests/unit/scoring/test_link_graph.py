@@ -90,8 +90,8 @@ def test_filter(gcfs, spectra, score):
     lg.add_link(gcfs[0], spectra[0], metcalf=score)
     lg.add_link(gcfs[1], spectra[1], metcalf=score)
 
-    u_nodes = [gcfs[0], gcfs[1]]
-    v_nodes = [spectra[0], spectra[1]]
+    u_nodes = [gcfs[0], gcfs[1], gcfs[2]]
+    v_nodes = [spectra[0], spectra[1], spectra[2]]
 
     # test filtering with GCFs
     lg_filtered = lg.filter(u_nodes)

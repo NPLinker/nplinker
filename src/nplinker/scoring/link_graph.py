@@ -258,9 +258,13 @@ class LinkGraph:
     @validate_u
     def _filter_one_node(self, u: Entity, lg: LinkGraph) -> None:
         """Filter the links for a given object and add them to the new LinkGraph object."""
-        links = self[u]
-        for node2, value in links.items():
-            lg.add_link(u, node2, **value)
+        try:
+            links = self[u]
+        except KeyError:
+            pass
+        else:
+            for node2, value in links.items():
+                lg.add_link(u, node2, **value)
 
     @validate_uv
     def _filter_two_nodes(self, u: Entity, v: Entity, lg: LinkGraph) -> None:
