@@ -1,5 +1,8 @@
 name: cffconvert
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:

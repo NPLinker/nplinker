@@ -1,5 +1,8 @@
 name: Check format and static typing
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:

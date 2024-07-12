@@ -1,6 +1,13 @@
 name: Draft or publish Github release
 # this action will automatically create a tag for the latest commit
 
+permissions:
+  actions: write
+  contents: write
+  packages: write
+  pull-requests: write
+  statuses: read
+
 on:
   workflow_dispatch:
     inputs:

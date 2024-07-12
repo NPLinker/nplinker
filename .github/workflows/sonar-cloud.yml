@@ -1,5 +1,7 @@
 name: Check coverage
 
+permissions: read-all
+
 on:
   push:
     branches:
