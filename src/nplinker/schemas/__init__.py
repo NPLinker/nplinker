@@ -58,7 +58,7 @@ with open(_schema_dir / "podp_adapted_schema.json", "r") as f:
     PODP_ADAPTED_SCHEMA = json.load(f)
     """Schema for PODP JSON file.
 
-    The PODP JSON file is the project JSON file downloaded from PODP platform. 
+    The PODP JSON file is the project JSON file downloaded from PODP platform.
     For example, for PODP project MSV000079284, its JSON file is
     https://pairedomicsdata.bioinformatics.nl/api/projects/4b29ddc3-26d0-40d7-80c5-44fb6631dbf9.4.
 
