@@ -79,7 +79,7 @@ class LinkGraph:
             >>> lg[gcf]
             {spectrum: {"metcalf": Score("metcalf", 1.0, {"cutoff": 0.5})}}
 
-            Get all links:
+            Get all links in the LinkGraph:
             >>> lg.links
             [(gcf, spectrum, {"metcalf": Score("metcalf", 1.0, {"cutoff": 0.5})})]
 
@@ -129,6 +129,10 @@ class LinkGraph:
 
         Returns:
             A list of tuples containing the links between objects.
+
+        Examples:
+            >>> lg.links
+            [(gcf, spectrum, {"metcalf": Score("metcalf", 1.0, {"cutoff": 0.5})})]
         """
         return list(self._g.edges(data=True))
 
@@ -150,6 +154,9 @@ class LinkGraph:
             data: keyword arguments. At least one scoring method and its data must be provided.
                 The key must be the name of the scoring method defined in `ScoringMethod`, and the
                 value is a `Score` object, e.g. `metcalf=Score("metcalf", 1.0, {"cutoff": 0.5})`.
+
+        Examples:
+            >>> lg.add_link(gcf, spectrum, metcalf=Score("metcalf", 1.0, {"cutoff": 0.5}))
         """
         # validate the data
         if not data:
@@ -174,6 +181,10 @@ class LinkGraph:
 
         Returns:
             True if there is a link between the two objects, False otherwise
+
+        Examples:
+            >>> lg.has_link(gcf, spectrum)
+            True
         """
         return self._g.has_edge(u, v)
 
@@ -192,5 +203,9 @@ class LinkGraph:
         Returns:
             A dictionary of scoring methods and their data for the link between the two objects, or
             None if there is no link between the two objects.
+
+        Examples:
+            >>> lg.get_link_data(gcf, spectrum)
+            {"metcalf": Score("metcalf", 1.0, {"cutoff": 0.5})}
         """
         return self._g.get_edge_data(u, v)  # type: ignore
