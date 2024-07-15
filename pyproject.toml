@@ -57,7 +57,7 @@ dev = [
     # static typing
     "mypy",
     "typing_extensions",
-    # stub packages 
+    # stub packages. Update the `format-typing-check.yml` too if you add more.
     "types-Deprecated",
     "types-beautifulsoup4",
     "types-jsonschema",
