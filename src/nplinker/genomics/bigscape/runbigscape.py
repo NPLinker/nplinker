@@ -58,6 +58,7 @@ def run_bigscape(
         raise Exception(f'antismash_path "{antismash_path}" does not exist!')
 
 
+    logger.info(f"Running BiG-SCAPE version {version}")
     logger.info(
         f'run_bigscape: input="{antismash_path}", output="{output_path}", extra_params={extra_params}"'
     )
