@@ -47,10 +47,6 @@ def run_bigscape(
     else:
         raise ValueError("Unexpected BiG-SCAPE version number specified")
 
-    logger.info(
-        f'run_bigscape: input="{antismash_path}", output="{output_path}", extra_params={extra_params}"'
-    )
-
     try:
         subprocess.run([bigscape_py_path, "-h"], capture_output=True, check=True)
     except Exception as e:
@@ -60,6 +56,11 @@ def run_bigscape(
 
     if not os.path.exists(antismash_path):
         raise Exception(f'antismash_path "{antismash_path}" does not exist!')
+
+
+    logger.info(
+        f'run_bigscape: input="{antismash_path}", output="{output_path}", extra_params={extra_params}"'
+    )
 
     # assemble arguments. first argument is the python file
     args = [bigscape_py_path]
