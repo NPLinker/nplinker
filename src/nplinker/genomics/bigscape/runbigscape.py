@@ -83,9 +83,13 @@ def run_bigscape(
     logger.info(f"BiG-SCAPE command: {args}")
     result = subprocess.run(args, stdout=sys.stdout, stderr=sys.stderr, check=True)
     logger.info(f"BiG-SCAPE completed with return code {result.returncode}")
-    # use subprocess.CompletedProcess.check_returncode() to test if the BiG-SCAPE
-    # process exited successfully. This throws an exception for non-zero returncodes
-    # which will indicate to the PODPDownloader module that something went wrong.
-    result.check_returncode()
 
-    return True
+    # return true on any non-error return code
+    if result.returncode == 0:
+        return True
+
+    # otherwise log details and raise a runtime error
+    logger.error(f"BiG-SCAPE failed with return code {result.returncode}")
+    logger.error(f"output: {result.stdout}")
+
+    raise RuntimeError(f"Failed to run BiG-SCAPE with error code {result.returncode}")
