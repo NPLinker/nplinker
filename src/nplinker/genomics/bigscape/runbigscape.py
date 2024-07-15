@@ -44,6 +44,8 @@ def run_bigscape(
         bigscape_py_path = "bigscape.py"
     elif version == 2:
         bigscape_py_path = "bigscape-v2.py"
+    else:
+        raise ValueError("Unexpected BiG-SCAPE version number specified")
 
     logger.info(
         f'run_bigscape: input="{antismash_path}", output="{output_path}", extra_params={extra_params}"'
