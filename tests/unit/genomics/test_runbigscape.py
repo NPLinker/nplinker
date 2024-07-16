@@ -25,7 +25,7 @@ class TestRunBigscape:
         assert result is True
 
     def test_run_bigscape_wrong_version(self, tmp_path):
-        with pytest.raises(Exception) as e:
+        with pytest.raises(ValueError) as e:
             bigscape.run_bigscape(
                 antismash_path=DATA_DIR,
                 output_path=tmp_path,
