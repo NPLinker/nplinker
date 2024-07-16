@@ -1,11 +1,11 @@
 import pytest
-from nplinker.genomics.bigscape.runbigscape import run_bigscape
+from nplinker.genomics import bigscape
 from .. import DATA_DIR
 
 
 class TestRunBigscape:
     def test_run_bigscape_v1(self, tmp_path):
-        result = run_bigscape(
+        result = bigscape.run_bigscape(
             antismash_path=DATA_DIR,
             output_path=tmp_path,
             extra_params="--help",
@@ -15,7 +15,7 @@ class TestRunBigscape:
         assert result is True
 
     def test_run_bigscape_v2(self, tmp_path):
-        result = run_bigscape(
+        result = bigscape.run_bigscape(
             antismash_path=DATA_DIR,
             output_path=tmp_path,
             extra_params="--help",
@@ -26,7 +26,7 @@ class TestRunBigscape:
 
     def test_run_bigscape_wrong_version(self, tmp_path):
         with pytest.raises(Exception) as e:
-            run_bigscape(
+            bigscape.run_bigscape(
                 antismash_path=DATA_DIR,
                 output_path=tmp_path,
                 extra_params="--help",
@@ -37,7 +37,7 @@ class TestRunBigscape:
 
     def test_input_path_not_exist_v1(self, tmp_path):
         with pytest.raises(FileNotFoundError) as e:
-            run_bigscape(
+            bigscape.run_bigscape(
                 antismash_path=tmp_path / "not_exist",
                 output_path=tmp_path,
                 extra_params="",
@@ -48,7 +48,7 @@ class TestRunBigscape:
 
     def test_input_path_not_exist_v2(self, tmp_path):
         with pytest.raises(FileNotFoundError) as e:
-            run_bigscape(
+            bigscape.run_bigscape(
                 antismash_path=tmp_path / "not_exist",
                 output_path=tmp_path,
                 extra_params="",
