@@ -57,7 +57,6 @@ def run_bigscape(
     if not os.path.exists(antismash_path):
         raise FileNotFoundError(f'antismash_path "{antismash_path}" does not exist!')
 
-
     logger.info(f"Running BiG-SCAPE version {version}")
     logger.info(
         f'run_bigscape: input="{antismash_path}", output="{output_path}", extra_params={extra_params}"'
@@ -90,6 +89,6 @@ def run_bigscape(
 
     # otherwise log details and raise a runtime error
     logger.error(f"BiG-SCAPE failed with return code {result.returncode}")
-    logger.error(f"output: {result.stdout}")
+    logger.error(f"output: {str(result.stdout)}")
 
     raise RuntimeError(f"Failed to run BiG-SCAPE with error code {result.returncode}")
