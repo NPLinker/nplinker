@@ -1,0 +1,18 @@
+# NPLinker default configurations
+
+[log]
+level = "INFO"
+use_console = true
+
+[mibig]
+to_use = true
+version = "3.1"
+
+[bigscape]
+version = 1
+parameters = "--mibig --clans-off --mix --include_singletons --cutoffs 0.30"
+
+cutoff = "0.30"
+
+[scoring]
+methods = ["metcalf"]

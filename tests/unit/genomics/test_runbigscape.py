@@ -35,13 +35,24 @@ class TestRunBigscape:
 
             assert "version" in e.value.args[0]
 
-    def test_input_path_not_exist(self, tmp_path):
+    def test_input_path_not_exist_v1(self, tmp_path):
         with pytest.raises(Exception) as e:
             run_bigscape(
                 antismash_path=tmp_path / "not_exist",
                 output_path=tmp_path,
                 extra_params="",
                 version=1,
+            )
+
+            assert "antismash_path" in e.value.args[0]
+
+    def test_input_path_not_exist_v2(self, tmp_path):
+        with pytest.raises(Exception) as e:
+            run_bigscape(
+                antismash_path=tmp_path / "not_exist",
+                output_path=tmp_path,
+                extra_params="",
+                version=2,
             )
 
             assert "antismash_path" in e.value.args[0]
