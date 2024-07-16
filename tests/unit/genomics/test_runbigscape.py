@@ -33,7 +33,7 @@ class TestRunBigscape:
                 version=3,
             )
 
-            assert "version" in e.value.args[0]
+        assert "version" in e.value.args[0]
 
     def test_input_path_not_exist_v1(self, tmp_path):
         with pytest.raises(FileNotFoundError) as e:
@@ -44,7 +44,7 @@ class TestRunBigscape:
                 version=1,
             )
 
-            assert "antismash_path" in e.value.args[0]
+        assert "antismash_path" in e.value.args[0]
 
     def test_input_path_not_exist_v2(self, tmp_path):
         with pytest.raises(FileNotFoundError) as e:
@@ -55,4 +55,4 @@ class TestRunBigscape:
                 version=2,
             )
 
-            assert "antismash_path" in e.value.args[0]
+        assert "antismash_path" in e.value.args[0]
