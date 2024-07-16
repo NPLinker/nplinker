@@ -24,6 +24,26 @@ class TestRunBigscape:
 
         assert result is True
 
+    def test_run_bigscape_small_dataset_v1(self, tmp_path):
+        result = bigscape.run_bigscape(
+            antismash_path=DATA_DIR / "bigscape/minimal_dataset",
+            output_path=tmp_path,
+            extra_params="",
+            version=1,
+        )
+
+        assert result is True
+
+    def test_run_bigscape_small_dataset_v2(self, tmp_path):
+        result = bigscape.run_bigscape(
+            antismash_path=DATA_DIR / "bigscape/minimal_dataset",
+            output_path=tmp_path,
+            extra_params="",
+            version=2,
+        )
+
+        assert result is True
+
     def test_run_bigscape_wrong_version(self, tmp_path):
         with pytest.raises(ValueError) as e:
             bigscape.run_bigscape(
