@@ -22,7 +22,7 @@ podp_id = ""
 # The default value is "INFO".
 level = "INFO"
 # The log file to append log messages.
-# The value is optional. 
+# The value is optional.
 # If not set or use empty string, log messages will not be written to a file.
 # The file will be created if it does not exist. Log messages will be appended to the file if it exists.
 file = "path/to/logfile"
@@ -56,6 +56,8 @@ version = 1
 parameters = "--mibig --clans-off --mix --include_singletons --cutoffs 0.30"
 # for version 2, use the following parameters string:
 # parameters = "--mibig_version 3.1 --include_singletons --gcf_cutoffs 0.30"
+# Note that for BiG-SCAPE version 2, you cannot set any other mode other than "cluster"
+# using these parameters
 # Which bigscape cutoff to use for NPLinker analysis.
 # There might be multiple cutoffs in bigscape output.
 # Note that this value must be a string.
