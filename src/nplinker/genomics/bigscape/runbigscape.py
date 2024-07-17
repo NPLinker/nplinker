@@ -15,7 +15,7 @@ def run_bigscape(
     antismash_path: str | PathLike,
     output_path: str | PathLike,
     extra_params: str,
-    version: int = 1,
+    version: Literal[1, 2] = 1,
 ) -> bool:
     """Runs BiG-SCAPE to cluster BGCs.
 
@@ -34,7 +34,7 @@ def run_bigscape(
         antismash_path: Path to the antismash output directory.
         output_path: Path to the output directory where BiG-SCAPE will write its results.
         extra_params: Additional parameters to pass to BiG-SCAPE.
-        version: The version of BiG-SCAPE to run. Can be 1 or 2.
+        version: The version of BiG-SCAPE to run. Must be 1 or 2.
 
     Returns:
         True if BiG-SCAPE ran successfully, False otherwise.
@@ -45,13 +45,13 @@ def run_bigscape(
     elif version == 2:
         bigscape_py_path = "bigscape-v2.py"
     else:
-        raise ValueError("Unexpected BiG-SCAPE version number specified")
+        raise ValueError("Invalid BiG-SCAPE version number. Expected: 1 or 2.")
 
     try:
         subprocess.run([bigscape_py_path, "-h"], capture_output=True, check=True)
     except Exception as e:
         raise FileNotFoundError(
-            f"Failed to find/run bigscape.py (path={bigscape_py_path}, err={e})"
+            f"Failed to find/run BiG-SCAPE executable program (path={bigscape_py_path}, err={e})"
         ) from e
 
     if not os.path.exists(antismash_path):

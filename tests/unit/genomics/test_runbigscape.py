@@ -27,7 +27,7 @@ def test_run_bigscape_v2(tmp_path):
 
 def test_run_bigscape_small_dataset_v1(tmp_path):
     result = bigscape.run_bigscape(
-        antismash_path=DATA_DIR / "bigscape/minimal_dataset",
+        antismash_path=DATA_DIR / "bigscape" / "minimal_dataset",
         output_path=tmp_path,
         extra_params="",
         version=1,
@@ -38,7 +38,7 @@ def test_run_bigscape_small_dataset_v1(tmp_path):
 
 def test_run_bigscape_small_dataset_v2(tmp_path):
     result = bigscape.run_bigscape(
-        antismash_path=DATA_DIR / "bigscape/minimal_dataset",
+        antismash_path=DATA_DIR / "bigscape" / "minimal_dataset",
         output_path=tmp_path,
         extra_params="",
         version=2,
