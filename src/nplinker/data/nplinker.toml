@@ -57,7 +57,7 @@ parameters = "--mibig --clans-off --mix --include_singletons --cutoffs 0.30"
 # for version 2, use the following parameters string:
 # parameters = "--mibig_version 3.1 --include_singletons --gcf_cutoffs 0.30"
 # Note that BiG-SCAPE v2 has subcommands. NPLinker requires the "cluster" subcommand and its parameters to be used. 
-NPLinker will automatically set the following parameters: `--pfam_path`, `--inputdir` and `--outputdir`. So, do not set them here.
+# NPLinker will automatically set the following parameters: `--pfam_path`, `--inputdir` and `--outputdir`. So, do not set them here.
 # BiG-SCPAPE v2 also runs a --mix analysis by default, and does not need this to be included.
 # Which bigscape cutoff to use for NPLinker analysis.
 # There might be multiple cutoffs in bigscape output.
