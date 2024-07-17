@@ -28,6 +28,7 @@ def run_bigscape(
     The directory can contain subdirectories, in which case BiG-SCAPE will search
     recursively for GBK files. E.g.:
 
+    ```
     example_folder
         ├── organism_1
         │  ├── organism_1.region001.gbk
@@ -38,6 +39,7 @@ def run_bigscape(
         ├── organism_2
         │  ├── ...
         └── ...
+    ```
 
     By default, only GBK Files with "cluster" or "region" in the filename are
     accepted. GBK Files with "final" in the filename are excluded.
@@ -56,6 +58,10 @@ def run_bigscape(
         FileNotFoundError: If the antismash_path does not exist or if the BiG-SCAPE python
             script could not be found.
         RuntimeError: If BiG-SCAPE fails to run.
+    Examples:
+        >>>  from nplinker.genomics.bigscape import run_bigscape
+        >>> run_bigscape(antismash_path="./antismash", output_path="./output",  
+        ... extra_params="--help", version=1)
     """
     # switch to correct version of BiG-SCAPE
     if version == 1:
