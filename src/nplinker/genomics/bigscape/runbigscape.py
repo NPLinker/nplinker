@@ -88,10 +88,10 @@ def run_bigscape(
 
     logger.info(f"BiG-SCAPE command: {args}")
     result = subprocess.run(args, stdout=sys.stdout, stderr=sys.stderr)
-    logger.info(f"BiG-SCAPE completed with return code {result.returncode}")
 
     # return true on any non-error return code
     if result.returncode == 0:
+        logger.info(f"BiG-SCAPE completed with return code {result.returncode}")
         return True
 
     # otherwise log details and raise a runtime error
