@@ -56,8 +56,8 @@ version = 1
 parameters = "--mibig --clans-off --mix --include_singletons --cutoffs 0.30"
 # for version 2, use the following parameters string:
 # parameters = "--mibig_version 3.1 --include_singletons --gcf_cutoffs 0.30"
-# Note that for BiG-SCAPE version 2, you cannot set any other mode other than "cluster"
-# using these parameters
+# Note that BiG-SCAPE v2 has subcommands. NPLinker requires the "cluster" subcommand to be used.
+# BiG-SCPAPE v2 also runs a --mix analysis by default, and does not need this to be included.
 # Which bigscape cutoff to use for NPLinker analysis.
 # There might be multiple cutoffs in bigscape output.
 # Note that this value must be a string.
