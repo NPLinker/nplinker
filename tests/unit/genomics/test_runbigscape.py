@@ -6,7 +6,7 @@ from .. import DATA_DIR
 def test_run_bigscape_v1(tmp_path):
     """Test whether BiG-SCAPE v1 runs at all using the --help command"""
     result = bigscape.run_bigscape(
-        antismash_path=DATA_DIR,
+        antismash_path=tmp_path,
         output_path=tmp_path,
         extra_params="--help",
         version=1,
@@ -18,7 +18,7 @@ def test_run_bigscape_v1(tmp_path):
 def test_run_bigscape_v2(tmp_path):
     """Test whether BiG-SCAPE v2 runs at all using the --help command"""
     result = bigscape.run_bigscape(
-        antismash_path=DATA_DIR,
+        antismash_path=tmp_path,
         output_path=tmp_path,
         extra_params="--help",
         version=2,
