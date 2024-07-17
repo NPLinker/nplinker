@@ -52,3 +52,16 @@ def test_input_path_not_exist(tmp_path, version):
         )
 
     assert "antismash_path" in e.value.args[0]
+
+
+@pytest.mark.parametrize("version", [1, 2])
+def test_bad_parameters(tmp_path, version):
+    with pytest.raises(RuntimeError) as e:
+        bigscape.run_bigscape(
+            antismash_path=tmp_path,
+            output_path=tmp_path,
+            extra_params="--this-is-not-a-real-argument",
+            version=version,
+        )
+
+    assert "BiG-SCAPE" in e.value.args[0]
