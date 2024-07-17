@@ -97,5 +97,6 @@ def run_bigscape(
     # otherwise log details and raise a runtime error
     logger.error(f"BiG-SCAPE failed with return code {result.returncode}")
     logger.error(f"output: {str(result.stdout)}")
+    logger.error(f"stderr: {str(result.stderr)}")
 
     raise RuntimeError(f"Failed to run BiG-SCAPE with error code {result.returncode}")
