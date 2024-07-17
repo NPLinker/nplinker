@@ -38,6 +38,12 @@ def run_bigscape(
 
     Returns:
         True if BiG-SCAPE ran successfully, False otherwise.
+
+    Raises:
+        ValueError: If an unexpected BiG-SCAPE version number is specified.
+        FileNotFoundError: If the antismash_path does not exist or if the BiG-SCAPE python
+            script could not be found.
+        RuntimeError: If BiG-SCAPE fails to run.
     """
     # switch to correct version of BiG-SCAPE
     if version == 1:
