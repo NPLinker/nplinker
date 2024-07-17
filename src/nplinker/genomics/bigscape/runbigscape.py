@@ -4,6 +4,7 @@ import os
 import subprocess
 import sys
 from os import PathLike
+from typing import Literal
 
 
 logger = logging.getLogger(__name__)
