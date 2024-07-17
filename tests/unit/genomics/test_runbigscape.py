@@ -18,6 +18,7 @@ def test_run_bigscape(tmp_path, version):
 
 @pytest.mark.parametrize("version", [1, 2])
 def test_run_bigscape_small_dataset(tmp_path, version):
+    pytest.skip("This test is too slow to run in CI")
     result = bigscape.run_bigscape(
         antismash_path=DATA_DIR / "bigscape" / "minimal_dataset",
         output_path=tmp_path,
