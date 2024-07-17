@@ -58,9 +58,10 @@ def run_bigscape(
         FileNotFoundError: If the antismash_path does not exist or if the BiG-SCAPE python
             script could not be found.
         RuntimeError: If BiG-SCAPE fails to run.
+
     Examples:
         >>>  from nplinker.genomics.bigscape import run_bigscape
-        >>> run_bigscape(antismash_path="./antismash", output_path="./output",  
+        >>> run_bigscape(antismash_path="./antismash", output_path="./output",
         ... extra_params="--help", version=1)
     """
     # switch to correct version of BiG-SCAPE
