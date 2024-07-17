@@ -1,3 +1,4 @@
+import os
 import pytest
 from nplinker.genomics import bigscape
 from .. import DATA_DIR
