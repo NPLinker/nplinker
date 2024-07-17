@@ -3,47 +3,26 @@ from nplinker.genomics import bigscape
 from .. import DATA_DIR
 
 
-def test_run_bigscape_v1(tmp_path):
-    """Test whether BiG-SCAPE v1 runs at all using the --help command"""
+@pytest.mark.parametrize("version", [1, 2])
+def test_run_bigscape(tmp_path, version):
+    """Test whether BiG-SCAPE runs at all using the --help command"""
     result = bigscape.run_bigscape(
         antismash_path=tmp_path,
         output_path=tmp_path,
         extra_params="--help",
-        version=1,
+        version=version,
     )
 
     assert result is True
 
 
-def test_run_bigscape_v2(tmp_path):
-    """Test whether BiG-SCAPE v2 runs at all using the --help command"""
-    result = bigscape.run_bigscape(
-        antismash_path=tmp_path,
-        output_path=tmp_path,
-        extra_params="--help",
-        version=2,
-    )
-
-    assert result is True
-
-
-def test_run_bigscape_small_dataset_v1(tmp_path):
+@pytest.mark.parametrize("version", [1, 2])
+def test_run_bigscape_small_dataset(tmp_path, version):
     result = bigscape.run_bigscape(
         antismash_path=DATA_DIR / "bigscape" / "minimal_dataset",
         output_path=tmp_path,
         extra_params="",
-        version=1,
-    )
-
-    assert result is True
-
-
-def test_run_bigscape_small_dataset_v2(tmp_path):
-    result = bigscape.run_bigscape(
-        antismash_path=DATA_DIR / "bigscape" / "minimal_dataset",
-        output_path=tmp_path,
-        extra_params="",
-        version=2,
+        version=version,
     )
 
     assert result is True
@@ -61,25 +40,14 @@ def test_run_bigscape_wrong_version(tmp_path):
     assert "version" in e.value.args[0]
 
 
-def test_input_path_not_exist_v1(tmp_path):
+@pytest.mark.parametrize("version", [1, 2])
+def test_input_path_not_exist(tmp_path, version):
     with pytest.raises(FileNotFoundError) as e:
         bigscape.run_bigscape(
             antismash_path=tmp_path / "not_exist",
             output_path=tmp_path,
             extra_params="",
-            version=1,
-        )
-
-    assert "antismash_path" in e.value.args[0]
-
-
-def test_input_path_not_exist_v2(tmp_path):
-    with pytest.raises(FileNotFoundError) as e:
-        bigscape.run_bigscape(
-            antismash_path=tmp_path / "not_exist",
-            output_path=tmp_path,
-            extra_params="",
-            version=2,
+            version=version,
         )
 
     assert "antismash_path" in e.value.args[0]
