@@ -52,6 +52,8 @@
     
       <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="../../css/extra.css">
+    
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -1471,22 +1473,10 @@
 
   <h1>BigScape</h1>
 
-<p>NPLinker can run BigScape automatically if the <code>bigscape</code> directory does not exist in the working directory.</p>
-<p>To run BigScape, NPLinker requires the following BigScape parameters:</p>
-<ul>
-<li><code>--mix</code></li>
-<li><code>--include_singletons</code></li>
-<li><code>--cutoffs</code></li>
-</ul>
-<p>And the following parameters are not allowed:</p>
-<ul>
-<li><code>--inputdir</code></li>
-<li><code>--outputdir</code></li>
-<li><code>--pfam_dir</code></li>
-</ul>
-<p>If BigScape parameter <code>--mibig</code> is set, make sure setting the  <code>mibig.to_use</code> to true in your config file <code>nplinker.toml</code> and <code>mibig.version</code> to the version of mibig used by bigscape.</p>
-<p>See the <a href="../config_file/#default-configurations">default configurations</a> for the default 
-parameters of BigScape.</p>
+<p>NPLinker can run BigScape automatically if the <code>bigscape</code> directory does not exist in the working directory.
+Both BigScape version 1 and 2 are supported.</p>
+<p>See the <a class="autorefs autorefs-internal" href="../config_file/#configuration-template">configuration template</a> for how to set parameters for running BigScape.</p>
+<p>See the <a class="autorefs autorefs-internal" href="../config_file/#default-configurations">default configurations</a> for the default parameters used in NPLinker.</p>
 
 
 
