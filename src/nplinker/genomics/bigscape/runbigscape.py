@@ -26,7 +26,18 @@ def run_bigscape(
 
     The AntiSMASH output directory should be a directory that contains GBK files.
     The directory can contain subdirectories, in which case BiG-SCAPE will search
-    recursively for GBK files.
+    recursively for GBK files. E.g.:
+
+    example_folder
+        ├── organism_1
+        │  ├── organism_1.region001.gbk
+        │  ├── organism_1.region002.gbk
+        │  ├── organism_1.region003.gbk
+        │  ├── organism_1.final.gbk          <- skipped!
+        │  └── ...
+        ├── organism_2
+        │  ├── ...
+        └── ...
 
     By default, only GBK Files with "cluster" or "region" in the filename are
     accepted. GBK Files with "final" in the filename are excluded.
