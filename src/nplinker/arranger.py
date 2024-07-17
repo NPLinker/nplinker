@@ -304,21 +304,34 @@ class DatasetArranger:
         default BiG-SCAPE directory.
         """
         self.bigscape_running_output_dir.mkdir(exist_ok=True, parents=True)
+
+        version = self.config.bigscape.version
+
         run_bigscape(
             self.antismash_dir,
             self.bigscape_running_output_dir,
             self.config.bigscape.parameters,
+            version,
         )
-        for f in glob(
-            str(
-                self.bigscape_running_output_dir
-                / "network_files"
-                / "*"
-                / "mix"
-                / "mix_clustering_c*.tsv"
+
+        if version == 1:
+            for f in glob(
+                str(
+                    self.bigscape_running_output_dir
+                    / "network_files"
+                    / "*"
+                    / "mix"
+                    / "mix_clustering_c*.tsv"
+                )
+            ):
+                shutil.copy(f, self.bigscape_dir)
+        elif version == 2:
+            shutil.copy(
+                self.bigscape_running_output_dir / "data_sqlite.db",
+                self.bigscape_dir,
             )
-        ):
-            shutil.copy(f, self.bigscape_dir)
+        else:
+            raise ValueError(f"Invalid BiG-SCAPE version: {version}")
 
     def arrange_strain_mappings(self) -> None:
         """Arrange the strain mappings file.
