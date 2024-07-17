@@ -44,6 +44,9 @@ extra:
   version:
     provider: mike
 
+extra_css:
+  - css/extra.css
+
 # https://www.mkdocs.org/user-guide/configuration/#validation
 validation:
   omitted_files: warn
