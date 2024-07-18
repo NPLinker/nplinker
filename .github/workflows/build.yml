@@ -52,4 +52,4 @@ jobs:
           pip install $(ls dist/nplinker*.whl)
           install-nplinker-deps --run-on-github
       - name: Run unit tests
-        run: pytest -v tests/unit/genomics/test_runbigscape.py
+        run: pytest -n1 -v tests/unit/genomics/test_runbigscape.py
