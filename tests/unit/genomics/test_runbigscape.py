@@ -1,4 +1,3 @@
-import os
 import pytest
 from nplinker.genomics import bigscape
 from .. import DATA_DIR
@@ -17,7 +16,7 @@ def test_run_bigscape(tmp_path, version):
     assert result is True
 
 
-@pytest.mark.skipif(os.getenv('GITHUB_ACTIONS') == 'true', reason="The test is time-consuming on CI")
+# @pytest.mark.skipif(os.getenv('GITHUB_ACTIONS') == 'true', reason="The test is time-consuming on CI")
 @pytest.mark.parametrize("version", [1, 2])
 def test_run_bigscape_small_dataset(tmp_path, version):
     result = bigscape.run_bigscape(

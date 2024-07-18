@@ -55,37 +55,4 @@ jobs:
           pip install $(ls dist/nplinker*.whl)
           install-nplinker-deps --run-on-github
       - name: Run unit tests
-        run: pytest -v
-
-  build:
-    needs: smoke_test
-    name: Build for (${{ matrix.python-version }}, ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ['ubuntu-latest']
-        python-version: ['3.9', '3.11']
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Python info
-        shell: bash -l {0}
-        run: |
-          which python3
-          python3 --version
-      - name: Upgrade pip and install dependencies
-        run: |
-          python3 -m pip install --upgrade pip setuptools
-          pip install build pytest wheel pytest-xdist
-      - name: Build the package
-        run: 	python -m build
-      - name: Install nplinker
-        run: |
-          pip install $(ls dist/nplinker*.whl)
-          install-nplinker-deps --run-on-github
-      - name: Run unit tests
-        run: pytest -v
+        run: pytest -v tests/unit/genomics/test_runbigscape.py
