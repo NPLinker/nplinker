@@ -46,19 +46,23 @@ version = "3.1"
 # Version of BiG-SCAPE to run. Make sure to change the parameters property below as well
 # when changing versions.
 version = 1
-# Required bigscape parameters are `--mix`, `--include_singletons` and `--cutoffs`. NPLinker needs
-# them to run the analysis properly.
-# Parameters that must NOT exist: `--inputdir`, `--outputdir`, `--pfam_dir`. NPLinker will
-# automatically configure them.
-# If parameter `--mibig` is set, make sure setting the config `mibig.to_use` to true and
-# `mibig.version` to the version of mibig in bigscape.
+# Required BiG-SCAPE parameters.
+# --------------
+# For version 1:
+# -------------
+# Required parameters are: `--mix`, `--include_singletons` and `--cutoffs`. NPLinker needs them to run the analysis properly.
+# Do NOT set these parameters: `--inputdir`, `--outputdir`, `--pfam_dir`. NPLinker will automatically configure them.
+# If parameter `--mibig` is set, make sure to set the config `mibig.to_use` to true and `mibig.version` to the version of mibig in BiG-SCAPE.
 # The default value is "--mibig --clans-off --mix --include_singletons --cutoffs 0.30".
+# --------------
+# For version 2:
+# --------------
+# Note that BiG-SCAPE v2 has subcommands. NPLinker requires the `cluster` subcommand and its parameters.
+# Required parameters of `cluster` subcommand are: `--mibig_version`, `--include_singletons` and `--gcf_cutoffs`.
+# DO NOT set these parameters: `--pfam_path`, `--inputdir`, `--outputdir`. NPLinker will automatically configure them.
+# BiG-SCPAPE v2 also runs a `--mix` analysis by default, so you don't need to set this parameter here.
+# Example parameters for BiG-SCAPE v2: "--mibig_version 3.1 --include_singletons --gcf_cutoffs 0.30"
 parameters = "--mibig --clans-off --mix --include_singletons --cutoffs 0.30"
-# for version 2, use the following parameters string:
-# parameters = "--mibig_version 3.1 --include_singletons --gcf_cutoffs 0.30"
-# Note that BiG-SCAPE v2 has subcommands. NPLinker requires the "cluster" subcommand and its parameters to be used. 
-NPLinker will automatically set the following parameters: `--pfam_path`, `--inputdir` and `--outputdir`. So, do not set them here.
-# BiG-SCPAPE v2 also runs a --mix analysis by default, and does not need this to be included.
 # Which bigscape cutoff to use for NPLinker analysis.
 # There might be multiple cutoffs in bigscape output.
 # Note that this value must be a string.
