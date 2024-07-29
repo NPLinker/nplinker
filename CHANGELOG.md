@@ -1,5 +1,27 @@
 # Changelog
 
+## [v2.0.0-alpha.4](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.4) (2024-07-29)
+
+[Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.3...v2.0.0-alpha.4)
+
+**Implemented enhancements:**
+
+- Select subset of the data [\#265](https://github.com/NPLinker/nplinker/issues/265)
+
+**Closed issues:**
+
+- Fix code scanning alert - Token-Permissions [\#268](https://github.com/NPLinker/nplinker/issues/268)
+- support bigscape v2 [\#216](https://github.com/NPLinker/nplinker/issues/216)
+- Abstraction of run\_bigscape function [\#115](https://github.com/NPLinker/nplinker/issues/115)
+
+**Merged pull requests:**
+
+- update doc for bigscape [\#270](https://github.com/NPLinker/nplinker/pull/270) ([CunliangGeng](https://github.com/CunliangGeng))
+- add filter method to LinkGraph [\#269](https://github.com/NPLinker/nplinker/pull/269) ([CunliangGeng](https://github.com/CunliangGeng))
+- Add OSSF Scorecard action and badge  [\#267](https://github.com/NPLinker/nplinker/pull/267) ([CunliangGeng](https://github.com/CunliangGeng))
+- improve docstrings [\#266](https://github.com/NPLinker/nplinker/pull/266) ([CunliangGeng](https://github.com/CunliangGeng))
+- Run bigscape v2 [\#251](https://github.com/NPLinker/nplinker/pull/251) ([adraismawur](https://github.com/adraismawur))
+
 ## [v2.0.0-alpha.3](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.3) (2024-07-11)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.2...v2.0.0-alpha.3)
