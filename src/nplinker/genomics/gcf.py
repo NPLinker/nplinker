@@ -32,6 +32,10 @@ class GCF:
             - Saccharides
             - Terpene
 
+            For BGC falls outside of these categories, the value is "Others".
+
+            Default is None, which means the class is unknown.
+
             More details see:
             https://doi.org/10.1038%2Fs41589-019-0400-9.
     """
