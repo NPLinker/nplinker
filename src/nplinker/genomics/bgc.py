@@ -142,7 +142,17 @@ class BGC:
         """Get BiG-SCAPE's BGC classes.
 
         BiG-SCAPE's BGC classes are similar to those defined in MiBIG but have
-        more categories (7 classes). More details see:
+        more categories (7 classes), including:
+
+        - NRPS
+        - PKS-NRP_Hybrids
+        - PKSI
+        - PKSother
+        - RiPPs
+        - Saccharides
+        - Terpene
+
+        More details see:
         https://doi.org/10.1038%2Fs41589-019-0400-9.
         """
         return {p.bigscape_class for p in self.parents}

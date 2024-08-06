@@ -22,7 +22,17 @@ class GCF:
         bgc_ids: a set of BGC ids that belongs to the GCF.
         bigscape_class: BiG-SCAPE's BGC class.
             BiG-SCAPE's BGC classes are similar to those defined in MiBIG
-            but have more categories (7 classes). More details see:
+            but have more categories (7 classes), including:
+
+            - NRPS
+            - PKS-NRP_Hybrids
+            - PKSI
+            - PKSother
+            - RiPPs
+            - Saccharides
+            - Terpene
+
+            More details see:
             https://doi.org/10.1038%2Fs41589-019-0400-9.
     """
 
