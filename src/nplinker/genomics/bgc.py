@@ -35,7 +35,7 @@ class BGC:
             gives product information.
             For MIBiG metadata, its biosynthetic class provides such info.
         mibig_bgc_class: A tuple of MIBiG biosynthetic classes to which the BGC belongs.
-            Defaults to None.
+            Defaults to None, which means the class is unknown.
 
             MIBiG defines 6 major biosynthetic classes for natural products,
             including `NRP`, `Polyketide`, `RiPP`, `Terpene`, `Saccharide`
@@ -142,7 +142,21 @@ class BGC:
         """Get BiG-SCAPE's BGC classes.
 
         BiG-SCAPE's BGC classes are similar to those defined in MiBIG but have
-        more categories (7 classes). More details see:
+        more categories (7 classes), including:
+
+        - NRPS
+        - PKS-NRP_Hybrids
+        - PKSI
+        - PKSother
+        - RiPPs
+        - Saccharides
+        - Terpene
+
+        For BGC falls outside of these categories, the value is "Others".
+
+        Default is None, which means the class is unknown.
+
+        More details see:
         https://doi.org/10.1038%2Fs41589-019-0400-9.
         """
         return {p.bigscape_class for p in self.parents}
