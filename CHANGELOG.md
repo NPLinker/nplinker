@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.0.0-alpha.5](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.5) (2024-08-22)
+
+[Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.4...v2.0.0-alpha.5)
+
+**Merged pull requests:**
+
+- add names of bigscape classes [\#273](https://github.com/NPLinker/nplinker/pull/273) ([CunliangGeng](https://github.com/CunliangGeng))
+
 ## [v2.0.0-alpha.4](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.4) (2024-07-29)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.3...v2.0.0-alpha.4)
