@@ -1,6 +1,6 @@
 
 ???- Note "Requirements"
-    - Linux or MacOS
+    - Linux, MacOS or [Windows with WSL](https://learn.microsoft.com/en-us/windows/wsl/)
     - Python version ≥3.9
 
 

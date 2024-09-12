@@ -29,11 +29,14 @@ else
     exit
 fi
 
-# check the path of this script
-if [[ $(command -v install-nplinker-deps) != $PY_PATH/bin/install-nplinker-deps ]]; then
-    echo "❌ Error: command `install-nplinker-deps` invoked from bad path;"
-    echo "Please install nplinker with `pip install nplinker` and then re-run this command."
-    exit
+script_path=$(command -v install-nplinker-deps)
+expected_path="$PY_PATH/bin/install-nplinker-deps"
+
+if [[ $script_path != $expected_path ]]; then
+    echo "❌ Error: command 'install-nplinker-deps' invoked from an incorrect path or enviroment: $script_path"
+    echo "Please ensure that it is invoked from the expected path: $expected_path."
+    echo "Check your PATH environment variable to correct the execution order of paths."
+    exit 1
 fi
 
 # create dependecy install path
