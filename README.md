@@ -24,7 +24,7 @@ Original paper: [Ranking microbial metabolomic and genomic links in the NPLinker
 ## Setup and usage
 
 ### Requirement
-- Linux, MacOS and [Windows with WSL](https://learn.microsoft.com/en-us/windows/wsl/)
+- Linux, MacOS or [Windows with WSL](https://learn.microsoft.com/en-us/windows/wsl/)
 - Python version ≥3.9
 
 
