@@ -263,7 +263,9 @@ class DatasetArranger:
     def arrange_bigscape(self) -> None:
         """Arrange the BiG-SCAPE data.
 
-        For `local` mode, validate the BiG-SCAPE data.
+        For `local` mode, if the BiG-SCAPE data is provided by users, validate it and raise an error
+        if it is invalid. If the BiG-SCAPE data does not exist, run BiG-SCAPE to generate the
+        clustering file.
 
         For `podp` mode, if the BiG-SCAPE data does not exist, run BiG-SCAPE to generate the
         clustering file; if it exists but not valid, remove the data and re-run BiG-SCAPE to generate
@@ -281,16 +283,19 @@ class DatasetArranger:
                 BiG-SCAPE data directory.
         - Check if the `data_sqlite.db` file exists in the BiG-SCAPE data directory.
         """
+        if self.config.mode == "local" and self.bigscape_dir.exists():
+            validate_bigscape(self.bigscape_dir, self.config.bigscape.cutoff)
+            return
+
         pass_validation = False
-        if self.config.mode == "podp":
-            for _ in range(3):
-                try:
-                    validate_bigscape(self.bigscape_dir, self.config.bigscape.cutoff)
-                    pass_validation = True
-                    break
-                except FileNotFoundError:
-                    shutil.rmtree(self.bigscape_dir, ignore_errors=True)
-                    self._run_bigscape()
+        for _ in range(3):
+            try:
+                validate_bigscape(self.bigscape_dir, self.config.bigscape.cutoff)
+                pass_validation = True
+                break
+            except FileNotFoundError:
+                shutil.rmtree(self.bigscape_dir, ignore_errors=True)
+                self._run_bigscape()
 
         if not pass_validation:
             validate_bigscape(self.bigscape_dir, self.config.bigscape.cutoff)
