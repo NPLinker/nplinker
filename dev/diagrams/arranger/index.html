@@ -737,9 +737,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gnps-antismash-and-bigscape" class="md-nav__link">
+  <a href="#gnps-and-antismash" class="md-nav__link">
     <span class="md-ellipsis">
-      GNPS, AntiSMASH and BigScape
+      GNPS and AntiSMASH
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bigscape" class="md-nav__link">
+    <span class="md-ellipsis">
+      BigScape
     </span>
   </a>
   
@@ -1573,9 +1582,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gnps-antismash-and-bigscape" class="md-nav__link">
+  <a href="#gnps-and-antismash" class="md-nav__link">
     <span class="md-ellipsis">
-      GNPS, AntiSMASH and BigScape
+      GNPS and AntiSMASH
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bigscape" class="md-nav__link">
+    <span class="md-ellipsis">
+      BigScape
     </span>
   </a>
   
@@ -1627,19 +1645,41 @@
     A --&gt; |Yes| P{Does the file exist?}
     P --&gt; |No | P0[Download the file] --&gt; P1
     P --&gt; |Yes| P1[Validate the file]</code></pre>
-<h2 id="gnps-antismash-and-bigscape">GNPS, AntiSMASH and BigScape<a class="headerlink" href="#gnps-antismash-and-bigscape" title="Permanent link">&para;</a></h2>
+<h2 id="gnps-and-antismash">GNPS and AntiSMASH<a class="headerlink" href="#gnps-and-antismash" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>flowchart TD
     ConfigError[Dynaconf config validation error]
     DataError[Data validation error]
     UseIt[Use the data]
     Download[First remove existing data if relevent, then download or generate data]
 
-    A[GNPS, antiSMASH and BigSCape] --&gt; B{Pass Dynaconf config validation?}
+    A[GNPS or antiSMASH] --&gt; B{Pass Dynaconf config validation?}
     B --&gt;|No | ConfigError
     B --&gt;|Yes| G{Is the mode PODP?}
 
     G --&gt;|No, local mode| G1{Does data dir exist?}
     G1 --&gt;|No | DataError
+    G1 --&gt;|Yes| H{Pass data validation?}
+    H --&gt; |No | DataError
+    H --&gt; |Yes| UseIt 
+
+    G --&gt;|Yes, podp mode| G2{Does data dir exist?}
+    G2 --&gt; |No | Download
+    G2 --&gt; |Yes | J{Pass data validation?}
+    J --&gt;|No | Download --&gt; |try max 2 times| J
+    J --&gt;|Yes| UseIt</code></pre>
+<h2 id="bigscape">BigScape<a class="headerlink" href="#bigscape" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart TD
+    ConfigError[Dynaconf config validation error]
+    DataError[Data validation error]
+    UseIt[Use the data]
+    Download[First remove existing data if relevent, then download or generate data]
+
+    A[BigSCape] --&gt; B{Pass Dynaconf config validation?}
+    B --&gt;|No | ConfigError
+    B --&gt;|Yes| G{Is the mode PODP?}
+
+    G --&gt;|No, local mode| G1{Does data dir exist?}
+    G1 --&gt;|No | Download
     G1 --&gt;|Yes| H{Pass data validation?}
     H --&gt; |No | DataError
     H --&gt; |Yes| UseIt 
