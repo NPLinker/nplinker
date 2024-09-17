@@ -3,6 +3,7 @@ from collections.abc import Sequence
 from functools import wraps
 from typing import Union
 from networkx import Graph
+from tabulate import tabulate
 from nplinker.genomics import GCF
 from nplinker.metabolomics import MolecularFamily
 from nplinker.metabolomics import Spectrum
@@ -73,8 +74,19 @@ class LinkGraph:
             Create a LinkGraph object:
             >>> lg = LinkGraph()
 
+            Display the empty LinkGraph object:
+            >>> lg
+            |    |   Object 1 |   Object 2 |   Metcalf Score |   Rosetta Score |
+            |----|------------|------------|-----------------|-----------------|
+
             Add a link between a GCF and a Spectrum object:
             >>> lg.add_link(gcf, spectrum, metcalf=Score("metcalf", 1.0, {"cutoff": 0.5}))
+
+            Display all links in LinkGraph object:
+            >>> lg
+            |    |     Object 1 |               Object 2 |   Metcalf Score |   Rosetta Score |
+            |----|--------------|------------------------|-----------------|-----------------|
+            |  1 | GCF(id=gcf1) | Spectrum(id=spectrum1) |               1 |               - |
 
             Get all links for a given object:
             >>> lg[gcf]
@@ -94,9 +106,9 @@ class LinkGraph:
         """
         self._g: Graph = Graph()
 
-    def __str__(self) -> str:
-        """Get a short summary of the LinkGraph."""
-        return f"{self.__class__.__name__}(#links={len(self.links)}, #objects={len(self)})"
+    def __repr__(self) -> str:
+        """Return a string representation of the LinkGraph."""
+        return self._get_table_repr()
 
     def __len__(self) -> int:
         """Get the number of objects."""
@@ -272,3 +284,36 @@ class LinkGraph:
         link_data = self.get_link_data(u, v)
         if link_data is not None:
             lg.add_link(u, v, **link_data)
+
+    def _get_table_repr(self) -> str:
+        """Generate a table representation of the LinkGraph.
+
+        The table is truncated to 60 links.
+        """
+        headers = ["", "Object 1", "Object 2", "Metcalf Score", "Rosetta Score"]
+        table_data = []
+        display_limit = 60
+
+        for index, (u, v, data) in enumerate(self.links, start=1):
+            metcalf_score = data.get("metcalf")
+            rosetta_score = data.get("rosetta")
+
+            row = [
+                index,
+                str(u if isinstance(u, GCF) else v),
+                str(v if isinstance(u, GCF) else u),
+                f"{metcalf_score.value:.2f}" if metcalf_score else "-",
+                f"{rosetta_score.value:.2f}" if rosetta_score else "-",
+            ]
+            table_data.append(row)
+
+            if index == display_limit:
+                break
+
+        table = tabulate(table_data, headers=headers, tablefmt="github", stralign="right")
+
+        if len(self.links) > display_limit:
+            truncated_info = f"...\n[ {len(self.links)} links ]"
+            return f"{table}\n{truncated_info}"
+
+        return table
