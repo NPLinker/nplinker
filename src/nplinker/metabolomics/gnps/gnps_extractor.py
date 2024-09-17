@@ -148,9 +148,18 @@ class GNPSExtractor:
             os.renames(self._extract_path / member, self._extract_path / fname)
 
     def _extract_fbmn(self):
+        # there might be two folders for quantification table
+        # "quantification_table_reformatted" and "quantification_table"
+        try:
+            quantification_table_member = self._select_member(
+                "quantification_table_reformatted", ".csv"
+            )
+        except ValueError:
+            quantification_table_member = self._select_member("quantification_table", ".csv")
+
         # the order of members matters
         members = [
-            self._select_member("quantification_table", ".csv"),
+            quantification_table_member,
             self._select_member("spectra", ".mgf"),
             self._select_member("networkedges_selfloop", ".selfloop"),
             self._select_member("DB_result", ".tsv"),
