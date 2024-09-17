@@ -1,5 +1,16 @@
 # Changelog
 
+## [v2.0.0-alpha.6](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.6) (2024-09-17)
+
+[Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.5...v2.0.0-alpha.6)
+
+**Merged pull requests:**
+
+- Allow bigscape run for local mode [\#277](https://github.com/NPLinker/nplinker/pull/277) ([CunliangGeng](https://github.com/CunliangGeng))
+- Add table display for link graph [\#276](https://github.com/NPLinker/nplinker/pull/276) ([CunliangGeng](https://github.com/CunliangGeng))
+- Handle two quantification table folders of GNPS feature-based workflow  [\#275](https://github.com/NPLinker/nplinker/pull/275) ([CunliangGeng](https://github.com/CunliangGeng))
+- Verify the support of WSL [\#274](https://github.com/NPLinker/nplinker/pull/274) ([CunliangGeng](https://github.com/CunliangGeng))
+
 ## [v2.0.0-alpha.5](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.5) (2024-08-22)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.4...v2.0.0-alpha.5)
