@@ -112,3 +112,20 @@ def test_filter(gcfs, spectra, score):
     # test filtering with GCFs and Spectra
     lg_filtered = lg.filter(u_nodes, v_nodes)
     assert len(lg_filtered) == 4
+
+
+def test_get_table_data(lg, gcfs, spectra, score):
+    table_data = lg.get_table_data()
+    assert type(table_data) is list
+    assert type(table_data[0]) is dict
+    assert table_data == [
+        {
+            "Index": 1,
+            "Genomic Object Type": gcfs[0].__class__.__name__,
+            "Genomic Object ID": gcfs[0].id,
+            "Metabolomic Object Type": spectra[0].__class__.__name__,
+            "Metabolomic Object ID": spectra[0].id,
+            "Metcalf Score": f"{score.value:.2f}",
+            "Rosetta Score": "-",
+        },
+    ]

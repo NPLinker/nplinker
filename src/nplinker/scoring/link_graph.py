@@ -1,6 +1,7 @@
 from __future__ import annotations
 from collections.abc import Sequence
 from functools import wraps
+from os import PathLike
 from typing import Union
 from networkx import Graph
 from tabulate import tabulate
@@ -76,17 +77,17 @@ class LinkGraph:
 
             Display the empty LinkGraph object:
             >>> lg
-            |    |   Object 1 |   Object 2 |   Metcalf Score |   Rosetta Score |
-            |----|------------|------------|-----------------|-----------------|
+            |    | Genomic Object Type   | Genomic Object ID   | Metabolomic Object Type   | Metabolomic Object ID   | Metcalf Score   | Rosetta Score   |
+            |----|-----------------------|---------------------|---------------------------|-------------------------|-----------------|-----------------|
 
             Add a link between a GCF and a Spectrum object:
             >>> lg.add_link(gcf, spectrum, metcalf=Score("metcalf", 1.0, {"cutoff": 0.5}))
 
             Display all links in LinkGraph object:
             >>> lg
-            |    |     Object 1 |               Object 2 |   Metcalf Score |   Rosetta Score |
-            |----|--------------|------------------------|-----------------|-----------------|
-            |  1 | GCF(id=gcf1) | Spectrum(id=spectrum1) |               1 |               - |
+            |    | Genomic Object Type   | Genomic Object ID   | Metabolomic Object Type   | Metabolomic Object ID   | Metcalf Score   | Rosetta Score   |
+            |----|-----------------------|---------------------|---------------------------|-------------------------|-----------------|-----------------|
+            |  1 | GCF                   | 1                   | Spectrum                  | 1                       | 1.00            | -               |
 
             Get all links for a given object:
             >>> lg[gcf]
@@ -285,35 +286,92 @@ class LinkGraph:
         if link_data is not None:
             lg.add_link(u, v, **link_data)
 
-    def _get_table_repr(self) -> str:
-        """Generate a table representation of the LinkGraph.
+    def get_table_data(self, display_limit: int | None = None) -> list[dict]:
+        """Generate the table data for the LinkGraph.
 
-        The table is truncated to 60 links.
+        This method iterates over the links in the LinkGraph and constructs a table
+        containing information about genomic and metabolomic objects, as well as their
+        associated scores. Each row in the table represents a link between a genomic
+        object and a metabolomic object.
+
+        Args:
+            display_limit (int | None): The maximum number of rows to include in the
+                table. If None, all rows are included.
+
+        Returns:
+            list: A list of dictionaries, where each dictionary contains
+                the following keys:
+                - Index (int)
+                - Genomic Object Type (str)
+                - Genomic Object ID (str or int)
+                - Metabolomic Object Type (str)
+                - Metabolomic Object ID (str or int)
+                - Metcalf Score (str, formatted to 2 decimal places, or "-")
+                - Rosetta Score (str, formatted to 2 decimal places, or "-")
         """
-        headers = ["", "Object 1", "Object 2", "Metcalf Score", "Rosetta Score"]
+        genomic_object_classes = (GCF,)
+
         table_data = []
-        display_limit = 60
 
         for index, (u, v, data) in enumerate(self.links, start=1):
+            genomic_object = u if isinstance(u, genomic_object_classes) else v
+            metabolomic_object = v if isinstance(u, genomic_object_classes) else u
             metcalf_score = data.get("metcalf")
             rosetta_score = data.get("rosetta")
 
-            row = [
-                index,
-                str(u if isinstance(u, GCF) else v),
-                str(v if isinstance(u, GCF) else u),
-                f"{metcalf_score.value:.2f}" if metcalf_score else "-",
-                f"{rosetta_score.value:.2f}" if rosetta_score else "-",
-            ]
-            table_data.append(row)
+            table_data.append(
+                {
+                    "Index": index,
+                    "Genomic Object Type": genomic_object.__class__.__name__,
+                    "Genomic Object ID": genomic_object.id,
+                    "Metabolomic Object Type": metabolomic_object.__class__.__name__,
+                    "Metabolomic Object ID": metabolomic_object.id,
+                    "Metcalf Score": f"{metcalf_score.value:.2f}" if metcalf_score else "-",
+                    "Rosetta Score": f"{rosetta_score.value:.2f}" if rosetta_score else "-",
+                }
+            )
 
-            if index == display_limit:
+            if display_limit is not None and index == display_limit:
                 break
 
-        table = tabulate(table_data, headers=headers, tablefmt="github", stralign="right")
+        return table_data
+
+    def _get_table_repr(self, display_limit: int | None = 60) -> str:
+        """Generate a table representation of the LinkGraph.
+
+        Args:
+            display_limit: The maximum number of links to display in the table. Defaults to 60.
+
+        Returns:
+            str: A string representation of the table in GitHub-flavored markdown format. If the number of links
+            exceeds the display limit, the table is truncated and an additional line indicating the total number
+            of links is appended.
+        """
+        table = tabulate(
+            self.get_table_data(display_limit),
+            headers="keys",
+            tablefmt="github",
+            stralign="right",
+        )
 
         if len(self.links) > display_limit:
             truncated_info = f"...\n[ {len(self.links)} links ]"
-            return f"{table}\n{truncated_info}"
+            table += f"\n{truncated_info}"
 
         return table
+
+    def print_links(self, file: str | PathLike) -> None:
+        """Print the links in the LinkGraph to a file.
+
+        Args:
+            file: the file to write the links to.
+
+        Examples:
+            >>> lg.print_links("links.tsv")
+        """
+        table_data = self.get_table_data()
+        headers = table_data[0].keys()
+        with open(file, "w") as f:
+            f.write("\t".join(headers) + "\n")
+            for row in table_data:
+                f.write("\t".join(str(row[h]) for h in headers) + "\n")
