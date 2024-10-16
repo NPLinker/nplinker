@@ -97,3 +97,19 @@ class Spectrum:
             True when the given strain exist in the spectrum.
         """
         return strain in self.strains
+
+    def to_dict(self) -> dict:
+        """Convert the Spectrum object to a dictionary that can be used to export the results.
+
+        Returns:
+            A dictionary containing relavant information about the Spectrum object.
+        """
+        return {
+            "spectrum_id": self.id,
+            "num_strains_with_spectrum": len(self.strains),
+            "precursor_mz": self.precursor_mz,
+            "rt": self.rt,
+            "molecular_family": self.family.id if self.family else None,
+            "gnps_id": self.gnps_id,
+            "gnps_annotations": self.gnps_annotations,
+        }

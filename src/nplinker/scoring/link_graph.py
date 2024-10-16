@@ -321,13 +321,13 @@ class LinkGraph:
 
             table_data.append(
                 {
-                    "Index": index,
-                    "Genomic Object Type": genomic_object.__class__.__name__,
-                    "Genomic Object ID": genomic_object.id,
-                    "Metabolomic Object Type": metabolomic_object.__class__.__name__,
-                    "Metabolomic Object ID": metabolomic_object.id,
-                    "Metcalf Score": f"{metcalf_score.value:.2f}" if metcalf_score else "-",
-                    "Rosetta Score": f"{rosetta_score.value:.2f}" if rosetta_score else "-",
+                    "index": index,
+                    "genomic_object_type": genomic_object.__class__.__name__,
+                    "genomic_object_id": genomic_object.id,
+                    "metabolomic_object_type": metabolomic_object.__class__.__name__,
+                    "metabolomic_object_id": metabolomic_object.id,
+                    "metcalf_score": f"{metcalf_score.value:.2f}" if metcalf_score else "-",
+                    "rosetta_score": f"{rosetta_score.value:.2f}" if rosetta_score else "-",
                 }
             )
 

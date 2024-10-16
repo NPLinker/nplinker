@@ -355,3 +355,52 @@ class NPLinker:
         data = (self.bgcs, self.gcfs, self.spectra, self.mfs, self.strains, links)
         with open(file, "wb") as f:
             pickle.dump(data, f)
+
+    def print_bgcs(self, file: str | PathLike) -> None:
+        """Prints the BGC data to a specified file in tab-separated format.
+
+        Args:
+            file: The path to the file where the BGC data will be printed.
+        """
+        headers = self.bgcs[0].to_dict().keys()
+
+        with open(file, "w") as f:
+            f.write("\t".join(headers) + "\n")
+            for bgc in self.bgcs:
+                row_data = bgc.to_dict()
+                f.write("\t".join(str(row_data[h]) for h in headers) + "\n")
+
+    def print_gcfs(self, file: str | PathLike) -> None:
+        """Prints the GCF data to a specified file in tab-separated format.
+
+        Args:
+            file: The path to the file where the GCF data will be printed.
+        """
+        headers = self.gcfs[0].to_dict().keys()
+
+        with open(file, "w") as f:
+            f.write("\t".join(headers) + "\n")
+            for gcf in self.gcfs:
+                row_data = gcf.to_dict()
+                f.write("\t".join(str(row_data[h]) for h in headers) + "\n")
+
+    def print_spectra(self, file: str | PathLike) -> None:
+        """Prints the Spectrum data to a specified file in tab-separated format.
+
+        Args:
+            file: The path to the file where the Spectrum data will be printed.
+        """
+        headers = self.spectra[0].to_dict().keys()
+
+        with open(file, "w") as f:
+            f.write("\t".join(headers) + "\n")
+            for spectrum in self.spectra:
+                row_data = spectrum.to_dict()
+                f.write("\t".join(str(row_data[h]) for h in headers) + "\n")
+
+    def print_results(self, lg: LinkGraph | None = None) -> None:
+        """Prints the results to the output directory in tab-separated format."""
+        self.print_bgcs(self._output_dir / "genomics_data.tsv")
+        self.print_spectra(self._output_dir / "metabolomics_data.tsv")
+        if lg is not None:
+            lg.print_links(self._output_dir / "links.tsv")

@@ -192,3 +192,24 @@ class BGC:
                 for p in predict_aa(self.antismash_file):
                     self._aa_predictions[p[0]] = p[1]
         return [self._aa_predictions]
+
+    def to_dict(self) -> dict:
+        """Convert the BGC object to a dictionary that can be used to export the results.
+
+        Returns:
+            A dictionary containing relavant information about the BGC object.
+        """
+        gcf_ids = [gcf.id for gcf in self.parents if gcf.id is not None]
+        gcf_bsc = [gcf.bigscape_class for gcf in self.parents if gcf.bigscape_class is not None]
+
+        return {
+            "GCF_id": ", ".join(gcf_ids) if gcf_ids else None,
+            "GCF_bigscape_class": ", ".join(gcf_bsc) if gcf_bsc else None,
+            "BGC_name": self.id,
+            "strain_id": self.strain.id,
+            "description": self.description,
+            "antismash_id": self.antismash_id,
+            "antismash_region": self.antismash_region,
+            "antismash_cluster_type": ", ".join(self.product_prediction),
+            "mibig_bgc_class": self.mibig_bgc_class,
+        }
