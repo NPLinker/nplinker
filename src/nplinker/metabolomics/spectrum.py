@@ -98,6 +98,10 @@ class Spectrum:
         """
         return strain in self.strains
 
+    def _formatted_gnps_annotations(self) -> str:
+        """Format GNPS annotations dictionary into a string."""
+        return "; ".join(f"{k}: {v}" for k, v in self.gnps_annotations.items())
+
     def to_dict(self) -> dict[str, any]:
         """Convert the Spectrum object to a dictionary that can be used to export the results.
 
@@ -114,11 +118,6 @@ class Spectrum:
                 - "gnps_id": The GNPS identifier, or "-" if not available.
                 - "gnps_annotations": A formatted string of GNPS annotations, or "-" if not available.
         """
-
-        def format_gnps_annotations(annotations: dict) -> str:
-            """Format GNPS annotations dictionary into a string."""
-            return "; ".join(f"{k}: {v}" for k, v in annotations.items())
-
         return {
             "spectrum_id": self.id,
             "num_strains_with_spectrum": len(self.strains),
@@ -126,5 +125,7 @@ class Spectrum:
             "rt": round(self.rt, 3),
             "molecular_family": self.family.id if self.family else "-",
             "gnps_id": self.gnps_id if self.gnps_id else "-",
-            "gnps_annotations": self.gnps_annotations if self.gnps_annotations else "-",
+            "gnps_annotations": self._formatted_gnps_annotations()
+            if self.gnps_annotations
+            else "-",
         }
