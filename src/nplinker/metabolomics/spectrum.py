@@ -98,25 +98,21 @@ class Spectrum:
         """
         return strain in self.strains
 
-    def _formatted_gnps_annotations(self) -> str:
-        """Format GNPS annotations dictionary into a string."""
-        return "; ".join(f"{k}: {v}" for k, v in self.gnps_annotations.items())
-
     def to_dict(self) -> dict[str, any]:
-        """Convert the Spectrum object to a dictionary that can be used to export the results.
+        """Convert the Spectrum object to a dictionary for exporting results.
 
-        This method gathers relevant information from the Spectrum object and formats it into a dictionary
-        where each key-value pair represents a specific attribute of the Spectrum.
+        This method compiles relevant information from the Spectrum object into a dictionary format.
+        Each key-value pair in the dictionary represents a specific attribute of the Spectrum Object.
 
         Returns:
-            dict[str, str]: A dictionary containing relevant information about the Spectrum object, including:
-                - "spectrum_id": The unique identifier of the spectrum.
-                - "num_strains_with_spectrum": The number of strains associated with the spectrum.
-                - "precursor_mz": The precursor m/z value formatted to four decimal places.
-                - "rt": The retention time formatted to three decimal places.
-                - "molecular_family": The identifier of the molecular family, or "-" if not available.
-                - "gnps_id": The GNPS identifier, or "-" if not available.
-                - "gnps_annotations": A formatted string of GNPS annotations, or "-" if not available.
+            A dictionary containing containing the following key-value pairs:
+                - "spectrum_id" (str): The unique identifier of the spectrum.
+                - "num_strains_with_spectrum" (int): The number of strains associated with the spectrum.
+                - "precursor_mz" (float): The precursor m/z value, rounded to four decimal places.
+                - "rt" (float): The retention time, rounded to three decimal places.
+                - "molecular_family" (str): The identifier of the molecular family, or "-" if not available.
+                - "gnps_id" (str): The GNPS identifier, or "-" if not available.
+                - "gnps_annotations" (dict | str): A dictionary of GNPS annotations, or "-" if not available.
         """
         return {
             "spectrum_id": self.id,
@@ -125,7 +121,5 @@ class Spectrum:
             "rt": round(self.rt, 3),
             "molecular_family": self.family.id if self.family else "-",
             "gnps_id": self.gnps_id if self.gnps_id else "-",
-            "gnps_annotations": self._formatted_gnps_annotations()
-            if self.gnps_annotations
-            else "-",
+            "gnps_annotations": self.gnps_annotations if self.gnps_annotations else "-",
         }

@@ -299,15 +299,14 @@ class LinkGraph:
                 table. If None, all rows are included.
 
         Returns:
-            list: A list of dictionaries, where each dictionary contains
-                the following keys:
-                - Index (int)
-                - Genomic Object Type (str)
-                - Genomic Object ID (str or int)
-                - Metabolomic Object Type (str)
-                - Metabolomic Object ID (str or int)
-                - Metcalf Score (str, formatted to 2 decimal places, or "-")
-                - Rosetta Score (str, formatted to 2 decimal places, or "-")
+            A list of dictionaries, where each dictionary contains
+                - index (int): The index of the link.
+                - genomic_object_type (str): The type of the genomic object.
+                - genomic_object_id (str or int): The ID of the genomic object.
+                - metabolomic_object_type (str): The type of the metabolomic object.
+                - metabolomic_object_id (str or int): The ID of the metabolomic object.
+                - metcalf_score (str): The Metcalf score, formatted to 2 decimal places, or "-".
+                - rosetta_score (str): The Rosetta score, formatted to 2 decimal places, or "-".
         """
         genomic_object_classes = (GCF,)
 

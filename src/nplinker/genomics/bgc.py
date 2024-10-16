@@ -194,22 +194,22 @@ class BGC:
         return [self._aa_predictions]
 
     def to_dict(self) -> dict[str, any]:
-        """Convert the BGC object to a dictionary that can be used to export the results.
+        """Convert the BGC object to a dictionary for exporting results.
 
-        This method gathers relevant information from the BGC object and formats it into a dictionary
-        where each key-value pair represents a specific attribute of the BGC.
+        This method compiles relevant information from the BGC object and formats it into a dictionary.
+        Each key-value pair in the dictionary represents a specific attribute of the BGC.
 
         Returns:
-            dict[str, str]: A dictionary containing relevant information about the BGC object, including:
-                - GCF_id: A comma-separated string of GCF IDs or "-" if none.
-                - GCF_bigscape_class: A comma-separated string of BiG-SCAPE classes or "-" if none.
-                - BGC_name: The name of the BGC.
-                - strain_id: The ID of the strain.
-                - description: A description of the BGC.
-                - antismash_id: The antiSMASH ID.
-                - antismash_region: The antiSMASH region.
-                - antismash_cluster_type: A comma-separated string of product predictions.
-                - mibig_bgc_class: The MiBIG BGC class or "-" if none.
+            A dictionary containing the following key-value pairs:
+            - GCF_id (str): A comma-separated string of GCF IDs or "-" if none are available.
+            - GCF_bigscape_class (str): A comma-separated string of BiG-SCAPE classes or "-" if none are available.
+            - BGC_name (str): The name of the BGC.
+            - strain_id (str): The ID of the strain.
+            - description (str): A description of the BGC.
+            - antismash_id (str): The antiSMASH ID.
+            - antismash_region (str): The antiSMASH region.
+            - antismash_cluster_type (str): A comma-separated string of product predictions.
+            - mibig_bgc_class (str): The MiBIG BGC class or "-" if none is available.
         """
         gcf_ids = {gcf.id for gcf in self.parents if gcf.id is not None}
         gcf_bsc = {bsc for bsc in self.bigscape_classes if bsc is not None}
