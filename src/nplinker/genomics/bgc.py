@@ -193,23 +193,35 @@ class BGC:
                     self._aa_predictions[p[0]] = p[1]
         return [self._aa_predictions]
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, any]:
         """Convert the BGC object to a dictionary that can be used to export the results.
 
+        This method gathers relevant information from the BGC object and formats it into a dictionary
+        where each key-value pair represents a specific attribute of the BGC.
+
         Returns:
-            A dictionary containing relavant information about the BGC object.
+            dict[str, str]: A dictionary containing relevant information about the BGC object, including:
+                - GCF_id: A comma-separated string of GCF IDs or "-" if none.
+                - GCF_bigscape_class: A comma-separated string of BiG-SCAPE classes or "-" if none.
+                - BGC_name: The name of the BGC.
+                - strain_id: The ID of the strain.
+                - description: A description of the BGC.
+                - antismash_id: The antiSMASH ID.
+                - antismash_region: The antiSMASH region.
+                - antismash_cluster_type: A comma-separated string of product predictions.
+                - mibig_bgc_class: The MiBIG BGC class or "-" if none.
         """
-        gcf_ids = [gcf.id for gcf in self.parents if gcf.id is not None]
-        gcf_bsc = [gcf.bigscape_class for gcf in self.parents if gcf.bigscape_class is not None]
+        gcf_ids = {gcf.id for gcf in self.parents if gcf.id is not None}
+        gcf_bsc = {bsc for bsc in self.bigscape_classes if bsc is not None}
 
         return {
-            "GCF_id": ", ".join(gcf_ids) if gcf_ids else None,
-            "GCF_bigscape_class": ", ".join(gcf_bsc) if gcf_bsc else None,
+            "GCF_id": ", ".join(gcf_ids) if gcf_ids else "-",
+            "GCF_bigscape_class": ", ".join(gcf_bsc) if gcf_bsc else "-",
             "BGC_name": self.id,
             "strain_id": self.strain.id,
             "description": self.description,
             "antismash_id": self.antismash_id,
             "antismash_region": self.antismash_region,
             "antismash_cluster_type": ", ".join(self.product_prediction),
-            "mibig_bgc_class": self.mibig_bgc_class,
+            "mibig_bgc_class": self.mibig_bgc_class if self.mibig_bgc_class else "-",
         }

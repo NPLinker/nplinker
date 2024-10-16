@@ -98,18 +98,33 @@ class Spectrum:
         """
         return strain in self.strains
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, any]:
         """Convert the Spectrum object to a dictionary that can be used to export the results.
 
+        This method gathers relevant information from the Spectrum object and formats it into a dictionary
+        where each key-value pair represents a specific attribute of the Spectrum.
+
         Returns:
-            A dictionary containing relavant information about the Spectrum object.
+            dict[str, str]: A dictionary containing relevant information about the Spectrum object, including:
+                - "spectrum_id": The unique identifier of the spectrum.
+                - "num_strains_with_spectrum": The number of strains associated with the spectrum.
+                - "precursor_mz": The precursor m/z value formatted to four decimal places.
+                - "rt": The retention time formatted to three decimal places.
+                - "molecular_family": The identifier of the molecular family, or "-" if not available.
+                - "gnps_id": The GNPS identifier, or "-" if not available.
+                - "gnps_annotations": A formatted string of GNPS annotations, or "-" if not available.
         """
+
+        def format_gnps_annotations(annotations: dict) -> str:
+            """Format GNPS annotations dictionary into a string."""
+            return "; ".join(f"{k}: {v}" for k, v in annotations.items())
+
         return {
             "spectrum_id": self.id,
             "num_strains_with_spectrum": len(self.strains),
-            "precursor_mz": self.precursor_mz,
-            "rt": self.rt,
-            "molecular_family": self.family.id if self.family else None,
-            "gnps_id": self.gnps_id,
-            "gnps_annotations": self.gnps_annotations,
+            "precursor_mz": round(self.precursor_mz, 4),
+            "rt": round(self.rt, 3),
+            "molecular_family": self.family.id if self.family else "-",
+            "gnps_id": self.gnps_id if self.gnps_id else "-",
+            "gnps_annotations": self.gnps_annotations if self.gnps_annotations else "-",
         }

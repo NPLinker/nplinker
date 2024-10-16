@@ -286,7 +286,7 @@ class LinkGraph:
         if link_data is not None:
             lg.add_link(u, v, **link_data)
 
-    def get_table_data(self, display_limit: int | None = None) -> list[dict]:
+    def get_table_data(self, display_limit: int | None = None) -> list[dict[str, any]]:
         """Generate the table data for the LinkGraph.
 
         This method iterates over the links in the LinkGraph and constructs a table
