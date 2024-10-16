@@ -118,14 +118,11 @@ def test_get_table_data(lg, gcfs, spectra, score):
     table_data = lg.get_table_data()
     assert type(table_data) is list
     assert type(table_data[0]) is dict
-    assert table_data == [
-        {
-            "Index": 1,
-            "Genomic Object Type": gcfs[0].__class__.__name__,
-            "Genomic Object ID": gcfs[0].id,
-            "Metabolomic Object Type": spectra[0].__class__.__name__,
-            "Metabolomic Object ID": spectra[0].id,
-            "Metcalf Score": f"{score.value:.2f}",
-            "Rosetta Score": "-",
-        },
-    ]
+    assert len(table_data) == 1
+    assert table_data[0]["index"] == 1
+    assert table_data[0]["genomic_object_type"] == gcfs[0].__class__.__name__
+    assert table_data[0]["genomic_object_id"] == gcfs[0].id
+    assert table_data[0]["metabolomic_object_type"] == spectra[0].__class__.__name__
+    assert table_data[0]["metabolomic_object_id"] == spectra[0].id
+    assert table_data[0]["metcalf_score"] == f"{score.value:.2f}"
+    assert table_data[0]["rosetta_score"] == "-"
