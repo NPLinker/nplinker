@@ -356,11 +356,13 @@ class NPLinker:
         with open(file, "wb") as f:
             pickle.dump(data, f)
 
-    def print_bgcs(self, file: str | PathLike) -> None:
-        """Prints the BGC data to a specified file in tab-separated format.
+    def export_genomics_data(self, file: str | PathLike) -> None:
+        """Exports the genomics data to a specified file in tab-separated format.
+
+        Each row in the file corresponds to a BGC object.
 
         Args:
-            file: The path to the file where the BGC data will be printed.
+            file: The path to the file where the genomics data will be printed.
         """
         headers = self.bgcs[0].to_dict().keys()
 
@@ -370,25 +372,13 @@ class NPLinker:
                 row_data = bgc.to_dict()
                 f.write("\t".join(str(row_data[h]) for h in headers) + "\n")
 
-    def print_gcfs(self, file: str | PathLike) -> None:
-        """Prints the GCF data to a specified file in tab-separated format.
+    def export_metabolomics_data(self, file: str | PathLike) -> None:
+        """Exports the metabolomics data to a specified file in tab-separated format.
+
+        Each row in the file corresponds to a Spectrum object.
 
         Args:
-            file: The path to the file where the GCF data will be printed.
-        """
-        headers = self.gcfs[0].to_dict().keys()
-
-        with open(file, "w") as f:
-            f.write("\t".join(headers) + "\n")
-            for gcf in self.gcfs:
-                row_data = gcf.to_dict()
-                f.write("\t".join(str(row_data[h]) for h in headers) + "\n")
-
-    def print_spectra(self, file: str | PathLike) -> None:
-        """Prints the Spectrum data to a specified file in tab-separated format.
-
-        Args:
-            file: The path to the file where the Spectrum data will be printed.
+            file: The path to the file where the metabolomics data will be printed.
         """
         headers = self.spectra[0].to_dict().keys()
 
@@ -398,9 +388,18 @@ class NPLinker:
                 row_data = spectrum.to_dict()
                 f.write("\t".join(str(row_data[h]) for h in headers) + "\n")
 
-    def print_results(self, lg: LinkGraph | None = None) -> None:
-        """Prints the results to the output directory in tab-separated format."""
-        self.print_bgcs(self._output_dir / "genomics_data.tsv")
-        self.print_spectra(self._output_dir / "metabolomics_data.tsv")
+    def export_results(self, lg: LinkGraph | None = None) -> None:
+        """Exports the results to the output directory in tab-separated format.
+
+        This method exports genomics and metabolomics data to their respective
+        TSV files in the specified output directory. If a LinkGraph object is
+        provided, it also exports the links data to a TSV file.
+
+        Args:
+            lg (LinkGraph | None): An optional LinkGraph object. If provided,
+                       the links data will be exported to 'links.tsv'.
+        """
+        self.export_genomics_data(self._output_dir / "genomics_data.tsv")
+        self.export_metabolomics_data(self._output_dir / "metabolomics_data.tsv")
         if lg is not None:
-            lg.print_links(self._output_dir / "links.tsv")
+            lg.export_links(self._output_dir / "links.tsv")

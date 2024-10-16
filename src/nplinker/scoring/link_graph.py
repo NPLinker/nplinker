@@ -360,8 +360,8 @@ class LinkGraph:
 
         return table
 
-    def print_links(self, file: str | PathLike) -> None:
-        """Print the links in the LinkGraph to a file.
+    def export_links(self, file: str | PathLike) -> None:
+        """Exports the links in the LinkGraph to a file.
 
         Args:
             file: the file to write the links to.
