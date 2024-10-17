@@ -119,7 +119,7 @@ class Spectrum:
             "num_strains_with_spectrum": len(self.strains),
             "precursor_mz": round(self.precursor_mz, 4),
             "rt": round(self.rt, 3),
-            "molecular_family": self.family.id if self.family else "",
-            "gnps_id": self.gnps_id if self.gnps_id else "",
-            "gnps_annotations": self.gnps_annotations if self.gnps_annotations else "",
+            "molecular_family": self.family.id if self.family else None,
+            "gnps_id": self.gnps_id,
+            "gnps_annotations": self.gnps_annotations,
         }

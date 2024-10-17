@@ -356,37 +356,34 @@ class NPLinker:
         with open(file, "wb") as f:
             pickle.dump(data, f)
 
-    def export_genomics_data(self, file: str | PathLike) -> None:
-        """Exports the genomics data to a specified file in tab-separated format.
-
-        Each row in the file corresponds to a BGC object.
+    def export_objects(self, objects: BGC | Spectrum, filename: str) -> None:
+        """Exports the data for a list of BGC or Spectrum objects to a specified file in tab-separated format.
 
         Args:
-            file: The path to the file where the genomics data will be printed.
+            objects (BGC | Spectrum): A list of BGC or Spectrum objects to be exported.
+            filename (str): The name of the file where the data will be saved.
         """
-        headers = self.bgcs[0].to_dict().keys()
-
-        with open(file, "w") as f:
+        headers = objects[0].to_dict().keys()
+        with open(self._output_dir / filename, "w") as f:
             f.write("\t".join(headers) + "\n")
-            for bgc in self.bgcs:
-                row_data = bgc.to_dict()
-                f.write("\t".join(str(row_data[h]) for h in headers) + "\n")
-
-    def export_metabolomics_data(self, file: str | PathLike) -> None:
-        """Exports the metabolomics data to a specified file in tab-separated format.
-
-        Each row in the file corresponds to a Spectrum object.
-
-        Args:
-            file: The path to the file where the metabolomics data will be printed.
-        """
-        headers = self.spectra[0].to_dict().keys()
-
-        with open(file, "w") as f:
-            f.write("\t".join(headers) + "\n")
-            for spectrum in self.spectra:
-                row_data = spectrum.to_dict()
-                f.write("\t".join(str(row_data[h]) for h in headers) + "\n")
+            for obj in objects:
+                row_data = obj.to_dict()
+                formatted_row = []
+                for header in headers:
+                    item = row_data.get(header, "")
+                    # Convert list, tuple, set to comma-separated string
+                    if isinstance(item, (list, tuple, set)):
+                        formatted_row.append(", ".join(map(str, item)))
+                    # Convert dict to comma-separated string
+                    elif isinstance(item, dict):
+                        formatted_row.append(", ".join([f"{k}:{v}" for k, v in item.items()]))
+                    # Convert non-empty value to string
+                    elif item:
+                        formatted_row.append(str(item))
+                    # Convert empty value to empty string
+                    else:
+                        formatted_row.append("")
+                f.write("\t".join(formatted_row) + "\n")
 
     def export_results(self, lg: LinkGraph | None = None) -> None:
         """Exports the results to the output directory in tab-separated format.
@@ -399,7 +396,7 @@ class NPLinker:
             lg (LinkGraph | None): An optional LinkGraph object. If provided,
                        the links data will be exported to 'links.tsv'.
         """
-        self.export_genomics_data(self._output_dir / "genomics_data.tsv")
-        self.export_metabolomics_data(self._output_dir / "metabolomics_data.tsv")
+        self.export_objects(self.bgcs, "genomics_data.tsv")
+        self.export_objects(self.spectra, "metabolomics_data.tsv")
         if lg is not None:
             lg.export_links(self._output_dir / "links.tsv")

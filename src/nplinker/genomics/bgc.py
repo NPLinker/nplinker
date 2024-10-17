@@ -211,17 +211,14 @@ class BGC:
             - antismash_cluster_type (str): A comma-separated string of product predictions.
             - mibig_bgc_class (str): The MiBIG BGC class or "-" if none is available.
         """
-        gcf_ids = {str(gcf.id) for gcf in self.parents if gcf.id is not None}
-        gcf_bsc = {str(bsc) for bsc in self.bigscape_classes if bsc is not None}
-
         return {
-            "GCF_id": ", ".join(gcf_ids),
-            "GCF_bigscape_class": ", ".join(gcf_bsc),
+            "GCF_id": {gcf.id for gcf in self.parents if gcf.id is not None},
+            "GCF_bigscape_class": {bsc for bsc in self.bigscape_classes if bsc is not None},
             "BGC_name": self.id,
             "strain_id": self.strain.id,
             "description": self.description,
             "antismash_id": self.antismash_id,
             "antismash_region": self.antismash_region,
-            "antismash_cluster_type": ", ".join(self.product_prediction),
+            "antismash_cluster_type": self.product_prediction,
             "mibig_bgc_class": self.mibig_bgc_class if self.mibig_bgc_class else "",
         }

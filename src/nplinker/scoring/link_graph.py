@@ -311,41 +311,47 @@ class LinkGraph:
                 table. If None, all rows are included.
 
         Returns:
-            A list of dictionaries, where each dictionary contains
+            A list of dictionaries containing the table data.
+        """
+        table_data = []
+        for index, link in enumerate(self.links, start=1):
+            table_data.append(self.link_to_dict(link, index))
+            if display_limit is not None and index == display_limit:
+                break
+        return table_data
+
+    def link_to_dict(self, link: LINK, index: int) -> dict[str, any]:
+        """Convert a link to a dictionary representation.
+
+        Args:
+            link: A tuple containing the link information (u, v, data).
+            index: The index of the link.
+
+        Returns:
+            A dictionary containing the link information with the following keys:
                 - index (int): The index of the link.
-                - genomic_object_type (str): The type of the genomic object.
                 - genomic_object_id (str or int): The ID of the genomic object.
-                - metabolomic_object_type (str): The type of the metabolomic object.
+                - genomic_object_type (str): The type of the genomic object.
                 - metabolomic_object_id (str or int): The ID of the metabolomic object.
+                - metabolomic_object_type (str): The type of the metabolomic object.
                 - metcalf_score (float): The Metcalf score, rounded to 2 decimal places.
                 - rosetta_score (float): The Rosetta score, rounded to 2 decimal places.
         """
+        u, v, data = link
         genomic_object_classes = (GCF,)
-
-        table_data = []
-
-        for index, (u, v, data) in enumerate(self.links, start=1):
-            genomic_object = u if isinstance(u, genomic_object_classes) else v
-            metabolomic_object = v if isinstance(u, genomic_object_classes) else u
-            metcalf_score = data.get("metcalf")
-            rosetta_score = data.get("rosetta")
-
-            table_data.append(
-                {
-                    "index": index,
-                    "genomic_object_id": genomic_object.id,
-                    "genomic_object_type": genomic_object.__class__.__name__,
-                    "metabolomic_object_id": metabolomic_object.id,
-                    "metabolomic_object_type": metabolomic_object.__class__.__name__,
-                    "metcalf_score": round(metcalf_score.value, 2) if metcalf_score else "",
-                    "rosetta_score": round(rosetta_score.value, 2) if rosetta_score else "",
-                }
-            )
-
-            if display_limit is not None and index == display_limit:
-                break
-
-        return table_data
+        genomic_object = u if isinstance(u, genomic_object_classes) else v
+        metabolomic_object = v if isinstance(u, genomic_object_classes) else u
+        metcalf_score = data.get("metcalf")
+        rosetta_score = data.get("rosetta")
+        return {
+            "index": index,
+            "genomic_object_id": genomic_object.id,
+            "genomic_object_type": genomic_object.__class__.__name__,
+            "metabolomic_object_id": metabolomic_object.id,
+            "metabolomic_object_type": metabolomic_object.__class__.__name__,
+            "metcalf_score": round(metcalf_score.value, 2) if metcalf_score else "",
+            "rosetta_score": round(rosetta_score.value, 2) if rosetta_score else "",
+        }
 
     def _get_table_repr(self, display_limit: int | None = 60) -> str:
         """Generate a table representation of the LinkGraph.

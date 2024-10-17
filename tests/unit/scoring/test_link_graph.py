@@ -124,5 +124,5 @@ def test_get_table_data(lg, gcfs, spectra, score):
     assert table_data[0]["genomic_object_id"] == gcfs[0].id
     assert table_data[0]["metabolomic_object_type"] == spectra[0].__class__.__name__
     assert table_data[0]["metabolomic_object_id"] == spectra[0].id
-    assert table_data[0]["metcalf_score"] == f"{score.value:.2f}"
-    assert table_data[0]["rosetta_score"] == "-"
+    assert table_data[0]["metcalf_score"] == round(score.value, 2)
+    assert table_data[0]["rosetta_score"] == ""
