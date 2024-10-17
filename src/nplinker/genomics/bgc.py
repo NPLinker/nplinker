@@ -211,8 +211,8 @@ class BGC:
             - antismash_cluster_type (str): A comma-separated string of product predictions.
             - mibig_bgc_class (str): The MiBIG BGC class or "-" if none is available.
         """
-        gcf_ids = {gcf.id for gcf in self.parents if gcf.id is not None}
-        gcf_bsc = {bsc for bsc in self.bigscape_classes if bsc is not None}
+        gcf_ids = {str(gcf.id) for gcf in self.parents if gcf.id is not None}
+        gcf_bsc = {str(bsc) for bsc in self.bigscape_classes if bsc is not None}
 
         return {
             "GCF_id": ", ".join(gcf_ids) if gcf_ids else "-",
