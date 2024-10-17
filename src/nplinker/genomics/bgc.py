@@ -215,13 +215,13 @@ class BGC:
         gcf_bsc = {str(bsc) for bsc in self.bigscape_classes if bsc is not None}
 
         return {
-            "GCF_id": ", ".join(gcf_ids) if gcf_ids else "-",
-            "GCF_bigscape_class": ", ".join(gcf_bsc) if gcf_bsc else "-",
+            "GCF_id": ", ".join(gcf_ids),
+            "GCF_bigscape_class": ", ".join(gcf_bsc),
             "BGC_name": self.id,
             "strain_id": self.strain.id,
             "description": self.description,
             "antismash_id": self.antismash_id,
             "antismash_region": self.antismash_region,
             "antismash_cluster_type": ", ".join(self.product_prediction),
-            "mibig_bgc_class": self.mibig_bgc_class if self.mibig_bgc_class else "-",
+            "mibig_bgc_class": self.mibig_bgc_class if self.mibig_bgc_class else "",
         }

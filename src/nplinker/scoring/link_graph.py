@@ -104,6 +104,18 @@ class LinkGraph:
             Get the link data between two objects:
             >>> lg.get_link_data(gcf, spectrum)
             {"metcalf": Score("metcalf", 1.0, {"cutoff": 0.5})}
+
+            Filter the links for `gcf1` and `gcf2`:
+            >>> new_lg = lg.filter([gcf1, gcf2])
+
+            Filter the links for `spectrum1` and `spectrum2`:
+            >>> new_lg = lg.filter([spectrum1, spectrum2])
+
+            Filter the links between two lists of objects:
+            >>> new_lg = lg.filter([gcf1, gcf2], [spectrum1, spectrum2])
+
+            Export the links to a file:
+            >>> lg.export_links("links.tsv")
         """
         self._g: Graph = Graph()
 
@@ -305,8 +317,8 @@ class LinkGraph:
                 - genomic_object_id (str or int): The ID of the genomic object.
                 - metabolomic_object_type (str): The type of the metabolomic object.
                 - metabolomic_object_id (str or int): The ID of the metabolomic object.
-                - metcalf_score (str): The Metcalf score, formatted to 2 decimal places, or "-".
-                - rosetta_score (str): The Rosetta score, formatted to 2 decimal places, or "-".
+                - metcalf_score (float): The Metcalf score, rounded to 2 decimal places.
+                - rosetta_score (float): The Rosetta score, rounded to 2 decimal places.
         """
         genomic_object_classes = (GCF,)
 
@@ -321,12 +333,12 @@ class LinkGraph:
             table_data.append(
                 {
                     "index": index,
-                    "genomic_object_type": genomic_object.__class__.__name__,
                     "genomic_object_id": genomic_object.id,
-                    "metabolomic_object_type": metabolomic_object.__class__.__name__,
+                    "genomic_object_type": genomic_object.__class__.__name__,
                     "metabolomic_object_id": metabolomic_object.id,
-                    "metcalf_score": f"{metcalf_score.value:.2f}" if metcalf_score else "-",
-                    "rosetta_score": f"{rosetta_score.value:.2f}" if rosetta_score else "-",
+                    "metabolomic_object_type": metabolomic_object.__class__.__name__,
+                    "metcalf_score": round(metcalf_score.value, 2) if metcalf_score else "",
+                    "rosetta_score": round(rosetta_score.value, 2) if rosetta_score else "",
                 }
             )
 
