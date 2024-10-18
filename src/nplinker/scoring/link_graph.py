@@ -298,29 +298,8 @@ class LinkGraph:
         if link_data is not None:
             lg.add_link(u, v, **link_data)
 
-    def get_table_data(self, display_limit: int | None = None) -> list[dict[str, any]]:
-        """Generate the table data for the LinkGraph.
-
-        This method iterates over the links in the LinkGraph and constructs a table
-        containing information about genomic and metabolomic objects, as well as their
-        associated scores. Each row in the table represents a link between a genomic
-        object and a metabolomic object.
-
-        Args:
-            display_limit (int | None): The maximum number of rows to include in the
-                table. If None, all rows are included.
-
-        Returns:
-            A list of dictionaries containing the table data.
-        """
-        table_data = []
-        for index, link in enumerate(self.links, start=1):
-            table_data.append(self.link_to_dict(link, index))
-            if display_limit is not None and index == display_limit:
-                break
-        return table_data
-
-    def link_to_dict(self, link: LINK, index: int) -> dict[str, any]:
+    @staticmethod
+    def link_to_dict(link: LINK, index: int) -> dict[str, any]:
         """Convert a link to a dictionary representation.
 
         Args:
@@ -352,6 +331,28 @@ class LinkGraph:
             "metcalf_score": round(metcalf_score.value, 2) if metcalf_score else "",
             "rosetta_score": round(rosetta_score.value, 2) if rosetta_score else "",
         }
+
+    def get_table_data(self, display_limit: int | None = None) -> list[dict[str, any]]:
+        """Generate the table data for the LinkGraph.
+
+        This method iterates over the links in the LinkGraph and constructs a table
+        containing information about genomic and metabolomic objects, as well as their
+        associated scores. Each row in the table represents a link between a genomic
+        object and a metabolomic object.
+
+        Args:
+            display_limit (int | None): The maximum number of rows to include in the
+                table. If None, all rows are included.
+
+        Returns:
+            A list of dictionaries containing the table data.
+        """
+        table_data = []
+        for index, link in enumerate(self.links, start=1):
+            table_data.append(self.link_to_dict(link, index))
+            if display_limit is not None and index == display_limit:
+                break
+        return table_data
 
     def _get_table_repr(self, display_limit: int | None = 60) -> str:
         """Generate a table representation of the LinkGraph.
