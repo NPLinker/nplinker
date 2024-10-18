@@ -68,3 +68,35 @@ def test_has_strain():
     spec.strains.add(strain1)
     assert spec.has_strain(strain1)
     assert not spec.has_strain(strain2)
+
+
+def test_to_dict():
+    """Test the to_dict method."""
+    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150, 0, {"info": "test"})
+    spec.strains.add(Strain("strain1"))
+    spec.strains.add(Strain("strain2"))
+
+    dict_repr = spec.to_dict()
+    assert dict_repr["spectrum_id"] == "spec1"
+    assert dict_repr["num_strains_with_spectrum"] == 2
+    assert dict_repr["precursor_mz"] == 150.0
+    assert dict_repr["rt"] == 0.0
+    assert dict_repr["molecular_family"] is None
+    assert dict_repr["gnps_id"] is None
+    assert dict_repr["gnps_annotations"] == dict()
+
+    # Test with gnps information
+    spec.gnps_id = "GNPS0001"
+    spec.gnps_annotations = {"annotation1": "value1"}
+
+    # Test with molecular family
+    class MockMolecularFamily:
+        def __init__(self, id):
+            self.id = id
+
+    spec.family = MockMolecularFamily("family1")
+
+    dict_repr = spec.to_dict()
+    assert dict_repr["molecular_family"] == "family1"
+    assert dict_repr["gnps_id"] == "GNPS0001"
+    assert dict_repr["gnps_annotations"] == {"annotation1": "value1"}

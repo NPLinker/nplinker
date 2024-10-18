@@ -215,10 +215,10 @@ class BGC:
             "GCF_id": {gcf.id for gcf in self.parents if gcf.id is not None},
             "GCF_bigscape_class": {bsc for bsc in self.bigscape_classes if bsc is not None},
             "BGC_name": self.id,
-            "strain_id": self.strain.id,
+            "product_prediction": self.product_prediction,
+            "mibig_bgc_class": self.mibig_bgc_class,
             "description": self.description,
+            "strain_id": self.strain.id,
             "antismash_id": self.antismash_id,
             "antismash_region": self.antismash_region,
-            "antismash_cluster_type": self.product_prediction,
-            "mibig_bgc_class": self.mibig_bgc_class if self.mibig_bgc_class else "",
         }

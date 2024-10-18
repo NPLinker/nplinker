@@ -114,15 +114,29 @@ def test_filter(gcfs, spectra, score):
     assert len(lg_filtered) == 4
 
 
+def test_link_to_dict(lg, gcfs, spectra, score):
+    link = lg.links[0]
+    index = 1
+    dict_repr = lg.link_to_dict(link, index)
+    assert type(dict_repr) is dict
+    assert dict_repr["index"] == 1
+    assert dict_repr["genomic_object_type"] == gcfs[0].__class__.__name__
+    assert dict_repr["genomic_object_id"] == gcfs[0].id
+    assert dict_repr["metabolomic_object_type"] == spectra[0].__class__.__name__
+    assert dict_repr["metabolomic_object_id"] == spectra[0].id
+    assert dict_repr["metcalf_score"] == round(score.value, 2)
+    assert dict_repr["rosetta_score"] == ""
+
+
 def test_get_table_data(lg, gcfs, spectra, score):
+    # add a second link
+    lg.add_link(gcfs[1], spectra[1], metcalf=score)
+
     table_data = lg.get_table_data()
     assert type(table_data) is list
     assert type(table_data[0]) is dict
+    assert len(table_data) == 2
+
+    display_limit = 1
+    table_data = lg.get_table_data(display_limit)
     assert len(table_data) == 1
-    assert table_data[0]["index"] == 1
-    assert table_data[0]["genomic_object_type"] == gcfs[0].__class__.__name__
-    assert table_data[0]["genomic_object_id"] == gcfs[0].id
-    assert table_data[0]["metabolomic_object_type"] == spectra[0].__class__.__name__
-    assert table_data[0]["metabolomic_object_id"] == spectra[0].id
-    assert table_data[0]["metcalf_score"] == round(score.value, 2)
-    assert table_data[0]["rosetta_score"] == ""
