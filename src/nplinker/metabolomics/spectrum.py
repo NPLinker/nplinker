@@ -110,9 +110,9 @@ class Spectrum:
                 - "num_strains_with_spectrum" (int): The number of strains associated with the spectrum.
                 - "precursor_mz" (float): The precursor m/z value, rounded to four decimal places.
                 - "rt" (float): The retention time, rounded to three decimal places.
-                - "molecular_family" (str): The identifier of the molecular family, or "-" if not available.
-                - "gnps_id" (str): The GNPS identifier, or "-" if not available.
-                - "gnps_annotations" (dict | str): A dictionary of GNPS annotations, or "-" if not available.
+                - "molecular_family" (str | None ): The identifier of the molecular family.
+                - "gnps_id" (str | None ): The GNPS identifier.
+                - "gnps_annotations" (dict): A dictionary of GNPS annotations.
         """
         return {
             "spectrum_id": self.id,

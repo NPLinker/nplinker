@@ -201,24 +201,24 @@ class BGC:
 
         Returns:
             A dictionary containing the following key-value pairs:
-            - GCF_id (str): A comma-separated string of GCF IDs or "-" if none are available.
-            - GCF_bigscape_class (str): A comma-separated string of BiG-SCAPE classes or "-" if none are available.
-            - BGC_name (str): The name of the BGC.
+            - GCF_id (set): A set of GCF IDs.
+            - GCF_bigscape_class (set): A set of BiG-SCAPE classes.
             - strain_id (str): The ID of the strain.
-            - description (str): A description of the BGC.
-            - antismash_id (str): The antiSMASH ID.
-            - antismash_region (str): The antiSMASH region.
-            - antismash_cluster_type (str): A comma-separated string of product predictions.
-            - mibig_bgc_class (str): The MiBIG BGC class or "-" if none is available.
+            - description (str | None): A description of the BGC.
+            - BGC_name (str): The name of the BGC.
+            - product_prediction (tuple): (predicted) natural products or product classes of the BGC.
+            - mibig_bgc_class (tuple[str] | None):  MIBiG biosynthetic classes to which the BGC belongs.
+            - antismash_id (str | None): The antiSMASH ID.
+            - antismash_region (int | None): The antiSMASH region.
         """
         return {
             "GCF_id": {gcf.id for gcf in self.parents if gcf.id is not None},
             "GCF_bigscape_class": {bsc for bsc in self.bigscape_classes if bsc is not None},
+            "strain_id": self.strain.id,
+            "description": self.description,
             "BGC_name": self.id,
             "product_prediction": self.product_prediction,
             "mibig_bgc_class": self.mibig_bgc_class,
-            "description": self.description,
-            "strain_id": self.strain.id,
             "antismash_id": self.antismash_id,
             "antismash_region": self.antismash_region,
         }

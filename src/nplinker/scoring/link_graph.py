@@ -309,12 +309,12 @@ class LinkGraph:
         Returns:
             A dictionary containing the link information with the following keys:
                 - index (int): The index of the link.
-                - genomic_object_id (str or int): The ID of the genomic object.
+                - genomic_object_id (str): The ID of the genomic object.
                 - genomic_object_type (str): The type of the genomic object.
-                - metabolomic_object_id (str or int): The ID of the metabolomic object.
+                - metabolomic_object_id (str): The ID of the metabolomic object.
                 - metabolomic_object_type (str): The type of the metabolomic object.
-                - metcalf_score (float): The Metcalf score, rounded to 2 decimal places.
-                - rosetta_score (float): The Rosetta score, rounded to 2 decimal places.
+                - metcalf_score (float | str): The Metcalf score, rounded to 2 decimal places.
+                - rosetta_score (float | str): The Rosetta score, rounded to 2 decimal places.
         """
         u, v, data = link
         genomic_object_classes = (GCF,)
