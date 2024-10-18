@@ -355,3 +355,48 @@ class NPLinker:
         data = (self.bgcs, self.gcfs, self.spectra, self.mfs, self.strains, links)
         with open(file, "wb") as f:
             pickle.dump(data, f)
+
+    def export_objects(self, objects: BGC | Spectrum, filename: str) -> None:
+        """Exports the data for a list of BGC or Spectrum objects to a specified file in tab-separated format.
+
+        Args:
+            objects (BGC | Spectrum): A list of BGC or Spectrum objects to be exported.
+            filename (str): The name of the file where the data will be saved.
+        """
+        headers = objects[0].to_dict().keys()
+        with open(self._output_dir / filename, "w") as f:
+            f.write("\t".join(headers) + "\n")
+            for obj in objects:
+                row_data = obj.to_dict()
+                formatted_row = []
+                for header in headers:
+                    item = row_data.get(header, "")
+                    # Convert list, tuple, set to comma-separated string
+                    if isinstance(item, (list, tuple, set)):
+                        formatted_row.append(", ".join(map(str, item)))
+                    # Convert dict to comma-separated string
+                    elif isinstance(item, dict):
+                        formatted_row.append(", ".join([f"{k}:{v}" for k, v in item.items()]))
+                    # Convert non-empty value to string
+                    elif item:
+                        formatted_row.append(str(item))
+                    # Convert empty value to empty string
+                    else:
+                        formatted_row.append("")
+                f.write("\t".join(formatted_row) + "\n")
+
+    def export_results(self, lg: LinkGraph | None = None) -> None:
+        """Exports the results to the output directory in tab-separated format.
+
+        This method exports genomics and metabolomics data to their respective
+        TSV files in the specified output directory. If a LinkGraph object is
+        provided, it also exports the links data to a TSV file.
+
+        Args:
+            lg (LinkGraph | None): An optional LinkGraph object. If provided,
+                       the links data will be exported to 'links.tsv'.
+        """
+        self.export_objects(self.bgcs, "genomics_data.tsv")
+        self.export_objects(self.spectra, "metabolomics_data.tsv")
+        if lg is not None:
+            lg.export_links(self._output_dir / "links.tsv")

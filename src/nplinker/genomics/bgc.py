@@ -192,3 +192,33 @@ class BGC:
                 for p in predict_aa(self.antismash_file):
                     self._aa_predictions[p[0]] = p[1]
         return [self._aa_predictions]
+
+    def to_dict(self) -> dict[str, any]:
+        """Convert the BGC object to a dictionary for exporting results.
+
+        This method compiles relevant information from the BGC object and formats it into a dictionary.
+        Each key-value pair in the dictionary represents a specific attribute of the BGC.
+
+        Returns:
+            A dictionary containing the following key-value pairs:
+            - GCF_id (set): A set of GCF IDs.
+            - GCF_bigscape_class (set): A set of BiG-SCAPE classes.
+            - strain_id (str): The ID of the strain.
+            - description (str | None): A description of the BGC.
+            - BGC_name (str): The name of the BGC.
+            - product_prediction (tuple): (predicted) natural products or product classes of the BGC.
+            - mibig_bgc_class (tuple[str] | None):  MIBiG biosynthetic classes to which the BGC belongs.
+            - antismash_id (str | None): The antiSMASH ID.
+            - antismash_region (int | None): The antiSMASH region.
+        """
+        return {
+            "GCF_id": {gcf.id for gcf in self.parents if gcf.id is not None},
+            "GCF_bigscape_class": {bsc for bsc in self.bigscape_classes if bsc is not None},
+            "strain_id": self.strain.id,
+            "description": self.description,
+            "BGC_name": self.id,
+            "product_prediction": self.product_prediction,
+            "mibig_bgc_class": self.mibig_bgc_class,
+            "antismash_id": self.antismash_id,
+            "antismash_region": self.antismash_region,
+        }

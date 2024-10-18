@@ -97,3 +97,29 @@ class Spectrum:
             True when the given strain exist in the spectrum.
         """
         return strain in self.strains
+
+    def to_dict(self) -> dict[str, any]:
+        """Convert the Spectrum object to a dictionary for exporting results.
+
+        This method compiles relevant information from the Spectrum object into a dictionary format.
+        Each key-value pair in the dictionary represents a specific attribute of the Spectrum Object.
+
+        Returns:
+            A dictionary containing containing the following key-value pairs:
+                - "spectrum_id" (str): The unique identifier of the spectrum.
+                - "num_strains_with_spectrum" (int): The number of strains associated with the spectrum.
+                - "precursor_mz" (float): The precursor m/z value, rounded to four decimal places.
+                - "rt" (float): The retention time, rounded to three decimal places.
+                - "molecular_family" (str | None ): The identifier of the molecular family.
+                - "gnps_id" (str | None ): The GNPS identifier.
+                - "gnps_annotations" (dict): A dictionary of GNPS annotations.
+        """
+        return {
+            "spectrum_id": self.id,
+            "num_strains_with_spectrum": len(self.strains),
+            "precursor_mz": round(self.precursor_mz, 4),
+            "rt": round(self.rt, 3),
+            "molecular_family": self.family.id if self.family else None,
+            "gnps_id": self.gnps_id,
+            "gnps_annotations": self.gnps_annotations,
+        }
