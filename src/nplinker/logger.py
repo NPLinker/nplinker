@@ -21,6 +21,7 @@ def setup_logging(level: str = "INFO", file: str = "", use_console: bool = True)
     # Get the ancestor logger "nplinker"
     logger = logging.getLogger("nplinker")
     logger.setLevel(level)
+    logger.handlers.clear()
 
     # File handler
     if file:
