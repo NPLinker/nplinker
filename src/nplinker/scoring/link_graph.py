@@ -282,16 +282,14 @@ class LinkGraph:
         return lg
 
     @staticmethod
-    def link_to_dict(link: LINK, index: int) -> dict[str, Any]:
+    def link_to_dict(link: LINK) -> dict[str, Any]:
         """Convert a link to a dictionary representation.
 
         Args:
             link: A tuple containing the link information (u, v, data).
-            index: The index of the link.
 
         Returns:
             A dictionary containing the link information with the following keys:
-                - index (int): The index of the link.
                 - genomic_object_id (str): The ID of the genomic object.
                 - genomic_object_type (str): The type of the genomic object.
                 - metabolomic_object_id (str): The ID of the metabolomic object.
@@ -306,7 +304,6 @@ class LinkGraph:
         metcalf_score = data.get("metcalf")
         rosetta_score = data.get("rosetta")
         return {
-            "index": index,
             "genomic_object_id": genomic_object.id,
             "genomic_object_type": genomic_object.__class__.__name__,
             "metabolomic_object_id": metabolomic_object.id,
@@ -388,9 +385,8 @@ class LinkGraph:
         Returns:
             A list of dictionaries containing the table data.
         """
+        links = self.links[:display_limit] if display_limit else self.links
         link_dicts = []
-        for index, link in enumerate(self.links, start=1):
-            link_dicts.append(self.link_to_dict(link, index))
-            if display_limit is not None and index == display_limit:
-                break
+        for idx, link in enumerate(links):
+            link_dicts.append({"index": idx + 1, **self.link_to_dict(link)})
         return link_dicts
