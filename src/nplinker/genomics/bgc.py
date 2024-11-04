@@ -117,6 +117,18 @@ class BGC:
         """Reduce function for pickling."""
         return (self.__class__, (self.id, *self.product_prediction), self.__dict__)
 
+    def add_parent(self, gcf: GCF) -> None:
+        """Add a parent GCF to the BGC.
+
+        Args:
+            gcf: gene cluster family
+        """
+        gcf.add_bgc(self)
+
+    def detach_parent(self, gcf: GCF) -> None:
+        """Remove a parent GCF."""
+        gcf.detach_bgc(self)
+
     @property
     def strain(self) -> Strain | None:
         """Get the strain of the BGC."""
@@ -149,18 +161,6 @@ class BGC:
         https://doi.org/10.1038%2Fs41589-019-0400-9.
         """
         return {p.bigscape_class for p in self.parents}
-
-    def add_parent(self, gcf: GCF) -> None:
-        """Add a parent GCF to the BGC.
-
-        Args:
-            gcf: gene cluster family
-        """
-        gcf.add_bgc(self)
-
-    def detach_parent(self, gcf: GCF) -> None:
-        """Remove a parent GCF."""
-        gcf.detach_bgc(self)
 
     def is_mibig(self) -> bool:
         """Check if the BGC is a MIBiG reference BGC or not.

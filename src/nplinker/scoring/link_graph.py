@@ -198,6 +198,45 @@ class LinkGraph:
 
         self._g.add_edge(u, v, **data)
 
+    @validate_uv
+    def has_link(self, u: Entity, v: Entity) -> bool:
+        """Check if there is a link between two objects.
+
+        Args:
+            u: the first object, either a GCF, Spectrum, or MolecularFamily
+            v: the second object, either a GCF, Spectrum, or MolecularFamily
+
+        Returns:
+            True if there is a link between the two objects, False otherwise
+
+        Examples:
+            >>> lg.has_link(gcf, spectrum)
+            True
+        """
+        return self._g.has_edge(u, v)
+
+    @validate_uv
+    def get_link_data(
+        self,
+        u: Entity,
+        v: Entity,
+    ) -> LINK_DATA | None:
+        """Get the data for a link between two objects.
+
+        Args:
+            u: the first object, either a GCF, Spectrum, or MolecularFamily
+            v: the second object, either a GCF, Spectrum, or MolecularFamily
+
+        Returns:
+            A dictionary of scoring methods and their data for the link between the two objects, or
+            None if there is no link between the two objects.
+
+        Examples:
+            >>> lg.get_link_data(gcf, spectrum)
+            {"metcalf": Score("metcalf", 1.0, {"cutoff": 0.5})}
+        """
+        return self._g.get_edge_data(u, v)  # type: ignore
+
     def export_links(self, file: str | PathLike) -> None:
         """Exports the links in the LinkGraph to a file.
 
@@ -258,28 +297,6 @@ class LinkGraph:
 
         return lg
 
-    @validate_uv
-    def get_link_data(
-        self,
-        u: Entity,
-        v: Entity,
-    ) -> LINK_DATA | None:
-        """Get the data for a link between two objects.
-
-        Args:
-            u: the first object, either a GCF, Spectrum, or MolecularFamily
-            v: the second object, either a GCF, Spectrum, or MolecularFamily
-
-        Returns:
-            A dictionary of scoring methods and their data for the link between the two objects, or
-            None if there is no link between the two objects.
-
-        Examples:
-            >>> lg.get_link_data(gcf, spectrum)
-            {"metcalf": Score("metcalf", 1.0, {"cutoff": 0.5})}
-        """
-        return self._g.get_edge_data(u, v)  # type: ignore
-
     def get_table_data(self, display_limit: int | None = None) -> list[dict[str, Any]]:
         """Generate the table data for the LinkGraph.
 
@@ -301,23 +318,6 @@ class LinkGraph:
             if display_limit is not None and index == display_limit:
                 break
         return table_data
-
-    @validate_uv
-    def has_link(self, u: Entity, v: Entity) -> bool:
-        """Check if there is a link between two objects.
-
-        Args:
-            u: the first object, either a GCF, Spectrum, or MolecularFamily
-            v: the second object, either a GCF, Spectrum, or MolecularFamily
-
-        Returns:
-            True if there is a link between the two objects, False otherwise
-
-        Examples:
-            >>> lg.has_link(gcf, spectrum)
-            True
-        """
-        return self._g.has_edge(u, v)
 
     @staticmethod
     def link_to_dict(link: LINK, index: int) -> dict[str, Any]:

@@ -168,50 +168,34 @@ class NPLinker:
         """Get names of all valid scoring methods."""
         return list(self._valid_scoring_methods.keys())
 
-    def export_objects(self, objects: Sequence[BGC | Spectrum], filename: str) -> None:
-        """Exports the data for a list of BGC or Spectrum objects to a specified file in tab-separated format.
+    def load_data(self):
+        """Load all data from files into memory.
 
-        Args:
-            objects (list[BGC | Spectrum]): A list of BGC or Spectrum objects to be exported.
-            filename (str): The name of the file where the data will be saved.
+        This method is a convenience function that calls the
+        [`DatasetArranger`][nplinker.arranger.DatasetArranger] class to arrange data files
+        (download, generate and/or validate data) in the [correct directory structure][working-directory-structure],
+        and then calls the [`DatasetLoader`][nplinker.loader.DatasetLoader] class to load all data
+        from the files into memory.
+
+        The loaded data is stored in various data containers for easy access, e.g.
+        [`self.bgcs`][nplinker.NPLinker.bgcs] for all BGC objects,
+        [`self.strains`][nplinker.NPLinker.strains] for all Strain objects, etc.
         """
-        headers = objects[0].to_dict().keys()
-        with open(self._output_dir / filename, "w") as f:
-            f.write("\t".join(headers) + "\n")
-            for obj in objects:
-                row_data = obj.to_dict()
-                formatted_row = []
-                for header in headers:
-                    item = row_data.get(header, "")
-                    # Convert list, tuple, set to comma-separated string
-                    if isinstance(item, (list, tuple, set)):
-                        formatted_row.append(", ".join(map(str, item)))
-                    # Convert dict to comma-separated string
-                    elif isinstance(item, dict):
-                        formatted_row.append(", ".join([f"{k}:{v}" for k, v in item.items()]))
-                    # Convert non-empty value to string
-                    elif item:
-                        formatted_row.append(str(item))
-                    # Convert empty value to empty string
-                    else:
-                        formatted_row.append("")
-                f.write("\t".join(formatted_row) + "\n")
+        arranger = DatasetArranger(self.config)
+        arranger.arrange()
+        loader = DatasetLoader(self.config)
+        loader.load()
 
-    def export_results(self, lg: LinkGraph | None = None) -> None:
-        """Exports the results to the output directory in tab-separated format.
+        self._bgc_dict = {bgc.id: bgc for bgc in loader.bgcs}
+        self._gcf_dict = {gcf.id: gcf for gcf in loader.gcfs}
+        self._spec_dict = {spec.id: spec for spec in loader.spectra}
+        self._mf_dict = {mf.id: mf for mf in loader.mfs}
 
-        This method exports genomics and metabolomics data to their respective
-        TSV files in the specified output directory. If a LinkGraph object is
-        provided, it also exports the links data to a TSV file.
-
-        Args:
-            lg (LinkGraph | None): An optional LinkGraph object. If provided,
-                       the links data will be exported to 'links.tsv'.
-        """
-        self.export_objects(self.bgcs, "genomics_data.tsv")
-        self.export_objects(self.spectra, "metabolomics_data.tsv")
-        if lg is not None:
-            lg.export_links(self._output_dir / "links.tsv")
+        self._mibig_bgcs = loader.mibig_bgcs
+        self._strains = loader.strains
+        self._product_types = loader.product_types
+        self._chem_classes = loader.chem_classes
+        self._class_matches = loader.class_matches
 
     @overload
     def get_links(
@@ -297,35 +281,6 @@ class NPLinker:
 
         return scoring.get_links(*objects, **scoring_params)
 
-    def load_data(self):
-        """Load all data from files into memory.
-
-        This method is a convenience function that calls the
-        [`DatasetArranger`][nplinker.arranger.DatasetArranger] class to arrange data files
-        (download, generate and/or validate data) in the [correct directory structure][working-directory-structure],
-        and then calls the [`DatasetLoader`][nplinker.loader.DatasetLoader] class to load all data
-        from the files into memory.
-
-        The loaded data is stored in various data containers for easy access, e.g.
-        [`self.bgcs`][nplinker.NPLinker.bgcs] for all BGC objects,
-        [`self.strains`][nplinker.NPLinker.strains] for all Strain objects, etc.
-        """
-        arranger = DatasetArranger(self.config)
-        arranger.arrange()
-        loader = DatasetLoader(self.config)
-        loader.load()
-
-        self._bgc_dict = {bgc.id: bgc for bgc in loader.bgcs}
-        self._gcf_dict = {gcf.id: gcf for gcf in loader.gcfs}
-        self._spec_dict = {spec.id: spec for spec in loader.spectra}
-        self._mf_dict = {mf.id: mf for mf in loader.mfs}
-
-        self._mibig_bgcs = loader.mibig_bgcs
-        self._strains = loader.strains
-        self._product_types = loader.product_types
-        self._chem_classes = loader.chem_classes
-        self._class_matches = loader.class_matches
-
     def lookup_bgc(self, id: str) -> BGC | None:
         """Get the BGC object with the given ID.
 
@@ -400,3 +355,48 @@ class NPLinker:
         data = (self.bgcs, self.gcfs, self.spectra, self.mfs, self.strains, links)
         with open(file, "wb") as f:
             pickle.dump(data, f)
+
+    def export_objects(self, objects: Sequence[BGC | Spectrum], filename: str) -> None:
+        """Exports the data for a list of BGC or Spectrum objects to a specified file in tab-separated format.
+
+        Args:
+            objects (list[BGC | Spectrum]): A list of BGC or Spectrum objects to be exported.
+            filename (str): The name of the file where the data will be saved.
+        """
+        headers = objects[0].to_dict().keys()
+        with open(self._output_dir / filename, "w") as f:
+            f.write("\t".join(headers) + "\n")
+            for obj in objects:
+                row_data = obj.to_dict()
+                formatted_row = []
+                for header in headers:
+                    item = row_data.get(header, "")
+                    # Convert list, tuple, set to comma-separated string
+                    if isinstance(item, (list, tuple, set)):
+                        formatted_row.append(", ".join(map(str, item)))
+                    # Convert dict to comma-separated string
+                    elif isinstance(item, dict):
+                        formatted_row.append(", ".join([f"{k}:{v}" for k, v in item.items()]))
+                    # Convert non-empty value to string
+                    elif item:
+                        formatted_row.append(str(item))
+                    # Convert empty value to empty string
+                    else:
+                        formatted_row.append("")
+                f.write("\t".join(formatted_row) + "\n")
+
+    def export_results(self, lg: LinkGraph | None = None) -> None:
+        """Exports the results to the output directory in tab-separated format.
+
+        This method exports genomics and metabolomics data to their respective
+        TSV files in the specified output directory. If a LinkGraph object is
+        provided, it also exports the links data to a TSV file.
+
+        Args:
+            lg (LinkGraph | None): An optional LinkGraph object. If provided,
+                       the links data will be exported to 'links.tsv'.
+        """
+        self.export_objects(self.bgcs, "genomics_data.tsv")
+        self.export_objects(self.spectra, "metabolomics_data.tsv")
+        if lg is not None:
+            lg.export_links(self._output_dir / "links.tsv")
