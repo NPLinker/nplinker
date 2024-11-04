@@ -177,28 +177,28 @@ class BGC:
     def to_dict(self) -> dict[str, Any]:
         """Convert the BGC object to a dictionary for exporting results.
 
-        This method compiles relevant information from the BGC object and formats it into a dictionary.
+        Compiles relevant information from the BGC object and formats it into a dictionary.
         Each key-value pair in the dictionary represents a specific attribute of the BGC.
 
         Returns:
             A dictionary containing the following key-value pairs:
-            - GCF_id (set): A set of GCF IDs.
-            - GCF_bigscape_class (set): A set of BiG-SCAPE classes.
+            - GCF_id (list[str]): A list of GCF IDs.
+            - GCF_bigscape_class (list[str | None]): A list of BiG-SCAPE classes.
             - strain_id (str | None): The ID of the strain.
             - description (str | None): A description of the BGC.
             - BGC_name (str): The name of the BGC.
-            - product_prediction (tuple): (predicted) natural products or product classes of the BGC.
-            - mibig_bgc_class (tuple[str] | None):  MIBiG biosynthetic classes to which the BGC belongs.
+            - product_prediction (list[str]): (predicted) products or product classes of the BGC.
+            - mibig_bgc_class (list[str] | None): MIBiG biosynthetic classes.
             - antismash_id (str | None): The antiSMASH ID.
-            - antismash_region (int | None): The antiSMASH region.
+            - antismash_region (int | None): The antiSMASH region number.
         """
         return {
-            "GCF_id": {gcf.id for gcf in self.parents if gcf.id is not None},
-            "GCF_bigscape_class": {bsc for bsc in self.bigscape_classes if bsc is not None},
+            "GCF_id": [gcf.id for gcf in self.parents if gcf.id is not None],
+            "GCF_bigscape_class": [bsc for bsc in self.bigscape_classes if bsc is not None],
             "strain_id": self.strain.id if self.strain is not None else None,
             "description": self.description,
             "BGC_name": self.id,
-            "product_prediction": self.product_prediction,
+            "product_prediction": list(self.product_prediction),
             "mibig_bgc_class": self.mibig_bgc_class,
             "antismash_id": self.antismash_id,
             "antismash_region": self.antismash_region,

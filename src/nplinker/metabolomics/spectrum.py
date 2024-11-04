@@ -113,7 +113,7 @@ class Spectrum:
                 - "rt" (float): The retention time, rounded to three decimal places.
                 - "molecular_family" (str | None ): The identifier of the molecular family.
                 - "gnps_id" (str | None ): The GNPS identifier.
-                - "gnps_annotations" (dict): A dictionary of GNPS annotations.
+                - "gnps_annotations" (dict[str, str]): A dictionary of GNPS annotations.
         """
         return {
             "spectrum_id": self.id,
