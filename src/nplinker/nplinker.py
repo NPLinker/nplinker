@@ -367,6 +367,11 @@ class NPLinker:
         if not objects:
             raise ValueError("No objects provided to export")
 
+        # Ensure all elements in the list are of the same type
+        obj_type = type(objects[0])
+        if not all(isinstance(obj, obj_type) for obj in objects):
+            raise TypeError("All objects in the list must be of the same type")
+
         headers = objects[0].to_dict().keys()
         with open(self._output_dir / filename, "w", newline="") as outfile:
             writer = csv.DictWriter(outfile, fieldnames=headers, delimiter="\t")
