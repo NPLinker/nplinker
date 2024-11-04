@@ -79,17 +79,17 @@ class LinkGraph:
 
             Display the empty LinkGraph object:
             >>> lg
-            |    | Genomic Object Type   | Genomic Object ID   | Metabolomic Object Type   | Metabolomic Object ID   | Metcalf Score   | Rosetta Score   |
-            |----|-----------------------|---------------------|---------------------------|-------------------------|-----------------|-----------------|
+            |   index |   genomic_object_id |   genomic_object_type |   metabolomic_object_id |   metabolomic_object_type |   metcalf_score |   rosetta_score |
+            |---------|---------------------|-----------------------|-------------------------|---------------------------|-----------------|-----------------|
 
             Add a link between a GCF and a Spectrum object:
             >>> lg.add_link(gcf, spectrum, metcalf=Score("metcalf", 1.0, {"cutoff": 0.5}))
 
             Display all links in LinkGraph object:
             >>> lg
-            |    | Genomic Object Type   | Genomic Object ID   | Metabolomic Object Type   | Metabolomic Object ID   | Metcalf Score   | Rosetta Score   |
-            |----|-----------------------|---------------------|---------------------------|-------------------------|-----------------|-----------------|
-            |  1 | GCF                   | 1                   | Spectrum                  | 1                       | 1.00            | -               |
+            |   index |   genomic_object_id |   genomic_object_type |   metabolomic_object_id |   metabolomic_object_type |   metcalf_score |   rosetta_score |
+            |---------|---------------------|-----------------------|-------------------------|---------------------------|-----------------|-----------------|
+            |       1 |                   1 |                   GCF |                       1 |                  Spectrum |            1.00 |                 |
 
             Get all links for a given object:
             >>> lg[gcf]
@@ -117,7 +117,7 @@ class LinkGraph:
             >>> new_lg = lg.filter([gcf1, gcf2], [spectrum1, spectrum2])
 
             Export the links to a file:
-            >>> lg.export_links("links.tsv")
+            >>> lg.to_tsv("links.tsv")
         """
         self._g: Graph = Graph()
 
@@ -354,9 +354,9 @@ class LinkGraph:
             display_limit: The maximum number of links to display in the table. Defaults to 60.
 
         Returns:
-            str: A string representation of the table in GitHub-flavored markdown format. If the number of links
-            exceeds the display limit, the table is truncated and an additional line indicating the total number
-            of links is appended.
+            str: A string representation of the table in GitHub-flavored markdown format. If the
+            number of links exceeds the display limit, the table is truncated and an additional
+            line indicating the total number of links is appended.
         """
         table = tabulate(
             self._links_to_dicts(display_limit),
