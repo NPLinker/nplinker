@@ -237,22 +237,6 @@ class LinkGraph:
         """
         return self._g.get_edge_data(u, v)  # type: ignore
 
-    def export_links(self, file: str | PathLike) -> None:
-        """Exports the links in the LinkGraph to a file.
-
-        Args:
-            file: the file to write the links to.
-
-        Examples:
-            >>> lg.print_links("links.tsv")
-        """
-        table_data = self.get_table_data()
-        headers = table_data[0].keys()
-        with open(file, "w") as f:
-            f.write("\t".join(headers) + "\n")
-            for row in table_data:
-                f.write("\t".join(str(row[h]) for h in headers) + "\n")
-
     def filter(self, u_nodes: Sequence[Entity], v_nodes: Sequence[Entity] = [], /) -> LinkGraph:
         """Return a new LinkGraph object with the filtered links between the given objects.
 
@@ -297,28 +281,6 @@ class LinkGraph:
 
         return lg
 
-    def get_table_data(self, display_limit: int | None = None) -> list[dict[str, Any]]:
-        """Generate the table data for the LinkGraph.
-
-        This method iterates over the links in the LinkGraph and constructs a table
-        containing information about genomic and metabolomic objects, as well as their
-        associated scores. Each row in the table represents a link between a genomic
-        object and a metabolomic object.
-
-        Args:
-            display_limit (int | None): The maximum number of rows to include in the
-                table. If None, all rows are included.
-
-        Returns:
-            A list of dictionaries containing the table data.
-        """
-        table_data = []
-        for index, link in enumerate(self.links, start=1):
-            table_data.append(self.link_to_dict(link, index))
-            if display_limit is not None and index == display_limit:
-                break
-        return table_data
-
     @staticmethod
     def link_to_dict(link: LINK, index: int) -> dict[str, Any]:
         """Convert a link to a dictionary representation.
@@ -338,9 +300,9 @@ class LinkGraph:
                 - rosetta_score (float | str): The Rosetta score, rounded to 2 decimal places.
         """
         u, v, data = link
-        genomic_object_classes = (GCF,)
-        genomic_object = u if isinstance(u, genomic_object_classes) else v
-        metabolomic_object = v if isinstance(u, genomic_object_classes) else u
+        genomic_types = (GCF,)
+        genomic_object = u if isinstance(u, genomic_types) else v
+        metabolomic_object = v if isinstance(u, genomic_types) else u
         metcalf_score = data.get("metcalf")
         rosetta_score = data.get("rosetta")
         return {
@@ -352,6 +314,22 @@ class LinkGraph:
             "metcalf_score": round(metcalf_score.value, 2) if metcalf_score else "",
             "rosetta_score": round(rosetta_score.value, 2) if rosetta_score else "",
         }
+
+    def to_tsv(self, file: str | PathLike) -> None:
+        """Exports the links in the LinkGraph to a file  in tab-separated format.
+
+        Args:
+            file: the file to write the links to.
+
+        Examples:
+            >>> lg.print_links("links.tsv")
+        """
+        table_data = self._links_to_dicts()
+        headers = table_data[0].keys()
+        with open(file, "w") as f:
+            f.write("\t".join(headers) + "\n")
+            for row in table_data:
+                f.write("\t".join(str(row[h]) for h in headers) + "\n")
 
     @validate_u
     def _filter_one_node(self, u: Entity, lg: LinkGraph) -> None:
@@ -383,7 +361,7 @@ class LinkGraph:
             of links is appended.
         """
         table = tabulate(
-            self.get_table_data(display_limit),
+            self._links_to_dicts(display_limit),
             headers="keys",
             tablefmt="github",
             stralign="right",
@@ -394,3 +372,25 @@ class LinkGraph:
             table += f"\n{truncated_info}"
 
         return table
+
+    def _links_to_dicts(self, display_limit: int | None = None) -> list[dict[str, Any]]:
+        """Generate the table data for the LinkGraph.
+
+        This method iterates over the links in the LinkGraph and constructs a table
+        containing information about genomic and metabolomic objects, as well as their
+        associated scores. Each row in the table represents a link between a genomic
+        object and a metabolomic object.
+
+        Args:
+            display_limit (int | None): The maximum number of rows to include in the
+                table. If None, all rows are included.
+
+        Returns:
+            A list of dictionaries containing the table data.
+        """
+        link_dicts = []
+        for index, link in enumerate(self.links, start=1):
+            link_dicts.append(self.link_to_dict(link, index))
+            if display_limit is not None and index == display_limit:
+                break
+        return link_dicts

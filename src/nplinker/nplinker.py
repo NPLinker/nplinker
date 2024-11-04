@@ -356,8 +356,8 @@ class NPLinker:
         with open(file, "wb") as f:
             pickle.dump(data, f)
 
-    def export_objects(self, objects: Sequence[BGC | Spectrum], filename: str) -> None:
-        """Exports the data for a list of BGC or Spectrum objects to a specified file in tab-separated format.
+    def objects_to_tsv(self, objects: Sequence[BGC] | Sequence[BGC], filename: str) -> None:
+        """Exports a list of BGC or Spectrum objects to a specified file in tab-separated format.
 
         Args:
             objects (list[BGC | Spectrum]): A list of BGC or Spectrum objects to be exported.
@@ -385,7 +385,7 @@ class NPLinker:
                         formatted_row.append("")
                 f.write("\t".join(formatted_row) + "\n")
 
-    def export_results(self, lg: LinkGraph | None = None) -> None:
+    def to_tsv(self, lg: LinkGraph | None = None) -> None:
         """Exports the results to the output directory in tab-separated format.
 
         This method exports genomics and metabolomics data to their respective
@@ -396,7 +396,7 @@ class NPLinker:
             lg (LinkGraph | None): An optional LinkGraph object. If provided,
                        the links data will be exported to 'links.tsv'.
         """
-        self.export_objects(self.bgcs, "genomics_data.tsv")
-        self.export_objects(self.spectra, "metabolomics_data.tsv")
+        self.objects_to_tsv(self.bgcs, "genomics_data.tsv")
+        self.objects_to_tsv(self.spectra, "metabolomics_data.tsv")
         if lg is not None:
-            lg.export_links(self._output_dir / "links.tsv")
+            lg.to_tsv(self._output_dir / "links.tsv")
