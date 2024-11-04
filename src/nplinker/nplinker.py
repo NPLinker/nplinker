@@ -1,4 +1,5 @@
 from __future__ import annotations
+import csv
 import logging
 import pickle
 from collections.abc import Sequence
@@ -356,34 +357,36 @@ class NPLinker:
         with open(file, "wb") as f:
             pickle.dump(data, f)
 
-    def objects_to_tsv(self, objects: Sequence[BGC] | Sequence[BGC], filename: str) -> None:
+    def objects_to_tsv(self, objects: Sequence[BGC] | Sequence[Spectrum], filename: str) -> None:
         """Exports a list of BGC or Spectrum objects to a specified file in tab-separated format.
 
         Args:
-            objects (list[BGC | Spectrum]): A list of BGC or Spectrum objects to be exported.
+            objects (list): A list of BGC or a list of Spectrum objects to be exported.
             filename (str): The name of the file where the data will be saved.
         """
+        if not objects:
+            raise ValueError("No objects provided to export")
+
         headers = objects[0].to_dict().keys()
-        with open(self._output_dir / filename, "w") as f:
-            f.write("\t".join(headers) + "\n")
+        with open(self._output_dir / filename, "w", newline="") as outfile:
+            writer = csv.DictWriter(outfile, fieldnames=headers, delimiter="\t")
+            writer.writeheader()
             for obj in objects:
-                row_data = obj.to_dict()
-                formatted_row = []
+                row = obj.to_dict()
                 for header in headers:
-                    item = row_data.get(header, "")
+                    value = row[header]
                     # Convert list, tuple, set to comma-separated string
-                    if isinstance(item, (list, tuple, set)):
-                        formatted_row.append(", ".join(map(str, item)))
+                    if isinstance(value, (list, tuple, set)):
+                        row[header] = ", ".join(map(str, value))
                     # Convert dict to comma-separated string
-                    elif isinstance(item, dict):
-                        formatted_row.append(", ".join([f"{k}:{v}" for k, v in item.items()]))
-                    # Convert non-empty value to string
-                    elif item:
-                        formatted_row.append(str(item))
-                    # Convert empty value to empty string
+                    elif isinstance(value, dict):
+                        row[header] = ", ".join([f"{k}:{v}" for k, v in value.items()])
+                    # Convert anything else to string
                     else:
-                        formatted_row.append("")
-                f.write("\t".join(formatted_row) + "\n")
+                        row[header] = str(value) if value else ""
+                    # Replace tabs with 4 spaces
+                    row[header] = row[header].replace("\t", "    ")
+                writer.writerow(row)
 
     def to_tsv(self, lg: LinkGraph | None = None) -> None:
         """Exports the results to the output directory in tab-separated format.

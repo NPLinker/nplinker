@@ -1,4 +1,5 @@
 from __future__ import annotations
+import csv
 from collections.abc import Sequence
 from functools import wraps
 from os import PathLike
@@ -313,20 +314,20 @@ class LinkGraph:
         }
 
     def to_tsv(self, file: str | PathLike) -> None:
-        """Exports the links in the LinkGraph to a file  in tab-separated format.
+        """Exports the links in the LinkGraph to a file in tab-separated format.
 
         Args:
             file: the file to write the links to.
 
         Examples:
-            >>> lg.print_links("links.tsv")
+            >>> lg.to_tsv("links.tsv")
         """
         table_data = self._links_to_dicts()
         headers = table_data[0].keys()
-        with open(file, "w") as f:
-            f.write("\t".join(headers) + "\n")
-            for row in table_data:
-                f.write("\t".join(str(row[h]) for h in headers) + "\n")
+        with open(file, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=headers, delimiter="\t")
+            writer.writeheader()
+            writer.writerows(table_data)
 
     @validate_u
     def _filter_one_node(self, u: Entity, lg: LinkGraph) -> None:
