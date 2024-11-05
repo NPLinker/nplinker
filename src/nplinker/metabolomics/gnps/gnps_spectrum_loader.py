@@ -86,6 +86,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
             # Load the spectrum
             spectrum_id: str = spec["params"]["scans"]
             precursor_mz: float = spec["params"]["pepmass"][0]
+            precursor_charge: int = spec["params"]["charge"][0]
             rt = spec["params"].get("rtinseconds", 0)
 
             spectrum = Spectrum(
@@ -93,6 +94,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
                 mz=list(spec["m/z array"]),
                 intensity=list(spec["intensity array"]),
                 precursor_mz=precursor_mz,
+                precursor_charge=precursor_charge,
                 rt=rt,
                 metadata=spec["params"],
             )
