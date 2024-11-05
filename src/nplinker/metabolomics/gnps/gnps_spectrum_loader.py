@@ -85,10 +85,7 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
 
             # Load the spectrum
             spectrum_id: str = spec["params"]["scans"]
-            # calculate precursor m/z from precursor mass and charge
-            precursor_mass = spec["params"]["pepmass"][0]
-            precursor_charge = self._get_precursor_charge(spec["params"]["charge"])
-            precursor_mz: float = precursor_mass / abs(precursor_charge)
+            precursor_mz: float = spec["params"]["pepmass"][0]
             rt = spec["params"].get("rtinseconds", 0)
 
             spectrum = Spectrum(
@@ -100,21 +97,3 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
                 metadata=spec["params"],
             )
             self._spectra.append(spectrum)
-
-    def _get_precursor_charge(self, charges: list[int]) -> int:
-        """Get the precursor charge from the charge list.
-
-        Args:
-            charges: list of charge values.
-
-        Returns:
-            the precursor charge.
-        """
-        charge = charges[0]
-        if charge == 0:
-            logger.warning(
-                f"Invalid precursor charge value 0. "
-                f"Assuming charge is 1 for spectrum '{self._file}'."
-            )
-            charge = 1
-        return charge
