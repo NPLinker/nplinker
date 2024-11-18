@@ -16,7 +16,8 @@
 | Citation data consistency          | [![cffconvert](https://github.com/NPLinker/nplinker/actions/workflows/cffconvert.yml/badge.svg)](https://github.com/NPLinker/nplinker/actions/workflows/cffconvert.yml) |
 
 
-# Natural Products Linker (NPLinker)
+![NPLinker Logo](./docs/images/NPLinker_standard_black.svg)
+
 NPLinker is a python framework for data mining microbial natural products by integrating genomics and metabolomics data.
 
 Original paper: [Ranking microbial metabolomic and genomic links in the NPLinker framework using complementary scoring functions](https://doi.org/10.1371/journal.pcbi.1008920).
