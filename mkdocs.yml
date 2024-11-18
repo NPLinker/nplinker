@@ -48,6 +48,9 @@ extra:
 extra_css:
   - css/extra.css
 
+extra_javascript:
+  - scripts/extra.js
+
 # https://www.mkdocs.org/user-guide/configuration/#validation
 validation:
   omitted_files: warn
