@@ -35,7 +35,8 @@ theme:
     logo: 'material/library-outline'
     previous: fontawesome/solid/angle-left
     next: fontawesome/solid/angle-right
-  favicon: 'favicon.png'
+  favicon: images/NPLinker_icon_black.svg
+  logo: images/NPLinker_icon_white.svg
 
 repo_name: nplinker/nplinker
 repo_url: https://github.com/nplinker/nplinker
