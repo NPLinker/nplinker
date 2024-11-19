@@ -372,26 +372,37 @@ class NPLinker:
         if not all(isinstance(obj, obj_type) for obj in objects):
             raise TypeError("All objects in the list must be of the same type")
 
-        headers = objects[0].to_dict().keys()
         with open(self._output_dir / filename, "w", newline="") as outfile:
+            headers = objects[0].to_dict().keys()
             writer = csv.DictWriter(outfile, fieldnames=headers, delimiter="\t")
             writer.writeheader()
             for obj in objects:
                 row = obj.to_dict()
-                for header in headers:
-                    value = row[header]
-                    # Convert list, tuple, set to comma-separated string
-                    if isinstance(value, (list, tuple, set)):
-                        row[header] = ", ".join(map(str, value))
-                    # Convert dict to comma-separated string
-                    elif isinstance(value, dict):
-                        row[header] = ", ".join([f"{k}:{v}" for k, v in value.items()])
-                    # Convert anything else to string
-                    else:
-                        row[header] = str(value) if value else ""
-                    # Replace tabs with 4 spaces
-                    row[header] = row[header].replace("\t", "    ")
+                for key, value in row.items():
+                    row[key] = self.to_string(value).replace("\t", "    ")
                 writer.writerow(row)
+
+    @staticmethod
+    def to_string(value: Any) -> str:
+        """Convert various types of values to a string.
+
+        Args:
+            value: The value to be converted to a string.
+                Can be a list, tuple, set, dict, or any other type.
+
+        Returns:
+            A string representation of the input value.
+        """
+        # Convert list, tuple, set to comma-separated string
+        if isinstance(value, (list, tuple, set)):
+            value = ", ".join(map(str, value))
+        # Convert dict to comma-separated string
+        elif isinstance(value, dict):
+            value = ", ".join([f"{k}:{v}" for k, v in value.items()])
+        # Convert anything else to string
+        else:
+            value = str(value) if value else ""
+        return value
 
     def to_tsv(self, lg: LinkGraph | None = None) -> None:
         """Exports the results to the output directory in tab-separated format.
