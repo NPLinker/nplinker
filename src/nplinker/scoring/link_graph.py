@@ -291,6 +291,7 @@ class LinkGraph:
 
         Returns:
             A dictionary containing the link information with the following keys:
+            
                 - genomic_object_id (str): The ID of the genomic object.
                 - genomic_object_type (str): The type of the genomic object.
                 - metabolomic_object_id (str): The ID of the metabolomic object.
@@ -314,10 +315,10 @@ class LinkGraph:
         }
 
     def to_tsv(self, file: str | PathLike) -> None:
-        """Exports the links in the LinkGraph to a file in tab-separated format.
+        """Exports the links in the LinkGraph to a TSV file.
 
         Args:
-            file: the file to write the links to.
+            file: the path to the output TSV file.
 
         Examples:
             >>> lg.to_tsv("links.tsv")
@@ -354,7 +355,7 @@ class LinkGraph:
             display_limit: The maximum number of links to display in the table. Defaults to 60.
 
         Returns:
-            str: A string representation of the table in GitHub-flavored markdown format. If the
+           A string representation of the table in GitHub-flavored markdown format. If the
             number of links exceeds the display limit, the table is truncated and an additional
             line indicating the total number of links is appended.
         """
