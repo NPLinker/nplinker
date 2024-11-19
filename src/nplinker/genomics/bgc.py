@@ -175,15 +175,12 @@ class BGC:
         return self.id.startswith("BGC")
 
     def to_dict(self) -> dict[str, Any]:
-        """Convert the BGC object to a dictionary for exporting results.
-
-        Compiles relevant information from the BGC object and formats it into a dictionary.
-        Each key-value pair in the dictionary represents a specific attribute of the BGC.
-
+        """Convert the BGC object to a dictionary for exporting purpose.
         Returns:
             A dictionary containing the following key-value pairs:
+
             - GCF_id (list[str]): A list of GCF IDs.
-            - GCF_bigscape_class (list[str | None]): A list of BiG-SCAPE classes.
+            - GCF_bigscape_class (list[str]): A list of BiG-SCAPE classes.
             - strain_id (str | None): The ID of the strain.
             - description (str | None): A description of the BGC.
             - BGC_name (str): The name of the BGC.
