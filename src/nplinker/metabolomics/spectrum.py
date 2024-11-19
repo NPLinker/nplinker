@@ -100,13 +100,11 @@ class Spectrum:
         return strain in self.strains
 
     def to_dict(self) -> dict[str, Any]:
-        """Convert the Spectrum object to a dictionary for exporting results.
-
-        This method compiles relevant information from the Spectrum object into a dictionary format.
-        Each key-value pair in the dictionary represents a specific attribute of the Spectrum Object.
+        """Convert the Spectrum object to a dictionary for exporting purpose.
 
         Returns:
             A dictionary containing containing the following key-value pairs:
+
                 - "spectrum_id" (str): The unique identifier of the spectrum.
                 - "num_strains_with_spectrum" (int): The number of strains associated with the spectrum.
                 - "precursor_mz" (float): The precursor m/z value, rounded to four decimal places.
