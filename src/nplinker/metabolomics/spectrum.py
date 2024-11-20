@@ -145,20 +145,10 @@ class Spectrum:
             value = str(value) if value else ""
         return value
 
-    def to_tabular(self, delimiter: str = "\t") -> str:
-        """Convert the Spectrum object to a tabular string format.
-
-        Args:
-            delimiter: The delimiter to use for separating values. Default is tab.
+    def to_tabular(self) -> list:
+        """Convert the Spectrum object to a tabular format.
 
         Returns:
-            A string representation of the Spectrum object in tabular format.
+            list: A list of strings representing the Spectrum object in tabular format.
         """
-        values = [self.to_string(value) for value in self.to_dict().values()]
-        if delimiter == "\t":
-            values = [value.replace("\t", "    ") for value in values]
-        elif delimiter == ",":
-            values = [value.replace(",", ";") for value in values]
-        elif delimiter == ";":
-            values = [value.replace(";", ":") for value in values]
-        return delimiter.join(values)
+        return [self.to_string(value) for value in self.to_dict().values()]

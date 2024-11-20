@@ -377,7 +377,7 @@ class NPLinker:
             writer = csv.writer(outfile, delimiter="\t")
             writer.writerow(headers)
             for obj in objects:
-                row = obj.to_tabular(delimiter="\t").split("\t")
+                row = [item.replace("\t", "    ") for item in obj.to_tabular()]
                 writer.writerow(row)
 
     def to_tsv(self, lg: LinkGraph | None = None) -> None:
