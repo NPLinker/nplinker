@@ -176,6 +176,7 @@ class BGC:
 
     def to_dict(self) -> dict[str, Any]:
         """Convert the BGC object to a dictionary for exporting purpose.
+
         Returns:
             A dictionary containing the following key-value pairs:
 
@@ -189,6 +190,7 @@ class BGC:
             - antismash_id (str | None): The antiSMASH ID.
             - antismash_region (int | None): The antiSMASH region number.
         """
+        # Keys are ordered to make the output easier to analyze
         return {
             "GCF_id": [gcf.id for gcf in self.parents if gcf.id is not None],
             "GCF_bigscape_class": [bsc for bsc in self.bigscape_classes if bsc is not None],
