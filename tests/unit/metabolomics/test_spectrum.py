@@ -100,3 +100,13 @@ def test_to_dict():
     assert dict_repr["molecular_family"] == "family1"
     assert dict_repr["gnps_id"] == "GNPS0001"
     assert dict_repr["gnps_annotations"] == {"annotation1": "value1"}
+
+
+def test_to_string():
+    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150)
+    assert spec.to_string([1, "a"]) == "1, a"
+    assert spec.to_string((1, "a")) == "1, a"
+    assert spec.to_string({1, "a"}) in ["1, a", "a, 1"]
+    assert spec.to_string({"key1": 1, "key2": "value2"}) == "key1:1, key2:value2"
+    assert spec.to_string(100.2) == "100.2"
+    assert spec.to_string(None) == ""

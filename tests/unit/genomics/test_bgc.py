@@ -58,3 +58,12 @@ def test_to_dict():
     ]
     assert dict_repr["antismash_id"] == "ABC_0001"
     assert dict_repr["antismash_region"] == 1
+
+
+def test_to_string():
+    assert BGC.to_string([1, "a"]) == "1, a"
+    assert BGC.to_string((1, "a")) == "1, a"
+    assert BGC.to_string({1, "a"}) in ["1, a", "a, 1"]
+    assert BGC.to_string({"key1": 1, "key2": "value2"}) == "key1:1, key2:value2"
+    assert BGC.to_string(100.2) == "100.2"
+    assert BGC.to_string(None) == ""
