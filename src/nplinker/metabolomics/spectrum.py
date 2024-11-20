@@ -122,3 +122,43 @@ class Spectrum:
             "gnps_id": self.gnps_id,
             "gnps_annotations": self.gnps_annotations,
         }
+
+    @staticmethod
+    def to_string(value: Any) -> str:
+        """Convert various types of values to a string.
+
+        Args:
+            value: The value to be converted to a string.
+                Can be a list, tuple, set, dict, or any other type.
+
+        Returns:
+            A string representation of the input value.
+        """
+        # Convert list, tuple, set to comma-separated string
+        if isinstance(value, (list, tuple, set)):
+            value = ", ".join(map(str, value))
+        # Convert dict to comma-separated string
+        elif isinstance(value, dict):
+            value = ", ".join([f"{k}:{v}" for k, v in value.items()])
+        # Convert anything else to string
+        else:
+            value = str(value) if value else ""
+        return value
+
+    def to_tabular(self, delimiter: str = "\t") -> str:
+        """Convert the Spectrum object to a tabular string format.
+
+        Args:
+            delimiter: The delimiter to use for separating values. Default is tab.
+
+        Returns:
+            A string representation of the Spectrum object in tabular format.
+        """
+        values = [self.to_string(value) for value in self.to_dict().values()]
+        if delimiter == "\t":
+            values = [value.replace("\t", "    ") for value in values]
+        elif delimiter == ",":
+            values = [value.replace(",", ";") for value in values]
+        elif delimiter == ";":
+            values = [value.replace(";", ":") for value in values]
+        return delimiter.join(values)

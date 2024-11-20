@@ -374,41 +374,17 @@ class NPLinker:
 
         with open(self._output_dir / filename, "w", newline="") as outfile:
             headers = objects[0].to_dict().keys()
-            writer = csv.DictWriter(outfile, fieldnames=headers, delimiter="\t")
-            writer.writeheader()
+            writer = csv.writer(outfile, delimiter="\t")
+            writer.writerow(headers)
             for obj in objects:
-                row = obj.to_dict()
-                for key, value in row.items():
-                    row[key] = self.to_string(value).replace("\t", "    ")
+                row = obj.to_tabular(delimiter="\t").split("\t")
                 writer.writerow(row)
-
-    @staticmethod
-    def to_string(value: Any) -> str:
-        """Convert various types of values to a string.
-
-        Args:
-            value: The value to be converted to a string.
-                Can be a list, tuple, set, dict, or any other type.
-
-        Returns:
-            A string representation of the input value.
-        """
-        # Convert list, tuple, set to comma-separated string
-        if isinstance(value, (list, tuple, set)):
-            value = ", ".join(map(str, value))
-        # Convert dict to comma-separated string
-        elif isinstance(value, dict):
-            value = ", ".join([f"{k}:{v}" for k, v in value.items()])
-        # Convert anything else to string
-        else:
-            value = str(value) if value else ""
-        return value
 
     def to_tsv(self, lg: LinkGraph | None = None) -> None:
         """Export data to tsv files.
 
         This method exports following data to seperated TSV files:
-        
+
          - BGC objects: `genomics_data.tsv`
          - Spectrum objects: `metabolomics_data.tsv`
          - LinkGraph object (if given): `links.tsv`
