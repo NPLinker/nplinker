@@ -344,7 +344,7 @@ def _resolve_jgi_accession(jgi_id: str) -> str:
         jgi_id: JGI_Genome_ID for GenBank accession.
 
     Returns:
-        RefSeq ID if search is successful, otherwise None.
+        RefSeq ID if search is successful, otherwise an empty string.
     """
     url = JGI_GENOME_LOOKUP_URL.format(jgi_id)
     logger.info(f"Attempting to resolve JGI_Genome_ID {jgi_id} to GenBank accession via {url}")
@@ -358,12 +358,17 @@ def _resolve_jgi_accession(jgi_id: str) -> str:
         return ""
 
     soup = BeautifulSoup(resp.content, "html.parser")
-    # find the table entry giving the NCBI assembly accession ID
-    link = soup.find("a", href=re.compile("https://www.ncbi.nlm.nih.gov/nuccore/.*"))
+    # Find the table entry giving the "NCBI Assembly Accession" ID
+    link = soup.find("a", href=re.compile("https://www.ncbi.nlm.nih.gov/datasets/genome/.*"))
     if link is None:
         return ""
 
-    return _resolve_genbank_accession(link.text)
+    assembly_id = link.text
+    # check if the assembly ID is already a RefSeq ID
+    if assembly_id.startswith("GCF_"):
+        return assembly_id
+    else:
+        return _resolve_genbank_accession(assembly_id)
 
 
 def _resolve_refseq_id(genome_id_data: Mapping[str, str]) -> str:
