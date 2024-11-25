@@ -85,6 +85,8 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
 
             # Load the spectrum
             spectrum_id: str = spec["params"]["scans"]
+            # The pepmass in an mgf file is actually the m/z and not the peptide mass 
+            # See: https://www.matrixscience.com/help/obsolete_data_file_formats.html
             precursor_mz: float = spec["params"]["pepmass"][0]
             precursor_charge: int = spec["params"]["charge"][0]
             rt = spec["params"].get("rtinseconds", 0)
