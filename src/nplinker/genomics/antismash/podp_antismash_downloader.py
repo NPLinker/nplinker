@@ -2,7 +2,6 @@ from __future__ import annotations
 import json
 import logging
 import re
-import time
 import warnings
 from collections.abc import Mapping
 from collections.abc import Sequence
@@ -10,8 +9,6 @@ from os import PathLike
 from pathlib import Path
 import httpx
 from bs4 import BeautifulSoup
-from bs4 import NavigableString
-from bs4 import Tag
 from jsonschema import validate
 from nplinker.defaults import GENOME_STATUS_FILENAME
 from nplinker.genomics.antismash import download_and_extract_antismash_data
@@ -20,7 +17,6 @@ from nplinker.schemas import GENOME_STATUS_SCHEMA
 
 logger = logging.getLogger(__name__)
 
-NCBI_LOOKUP_URL = "https://www.ncbi.nlm.nih.gov/assembly/?term={}"
 JGI_GENOME_LOOKUP_URL = (
     "https://img.jgi.doe.gov/cgi-bin/m/main.cgi?section=TaxonDetail&page=taxonDetail&taxon_oid={}"
 )
@@ -251,90 +247,49 @@ def get_best_available_genome_id(genome_id_data: Mapping[str, str]) -> str | Non
     return best_id
 
 
-def _ncbi_genbank_search(genbank_id: str, retry_times: int = 3) -> Tag | NavigableString | None:
-    url = NCBI_LOOKUP_URL.format(genbank_id)
-    retry = 1
-    while retry <= retry_times:
-        logger.info(f"Looking up GenBank data for {genbank_id} at {url}")
-        resp = httpx.get(url, follow_redirects=True)
-        if resp.status_code == httpx.codes.OK:
-            # the page should contain a <dl> element with class "assembly_summary_new". retrieving
-            # the page seems to fail occasionally in the middle of lengthy sequences of genome
-            # lookups, so there might be some throttling going on. this will automatically retry
-            # the lookup if the expected content isn't found the first time
-            soup = BeautifulSoup(resp.content, "html.parser")
-            # find the <dl> element with class "assembly_summary_new"
-            dl_element = soup.find("dl", {"class": "assembly_summary_new"})
-            if dl_element is not None:
-                return dl_element
-        retry = retry + 1
-        time.sleep(5)
-
-    logger.warning(f"Failed to resolve NCBI genome ID {genbank_id} at URL {url} (after retrying)")
-    return None
-
-
 def _resolve_genbank_accession(genbank_id: str) -> str:
-    """Try to get RefSeq id through given GenBank id.
+    """Try to get RefSeq assembly id through given GenBank assembly id.
+
+    Note that GenBank assembly accession starts with "GCA_" and RefSeq assembly
+    accession starts with "GCF_". For more info, see
+    https://www.ncbi.nlm.nih.gov/datasets/docs/v2/troubleshooting/faq
 
     Args:
-        genbank_id: ID for GenBank accession.
+        genbank_id: ID for GenBank assembly accession.
 
     Raises:
-        Exception: "Unknown HTML format" if the search of genbank does not give any results.
-        Exception: "Expected HTML elements not found" if no match with RefSeq assembly accession is found.
+        httpx.ReadTimeout: If the request times out.
 
     Returns:
-        RefSeq ID if the search is successful, otherwise None.
+        RefSeq assembly ID if the search is successful, otherwise an empty string.
     """
-    logger.info(f"Attempting to resolve Genbank accession {genbank_id} to RefSeq accession")
-    # genbank id => genbank seq => refseq
+    logger.info(
+        f"Attempting to resolve Genbank assembly accession {genbank_id} to RefSeq accession"
+    )
+    # NCBI Datasets API https://www.ncbi.nlm.nih.gov/datasets/docs/v2/api/
+    # Note that there is a API rate limit of 5 requests per second without using an API key
+    # For more info, see https://www.ncbi.nlm.nih.gov/datasets/docs/v2/troubleshooting/faq/
 
-    # The GenBank accession can have several formats:
-    # 1: BAFR00000000.1
-    # 2: NZ_BAGG00000000.1
-    # 3: NC_016887.1
-    # Case 1 is the default.
-    if "_" in genbank_id:
-        # case 2
-        if len(genbank_id.split("_")[-1].split(".")[0]) == 12:
-            genbank_id = genbank_id.split("_")[-1]
-        # case 3
-        else:
-            genbank_id = genbank_id.lower()
+    # API for getting revision history of a genome assembly
+    # For schema, see https://www.ncbi.nlm.nih.gov/datasets/docs/v2/api/rest-api/#get-/genome/accession/-accession-/revision_history
+    url = f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{genbank_id}/revision_history"
 
-    # get rid of any extraneous whitespace
-    genbank_id = genbank_id.strip()
-    logger.info(f'Parsed GenBank ID to "{genbank_id}"')
-
-    # run a search using the GenBank accession ID
+    refseq_id = ""
     try:
-        dl_element = _ncbi_genbank_search(genbank_id)
-        if dl_element is None or isinstance(dl_element, NavigableString):
-            raise Exception("Unknown HTML format")
+        resp = httpx.get(
+            url, headers={"User-Agent": USER_AGENT}, timeout=10.0, follow_redirects=True
+        )
+        if resp.status_code == httpx.codes.OK:
+            data = resp.json()
+            latest_entry = max(
+                (entry for entry in data["assembly_revisions"] if "refseq_accession" in entry),
+                key=lambda x: x["release_date"],
+            )
+            refseq_id = latest_entry["refseq_accession"]
+    except httpx.ReadTimeout:
+        logger.warning("Timed out waiting for result of GenBank assembly lookup")
 
-        refseq_idx = -1
-        for field_idx, field in enumerate(dl_element.children):
-            # this is the element immediately preceding the one with
-            # the actual RefSeq ID we want
-            if field.getText().strip() == "RefSeq assembly accession:":
-                refseq_idx = field_idx + 1
-
-            # this should be True when we've reached the right element
-            if field_idx == refseq_idx:
-                refseq_id = field.getText()
-                # if it has any spaces, take everything up to first one (some have annotations afterwards)
-                if refseq_id.find(" ") != -1:
-                    refseq_id = refseq_id[: refseq_id.find(" ")]
-
-                return str(refseq_id)
-
-        if refseq_idx == -1:
-            raise Exception("Expected HTML elements not found")
-    except Exception as e:
-        logger.warning(f"Failed resolving GenBank accession {genbank_id}, error {e}")
-
-    return ""
+    return refseq_id
 
 
 def _resolve_jgi_accession(jgi_id: str) -> str:
