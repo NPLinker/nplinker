@@ -124,18 +124,18 @@ class Spectrum:
         }
 
     @staticmethod
-    def to_string(value: Any) -> str:
+    def _to_string(value: Any) -> str:
         """Convert various types of values to a string.
 
         Args:
             value: The value to be converted to a string.
-                Can be a list, tuple, set, dict, or any other type.
+                Can be a list, dict, or any other type.
 
         Returns:
             A string representation of the input value.
         """
         # Convert list, tuple, set to comma-separated string
-        if isinstance(value, (list, tuple, set)):
+        if isinstance(value, list):
             value = ", ".join(map(str, value))
         # Convert dict to comma-separated string
         elif isinstance(value, dict):
@@ -145,10 +145,13 @@ class Spectrum:
             value = str(value) if value else ""
         return value
 
-    def to_tabular(self) -> list:
+    def to_tabular(self) -> dict[str, Any]:
         """Convert the Spectrum object to a tabular format.
 
         Returns:
-            list: A list of strings representing the Spectrum object in tabular format.
+            dict: A dictionary representing the Spectrum object in tabular format.
         """
-        return [self.to_string(value) for value in self.to_dict().values()]
+        return {
+            key: self._to_string(value).replace("\t", "    ")
+            for key, value in self.to_dict().items()
+        }

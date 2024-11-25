@@ -373,12 +373,11 @@ class NPLinker:
             raise TypeError("All objects in the list must be of the same type")
 
         with open(self._output_dir / filename, "w", newline="") as outfile:
-            headers = objects[0].to_dict().keys()
-            writer = csv.writer(outfile, delimiter="\t")
-            writer.writerow(headers)
+            headers = objects[0].to_tabular().keys()
+            writer = csv.DictWriter(outfile, fieldnames=headers, delimiter="\t")
+            writer.writeheader()
             for obj in objects:
-                row = [item.replace("\t", "    ") for item in obj.to_tabular()]
-                writer.writerow(row)
+                writer.writerow(obj.to_tabular())
 
     def to_tsv(self, lg: LinkGraph | None = None) -> None:
         """Export data to tsv files.
