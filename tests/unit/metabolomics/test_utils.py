@@ -17,9 +17,9 @@ def spectra():
     """Fixture for a list of Spectrum objects."""
     # The order of the spectra is important for the tests.
     return [
-        Spectrum("spec0", [100, 200], [0.1, 0.2], 150),
-        Spectrum("spec1", [100, 200], [0.1, 0.2], 150),
-        Spectrum("spec2", [100, 200], [0.1, 0.2], 150),
+        Spectrum("spec0", [100, 200], [0.1, 0.2], 150, 1),
+        Spectrum("spec1", [100, 200], [0.1, 0.2], 150, 1),
+        Spectrum("spec2", [100, 200], [0.1, 0.2], 150, 1),
     ]
 
 
