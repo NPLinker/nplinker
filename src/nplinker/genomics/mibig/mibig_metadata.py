@@ -9,6 +9,8 @@ class MibigMetadata:
     MIBiG is a specification of BGC metadata and use JSON schema to
     represent BGC metadata. More details see:
     https://mibig.secondarymetabolites.org/download.
+
+    This class supports MIBiG version 1.0 to 4.0.
     """
 
     def __init__(self, file: str | PathLike) -> None:
@@ -37,22 +39,37 @@ class MibigMetadata:
     def biosyn_class(self) -> tuple[str]:
         """Get the value of metadata item 'biosyn_class'.
 
-        The 'biosyn_class' is biosynthetic class(es), namely the type of
-        natural product or secondary metabolite.
+        The 'biosyn_class' is biosynthetic class(es) defined by MIBiG.
 
-        MIBiG defines 6 major biosynthetic classes for natural products,
+        Before version 4.0 of MIBiG, it defines 6 major biosynthetic classes,
         including `NRP`, `Polyketide`, `RiPP`, `Terpene`, `Saccharide`
-        and `Alkaloid`. Note that natural products created by the other
-        biosynthetic mechanisms fall under the category `Other`. For more details
-        see [the paper](https://doi.org/10.1186/s40793-018-0318-y).
+        and `Alkaloid`.
+
+        Starting from version 4.0, MIBiG defines 5 major biosynthetic classes,
+        including `PKS`, `NRPS`, `Ribosomal`, `Terpene` and `Saccharide`.
+
+        The mapping between the old and new classes is as follows:
+
+        - `NRP` -> `NRPS`
+        - `Polyketide` -> `PKS`
+        - `RiPP` -> `Ribosomal`
+        - `Terpene` -> `Terpene`
+        - `Saccharide` -> `Saccharide`
+        - `Alkaloid` -> `Other`
+
+        Note that natural products that do not fit into any of the above
+        biosynthetic classes fall under the category `Other`.
         """
         return self._biosyn_class
 
     def _parse_metadata(self) -> None:
         """Parse metadata to get 'mibig_accession' and 'biosyn_class' values."""
-        if "general_params" in self.metadata:
+        if "general_params" in self.metadata:  # version ≤1.4
             self._mibig_accession = self.metadata["general_params"]["mibig_accession"]
             self._biosyn_class = tuple(self.metadata["general_params"]["biosyn_class"])
-        else:  # version≥2.0
+        elif "cluster" in self.metadata:  # version ≥2.0 and <4.0
             self._mibig_accession = self.metadata["cluster"]["mibig_accession"]
             self._biosyn_class = tuple(self.metadata["cluster"]["biosyn_class"])
+        elif "version" in self.metadata:  # version≥4.0
+            self._mibig_accession = self.metadata["accession"]
+            self._biosyn_class = tuple(i["class"] for i in self.metadata["biosynthesis"]["classes"])
