@@ -1,6 +1,5 @@
 from __future__ import annotations
 from os import PathLike
-from pathlib import Path
 from dynaconf import Dynaconf
 from dynaconf import Validator
 from nplinker.utils import transform_to_full_path
@@ -25,11 +24,8 @@ def load_config(config_file: str | PathLike) -> Dynaconf:
     if not config_file.exists():
         raise FileNotFoundError(f"Config file '{config_file}' not found")
 
-    # Locate the default config file
-    default_config_file = Path(__file__).resolve().parent / "nplinker_default.toml"
-
     # Load config files
-    config = Dynaconf(settings_files=[config_file], preload=[default_config_file])
+    config = Dynaconf(settings_files=[config_file])
 
     # Validate configs
     config.validators.register(*CONFIG_VALIDATORS)
