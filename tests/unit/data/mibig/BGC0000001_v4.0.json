@@ -1,0 +1,603 @@
+{
+    "accession": "BGC0000001",
+    "version": 5,
+    "changelog": {
+        "releases": [
+            {
+                "version": "1",
+                "entries": [
+                    {
+                        "contributors": [
+                            "M2JBIQNJAZIP5YVYS7CZLALR"
+                        ],
+                        "reviewers": [
+                            "AAAAAAAAAAAAAAAAAAAAAAAA"
+                        ],
+                        "date": "2015-06-12",
+                        "comment": "Submitted"
+                    }
+                ],
+                "date": "2015-06-12"
+            },
+            {
+                "version": "2",
+                "entries": [
+                    {
+                        "contributors": [
+                            "AAAAAAAAAAAAAAAAAAAAAAAA"
+                        ],
+                        "reviewers": [
+                            "AAAAAAAAAAAAAAAAAAAAAAAA"
+                        ],
+                        "date": "2019-10-16",
+                        "comment": "Migrated from v1.4"
+                    },
+                    {
+                        "contributors": [
+                            "AAAAAAAAAAAAAAAAAAAAAAAA"
+                        ],
+                        "reviewers": [
+                            "AAAAAAAAAAAAAAAAAAAAAAAA"
+                        ],
+                        "date": "2019-10-16",
+                        "comment": "Updated compound(s) information (MIBiG Annotathon)"
+                    },
+                    {
+                        "contributors": [
+                            "AAAAAAAAAAAAAAAAAAAAAAAA"
+                        ],
+                        "reviewers": [
+                            "AAAAAAAAAAAAAAAAAAAAAAAA"
+                        ],
+                        "date": "2019-10-16",
+                        "comment": "Updated compound(s) information (NPAtlas curation)"
+                    }
+                ],
+                "date": "2019-10-16"
+            },
+            {
+                "version": "3",
+                "entries": [
+                    {
+                        "contributors": [
+                            "AAAAAAAAAAAAAAAAAAAAAAAA"
+                        ],
+                        "reviewers": [
+                            "AAAAAAAAAAAAAAAAAAAAAAAA"
+                        ],
+                        "date": "2022-09-15",
+                        "comment": "Removed ketoreductase stereochemistry annotation from modules without ketoreductases"
+                    },
+                    {
+                        "contributors": [
+                            "AAAAAAAAAAAAAAAAAAAAAAAA"
+                        ],
+                        "reviewers": [
+                            "AAAAAAAAAAAAAAAAAAAAAAAA"
+                        ],
+                        "date": "2022-09-15",
+                        "comment": "Sorted modules by module number"
+                    }
+                ],
+                "date": "2022-09-15"
+            },
+            {
+                "version": "4",
+                "entries": [
+                    {
+                        "contributors": [
+                            "AAAAAAAAAAAAAAAAAAAAAAAA"
+                        ],
+                        "reviewers": [
+                            "AAAAAAAAAAAAAAAAAAAAAAAA"
+                        ],
+                        "date": "2022-10-07",
+                        "comment": "Update chemical activity to schema version 2.11"
+                    }
+                ],
+                "date": "2022-10-07"
+            },
+            {
+                "version": "5",
+                "entries": [
+                    {
+                        "contributors": [
+                            "IQDGAEIXNOAWG3AVLVJH6HBZ"
+                        ],
+                        "reviewers": [
+                            "AAAAAAAAAAAAAAAAAAAAAAAA"
+                        ],
+                        "date": "2024-04-23",
+                        "comment": "MIBiG v4 annotathon"
+                    }
+                ],
+                "date": "2024-11-15"
+            }
+        ]
+    },
+    "quality": "questionable",
+    "status": "active",
+    "completeness": "complete",
+    "loci": [
+        {
+            "accession": "JF752342.1",
+            "location": {
+                "from": 0,
+                "to": 0
+            },
+            "evidence": [
+                {
+                    "method": "Knock-out studies"
+                }
+            ]
+        }
+    ],
+    "biosynthesis": {
+        "classes": [
+            {
+                "class": "PKS",
+                "subclass": "Type I",
+                "cyclases": []
+            }
+        ],
+        "modules": [
+            {
+                "type": "pks-modular",
+                "name": "1",
+                "genes": [
+                    "AEK75502.1"
+                ],
+                "active": true,
+                "carriers": [
+                    {
+                        "type": "carrier",
+                        "gene": "AEK75502.1",
+                        "location": {
+                            "from": -1,
+                            "to": -1
+                        },
+                        "subtype": "ACP",
+                        "beta_branching": false
+                    }
+                ],
+                "at_domain": {
+                    "type": "acyltransferase",
+                    "gene": "AEK75502.1",
+                    "location": {
+                        "from": -1,
+                        "to": -1
+                    },
+                    "substrates": [],
+                    "evidence": []
+                },
+                "ks_domain": {
+                    "type": "ketosynthase",
+                    "gene": "AEK75502.1",
+                    "location": {
+                        "from": -1,
+                        "to": -1
+                    }
+                }
+            },
+            {
+                "type": "pks-modular",
+                "name": "2",
+                "genes": [
+                    "AEK75502.1"
+                ],
+                "active": true,
+                "carriers": [
+                    {
+                        "type": "carrier",
+                        "gene": "AEK75502.1",
+                        "location": {
+                            "from": -1,
+                            "to": -1
+                        },
+                        "subtype": "ACP",
+                        "beta_branching": false
+                    }
+                ],
+                "modification_domains": [
+                    {
+                        "type": "ketoreductase",
+                        "gene": "AEK75502.1",
+                        "location": {
+                            "from": -1,
+                            "to": -1
+                        }
+                    },
+                    {
+                        "type": "dehydratase",
+                        "gene": "AEK75502.1",
+                        "location": {
+                            "from": -1,
+                            "to": -1
+                        }
+                    }
+                ],
+                "at_domain": {
+                    "type": "acyltransferase",
+                    "gene": "AEK75502.1",
+                    "location": {
+                        "from": -1,
+                        "to": -1
+                    },
+                    "substrates": [],
+                    "evidence": []
+                },
+                "ks_domain": {
+                    "type": "ketosynthase",
+                    "gene": "AEK75502.1",
+                    "location": {
+                        "from": -1,
+                        "to": -1
+                    }
+                }
+            },
+            {
+                "type": "pks-modular",
+                "name": "3",
+                "genes": [
+                    "AEK75502.1"
+                ],
+                "active": true,
+                "carriers": [
+                    {
+                        "type": "carrier",
+                        "gene": "AEK75502.1",
+                        "location": {
+                            "from": -1,
+                            "to": -1
+                        },
+                        "subtype": "ACP",
+                        "beta_branching": false
+                    }
+                ],
+                "modification_domains": [
+                    {
+                        "type": "ketoreductase",
+                        "gene": "AEK75502.1",
+                        "location": {
+                            "from": -1,
+                            "to": -1
+                        }
+                    },
+                    {
+                        "type": "dehydratase",
+                        "gene": "AEK75502.1",
+                        "location": {
+                            "from": -1,
+                            "to": -1
+                        }
+                    }
+                ],
+                "at_domain": {
+                    "type": "acyltransferase",
+                    "gene": "AEK75502.1",
+                    "location": {
+                        "from": -1,
+                        "to": -1
+                    },
+                    "substrates": [],
+                    "evidence": []
+                },
+                "ks_domain": {
+                    "type": "ketosynthase",
+                    "gene": "AEK75502.1",
+                    "location": {
+                        "from": -1,
+                        "to": -1
+                    }
+                }
+            },
+            {
+                "type": "pks-modular",
+                "name": "4",
+                "genes": [
+                    "AEK75502.1"
+                ],
+                "active": true,
+                "carriers": [
+                    {
+                        "type": "carrier",
+                        "gene": "AEK75502.1",
+                        "location": {
+                            "from": -1,
+                            "to": -1
+                        },
+                        "subtype": "ACP",
+                        "beta_branching": false
+                    }
+                ],
+                "modification_domains": [
+                    {
+                        "type": "ketoreductase",
+                        "gene": "AEK75502.1",
+                        "location": {
+                            "from": -1,
+                            "to": -1
+                        }
+                    },
+                    {
+                        "type": "dehydratase",
+                        "gene": "AEK75502.1",
+                        "location": {
+                            "from": -1,
+                            "to": -1
+                        }
+                    }
+                ],
+                "at_domain": {
+                    "type": "acyltransferase",
+                    "gene": "AEK75502.1",
+                    "location": {
+                        "from": -1,
+                        "to": -1
+                    },
+                    "substrates": [],
+                    "evidence": []
+                },
+                "ks_domain": {
+                    "type": "ketosynthase",
+                    "gene": "AEK75502.1",
+                    "location": {
+                        "from": -1,
+                        "to": -1
+                    }
+                }
+            },
+            {
+                "type": "pks-modular",
+                "name": "5",
+                "genes": [
+                    "AEK75503.1"
+                ],
+                "active": true,
+                "carriers": [
+                    {
+                        "type": "carrier",
+                        "gene": "AEK75503.1",
+                        "location": {
+                            "from": -1,
+                            "to": -1
+                        },
+                        "subtype": "ACP",
+                        "beta_branching": false
+                    }
+                ],
+                "at_domain": {
+                    "type": "acyltransferase",
+                    "gene": "AEK75503.1",
+                    "location": {
+                        "from": -1,
+                        "to": -1
+                    },
+                    "substrates": [],
+                    "evidence": []
+                },
+                "ks_domain": {
+                    "type": "ketosynthase",
+                    "gene": "AEK75503.1",
+                    "location": {
+                        "from": -1,
+                        "to": -1
+                    }
+                }
+            },
+            {
+                "type": "pks-modular",
+                "name": "6",
+                "genes": [
+                    "AEK75503.1"
+                ],
+                "active": true,
+                "carriers": [
+                    {
+                        "type": "carrier",
+                        "gene": "AEK75503.1",
+                        "location": {
+                            "from": -1,
+                            "to": -1
+                        },
+                        "subtype": "ACP",
+                        "beta_branching": false
+                    }
+                ],
+                "modification_domains": [
+                    {
+                        "type": "ketoreductase",
+                        "gene": "AEK75503.1",
+                        "location": {
+                            "from": -1,
+                            "to": -1
+                        }
+                    },
+                    {
+                        "type": "dehydratase",
+                        "gene": "AEK75503.1",
+                        "location": {
+                            "from": -1,
+                            "to": -1
+                        }
+                    },
+                    {
+                        "type": "enoylreductase",
+                        "gene": "AEK75503.1",
+                        "location": {
+                            "from": -1,
+                            "to": -1
+                        }
+                    }
+                ],
+                "at_domain": {
+                    "type": "acyltransferase",
+                    "gene": "AEK75503.1",
+                    "location": {
+                        "from": -1,
+                        "to": -1
+                    },
+                    "substrates": [],
+                    "evidence": []
+                },
+                "ks_domain": {
+                    "type": "ketosynthase",
+                    "gene": "AEK75503.1",
+                    "location": {
+                        "from": -1,
+                        "to": -1
+                    }
+                }
+            },
+            {
+                "type": "pks-modular",
+                "name": "7",
+                "genes": [
+                    "AEK75504.1"
+                ],
+                "active": true,
+                "carriers": [
+                    {
+                        "type": "carrier",
+                        "gene": "AEK75504.1",
+                        "location": {
+                            "from": -1,
+                            "to": -1
+                        },
+                        "subtype": "ACP",
+                        "beta_branching": false
+                    }
+                ],
+                "at_domain": {
+                    "type": "acyltransferase",
+                    "gene": "AEK75504.1",
+                    "location": {
+                        "from": -1,
+                        "to": -1
+                    },
+                    "substrates": [],
+                    "evidence": []
+                },
+                "ks_domain": {
+                    "type": "ketosynthase",
+                    "gene": "AEK75504.1",
+                    "location": {
+                        "from": -1,
+                        "to": -1
+                    }
+                }
+            }
+        ]
+    },
+    "compounds": [
+        {
+            "name": "abyssomicin C",
+            "evidence": [],
+            "bioactivities": [
+                {
+                    "name": "antibacterial",
+                    "observed": true,
+                    "references": []
+                },
+                {
+                    "name": "cytotoxic",
+                    "observed": true,
+                    "references": []
+                }
+            ],
+            "structure": "CC1C[C@]23OC(=O)C4=C2OC1C(O)C3\\C=C/C(=O)[C@@H](C)C[C@@H](C)C4=O",
+            "databaseIds": [
+                "npatlas:NPA01961",
+                "pubchem:71455791",
+                "chembl:CHEMBL1651097"
+            ],
+            "moieties": [
+                "Tetronate"
+            ],
+            "mass": 346.141638424,
+            "formula": "C19H22O6"
+        },
+        {
+            "name": "atrop-abyssomicin C",
+            "evidence": [],
+            "bioactivities": [
+                {
+                    "name": "antibacterial",
+                    "observed": true,
+                    "references": []
+                },
+                {
+                    "name": "cytotoxic",
+                    "observed": true,
+                    "references": []
+                }
+            ],
+            "structure": "CC1CC23OC(=O)C4=C2OC1C(O)C3\\C=C/C(=O)C(C)CC(C)C4=O",
+            "databaseIds": [
+                "npatlas:NPA018239",
+                "chemspider:19955692"
+            ],
+            "moieties": [
+                "Tetronate"
+            ],
+            "mass": 346.141638424,
+            "formula": "C19H22O6"
+        }
+    ],
+    "taxonomy": {
+        "name": "Verrucosispora maris AB-18-032",
+        "ncbiTaxId": 263358
+    },
+    "genes": {
+        "to_add": [
+            {
+                "id": "abyU",
+                "location": {
+                    "exons": [
+                        {
+                            "from": 7760,
+                            "to": 8182
+                        }
+                    ],
+                    "strand": -1
+                },
+                "translation": "MTERLETRPQALLIKVPTEIVVKVVDDVDVAAPAVGQVGKFDDELYDEAGAQIGTSSGNFRIEYVRPTDGGLLTYYQEDITLSDGVIHAEGWADFNDVRTSKWVFYPATGVSGRYLGLTGFRQWRMTGVRKSAEARILLGE"
+            }
+        ],
+        "annotations": [
+            {
+                "id": "AEK75497.1",
+                "name": "abyA1",
+                "product": "3-oxoacyl-ACP synthase III"
+            },
+            {
+                "id": "AEK75498.1",
+                "name": "abyA2",
+                "product": "phosphatase and glyceryl transferase"
+            },
+            {
+                "id": "AEK75499.1",
+                "name": "abyA3",
+                "product": "acyl-carrier protein"
+            },
+            {
+                "id": "AEK75500.1",
+                "name": "abyA4",
+                "product": "pyruvate/2-oxoglutarate dehydrogenase"
+            },
+            {
+                "id": "abyU",
+                "name": "abyU",
+                "product": "Diels-Alderase"
+            },
+            {
+                "id": "AEK75512.1",
+                "name": "abyV",
+                "product": "cytochrome P450"
+            }
+        ]
+    },
+    "legacy_references": [
+        "pubmed:21656887"
+    ]
+}

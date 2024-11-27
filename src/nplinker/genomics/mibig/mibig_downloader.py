@@ -21,6 +21,7 @@ _MD5_MIBIG_METADATA = {
     "2.0": "843ce4677db6d11422f0e6d94dd03e81",
     "3.0": "7c38b90f939086c03392d99a913baef9",
     "3.1": "643d1349722a9437d8dcf558dac5f815",
+    "4.0": "70d1e7d573652ba62548b1fcfbdbf844",
 }
 
 
@@ -31,6 +32,8 @@ def download_and_extract_mibig_metadata(
 ):
     """Download and extract MIBiG metadata json files.
 
+    The MIBiG metadata json files are available at https://mibig.secondarymetabolites.org/download.
+
     Note that it does not matter whether the metadata json files are in nested folders or not in the archive,
     all json files will be extracted to the same location, i.e. `extract_path`. The nested
     folders will be removed if they exist. So the `extract_path` will have only json files.
@@ -39,7 +42,7 @@ def download_and_extract_mibig_metadata(
         download_root: Path to the directory in which to place the downloaded archive.
         extract_path: Path to an empty directory where the json files will be extracted.
             The directory must be empty if it exists. If it doesn't exist, the directory will be created.
-        version: _description_. Defaults to "3.1".
+        version: MIBiG version. Defaults to "3.1".
 
     Examples:
         >>> download_and_extract_mibig_metadata("/data/download", "/data/mibig_metadata")
@@ -58,7 +61,7 @@ def download_and_extract_mibig_metadata(
             raise ValueError(f'Nonempty directory: "{extract_path}"')
 
     # download and extract
-    md5 = _MD5_MIBIG_METADATA[version]
+    md5 = _MD5_MIBIG_METADATA.get(version, None)
     download_and_extract_archive(
         url=MIBIG_METADATA_URL.format(version=version),
         download_root=download_root,
