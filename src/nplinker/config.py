@@ -57,7 +57,7 @@ CONFIG_VALIDATORS = [
         is_in=["NOTSET", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
     ),
     Validator("log.file", is_type_of=str),
-    Validator("log.use_console", is_type_of=bool),
+    Validator("log.use_console", required=True, is_type_of=bool),
     #  Mibig
     Validator("mibig.to_use", required=True, is_type_of=bool),
     Validator(
@@ -67,9 +67,9 @@ CONFIG_VALIDATORS = [
         when=Validator("mibig.to_use", eq=True),
     ),
     # BigScape
-    Validator("bigscape.parameters", required=True, is_type_of=str),
+    Validator("bigscape.parameters", is_type_of=str),
     Validator("bigscape.cutoff", required=True, is_type_of=str),
-    Validator("bigscape.version", required=True, is_type_of=int),
+    Validator("bigscape.version", required=True, is_type_of=int, is_in=[1, 2]),
     # Scoring
     ## `scoring.methods` must be a list of strings and must contain at least one of the
     ## supported scoring methods.
