@@ -2,76 +2,87 @@
 # NPLinker configuration file
 #############################
 
-# The root directory of the NPLinker project. You need to create it first.
-# The value is required and must be a full path.
 root_dir = "<NPLinker root directory>"
-# The mode for preparing dataset.
-# The available modes are "podp" and "local".
-# "podp" mode is for using the PODP platform (https://pairedomicsdata.bioinformatics.nl/) to prepare the dataset.
-# "local" mode is for preparing the dataset locally. So uers do not need to upload their data to the PODP platform.
-# The value is required.
+# [REQUIRED] The value is required and must be a full path.
+# The root directory of the NPLinker project. You need to create it first.
+
 mode = "podp"
-# The PODP project identifier.
-# The value is required if the mode is "podp".
+# [REQUIRED] Available values are "podp" and "local".
+# The mode for preparing dataset.
+# "podp" mode is for using the PODP platform (https://pairedomicsdata.bioinformatics.nl/) to prepare the dataset.
+# "local" mode is for preparing the dataset locally. So users do not need to upload their data to the PODP platform.
+
 podp_id = ""
+# [REQUIRED-UNDER-CONDITIONS] The value is required if the mode is "podp".
+# The PODP project identifier.
+# Example: The identifier is "4b29ddc3-26d0-40d7-80c5-44fb6631dbf9.4" for the project
+# https://pairedomicsdata.bioinformatics.nl/projects/4b29ddc3-26d0-40d7-80c5-44fb6631dbf9.4
 
 
 [log]
-# Log level. The available levels are same as the levels in python package `logging`:
-# "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL".
-# The default value is "INFO".
+# Settings for logging.
+
 level = "INFO"
+# [REQUIRED] Available values are "DEBUG", "INFO", "WARNING", "ERROR", and "CRITICAL".
+# Log level. 
+
+use_console = true
+# [REQUIRED] Available values are "true" and "false".
+# Whether to write log messages to console.
+
+file = "path/to/logfile"
+# [OPTIONAL]
 # The log file to append log messages.
-# The value is optional.
 # If not set or use empty string, log messages will not be written to a file.
 # The file will be created if it does not exist. Log messages will be appended to the file if it exists.
-file = "path/to/logfile"
-# Whether to write log meesages to console.
-# The default value is true.
-use_console = true
 
 
 [mibig]
-# Whether to use mibig metadta (json).
-# The default value is true.
+# Settings for MIBiG.
+
 to_use = true
-# The version of mibig metadata.
-# Make sure using the same version of mibig in bigscape.
-# The default value is "3.1"
+# [REQUIRED] Available values are `true` and `false`.
+# Whether to use MIBiG annotations/metadata data for the analysis.
+
 version = "3.1"
+# [REQUIRED-UNDER-CONDITIONS] The version must be same as the version of MIBiG used in BiG-SCAPE.
+# The version of MIBiG data to use.
+# Check all available versions at https://mibig.secondarymetabolites.org/download.
 
 
 [bigscape]
-# The parameters to use for running BiG-SCAPE.
-# Version of BiG-SCAPE to run. Make sure to change the parameters property below as well
-# when changing versions.
+# Settings for BiG-SCAPE.
+
 version = 1
-# Required BiG-SCAPE parameters.
+# [REQUIRED] Available values are 1 and 2. 1 for version 1.x series and 2 for version 2.x series.
+# The version of BiG-SCAPE to use.
+
+cutoff = "0.30"
+# [REQUIRED] The value must be a string.
+# Which cutoff to use for the analysis. 
+# There might be multiple cutoffs in the BiG-SCAPE output and this value must be one of them.
+
+parameters = "version1_parameters_or_version2_parameters"
+# [REQUIRED-UNDER-CONDITIONS] It's required when you want to run BiG-SCAPE in NPLinker.
+# Parameters for running BiG-SCAPE.
 # --------------
 # For version 1:
 # -------------
-# Required parameters are: `--mix`, `--include_singletons` and `--cutoffs`. NPLinker needs them to run the analysis properly.
-# Do NOT set these parameters: `--inputdir`, `--outputdir`, `--pfam_dir`. NPLinker will automatically configure them.
-# If parameter `--mibig` is set, make sure to set the config `mibig.to_use` to true and `mibig.version` to the version of mibig in BiG-SCAPE.
-# The default value is "--mibig --clans-off --mix --include_singletons --cutoffs 0.30".
+# The parameters MUST contain `--mix`, `--include_singletons` and `--cutoffs`. NPLinker needs them to run the analysis properly.
+# The parameters must NOT contain `--inputdir`, `--outputdir`, `--pfam_dir`. NPLinker will automatically configure them.
+# An example value could be: "--mibig --clans-off --mix --include_singletons --cutoffs 0.30".
 # --------------
 # For version 2:
 # --------------
-# Note that BiG-SCAPE v2 has subcommands. NPLinker requires the `cluster` subcommand and its parameters.
+# BiG-SCAPE v2 has subcommands. NPLinker requires the `cluster` subcommand and its parameters.
 # Required parameters of `cluster` subcommand are: `--mibig_version`, `--include_singletons` and `--gcf_cutoffs`.
 # DO NOT set these parameters: `--pfam_path`, `--inputdir`, `--outputdir`. NPLinker will automatically configure them.
 # BiG-SCPAPE v2 also runs a `--mix` analysis by default, so you don't need to set this parameter here.
-# Example parameters for BiG-SCAPE v2: "--mibig_version 3.1 --include_singletons --gcf_cutoffs 0.30"
-parameters = "--mibig --clans-off --mix --include_singletons --cutoffs 0.30"
-# Which bigscape cutoff to use for NPLinker analysis.
-# There might be multiple cutoffs in bigscape output.
-# Note that this value must be a string.
-# The default value is "0.30".
-cutoff = "0.30"
+# An example value could be: "--mibig_version 3.1 --include_singletons --gcf_cutoffs 0.30"
 
 
 [scoring]
-# Scoring methods.
-# Valid values are "metcalf" and "rosetta".
-# The default value is "metcalf".
+# Settings for scoring.
 methods = ["metcalf"]
+# [REQUIRED] Available values are "metcalf" and "rosetta".
+# Scoring methods to use for the analysis.
