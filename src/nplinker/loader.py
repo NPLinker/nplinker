@@ -206,24 +206,20 @@ class DatasetLoader:
         all_bgcs_with_strain = antismash_bgcs_with_strain + self.mibig_bgcs
 
         # Step 4: load all GCF objects
-        bigscape_cluster_file = (
-            self.config.root_dir
-            / defaults.BIGSCAPE_DIRNAME
-            / f"mix_clustering_c{self.config.bigscape.cutoff}.tsv"
-        )
-        bigscape_db_file = self.config.root_dir / defaults.BIGSCAPE_DIRNAME / "data_sqlite.db"
-
-        # switch depending on found file. prefer V1 if both are found
-        if bigscape_cluster_file.exists():
+        if self.config.bigscape.version == 1:
+            bigscape_cluster_file = (
+                self.config.root_dir
+                / defaults.BIGSCAPE_DIRNAME
+                / f"mix_clustering_c{self.config.bigscape.cutoff}.tsv"
+            )
             loader = BigscapeGCFLoader(bigscape_cluster_file)
             logger.info(f"Loading BigSCAPE cluster file {bigscape_cluster_file}")
-        elif bigscape_db_file.exists():
+        elif self.config.bigscape.version == 2:
+            bigscape_db_file = self.config.root_dir / defaults.BIGSCAPE_DIRNAME / "data_sqlite.db"
             loader = BigscapeV2GCFLoader(bigscape_db_file)
             logger.info(f"Loading BigSCAPE database file {bigscape_db_file}")
         else:
-            raise FileNotFoundError(
-                f"Neither BigSCAPE cluster file {bigscape_cluster_file} nor database file {bigscape_db_file} were found."
-            )
+            raise ValueError(f"Unsupported BigScape version: {self.config.bigscape.version}")
 
         raw_gcfs = loader.get_gcfs()
 
