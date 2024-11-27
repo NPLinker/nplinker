@@ -42,7 +42,7 @@ def download_and_extract_mibig_metadata(
         download_root: Path to the directory in which to place the downloaded archive.
         extract_path: Path to an empty directory where the json files will be extracted.
             The directory must be empty if it exists. If it doesn't exist, the directory will be created.
-        version: MIBiG version.
+        version: MIBiG version. Defaults to "3.1".
 
     Examples:
         >>> download_and_extract_mibig_metadata("/data/download", "/data/mibig_metadata")
