@@ -1,6 +1,5 @@
 from __future__ import annotations
 from os import PathLike
-from pathlib import Path
 from dynaconf import Dynaconf
 from dynaconf import Validator
 from nplinker.utils import transform_to_full_path
@@ -25,11 +24,8 @@ def load_config(config_file: str | PathLike) -> Dynaconf:
     if not config_file.exists():
         raise FileNotFoundError(f"Config file '{config_file}' not found")
 
-    # Locate the default config file
-    default_config_file = Path(__file__).resolve().parent / "nplinker_default.toml"
-
     # Load config files
-    config = Dynaconf(settings_files=[config_file], preload=[default_config_file])
+    config = Dynaconf(settings_files=[config_file])
 
     # Validate configs
     config.validators.register(*CONFIG_VALIDATORS)
@@ -61,7 +57,7 @@ CONFIG_VALIDATORS = [
         is_in=["NOTSET", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
     ),
     Validator("log.file", is_type_of=str),
-    Validator("log.use_console", is_type_of=bool),
+    Validator("log.use_console", required=True, is_type_of=bool),
     #  Mibig
     Validator("mibig.to_use", required=True, is_type_of=bool),
     Validator(
@@ -71,9 +67,9 @@ CONFIG_VALIDATORS = [
         when=Validator("mibig.to_use", eq=True),
     ),
     # BigScape
-    Validator("bigscape.parameters", required=True, is_type_of=str),
+    Validator("bigscape.parameters", is_type_of=str),
     Validator("bigscape.cutoff", required=True, is_type_of=str),
-    Validator("bigscape.version", required=True, is_type_of=int),
+    Validator("bigscape.version", required=True, is_type_of=int, is_in=[1, 2]),
     # Scoring
     ## `scoring.methods` must be a list of strings and must contain at least one of the
     ## supported scoring methods.

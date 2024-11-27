@@ -166,16 +166,27 @@ is recommended to put it in the working directory created in step 2.
 
 The details of all settings can be found at this page [Config File](./concepts/config_file.md).
 
-To keep it simple, [default settings](./concepts/config_file.md#default-configurations) will be used 
-automatically by NPLinker if you don't set them in your `nplinker.toml` config file.
-
-What you need to do is to set the `root_dir` and `mode` in the `nplinker.toml` file.
+Here are some example values for the `nplinker.toml` file:
 
 === "`local` mode"
     ```toml title="nplinker.toml"
     root_dir = "absolute/path/to/working/directory" # (1)!
     mode = "local"
-    # and other settings you want to override the default settings 
+
+    [log]
+    level = "DEBUG"
+    use_console = true
+
+    [mibig]
+    to_use = true
+    version = "3.1"
+
+    [bigscape]
+    version = 1
+    cutoff = "0.30"
+
+    [scoring]
+    methods = ["metcalf"]
     ```
 
     1. Replace `absolute/path/to/working/directory` with the **absolute** path to the working directory
@@ -187,7 +198,22 @@ What you need to do is to set the `root_dir` and `mode` in the `nplinker.toml` f
     root_dir = "absolute/path/to/working/directory" # (1)!
     mode = "podp"
     podp_id = "podp_id" # (2)!
-    # and other settings you want to override the default settings 
+
+    [log]
+    level = "DEBUG"
+    use_console = true
+
+    [mibig]
+    to_use = true
+    version = "3.1"
+
+    [bigscape]
+    version = 2
+    cutoff = "0.30"
+    parameters = "--mibig_version 3.1 --include_singletons --gcf_cutoffs 0.30"
+
+    [scoring]
+    methods = ["metcalf"]
     ```
 
     1. Replace `absolute/path/to/working/directory` with the **absolute** path to the working directory
