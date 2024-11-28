@@ -1,5 +1,21 @@
 # Changelog
 
+## [v2.0.0-alpha.7](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.7) (2024-11-28)
+
+[Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.6...v2.0.0-alpha.7)
+
+**Closed issues:**
+
+- Incorrect precursor m/z when loading MGF file from GNPS [\#282](https://github.com/NPLinker/nplinker/issues/282)
+- Use bigscape version in loaders [\#271](https://github.com/NPLinker/nplinker/issues/271)
+
+**Merged pull requests:**
+
+- remove default config file to make all settings explicit [\#287](https://github.com/NPLinker/nplinker/pull/287) ([CunliangGeng](https://github.com/CunliangGeng))
+- add support of mibig v4.0 [\#286](https://github.com/NPLinker/nplinker/pull/286) ([CunliangGeng](https://github.com/CunliangGeng))
+- fix the resolving of genbank and jgi IDs [\#285](https://github.com/NPLinker/nplinker/pull/285) ([CunliangGeng](https://github.com/CunliangGeng))
+- Precursor m/z value fix [\#283](https://github.com/NPLinker/nplinker/pull/283) ([liannette](https://github.com/liannette))
+
 ## [v2.0.0-alpha.6](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.6) (2024-09-17)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.5...v2.0.0-alpha.6)
