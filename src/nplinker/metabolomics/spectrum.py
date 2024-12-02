@@ -140,9 +140,12 @@ class Spectrum:
         # Convert dict to comma-separated string
         elif isinstance(value, dict):
             value = ", ".join([f"{k}:{v}" for k, v in value.items()])
+        # Convert None to empty string
+        elif value is None:
+            value = ""
         # Convert anything else to string
         else:
-            value = str(value) if value else ""
+            value = str(value)
         return value
 
     def to_tabular(self) -> dict[str, str]:
