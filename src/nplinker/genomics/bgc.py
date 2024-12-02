@@ -209,12 +209,12 @@ class BGC:
 
         Args:
             value: The value to be converted to a string.
-                Can be a list, dict, or any other type.
+                Can be a list, dict, or any other JSON-compatible type.
 
         Returns:
             A string representation of the input value.
         """
-        # Convert list, tuple, set to comma-separated string
+        # Convert list to comma-separated string
         if isinstance(value, list):
             value = ", ".join(map(str, value))
         # Convert dict to comma-separated string
@@ -230,6 +230,8 @@ class BGC:
 
         Returns:
             dict: A dictionary representing the BGC object in tabular format.
+                The keys can be treated as headers and values are strings in which tabs are removed.
+                This dict can be exported as a TSV file.
         """
         return {
             key: self._to_string(value).replace("\t", "    ")
