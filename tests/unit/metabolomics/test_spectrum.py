@@ -102,9 +102,45 @@ def test_to_dict():
     assert dict_repr["gnps_annotations"] == {"annotation1": "value1"}
 
 
-def test_to_string():
-    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150)
-    assert spec._to_string([1, "a"]) == "1, a"
-    assert spec._to_string({"key1": 1, "key2": "value2"}) == "key1:1, key2:value2"
-    assert spec._to_string(100.2) == "100.2"
-    assert spec._to_string(None) == ""
+def test__to_string():
+    assert Spectrum._to_string([]) == ""
+    assert Spectrum._to_string([1, 2.0, "a"]) == "1, 2.0, a"
+    assert Spectrum._to_string(dict()) == ""
+    assert Spectrum._to_string({"key1": 1, "key2": "value2"}) == "key1:1, key2:value2"
+    assert Spectrum._to_string(None) == ""
+    assert Spectrum._to_string(0) == "0"
+    assert Spectrum._to_string(0.0) == "0.0"
+    assert Spectrum._to_string(100.2) == "100.2"
+    assert Spectrum._to_string(False) == "False"
+
+
+def test_to_tabular():
+    """Test the to_tabular method."""
+    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150, 0, {"info": "test"})
+    spec.strains.add(Strain("strain1"))
+    spec.strains.add(Strain("strain2"))
+
+    tabular_repr = spec.to_tabular()
+    assert tabular_repr["spectrum_id"] == "spec1"
+    assert tabular_repr["num_strains_with_spectrum"] == "2"
+    assert tabular_repr["precursor_mz"] == "150"
+    assert tabular_repr["rt"] == "0"
+    assert tabular_repr["molecular_family"] == ""
+    assert tabular_repr["gnps_id"] == ""
+    assert tabular_repr["gnps_annotations"] == ""
+
+    # Test with molecular family
+    class MockMolecularFamily:
+        def __init__(self, id):
+            self.id = id
+
+    spec.family = MockMolecularFamily("family1")
+
+    # Test with gnps information
+    spec.gnps_id = "GNPS0001"
+    spec.gnps_annotations = {"key1": "value1", "key2": "value2"}
+
+    tabular_repr = spec.to_tabular()
+    assert tabular_repr["molecular_family"] == "family1"
+    assert tabular_repr["gnps_id"] == "GNPS0001"
+    assert tabular_repr["gnps_annotations"] == "key1:value1, key2:value2"

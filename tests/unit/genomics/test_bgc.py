@@ -60,8 +60,43 @@ def test_to_dict():
     assert dict_repr["antismash_region"] == 1
 
 
-def test_to_string():
-    assert BGC._to_string([1, "a"]) == "1, a"
+def test__to_string():
+    assert BGC._to_string([]) == ""
+    assert BGC._to_string([1, 2.0, "a"]) == "1, 2.0, a"
+    assert BGC._to_string(dict()) == ""
     assert BGC._to_string({"key1": 1, "key2": "value2"}) == "key1:1, key2:value2"
-    assert BGC._to_string(100.2) == "100.2"
     assert BGC._to_string(None) == ""
+    assert BGC._to_string(0) == "0"
+    assert BGC._to_string(0.0) == "0.0"
+    assert BGC._to_string(100.2) == "100.2"
+    assert BGC._to_string(False) == "False"
+
+
+def test_to_tabular():
+    bgc = BGC("BGC0000001", "Polyketide", "NRP")
+    bgc.strain = Strain("sample_strain")
+    bgc.description = "Sample description"
+
+    tabular_repr = bgc.to_tabular()
+    assert tabular_repr["GCF_id"] == ""
+    assert tabular_repr["GCF_bigscape_class"] == ""
+    assert tabular_repr["BGC_name"] == "BGC0000001"
+    assert tabular_repr["product_prediction"] == "Polyketide, NRP"
+    assert tabular_repr["mibig_bgc_class"] == ""
+    assert tabular_repr["description"] == "Sample description"
+    assert tabular_repr["strain_id"] == "sample_strain"
+    assert tabular_repr["antismash_id"] == ""
+    assert tabular_repr["antismash_region"] == ""
+
+    bgc.add_parent(GCF("1"))
+    bgc.mibig_bgc_class = [
+        "NRP",
+    ]
+    bgc.antismash_id = "ABC_0001"
+    bgc.antismash_region = 1
+    tabular_repr = bgc.to_tabular()
+    assert tabular_repr["GCF_id"] == "1"
+    assert tabular_repr["GCF_bigscape_class"] == ""
+    assert tabular_repr["mibig_bgc_class"] == "NRP"
+    assert tabular_repr["antismash_id"] == "ABC_0001"
+    assert tabular_repr["antismash_region"] == "1"

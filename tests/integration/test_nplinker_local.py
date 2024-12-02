@@ -1,5 +1,6 @@
 import os
 import pickle
+from pathlib import Path
 import pytest
 from nplinker.genomics import GCF
 from nplinker.metabolomics import MolecularFamily
@@ -106,3 +107,42 @@ def test_save_data(npl):
             assert obj1 in mfs
         else:
             assert False
+
+
+def test_objects_to_tsv(npl, tmp_path):
+    tsv_file = tmp_path / "test.tsv"
+
+    # Test objects_to_tsv for BGCs
+    npl.objects_to_tsv(npl.bgcs, tsv_file)
+    with open(tsv_file, "r") as f:
+        lines = f.readlines()
+        assert len(lines) == len(npl.bgcs) + 1  # +1 for header
+
+    # Test objects_to_tsv for Spectra
+    npl.objects_to_tsv(npl.spectra, tsv_file)
+    with open(tsv_file, "r") as f:
+        lines = f.readlines()
+        assert len(lines) == len(npl.spectra) + 1  # +1 for header
+
+
+def test_to_tsv(npl):
+    lg = npl.get_links(npl.spectra[:1], "metcalf")
+    npl.to_tsv(lg)
+
+    # Check the genomics_data.tsv file
+    genomics_tsv_file = Path(npl.output_dir) / "genomics_data.tsv"
+    with open(genomics_tsv_file, "r") as f:
+        lines = f.readlines()
+        assert len(lines) == len(npl.bgcs) + 1  # +1 for header
+
+    # Check metabolomics_data.tsv file
+    metabolomics_tsv_file = Path(npl.output_dir) / "metabolomics_data.tsv"
+    with open(metabolomics_tsv_file, "r") as f:
+        lines = f.readlines()
+        assert len(lines) == len(npl.spectra) + 1  # +1 for header
+
+    # Check the links.tsv file
+    links_tsv_file = Path(npl.output_dir) / "links.tsv"
+    with open(links_tsv_file, "r") as f:
+        lines = f.readlines()
+        assert len(lines) == len(lg.links) + 1  # +1 for header

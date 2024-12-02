@@ -140,3 +140,33 @@ def test__links_to_dicts(lg, gcfs, spectra, score):
     display_limit = 1
     table_data = lg._links_to_dicts(display_limit)
     assert len(table_data) == 1
+
+
+def test_to_tsv(lg, gcfs, mfs, score, tmp_path):
+    lg.add_link(gcfs[1], mfs[0], metcalf=score)
+
+    tsv_file = tmp_path / "links.tsv"
+    lg.to_tsv(tsv_file)
+
+    with open(tsv_file, "r") as f:
+        lines = f.readlines()
+
+    # Check the header
+    expected_header_names = [
+        "index",
+        "genomic_object_id",
+        "genomic_object_type",
+        "metabolomic_object_id",
+        "metabolomic_object_type",
+        "metcalf_score",
+        "rosetta_score",
+    ]
+    assert lines[0].rstrip("\n").split("\t") == expected_header_names
+
+    # Check first link data
+    expected_line = ["1", "gcf1", "GCF", "spectrum1", "Spectrum", "1.0", ""]
+    assert lines[1].rstrip("\n").split("\t") == expected_line
+
+    # Check second link data
+    expected_line = ["2", "gcf2", "GCF", "mf1", "MolecularFamily", "1.0", ""]
+    assert lines[2].rstrip("\n").split("\t") == expected_line
