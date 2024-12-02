@@ -203,6 +203,19 @@ class BGC:
             "antismash_region": self.antismash_region,
         }
 
+    def to_tabular(self) -> dict[str, str]:
+        """Convert the BGC object to a tabular format.
+
+        Returns:
+            dict: A dictionary representing the BGC object in tabular format.
+                The keys can be treated as headers and values are strings in which tabs are removed.
+                This dict can be exported as a TSV file.
+        """
+        return {
+            key: self._to_string(value).replace("\t", "    ")
+            for key, value in self.to_dict().items()
+        }
+    
     @staticmethod
     def _to_string(value: Any) -> str:
         """Convert various types of values to a string.
@@ -227,19 +240,6 @@ class BGC:
         else:
             value = str(value)
         return value
-
-    def to_tabular(self) -> dict[str, str]:
-        """Convert the BGC object to a tabular format.
-
-        Returns:
-            dict: A dictionary representing the BGC object in tabular format.
-                The keys can be treated as headers and values are strings in which tabs are removed.
-                This dict can be exported as a TSV file.
-        """
-        return {
-            key: self._to_string(value).replace("\t", "    ")
-            for key, value in self.to_dict().items()
-        }
 
     # CG: why not providing whole product but only amino acid as product monomer?
     # this property is not used in NPLinker core business.
