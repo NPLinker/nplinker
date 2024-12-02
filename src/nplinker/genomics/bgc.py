@@ -215,7 +215,7 @@ class BGC:
             key: self._to_string(value).replace("\t", "    ")
             for key, value in self.to_dict().items()
         }
-    
+
     @staticmethod
     def _to_string(value: Any) -> str:
         """Convert various types of values to a string.

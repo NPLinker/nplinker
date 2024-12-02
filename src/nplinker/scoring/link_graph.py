@@ -291,7 +291,7 @@ class LinkGraph:
 
         Returns:
             A dictionary containing the link information with the following keys:
-            
+
                 - genomic_object_id (str): The ID of the genomic object.
                 - genomic_object_type (str): The type of the genomic object.
                 - metabolomic_object_id (str): The ID of the metabolomic object.
