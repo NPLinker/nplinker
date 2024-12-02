@@ -73,14 +73,7 @@ def test_has_strain():
 
 def test_to_dict():
     """Test the to_dict method."""
-    spec = Spectrum(
-        id="spec1",
-        mz=[100.0, 200.0],
-        intensity=[0.1, 0.2],
-        precursor_mz=150.0,
-        rt=0.0,
-        metadata={"info": "test"},
-    )
+    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150, 1, 0, {"info": "test"})
     spec.strains.add(Strain("strain1"))
     spec.strains.add(Strain("strain2"))
 
@@ -88,7 +81,7 @@ def test_to_dict():
     assert dict_repr["spectrum_id"] == "spec1"
     assert dict_repr["num_strains_with_spectrum"] == 2
     assert dict_repr["precursor_mz"] == 150.0
-    assert dict_repr["rt"] == 0.0
+    assert dict_repr["rt"] == 0
     assert dict_repr["molecular_family"] is None
     assert dict_repr["gnps_id"] is None
     assert dict_repr["gnps_annotations"] == dict()
@@ -124,7 +117,7 @@ def test__to_string():
 
 def test_to_tabular():
     """Test the to_tabular method."""
-    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150, 0, {"info": "test"})
+    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150, 1, 0, {"info": "test"})
     spec.strains.add(Strain("strain1"))
     spec.strains.add(Strain("strain2"))
 
