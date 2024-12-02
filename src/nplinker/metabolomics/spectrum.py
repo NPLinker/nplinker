@@ -149,14 +149,14 @@ class Spectrum:
         """
         # Convert list to comma-separated string
         if isinstance(value, list):
-            value = ", ".join(map(str, value))
+            formatted_value = ", ".join(map(str, value))
         # Convert dict to comma-separated string
         elif isinstance(value, dict):
-            value = ", ".join([f"{k}:{v}" for k, v in value.items()])
+            formatted_value = ", ".join([f"{k}:{v}" for k, v in value.items()])
         # Convert None to empty string
         elif value is None:
-            value = ""
+            formatted_value = ""
         # Convert anything else to string
         else:
-            value = str(value)
-        return value
+            formatted_value = str(value)
+        return formatted_value
