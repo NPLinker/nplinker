@@ -14,12 +14,13 @@ from nplinker.strain import StrainCollection
 )
 def test_init(rt, metadata, expected_metadata):
     """Test the initialization of the Spectrum class."""
-    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150, rt, metadata)
+    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150, 1, rt, metadata)
 
     assert spec.id == "spec1"
     assert spec.mz == [100, 200]
     assert spec.intensity == [0.1, 0.2]
     assert spec.precursor_mz == 150
+    assert spec.precursor_charge == 1
     assert spec.rt == rt
     assert spec.metadata == expected_metadata
 
@@ -32,16 +33,16 @@ def test_init(rt, metadata, expected_metadata):
 
 def test_str_repr():
     """Test the __str__ and __repr__ methods."""
-    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150)
+    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150, 1)
     assert str(spec) == "Spectrum(id=spec1, #strains=0)"
     assert repr(spec) == "Spectrum(id=spec1, #strains=0)"
 
 
 def test_eq():
     """Test the __eq__ method."""
-    spec1 = Spectrum("spec1", [100, 200], [0.1, 0.2], 150, 0, {"info": "test"})
-    spec2 = Spectrum("spec1", [100, 200], [0.1, 0.2], 150, 0, {"info": "test"})
-    spec3 = Spectrum("spec2", [100, 200], [0.1, 0.2], 150, 0, {"info": "test"})
+    spec1 = Spectrum("spec1", [100, 200], [0.1, 0.2], 150, 1, 0, {"info": "test"})
+    spec2 = Spectrum("spec1", [100, 200], [0.1, 0.2], 150, 1, 0, {"info": "test"})
+    spec3 = Spectrum("spec2", [100, 200], [0.1, 0.2], 150, 1, 0, {"info": "test"})
 
     assert spec1 == spec2
     assert spec1 != spec3
@@ -49,19 +50,19 @@ def test_eq():
 
 def test_hash():
     """Test the __hash__ method."""
-    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150)
+    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150, 1)
     assert hash(spec) == hash(("spec1", 150))
 
 
 def test_peaks():
     """Test the peaks attribute."""
-    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150)
+    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150, 1)
     assert np.array_equal(spec.peaks, np.array([[100, 0.1], [200, 0.2]]))
 
 
 def test_has_strain():
     """Test the has_strain method."""
-    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150)
+    spec = Spectrum("spec1", [100, 200], [0.1, 0.2], 150, 1)
     strain1 = Strain("strain1")
     strain2 = Strain("strain2")
 

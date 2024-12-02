@@ -8,7 +8,7 @@ from nplinker.strain import StrainCollection
 @pytest.fixture()
 def spectrum1():
     """Return a Spectrum object."""
-    spec = Spectrum(id="spec001", mz=[1.0], intensity=[1.0], precursor_mz=100.0)
+    spec = Spectrum(id="spec001", mz=[1.0], intensity=[1.0], precursor_mz=100.0, precursor_charge=1)
     spec.strains = StrainCollection()
     spec.strains.add(Strain("strain001"))
     yield spec
@@ -17,7 +17,7 @@ def spectrum1():
 @pytest.fixture()
 def spectrum2():
     """Return a Spectrum object."""
-    spec = Spectrum(id="spec002", mz=[1.0], intensity=[1.0], precursor_mz=100.0)
+    spec = Spectrum(id="spec002", mz=[1.0], intensity=[1.0], precursor_mz=100.0, precursor_charge=1)
     spec.strains = StrainCollection()
     spec.strains.add(Strain("strain002"))
     yield spec

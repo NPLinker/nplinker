@@ -4,13 +4,9 @@
 --8<-- "src/nplinker/data/nplinker.toml"
 ```
 
+## Example Configuration
 
-## Default Configurations
-The default configurations are automatically used by NPLinker if you don't set them in your config file.
-
-```toml
---8<-- "src/nplinker/nplinker_default.toml"
-```
+For a full example of a configuration file, see [here](../quickstart.md#3-prepare-config-file).
 
 ## Config loader
 

@@ -18,10 +18,10 @@ class Spectrum:
         id: the spectrum ID.
         mz: the list of m/z values.
         intensity: the list of intensity values.
-        precursor_mz: the m/z value of the precursor.
+        precursor_mz: the m/z value of the precursor ion.
+        precursor_charge: the charge of the precursor ion.
         rt: the retention time in seconds.
-        metadata: the metadata of the spectrum, i.e. the header information in the MGF
-            file.
+        metadata: the metadata of the spectrum, i.e. the header information in the MGF file.
         gnps_annotations: the GNPS annotations of the spectrum.
         gnps_id: the GNPS ID of the spectrum.
         strains: the strains that this spectrum belongs to.
@@ -35,6 +35,7 @@ class Spectrum:
         mz: list[float],
         intensity: list[float],
         precursor_mz: float,
+        precursor_charge: int,
         rt: float = 0,
         metadata: dict | None = None,
     ) -> None:
@@ -45,6 +46,7 @@ class Spectrum:
             mz: the list of m/z values.
             intensity: the list of intensity values.
             precursor_mz: the precursor m/z.
+            precursor_charge: the charge of the precursor ion.
             rt: the retention time in seconds. Defaults to 0.
             metadata: the metadata of the spectrum, i.e. the header information
                 in the MGF file.
@@ -53,6 +55,7 @@ class Spectrum:
         self.mz = mz
         self.intensity = intensity
         self.precursor_mz = precursor_mz
+        self.precursor_charge = precursor_charge
         self.rt = rt
         self.metadata = metadata or {}
 
@@ -79,7 +82,15 @@ class Spectrum:
         """Reduce function for pickling."""
         return (
             self.__class__,
-            (self.id, self.mz, self.intensity, self.precursor_mz, self.rt, self.metadata),
+            (
+                self.id,
+                self.mz,
+                self.intensity,
+                self.precursor_mz,
+                self.precursor_charge,
+                self.rt,
+                self.metadata,
+            ),
             self.__dict__,
         )
 
