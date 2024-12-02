@@ -145,7 +145,7 @@ class Spectrum:
             value = str(value) if value else ""
         return value
 
-    def to_tabular(self) -> dict[str, Any]:
+    def to_tabular(self) -> dict[str, str]:
         """Convert the Spectrum object to a tabular format.
 
         Returns:
