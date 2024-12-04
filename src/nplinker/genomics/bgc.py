@@ -2,9 +2,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 from typing import Any
-from deprecated import deprecated
 from nplinker.strain import Strain
-from .aa_pred import predict_aa
 
 
 if TYPE_CHECKING:
@@ -240,23 +238,3 @@ class BGC:
         else:
             formatted_value = str(value)
         return formatted_value
-
-    # CG: why not providing whole product but only amino acid as product monomer?
-    # this property is not used in NPLinker core business.
-    @property
-    @deprecated(version="2.0.0", reason="This method will be removed soon")
-    def aa_predictions(self) -> list:
-        """Amino acids as predicted monomers of product.
-
-        Returns:
-            list of dicts with key as amino acid and value as prediction
-            probability.
-        """
-        # Load aa predictions and cache them
-        self._aa_predictions = None
-        if self._aa_predictions is None:
-            self._aa_predictions = {}
-            if self.antismash_file is not None:
-                for p in predict_aa(self.antismash_file):
-                    self._aa_predictions[p[0]] = p[1]
-        return [self._aa_predictions]
