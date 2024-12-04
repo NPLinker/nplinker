@@ -1,6 +1,9 @@
 from __future__ import annotations
+import csv
 from collections.abc import Sequence
 from functools import wraps
+from os import PathLike
+from typing import Any
 from typing import Union
 from networkx import Graph
 from tabulate import tabulate
@@ -76,17 +79,17 @@ class LinkGraph:
 
             Display the empty LinkGraph object:
             >>> lg
-            |    |   Object 1 |   Object 2 |   Metcalf Score |   Rosetta Score |
-            |----|------------|------------|-----------------|-----------------|
+            |   index |   genomic_object_id |   genomic_object_type |   metabolomic_object_id |   metabolomic_object_type |   metcalf_score |   rosetta_score |
+            |---------|---------------------|-----------------------|-------------------------|---------------------------|-----------------|-----------------|
 
             Add a link between a GCF and a Spectrum object:
             >>> lg.add_link(gcf, spectrum, metcalf=Score("metcalf", 1.0, {"cutoff": 0.5}))
 
             Display all links in LinkGraph object:
             >>> lg
-            |    |     Object 1 |               Object 2 |   Metcalf Score |   Rosetta Score |
-            |----|--------------|------------------------|-----------------|-----------------|
-            |  1 | GCF(id=gcf1) | Spectrum(id=spectrum1) |               1 |               - |
+            |   index |   genomic_object_id |   genomic_object_type |   metabolomic_object_id |   metabolomic_object_type |   metcalf_score |   rosetta_score |
+            |---------|---------------------|-----------------------|-------------------------|---------------------------|-----------------|-----------------|
+            |       1 |                   1 |                   GCF |                       1 |                  Spectrum |            1.00 |                 |
 
             Get all links for a given object:
             >>> lg[gcf]
@@ -103,6 +106,18 @@ class LinkGraph:
             Get the link data between two objects:
             >>> lg.get_link_data(gcf, spectrum)
             {"metcalf": Score("metcalf", 1.0, {"cutoff": 0.5})}
+
+            Filter the links for `gcf1` and `gcf2`:
+            >>> new_lg = lg.filter([gcf1, gcf2])
+
+            Filter the links for `spectrum1` and `spectrum2`:
+            >>> new_lg = lg.filter([spectrum1, spectrum2])
+
+            Filter the links between two lists of objects:
+            >>> new_lg = lg.filter([gcf1, gcf2], [spectrum1, spectrum2])
+
+            Export the links to a file:
+            >>> lg.to_tsv("links.tsv")
         """
         self._g: Graph = Graph()
 
@@ -267,6 +282,54 @@ class LinkGraph:
 
         return lg
 
+    @staticmethod
+    def link_to_dict(link: LINK) -> dict[str, Any]:
+        """Convert a link to a dictionary representation.
+
+        Args:
+            link: A tuple containing the link information (u, v, data).
+
+        Returns:
+            A dictionary containing the link information with the following keys:
+
+                - genomic_object_id (str): The ID of the genomic object.
+                - genomic_object_type (str): The type of the genomic object.
+                - metabolomic_object_id (str): The ID of the metabolomic object.
+                - metabolomic_object_type (str): The type of the metabolomic object.
+                - metcalf_score (float | str): The Metcalf score, rounded to 2 decimal places.
+                - rosetta_score (float | str): The Rosetta score, rounded to 2 decimal places.
+        """
+        u, v, data = link
+        genomic_types = (GCF,)
+        genomic_object = u if isinstance(u, genomic_types) else v
+        metabolomic_object = v if isinstance(u, genomic_types) else u
+        metcalf_score = data.get("metcalf")
+        rosetta_score = data.get("rosetta")
+        return {
+            "genomic_object_id": genomic_object.id,
+            "genomic_object_type": genomic_object.__class__.__name__,
+            "metabolomic_object_id": metabolomic_object.id,
+            "metabolomic_object_type": metabolomic_object.__class__.__name__,
+            "metcalf_score": round(metcalf_score.value, 2) if metcalf_score else "",
+            "rosetta_score": round(rosetta_score.value, 2) if rosetta_score else "",
+        }
+
+    def to_tsv(self, file: str | PathLike) -> None:
+        """Exports the links in the LinkGraph to a TSV file.
+
+        Args:
+            file: the path to the output TSV file.
+
+        Examples:
+            >>> lg.to_tsv("links.tsv")
+        """
+        table_data = self._links_to_dicts()
+        headers = table_data[0].keys()
+        with open(file, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=headers, delimiter="\t")
+            writer.writeheader()
+            writer.writerows(table_data)
+
     @validate_u
     def _filter_one_node(self, u: Entity, lg: LinkGraph) -> None:
         """Filter the links for a given object and add them to the new LinkGraph object."""
@@ -285,35 +348,47 @@ class LinkGraph:
         if link_data is not None:
             lg.add_link(u, v, **link_data)
 
-    def _get_table_repr(self) -> str:
+    def _get_table_repr(self, display_limit: int | None = 60) -> str:
         """Generate a table representation of the LinkGraph.
 
-        The table is truncated to 60 links.
+        Args:
+            display_limit: The maximum number of links to display in the table. Defaults to 60.
+
+        Returns:
+           A string representation of the table in GitHub-flavored markdown format. If the
+            number of links exceeds the display limit, the table is truncated and an additional
+            line indicating the total number of links is appended.
         """
-        headers = ["", "Object 1", "Object 2", "Metcalf Score", "Rosetta Score"]
-        table_data = []
-        display_limit = 60
+        table = tabulate(
+            self._links_to_dicts(display_limit),
+            headers="keys",
+            tablefmt="github",
+            stralign="right",
+        )
 
-        for index, (u, v, data) in enumerate(self.links, start=1):
-            metcalf_score = data.get("metcalf")
-            rosetta_score = data.get("rosetta")
-
-            row = [
-                index,
-                str(u if isinstance(u, GCF) else v),
-                str(v if isinstance(u, GCF) else u),
-                f"{metcalf_score.value:.2f}" if metcalf_score else "-",
-                f"{rosetta_score.value:.2f}" if rosetta_score else "-",
-            ]
-            table_data.append(row)
-
-            if index == display_limit:
-                break
-
-        table = tabulate(table_data, headers=headers, tablefmt="github", stralign="right")
-
-        if len(self.links) > display_limit:
+        if display_limit is not None and len(self.links) > display_limit:
             truncated_info = f"...\n[ {len(self.links)} links ]"
-            return f"{table}\n{truncated_info}"
+            table += f"\n{truncated_info}"
 
         return table
+
+    def _links_to_dicts(self, display_limit: int | None = None) -> list[dict[str, Any]]:
+        """Generate the table data for the LinkGraph.
+
+        This method iterates over the links in the LinkGraph and constructs a table
+        containing information about genomic and metabolomic objects, as well as their
+        associated scores. Each row in the table represents a link between a genomic
+        object and a metabolomic object.
+
+        Args:
+            display_limit (int | None): The maximum number of rows to include in the
+                table. If None, all rows are included.
+
+        Returns:
+            A list of dictionaries containing the table data.
+        """
+        links = self.links[:display_limit] if display_limit else self.links
+        link_dicts = []
+        for idx, link in enumerate(links):
+            link_dicts.append({"index": idx + 1, **self.link_to_dict(link)})
+        return link_dicts

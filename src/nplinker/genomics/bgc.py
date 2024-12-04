@@ -1,6 +1,7 @@
 from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
+from typing import Any
 from deprecated import deprecated
 from nplinker.strain import Strain
 from .aa_pred import predict_aa
@@ -172,6 +173,73 @@ class BGC:
             True if it's MIBiG reference BGC
         """
         return self.id.startswith("BGC")
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert the BGC object to a dictionary for exporting purpose.
+
+        Returns:
+            A dictionary containing the following key-value pairs:
+
+            - GCF_id (list[str]): A list of GCF IDs.
+            - GCF_bigscape_class (list[str]): A list of BiG-SCAPE classes.
+            - strain_id (str | None): The ID of the strain.
+            - description (str | None): A description of the BGC.
+            - BGC_name (str): The name of the BGC.
+            - product_prediction (list[str]): (predicted) products or product classes of the BGC.
+            - mibig_bgc_class (list[str] | None): MIBiG biosynthetic classes.
+            - antismash_id (str | None): The antiSMASH ID.
+            - antismash_region (int | None): The antiSMASH region number.
+        """
+        # Keys are ordered to make the output easier to analyze
+        return {
+            "GCF_id": [gcf.id for gcf in self.parents if gcf.id is not None],
+            "GCF_bigscape_class": [bsc for bsc in self.bigscape_classes if bsc is not None],
+            "strain_id": self.strain.id if self.strain is not None else None,
+            "description": self.description,
+            "BGC_name": self.id,
+            "product_prediction": list(self.product_prediction),
+            "mibig_bgc_class": self.mibig_bgc_class,
+            "antismash_id": self.antismash_id,
+            "antismash_region": self.antismash_region,
+        }
+
+    def to_tabular(self) -> dict[str, str]:
+        """Convert the BGC object to a tabular format.
+
+        Returns:
+            dict: A dictionary representing the BGC object in tabular format.
+                The keys can be treated as headers and values are strings in which tabs are removed.
+                This dict can be exported as a TSV file.
+        """
+        return {
+            key: self._to_string(value).replace("\t", "    ")
+            for key, value in self.to_dict().items()
+        }
+
+    @staticmethod
+    def _to_string(value: Any) -> str:
+        """Convert various types of values to a string.
+
+        Args:
+            value: The value to be converted to a string.
+                Can be a list, dict, or any other JSON-compatible type.
+
+        Returns:
+            A string representation of the input value.
+        """
+        # Convert list to comma-separated string
+        if isinstance(value, list):
+            formatted_value = ", ".join(map(str, value))
+        # Convert dict to comma-separated string
+        elif isinstance(value, dict):
+            formatted_value = ", ".join([f"{k}:{v}" for k, v in value.items()])
+        # Convert None to empty string
+        elif value is None:
+            formatted_value = ""
+        # Convert anything else to string
+        else:
+            formatted_value = str(value)
+        return formatted_value
 
     # CG: why not providing whole product but only amino acid as product monomer?
     # this property is not used in NPLinker core business.

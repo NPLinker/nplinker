@@ -1,6 +1,7 @@
 from __future__ import annotations
 from functools import cached_property
 from typing import TYPE_CHECKING
+from typing import Any
 import numpy as np
 from nplinker.strain import Strain
 from nplinker.strain import StrainCollection
@@ -108,3 +109,65 @@ class Spectrum:
             True when the given strain exist in the spectrum.
         """
         return strain in self.strains
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert the Spectrum object to a dictionary for exporting purpose.
+
+        Returns:
+            A dictionary containing containing the following key-value pairs:
+
+                - "spectrum_id" (str): The unique identifier of the spectrum.
+                - "num_strains_with_spectrum" (int): The number of strains associated with the spectrum.
+                - "precursor_mz" (float): The precursor m/z value, rounded to four decimal places.
+                - "rt" (float): The retention time, rounded to three decimal places.
+                - "molecular_family" (str | None ): The identifier of the molecular family.
+                - "gnps_id" (str | None ): The GNPS identifier.
+                - "gnps_annotations" (dict[str, str]): A dictionary of GNPS annotations.
+        """
+        return {
+            "spectrum_id": self.id,
+            "num_strains_with_spectrum": len(self.strains),
+            "precursor_mz": round(self.precursor_mz, 4),
+            "rt": round(self.rt, 3),
+            "molecular_family": self.family.id if self.family else None,
+            "gnps_id": self.gnps_id,
+            "gnps_annotations": self.gnps_annotations,
+        }
+
+    def to_tabular(self) -> dict[str, str]:
+        """Convert the Spectrum object to a tabular format.
+
+        Returns:
+            dict: A dictionary representing the Spectrum object in tabular format.
+                The keys can be treated as headers and values are strings in which tabs are removed.
+                This dict can be exported as a TSV file.
+        """
+        return {
+            key: self._to_string(value).replace("\t", "    ")
+            for key, value in self.to_dict().items()
+        }
+
+    @staticmethod
+    def _to_string(value: Any) -> str:
+        """Convert various types of values to a string.
+
+        Args:
+            value: The value to be converted to a string.
+                Can be a list, dict, or any other JSON-compatible type.
+
+        Returns:
+            A string representation of the input value.
+        """
+        # Convert list to comma-separated string
+        if isinstance(value, list):
+            formatted_value = ", ".join(map(str, value))
+        # Convert dict to comma-separated string
+        elif isinstance(value, dict):
+            formatted_value = ", ".join([f"{k}:{v}" for k, v in value.items()])
+        # Convert None to empty string
+        elif value is None:
+            formatted_value = ""
+        # Convert anything else to string
+        else:
+            formatted_value = str(value)
+        return formatted_value

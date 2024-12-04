@@ -37,7 +37,7 @@ jobs:
       - name: Install ruff and mypy
         run: |
           pip install ruff mypy typing_extensions \
-            types-Deprecated types-beautifulsoup4 types-jsonschema types-networkx pandas-stubs
+            types-Deprecated types-beautifulsoup4 types-jsonschema types-networkx types-tabulate pandas-stubs 
       - name: Get all changed python files
         id: changed-python-files
         uses: tj-actions/changed-files@v44

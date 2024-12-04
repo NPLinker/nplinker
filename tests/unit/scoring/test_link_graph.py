@@ -112,3 +112,61 @@ def test_filter(gcfs, spectra, score):
     # test filtering with GCFs and Spectra
     lg_filtered = lg.filter(u_nodes, v_nodes)
     assert len(lg_filtered) == 4
+
+
+def test_link_to_dict(lg, gcfs, spectra, score):
+    link = lg.links[0]
+    dict_repr = lg.link_to_dict(link)
+    assert type(dict_repr) is dict
+    assert dict_repr["genomic_object_type"] == gcfs[0].__class__.__name__
+    assert dict_repr["genomic_object_id"] == gcfs[0].id
+    assert dict_repr["metabolomic_object_type"] == spectra[0].__class__.__name__
+    assert dict_repr["metabolomic_object_id"] == spectra[0].id
+    assert dict_repr["metcalf_score"] == round(score.value, 2)
+    assert dict_repr["rosetta_score"] == ""
+
+
+def test__links_to_dicts(lg, gcfs, spectra, score):
+    # add a second link
+    lg.add_link(gcfs[1], spectra[1], metcalf=score)
+
+    table_data = lg._links_to_dicts()
+    assert type(table_data) is list
+    assert type(table_data[0]) is dict
+    assert len(table_data) == 2
+    assert table_data[0]["index"] == 1
+    assert table_data[1]["index"] == 2
+
+    display_limit = 1
+    table_data = lg._links_to_dicts(display_limit)
+    assert len(table_data) == 1
+
+
+def test_to_tsv(lg, gcfs, mfs, score, tmp_path):
+    lg.add_link(gcfs[1], mfs[0], metcalf=score)
+
+    tsv_file = tmp_path / "links.tsv"
+    lg.to_tsv(tsv_file)
+
+    with open(tsv_file, "r") as f:
+        lines = f.readlines()
+
+    # Check the header
+    expected_header_names = [
+        "index",
+        "genomic_object_id",
+        "genomic_object_type",
+        "metabolomic_object_id",
+        "metabolomic_object_type",
+        "metcalf_score",
+        "rosetta_score",
+    ]
+    assert lines[0].rstrip("\n").split("\t") == expected_header_names
+
+    # Check first link data
+    expected_line = ["1", "gcf1", "GCF", "spectrum1", "Spectrum", "1.0", ""]
+    assert lines[1].rstrip("\n").split("\t") == expected_line
+
+    # Check second link data
+    expected_line = ["2", "gcf2", "GCF", "mf1", "MolecularFamily", "1.0", ""]
+    assert lines[2].rstrip("\n").split("\t") == expected_line

@@ -63,6 +63,7 @@ dev = [
     "types-beautifulsoup4",
     "types-jsonschema",
     "types-networkx",
+    "types-tabulate",
     "pandas-stubs",
     # docs
     "black",
