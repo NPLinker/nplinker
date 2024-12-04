@@ -138,7 +138,7 @@ class Spectrum:
         """Convert the Spectrum object to a tabular format.
 
         Returns:
-            dict: A dictionary representing the BGC object in tabular format.
+            dict: A dictionary representing the Spectrum object in tabular format.
                 The keys can be treated as headers and values are strings in which tabs are removed.
                 This dict can be exported as a TSV file.
         """
