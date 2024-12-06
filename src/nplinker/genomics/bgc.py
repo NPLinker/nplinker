@@ -43,9 +43,6 @@ class BGC:
             see [the paper](https://doi.org/10.1186/s40793-018-0318-y).
         description: Brief description of the BGC.
             Defaults to None.
-        smiles: A tuple of SMILES formulas of the BGC's
-            products.
-            Defaults to None.
         antismash_file: The path to the antiSMASH GenBank file.
             Defaults to None.
         antismash_id: Identifier of the antiSMASH BGC, referring
@@ -80,7 +77,6 @@ class BGC:
 
         self.mibig_bgc_class: tuple[str] | None = None
         self.description: str | None = None
-        self.smiles: tuple[str] | None = None
 
         # antismash related attributes
         self.antismash_file: str | None = None
