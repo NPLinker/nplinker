@@ -142,7 +142,6 @@ def parse_bgc_genbank(file: str | PathLike) -> BGC:
     bgc.antismash_id = antismash_id
     bgc.antismash_file = str(file)
     bgc.antismash_region = features.get("region_number")
-    bgc.smiles = features.get("smiles")
     bgc.strain = Strain(fname)
     return bgc
 
@@ -154,11 +153,4 @@ def _parse_antismash_genbank(record: SeqRecord.SeqRecord) -> dict:
             # biopython assumes region numer is a list, but it's actually an int
             features["region_number"] = feature.qualifiers.get("region_number")[0]
             features["product"] = feature.qualifiers.get("product")
-        if feature.type == "cand_cluster":
-            smiles = feature.qualifiers.get("SMILES")
-            # space is not allowed in SMILES spec
-            # biopython generates space when reading multi-line SMILES from .gbk
-            if smiles is not None:
-                smiles = tuple(i.replace(" ", "") for i in smiles)
-            features["smiles"] = smiles
     return features

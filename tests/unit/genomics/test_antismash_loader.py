@@ -68,7 +68,6 @@ def test_parse_bgc_genbank():
     assert bgc.antismash_id == "NZ_AZWB01000005"
     assert bgc.antismash_file == gbk_file
     assert bgc.antismash_region == "1"
-    assert bgc.smiles == ("NC([*])C(=O)NC([*])C(=O)NC(CO)C(=O)NC(Cc1ccccc1)C(=O)NCC(=O)O",)
 
 
 def test_parse_bgc_genbank_error():
