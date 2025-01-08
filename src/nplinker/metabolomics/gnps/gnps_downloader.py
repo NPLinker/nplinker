@@ -111,6 +111,9 @@ class GNPSDownloader:
         Returns:
             URL pointing to the GNPS data to be downloaded.
         """
-        if self.gnps_format == GNPSFormat.FBMN:
-            return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL_FBMN.format(self._task_id)
-        return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL.format(self._task_id)
+        if self._gnps_version == "1":
+            if self._gnps_format == GNPSFormat.FBMN:
+                return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL_FBMN.format(self._task_id)
+            return GNPSDownloader.GNPS_DATA_DOWNLOAD_URL.format(self._task_id)
+        if self._gnps_version == "2":
+            return GNPSDownloader.GNPS2_DATA_DOWNLOAD_URL.format(self._task_id)
