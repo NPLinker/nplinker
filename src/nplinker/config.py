@@ -69,7 +69,7 @@ CONFIG_VALIDATORS = [
     # BigScape
     Validator("bigscape.parameters", is_type_of=str),
     Validator("bigscape.cutoff", required=True, is_type_of=str),
-    Validator("bigscape.version", required=True, is_type_of=int, is_in=[1, 2]),
+    Validator("bigscape.version", required=True, is_type_of=str, is_in=["1", "2"]),
     # Scoring
     ## `scoring.methods` must be a list of strings and must contain at least one of the
     ## supported scoring methods.

@@ -182,7 +182,7 @@ Here are some example values for the `nplinker.toml` file:
     version = "3.1"
 
     [bigscape]
-    version = 1
+    version = "1"
     cutoff = "0.30"
 
     [scoring]
@@ -208,7 +208,7 @@ Here are some example values for the `nplinker.toml` file:
     version = "3.1"
 
     [bigscape]
-    version = 2
+    version = "2"
     cutoff = "0.30"
     parameters = "--mibig_version 3.1 --include_singletons --gcf_cutoffs 0.30"
 
