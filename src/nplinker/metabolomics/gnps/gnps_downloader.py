@@ -18,7 +18,6 @@ class GNPSDownloader:
     Attributes:
         GNPS_DATA_DOWNLOAD_URL: URL template for downloading GNPS data.
         GNPS_DATA_DOWNLOAD_URL_FBMN: URL template for downloading GNPS data for FBMN.
-        gnps_format: GNPS workflow type.
     """
 
     GNPS_DATA_DOWNLOAD_URL: str = (
@@ -69,15 +68,6 @@ class GNPSDownloader:
         self._task_id = task_id
         self._download_root: Path = Path(download_root)
         self._gnps_version = gnps_version
-
-    @property
-    def gnps_format(self) -> GNPSFormat:
-        """Get the GNPS workflow type.
-
-        Returns:
-            GNPS workflow type.
-        """
-        return self._gnps_format
 
     def download(self) -> Self:
         """Download GNPS data."""
