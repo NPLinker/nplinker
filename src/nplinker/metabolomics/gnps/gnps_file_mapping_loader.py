@@ -28,6 +28,8 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         - quantification_table*/*.csv
     """
 
+    _CSV_GNPSFormats = (GNPSFormat.FBMN, GNPSFormat.GNPS2CN, GNPSFormat.GNPS2FBMN)
+
     def __init__(self, file: str | PathLike) -> None:
         """Initialize the GNPSFileMappingLoader.
 
@@ -90,7 +92,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         required_file_formats = {
             GNPSFormat.SNETS: "tsv",
             GNPSFormat.SNETSV2: "tsv",
-            GNPSFormat.FBMN: "csv",
+            self._CSV_GNPSFormats: "csv",
         }
         if not is_file_format(self._file, required_file_formats[self._gnps_format]):
             raise ValueError(
@@ -102,7 +104,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         required_columns = {
             GNPSFormat.SNETS: ["cluster index", "AllFiles"],
             GNPSFormat.SNETSV2: ["cluster index", "UniqueFileSources"],
-            GNPSFormat.FBMN: ["row ID", " Peak area"],
+            self._CSV_GNPSFormats: ["row ID", " Peak area"],
         }
         with open(self._file, mode="rt") as f:
             header = f.readline()
@@ -116,7 +118,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
 
         # validate that cluster index or row id must be unique
         with open(self._file, mode="rt") as f:
-            if self._gnps_format is GNPSFormat.FBMN:
+            if self._gnps_format is self._CSV_GNPSFormats:
                 reader = csv.DictReader(f, delimiter=",")
                 ids = [row["row ID"] for row in reader]
             else:
@@ -136,8 +138,8 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             self._load_snets()
         elif self._gnps_format is GNPSFormat.SNETSV2:
             self._load_snetsv2()
-        elif self._gnps_format is GNPSFormat.FBMN:
-            self._load_fbmn()
+        elif self._gnps_format is self._CSV_GNPSFormats:
+            self._load_csv()
 
     def _load_snets(self) -> None:
         """Load file mapping from output of GNPS SNETS workflow.
@@ -178,8 +180,8 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
                 samples = row["UniqueFileSources"].split("|")
                 self._mapping[spectrum_id] = samples
 
-    def _load_fbmn(self) -> None:
-        """Load file mapping from output of GNPS FBMN workflow.
+    def _load_csv(self) -> None:
+        """Load file mapping that is in .csv format.
 
         The column "row ID" is loaded as spectrum id.
 
