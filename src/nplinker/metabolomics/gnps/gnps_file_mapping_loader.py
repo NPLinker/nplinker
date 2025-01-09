@@ -1,11 +1,11 @@
 from __future__ import annotations
 import csv
+import re
 from os import PathLike
 from pathlib import Path
 from nplinker.metabolomics.abc import FileMappingLoaderBase
 from nplinker.utils import is_file_format
 from .gnps_format import GNPSFormat
-from .gnps_format import gnps_format_from_file_mapping
 
 
 class GNPSFileMappingLoader(FileMappingLoaderBase):
@@ -23,9 +23,17 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
     1. METABOLOMICS-SNETS
         - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.tsv
     2. METABOLOMICS-SNETS-V2
-        - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.clustersummary
+        - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.clustersummary (.tsv file)
     3. FEATURE-BASED-MOLECULAR-NETWORKING
         - quantification_table*/*.csv
+    4. GNPS2 classical_networking_workflow
+        - nf_output/clustering/featuretable_reformatted_presence.csv
+    5. GNPS2 feature_based_molecular_networking_workflow
+        - nf_output/clustering/featuretable_reformated.csv
+
+
+    The `tsv` files from different workflows have different headers, while the `.csv` files from
+    different workflows have consistent headers.
     """
 
     _CSV_GNPSFormats = (GNPSFormat.FBMN, GNPSFormat.GNPS2CN, GNPSFormat.GNPS2FBMN)
@@ -46,7 +54,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             >>> print(loader.mapping_reversed["26c.mzXML"])
             {'1', '3', '7', ...}
         """
-        self._gnps_format = gnps_format_from_file_mapping(file)
+        self._gnps_format = self._detect_gnps_format(file)
         if self._gnps_format is GNPSFormat.Unknown:
             raise ValueError("Unknown workflow type for GNPS file mappings file ")
 
@@ -81,6 +89,29 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
                     mapping_reversed[filename] = {spectrum_id}
 
         return mapping_reversed
+
+    def _detect_gnps_format(self, file: str | PathLike) -> GNPSFormat | tuple[GNPSFormat, ...]:
+        """Detect GNPS format(s) from the given file mapping file.
+
+        The `tsv` files from different workflows have different headers, while the `.csv` files from
+        different workflows have consistent headers.
+
+        Args:
+            file: Path to the file to peek the format for.
+
+        Returns:
+            GNPS format(s) identified in the file.
+        """
+        with open(file, "r") as f:
+            header = f.readline().strip()
+
+        if re.search(r"\bAllFiles\b", header):
+            return GNPSFormat.SNETS
+        if re.search(r"\bUniqueFileSources\b", header):
+            return GNPSFormat.SNETSV2
+        if re.search(r"\b{}\b".format(re.escape("row ID")), header):
+            return self._CSV_GNPSFormats
+        return GNPSFormat.Unknown
 
     def _validate(self) -> None:
         """Validate the file mappings file.
