@@ -5,6 +5,9 @@ from nplinker.metabolomics.gnps import gnps_format_from_file_mapping
 from nplinker.metabolomics.gnps import gnps_format_from_gnps1_task_id
 
 
+#
+# Test GNPS1 formats
+#
 @pytest.mark.parametrize(
     "task_id, expected",
     [
@@ -24,7 +27,7 @@ def test_gnps_format_from_gnps1_task_id(task_id: str, expected: GNPSFormat, gnps
 @pytest.mark.parametrize(
     "workflow", [GNPSFormat.FBMN, GNPSFormat.SNETS, GNPSFormat.SNETSV2, GNPSFormat.Unknown]
 )
-def test_gnps_format_from_archive(workflow: str, gnps_zip_files):
+def test_gnps_format_from_archive_gnps1(workflow: str, gnps_zip_files):
     actual = gnps_format_from_archive(gnps_zip_files[workflow])
     assert actual is workflow
 
@@ -32,4 +35,13 @@ def test_gnps_format_from_archive(workflow: str, gnps_zip_files):
 @pytest.mark.parametrize("workflow", [GNPSFormat.FBMN, GNPSFormat.SNETS, GNPSFormat.SNETSV2])
 def test_gnps_format_from_file_mapping(workflow: str, gnps_file_mappings_files):
     actual = gnps_format_from_file_mapping(gnps_file_mappings_files[workflow])
+    assert actual is workflow
+
+
+#
+# Test GNPS2 formats
+#
+@pytest.mark.parametrize("workflow", [GNPSFormat.GNPS2CN, GNPSFormat.GNPS2FBMN, GNPSFormat.Unknown])
+def test_gnps_format_from_archive_gnps2(workflow: str, gnps2_tar_files):
+    actual = gnps_format_from_archive(gnps2_tar_files[workflow])
     assert actual is workflow
