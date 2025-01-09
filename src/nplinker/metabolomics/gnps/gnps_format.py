@@ -24,9 +24,14 @@ class GNPSFormat(Enum):
     """
 
     # Format: ShortName = "GNPSWorkflowName"
+    # For GNPS1
     SNETS = "METABOLOMICS-SNETS"
     SNETSV2 = "METABOLOMICS-SNETS-V2"
     FBMN = "FEATURE-BASED-MOLECULAR-NETWORKING"
+    # For GNPS2
+    GNPS2CN = "classical_networking_workflow"
+    GNPS2FBMN = "feature_based_molecular_networking_workflow"
+    # Unknown format
     Unknown = "Unknown-GNPS-Workflow"
 
 
