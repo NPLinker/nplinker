@@ -2,7 +2,7 @@ import pytest
 from nplinker.metabolomics.gnps import GNPSFormat
 from nplinker.metabolomics.gnps import gnps_format_from_archive
 from nplinker.metabolomics.gnps import gnps_format_from_file_mapping
-from nplinker.metabolomics.gnps import gnps_format_from_task_id
+from nplinker.metabolomics.gnps import gnps_format_from_gnps1_task_id
 
 
 @pytest.mark.parametrize(
@@ -14,10 +14,10 @@ from nplinker.metabolomics.gnps import gnps_format_from_task_id
         ["0ad6535e34d449788f297e712f43068a", GNPSFormat.Unknown],
     ],
 )
-def test_gnps_format_from_task_id(task_id: str, expected: GNPSFormat, gnps_website_is_down):
+def test_gnps_format_from_gnps1_task_id(task_id: str, expected: GNPSFormat, gnps_website_is_down):
     if gnps_website_is_down:
         pytest.skip("GNPS website is down")
-    actual = gnps_format_from_task_id(task_id)
+    actual = gnps_format_from_gnps1_task_id(task_id)
     assert actual is expected
 
 
