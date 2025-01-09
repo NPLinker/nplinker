@@ -1,11 +1,13 @@
 from __future__ import annotations
 import re
+import tarfile
 import zipfile
 from enum import Enum
 from enum import unique
 from os import PathLike
 from pathlib import Path
 import httpx
+import yaml
 from bs4 import BeautifulSoup
 
 
@@ -72,17 +74,22 @@ def gnps_format_from_gnps1_task_id(task_id: str) -> GNPSFormat:
     return GNPSFormat.Unknown
 
 
-def gnps_format_from_archive(zip_file: str | PathLike) -> GNPSFormat:
-    """Detect GNPS format from GNPS zip archive.
+def gnps_format_from_archive(file: str | PathLike) -> GNPSFormat:
+    """Detect GNPS format or workflow from GNPS archive file.
 
-    The detection is based on the filename of the zip file and the names of the
-    files contained in the zip file.
+    GNPS archive files can be in two formats: GNPS1 (.zip) and GNPS2 (.tar).
+
+    For GNPS1 data, the detection of workflow format is based on the filename of the zip archive and
+    the names of the files contained in the zip archive.
+
+    For GNPS2 data, the workflow format is taken from the `submission_parameters.yaml` file in the
+    tar archive, which has a key `workflowname`.
 
     Args:
-        zip_file: Path to the GNPS zip file.
+        file: Path to the GNPS archive file.
 
     Returns:
-        The format identified in the GNPS zip file.
+        The format identified in the GNPS archive file.
 
     Examples:
         >>> gnps_format_from_archive("ProteoSAFe-METABOLOMICS-SNETS-c22f44b1-download_clustered_spectra.zip")
@@ -91,8 +98,22 @@ def gnps_format_from_archive(zip_file: str | PathLike) -> GNPSFormat:
         <GNPSFormat.SNETSV2: 'METABOLOMICS-SNETS-V2'>
         >>> gnps_format_from_archive("ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-672d0a53-download_cytoscape_data.zip")
         <GNPSFormat.FBMN: 'FEATURE-BASED-MOLECULAR-NETWORKING'>
+        >>> gnps_format_from_archive("206a7b40b7ed41c1ae6b4fbd2def3636.tar")
+        <GNPSFormat.GNPS2CN: 'classical_networking_workflow'>
+        >>> gnps_format_from_archive("2014f321d72542afb5216c932e0d5079.tar")
+        <GNPSFormat.GNPS2FBMN: 'feature_based_molecular_networking_workflow'>
     """
-    file = Path(zip_file)
+    file = Path(file)
+    suffix = file.suffix
+    if suffix == ".zip":
+        return _gnps_format_from_archive_gnps1(file)
+    if suffix == ".tar":
+        return _gnps_format_from_archive_gnps2(file)
+    return GNPSFormat.Unknown
+
+
+def _gnps_format_from_archive_gnps1(file: PathLike) -> GNPSFormat:
+    """Detect GNPS format from GNPS1 archive file."""
     # Guess the format from the filename of the zip file
     if GNPSFormat.FBMN.value in file.name:
         return GNPSFormat.FBMN
@@ -113,6 +134,26 @@ def gnps_format_from_archive(zip_file: str | PathLike) -> GNPSFormat:
     if any(GNPSFormat.SNETS.value in x for x in filenames):
         return GNPSFormat.SNETS
 
+    return GNPSFormat.Unknown
+
+
+def _gnps_format_from_archive_gnps2(file: PathLike) -> GNPSFormat:
+    """Detect GNPS format from GNPS2 archive file."""
+    with tarfile.open(file, "r") as tar:
+        try:
+            submission_file = tar.extractfile("submission_parameters.yaml")
+            if submission_file is None:
+                return GNPSFormat.Unknown
+            submission_params = yaml.safe_load(submission_file)
+        except (KeyError, yaml.YAMLError):
+            return GNPSFormat.Unknown
+
+    workflow = submission_params.get("workflowname")
+
+    if workflow == GNPSFormat.GNPS2FBMN.value:
+        return GNPSFormat.GNPS2FBMN
+    if workflow == GNPSFormat.GNPS2CN.value:
+        return GNPSFormat.GNPS2CN
     return GNPSFormat.Unknown
 
 
