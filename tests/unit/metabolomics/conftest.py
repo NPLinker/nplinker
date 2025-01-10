@@ -146,6 +146,20 @@ def gnps_annotations_files(tmp_gnps_dir) -> dict[GNPSFormat, PathLike]:
 
 
 @pytest.fixture(scope="session")
+def gnps2_website_is_down():
+    """Check if the GNPS2 website is down."""
+    gnps_url = "https://gnps2.org"
+    try:
+        r = httpx.get(gnps_url, follow_redirects=True)
+        if r.is_success:
+            return False
+        else:
+            return True
+    except httpx.HTTPError:
+        return True
+
+
+@pytest.fixture(scope="session")
 def gnps2_tar_files() -> dict[GNPSFormat, PathLike]:
     """Get the paths of the GNPS2 tar archives as a dict.
 
