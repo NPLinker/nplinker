@@ -7,6 +7,33 @@ from .. import GNPS_DATA_DIR
 
 
 #
+# Fixtures for both GNPS1 and GNPS2
+#
+
+
+@pytest.fixture(scope="session")
+def tmp_gnps_dir(tmp_path_factory):
+    """Temporary root directory for testing gnps."""
+    return tmp_path_factory.mktemp("gnps")
+
+
+@pytest.fixture(scope="session", autouse=True)
+def prepare_data(tmp_gnps_dir, gnps_zip_files, gnps2_tar_files):
+    """Extract GNPS zip archives to the "tmp_gnps_dir" directory.
+
+    The extracted archive is named after the workflow, for example the SNETS archive is extracted to
+    the "SNETS" directory in the "tmp_gnps_dir" directory.
+
+    Note that the `autouse` must be set to `True` so that the fixture is executed before any other
+    test function.
+    """
+    for workflow, zip_file in gnps_zip_files.items():
+        extract_archive(zip_file, tmp_gnps_dir / workflow.name)
+    for workflow, tar_file in gnps2_tar_files.items():
+        extract_archive(tar_file, tmp_gnps_dir / workflow.name)
+
+
+#
 # Fixtures for GNPS1
 #
 
@@ -47,26 +74,6 @@ def gnps_zip_files() -> dict[GNPSFormat, PathLike]:
         / "ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip",
         GNPSFormat.Unknown: GNPS_DATA_DIR / "ProteoSAFe-Unknown.zip",
     }
-
-
-@pytest.fixture(scope="session")
-def tmp_gnps_dir(tmp_path_factory):
-    """Temporary root directory for testing gnps."""
-    return tmp_path_factory.mktemp("gnps")
-
-
-@pytest.fixture(scope="session", autouse=True)
-def prepare_data(tmp_gnps_dir, gnps_zip_files):
-    """Extract GNPS zip archives to the "tmp_gnps_dir" directory.
-
-    The extracted archive is named after the workflow, e.g. "SNETS", "SNETSV2", "FBMN", so for
-    example the SNETS archive is extracted to the "SNETS" directory in the "tmp_gnps_dir" directory.
-
-    Note that the `autouse` must be set to `True` so that the fixture is executed before any other
-    test function.
-    """
-    for workflow, zip_file in gnps_zip_files.items():
-        extract_archive(zip_file, tmp_gnps_dir / workflow.name)
 
 
 @pytest.fixture(scope="session")
