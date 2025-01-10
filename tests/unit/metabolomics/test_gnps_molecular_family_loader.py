@@ -14,11 +14,29 @@ from nplinker.metabolomics.gnps import GNPSMolecularFamilyLoader
         (GNPSFormat.FBMN, 60, 5, False),
     ],
 )
-def test_gnps_molecular_family_loader(
+def test_gnps_molecular_family_loader_gnps1(
     workflow, num_families, num_spectra, keep_singleton, gnps_mf_files
 ):
     """Test GNPSMolecularFamilyLoader class."""
     loader = GNPSMolecularFamilyLoader(gnps_mf_files[workflow])
+    actual = loader.get_mfs(keep_singleton=keep_singleton)
+    assert len(actual) == num_families
+    # test molecular family with id "1" has correct number of spectra ids
+    mf = [mf for mf in actual if mf.id == "1"][0]
+    assert len(mf.spectra_ids) == num_spectra
+
+
+@pytest.mark.parametrize(
+    "workflow, num_families, num_spectra, keep_singleton",
+    [
+        (GNPSFormat.GNPS2CN, 88, 66, True),
+        (GNPSFormat.GNPS2FBMN, 38, 7, True),
+    ],
+)
+def test_gnps_molecular_family_loader_gnps2(
+    workflow, num_families, num_spectra, keep_singleton, gnps2_mf_files
+):
+    loader = GNPSMolecularFamilyLoader(gnps2_mf_files[workflow])
     actual = loader.get_mfs(keep_singleton=keep_singleton)
     assert len(actual) == num_families
     # test molecular family with id "1" has correct number of spectra ids
