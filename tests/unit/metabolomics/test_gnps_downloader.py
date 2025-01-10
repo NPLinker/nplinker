@@ -101,11 +101,13 @@ def test_get_url(gnps_version, task_id, url, tmpdir):
         ["189e8bf16af145758b0a900f1c44ff4a", GNPSFormat.SNETSV2],
     ],
 )
-def test_downloads_file(task_id, workflow, tmpdir, gnps_zip_files):
-    downloader = GNPSDownloader(task_id, tmpdir)
+def test_download_gnps1(task_id, workflow, tmpdir, gnps_zip_files, gnps_website_is_down):
+    if gnps_website_is_down:
+        pytest.skip("GNPS website is down: https://gnps.ucsd.edu")
+    downloader = GNPSDownloader(task_id, tmpdir, gnps_version="1")
     downloader.download()
     actual = zipfile.ZipFile(downloader.get_download_file())
     actual_names = actual.namelist()
     expected = zipfile.ZipFile(gnps_zip_files[workflow])
-    expected_names = [x.filename for x in expected.filelist if x.compress_size > 0]
-    assert all(item in actual_names for item in expected_names)
+    expected_names = expected.namelist()
+    assert actual_names == expected_names
