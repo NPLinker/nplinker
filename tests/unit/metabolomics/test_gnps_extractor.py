@@ -5,20 +5,25 @@ from nplinker.metabolomics.gnps import GNPSExtractor
 from nplinker.metabolomics.gnps import GNPSFormat
 
 
-def test_unknown_workflow(gnps_zip_files, tmpdir):
+#
+# Tests for GNPS1 data
+#
+
+
+def test_unknown_workflow_gnps1(gnps_zip_files, tmpdir):
     with pytest.raises(ValueError, match="Unknown workflow type for GNPS archive .*"):
         GNPSExtractor(gnps_zip_files[GNPSFormat.Unknown], tmpdir)
 
 
 @pytest.mark.parametrize("workflow", [GNPSFormat.FBMN, GNPSFormat.SNETS, GNPSFormat.SNETSV2])
-def test_supported_workflows(workflow, gnps_zip_files, tmpdir):
+def test_supported_workflows_gnps1(workflow, gnps_zip_files, tmpdir):
     extractor = GNPSExtractor(gnps_zip_files[workflow], tmpdir)
     assert extractor.gnps_format == workflow
     assert extractor.extract_dir == tmpdir
 
 
 @pytest.mark.parametrize("workflow", [GNPSFormat.FBMN, GNPSFormat.SNETS, GNPSFormat.SNETSV2])
-def test_extract(
+def test_extract_gnps1(
     workflow,
     gnps_zip_files,
     gnps_file_mappings_files,
