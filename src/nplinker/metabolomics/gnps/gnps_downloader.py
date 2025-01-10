@@ -80,13 +80,15 @@ class GNPSDownloader:
         return self._gnps_format
 
     def download(self) -> Self:
-        """Download GNPS data.
-
-        Note: GNPS data is downloaded using the POST method (empty payload is OK).
-        """
-        download_url(
-            self.get_url(), self._download_root, filename=self._file_name, http_method="POST"
-        )
+        """Download GNPS data."""
+        if self._gnps_version == "1":
+            download_url(
+                self.get_url(), self._download_root, filename=self._file_name, http_method="POST"
+            )
+        if self._gnps_version == "2":
+            download_url(
+                self.get_url(), self._download_root, filename=self._file_name, http_method="GET"
+            )
         return self
 
     def get_download_file(self) -> str:
