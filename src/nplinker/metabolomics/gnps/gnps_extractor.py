@@ -1,5 +1,6 @@
 from __future__ import annotations
 import os
+import tarfile
 import zipfile
 from os import PathLike
 from pathlib import Path
@@ -182,6 +183,21 @@ class GNPSExtractor:
             member_list = [
                 member
                 for member in zf.namelist()  # relative path
+                if member.startswith(prefix) and member.endswith(suffix)
+            ]
+            if len(member_list) != 1:
+                raise ValueError(
+                    f"Expected exactly one file matching pattern '{prefix}*{suffix}'"
+                    f"in archive '{self._file}', but found {len(member_list)}."
+                )
+        return member_list[0]
+
+    def _select_tar_member(self, prefix: str, suffix: str) -> str:
+        """Helper function to extract files matching a prefix and suffix from the tar archive."""
+        with tarfile.open(self._file) as tf:
+            member_list = [
+                member
+                for member in tf.getnames()
                 if member.startswith(prefix) and member.endswith(suffix)
             ]
             if len(member_list) != 1:
