@@ -18,24 +18,33 @@ def test_unknown_workflow(tmpdir):
 
 
 @pytest.mark.parametrize(
-    "task_id, filename",
+    "gnps_version, task_id, filename",
     [
         [
+            "1",
             "92036537c21b44c29e509291e53f6382",
             GNPSFormat.FBMN.value + "-92036537c21b44c29e509291e53f6382.zip",
         ],
         [
+            "1",
             "c22f44b14a3d450eb836d607cb9521bb",
             GNPSFormat.SNETS.value + "-c22f44b14a3d450eb836d607cb9521bb.zip",
         ],
         [
+            "1",
             "189e8bf16af145758b0a900f1c44ff4a",
             GNPSFormat.SNETSV2.value + "-189e8bf16af145758b0a900f1c44ff4a.zip",
         ],
+        [
+            "2",
+            "206a7b40b7ed41c1ae6b4fbd2def3636",
+            "206a7b40b7ed41c1ae6b4fbd2def3636.tar",
+        ],
+        ["2", "2014f321d72542afb5216c932e0d5079", "2014f321d72542afb5216c932e0d5079.tar"],
     ],
 )
-def test_get_download_file(task_id, filename, tmpdir):
-    downloader = GNPSDownloader(task_id, tmpdir)
+def test_get_download_file(gnps_version, task_id, filename, tmpdir):
+    downloader = GNPSDownloader(task_id, tmpdir, gnps_version)
     assert downloader.get_download_file() == tmpdir / filename
 
 
@@ -53,24 +62,37 @@ def test_get_task_id(task_id, tmpdir):
 
 
 @pytest.mark.parametrize(
-    "task_id, url",
+    "gnps_version, task_id, url",
     [
         [
+            "1",
             "92036537c21b44c29e509291e53f6382",
             GNPSDownloader.GNPS_DATA_DOWNLOAD_URL_FBMN.format("92036537c21b44c29e509291e53f6382"),
         ],
         [
+            "1",
             "c22f44b14a3d450eb836d607cb9521bb",
             GNPSDownloader.GNPS_DATA_DOWNLOAD_URL.format("c22f44b14a3d450eb836d607cb9521bb"),
         ],
         [
+            "1",
             "189e8bf16af145758b0a900f1c44ff4a",
             GNPSDownloader.GNPS_DATA_DOWNLOAD_URL.format("189e8bf16af145758b0a900f1c44ff4a"),
         ],
+        [
+            "2",
+            "206a7b40b7ed41c1ae6b4fbd2def3636",
+            GNPSDownloader.GNPS2_DATA_DOWNLOAD_URL.format("206a7b40b7ed41c1ae6b4fbd2def3636"),
+        ],
+        [
+            "2",
+            "2014f321d72542afb5216c932e0d5079",
+            GNPSDownloader.GNPS2_DATA_DOWNLOAD_URL.format("2014f321d72542afb5216c932e0d5079"),
+        ],
     ],
 )
-def test_get_url(task_id, url, tmpdir):
-    downloader = GNPSDownloader(task_id, tmpdir)
+def test_get_url(gnps_version, task_id, url, tmpdir):
+    downloader = GNPSDownloader(task_id, tmpdir, gnps_version)
     assert downloader.get_url() == url
 
 
