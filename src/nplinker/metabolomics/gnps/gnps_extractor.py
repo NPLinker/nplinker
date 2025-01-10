@@ -177,6 +177,38 @@ class GNPSExtractor:
         for member, fname in zip(members[1:], self._target_files[1:]):
             os.renames(self._extract_path / member, self._extract_path / fname)
 
+    def _extract_gnps2cn(self):
+        # the order of members matters
+        members = [
+            self._select_tar_member(
+                "nf_output/clustering/featuretable_reformatted_presence", ".csv"
+            ),
+            self._select_tar_member("nf_output/clustering/specs_ms", ".mgf"),
+            self._select_tar_member("nf_output/networking/filtered_pairs", ".tsv"),
+            self._select_tar_member("nf_output/library/merged_results_with_gnps", ".tsv"),
+        ]
+        utils.extract_archive(self._file, self._extract_path, members)
+        os.renames(
+            self._extract_path / members[0], self._extract_path / (self._target_files[0] + ".csv")
+        )
+        for member, fname in zip(members[1:], self._target_files[1:]):
+            os.renames(self._extract_path / member, self._extract_path / fname)
+
+    def _extract_gnps2fbmn(self):
+        # the order of members matters
+        members = [
+            self._select_tar_member("nf_output/clustering/featuretable_reformated", ".csv"),
+            self._select_tar_member("nf_output/clustering/specs_ms", ".mgf"),
+            self._select_tar_member("nf_output/networking/filtered_pairs", ".tsv"),
+            self._select_tar_member("nf_output/library/merged_results_with_gnps", ".tsv"),
+        ]
+        utils.extract_archive(self._file, self._extract_path, members)
+        os.renames(
+            self._extract_path / members[0], self._extract_path / (self._target_files[0] + ".csv")
+        )
+        for member, fname in zip(members[1:], self._target_files[1:]):
+            os.renames(self._extract_path / member, self._extract_path / fname)
+
     def _select_zip_member(self, prefix: str, suffix: str) -> str:
         """Helper function to extract files matching a prefix and suffix from the zip archive."""
         with zipfile.ZipFile(self._file) as zf:
