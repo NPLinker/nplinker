@@ -24,6 +24,10 @@ class GNPSSpectrumLoader(SpectrumLoaderBase):
         - METABOLOMICS-SNETS-V2*.mgf
     3. FEATURE-BASED-MOLECULAR-NETWORKING
         - spectra/*.mgf
+    4. GNPS2 classical_networking_workflow
+        - nf_output/clustering/specs_ms.mgf
+    5. GNPS2 feature_based_molecular_networking_workflow
+        - nf_output/clustering/specs_ms.mgf
     """
 
     def __init__(self, file: str | PathLike) -> None:
