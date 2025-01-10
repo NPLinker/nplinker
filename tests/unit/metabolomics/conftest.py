@@ -182,3 +182,71 @@ def gnps2_tar_files() -> dict[GNPSFormat, PathLike]:
         GNPSFormat.GNPS2FBMN: GNPS_DATA_DIR / "2014f321d72542afb5216c932e0d5079.tar",
         GNPSFormat.Unknown: GNPS_DATA_DIR / "gnps2_nnknown.tar",
     }
+
+
+@pytest.fixture(scope="session")
+def gnps2_file_mappings_files(tmp_gnps_dir) -> dict[GNPSFormat, PathLike]:
+    """Get the paths of the GNPS2 file mappings."""
+    return {
+        GNPSFormat.GNPS2CN: tmp_gnps_dir
+        / GNPSFormat.GNPS2CN.name
+        / "nf_output"
+        / "clustering"
+        / "featuretable_reformatted_presence.csv",
+        GNPSFormat.GNPS2FBMN: tmp_gnps_dir
+        / GNPSFormat.GNPS2FBMN.name
+        / "nf_output"
+        / "clustering"
+        / "featuretable_reformated.csv",
+    }
+
+
+@pytest.fixture(scope="session")
+def gnps2_spectra_files(tmp_gnps_dir) -> dict[GNPSFormat, PathLike]:
+    """Get the paths of the GNPS2 spectra."""
+    return {
+        GNPSFormat.GNPS2CN: tmp_gnps_dir
+        / GNPSFormat.GNPS2CN.name
+        / "nf_output"
+        / "clustering"
+        / "specs_ms.mgf",
+        GNPSFormat.GNPS2FBMN: tmp_gnps_dir
+        / GNPSFormat.GNPS2FBMN.name
+        / "nf_output"
+        / "clustering"
+        / "specs_ms.mgf",
+    }
+
+
+@pytest.fixture(scope="session")
+def gnps2_mf_files(tmp_gnps_dir) -> dict[GNPSFormat, PathLike]:
+    """Get the paths of the GNPS2 molecular formula files."""
+    return {
+        GNPSFormat.GNPS2CN: tmp_gnps_dir
+        / GNPSFormat.GNPS2CN.name
+        / "nf_output"
+        / "networking"
+        / "filtered_pairs.tsv",
+        GNPSFormat.GNPS2FBMN: tmp_gnps_dir
+        / GNPSFormat.GNPS2FBMN.name
+        / "nf_output"
+        / "networking"
+        / "filtered_pairs.tsv",
+    }
+
+
+@pytest.fixture(scope="session")
+def gnps2_annotations_files(tmp_gnps_dir) -> dict[GNPSFormat, PathLike]:
+    """Get the paths of the GNPS2 annotations file."""
+    return {
+        GNPSFormat.GNPS2CN: tmp_gnps_dir
+        / GNPSFormat.GNPS2CN.name
+        / "nf_output"
+        / "library"
+        / "merged_results_with_gnps.tsv",
+        GNPSFormat.GNPS2FBMN: tmp_gnps_dir
+        / GNPSFormat.GNPS2FBMN.name
+        / "nf_output"
+        / "library"
+        / "merged_results_with_gnps.tsv",
+    }
