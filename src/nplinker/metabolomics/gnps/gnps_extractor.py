@@ -9,7 +9,7 @@ from .gnps_format import gnps_format_from_archive
 
 
 class GNPSExtractor:
-    """Extract files from a GNPS molecular networking archive (.zip).
+    """Extract files from a GNPS molecular networking archive.
 
     ??? info "Concept"
         [GNPS data][gnps-data]
@@ -39,6 +39,16 @@ class GNPSExtractor:
         - spectra/*.mgf
         - networkedges_selfloop/*.selfloop
         - DB_result/*.tsv
+    4. GNPS2 classical_networking_workflow
+        - nf_output/clustering/featuretable_reformatted_presence.csv
+        - nf_output/clustering/specs_ms.mgf
+        - nf_output/networking/filtered_pairs.tsv
+        - nf_output/library/merged_results_with_gnps.tsv
+    5. GNPS2 feature_based_molecular_networking_workflow
+        - nf_output/clustering/featuretable_reformated.csv
+        - nf_output/clustering/specs_ms.mgf
+        - nf_output/networking/filtered_pairs.tsv
+        - nf_output/library/merged_results_with_gnps.tsv
 
     Attributes:
         gnps_format: The GNPS workflow type.
@@ -49,7 +59,7 @@ class GNPSExtractor:
         """Initialize the GNPSExtractor.
 
         Args:
-            file: The path to the GNPS zip file.
+            file: The path to the GNPS archive file.
             extract_dir: path to the directory where to extract the files to.
 
         Raises:
@@ -64,12 +74,7 @@ class GNPSExtractor:
         """
         gnps_format = gnps_format_from_archive(file)
         if gnps_format == GNPSFormat.Unknown:
-            raise ValueError(
-                f"Unknown workflow type for GNPS archive '{file}'."
-                f"Supported GNPS workflows are described in the GNPSFormat enum, "
-                f"including such as 'METABOLOMICS-SNETS', 'METABOLOMICS-SNETS-V2' "
-                f"and 'FEATURE-BASED-MOLECULAR-NETWORKING'."
-            )
+            raise ValueError(f"Unknown workflow type for GNPS archive '{file}'.")
 
         self._file = Path(file)
         self._extract_path = Path(extract_dir)
