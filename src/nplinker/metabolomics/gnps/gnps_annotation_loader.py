@@ -26,6 +26,10 @@ class GNPSAnnotationLoader(AnnotationLoaderBase):
         - result_specnets_DB/.tsv
     3. FEATURE-BASED-MOLECULAR-NETWORKING
         - DB_result/*.tsv
+    4. GNPS2 classical_networking_workflow
+        - nf_output/library/merged_results_with_gnps.tsv
+    5. GNPS2 feature_based_molecular_networking_workflow
+        - nf_output/library/merged_results_with_gnps.tsv
     """
 
     def __init__(self, file: str | PathLike) -> None:
