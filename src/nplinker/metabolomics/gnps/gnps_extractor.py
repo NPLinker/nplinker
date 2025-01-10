@@ -119,12 +119,12 @@ class GNPSExtractor:
     def _extract_snets(self):
         # the order of members matters
         members = [
-            self._select_member(
+            self._select_zip_member(
                 "clusterinfosummarygroup_attributes_withIDs_withcomponentID", ".tsv"
             ),
-            self._select_member("METABOLOMICS-SNETS", ".mgf"),
-            self._select_member("networkedges_selfloop", ".pairsinfo"),
-            self._select_member("result_specnets_DB", ".tsv"),
+            self._select_zip_member("METABOLOMICS-SNETS", ".mgf"),
+            self._select_zip_member("networkedges_selfloop", ".pairsinfo"),
+            self._select_zip_member("result_specnets_DB", ".tsv"),
         ]
         utils.extract_archive(self._file, self._extract_path, members)
         # rename the files to the expected names
@@ -138,12 +138,12 @@ class GNPSExtractor:
     def _extract_snetsv2(self):
         # the order of members matters
         members = [
-            self._select_member(
+            self._select_zip_member(
                 "clusterinfosummarygroup_attributes_withIDs_withcomponentID", ".clustersummary"
             ),
-            self._select_member("METABOLOMICS-SNETS-V2", ".mgf"),
-            self._select_member("networkedges_selfloop", ".selfloop"),
-            self._select_member("result_specnets_DB", ".tsv"),
+            self._select_zip_member("METABOLOMICS-SNETS-V2", ".mgf"),
+            self._select_zip_member("networkedges_selfloop", ".selfloop"),
+            self._select_zip_member("result_specnets_DB", ".tsv"),
         ]
         utils.extract_archive(self._file, self._extract_path, members)
         os.renames(
@@ -156,18 +156,18 @@ class GNPSExtractor:
         # there might be two folders for quantification table
         # "quantification_table_reformatted" and "quantification_table"
         try:
-            quantification_table_member = self._select_member(
+            quantification_table_member = self._select_zip_member(
                 "quantification_table_reformatted", ".csv"
             )
         except ValueError:
-            quantification_table_member = self._select_member("quantification_table", ".csv")
+            quantification_table_member = self._select_zip_member("quantification_table", ".csv")
 
         # the order of members matters
         members = [
             quantification_table_member,
-            self._select_member("spectra", ".mgf"),
-            self._select_member("networkedges_selfloop", ".selfloop"),
-            self._select_member("DB_result", ".tsv"),
+            self._select_zip_member("spectra", ".mgf"),
+            self._select_zip_member("networkedges_selfloop", ".selfloop"),
+            self._select_zip_member("DB_result", ".tsv"),
         ]
         utils.extract_archive(self._file, self._extract_path, members)
         os.renames(
@@ -176,12 +176,12 @@ class GNPSExtractor:
         for member, fname in zip(members[1:], self._target_files[1:]):
             os.renames(self._extract_path / member, self._extract_path / fname)
 
-    def _select_member(self, prefix: str, suffix: str) -> str:
-        """Helper function to extract files matching a prefix and suffix from the archive."""
+    def _select_zip_member(self, prefix: str, suffix: str) -> str:
+        """Helper function to extract files matching a prefix and suffix from the zip archive."""
         with zipfile.ZipFile(self._file) as zf:
             member_list = [
                 member
-                for member in zf.namelist()
+                for member in zf.namelist()  # relative path
                 if member.startswith(prefix) and member.endswith(suffix)
             ]
             if len(member_list) != 1:
