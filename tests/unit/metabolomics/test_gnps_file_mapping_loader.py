@@ -11,7 +11,7 @@ from nplinker.metabolomics.gnps import GNPSFormat
         [GNPSFormat.SNETSV2, 7383, "140221_ME_14_13.mzML"],
     ],
 )
-def test_file_mapping_loader(workflow, num_spectra, filename, gnps_file_mappings_files):
+def test_file_mapping_loader_gnps1(workflow, num_spectra, filename, gnps_file_mappings_files):
     loader = GNPSFileMappingLoader(gnps_file_mappings_files[workflow])
     assert len(loader.mappings) == num_spectra
     # test file is in the mapping for spectrum "1"
@@ -20,6 +20,20 @@ def test_file_mapping_loader(workflow, num_spectra, filename, gnps_file_mappings
     if workflow == GNPSFormat.FBMN:
         assert len(loader.mappings["1"]) == 110
         assert "5425_5426_mod.mzXML" not in loader.mappings["1"]
+
+
+@pytest.mark.parametrize(
+    "workflow, num_spectra, filename",
+    [
+        [GNPSFormat.GNPS2CN, 1051, "blk_g10_dora.mzML"],
+        [GNPSFormat.GNPS2FBMN, 371, "blk_g10_dora.mzML"],
+    ],
+)
+def test_file_mapping_loader_gnps2(workflow, num_spectra, filename, gnps2_file_mappings_files):
+    loader = GNPSFileMappingLoader(gnps2_file_mappings_files[workflow])
+    assert len(loader.mappings) == num_spectra
+    # test file is in the mapping for spectrum "2"
+    assert filename in loader.mappings["2"]
 
 
 def test_mapping_reversed(gnps_file_mappings_files):
