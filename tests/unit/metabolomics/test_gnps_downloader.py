@@ -1,3 +1,4 @@
+import tarfile
 import zipfile
 import pytest
 from nplinker.metabolomics.gnps import GNPSDownloader
@@ -110,4 +111,23 @@ def test_download_gnps1(task_id, workflow, tmpdir, gnps_zip_files, gnps_website_
     actual_names = actual.namelist()
     expected = zipfile.ZipFile(gnps_zip_files[workflow])
     expected_names = expected.namelist()
+    assert actual_names == expected_names
+
+
+@pytest.mark.parametrize(
+    "task_id, workflow",
+    [
+        ["2014f321d72542afb5216c932e0d5079", GNPSFormat.GNPS2FBMN],
+        ["206a7b40b7ed41c1ae6b4fbd2def3636", GNPSFormat.GNPS2CN],
+    ],
+)
+def test_download_gnps2(task_id, workflow, tmpdir, gnps2_tar_files, gnps2_website_is_down):
+    if gnps2_website_is_down:
+        pytest.skip("GNPS2 website is down: https://gnps2.org")
+    downloader = GNPSDownloader(task_id, tmpdir, gnps_version="2")
+    downloader.download()
+    actual = tarfile.open(downloader.get_download_file())
+    actual_names = actual.getnames()
+    expected = tarfile.open(gnps2_tar_files[workflow])
+    expected_names = expected.getnames()
     assert actual_names == expected_names
