@@ -110,12 +110,19 @@ class GNPSExtractor:
 
     def _extract(self):
         """Extract required files from archive."""
-        if self._gnps_format == GNPSFormat.SNETS:
-            self._extract_snets()
-        elif self._gnps_format == GNPSFormat.SNETSV2:
-            self._extract_snetsv2()
-        elif self._gnps_format == GNPSFormat.FBMN:
-            self._extract_fbmn()
+        extract_methods = {
+            GNPSFormat.SNETS: self._extract_snets,
+            GNPSFormat.SNETSV2: self._extract_snetsv2,
+            GNPSFormat.FBMN: self._extract_fbmn,
+            GNPSFormat.GNPS2CN: self._extract_gnps2cn,
+            GNPSFormat.GNPS2FBMN: self._extract_gnps2fbmn,
+        }
+
+        extract_method = extract_methods.get(self._gnps_format)
+        if extract_method:
+            extract_method()
+        else:
+            raise ValueError(f"Unsupported GNPS format: {self._gnps_format}")
 
     def _extract_snets(self):
         # the order of members matters
