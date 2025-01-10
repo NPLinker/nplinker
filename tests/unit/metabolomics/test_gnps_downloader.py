@@ -4,12 +4,9 @@ from nplinker.metabolomics.gnps import GNPSDownloader
 from nplinker.metabolomics.gnps import GNPSFormat
 
 
-@pytest.fixture(scope="module", autouse=True)
-def setup_with_fixture(gnps_website_is_down):
-    if gnps_website_is_down:
-        pytest.skip(
-            "GNPS website is down, skipping all tests in this module!", allow_module_level=True
-        )
+def test_invalid_gnps_version(tmpdir):
+    with pytest.raises(ValueError, match="Invalid GNPS version '3'"):
+        GNPSDownloader("0ad6535e34d449788f297e712f43068a", tmpdir, "3")
 
 
 def test_unknown_workflow(tmpdir):
