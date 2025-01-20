@@ -111,7 +111,7 @@ def gnps_format_from_archive(file: str | PathLike) -> GNPSFormat:
     return GNPSFormat.Unknown
 
 
-def _gnps_format_from_archive_gnps1(file: PathLike) -> GNPSFormat:
+def _gnps_format_from_archive_gnps1(file: Path) -> GNPSFormat:
     """Detect GNPS format from GNPS1 archive file."""
     # Guess the format from the filename of the zip file
     if GNPSFormat.FBMN.value in file.name:
@@ -136,7 +136,7 @@ def _gnps_format_from_archive_gnps1(file: PathLike) -> GNPSFormat:
     return GNPSFormat.Unknown
 
 
-def _gnps_format_from_archive_gnps2(file: PathLike) -> GNPSFormat:
+def _gnps_format_from_archive_gnps2(file: Path) -> GNPSFormat:
     """Detect GNPS format from GNPS2 archive file."""
     with tarfile.open(file, "r") as tar:
         try:
