@@ -6,6 +6,11 @@ from nplinker.utils import extract_archive
 from .. import GNPS_DATA_DIR
 
 
+#
+# Fixtures for GNPS1
+#
+
+
 @pytest.fixture(scope="session")
 def gnps_website_is_down():
     """Check if the GNPS website is down."""
@@ -132,4 +137,27 @@ def gnps_annotations_files(tmp_gnps_dir) -> dict[GNPSFormat, PathLike]:
         / GNPSFormat.FBMN.name
         / "DB_result"
         / "7dc5b46b50d94246a1de12ef485d0f75.tsv",
+    }
+
+
+#
+# Fixtures for GNPS2
+#
+
+
+@pytest.fixture(scope="session")
+def gnps2_tar_files() -> dict[GNPSFormat, PathLike]:
+    """Get the paths of the GNPS2 tar archives as a dict.
+
+    The dict keys are the workflow short names taken from the GNPSFormat enum.
+    The dict values are the paths to the tar archives.
+
+    You can download the archives ("Download all results") from the following links :
+    - https://gnps2.org/status?task=2014f321d72542afb5216c932e0d5079
+    - https://gnps2.org/status?task=206a7b40b7ed41c1ae6b4fbd2def3636
+    """
+    return {
+        GNPSFormat.GNPS2CN: GNPS_DATA_DIR / "206a7b40b7ed41c1ae6b4fbd2def3636.tar",
+        GNPSFormat.GNPS2FBMN: GNPS_DATA_DIR / "2014f321d72542afb5216c932e0d5079.tar",
+        GNPSFormat.Unknown: GNPS_DATA_DIR / "gnps2_nnknown.tar",
     }

@@ -37,6 +37,7 @@ dependencies = [
     "networkx",
     "pandas",
     "pyteomics",
+    "pyyaml",
     "rich",
     "scipy",
     "sortedcontainers",
