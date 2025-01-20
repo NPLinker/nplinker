@@ -80,6 +80,14 @@ parameters = "version1_parameters_or_version2_parameters"
 # BiG-SCPAPE v2 also runs a `--mix` analysis by default, so you don't need to set this parameter here.
 # An example value could be: "--mibig_version 3.1 --include_singletons --gcf_cutoffs 0.30"
 
+[gnps]
+# Settings for GNPS.
+
+version = "1"
+# [REQUIRED] Available values are "1" and "2".
+# The version of GNPS platform you have used to run the analysis.
+# Set the version to "1" if you have used https://gnps.ucsd.edu/;
+# Set the version to "2" if you have used https://gnps2.org/.
 
 [scoring]
 # Settings for scoring.
