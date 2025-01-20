@@ -4,7 +4,7 @@ from pathlib import Path
 from typing_extensions import Self
 from nplinker.utils import download_url
 from .gnps_format import GNPSFormat
-from .gnps_format import gnps_format_from_task_id
+from .gnps_format import gnps_format_from_gnps1_task_id
 
 
 class GNPSDownloader:
@@ -42,7 +42,7 @@ class GNPSDownloader:
         Examples:
             >>> GNPSDownloader("c22f44b14a3d450eb836d607cb9521bb", "~/downloads")
         """
-        gnps_format = gnps_format_from_task_id(task_id)
+        gnps_format = gnps_format_from_gnps1_task_id(task_id)
         if gnps_format == GNPSFormat.Unknown:
             raise ValueError(
                 f"Unknown workflow type for GNPS task '{task_id}'."

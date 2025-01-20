@@ -9,9 +9,6 @@ import httpx
 from bs4 import BeautifulSoup
 
 
-GNPS_TASK_URL = "https://gnps.ucsd.edu/ProteoSAFe/status.jsp?task={}"
-
-
 @unique
 class GNPSFormat(Enum):
     """Enum class for GNPS formats or workflows.
@@ -24,20 +21,27 @@ class GNPSFormat(Enum):
     """
 
     # Format: ShortName = "GNPSWorkflowName"
+    # For GNPS1
     SNETS = "METABOLOMICS-SNETS"
     SNETSV2 = "METABOLOMICS-SNETS-V2"
     FBMN = "FEATURE-BASED-MOLECULAR-NETWORKING"
+    # For GNPS2
+    GNPS2CN = "classical_networking_workflow"
+    GNPS2FBMN = "feature_based_molecular_networking_workflow"
+    # Unknown format
     Unknown = "Unknown-GNPS-Workflow"
 
 
-def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
-    """Detect GNPS format for the given task id.
+def gnps_format_from_gnps1_task_id(task_id: str) -> GNPSFormat:
+    """Detect GNPS format or workflow for the given GNPS1 task id.
+
+    GNPS1 tasks are those generated on the platform https://gnps.ucsd.edu.
 
     Args:
-        task_id: GNPS task id.
+        task_id: GNPS1 task id.
 
     Returns:
-        The format identified in the GNPS task.
+        The format identified in the task.
 
     Examples:
         >>> gnps_format_from_task_id("c22f44b14a3d450eb836d607cb9521bb")
@@ -49,7 +53,8 @@ def gnps_format_from_task_id(task_id: str) -> GNPSFormat:
         >>> gnps_format_from_task_id("0ad6535e34d449788f297e712f43068a")
         <GNPSFormat.Unknown: 'Unknown-GNPS-Workflow'>
     """
-    task_html = httpx.get(GNPS_TASK_URL.format(task_id))
+    gnps1_task_url = "https://gnps.ucsd.edu/ProteoSAFe/status.jsp?task={}"
+    task_html = httpx.get(gnps1_task_url.format(task_id))
     soup = BeautifulSoup(task_html.text, features="html.parser")
     try:
         # find the td tag that follows the th tag containing 'Workflow'
