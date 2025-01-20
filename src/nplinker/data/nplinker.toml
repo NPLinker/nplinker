@@ -53,8 +53,8 @@ version = "3.1"
 [bigscape]
 # Settings for BiG-SCAPE.
 
-version = 1
-# [REQUIRED] Available values are 1 and 2. 1 for version 1.x series and 2 for version 2.x series.
+version = "1"
+# [REQUIRED] Available values are "1" and "2". "1" for version 1.x series and "2" for version 2.x series.
 # The version of BiG-SCAPE to use.
 
 cutoff = "0.30"

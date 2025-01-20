@@ -10,7 +10,7 @@ to_use = true
 version = "3.1"
 
 [bigscape]
-version = 1
+version = "1"
 cutoff = "0.30"
 
 [scoring]

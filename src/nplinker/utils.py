@@ -249,7 +249,7 @@ def _extract_tar(
     members: Sequence[tarfile.TarInfo] | None,
     compression: str | None,
 ) -> None:
-    with tarfile.open(from_path, f"r:{compression[1:]}" if compression else "r") as tar:
+    with tarfile.open(from_path, f"r:{compression[1:]}" if compression else "r") as tar:  # type: ignore
         tar.extractall(to_path, members)
 
 

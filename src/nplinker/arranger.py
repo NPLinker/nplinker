@@ -319,7 +319,7 @@ class DatasetArranger:
             version,
         )
 
-        if version == 1:
+        if version == "1":
             for f in glob(
                 str(
                     self.bigscape_running_output_dir
@@ -330,7 +330,7 @@ class DatasetArranger:
                 )
             ):
                 shutil.copy(f, self.bigscape_dir)
-        elif version == 2:
+        elif version == "2":
             shutil.copy(
                 self.bigscape_running_output_dir / "data_sqlite.db",
                 self.bigscape_dir,
