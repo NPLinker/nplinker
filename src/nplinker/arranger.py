@@ -164,7 +164,7 @@ class DatasetArranger:
                 except (FileNotFoundError, ValueError):
                     # Don't need to remove downloaded archive, as it'll be overwritten
                     shutil.rmtree(self.gnps_dir, ignore_errors=True)
-                    self._download_and_extract_gnps()
+                    self._download_and_extract_gnps(self.config.gnps.version)
 
         if not pass_validation:
             validate_gnps(self.gnps_dir)
@@ -190,7 +190,7 @@ class DatasetArranger:
 
         return gnps_file_mappings_file  # type: ignore
 
-    def _download_and_extract_gnps(self) -> None:
+    def _download_and_extract_gnps(self, gnps_version: str) -> None:
         """Download and extract the GNPS data.
 
         Get the GNPS task ID from the PODP project JSON file, then download and extract the GNPS
@@ -202,7 +202,9 @@ class DatasetArranger:
         gnps_task_id = podp_json_data["metabolomics"]["project"].get("molecular_network")
 
         data_archive = (
-            GNPSDownloader(gnps_task_id, self.downloads_dir).download().get_download_file()
+            GNPSDownloader(gnps_task_id, self.downloads_dir, gnps_version)
+            .download()
+            .get_download_file()
         )
         GNPSExtractor(data_archive, self.gnps_dir)
 
