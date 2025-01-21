@@ -21,6 +21,10 @@ class GNPSMolecularFamilyLoader(MolecularFamilyLoaderBase):
         - networkedges_selfloop/*.selfloop
     3. FEATURE-BASED-MOLECULAR-NETWORKING
         - networkedges_selfloop/*.selfloop
+    4. GNPS2 classical_networking_workflow
+        - nf_output/networking/filtered_pairs.tsv
+    5. GNPS2 feature_based_molecular_networking_workflow
+        - nf_output/networking/filtered_pairs.tsv
 
     The `ComponentIndex` column in the GNPS molecular family file is treated
     as family id.
