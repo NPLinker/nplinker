@@ -1,7 +1,6 @@
 import pytest
 from nplinker.metabolomics.gnps import GNPSFormat
 from nplinker.metabolomics.gnps import gnps_format_from_archive
-from nplinker.metabolomics.gnps import gnps_format_from_file_mapping
 from nplinker.metabolomics.gnps import gnps_format_from_gnps1_task_id
 
 
@@ -29,12 +28,6 @@ def test_gnps_format_from_gnps1_task_id(task_id: str, expected: GNPSFormat, gnps
 )
 def test_gnps_format_from_archive_gnps1(workflow: str, gnps_zip_files):
     actual = gnps_format_from_archive(gnps_zip_files[workflow])
-    assert actual is workflow
-
-
-@pytest.mark.parametrize("workflow", [GNPSFormat.FBMN, GNPSFormat.SNETS, GNPSFormat.SNETSV2])
-def test_gnps_format_from_file_mapping(workflow: str, gnps_file_mappings_files):
-    actual = gnps_format_from_file_mapping(gnps_file_mappings_files[workflow])
     assert actual is workflow
 
 

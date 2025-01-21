@@ -1,5 +1,4 @@
 from __future__ import annotations
-import re
 import tarfile
 import zipfile
 from enum import Enum
@@ -112,7 +111,7 @@ def gnps_format_from_archive(file: str | PathLike) -> GNPSFormat:
     return GNPSFormat.Unknown
 
 
-def _gnps_format_from_archive_gnps1(file: PathLike) -> GNPSFormat:
+def _gnps_format_from_archive_gnps1(file: Path) -> GNPSFormat:
     """Detect GNPS format from GNPS1 archive file."""
     # Guess the format from the filename of the zip file
     if GNPSFormat.FBMN.value in file.name:
@@ -137,7 +136,7 @@ def _gnps_format_from_archive_gnps1(file: PathLike) -> GNPSFormat:
     return GNPSFormat.Unknown
 
 
-def _gnps_format_from_archive_gnps2(file: PathLike) -> GNPSFormat:
+def _gnps_format_from_archive_gnps2(file: Path) -> GNPSFormat:
     """Detect GNPS format from GNPS2 archive file."""
     with tarfile.open(file, "r") as tar:
         try:
@@ -154,35 +153,4 @@ def _gnps_format_from_archive_gnps2(file: PathLike) -> GNPSFormat:
         return GNPSFormat.GNPS2FBMN
     if workflow == GNPSFormat.GNPS2CN.value:
         return GNPSFormat.GNPS2CN
-    return GNPSFormat.Unknown
-
-
-def gnps_format_from_file_mapping(file: str | PathLike) -> GNPSFormat:
-    """Detect GNPS format from the given file mapping file.
-
-    The GNPS file mapping file is located in different folders depending on the
-    GNPS workflow. Here are the locations in corresponding GNPS zip archives:
-
-    - `METABOLOMICS-SNETS` workflow: the `.tsv` file in the folder
-        `clusterinfosummarygroup_attributes_withIDs_withcomponentID`
-    - `METABOLOMICS-SNETS-V2` workflow: the `.clustersummary` file (tsv) in the folder
-        `clusterinfosummarygroup_attributes_withIDs_withcomponentID`
-    - `FEATURE-BASED-MOLECULAR-NETWORKING` workflow: the `.csv` file in the folder
-        `quantification_table`
-
-    Args:
-        file: Path to the file to peek the format for.
-
-    Returns:
-        GNPS format identified in the file.
-    """
-    with open(file, "r") as f:
-        header = f.readline().strip()
-
-    if re.search(r"\bAllFiles\b", header):
-        return GNPSFormat.SNETS
-    if re.search(r"\bUniqueFileSources\b", header):
-        return GNPSFormat.SNETSV2
-    if re.search(r"\b{}\b".format(re.escape("row ID")), header):
-        return GNPSFormat.FBMN
     return GNPSFormat.Unknown

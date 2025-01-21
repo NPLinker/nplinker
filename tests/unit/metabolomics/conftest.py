@@ -7,6 +7,33 @@ from .. import GNPS_DATA_DIR
 
 
 #
+# Fixtures for both GNPS1 and GNPS2
+#
+
+
+@pytest.fixture(scope="session")
+def tmp_gnps_dir(tmp_path_factory):
+    """Temporary root directory for testing gnps."""
+    return tmp_path_factory.mktemp("gnps")
+
+
+@pytest.fixture(scope="session", autouse=True)
+def prepare_data(tmp_gnps_dir, gnps_zip_files, gnps2_tar_files):
+    """Extract GNPS zip archives to the "tmp_gnps_dir" directory.
+
+    The extracted archive is named after the workflow, for example the SNETS archive is extracted to
+    the "SNETS" directory in the "tmp_gnps_dir" directory.
+
+    Note that the `autouse` must be set to `True` so that the fixture is executed before any other
+    test function.
+    """
+    for workflow, zip_file in gnps_zip_files.items():
+        extract_archive(zip_file, tmp_gnps_dir / workflow.name)
+    for workflow, tar_file in gnps2_tar_files.items():
+        extract_archive(tar_file, tmp_gnps_dir / workflow.name)
+
+
+#
 # Fixtures for GNPS1
 #
 
@@ -47,26 +74,6 @@ def gnps_zip_files() -> dict[GNPSFormat, PathLike]:
         / "ProteoSAFe-FEATURE-BASED-MOLECULAR-NETWORKING-92036537-download_cytoscape_data.zip",
         GNPSFormat.Unknown: GNPS_DATA_DIR / "ProteoSAFe-Unknown.zip",
     }
-
-
-@pytest.fixture(scope="session")
-def tmp_gnps_dir(tmp_path_factory):
-    """Temporary root directory for testing gnps."""
-    return tmp_path_factory.mktemp("gnps")
-
-
-@pytest.fixture(scope="session", autouse=True)
-def prepare_data(tmp_gnps_dir, gnps_zip_files):
-    """Extract GNPS zip archives to the "tmp_gnps_dir" directory.
-
-    The extracted archive is named after the workflow, e.g. "SNETS", "SNETSV2", "FBMN", so for
-    example the SNETS archive is extracted to the "SNETS" directory in the "tmp_gnps_dir" directory.
-
-    Note that the `autouse` must be set to `True` so that the fixture is executed before any other
-    test function.
-    """
-    for workflow, zip_file in gnps_zip_files.items():
-        extract_archive(zip_file, tmp_gnps_dir / workflow.name)
 
 
 @pytest.fixture(scope="session")
@@ -174,4 +181,72 @@ def gnps2_tar_files() -> dict[GNPSFormat, PathLike]:
         GNPSFormat.GNPS2CN: GNPS_DATA_DIR / "206a7b40b7ed41c1ae6b4fbd2def3636.tar",
         GNPSFormat.GNPS2FBMN: GNPS_DATA_DIR / "2014f321d72542afb5216c932e0d5079.tar",
         GNPSFormat.Unknown: GNPS_DATA_DIR / "gnps2_nnknown.tar",
+    }
+
+
+@pytest.fixture(scope="session")
+def gnps2_file_mappings_files(tmp_gnps_dir) -> dict[GNPSFormat, PathLike]:
+    """Get the paths of the GNPS2 file mappings."""
+    return {
+        GNPSFormat.GNPS2CN: tmp_gnps_dir
+        / GNPSFormat.GNPS2CN.name
+        / "nf_output"
+        / "clustering"
+        / "featuretable_reformatted_presence.csv",
+        GNPSFormat.GNPS2FBMN: tmp_gnps_dir
+        / GNPSFormat.GNPS2FBMN.name
+        / "nf_output"
+        / "clustering"
+        / "featuretable_reformated.csv",
+    }
+
+
+@pytest.fixture(scope="session")
+def gnps2_spectra_files(tmp_gnps_dir) -> dict[GNPSFormat, PathLike]:
+    """Get the paths of the GNPS2 spectra."""
+    return {
+        GNPSFormat.GNPS2CN: tmp_gnps_dir
+        / GNPSFormat.GNPS2CN.name
+        / "nf_output"
+        / "clustering"
+        / "specs_ms.mgf",
+        GNPSFormat.GNPS2FBMN: tmp_gnps_dir
+        / GNPSFormat.GNPS2FBMN.name
+        / "nf_output"
+        / "clustering"
+        / "specs_ms.mgf",
+    }
+
+
+@pytest.fixture(scope="session")
+def gnps2_mf_files(tmp_gnps_dir) -> dict[GNPSFormat, PathLike]:
+    """Get the paths of the GNPS2 molecular formula files."""
+    return {
+        GNPSFormat.GNPS2CN: tmp_gnps_dir
+        / GNPSFormat.GNPS2CN.name
+        / "nf_output"
+        / "networking"
+        / "filtered_pairs.tsv",
+        GNPSFormat.GNPS2FBMN: tmp_gnps_dir
+        / GNPSFormat.GNPS2FBMN.name
+        / "nf_output"
+        / "networking"
+        / "filtered_pairs.tsv",
+    }
+
+
+@pytest.fixture(scope="session")
+def gnps2_annotations_files(tmp_gnps_dir) -> dict[GNPSFormat, PathLike]:
+    """Get the paths of the GNPS2 annotations file."""
+    return {
+        GNPSFormat.GNPS2CN: tmp_gnps_dir
+        / GNPSFormat.GNPS2CN.name
+        / "nf_output"
+        / "library"
+        / "merged_results_with_gnps.tsv",
+        GNPSFormat.GNPS2FBMN: tmp_gnps_dir
+        / GNPSFormat.GNPS2FBMN.name
+        / "nf_output"
+        / "library"
+        / "merged_results_with_gnps.tsv",
     }

@@ -1,11 +1,11 @@
 from __future__ import annotations
 import csv
+import re
 from os import PathLike
 from pathlib import Path
 from nplinker.metabolomics.abc import FileMappingLoaderBase
 from nplinker.utils import is_file_format
 from .gnps_format import GNPSFormat
-from .gnps_format import gnps_format_from_file_mapping
 
 
 class GNPSFileMappingLoader(FileMappingLoaderBase):
@@ -23,10 +23,20 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
     1. METABOLOMICS-SNETS
         - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.tsv
     2. METABOLOMICS-SNETS-V2
-        - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.clustersummary
+        - clusterinfosummarygroup_attributes_withIDs_withcomponentID/*.clustersummary (.tsv file)
     3. FEATURE-BASED-MOLECULAR-NETWORKING
         - quantification_table*/*.csv
+    4. GNPS2 classical_networking_workflow
+        - nf_output/clustering/featuretable_reformatted_presence.csv
+    5. GNPS2 feature_based_molecular_networking_workflow
+        - nf_output/clustering/featuretable_reformated.csv
+
+
+    The `tsv` files from different workflows have different headers, while the `.csv` files from
+    different workflows have consistent headers.
     """
+
+    _CSV_GNPSFormats = (GNPSFormat.FBMN, GNPSFormat.GNPS2CN, GNPSFormat.GNPS2FBMN)
 
     def __init__(self, file: str | PathLike) -> None:
         """Initialize the GNPSFileMappingLoader.
@@ -44,7 +54,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             >>> print(loader.mapping_reversed["26c.mzXML"])
             {'1', '3', '7', ...}
         """
-        self._gnps_format = gnps_format_from_file_mapping(file)
+        self._gnps_format = self._detect_gnps_format(file)
         if self._gnps_format is GNPSFormat.Unknown:
             raise ValueError("Unknown workflow type for GNPS file mappings file ")
 
@@ -80,6 +90,29 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
 
         return mapping_reversed
 
+    def _detect_gnps_format(self, file: str | PathLike) -> GNPSFormat | tuple[GNPSFormat, ...]:
+        """Detect GNPS format(s) from the given file mapping file.
+
+        The `tsv` files from different workflows have different headers, while the `.csv` files from
+        different workflows have consistent headers.
+
+        Args:
+            file: Path to the file to peek the format for.
+
+        Returns:
+            GNPS format(s) identified in the file.
+        """
+        with open(file, "r") as f:
+            header = f.readline().strip()
+
+        if re.search(r"\bAllFiles\b", header):
+            return GNPSFormat.SNETS
+        if re.search(r"\bUniqueFileSources\b", header):
+            return GNPSFormat.SNETSV2
+        if re.search(r"\b{}\b".format(re.escape("row ID")), header):
+            return self._CSV_GNPSFormats
+        return GNPSFormat.Unknown
+
     def _validate(self) -> None:
         """Validate the file mappings file.
 
@@ -90,7 +123,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         required_file_formats = {
             GNPSFormat.SNETS: "tsv",
             GNPSFormat.SNETSV2: "tsv",
-            GNPSFormat.FBMN: "csv",
+            self._CSV_GNPSFormats: "csv",
         }
         if not is_file_format(self._file, required_file_formats[self._gnps_format]):
             raise ValueError(
@@ -102,7 +135,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
         required_columns = {
             GNPSFormat.SNETS: ["cluster index", "AllFiles"],
             GNPSFormat.SNETSV2: ["cluster index", "UniqueFileSources"],
-            GNPSFormat.FBMN: ["row ID", " Peak area"],
+            self._CSV_GNPSFormats: ["row ID", " Peak area"],
         }
         with open(self._file, mode="rt") as f:
             header = f.readline()
@@ -116,7 +149,7 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
 
         # validate that cluster index or row id must be unique
         with open(self._file, mode="rt") as f:
-            if self._gnps_format is GNPSFormat.FBMN:
+            if self._gnps_format is self._CSV_GNPSFormats:
                 reader = csv.DictReader(f, delimiter=",")
                 ids = [row["row ID"] for row in reader]
             else:
@@ -136,8 +169,8 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
             self._load_snets()
         elif self._gnps_format is GNPSFormat.SNETSV2:
             self._load_snetsv2()
-        elif self._gnps_format is GNPSFormat.FBMN:
-            self._load_fbmn()
+        elif self._gnps_format is self._CSV_GNPSFormats:
+            self._load_csv()
 
     def _load_snets(self) -> None:
         """Load file mapping from output of GNPS SNETS workflow.
@@ -178,8 +211,8 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
                 samples = row["UniqueFileSources"].split("|")
                 self._mapping[spectrum_id] = samples
 
-    def _load_fbmn(self) -> None:
-        """Load file mapping from output of GNPS FBMN workflow.
+    def _load_csv(self) -> None:
+        """Load file mapping that is in .csv format.
 
         The column "row ID" is loaded as spectrum id.
 
