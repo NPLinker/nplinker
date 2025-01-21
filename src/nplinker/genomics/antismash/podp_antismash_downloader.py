@@ -321,7 +321,7 @@ def _resolve_jgi_accession(jgi_id: str) -> str:
     assembly_id = link.text
     # check if the assembly ID is already a RefSeq ID
     if assembly_id.startswith("GCF_"):
-        return assembly_id
+        return assembly_id  # type: ignore
     else:
         return _resolve_genbank_accession(assembly_id)
 

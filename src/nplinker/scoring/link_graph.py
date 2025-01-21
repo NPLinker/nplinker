@@ -214,7 +214,7 @@ class LinkGraph:
             >>> lg.has_link(gcf, spectrum)
             True
         """
-        return self._g.has_edge(u, v)
+        return self._g.has_edge(u, v)  # type: ignore
 
     @validate_uv
     def get_link_data(
