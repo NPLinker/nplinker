@@ -81,6 +81,6 @@ CONFIG_VALIDATORS = [
         cast=lambda v: [i.lower() for i in v],
         is_type_of=list,
         len_min=1,
-        condition=lambda v: set(v).issubset({"metcalf", "rosetta"}),
+        condition=lambda v: set(v).issubset({"metcalf"}),
     ),
 ]

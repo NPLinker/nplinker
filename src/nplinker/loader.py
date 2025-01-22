@@ -1,10 +1,7 @@
 from __future__ import annotations
 import logging
-import os
-from deprecated import deprecated
 from dynaconf import Dynaconf
 from nplinker import defaults
-from nplinker.defaults import NPLINKER_APP_DATA_DIR
 from nplinker.genomics import BGC
 from nplinker.genomics import GCF
 from nplinker.genomics.antismash import AntismashBGCLoader
@@ -49,16 +46,7 @@ class DatasetLoader:
         mibig_strains_in_use: A StrainCollection object that contains the strains in use from MIBiG.
         product_types: A list of product types.
         strains: A StrainCollection object that contains all strains.
-        class_matches: A ClassMatches object that contains class match info.
-        chem_classes: A ChemClassPredictions object that contains chemical class predictions.
     """
-
-    RUN_CANOPUS_DEFAULT = False
-    EXTRA_CANOPUS_PARAMS_DEFAULT = "--maxmz 600 formula zodiac structure canopus"
-
-    # class predictions
-    OR_CANOPUS = "canopus_dir"
-    OR_MOLNETENHANCER = "molnetenhancer_dir"
 
     def __init__(self, config: Dynaconf) -> None:
         """Initialize the DatasetLoader.
@@ -87,9 +75,6 @@ class DatasetLoader:
         self.mibig_strains_in_use: StrainCollection = StrainCollection()
         self.product_types: list = []
         self.strains: StrainCollection = StrainCollection()
-
-        self.class_matches = None
-        self.chem_classes = None
 
     def load(self) -> bool:
         """Load all data from data files in the working directory.
@@ -239,62 +224,4 @@ class DatasetLoader:
         self.mibig_strains_in_use = mibig_strains_in_use
 
         logger.info("Loading genomics data completed\n")
-        return True
-
-    @deprecated(reason="To be refactored. It was used in the `self.load` method before.")
-    def _load_class_info(self):
-        """Load class match info (based on mibig) and chemical class predictions.
-
-        Run CANOPUS if asked for. First sirius is run through docker, if this
-        fails, it is run with a version present on the path.
-
-        Return:
-            True if everything completes
-        """
-        # load Class_matches with mibig info from data
-        mibig_class_file = (
-            NPLINKER_APP_DATA_DIR / "MIBiG2.0_compounds_with_AS_BGC_CF_NPC_classes.txt"
-        )
-
-        self.class_matches = ClassMatches(mibig_class_file)  # noqa
-
-        # run canopus if canopus_dir does not exist
-        should_run_canopus = self._config_docker.get("run_canopus", self.RUN_CANOPUS_DEFAULT)
-        extra_canopus_parameters = self._config_docker.get(
-            "extra_canopus_parameters", self.EXTRA_CANOPUS_PARAMS_DEFAULT
-        )
-        if should_run_canopus:
-            # don't run canopus when canopus dir exists already
-            if not os.path.isdir(self.canopus_dir):
-                logger.info(
-                    'Running CANOPUS! extra_canopus_parameters="{}"'.format(
-                        extra_canopus_parameters
-                    )
-                )
-                try:
-                    run_canopus(self.gnps_mgf_file, self.canopus_dir, extra_canopus_parameters)  # noqa
-                except Exception as e:
-                    logger.warning(
-                        'Failed to run CANOPUS on mgf file with docker, error was "{}"'.format(e)
-                    )
-                    logger.info("Trying to run CANOPUS again using SIRIUS from path")
-                    try:
-                        run_canopus(self.gnps_mgf_file, self.canopus_dir, extra_canopus_parameters)  # noqa
-                    except Exception as e:
-                        logger.warning(
-                            'Again failed to run CANOPUS on mgf file using sirius from path, error was "{}"'.format(
-                                e
-                            )
-                        )
-            else:
-                logger.info("Found CANOPUS dir, CANOPUS not run again!")
-
-        # load Chem_class_predictions (canopus, molnetenhancer are loaded)
-        chem_classes = ChemClassPredictions(self.canopus_dir, self.molnetenhancer_dir, self._root)  # noqa
-        # if no mf classes transfer them from spectra (due to old style MN)
-        if not chem_classes.canopus.mf_classes and chem_classes.canopus.spectra_classes:
-            logger.info("Added chemical compound classes for MFs")
-            chem_classes.canopus.transfer_spec_classes_to_mfs(self.mfs)
-        # include them in loader
-        self.chem_classes = chem_classes
         return True

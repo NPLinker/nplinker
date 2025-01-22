@@ -145,10 +145,7 @@ echo "🔥 Start installing BigScape ..."
     cd BiG-SCAPE-v2
     git config --ad advice.detatchedHead false
     git checkout 99a4c2e4923bb50e175b2e619c2cee0a14918789 # Commits on Jun 14, 2024
-    pip install click
-    pip install sqlalchemy
-    pip install pyhmmer
-    pip install tqdm
+    pip install click sqlalchemy pyhmmer tqdm matplotlib requests
     chmod 754 bigscape.py
     ln -sf $LIB_PATH/BiG-SCAPE-v2/bigscape.py $PY_PATH/bin/bigscape-v2.py
     cd ..
@@ -179,28 +176,6 @@ echo "🔥 Start installing Pfam database ..."
     gunzip -f Pfam-A.hmm.gz
     hmmpress -f Pfam-A.hmm
 echo -e "✅ Pfam database installed successfully\n"
-
-
-#--- Install canopus_treemap
-echo "🔥 Start installing Canopus"
-    pip install -U -q canopus@git+https://github.com/kaibioinfo/canopus_treemap.git
-echo -e "✅ Canopus installed successfully\n"
-
-
-#--- Install SIRIUS
-echo "🔥 Start installing Sirius"
-    if [[ "$OSTYPE" == "linux"* ]]; then
-        wget -q --show-progress https://github.com/boecker-lab/sirius/releases/download/v5.5.5/sirius-5.5.5-linux64-headless.zip
-        unzip -q -o sirius-5.5.5-linux64-headless.zip
-        ln -sf $LIB_PATH/sirius/bin/sirius $PY_PATH/bin
-        rm sirius-5.5.5-linux64-headless.zip
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        wget -q --show-progress https://github.com/boecker-lab/sirius/releases/download/v5.5.5/sirius-5.5.5-osx64-headless.zip
-        unzip -q -o sirius-5.5.5-osx64-headless.zip
-        ln -sf $LIB_PATH/sirius.app/Contents/MacOS/sirius $PY_PATH/bin
-        rm sirius-5.5.5-osx64-headless.zip
-    fi
-echo -e "✅ Sirius installed successfully\n"
 
 
 echo -e "✅ 🎉 Successfully installed all NPLinker dependencies and databases!\n"
