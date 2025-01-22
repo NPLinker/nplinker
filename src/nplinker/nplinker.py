@@ -45,8 +45,6 @@ class NPLinker:
     # Valid scoring methods
     _valid_scoring_methods = {
         MetcalfScoring.name: MetcalfScoring,
-        # RosettaScoring.name: RosettaScoring, # To be refactored
-        # NPClassScoring.name: NPClassScoring, # To be refactored
     }
 
     def __init__(self, config_file: str | PathLike):
