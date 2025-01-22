@@ -1,6 +1,0 @@
-loglevel = "DEBUG"
-logfile = ""
-repro_file = ""
-[dataset]
-root = "/path/to/carnegie_nomibig_27112019"
-platform_id = ""
