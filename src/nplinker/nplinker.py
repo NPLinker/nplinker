@@ -101,8 +101,6 @@ class NPLinker:
         self._mibig_bgcs: list[BGC] = []
         self._strains: StrainCollection = StrainCollection()
         self._product_types: list = []
-        self._chem_classes = None  # TODO: to be refactored
-        self._class_matches = None  # TODO: to be refactored
 
         # Flags to keep track of whether the scoring methods have been set up
         self._scoring_methods_setup_done = {name: False for name in self._valid_scoring_methods}
@@ -153,16 +151,6 @@ class NPLinker:
         return self._product_types
 
     @property
-    def chem_classes(self):
-        """Returns loaded ChemClassPredictions with the class predictions."""
-        return self._chem_classes
-
-    @property
-    def class_matches(self):
-        """ClassMatches with the matched classes and scoring tables from MIBiG."""
-        return self._class_matches
-
-    @property
     def scoring_methods(self) -> list[str]:
         """Get names of all valid scoring methods."""
         return list(self._valid_scoring_methods.keys())
@@ -193,8 +181,6 @@ class NPLinker:
         self._mibig_bgcs = loader.mibig_bgcs
         self._strains = loader.strains
         self._product_types = loader.product_types
-        self._chem_classes = loader.chem_classes
-        self._class_matches = loader.class_matches
 
     @overload
     def get_links(
