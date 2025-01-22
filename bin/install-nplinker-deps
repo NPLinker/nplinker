@@ -181,26 +181,4 @@ echo "🔥 Start installing Pfam database ..."
 echo -e "✅ Pfam database installed successfully\n"
 
 
-#--- Install canopus_treemap
-echo "🔥 Start installing Canopus"
-    pip install -U -q canopus@git+https://github.com/kaibioinfo/canopus_treemap.git
-echo -e "✅ Canopus installed successfully\n"
-
-
-#--- Install SIRIUS
-echo "🔥 Start installing Sirius"
-    if [[ "$OSTYPE" == "linux"* ]]; then
-        wget -q --show-progress https://github.com/boecker-lab/sirius/releases/download/v5.5.5/sirius-5.5.5-linux64-headless.zip
-        unzip -q -o sirius-5.5.5-linux64-headless.zip
-        ln -sf $LIB_PATH/sirius/bin/sirius $PY_PATH/bin
-        rm sirius-5.5.5-linux64-headless.zip
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        wget -q --show-progress https://github.com/boecker-lab/sirius/releases/download/v5.5.5/sirius-5.5.5-osx64-headless.zip
-        unzip -q -o sirius-5.5.5-osx64-headless.zip
-        ln -sf $LIB_PATH/sirius.app/Contents/MacOS/sirius $PY_PATH/bin
-        rm sirius-5.5.5-osx64-headless.zip
-    fi
-echo -e "✅ Sirius installed successfully\n"
-
-
 echo -e "✅ 🎉 Successfully installed all NPLinker dependencies and databases!\n"
