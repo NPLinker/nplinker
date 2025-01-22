@@ -29,7 +29,6 @@ classifiers = [
 dependencies = [
     "beautifulsoup4",
     "biopython",
-    "deprecated",
     "dynaconf",
     "httpx",
     "jsonschema",
@@ -40,7 +39,6 @@ dependencies = [
     "pyyaml",
     "rich",
     "scipy",
-    "sortedcontainers",
     "tabulate",
 ]
 
@@ -60,7 +58,6 @@ dev = [
     "mypy",
     "typing_extensions",
     # stub packages. Update the `format-typing-check.yml` too if you add more.
-    "types-Deprecated",
     "types-beautifulsoup4",
     "types-jsonschema",
     "types-networkx",
@@ -103,20 +100,6 @@ testpaths = ["tests/unit"]
 branch = true
 source = ["src"]
 relative_files = true # show relative path in report, important for sonarcloud
-
-[tool.coverage.report]
-omit = [
-    "src/nplinker/class_info/*",
-    "src/nplinker/data/*",
-    "src/nplinker/genomics/aa_pred.py",
-    "src/nplinker/parsers/*",
-    "src/nplinker/scoring/iokr/*",
-    "src/nplinker/scoring/rosetta/*",
-    "src/nplinker/scoring/np_class_scoring.py",
-    "src/nplinker/scoring/rosetta_scoring.py",
-    "src/nplinker/spec_clustering.py",
-    "src/nplinker/pickler.py"
-    ]
 
 # Mypy: to check static type
 # see https://mypy.readthedocs.io/en/stable/config_file.html#example-pyproject-toml
