@@ -1,7 +1,7 @@
 ## Configuration Template
 
 ```toml
---8<-- "src/nplinker/data/nplinker.toml"
+--8<-- "config/nplinker.toml"
 ```
 
 ## Example Configuration
