@@ -1,5 +1,32 @@
 # Changelog
 
+## [v2.0.0-alpha.8](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.8) (2025-01-23)
+
+[Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.7...v2.0.0-alpha.8)
+
+**Closed issues:**
+
+- Replace square NPLinker logo by one used for Slack \(with NPLinker text\) [\#288](https://github.com/NPLinker/nplinker/issues/288)
+
+**Merged pull requests:**
+
+- move config template file outside of code folder [\#303](https://github.com/NPLinker/nplinker/pull/303) ([CunliangGeng](https://github.com/CunliangGeng))
+- remove unused or deprecated code and data [\#302](https://github.com/NPLinker/nplinker/pull/302) ([CunliangGeng](https://github.com/CunliangGeng))
+- update doc for gnps2 [\#301](https://github.com/NPLinker/nplinker/pull/301) ([CunliangGeng](https://github.com/CunliangGeng))
+- update DatasetArranger for different version of gnps [\#300](https://github.com/NPLinker/nplinker/pull/300) ([CunliangGeng](https://github.com/CunliangGeng))
+- update GNPSSpectrumLoader for gnps2 [\#299](https://github.com/NPLinker/nplinker/pull/299) ([CunliangGeng](https://github.com/CunliangGeng))
+- update GNPSMolecularFamilyLoader for gnps2 [\#298](https://github.com/NPLinker/nplinker/pull/298) ([CunliangGeng](https://github.com/CunliangGeng))
+- update GNPSFileMappingLoader for gnps2 [\#297](https://github.com/NPLinker/nplinker/pull/297) ([CunliangGeng](https://github.com/CunliangGeng))
+- Update GNPSFileMappingLoader to support GNPS2 data [\#296](https://github.com/NPLinker/nplinker/pull/296) ([CunliangGeng](https://github.com/CunliangGeng))
+- update GNPSExtractor class to support gnps2 [\#295](https://github.com/NPLinker/nplinker/pull/295) ([CunliangGeng](https://github.com/CunliangGeng))
+- update GNPSDownloader class to support gnps2 [\#294](https://github.com/NPLinker/nplinker/pull/294) ([CunliangGeng](https://github.com/CunliangGeng))
+- update gnpsformat detection function to support gnps2 [\#293](https://github.com/NPLinker/nplinker/pull/293) ([CunliangGeng](https://github.com/CunliangGeng))
+- update GNPSFormat to support gnps2 [\#292](https://github.com/NPLinker/nplinker/pull/292) ([CunliangGeng](https://github.com/CunliangGeng))
+- add gnps version as a new setting in config file [\#291](https://github.com/NPLinker/nplinker/pull/291) ([CunliangGeng](https://github.com/CunliangGeng))
+- change bigscape version setting from int to str [\#290](https://github.com/NPLinker/nplinker/pull/290) ([CunliangGeng](https://github.com/CunliangGeng))
+- remove smiles prediction [\#289](https://github.com/NPLinker/nplinker/pull/289) ([CunliangGeng](https://github.com/CunliangGeng))
+- add methods to export results in tabular format [\#280](https://github.com/NPLinker/nplinker/pull/280) ([liannette](https://github.com/liannette))
+
 ## [v2.0.0-alpha.7](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.7) (2024-11-28)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.6...v2.0.0-alpha.7)
