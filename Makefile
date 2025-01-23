@@ -10,7 +10,7 @@ help:
 	@echo "update - update pip, build, twine packages"
 	@echo "update-version - update NPLinker version. Usage: make update-version CURRENT_VERSION=0.1.0 NEW_VERSION=0.2.0"
 
-clean: clean-build clean-pyc clean-test
+clean: clean-build clean-pyc clean-test clean-doc
 
 clean-build:
 	rm -fr build/
@@ -29,6 +29,9 @@ clean-pyc:
 clean-test:
 	rm -f .coverage*
 	rm -f coverage.xml
+
+clean-doc:
+	rm -rf site
 
 build: clean
 	python -m build
