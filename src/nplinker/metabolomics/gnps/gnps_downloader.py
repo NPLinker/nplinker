@@ -45,7 +45,11 @@ class GNPSDownloader:
             ValueError: If the given GNPS version is not valid.
 
         Examples:
-            >>> GNPSDownloader("c22f44b14a3d450eb836d607cb9521bb", "~/downloads")
+            Download GNPS1 job
+            >>> GNPSDownloader("c22f44b14a3d450eb836d607cb9521bb", "~/downloads", "1")
+
+            Download GNPS2 job
+            >>> GNPSDownloader("2014f321d72542afb5216c932e0d5079", "~/downloads", "2")
         """
         if gnps_version == "1":
             gnps_format = gnps_format_from_gnps1_task_id(task_id)
