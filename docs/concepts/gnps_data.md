@@ -1,4 +1,4 @@
-# GNPS data 
+# GNPS
 
 NPLinker requires GNPS molecular networking data as input. It currently accepts data from both GNPS1
 (https://gnps.ucsd.edu) and GNPS2 (https://gnps2.org) workflows.

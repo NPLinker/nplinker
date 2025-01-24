@@ -46,7 +46,6 @@ jobs:
           python3 --version
       - name: Upgrade pip and install dependencies
         run: |
-          python3 -m pip install --upgrade pip setuptools
           pip install build pytest wheel pytest-xdist
       - name: Build the package
         run: 	python -m build
@@ -79,7 +78,6 @@ jobs:
           python3 --version
       - name: Upgrade pip and install dependencies
         run: |
-          python3 -m pip install --upgrade pip setuptools
           pip install build pytest wheel pytest-xdist
       - name: Build the package
         run: 	python -m build
