@@ -57,6 +57,17 @@ class AntismashBGCLoader(BGCLoaderBase):
             bid: os.path.basename(os.path.dirname(bpath)) for bid, bpath in self._file_dict.items()
         }
 
+    def get_genome_bgcs_mapping(self) -> dict[str, list]:
+            """Get the mapping from genome to BGCs.
+
+            Returns:
+                The key is genome id and value is a list of BGC names (gbk file names
+            """
+            genome_to_bgcs: dict[str, list] = {}
+            for bgc, genome in self.get_bgc_genome_mapping().items():
+                genome_to_bgcs.setdefault(genome, []).append(bgc)
+            return genome_to_bgcs
+
     def get_files(self) -> dict[str, str]:
         """Get BGC gbk files.
 
