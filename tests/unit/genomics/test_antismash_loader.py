@@ -28,6 +28,15 @@ class TestAntismashBGCLoader:
         assert mapping["NZ_KI911412.1.region001"] == "GCF_000514515.1"
         assert mapping["NZ_AZWS01000001.region001"] == "GCF_000514855.1"
         assert mapping["NZ_KI911483.1.region001"] == "GCF_000514855.1"
+    
+    def test_get_bgc_genome_mapping(self, loader):
+        mapping = loader.get_bgc_genome_mapping()
+        assert isinstance(mapping, dict)
+        assert len(mapping) == 44
+        assert mapping["GCF_000514515.1"] == "NZ_AZWB01000005.region001"
+        assert mapping["GCF_000514515.1"] == "NZ_KI911412.1.region001"
+        assert mapping["GCF_000514855.1"] == "NZ_AZWS01000001.region001"
+        assert mapping["GCF_000514855.1"] == "NZ_KI911483.1.region001"
 
     def test_get_files(self, loader):
         bgc_files = loader.get_files()
