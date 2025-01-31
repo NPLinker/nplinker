@@ -281,11 +281,12 @@ def _resolve_genbank_accession(genbank_id: str) -> str:
         )
         if resp.status_code == httpx.codes.OK:
             data = resp.json()
-            latest_entry = max(
-                (entry for entry in data["assembly_revisions"] if "refseq_accession" in entry),
-                key=lambda x: x["release_date"],
-            )
-            refseq_id = latest_entry["refseq_accession"]
+            assembly_entries = [
+                entry for entry in data["assembly_revisions"] if "refseq_accession" in entry
+            ]
+            if assembly_entries:
+                latest_entry = max(assembly_entries, key=lambda x: x["release_date"])
+                refseq_id = latest_entry["refseq_accession"]
     except httpx.ReadTimeout:
         logger.warning("Timed out waiting for result of GenBank assembly lookup")
 
