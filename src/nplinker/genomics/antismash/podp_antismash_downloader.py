@@ -304,7 +304,8 @@ def _resolve_genbank_accession(genbank_id: str) -> str:
         return ""
 
     latest_entry = max(assembly_entries, key=lambda x: x["release_date"])
-    return latest_entry["refseq_accession"]
+    refseq_id: str = latest_entry["refseq_accession"]
+    return refseq_id
 
 
 def _resolve_jgi_accession(jgi_id: str) -> str:
