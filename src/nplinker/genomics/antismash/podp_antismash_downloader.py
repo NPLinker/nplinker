@@ -281,6 +281,11 @@ def _resolve_genbank_accession(genbank_id: str) -> str:
         )
         if resp.status_code == httpx.codes.OK:
             data = resp.json()
+            if not data.get("assembly_revisions"):
+                logger.warning(
+                    f"Invalid GenBank accession {genbank_id}: no assembly revisions found"
+                )
+                return ""
             assembly_entries = [
                 entry for entry in data["assembly_revisions"] if "refseq_accession" in entry
             ]
