@@ -287,6 +287,8 @@ def _resolve_genbank_accession(genbank_id: str) -> str:
             if assembly_entries:
                 latest_entry = max(assembly_entries, key=lambda x: x["release_date"])
                 refseq_id = latest_entry["refseq_accession"]
+            else:
+                logger.warning(f"No RefSeq accession found for GenBank accession {genbank_id}")
     except httpx.ReadTimeout:
         logger.warning("Timed out waiting for result of GenBank assembly lookup")
 
