@@ -16,7 +16,7 @@ def run_bigscape(
     antismash_path: str | PathLike,
     output_path: str | PathLike,
     extra_params: str,
-    version: Literal["1", "2"] = "1",
+    version: Literal[1, 2] = 1,
 ) -> bool:
     """Runs BiG-SCAPE to cluster BGCs.
 
@@ -48,7 +48,7 @@ def run_bigscape(
         antismash_path: Path to the antismash output directory.
         output_path: Path to the output directory where BiG-SCAPE will write its results.
         extra_params: Additional parameters to pass to BiG-SCAPE.
-        version: The version of BiG-SCAPE to run. Must be "1" or "2".
+        version: The version of BiG-SCAPE to run. Must be 1 or 2.
 
     Returns:
         True if BiG-SCAPE ran successfully, False otherwise.
@@ -62,15 +62,15 @@ def run_bigscape(
     Examples:
         >>>  from nplinker.genomics.bigscape import run_bigscape
         >>> run_bigscape(antismash_path="./antismash", output_path="./output",
-        ... extra_params="--help", version="1")
+        ... extra_params="--help", version=1)
     """
     # switch to correct version of BiG-SCAPE
-    if version == "1":
+    if version == 1:
         bigscape_py_path = "bigscape.py"
-    elif version == "2":
+    elif version == 2:
         bigscape_py_path = "bigscape-v2.py"
     else:
-        raise ValueError("Invalid BiG-SCAPE version number. Expected: '1' or '2'.")
+        raise ValueError("Invalid BiG-SCAPE version number. Expected: 1 or 2.")
 
     try:
         subprocess.run([bigscape_py_path, "-h"], capture_output=True, check=True)
@@ -92,9 +92,9 @@ def run_bigscape(
 
     # version 2 points to specific Pfam file, version 1 points to directory
     # version 2 also requires the cluster subcommand
-    if version == "1":
+    if version == 1:
         args.extend(["--pfam_dir", PFAM_PATH])
-    elif version == "2":
+    elif version == 2:
         args.extend(["cluster", "--pfam_path", os.path.join(PFAM_PATH, "Pfam-A.hmm")])
 
     # add input and output paths. these are unchanged
