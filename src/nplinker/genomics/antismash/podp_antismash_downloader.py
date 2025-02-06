@@ -274,37 +274,37 @@ def _resolve_genbank_accession(genbank_id: str) -> str:
     # For schema, see https://www.ncbi.nlm.nih.gov/datasets/docs/v2/api/rest-api/#get-/genome/accession/-accession-/revision_history
     url = f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{genbank_id}/revision_history"
 
+    refseq_id = ""
     try:
         resp = httpx.get(
             url, headers={"User-Agent": USER_AGENT}, timeout=10.0, follow_redirects=True
         )
         resp.raise_for_status()
+
+        data = resp.json()
+        if not data:
+            raise ValueError("No Assembly Revision data found")
+
+        assembly_entries = [
+            entry for entry in data["assembly_revisions"] if "refseq_accession" in entry
+        ]
+        if not assembly_entries:
+            raise ValueError("No RefSeq assembly accession found")
+
+        latest_entry = max(assembly_entries, key=lambda x: x["release_date"])
+        refseq_id: str = latest_entry["refseq_accession"]
+
     except httpx.RequestError as exc:
         logger.warning(f"An error occurred while requesting {exc.request.url!r}: {exc}")
-        return ""
     except httpx.HTTPStatusError as exc:
         logger.warning(
             f"Error response {exc.response.status_code} while requesting {exc.request.url!r}"
         )
-        return ""
     except httpx.ReadTimeout:
         logger.warning("Timed out waiting for result of GenBank assembly lookup")
-        return ""
+    except ValueError as exc:
+        logger.warning(f"Error while resolving GenBank assembly accession {genbank_id}: {exc}")
 
-    data = resp.json()
-    if not data:
-        logger.warning(f"Invalid GenBank accession {genbank_id}: no data found")
-        return ""
-
-    assembly_entries = [
-        entry for entry in data["assembly_revisions"] if "refseq_accession" in entry
-    ]
-    if not assembly_entries:
-        logger.warning(f"No RefSeq accession found for GenBank accession {genbank_id}")
-        return ""
-
-    latest_entry = max(assembly_entries, key=lambda x: x["release_date"])
-    refseq_id: str = latest_entry["refseq_accession"]
     return refseq_id
 
 
