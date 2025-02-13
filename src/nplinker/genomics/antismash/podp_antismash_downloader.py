@@ -292,7 +292,7 @@ def _resolve_genbank_accession(genbank_id: str) -> str:
             raise ValueError("No RefSeq assembly accession found")
 
         latest_entry = max(assembly_entries, key=lambda x: x["release_date"])
-        refseq_id: str = latest_entry["refseq_accession"]
+        refseq_id = latest_entry["refseq_accession"]
 
     except httpx.RequestError as exc:
         logger.warning(f"An error occurred while requesting {exc.request.url!r}: {exc}")
