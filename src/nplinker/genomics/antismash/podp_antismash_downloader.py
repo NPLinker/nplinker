@@ -279,15 +279,31 @@ def _resolve_genbank_accession(genbank_id: str) -> str:
         resp = httpx.get(
             url, headers={"User-Agent": USER_AGENT}, timeout=10.0, follow_redirects=True
         )
-        if resp.status_code == httpx.codes.OK:
-            data = resp.json()
-            latest_entry = max(
-                (entry for entry in data["assembly_revisions"] if "refseq_accession" in entry),
-                key=lambda x: x["release_date"],
-            )
-            refseq_id = latest_entry["refseq_accession"]
+        resp.raise_for_status()
+
+        data = resp.json()
+        if not data:
+            raise ValueError("No Assembly Revision data found")
+
+        assembly_entries = [
+            entry for entry in data["assembly_revisions"] if "refseq_accession" in entry
+        ]
+        if not assembly_entries:
+            raise ValueError("No RefSeq assembly accession found")
+
+        latest_entry = max(assembly_entries, key=lambda x: x["release_date"])
+        refseq_id = latest_entry["refseq_accession"]
+
+    except httpx.RequestError as exc:
+        logger.warning(f"An error occurred while requesting {exc.request.url!r}: {exc}")
+    except httpx.HTTPStatusError as exc:
+        logger.warning(
+            f"Error response {exc.response.status_code} while requesting {exc.request.url!r}"
+        )
     except httpx.ReadTimeout:
         logger.warning("Timed out waiting for result of GenBank assembly lookup")
+    except ValueError as exc:
+        logger.warning(f"Error while resolving GenBank assembly accession {genbank_id}: {exc}")
 
     return refseq_id
 
