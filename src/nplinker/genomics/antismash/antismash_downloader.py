@@ -44,10 +44,7 @@ def download_and_extract_antismash_data(
     download_root = Path(download_root)
     extract_path = Path(extract_root) / "antismash" / antismash_id
 
-    if extract_path.exists():
-        _check_extract_path(extract_path)
-    else:
-        extract_path.mkdir(parents=True, exist_ok=True)
+    _prepare_extract_path(extract_path)
 
     try:
         for base_url in [ANTISMASH_DB_DOWNLOAD_URL, ANTISMASH_DBV2_DOWNLOAD_URL]:
@@ -81,3 +78,10 @@ def _cleanup_extracted_files(extract_path: str | PathLike) -> None:
     for file in list_files(extract_path):
         if file not in files_to_keep:
             os.remove(file)
+
+
+def _prepare_extract_path(extract_path: str | PathLike) -> None:
+    if extract_path.exists():
+        _check_extract_path(extract_path)
+    else:
+        extract_path.mkdir(parents=True, exist_ok=True)
