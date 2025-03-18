@@ -218,7 +218,7 @@ def test_caching(download_root, extract_root, genome_status_file, caplog):
     assert genome_obj.resolve_attempted
     podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
     assert (
-        f"Genome ID {genome_obj.original_id} already downloaded to {genome_obj.bgc_path}"
+        f"antiSMASH BGC data for genome ID {genome_obj.original_id} already downloaded to {genome_obj.bgc_path}"
         in caplog.text
     )
     assert (
