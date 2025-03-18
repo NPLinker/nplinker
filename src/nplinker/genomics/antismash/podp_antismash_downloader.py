@@ -153,30 +153,26 @@ def podp_download_and_extract_antismash_data(
     gs_dict = GenomeStatus.read_json(gs_file)
 
     for i, genome_record in enumerate(genome_records):
-        # get the best available ID from the dict
-        genome_id_data = genome_record["genome_ID"]
-        raw_genome_id = get_best_available_genome_id(genome_id_data)
-        if raw_genome_id is None or len(raw_genome_id) == 0:
-            logger.warning(f'Invalid input genome record "{genome_record}"')
-            continue
-
-        # check if genome ID exist in the genome status file
-        if raw_genome_id not in gs_dict:
-            gs_dict[raw_genome_id] = GenomeStatus(raw_genome_id)
-
-        gs_obj = gs_dict[raw_genome_id]
-
         logger.info(
-            f"Checking for antismash data {i + 1}/{len(genome_records)}, "
-            f"current genome ID={raw_genome_id}"
+            f"Getting antismash BGC data for genome record {i + 1} of {len(genome_records)}."
         )
-        # first, check if BGC data is downloaded
-        if gs_obj.bgc_path and Path(gs_obj.bgc_path).exists():
-            logger.info(f"Genome ID {raw_genome_id} already downloaded to {gs_obj.bgc_path}")
+
+        # get the best available genome ID from the dict
+        original_genome_id = get_best_available_genome_id(genome_record["genome_ID"])
+        if not original_genome_id:
+            logger.warning(f"Skipping invalid genome record: {genome_record}")
             continue
-        # second, check if lookup attempted previously
-        if gs_obj.resolve_attempted:
-            logger.info(f"Genome ID {raw_genome_id} skipped due to previous failed attempt")
+
+        # Retrieve or initialize the GenomeStatus object for the genome ID
+        gs = gs_dict.setdefault(original_genome_id, GenomeStatus(original_genome_id))
+
+        # Skip genome if BGC data is downloaded
+        if gs.bgc_path and Path(gs.bgc_path).exists():
+            logger.info(f"Genome ID {original_genome_id} already downloaded to {gs.bgc_path}")
+            continue
+        # Skip genome if lookup attempted previously
+        if gs.resolve_attempted:
+            logger.info(f"Genome ID {original_genome_id} skipped due to previous failed attempt")
             continue
 
         # resolve genome ID
