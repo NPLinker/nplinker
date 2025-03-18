@@ -55,15 +55,7 @@ def download_and_extract_antismash_data(
             download_and_extract_archive(url, download_root, extract_path, antismash_id + ".zip")
             break
 
-        # delete subdirs
-        for subdir_path in list_dirs(extract_path):
-            shutil.rmtree(subdir_path)
-
-        # delete unnecessary files
-        files_to_keep = list_files(extract_path, suffix=(".json", ".gbk"))
-        for file in list_files(extract_path):
-            if file not in files_to_keep:
-                os.remove(file)
+        _cleanup_extracted_files(extract_path)
 
         logger.info("antiSMASH BGC data of %s is downloaded and extracted.", antismash_id)
 
@@ -77,3 +69,15 @@ def _check_extract_path(extract_path: Path):
     # check if extract_path is empty
     if any(extract_path.iterdir()):
         raise ValueError(f'Nonempty directory: "{extract_path}"')
+
+
+def _cleanup_extracted_files(extract_path: str | PathLike) -> None:
+    # delete subdirs
+    for subdir_path in list_dirs(extract_path):
+        shutil.rmtree(subdir_path)
+
+    # delete unnecessary files
+    files_to_keep = list_files(extract_path, suffix=(".json", ".gbk"))
+    for file in list_files(extract_path):
+        if file not in files_to_keep:
+            os.remove(file)
