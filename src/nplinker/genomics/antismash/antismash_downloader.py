@@ -42,8 +42,7 @@ def download_and_extract_antismash_data(
         >>> download_and_extract_antismash_metadata("GCF_004339725.1", "/data/download", "/data/extracted")
     """
     download_root = Path(download_root)
-    extract_root = Path(extract_root)
-    extract_path = extract_root / "antismash" / antismash_id
+    extract_path = Path(extract_root) / "antismash" / antismash_id
 
     try:
         if extract_path.exists():
