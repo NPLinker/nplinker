@@ -162,13 +162,15 @@ def podp_download_and_extract_antismash_data(
         if not original_genome_id:
             logger.warning(f"Skipping invalid genome record: {genome_record}")
             continue
-
         # Retrieve or initialize the GenomeStatus object for the genome ID
         gs = gs_dict.setdefault(original_genome_id, GenomeStatus(original_genome_id))
 
         # Skip genomes
         if gs.bgc_path and Path(gs.bgc_path).exists():
-            logger.info(f"Genome ID {original_genome_id} already downloaded to {gs.bgc_path}")
+            logger.info(
+                f"antiSMASH BGC data for genome ID {original_genome_id} already downloaded to "
+                f"{gs.bgc_path}"
+            )
             continue
         if gs.resolve_attempted:
             logger.info(f"Genome ID {original_genome_id} skipped due to previous failed attempt")
@@ -184,7 +186,9 @@ def podp_download_and_extract_antismash_data(
         # retrieve antismash BGC data from antiSMASH-DB
         try:
             retrieve_antismash_db_data(gs, project_download_root, project_extract_root)
-            logger.info(f"antiSMASH BGC data for {gs.original_id} is downloaded and extracted")
+            logger.info(
+                f"antiSMASH BGC data for genome ID {gs.original_id} is downloaded and extracted"
+            )
         except Exception as e:
             logger.warning(
                 f"Failed to retrieve BGC data from antiSMASH-DB for {gs.original_id}. Error: {e}"
