@@ -185,8 +185,11 @@ def podp_download_and_extract_antismash_data(
         # retrieve antismash BGC data from antiSMASH-DB
         try:
             retrieve_antismash_db_data(gs, project_download_root, project_extract_root)
-        except Exception:
-            continue
+            logger.info(f"antiSMASH BGC data for {gs.original_id} is downloaded and extracted")
+        except Exception as e:
+            logger.warning(
+                f"Failed to retrieve BGC data from antiSMASH-DB for {gs.original_id}. Error: {e}"
+            )
 
     # raise and log warning for failed downloads
     failed_ids = [gs.original_id for gs in gs_dict.values() if not gs.bgc_path]

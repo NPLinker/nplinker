@@ -54,11 +54,8 @@ def download_and_extract_antismash_data(
 
         _cleanup_extracted_files(extract_path)
 
-        logger.info("antiSMASH BGC data of %s is downloaded and extracted.", antismash_id)
-
     except Exception as e:
         shutil.rmtree(extract_path)
-        logger.warning(e)
         raise e
 
 
