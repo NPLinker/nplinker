@@ -166,11 +166,10 @@ def podp_download_and_extract_antismash_data(
         # Retrieve or initialize the GenomeStatus object for the genome ID
         gs = gs_dict.setdefault(original_genome_id, GenomeStatus(original_genome_id))
 
-        # Skip genome if BGC data is downloaded
+        # Skip genomes
         if gs.bgc_path and Path(gs.bgc_path).exists():
             logger.info(f"Genome ID {original_genome_id} already downloaded to {gs.bgc_path}")
             continue
-        # Skip genome if lookup attempted previously
         if gs.resolve_attempted:
             logger.info(f"Genome ID {original_genome_id} skipped due to previous failed attempt")
             continue
