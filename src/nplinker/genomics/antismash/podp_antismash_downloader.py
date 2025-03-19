@@ -297,8 +297,8 @@ def get_genome_assembly_accession(
             information, where keys like "RefSeq_accession", "GenBank_accession",
             or "JGI_Genome_ID" are used to resolve the RefSeq ID.
 
-    Warnings:
-        Logs a warning if the RefSeq ID cannot be resolved.
+    Raises:
+        RuntimeError: If the RefSeq ID cannot be resolved.
     """
     genome_status.resolved_refseq_id = _resolve_refseq_id(genome_id_data)
     genome_status.resolve_attempted = True
