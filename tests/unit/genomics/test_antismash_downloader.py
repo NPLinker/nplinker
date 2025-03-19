@@ -1,5 +1,5 @@
 import pytest
-from nplinker.genomics.antismash import download_and_extract_antismash_data
+from nplinker.genomics.antismash import download_and_extract_from_antismash_db
 from nplinker.utils import extract_archive
 from nplinker.utils import list_files
 
@@ -14,7 +14,7 @@ class TestDownloadAndExtractAntismashData:
         extract_root.mkdir()
         original_extract_root = tmp_path / "original"
         original_extract_root.mkdir()
-        download_and_extract_antismash_data(self.antismash_id, download_root, extract_root)
+        download_and_extract_from_antismash_db(self.antismash_id, download_root, extract_root)
         archive = download_root / "GCF_004339725.1.zip"
         extracted_folder = extract_root / "antismash" / "GCF_004339725.1"
         extracted_files = list_files(extracted_folder, keep_parent=False)
@@ -32,7 +32,9 @@ class TestDownloadAndExtractAntismashData:
         nonempty_path = tmp_path / "extracted" / "antismash" / f"{self.antismash_id}" / "subdir"
         nonempty_path.mkdir(parents=True)
         with pytest.raises(ValueError, match="Nonempty directory"):
-            download_and_extract_antismash_data(self.antismash_id, tmp_path, tmp_path / "extracted")
+            download_and_extract_from_antismash_db(
+                self.antismash_id, tmp_path, tmp_path / "extracted"
+            )
 
     # test a non-existent ID, which can be either a fake ID, non-existent in NCBI
     # or a valid NCBI genome ID but it does not have BGC data in antismash database
@@ -44,6 +46,6 @@ class TestDownloadAndExtractAntismashData:
         extract_root.mkdir()
         for test_id in nonexisting_ids:
             with pytest.raises(RuntimeError):
-                download_and_extract_antismash_data(test_id, download_root, extract_root)
+                download_and_extract_from_antismash_db(test_id, download_root, extract_root)
             extracted_folder = extract_root / "antismash" / test_id
             assert not extracted_folder.exists()

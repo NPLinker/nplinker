@@ -2,6 +2,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import time
 import warnings
 from collections.abc import Mapping
 from collections.abc import Sequence
@@ -11,7 +12,11 @@ import httpx
 from bs4 import BeautifulSoup
 from jsonschema import validate
 from nplinker.defaults import GENOME_STATUS_FILENAME
-from nplinker.genomics.antismash import download_and_extract_antismash_data
+from nplinker.genomics.antismash import antismash_job_is_done
+from nplinker.genomics.antismash import download_and_extract_from_antismash_api
+from nplinker.genomics.antismash import download_and_extract_from_antismash_db
+from nplinker.genomics.antismash import download_and_extract_ncbi_genome
+from nplinker.genomics.antismash import submit_antismash_job
 from nplinker.schemas import GENOME_STATUS_SCHEMA
 
 
@@ -189,9 +194,31 @@ def podp_download_and_extract_antismash_data(
             logger.info(
                 f"antiSMASH BGC data for genome ID {gs.original_id} is downloaded and extracted"
             )
+            continue
         except Exception as e:
             logger.warning(
                 f"Failed to retrieve BGC data from antiSMASH-DB for {gs.original_id}. Error: {e}"
+            )
+
+        # retrieve antismash BGC by submitting antismash job via API
+        try:
+            logger.info(
+                f"Downloading genome and submitting antiSMASH job for genome ID {gs.original_id}."
+            )
+            genome_path = download_and_extract_ncbi_genome(
+                gs.resolved_refseq_id, project_download_root, project_extract_root
+            )
+            job_id = submit_antismash_job(genome_path)
+            while antismash_job_is_done(job_id) is False:
+                time.sleep(15)
+            retrieve_antismash_job_data(job_id, gs, project_download_root, project_extract_root)
+            logger.info(
+                f"antiSMASH BGC data for genome ID {gs.original_id} is downloaded and extracted"
+            )
+            continue
+        except Exception as e:
+            logger.warning(
+                f"Failed to retrieve BGC data by submitting a antiSMASH job for genome ID {gs.original_id}. Error: {e}"
             )
 
     # raise and log warning for failed downloads
@@ -286,13 +313,42 @@ def retrieve_antismash_db_data(
     extract_path = Path(extract_root, "antismash", antismash_id)
     download_path = Path(download_root, f"{antismash_id}.zip").absolute()
 
-    try:
-        download_and_extract_antismash_data(antismash_id, download_root, extract_root)
-        Path.touch(extract_path / "completed", exist_ok=True)
-        genome_status.bgc_path = str(download_path)
-    except Exception as e:
-        genome_status.bgc_path = ""
-        raise e
+    download_and_extract_from_antismash_db(antismash_id, download_root, extract_root)
+    Path.touch(extract_path / "completed", exist_ok=True)
+    genome_status.bgc_path = str(download_path)
+
+
+def retrieve_antismash_job_data(
+    job_id: str,
+    genome_status: GenomeStatus,
+    download_root: str | PathLike,
+    extract_root: str | PathLike,
+) -> None:
+    """Retrieve antiSMASH API data for a given genome and update its status.
+
+    This function downloads and extracts antiSMASH data for a genome identified
+    by its resolved RefSeq ID. It updates the `genome_status` object with the
+    path to the downloaded data or sets it to an empty string if an error occurs.
+
+    Args:
+        job_id (str): The job ID for the antiSMASH API job.
+        genome_status (GenomeStatus): An object representing the genome's status,
+            including its resolved RefSeq ID and BGC path.
+        download_root (str | PathLike): The root directory where the antiSMASH
+            data will be downloaded.
+        extract_root (str | PathLike): The root directory where the antiSMASH
+            data will be extracted.
+
+    Raises:
+        Exception: If an error occurs during the download or extraction process.
+    """
+    antismash_id = genome_status.resolved_refseq_id
+    extract_path = Path(extract_root, "antismash", antismash_id)
+    download_path = Path(download_root, f"{antismash_id}.zip").absolute()
+
+    download_and_extract_from_antismash_api(job_id, antismash_id, download_root, extract_root)
+    Path.touch(extract_path / "completed", exist_ok=True)
+    genome_status.bgc_path = str(download_path)
 
 
 def _resolve_genbank_accession(genbank_id: str) -> str:
