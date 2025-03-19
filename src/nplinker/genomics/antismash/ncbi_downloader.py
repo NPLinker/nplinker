@@ -108,7 +108,7 @@ def _download_genome(genome_assembly_acc, download_root, max_attempts):
         )
 
 
-def _verify_ncbi_dataset_md5_sums(extract_path: PathLike) -> bool:
+def _verify_ncbi_dataset_md5_sums(extract_path: PathLike) -> None:
     """Verify the integrity of files in a specified directory using MD5 checksums.
 
     This function reads an "md5sum.txt" file located in the given extraction path,
@@ -119,9 +119,6 @@ def _verify_ncbi_dataset_md5_sums(extract_path: PathLike) -> bool:
     Args:
         extract_path (PathLike): Path to the directory containing the files and
             the "md5sum.txt" file.
-
-    Returns:
-        bool: True if all files pass the MD5 checksum verification.
 
     Raises:
         ValueError: If the MD5 checksum of any file does not match the expected value.
