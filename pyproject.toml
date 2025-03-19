@@ -58,6 +58,7 @@ dev = [
     "mypy",
     "typing_extensions",
     # stub packages. Update the `format-typing-check.yml` too if you add more.
+    "types-requests",
     "types-beautifulsoup4",
     "types-jsonschema",
     "types-networkx",
