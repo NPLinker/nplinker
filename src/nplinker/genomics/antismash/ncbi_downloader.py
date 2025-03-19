@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def download_and_extract_ncbi_genome(
-    refseq_id: str,
+    genome_assembly_acc: str,
     download_root: str | PathLike,
     extract_root: str | PathLike,
     max_attempts: int = 10,
@@ -29,7 +29,7 @@ def download_and_extract_ncbi_genome(
     processing.
 
     Args:
-        refseq_id (str): The RefSeq ID for the dataset to be downloaded.
+        genome_assembly_acc (str): The NCBI accession of the genome assembly to be downloaded.
         download_root (str | PathLike): The directory where the dataset will be downloaded.
         extract_root (str | PathLike): The directory where the dataset will be extracted.
         max_attempts (int): The maximum number of download attempts. Defaults to 10.
@@ -43,12 +43,12 @@ def download_and_extract_ncbi_genome(
     """
     url = (
         "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/"
-        f"{refseq_id}/download?include_annotation_type=GENOME_GB"
+        f"{genome_assembly_acc}/download?include_annotation_type=GENOME_GB"
     )
 
     download_root = Path(download_root)
     extract_path = Path(extract_root) / "ncbi_genomes"
-    filename = f"ncbi_{refseq_id}.zip"
+    filename = f"ncbi_{genome_assembly_acc}.zip"
 
     extract_path.mkdir(parents=True, exist_ok=True)
 
@@ -70,8 +70,8 @@ def download_and_extract_ncbi_genome(
     verify_ncbi_dataset_md5_sums(extract_path)
 
     # Move and rename GenBank file
-    genbank_path = extract_path / "ncbi_dataset" / "data" / refseq_id / "genomic.gbff"
-    new_genbank_path = extract_path / f"{refseq_id}.gbff"
+    genbank_path = extract_path / "ncbi_dataset" / "data" / genome_assembly_acc / "genomic.gbff"
+    new_genbank_path = extract_path / f"{genome_assembly_acc}.gbff"
     genbank_path.rename(new_genbank_path)
 
     # Delete unnecessary files
