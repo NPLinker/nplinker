@@ -196,8 +196,9 @@ def podp_download_and_extract_antismash_data(
             )
             continue
         except Exception as e:
-            logger.warning(
-                f"Failed to retrieve BGC data from antiSMASH-DB for {gs.original_id}. Error: {e}"
+            logger.info(
+                f"Unable to retrieve BGC data from antiSMASH-DB for genome ID {gs.original_id}. "
+                f"Error: {e}"
             )
 
         # retrieve antismash BGC by submitting antismash job via API
@@ -218,9 +219,13 @@ def podp_download_and_extract_antismash_data(
             )
             continue
         except Exception as e:
-            logger.warning(
-                f"Failed to retrieve BGC data by submitting a antiSMASH job for genome ID {gs.original_id}. Error: {e}"
+            logger.info(
+                f"Unable to retrieve BGC data via antiSMASH API for genome ID {gs.original_id}. "
+                f"Error: {e}"
             )
+
+        if gs.bgc_path == "":
+            logger.warning(f"Failed to retrieve BGC data for genome ID {gs.original_id}.")
 
     # raise and log warning for failed downloads
     failed_ids = [gs.original_id for gs in gs_dict.values() if not gs.bgc_path]
