@@ -4,7 +4,6 @@ import shutil
 import time
 from os import PathLike
 from pathlib import Path
-from typing import Optional
 import httpx
 import requests
 from nplinker.utils import check_md5
@@ -20,7 +19,7 @@ def download_and_extract_ncbi_genome(
     download_root: str | PathLike,
     extract_root: str | PathLike,
     max_attempts: int = 10,
-) -> Optional[Path]:
+) -> Path:
     """Downloads and extracts an NCBI dataset for a given genome RefSeq ID.
 
     This function retrieves a dataset from the NCBI database using the provided
@@ -37,7 +36,7 @@ def download_and_extract_ncbi_genome(
         max_attempts (int): The maximum number of download attempts. Defaults to 10.
 
     Returns:
-        Optional[Path]: The path to the extracted GenBank file if successful, otherwise None.
+        Path: The path to the extracted GenBank file.
 
     Raises:
         RuntimeError: If the maximum number of retries is reached and the dataset
