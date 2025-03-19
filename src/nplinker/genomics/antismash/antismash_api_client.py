@@ -9,7 +9,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 
-def submit_antismash_job(genbank_filepath: str | PathLike) -> Optional[str]:
+def submit_antismash_job(genbank_filepath: str | PathLike) -> str:
     """Submits an antiSMASH job using the provided GenBank file.
 
     This function sends a GenBank file to the antiSMASH API
@@ -19,11 +19,11 @@ def submit_antismash_job(genbank_filepath: str | PathLike) -> Optional[str]:
         genbank_filepath (str | PathLike): The path to the GenBank file to be submitted.
 
     Returns:
-        Optional[str]: The job ID if the submission is successful, or None if it fails.
+        str: The job ID if the submission.
 
     Raises:
         requests.exceptions.RequestException: If there is an issue with the HTTP request.
-         RuntimeError: If the API response does not contain a job ID.
+        RuntimeError: If the API response does not contain a job ID.
     """
     url = "https://antismash.secondarymetabolites.org/api/v1.0/submit"
     genbank_filepath = Path(genbank_filepath)
