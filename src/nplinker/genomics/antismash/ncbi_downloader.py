@@ -19,26 +19,27 @@ def download_and_extract_ncbi_genome(
     extract_root: str | PathLike,
     max_attempts: int = 10,
 ) -> Optional[Path]:
-    """Downloads and extracts an NCBI dataset for a given genome refseq ID.
+    """Downloads and extracts an NCBI dataset for a given genome RefSeq ID.
 
-    This function attempts to download a dataset from the NCBI database using
-    the provided refseq ID. It retries the download process up to a maximum
-    number of times if any errors occur. The function verifies the integrity
-    of the downloaded files using MD5 checksums and moves and renames the
-    GenBank files upon successful verification.
+    This function retrieves a dataset from the NCBI database using the provided
+    RefSeq ID. It retries the download process up to a specified maximum number
+    of attempts in case of errors. The function verifies the integrity of the
+    downloaded files using MD5 checksums, extracts the dataset, and renames the
+    GenBank file for easier access. Unnecessary files are removed after successful
+    processing.
 
     Args:
-        refseq_id (str): The refseq ID for the dataset to be downloaded.
-        download_root (str or Path): The root directory where the dataset will be downloaded.
-        extract_root (str or Path): The root directory where the dataset will be extracted.
-        max_attempts (int): The maximum number of times to attempt downloading.
+        refseq_id (str): The RefSeq ID for the dataset to be downloaded.
+        download_root (str | PathLike): The directory where the dataset will be downloaded.
+        extract_root (str | PathLike): The directory where the dataset will be extracted.
+        max_attempts (int): The maximum number of download attempts. Defaults to 10.
 
     Returns:
-        Path: The path to the extracted dataset if successful, otherwise None.
+        Optional[Path]: The path to the extracted GenBank file if successful, otherwise None.
 
     Raises:
-        Exception: If the maximum number of retries is reached and the dataset could
-        not be successfully downloaded and extracted.
+        RuntimeError: If the maximum number of retries is reached and the dataset
+            could not be successfully downloaded and extracted.
     """
     url = (
         "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/"
