@@ -172,6 +172,7 @@ def _cleanup_extracted_files(extract_path: str | PathLike) -> None:
 
 
 def _prepare_extract_path(extract_path: str | PathLike) -> None:
+    extract_path = Path(extract_path)
     if extract_path.exists():
         _check_extract_path(extract_path)
     else:
