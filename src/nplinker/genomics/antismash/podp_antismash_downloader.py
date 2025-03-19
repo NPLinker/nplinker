@@ -211,6 +211,7 @@ def podp_download_and_extract_antismash_data(
                 gs.resolved_refseq_id, project_download_root, project_extract_root
             )
             job_id = submit_antismash_job(genome_path)
+            logger.info(f"Waiting for antiSMASH job {job_id} to complete.")
             while antismash_job_is_done(job_id) is False:
                 time.sleep(15)
             retrieve_antismash_job_data(job_id, gs, project_download_root, project_extract_root)
