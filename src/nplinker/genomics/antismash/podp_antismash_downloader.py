@@ -16,6 +16,7 @@ from nplinker.genomics.antismash import antismash_job_is_done
 from nplinker.genomics.antismash import download_and_extract_from_antismash_api
 from nplinker.genomics.antismash import download_and_extract_from_antismash_db
 from nplinker.genomics.antismash import download_and_extract_ncbi_genome
+from nplinker.genomics.antismash import extract_antismash_data
 from nplinker.genomics.antismash import submit_antismash_job
 from nplinker.schemas import GENOME_STATUS_SCHEMA
 
@@ -170,13 +171,23 @@ def podp_download_and_extract_antismash_data(
         # Retrieve or initialize the GenomeStatus object for the genome ID
         gs = gs_dict.setdefault(original_genome_id, GenomeStatus(original_genome_id))
 
-        # Skip genomes
+        # Check if genomes already have antiSMASH BGC data
         if gs.bgc_path and Path(gs.bgc_path).exists():
             logger.info(
                 f"antiSMASH BGC data for genome ID {original_genome_id} already downloaded to "
                 f"{gs.bgc_path}"
             )
-            continue
+            try:
+                process_existing_antismash_data(gs, project_extract_root)
+                continue
+            except Exception as e:
+                logger.warning(
+                    "Failed to process existing antiSMASH BGC data for genome ID "
+                    f"{original_genome_id}. Error: {e}"
+                )
+        gs.bgc_path = ""  # Reset bgc path
+
+        # Check if a previous attempt to get bgc data has failed
         if gs.resolve_attempted:
             logger.info(f"Genome ID {original_genome_id} skipped due to previous failed attempt")
             continue
@@ -294,6 +305,37 @@ def get_genome_assembly_accession(
 
     if genome_status.resolved_refseq_id == "":
         raise RuntimeError("Failed to get genome assembly accession")
+
+
+def process_existing_antismash_data(gs_obj: GenomeStatus, extract_root: str | PathLike) -> None:
+    """Processes already downloaded antiSMASH BGC data archive.
+
+    This function ensures that the antiSMASH data archive associated with a given genomic sequence
+    object is properly extracted into a specified directory. If the data has already been extracted,
+    the function skips the extraction process.
+
+    Args:
+        gs_obj: An object representing a genomic sequence, which contains the path
+                to the antiSMASH BGC data (accessible via `gs_obj.bgc_path`) and
+                an original identifier (`gs_obj.original_id`).
+        extract_root: The root directory where the antiSMASH data should be extracted.
+
+    Raises:
+        Any exceptions raised by the `extract_antismash_data` function if the extraction fails.
+    """
+    antismash_id = Path(gs_obj.bgc_path).stem
+    extract_path = Path(extract_root, "antismash", antismash_id)
+    completed_marker = extract_path / "completed"
+
+    # Check if archive is already successfully extracted
+    if completed_marker.exists():
+        logger.info(
+            f"antiSMASH BGC data for {gs_obj.original_id} already extracted at {extract_path}."
+        )
+        return
+
+    extract_antismash_data(gs_obj.bgc_path, extract_root, antismash_id)
+    completed_marker.touch(exist_ok=True)
 
 
 def retrieve_antismash_db_data(

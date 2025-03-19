@@ -6,6 +6,7 @@ from os import PathLike
 from pathlib import Path
 import requests
 from nplinker.utils import download_and_extract_archive
+from nplinker.utils import extract_archive
 from nplinker.utils import list_dirs
 from nplinker.utils import list_files
 
@@ -116,6 +117,40 @@ def download_and_extract_from_antismash_db(
 
     # if both urls give 404 not found
     raise RuntimeError(f"No results in antiSMASH DB for {refseq_acc}")
+
+
+def extract_antismash_data(
+    archive: str | PathLike, extract_root: str | PathLike, antimash_id: str
+) -> None:
+    """Extracts antiSMASH results from a given archive into a specified directory.
+
+    This function handles the extraction of antiSMASH results by preparing the
+    extraction path, extracting the archive, and performing cleanup of
+    unnecessary files. If an error occurs during the process, the partially
+    extracted files are removed, and the exception is re-raised.
+
+    Args:
+        archive (str | PathLike): The path to the archive file containing antiSMASH results.
+        extract_root (str | PathLike): The root directory where the data should
+            be extracted.
+        antimash_id (str): A unique identifier for the antiSMASH data, used to
+            create a subdirectory for the extracted files.
+
+    Raises:
+        Exception: If any error occurs during the extraction process, the
+            exception is re-raised after cleaning up the extraction directory.
+    """
+    extract_path = Path(extract_root) / "antismash" / antimash_id
+
+    _prepare_extract_path(extract_path)
+
+    try:
+        extract_archive(archive, extract_path, remove_finished=False)
+        _cleanup_extracted_files(extract_path)
+
+    except Exception as e:
+        shutil.rmtree(extract_path)
+        raise e
 
 
 def _check_extract_path(extract_path: Path):
