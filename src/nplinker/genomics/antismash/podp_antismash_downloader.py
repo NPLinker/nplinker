@@ -203,7 +203,8 @@ def podp_download_and_extract_antismash_data(
         # retrieve antismash BGC by submitting antismash job via API
         try:
             logger.info(
-                f"Downloading genome and submitting antiSMASH job for genome ID {gs.original_id}."
+                "Downloading genome assembly from NCBI and submitting antiSMASH job for "
+                f"genome ID {gs.original_id}."
             )
             genome_path = download_and_extract_ncbi_genome(
                 gs.resolved_refseq_id, project_download_root, project_extract_root
