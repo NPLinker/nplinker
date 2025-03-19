@@ -4,7 +4,7 @@ from nplinker.utils import extract_archive
 from nplinker.utils import list_files
 
 
-class TestDownloadAndExtractAntismashData:
+class TestDownloadAndExtractFromAntismashDb:
     antismash_id = "GCF_004339725.1"
 
     def test_default(self, tmp_path):
