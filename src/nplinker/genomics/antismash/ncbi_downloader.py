@@ -49,7 +49,7 @@ def download_and_extract_ncbi_genome(
     _check_genome_accession_validity(genome_assembly_acc)
     archive = _download_genome(genome_assembly_acc, download_root, max_attempts)
     extract_archive(archive, extract_path)
-    verify_ncbi_dataset_md5_sums(extract_path)
+    _verify_ncbi_dataset_md5_sums(extract_path)
 
     # Move and rename GenBank file
     genbank_path = extract_path / "ncbi_dataset" / "data" / genome_assembly_acc / "genomic.gbff"
@@ -64,7 +64,7 @@ def download_and_extract_ncbi_genome(
     return new_genbank_path
 
 
-def verify_ncbi_dataset_md5_sums(extract_path: PathLike) -> bool:
+def _verify_ncbi_dataset_md5_sums(extract_path: PathLike) -> bool:
     """Verify the integrity of files in a specified directory using MD5 checksums.
 
     This function reads an "md5sum.txt" file located in the given extraction path,
