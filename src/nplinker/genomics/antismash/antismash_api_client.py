@@ -18,7 +18,7 @@ def submit_antismash_job(genbank_filepath: str | PathLike) -> str:
         genbank_filepath (str | PathLike): The path to the GenBank file to be submitted.
 
     Returns:
-        str: The job ID if the submission.
+        str: The job ID of the submitted antiSMASH job.
 
     Raises:
         requests.exceptions.RequestException: If there is an issue with the HTTP request.
