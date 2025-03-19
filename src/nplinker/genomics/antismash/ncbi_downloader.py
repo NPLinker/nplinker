@@ -64,32 +64,6 @@ def download_and_extract_ncbi_genome(
     return new_genbank_path
 
 
-def _verify_ncbi_dataset_md5_sums(extract_path: PathLike) -> bool:
-    """Verify the integrity of files in a specified directory using MD5 checksums.
-
-    This function reads an "md5sum.txt" file located in the given extraction path,
-    which contains MD5 checksums and corresponding file names. It then computes
-    the MD5 checksum for each file and compares it with the expected value. If any
-    file's checksum does not match, a `ValueError` is raised.
-
-    Args:
-        extract_path (PathLike): Path to the directory containing the files and
-            the "md5sum.txt" file.
-
-    Returns:
-        bool: True if all files pass the MD5 checksum verification.
-
-    Raises:
-        ValueError: If the MD5 checksum of any file does not match the expected value.
-    """
-    with open(extract_path / "md5sum.txt", "r") as f:
-        for line in f:
-            md5sum, file_name = line.strip().split()
-            file_path = extract_path / file_name
-            if not check_md5(file_path, md5sum):
-                raise ValueError(f"MD5 checksum mismatch for {file_path}")
-
-
 def _check_genome_accession_validity(genome_assembly_acc, max_attempts=10):
     """Check the validity of genome accessio."""
     url = f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{genome_assembly_acc}/check"
@@ -133,3 +107,29 @@ def _download_genome(genome_assembly_acc, download_root, max_attempts):
             f"Failed to download the genome {genome_assembly_acc} from NCBI. "
             f"Maximum download retries ({max_attempts}) reached for {url}."
         )
+
+
+def _verify_ncbi_dataset_md5_sums(extract_path: PathLike) -> bool:
+    """Verify the integrity of files in a specified directory using MD5 checksums.
+
+    This function reads an "md5sum.txt" file located in the given extraction path,
+    which contains MD5 checksums and corresponding file names. It then computes
+    the MD5 checksum for each file and compares it with the expected value. If any
+    file's checksum does not match, a `ValueError` is raised.
+
+    Args:
+        extract_path (PathLike): Path to the directory containing the files and
+            the "md5sum.txt" file.
+
+    Returns:
+        bool: True if all files pass the MD5 checksum verification.
+
+    Raises:
+        ValueError: If the MD5 checksum of any file does not match the expected value.
+    """
+    with open(extract_path / "md5sum.txt", "r") as f:
+        for line in f:
+            md5sum, file_name = line.strip().split()
+            file_path = extract_path / file_name
+            if not check_md5(file_path, md5sum):
+                raise ValueError(f"MD5 checksum mismatch for {file_path}")
