@@ -2,7 +2,6 @@ from __future__ import annotations
 import logging
 from os import PathLike
 from pathlib import Path
-from typing import Optional
 import requests
 
 
@@ -36,60 +35,45 @@ def submit_antismash_job(genbank_filepath: str | PathLike) -> str:
     data = response.json()
     if "id" not in data:
         raise RuntimeError("No antiSMASH job ID returned")
-    return data["id"]
-
-
-def query_antismash_job(job_id: str) -> Optional[dict]:
-    """Gets the status of an antiSMASH job.
-
-    Args:
-        job_id (str): The job ID to query.
-
-    Returns:
-        dict: The response JSON if successful, otherwise None.
-    """
-    url = f"https://antismash.secondarymetabolites.org/api/v1.0/status/{job_id}"
-
-    try:
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()  # Raise an exception for HTTP errors
-        return response.json()
-
-    except requests.exceptions.RequestException as req_err:
-        logger.error(f"Request failed for job_id {job_id}: {req_err}")
-    except ValueError as json_err:  # Handles JSON decoding errors
-        logger.error(f"Invalid JSON response for job_id {job_id}: {json_err}")
-    except Exception as err:
-        logger.error(f"Unexpected error while getting job state for job_id {job_id}: {err}")
+    return str(data["id"])
 
 
 def antismash_job_is_done(job_id: str) -> bool:
-    """Checks if the antiSMASH job is complete by polling the job status.
+    """Determines if the antiSMASH job has completed by checking its status.
+
+    This function queries the antiSMASH API to retrieve the current state
+    of the job and determines whether it has finished successfully, is still
+    in progress, or has encountered an error.
 
     Args:
-        job_id (str): The job ID to query.
+        job_id (str): The unique identifier of the antiSMASH job.
 
     Returns:
-        bool: True if the job is done, False if the job is still running.
+        bool: True if the job is completed successfully, False if it is still
+            running or queued.
 
     Raises:
-        RuntimeError: If the job status could not be retrieved or if the job failed.
-        ValueError: If the job state is missing or unexpected in the response.
+        RuntimeError: If the job has failed or if the API response indicates an error.
+        ValueError: If the job state is missing or an unexpected state is encountered
+            in the API response.
+        requests.exceptions.HTTPError: If an HTTP error occurs during the API request.
     """
-    response = query_antismash_job(job_id)
+    url = f"https://antismash.secondarymetabolites.org/api/v1.0/status/{job_id}"
 
-    if response is None:
-        raise RuntimeError(f"Failed to retrieve job status for job_id {job_id}")
-    if "state" not in response:
+    response = requests.get(url, timeout=10)
+    response.raise_for_status()  # Raise exception for HTTP errors
+    respose_data = response.json()
+
+    if "state" not in respose_data:
         raise ValueError(f"Job state missing in response for job_id: {job_id}")
 
-    job_state = response["state"]
+    job_state = respose_data["state"]
     if job_state in ("running", "queued"):
         return False
     if job_state == "done":
         return True
     if job_state == "failed":
-        job_status = response.get("status", "No error message provided")
+        job_status = respose_data.get("status", "No error message provided")
         raise RuntimeError(f"AntiSMASH job {job_id} failed with an error: {job_status}")
     else:
         raise ValueError(
