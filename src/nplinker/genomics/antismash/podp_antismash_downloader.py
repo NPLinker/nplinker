@@ -328,6 +328,12 @@ def retrieve_antismash_db_data(
     Raises:
         Exception: If an error occurs during the download or extraction process.
     """
+    if not genome_status.resolved_id.startswith("GCF_"):
+        raise ValueError(
+            f"Resolved genome ID '{genome_status.resolved_id}' is not a valid RefSeq assembly and "
+            "antiSMASH-DB only contains results for RefSeq assemblies."
+        )
+
     antismash_id = genome_status.resolved_id
     extract_path = Path(extract_root, "antismash", antismash_id)
     download_path = Path(download_root, f"{antismash_id}.zip").absolute()
