@@ -21,10 +21,10 @@ def download_and_extract_ncbi_genome(
     extract_root: str | PathLike,
     max_attempts: int = 10,
 ) -> Path:
-    """Downloads and extracts an NCBI dataset for a given genome RefSeq ID.
+    """Downloads and extracts an NCBI dataset for a given genome assembly accession.
 
     This function retrieves a dataset from the NCBI database using the provided
-    RefSeq ID. It retries the download process up to a specified maximum number
+    genome assembly accession. It retries the download process up to a specified maximum number
     of attempts in case of errors. The function verifies the integrity of the
     downloaded files using MD5 checksums, extracts the dataset, and renames the
     GenBank file for easier access. Unnecessary files are removed after successful

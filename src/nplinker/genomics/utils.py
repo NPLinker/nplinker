@@ -276,7 +276,7 @@ def extract_mappings_original_genome_id_resolved_genome_id(
             Generate strain mappings JSON file for PODP pipeline.
     """
     gs_mappings_dict = GenomeStatus.read_json(genome_status_json_file)
-    return {gs.original_id: gs.resolved_refseq_id for gs in gs_mappings_dict.values()}
+    return {gs.original_id: gs.resolved_id for gs in gs_mappings_dict.values()}
 
 
 def extract_mappings_resolved_genome_id_bgc_id(

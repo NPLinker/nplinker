@@ -37,7 +37,7 @@ class GenomeStatus:
     def __init__(
         self,
         original_id: str,
-        resolved_refseq_id: str = "",
+        resolved_id: str = "",
         resolve_attempted: bool = False,
         bgc_path: str = "",
     ):
@@ -45,15 +45,14 @@ class GenomeStatus:
 
         Args:
             original_id: The original ID of the genome.
-            resolved_refseq_id: The resolved RefSeq ID of the
-                genome. Defaults to "".
-            resolve_attempted: A flag indicating whether an
-                attempt to resolve the RefSeq ID has been made. Defaults to False.
+            resolved_id: The resolved genome ID of the genome. Defaults to "".
+            resolve_attempted: A flag indicating whether an attempt to resolve
+                the genome ID has been made. Defaults to False.
             bgc_path: The path to the downloaded BGC file for
                 the genome. Defaults to "".
         """
         self.original_id = original_id
-        self.resolved_refseq_id = "" if resolved_refseq_id == "None" else resolved_refseq_id
+        self.resolved_id = "" if resolved_id == "None" else resolved_id
         self.resolve_attempted = resolve_attempted
         self.bgc_path = bgc_path
 
@@ -118,7 +117,7 @@ class GenomeStatus:
         """Convert the GenomeStatus object to a dict."""
         return {
             "original_id": self.original_id,
-            "resolved_refseq_id": self.resolved_refseq_id,
+            "resolved_id": self.resolved_id,
             "resolve_attempted": self.resolve_attempted,
             "bgc_path": self.bgc_path,
         }
@@ -192,7 +191,7 @@ def podp_download_and_extract_antismash_data(
 
         # resolve genome ID
         try:
-            gs.resolved_refseq_id = resolve_genome_accession(genome_record["genome_ID"])
+            gs.resolved_id = resolve_genome_accession(genome_record["genome_ID"])
             gs.resolve_attempted = True
         except Exception as e:
             logger.warning(f"Failed to resolve genome ID {gs.original_id}. Error: {e}")
@@ -218,7 +217,7 @@ def podp_download_and_extract_antismash_data(
                 f"genome ID {gs.original_id}."
             )
             genome_path = download_and_extract_ncbi_genome(
-                gs.resolved_refseq_id, project_download_root, project_extract_root
+                gs.resolved_id, project_download_root, project_extract_root
             )
             job_id = submit_antismash_job(genome_path)
             logger.info(f"Waiting for antiSMASH job {job_id} to complete.")
@@ -315,12 +314,12 @@ def retrieve_antismash_db_data(
     """Retrieve antiSMASH database data for a given genome and update its status.
 
     This function downloads and extracts antiSMASH data for a genome identified
-    by its resolved RefSeq ID. It updates the `genome_status` object with the
+    by its resolved genome ID. It updates the `genome_status` object with the
     path to the downloaded data or sets it to an empty string if an error occurs.
 
     Args:
         genome_status (GenomeStatus): An object representing the genome's status,
-            including its resolved RefSeq ID and BGC path.
+            including its resolved genome ID and BGC path.
         download_root (str | PathLike): The root directory where the antiSMASH
             data will be downloaded.
         extract_root (str | PathLike): The root directory where the antiSMASH
@@ -329,7 +328,7 @@ def retrieve_antismash_db_data(
     Raises:
         Exception: If an error occurs during the download or extraction process.
     """
-    antismash_id = genome_status.resolved_refseq_id
+    antismash_id = genome_status.resolved_id
     extract_path = Path(extract_root, "antismash", antismash_id)
     download_path = Path(download_root, f"{antismash_id}.zip").absolute()
 
@@ -347,13 +346,13 @@ def retrieve_antismash_job_data(
     """Retrieve antiSMASH API data for a given genome and update its status.
 
     This function downloads and extracts antiSMASH data for a genome identified
-    by its resolved RefSeq ID. It updates the `genome_status` object with the
+    by its resolved genome ID. It updates the `genome_status` object with the
     path to the downloaded data or sets it to an empty string if an error occurs.
 
     Args:
         job_id (str): The job ID for the antiSMASH API job.
         genome_status (GenomeStatus): An object representing the genome's status,
-            including its resolved RefSeq ID and BGC path.
+            including its resolved genome ID and BGC path.
         download_root (str | PathLike): The root directory where the antiSMASH
             data will be downloaded.
         extract_root (str | PathLike): The root directory where the antiSMASH
@@ -362,7 +361,7 @@ def retrieve_antismash_job_data(
     Raises:
         Exception: If an error occurs during the download or extraction process.
     """
-    antismash_id = genome_status.resolved_refseq_id
+    antismash_id = genome_status.resolved_id
     extract_path = Path(extract_root, "antismash", antismash_id)
     download_path = Path(download_root, f"{antismash_id}.zip").absolute()
 

@@ -17,7 +17,7 @@
         "type": "object",
         "required": [
           "original_id",
-          "resolved_refseq_id",
+          "resolved_id",
           "resolve_attempted",
           "bgc_path"
         ],
@@ -28,10 +28,10 @@
             "description": "The original ID of the genome",
             "minLength": 1
           },
-          "resolved_refseq_id": {
+          "resolved_id": {
             "type": "string",
-            "title": "Resolved RefSeq ID",
-            "description": "The RefSeq ID that was resolved for this genome"
+            "title": "Resolved genome ID",
+            "description": "The genome ID that was resolved for this genome"
           },
           "resolve_attempted": {
             "type": "boolean",
