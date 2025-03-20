@@ -238,10 +238,9 @@ def podp_download_and_extract_antismash_data(
                 f"Error: {e}"
             )
 
-        if gs.bgc_path == "":
-            logger.warning(f"Failed to retrieve BGC data for genome ID {gs.original_id}.")
-            gs.failed_previously = True
-            GenomeStatus.to_json(gs_dict, gs_file)
+        logger.warning(f"Failed to retrieve BGC data for genome ID {gs.original_id}.")
+        gs.failed_previously = True
+        GenomeStatus.to_json(gs_dict, gs_file)
 
     # raise and log warning for failed downloads
     failed_ids = [gs.original_id for gs in gs_dict.values() if not gs.bgc_path]
