@@ -187,6 +187,7 @@ def podp_download_and_extract_antismash_data(
         # Check if a previous attempt to get bgc data has failed
         if gs.failed_previously:
             logger.info(f"Genome ID {original_genome_id} skipped due to previous failed attempt")
+            GenomeStatus.to_json(gs_dict, gs_file)
             continue
 
         # resolve genome ID
@@ -195,6 +196,7 @@ def podp_download_and_extract_antismash_data(
         except Exception as e:
             logger.warning(f"Failed to resolve genome ID {gs.original_id}. Error: {e}")
             gs.failed_previously = True
+            GenomeStatus.to_json(gs_dict, gs_file)
             continue
 
         # retrieve antismash BGC data from antiSMASH-DB
@@ -203,6 +205,7 @@ def podp_download_and_extract_antismash_data(
             logger.info(
                 f"antiSMASH BGC data for genome ID {gs.original_id} is downloaded and extracted"
             )
+            GenomeStatus.to_json(gs_dict, gs_file)
             continue
         except Exception as e:
             logger.info(
@@ -227,6 +230,7 @@ def podp_download_and_extract_antismash_data(
             logger.info(
                 f"antiSMASH BGC data for genome ID {gs.original_id} is downloaded and extracted"
             )
+            GenomeStatus.to_json(gs_dict, gs_file)
             continue
         except Exception as e:
             logger.info(
@@ -237,6 +241,7 @@ def podp_download_and_extract_antismash_data(
         if gs.bgc_path == "":
             logger.warning(f"Failed to retrieve BGC data for genome ID {gs.original_id}.")
             gs.failed_previously = True
+            GenomeStatus.to_json(gs_dict, gs_file)
 
     # raise and log warning for failed downloads
     failed_ids = [gs.original_id for gs in gs_dict.values() if not gs.bgc_path]
@@ -246,9 +251,6 @@ def podp_download_and_extract_antismash_data(
         )
         logger.warning(warning_message)
         warnings.warn(warning_message, UserWarning)
-
-    # save updated genome status to json file
-    GenomeStatus.to_json(gs_dict, gs_file)
 
     if len(failed_ids) == len(genome_records):
         raise ValueError("No antiSMASH data found for any genome")
