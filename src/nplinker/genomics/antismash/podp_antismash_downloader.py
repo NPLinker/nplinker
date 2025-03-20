@@ -38,7 +38,7 @@ class GenomeStatus:
         self,
         original_id: str,
         resolved_id: str = "",
-        resolve_attempted: bool = False,
+        failed_previously: bool = False,
         bgc_path: str = "",
     ):
         """Initialize a GenomeStatus object for the given genome.
@@ -46,14 +46,14 @@ class GenomeStatus:
         Args:
             original_id: The original ID of the genome.
             resolved_id: The resolved genome ID of the genome. Defaults to "".
-            resolve_attempted: A flag indicating whether an attempt to resolve
-                the genome ID has been made. Defaults to False.
+            failed_previously: Indicates whether a previous attempt to get BGC data
+                for the genome has failed. Defaults to False.
             bgc_path: The path to the downloaded BGC file for
                 the genome. Defaults to "".
         """
         self.original_id = original_id
         self.resolved_id = "" if resolved_id == "None" else resolved_id
-        self.resolve_attempted = resolve_attempted
+        self.failed_previously = failed_previously
         self.bgc_path = bgc_path
 
     @staticmethod
@@ -118,7 +118,7 @@ class GenomeStatus:
         return {
             "original_id": self.original_id,
             "resolved_id": self.resolved_id,
-            "resolve_attempted": self.resolve_attempted,
+            "failed_previously": self.failed_previously,
             "bgc_path": self.bgc_path,
         }
 
@@ -185,16 +185,16 @@ def podp_download_and_extract_antismash_data(
         gs.bgc_path = ""  # Reset bgc path
 
         # Check if a previous attempt to get bgc data has failed
-        if gs.resolve_attempted:
+        if gs.failed_previously:
             logger.info(f"Genome ID {original_genome_id} skipped due to previous failed attempt")
             continue
 
         # resolve genome ID
         try:
             gs.resolved_id = resolve_genome_accession(genome_record["genome_ID"])
-            gs.resolve_attempted = True
         except Exception as e:
             logger.warning(f"Failed to resolve genome ID {gs.original_id}. Error: {e}")
+            gs.failed_previously = True
             continue
 
         # retrieve antismash BGC data from antiSMASH-DB
@@ -236,6 +236,7 @@ def podp_download_and_extract_antismash_data(
 
         if gs.bgc_path == "":
             logger.warning(f"Failed to retrieve BGC data for genome ID {gs.original_id}.")
+            gs.failed_previously = True
 
     # raise and log warning for failed downloads
     failed_ids = [gs.original_id for gs in gs_dict.values() if not gs.bgc_path]

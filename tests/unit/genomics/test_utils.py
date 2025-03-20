@@ -193,19 +193,19 @@ def test_extract_mappings_original_genome_id_resolved_genome_id(tmp_path):
             {
                 "original_id": "id1",
                 "resolved_id": "refseq1",
-                "resolve_attempted": True,
+                "failed_previously": True,
                 "bgc_path": "",
             },
             {
                 "original_id": "id2",
                 "resolved_id": "refseq2",
-                "resolve_attempted": True,
+                "failed_previously": True,
                 "bgc_path": "",
             },
             {
                 "original_id": "id3",
                 "resolved_id": "refseq3",
-                "resolve_attempted": True,
+                "failed_previously": True,
                 "bgc_path": "",
             },
         ],
