@@ -41,7 +41,7 @@ jobs:
             types-networkx types-tabulate types-PyYAML pandas-stubs
       - name: Get all changed python files
         id: changed-python-files
-        uses: tj-actions/changed-files@v44
+        uses: tj-actions/changed-files@v46
         with:
           files: |
              **.py
