@@ -1,15 +1,12 @@
 from __future__ import annotations
 import json
 import logging
-import re
 import time
 import warnings
 from collections.abc import Mapping
 from collections.abc import Sequence
 from os import PathLike
 from pathlib import Path
-import httpx
-from bs4 import BeautifulSoup
 from jsonschema import validate
 from nplinker.defaults import GENOME_STATUS_FILENAME
 from nplinker.genomics.antismash import antismash_job_is_done
@@ -17,6 +14,7 @@ from nplinker.genomics.antismash import download_and_extract_from_antismash_api
 from nplinker.genomics.antismash import download_and_extract_from_antismash_db
 from nplinker.genomics.antismash import download_and_extract_ncbi_genome
 from nplinker.genomics.antismash import extract_antismash_data
+from nplinker.genomics.antismash import resolve_genome_accession
 from nplinker.genomics.antismash import submit_antismash_job
 from nplinker.schemas import GENOME_STATUS_SCHEMA
 
@@ -194,7 +192,8 @@ def podp_download_and_extract_antismash_data(
 
         # resolve genome ID
         try:
-            get_genome_assembly_accession(gs, genome_record["genome_ID"])
+            gs.resolved_refseq_id = resolve_genome_accession(genome_record["genome_ID"])
+            gs.resolve_attempted = True
         except Exception as e:
             logger.warning(f"Failed to resolve genome ID {gs.original_id}. Error: {e}")
             continue
@@ -277,34 +276,6 @@ def get_best_available_genome_id(genome_id_data: Mapping[str, str]) -> str | Non
         logger.warning(f"Failed to get valid genome ID in genome data: {genome_id_data}")
         return None
     return best_id
-
-
-def get_genome_assembly_accession(
-    genome_status: GenomeStatus, genome_id_data: Mapping[str, str]
-) -> None:
-    """Resolve and update the genome assembly accession for a given genome status.
-
-    This function attempts to resolve the RefSeq ID for the provided genome record
-    and updates the `genome_status` object with the resolved ID. It also sets the
-    `resolve_attempted` flag to `True` to indicate that an attempt to resolve the
-    RefSeq ID has been made. If the resolution fails, raises a RuntimeError and leaves
-    the `resolved_refseq_id` empty.
-
-    Args:
-        genome_status (GenomeStatus): An object representing the status of the genome,
-            which will be updated with the resolved RefSeq ID.
-        genome_id_data (Mapping[str, str]): A dictionary containing genome
-            information, where keys like "RefSeq_accession", "GenBank_accession",
-            or "JGI_Genome_ID" are used to resolve the RefSeq ID.
-
-    Raises:
-        RuntimeError: If the RefSeq ID cannot be resolved.
-    """
-    genome_status.resolved_refseq_id = _resolve_refseq_id(genome_id_data)
-    genome_status.resolve_attempted = True
-
-    if genome_status.resolved_refseq_id == "":
-        raise RuntimeError("Failed to get genome assembly accession")
 
 
 def process_existing_antismash_data(gs_obj: GenomeStatus, extract_root: str | PathLike) -> None:
@@ -398,124 +369,3 @@ def retrieve_antismash_job_data(
     download_and_extract_from_antismash_api(job_id, antismash_id, download_root, extract_root)
     Path.touch(extract_path / "completed", exist_ok=True)
     genome_status.bgc_path = str(download_path)
-
-
-def _resolve_genbank_accession(genbank_id: str) -> str:
-    """Try to get RefSeq assembly id through given GenBank assembly id.
-
-    Note that GenBank assembly accession starts with "GCA_" and RefSeq assembly
-    accession starts with "GCF_". For more info, see
-    https://www.ncbi.nlm.nih.gov/datasets/docs/v2/troubleshooting/faq
-
-    Args:
-        genbank_id: ID for GenBank assembly accession.
-
-    Raises:
-        httpx.ReadTimeout: If the request times out.
-
-    Returns:
-        RefSeq assembly ID if the search is successful, otherwise an empty string.
-    """
-    logger.info(
-        f"Attempting to resolve Genbank assembly accession {genbank_id} to RefSeq accession"
-    )
-    # NCBI Datasets API https://www.ncbi.nlm.nih.gov/datasets/docs/v2/api/
-    # Note that there is a API rate limit of 5 requests per second without using an API key
-    # For more info, see https://www.ncbi.nlm.nih.gov/datasets/docs/v2/troubleshooting/faq/
-
-    # API for getting revision history of a genome assembly
-    # For schema, see https://www.ncbi.nlm.nih.gov/datasets/docs/v2/api/rest-api/#get-/genome/accession/-accession-/revision_history
-    url = f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{genbank_id}/revision_history"
-
-    refseq_id = ""
-    try:
-        resp = httpx.get(
-            url, headers={"User-Agent": USER_AGENT}, timeout=10.0, follow_redirects=True
-        )
-        resp.raise_for_status()
-
-        data = resp.json()
-        if not data:
-            raise ValueError("No Assembly Revision data found")
-
-        assembly_entries = [
-            entry for entry in data["assembly_revisions"] if "refseq_accession" in entry
-        ]
-        if not assembly_entries:
-            raise ValueError("No RefSeq assembly accession found")
-
-        latest_entry = max(assembly_entries, key=lambda x: x["release_date"])
-        refseq_id = latest_entry["refseq_accession"]
-
-    except httpx.RequestError as exc:
-        logger.warning(f"An error occurred while requesting {exc.request.url!r}: {exc}")
-    except httpx.HTTPStatusError as exc:
-        logger.warning(
-            f"Error response {exc.response.status_code} while requesting {exc.request.url!r}"
-        )
-    except httpx.ReadTimeout:
-        logger.warning("Timed out waiting for result of GenBank assembly lookup")
-    except ValueError as exc:
-        logger.warning(f"Error while resolving GenBank assembly accession {genbank_id}: {exc}")
-
-    return refseq_id
-
-
-def _resolve_jgi_accession(jgi_id: str) -> str:
-    """Try to get RefSeq id through given JGI id.
-
-    Args:
-        jgi_id: JGI_Genome_ID for GenBank accession.
-
-    Returns:
-        RefSeq ID if search is successful, otherwise an empty string.
-    """
-    url = JGI_GENOME_LOOKUP_URL.format(jgi_id)
-    logger.info(f"Attempting to resolve JGI_Genome_ID {jgi_id} to GenBank accession via {url}")
-    # no User-Agent header produces a 403 Forbidden error on this site...
-    try:
-        resp = httpx.get(
-            url, headers={"User-Agent": USER_AGENT}, timeout=10.0, follow_redirects=True
-        )
-    except httpx.ReadTimeout:
-        logger.warning("Timed out waiting for result of JGI_Genome_ID lookup")
-        return ""
-
-    soup = BeautifulSoup(resp.content, "html.parser")
-    # Find the table entry giving the "NCBI Assembly Accession" ID
-    link = soup.find("a", href=re.compile("https://www.ncbi.nlm.nih.gov/datasets/genome/.*"))
-    if link is None:
-        return ""
-
-    assembly_id = link.text
-    # check if the assembly ID is already a RefSeq ID
-    if assembly_id.startswith("GCF_"):
-        return assembly_id  # type: ignore
-    else:
-        return _resolve_genbank_accession(assembly_id)
-
-
-def _resolve_refseq_id(genome_id_data: Mapping[str, str]) -> str:
-    """Get the RefSeq ID to which the genome accession is linked.
-
-    Check https://pairedomicsdata.bioinformatics.nl/schema.json.
-
-    Args:
-        genome_id_data: dictionary containing information
-        for each genome record present.
-
-    Returns:
-        RefSeq ID if present, otherwise an empty string.
-    """
-    if "RefSeq_accession" in genome_id_data:
-        # best case, can use this directly
-        return genome_id_data["RefSeq_accession"]
-    if "GenBank_accession" in genome_id_data:
-        # resolve via NCBI
-        return _resolve_genbank_accession(genome_id_data["GenBank_accession"])
-    if "JGI_Genome_ID" in genome_id_data:
-        # resolve via JGI => NCBI
-        return _resolve_jgi_accession(genome_id_data["JGI_Genome_ID"])
-
-    logger.warning(f"Unable to resolve genome_ID: {genome_id_data}")
-    return ""
