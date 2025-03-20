@@ -215,7 +215,7 @@ def test_caching(download_root, extract_root, genome_status_file, caplog):
     genome_status_old = GenomeStatus.read_json(genome_status_file)
     genome_obj = genome_status_old["GCF_000016425.1"]
     assert Path(genome_obj.bgc_path).exists()
-    assert genome_obj.failed_previously
+    assert genome_obj.failed_previously is False
     podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
     assert (
         f"antiSMASH BGC data for genome ID {genome_obj.original_id} already downloaded to {genome_obj.bgc_path}"
