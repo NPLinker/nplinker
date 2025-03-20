@@ -1,6 +1,7 @@
 import logging
 import re
 from typing import Any
+from typing import Callable
 from typing import Literal
 import httpx
 from bs4 import BeautifulSoup
@@ -39,7 +40,7 @@ def get_latest_assembly_accession(acc: str) -> str:
         revisions_with_acc = [entry for entry in assembly_revisions if acc_type in entry]
         if revisions_with_acc:
             latest_revision = max(revisions_with_acc, key=lambda x: x["release_date"])
-            return latest_revision[acc_type]
+            return str(latest_revision[acc_type])
 
     raise ValueError("No valid genome accession found in assembly revision history")
 
@@ -78,7 +79,7 @@ def resolve_genome_accession(genome_id_data: dict) -> str:
         Warning messages if a resolver fails for a specific ID type.
     """
     resolver_priority = ["RefSeq_accession", "GenBank_accession", "JGI_Genome_ID"]
-    resolvers: dict[str, callable] = {
+    resolvers: dict[str, Callable] = {
         "RefSeq_accession": _resolve_refseq,
         "GenBank_accession": _resolve_genbank,
         "JGI_Genome_ID": _resolve_jgi,
@@ -90,7 +91,8 @@ def resolve_genome_accession(genome_id_data: dict) -> str:
 
         resolver = resolvers[id_type]
         try:
-            return resolver(genome_id_data[id_type].strip())
+            genome_id = genome_id_data[id_type].strip()
+            return str(resolver(genome_id))
         except Exception as e:
             logger.warning(f"Failed to resolve {id_type}: {e}")
 
@@ -151,6 +153,8 @@ def _get_revision_history(assembly_acc: str) -> dict[str, Any]:
     revision_history = resp.json()
     if not revision_history:
         raise ValueError(f"No Assembly Revision data found for {assembly_acc}")
+    if not isinstance(revision_history, dict):
+        raise ValueError(f"Unexpected response format: {type(revision_history)}")
     return revision_history
 
 
