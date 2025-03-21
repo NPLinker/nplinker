@@ -171,7 +171,7 @@ def podp_download_and_extract_antismash_data(
         # Check if genomes already have antiSMASH BGC data
         if gs.bgc_path and Path(gs.bgc_path).exists():
             logger.info(
-                f"antiSMASH BGC data for genome ID {original_genome_id} already downloaded to "
+                f"antiSMASH BGC data for genome ID {gs.original_id} already downloaded to "
                 f"{gs.bgc_path}"
             )
             try:
@@ -180,13 +180,13 @@ def podp_download_and_extract_antismash_data(
             except Exception as e:
                 logger.warning(
                     "Failed to process existing antiSMASH BGC data for genome ID "
-                    f"{original_genome_id}. Error: {e}"
+                    f"{gs.original_id}. Error: {e}"
                 )
         gs.bgc_path = ""  # Reset bgc path
 
         # Check if a previous attempt to get bgc data has failed
         if gs.failed_previously:
-            logger.info(f"Genome ID {original_genome_id} skipped due to previous failed attempt")
+            logger.info(f"Genome ID {gs.original_id} skipped due to previous failed attempt")
             GenomeStatus.to_json(gs_dict, gs_file)
             continue
 
@@ -203,7 +203,7 @@ def podp_download_and_extract_antismash_data(
         bgc_path = Path(project_download_root, f"{gs.resolved_id}.zip").absolute()
         if bgc_path.exists():
             logger.info(
-                f"antiSMASH BGC data for genome ID {original_genome_id} already downloaded to "
+                f"antiSMASH BGC data for genome ID {gs.original_id} already downloaded to "
                 f"{bgc_path}"
             )
             try:
@@ -214,7 +214,7 @@ def podp_download_and_extract_antismash_data(
             except Exception as e:
                 logger.warning(
                     "Failed to process existing antiSMASH BGC data for genome ID "
-                    f"{original_genome_id}. Error: {e}"
+                    f"{gs.original_id}. Error: {e}"
                 )
                 gs.bgc_path = ""
 
