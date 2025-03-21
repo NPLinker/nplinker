@@ -3,6 +3,7 @@ import re
 from typing import Any
 from typing import Callable
 from typing import Literal
+from typing import Mapping
 import httpx
 from bs4 import BeautifulSoup
 
@@ -45,7 +46,7 @@ def get_latest_assembly_accession(acc: str) -> str:
     raise ValueError("No valid genome accession found in assembly revision history")
 
 
-def resolve_genome_accession(genome_id_data: dict) -> str:
+def resolve_genome_accession(genome_id_data: Mapping[Any, Any]) -> str:
     """Gets the NCBI genome assembly accession.
 
     Gets the latest RefSeq genome assembly accession, or if not available,
