@@ -157,7 +157,7 @@ def podp_download_and_extract_antismash_data(
 
     for i, genome_record in enumerate(genome_records):
         logger.info(
-            f"Getting antismash BGC data for genome record {i + 1} of {len(genome_records)}."
+            f"Getting antiSMASH BGC data for genome record {i + 1} of {len(genome_records)}."
         )
 
         # get the best available genome ID from the dict
@@ -199,7 +199,7 @@ def podp_download_and_extract_antismash_data(
             GenomeStatus.to_json(gs_dict, gs_file)
             continue
 
-        # check if the antismash BGC data is already in the downloads
+        # check if the antiSMASH BGC data is already in the downloads
         bgc_path = Path(project_download_root, f"{gs.resolved_id}.zip").absolute()
         if bgc_path.exists():
             logger.info(
@@ -217,7 +217,7 @@ def podp_download_and_extract_antismash_data(
                     f"{original_genome_id}. Error: {e}"
                 )
 
-        # retrieve antismash BGC data from antiSMASH-DB
+        # retrieve antiSMASH BGC data from antiSMASH-DB
         try:
             retrieve_antismash_db_data(gs, project_download_root, project_extract_root)
             logger.info(
