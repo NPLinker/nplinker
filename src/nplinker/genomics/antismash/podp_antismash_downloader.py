@@ -199,6 +199,24 @@ def podp_download_and_extract_antismash_data(
             GenomeStatus.to_json(gs_dict, gs_file)
             continue
 
+        # check if the antismash BGC data is already in the downloads
+        bgc_path = Path(project_download_root, f"{gs.resolved_id}.zip").absolute()
+        if bgc_path.exists():
+            logger.info(
+                f"antiSMASH BGC data for genome ID {original_genome_id} already downloaded to "
+                f"{bgc_path}"
+            )
+            try:
+                process_existing_antismash_data(gs, project_extract_root)
+                gs.bgc_path = str(bgc_path)
+                GenomeStatus.to_json(gs_dict, gs_file)
+                continue
+            except Exception as e:
+                logger.warning(
+                    "Failed to process existing antiSMASH BGC data for genome ID "
+                    f"{original_genome_id}. Error: {e}"
+                )
+
         # retrieve antismash BGC data from antiSMASH-DB
         try:
             retrieve_antismash_db_data(gs, project_download_root, project_extract_root)
