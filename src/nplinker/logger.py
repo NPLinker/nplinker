@@ -27,7 +27,9 @@ def setup_logging(level: str = "INFO", file: str = "", use_console: bool = True)
     if file:
         logger.addHandler(
             RichHandler(
-                console=Console(file=open(file, "a"), width=120),  # force the line width to 120
+                console=Console(
+                    file=open(file, "a"), width=120, force_jupyter=False
+                ),  # force the line width to 120
                 omit_repeated_times=False,
                 rich_tracebacks=True,
                 tracebacks_show_locals=True,
