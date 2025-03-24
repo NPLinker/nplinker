@@ -196,10 +196,11 @@ class GNPSExtractor:
         ]
         utils.extract_archive(self._file, self._extract_path, members)
         os.renames(
-            self._extract_path / members[0], self._extract_path / (self._target_files[0] + ".csv")
+            self._extract_path / members[0].name,
+            self._extract_path / (self._target_files[0] + ".csv"),
         )
         for member, fname in zip(members[1:], self._target_files[1:]):
-            os.renames(self._extract_path / member, self._extract_path / fname)
+            os.renames(self._extract_path / member.name, self._extract_path / fname)
 
     def _extract_gnps2fbmn(self):
         # the order of members matters
@@ -211,10 +212,11 @@ class GNPSExtractor:
         ]
         utils.extract_archive(self._file, self._extract_path, members)
         os.renames(
-            self._extract_path / members[0], self._extract_path / (self._target_files[0] + ".csv")
+            self._extract_path / members[0].name,
+            self._extract_path / (self._target_files[0] + ".csv"),
         )
         for member, fname in zip(members[1:], self._target_files[1:]):
-            os.renames(self._extract_path / member, self._extract_path / fname)
+            os.renames(self._extract_path / member.name, self._extract_path / fname)
 
     def _select_zip_member(self, prefix: str, suffix: str) -> str:
         """Helper function to extract files matching a prefix and suffix from the zip archive."""
@@ -236,8 +238,8 @@ class GNPSExtractor:
         with tarfile.open(self._file) as tf:
             member_list = [
                 member
-                for member in tf.getnames()
-                if member.startswith(prefix) and member.endswith(suffix)
+                for member in tf.getmembers()
+                if member.name.startswith(prefix) and member.name.endswith(suffix)
             ]
             if len(member_list) != 1:
                 raise ValueError(
