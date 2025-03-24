@@ -4,6 +4,7 @@ import tarfile
 import zipfile
 from os import PathLike
 from pathlib import Path
+from tarfile import TarInfo
 from nplinker import utils
 from .gnps_format import GNPSFormat
 from .gnps_format import gnps_format_from_archive
@@ -233,7 +234,7 @@ class GNPSExtractor:
                 )
         return member_list[0]
 
-    def _select_tar_member(self, prefix: str, suffix: str) -> str:
+    def _select_tar_member(self, prefix: str, suffix: str) -> TarInfo:
         """Helper function to extract files matching a prefix and suffix from the tar archive."""
         with tarfile.open(self._file) as tf:
             member_list = [
