@@ -4,7 +4,7 @@ if [[ $# > 1 ]] || [[ $# == 1 && $1 != "--run-on-github" ]]; then
     echo -e "Usage: $0 [--run-on-github]\n"
     echo -e "Install NPLinker non-pypi dependencies and databases."
     echo -e "Do execute this command after running 'pip install nplinker'.\n"
-    echo -e "Option:\n  --run-on-github: spcify the running is in github actions to avoid permission issues\n"
+    echo -e "Option:\n  --run-on-github: specify the running is in github actions to avoid permission issues\n"
     exit
 elif [[ $# == 1 && $1 == "--run-on-github" ]]; then
     run_on_github=true
@@ -16,7 +16,7 @@ fi
 set -e
 
 #------------------------------------------------------------------------------
-# Creat installation path
+# Create installation path
 #------------------------------------------------------------------------------
 
 # Get python install prefix
@@ -33,18 +33,18 @@ script_path=$(command -v install-nplinker-deps)
 expected_path="$PY_PATH/bin/install-nplinker-deps"
 
 if [[ $script_path != $expected_path ]]; then
-    echo "❌ Error: command 'install-nplinker-deps' invoked from an incorrect path or enviroment: $script_path"
+    echo "❌ Error: command 'install-nplinker-deps' invoked from an incorrect path or environment: $script_path"
     echo "Please ensure that it is invoked from the expected path: $expected_path."
     echo "Check your PATH environment variable to correct the execution order of paths."
     exit 1
 fi
 
-# create dependecy install path
+# create dependency install path
 cd $PY_PATH
 [[ -d nplinker_lib ]] || mkdir nplinker_lib
 LIB_PATH=$PY_PATH/nplinker_lib
 cd $LIB_PATH
-echo -e "✅ NPLinker dependecies and databases will be installed in: $LIB_PATH"
+echo -e "✅ NPLinker dependencies and databases will be installed in: $LIB_PATH"
 echo -e "⏳ Installation will take about 5 minutes\n"
 
 
