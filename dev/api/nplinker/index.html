@@ -3968,7 +3968,9 @@ The log will be written to the file in append mode.</p>
 <span class="normal"><a href="#__codelineno-0-44">44</a></span>
 <span class="normal"><a href="#__codelineno-0-45">45</a></span>
 <span class="normal"><a href="#__codelineno-0-46">46</a></span>
-<span class="normal"><a href="#__codelineno-0-47">47</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-6" name="__codelineno-0-6"></a><span class="k">def</span><span class="w"> </span><span class="nf">setup_logging</span><span class="p">(</span><span class="n">level</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">use_console</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-47">47</a></span>
+<span class="normal"><a href="#__codelineno-0-48">48</a></span>
+<span class="normal"><a href="#__codelineno-0-49">49</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-6" name="__codelineno-0-6"></a><span class="k">def</span><span class="w"> </span><span class="nf">setup_logging</span><span class="p">(</span><span class="n">level</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">use_console</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Setup logging configuration for the ancestor logger &quot;nplinker&quot;.</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8"></a>
 <a id="__codelineno-0-9" name="__codelineno-0-9"></a><span class="sd">    ??? info &quot;Usage Documentation&quot;</span>
@@ -3992,24 +3994,26 @@ The log will be written to the file in append mode.</p>
 <a id="__codelineno-0-27" name="__codelineno-0-27"></a>    <span class="k">if</span> <span class="n">file</span><span class="p">:</span>
 <a id="__codelineno-0-28" name="__codelineno-0-28"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span>
 <a id="__codelineno-0-29" name="__codelineno-0-29"></a>            <span class="n">RichHandler</span><span class="p">(</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30"></a>                <span class="n">console</span><span class="o">=</span><span class="n">Console</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mi">120</span><span class="p">),</span>  <span class="c1"># force the line width to 120</span>
-<a id="__codelineno-0-31" name="__codelineno-0-31"></a>                <span class="n">omit_repeated_times</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32"></a>                <span class="n">rich_tracebacks</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-33" name="__codelineno-0-33"></a>                <span class="n">tracebacks_show_locals</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-34" name="__codelineno-0-34"></a>                <span class="n">log_time_format</span><span class="o">=</span><span class="s2">&quot;[%Y-%m-</span><span class="si">%d</span><span class="s2"> </span><span class="si">%X</span><span class="s2">]&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-35" name="__codelineno-0-35"></a>            <span class="p">)</span>
-<a id="__codelineno-0-36" name="__codelineno-0-36"></a>        <span class="p">)</span>
-<a id="__codelineno-0-37" name="__codelineno-0-37"></a>
-<a id="__codelineno-0-38" name="__codelineno-0-38"></a>    <span class="c1"># Console handler</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="k">if</span> <span class="n">use_console</span><span class="p">:</span>
-<a id="__codelineno-0-40" name="__codelineno-0-40"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span>
-<a id="__codelineno-0-41" name="__codelineno-0-41"></a>            <span class="n">RichHandler</span><span class="p">(</span>
-<a id="__codelineno-0-42" name="__codelineno-0-42"></a>                <span class="n">omit_repeated_times</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-43" name="__codelineno-0-43"></a>                <span class="n">rich_tracebacks</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-44" name="__codelineno-0-44"></a>                <span class="n">tracebacks_show_locals</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-45" name="__codelineno-0-45"></a>                <span class="n">log_time_format</span><span class="o">=</span><span class="s2">&quot;[%Y-%m-</span><span class="si">%d</span><span class="s2"> </span><span class="si">%X</span><span class="s2">]&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a>            <span class="p">)</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a>        <span class="p">)</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30"></a>                <span class="n">console</span><span class="o">=</span><span class="n">Console</span><span class="p">(</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31"></a>                    <span class="n">file</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">force_jupyter</span><span class="o">=</span><span class="kc">False</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32"></a>                <span class="p">),</span>  <span class="c1"># force the line width to 120</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33"></a>                <span class="n">omit_repeated_times</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-34" name="__codelineno-0-34"></a>                <span class="n">rich_tracebacks</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35"></a>                <span class="n">tracebacks_show_locals</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-36" name="__codelineno-0-36"></a>                <span class="n">log_time_format</span><span class="o">=</span><span class="s2">&quot;[%Y-%m-</span><span class="si">%d</span><span class="s2"> </span><span class="si">%X</span><span class="s2">]&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a>            <span class="p">)</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38"></a>        <span class="p">)</span>
+<a id="__codelineno-0-39" name="__codelineno-0-39"></a>
+<a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="c1"># Console handler</span>
+<a id="__codelineno-0-41" name="__codelineno-0-41"></a>    <span class="k">if</span> <span class="n">use_console</span><span class="p">:</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span>
+<a id="__codelineno-0-43" name="__codelineno-0-43"></a>            <span class="n">RichHandler</span><span class="p">(</span>
+<a id="__codelineno-0-44" name="__codelineno-0-44"></a>                <span class="n">omit_repeated_times</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-45" name="__codelineno-0-45"></a>                <span class="n">rich_tracebacks</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a>                <span class="n">tracebacks_show_locals</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a>                <span class="n">log_time_format</span><span class="o">=</span><span class="s2">&quot;[%Y-%m-</span><span class="si">%d</span><span class="s2"> </span><span class="si">%X</span><span class="s2">]&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-48" name="__codelineno-0-48"></a>            <span class="p">)</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a>        <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

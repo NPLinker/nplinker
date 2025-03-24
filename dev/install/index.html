@@ -1551,12 +1551,14 @@ requires <span style="color:red;"><strong>~4.5GB</strong></span> of disk space t
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>pip<span class="w"> </span>install<span class="w"> </span>--pre<span class="w"> </span>nplinker<span class="w"> </span><span class="c1"># (3)!</span>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="c1"># install nplinker non-pypi dependencies and databases (~4GB)</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>install-nplinker-deps
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>install-nplinker-deps<span class="w"> </span><span class="c1"># (4)!</span>
 </code></pre></div>
 <ol>
 <li>A virtual environment is <strong><em>required</em></strong> to install the the non-pypi dependencies. You can also use <code>conda</code> to create a new environment. But NPLinker is not available on conda yet.</li>
 <li>Check <code>pip</code> command and make sure it is provided by the activated virtual environment. </li>
 <li>NPLinker v2 is still under development and released as <a href="https://pypi.org/project/nplinker/#history">pre-release</a>. To install the pre-release, you need the <code>--pre</code> option. </li>
+<li>Use <code>which install-nplinker-deps</code> command to check if the command <code>install-nplinker-deps</code> is in the correct python virtual environment. If not, make sure you have activated the virtual environment and/or
+reinstall the <code>nplinker</code> package.</li>
 </ol>
 <h2 id="install-from-source-code">Install from source code<a class="headerlink" href="#install-from-source-code" title="Permanent link">&para;</a></h2>
 <p>You can also install NPLinker from source code:</p>
