@@ -22,12 +22,14 @@ source env/bin/activate     # (2)!
 pip install --pre nplinker # (3)!
 
 # install nplinker non-pypi dependencies and databases (~4GB)
-install-nplinker-deps
+install-nplinker-deps # (4)!
 ```
 
 1. A virtual environment is ***required*** to install the the non-pypi dependencies. You can also use `conda` to create a new environment. But NPLinker is not available on conda yet.
 2. Check `pip` command and make sure it is provided by the activated virtual environment. 
 3. NPLinker v2 is still under development and released as [pre-release](https://pypi.org/project/nplinker/#history). To install the pre-release, you need the `--pre` option. 
+4. Use `which install-nplinker-deps` command to check if the command `install-nplinker-deps` is in the correct python virtual environment. If not, make sure you have activated the virtual environment and/or
+reinstall the `nplinker` package.
 
 ## Install from source code
 
