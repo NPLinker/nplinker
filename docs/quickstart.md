@@ -5,10 +5,7 @@ NPLinker allows you to run in two modes:
 
     The required input data includes:
 
-    - GNPS molecular networking data from one of the following GNPS workflows
-        - `METABOLOMICS-SNETS`,
-        - `METABOLOMICS-SNETS-V2`
-        - `FEATURE-BASED-MOLECULAR-NETWORKING`
+    - GNPS molecular networking data from [GNPS1 or GNPS2 workflows](./concepts/gnps_data.md)
     - AntiSMASH BGC data
     - BigScape data (optional)
 
@@ -109,19 +106,14 @@ Here are some example values for the `nplinker.toml` file:
 
 ??? note "Details" 
 
-    Skip this step if you choose to use the `podp` mode.
+    Skip this step if you choose the `podp` mode.
 
-    If you choose to use the `local` mode, meaning you have input data of NPLinker stored on your local
+    If you choose the `local` mode, meaning you have input data of NPLinker stored on your local
     machine, you need to move the input data to the working directory created in the previous step.
 
     ### GNPS data
-    NPLinker accepts data from the output of the following GNPS workflows:
-
-    - `METABOLOMICS-SNETS`
-    - `METABOLOMICS-SNETS-V2`
-    - `FEATURE-BASED-MOLECULAR-NETWORKING`.
-
-    NPLinker provides the tools [`GNPSDownloader`][nplinker.metabolomics.gnps.GNPSDownloader] and
+    NPLinker accepts data from the output of [GNPS1 or GNPS2 workflows](./concepts/gnps_data.md). 
+    It provides the tools [`GNPSDownloader`][nplinker.metabolomics.gnps.GNPSDownloader] and
     [`GNPSExtractor`][nplinker.metabolomics.gnps.GNPSExtractor] to download and extract the GNPS data
     with ease. What you need to give is a valid GNPS task ID, referring to a task of the GNPS workflows
     supported by NPLinker.
@@ -179,10 +171,9 @@ Here are some example values for the `nplinker.toml` file:
     It is optional to provide the output of BigScape to NPLinker. If the output of BigScape is not provided,
     NPLinker will run BigScape automatically to generate the data using the AntiSMASH BGC data.
 
-    If you have the output of BigScape, you can put its `mix_clustering_c{cutoff}.tsv` file in the
-    `bigscape` subdirectory of the NPLinker working directory, where `{cutoff}` is the cutoff value used
-    in the BigScape run.
-
+    If you have the output of BigScape, you can put its `mix_clustering_c{cutoff}.tsv` file (for BigScape1)
+    or `data_sqlite.db` (for BigScape v2) in the `bigscape` subdirectory of the NPLinker working directory.
+    
     ### Strain mappings file
 
     The strain mappings file `strain_mapping.json` is required by NPLinker to map the strain to genomics
@@ -207,7 +198,7 @@ Here are some example values for the `nplinker.toml` file:
     ```
 
     1. `strain_id` is the unique identifier of the strain.
-    2. `strain_alias` is a list of aliases of the strain, which are the identifiers of the BGCs and
+    2, `strain_alias` is a list of aliases of the strain, which are the identifiers of the BGCs and
     spectra of the strain.
     3. `version` is the schema version of this file. It is recommended to use the latest version of the
     schema. The current latest version is `1.0`. 
