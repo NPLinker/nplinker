@@ -36,8 +36,76 @@ mkdir nplinker_quickstart
     working directory, see [Working Directory Structure](./concepts/working_dir_structure.md) page.
 
 
+## 2. Prepare config file
 
-## 2. Prepare input data (`local` mode only)
+The configuration file `nplinker.toml` is required by NPLinker to specify the working directory, mode,
+and other settings for the run of NPLinker. You can put the `nplinker.toml` file in any place, but it 
+is recommended to put it in the working directory created in step 1.
+
+The details of all settings can be found at this page [Config File](./concepts/config_file.md).
+
+Here are some example values for the `nplinker.toml` file:
+
+=== "`local` mode"
+    ```toml title="nplinker.toml"
+    root_dir = "absolute/path/to/working/directory" # (1)!
+    mode = "local"
+
+    [log]
+    level = "DEBUG"
+    use_console = true
+
+    [mibig]
+    to_use = true
+    version = "3.1"
+
+    [bigscape]
+    version = "1"
+    cutoff = "0.30"
+
+    [gnps]
+    version = "1"
+
+    [scoring]
+    methods = ["metcalf"]
+    ```
+
+    1. Replace `absolute/path/to/working/directory` with the **absolute** path to the working directory
+       created in step 1.
+
+
+=== "`podp` mode"
+    ```toml title="nplinker.toml"
+    root_dir = "absolute/path/to/working/directory" # (1)!
+    mode = "podp"
+    podp_id = "podp_id" # (2)!
+
+    [log]
+    level = "DEBUG"
+    use_console = true
+
+    [mibig]
+    to_use = true
+    version = "3.1"
+
+    [bigscape]
+    version = "2"
+    cutoff = "0.30"
+    parameters = "--mibig_version 3.1 --include_singletons --gcf_cutoffs 0.30"
+
+    [gnps]
+    version = "1"
+
+    [scoring]
+    methods = ["metcalf"]
+    ```
+
+    1. Replace `absolute/path/to/working/directory` with the **absolute** path to the working directory
+       created in step 1.
+    2. Replace `podp_id` with the identifier of the dataset in the Paired Omics Data Platform (PODP).
+
+
+## 3. Prepare input data (`local` mode only)
 
 ??? note "Details" 
 
@@ -79,7 +147,7 @@ mkdir nplinker_quickstart
     ```
 
     1. If you already have the downloaded archive of GNPS data, you can skip the download steps.
-    2. Replace `downloaded_archive` with the actuall path to your GNPS data archive if you skipped the download steps.
+    2. Replace `downloaded_archive` with the actual path to your GNPS data archive if you skipped the download steps.
 
     The required data for NPLinker will be extracted to the `gnps` subdirectory of the working directory.
 
@@ -156,75 +224,6 @@ mkdir nplinker_quickstart
 
     For the `local` mode, you need to create this file manually and put it in the working directory.
     It takes some effort to prepare this file manually, especially when you have a large number of strains.
-
-
-## 3. Prepare config file
-
-The configuration file `nplinker.toml` is required by NPLinker to specify the working directory, mode,
-and other settings for the run of NPLinker. You can put the `nplinker.toml` file in any place, but it 
-is recommended to put it in the working directory created in step 2.
-
-The details of all settings can be found at this page [Config File](./concepts/config_file.md).
-
-Here are some example values for the `nplinker.toml` file:
-
-=== "`local` mode"
-    ```toml title="nplinker.toml"
-    root_dir = "absolute/path/to/working/directory" # (1)!
-    mode = "local"
-
-    [log]
-    level = "DEBUG"
-    use_console = true
-
-    [mibig]
-    to_use = true
-    version = "3.1"
-
-    [bigscape]
-    version = "1"
-    cutoff = "0.30"
-
-    [gnps]
-    version = "1"
-
-    [scoring]
-    methods = ["metcalf"]
-    ```
-
-    1. Replace `absolute/path/to/working/directory` with the **absolute** path to the working directory
-       created in step 2.
-
-
-=== "`podp` mode"
-    ```toml title="nplinker.toml"
-    root_dir = "absolute/path/to/working/directory" # (1)!
-    mode = "podp"
-    podp_id = "podp_id" # (2)!
-
-    [log]
-    level = "DEBUG"
-    use_console = true
-
-    [mibig]
-    to_use = true
-    version = "3.1"
-
-    [bigscape]
-    version = "2"
-    cutoff = "0.30"
-    parameters = "--mibig_version 3.1 --include_singletons --gcf_cutoffs 0.30"
-
-    [gnps]
-    version = "1"
-
-    [scoring]
-    methods = ["metcalf"]
-    ```
-
-    1. Replace `absolute/path/to/working/directory` with the **absolute** path to the working directory
-       created in step 2.
-    2. Replace `podp_id` with the identifier of the dataset in the Paired Omics Data Platform (PODP).
 
 
 ## 4. Run NPLinker
