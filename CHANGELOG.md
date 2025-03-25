@@ -1,5 +1,29 @@
 # Changelog
 
+## [v2.0.0-alpha.9](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.9) (2025-03-25)
+
+[Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.8...v2.0.0-alpha.9)
+
+**Fixed bugs:**
+
+- Fix dependency conflict [\#278](https://github.com/NPLinker/nplinker/issues/278)
+
+**Closed issues:**
+
+- Fix logging file output [\#314](https://github.com/NPLinker/nplinker/issues/314)
+- Inconsistent BiG-SCAPE version handling causes ValueError [\#305](https://github.com/NPLinker/nplinker/issues/305)
+- GNPS2 results not supported [\#284](https://github.com/NPLinker/nplinker/issues/284)
+- Update releasing workflow [\#279](https://github.com/NPLinker/nplinker/issues/279)
+
+**Merged pull requests:**
+
+- Update docs and readme [\#317](https://github.com/NPLinker/nplinker/pull/317) ([CunliangGeng](https://github.com/CunliangGeng))
+- Bump tj-actions/changed-files from 44 to 46 in /.github/workflows [\#313](https://github.com/NPLinker/nplinker/pull/313) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Local strain mappings [\#310](https://github.com/NPLinker/nplinker/pull/310) ([rtlortega](https://github.com/rtlortega))
+- Fix: Handle invalid GenBank accessions or missing RefSeq accessions in \_resolve\_genbank\_accession\(\) [\#309](https://github.com/NPLinker/nplinker/pull/309) ([liannette](https://github.com/liannette))
+- Fix inconsistent Bigscape version handling [\#306](https://github.com/NPLinker/nplinker/pull/306) ([liannette](https://github.com/liannette))
+- fix mkdocs warnings [\#304](https://github.com/NPLinker/nplinker/pull/304) ([CunliangGeng](https://github.com/CunliangGeng))
+
 ## [v2.0.0-alpha.8](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.8) (2025-01-23)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.7...v2.0.0-alpha.8)
