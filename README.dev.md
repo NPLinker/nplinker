@@ -160,86 +160,47 @@ Updating the version of the NPLinker package is done with make command `update-v
 make update-version CURRENT_VERSION=0.0.1 NEW_VERSION=0.0.2
 ```
 
+This command will update the version in the following files:
+- `src/nplinker/__init__.py`
+- `pyproject.toml`
+- `CITATION.cff`
+
 ## Making a release
 
-This section describes how to make a release in 3 parts:
+This section describes how to make a release in 2 parts:
 
-1. preparation
-1. making a release on PyPI
-1. making a release on GitHub
+1. Create Github release
+2. Publish to Pypi
 
-### (1/3) Preparation
+### (1/2) Create Github release
 
-1. Update the <CHANGELOG.md> (don't forget to update links at bottom of page)
-2. Verify that the information in `CITATION.cff` is correct, and that `.zenodo.json` contains equivalent data
-3. Make sure the [version has been updated](#versioning).
-4. Run the unit tests with `pytest -v`
+We use the Github action [Draft or publish Github release
+](https://github.com/NPLinker/nplinker/actions/workflows/publish_gh_release.yml) to create a Github release.
 
-### (2/3) PyPI
+Click the right corner `Run workflow` button, then fill in the current version number and new version number, and choose `publish` to publish Github release, then click the `Run workflow` button. 
 
-In a new terminal, without an activated virtual environment or an env directory:
+The action will first update the version with the command `make update-version`. Then it will generate a release notes and update the `CHANGELOG.md` file with the notes. After that, the action will commit and push the changes. In the end, the action will create a Github release with the new version number and create a tag for the release.
 
-```shell
-# prepare a new directory
-cd $(mktemp -d nplinker.XXXXXX)
+After the action is finished successfully, you can go to the [release page](https://github.com/NPLinker/nplinker/releases) to check the release.
 
-# fresh git clone ensures the release has the state of origin/main branch
-git clone https://github.com/NPLinker/nplinker .
+This repository uses the GitHub-Zenodo integration, the new Github release will trigger Zenodo into making a snapshot of the repository and sticking a DOI on it. Check the [Zenodo page](https://zenodo.org/records/14723594) to see the new snapshot.
 
-# prepare a clean virtual environment and activate it
-python3 -m venv env
-source env/bin/activate
+### (2/2) Publish to Pypi
 
-# make sure to have a recent version of pip and setuptools
-python3 -m pip install --upgrade pip setuptools
-
-# install runtime dependencies and publishing dependencies
-python3 -m pip install --no-cache-dir .
-python3 -m pip install --no-cache-dir .[publishing]
-
-# clean up any previously generated artefacts
-rm -rf nplinker.egg-info
-rm -rf dist
-
-# create the source distribution and the wheel
-python3 -m build
-
-# upload to test pypi instance (requires credentials)
-twine upload --repository-url https://test.pypi.org/legacy/ dist/*
-```
-
-Visit
-[https://test.pypi.org/project/nplinker](https://test.pypi.org/project/nplinker)
-and verify that your package was uploaded successfully. Keep the terminal open, we'll need it later.
-
-In a new terminal, without an activated virtual environment or an env directory:
+You can publish the package to pypi with the following steps:
 
 ```shell
-cd $(mktemp -d nplinker-test.XXXXXX)
+# Go to your local nplinker repository
+cd path-to-nplinker-repo
 
-# prepare a clean virtual environment and activate it
-python3 -m venv env
-source env/bin/activate
+# Clean the repository
+make clean
 
-# make sure to have a recent version of pip and setuptools
-pip install --upgrade pip setuptools
+# Build the source distribution and the wheel
+make build
 
-# install from test pypi instance:
-python3 -m pip -v install --no-cache-dir \
---index-url https://test.pypi.org/simple/ \
---extra-index-url https://pypi.org/simple nplinker
+# Publish to pypi
+make publish
 ```
 
-Check that the package works as it should when installed from pypitest.
-
-Then upload to pypi.org with:
-
-```shell
-# Back to the first terminal,
-# FINAL STEP: upload to PyPI (requires credentials)
-twine upload dist/*
-```
-
-### (3/3) GitHub
-
-Don't forget to also make a [release on GitHub](https://github.com/NPLinker/nplinker/releases/new). If your repository uses the GitHub-Zenodo integration this will also trigger Zenodo into making a snapshot of your repository and sticking a DOI on it.
+After publishing to pypi, you can check the [pypi page](https://pypi.org/project/nplinker/#history) to see the new version.
