@@ -43,11 +43,3 @@ class ScoringBase(ABC):
         Returns:
             The LinkGraph object.
         """
-
-    @abstractmethod
-    def format_data(self, data) -> str:
-        """Format the scoring data to a string."""
-
-    @abstractmethod
-    def sort(self, objects, reverse=True) -> list:
-        """Sort the given objects based on the scoring data."""

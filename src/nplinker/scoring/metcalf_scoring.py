@@ -209,18 +209,6 @@ class MetcalfScoring(ScoringBase):
         logger.info(f"MetcalfScoring: completed! Found {len(links.links)} links in total.")
         return links
 
-    # TODO CG: refactor this method
-    def format_data(self, data):
-        """Format the data for display."""
-        # for metcalf the data will just be a floating point value (i.e. the score)
-        return f"{data:.4f}"
-
-    # TODO CG: refactor this method
-    def sort(self, objects, reverse=True):
-        """Sort the objects based on the score."""
-        # sort based on score
-        return sorted(objects, key=lambda objlink: objlink[self], reverse=reverse)
-
     @staticmethod
     def _calc_raw_score(
         p1: pd.DataFrame, p2: pd.DataFrame, weights: tuple[int, int, int, int]
