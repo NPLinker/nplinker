@@ -200,7 +200,7 @@ make clean
 make build
 
 # Publish to pypi
-make publish
+make release
 ```
 
 After publishing to pypi, you can check the [pypi page](https://pypi.org/project/nplinker/#history) to see the new version.
