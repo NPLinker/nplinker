@@ -198,7 +198,7 @@ Here are some example values for the `nplinker.toml` file:
     ```
 
     1. `strain_id` is the unique identifier of the strain.
-    2, `strain_alias` is a list of aliases of the strain, which are the identifiers of the BGCs and
+    2. `strain_alias` is a list of aliases of the strain, which are the identifiers of the BGCs and
     spectra of the strain.
     3. `version` is the schema version of this file. It is recommended to use the latest version of the
     schema. The current latest version is `1.0`. 
