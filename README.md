@@ -34,24 +34,16 @@ NPLinker is a python package, using both pypi packages and non-pypi packages as 
 requires <span style="color:red;">**~4.5GB**</span> of disk space to install all the dependencies. 
 
 ```shell
-# Check python version (requiring ≥3.9)
-python --version
-
-# Create a new virtual environment
-python -m venv env
-source env/bin/activate
+# Create a new virtual environment and activate it
+conda create -n npl-3.10 python=3.10
+conda activate npl-3.10 
 
 # install from nplinker releases (requiring ~300MB of disk space)
 pip install --pre nplinker
 
-# or install the latest from source code
-pip install git+https://github.com/nplinker/nplinker@dev 
-
 # install nplinker non-pypi dependencies and databases (~4GB)
 install-nplinker-deps
 ```
-A virtual environment is *required* to install the the non-pypi dependencies. You can also use `conda`
-to manage python environments.
 
 ### Testing
 
@@ -59,8 +51,8 @@ To run the tests, you need to clone this repo and install the development depend
 
 ```shell
 # Create a new virtual environment
-python -m venv env
-source env/bin/activate
+conda create -n npl-3.10 python=3.10
+conda activate npl-3.10
 
 # Clone the repository and install the development dependencies
 git clone https://github.com/NPLinker/nplinker.git
