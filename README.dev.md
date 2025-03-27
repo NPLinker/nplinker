@@ -109,7 +109,7 @@ We use [Mypy](http://mypy-lang.org/) as static type checker:
 pip install mypy
 
 # run mypy
-mypy path-to-source-code
+mypy src/nplinker
 ```
 
 Mypy configurations are set in [pyproject.toml](pyproject.toml) file.
