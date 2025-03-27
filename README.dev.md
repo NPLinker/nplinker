@@ -5,13 +5,11 @@ If you're looking for user documentation, go [here](README.md).
 ## Code editor
 We use [Visual Studio Code (VS Code)](https://code.visualstudio.com/) as code editor.
 
-The VS Code Profile for this project is [vscode/nplinker.code-profile](vscode/nplinker.code-profile), 
-which contains the settings, extensions and snippets for the project. To use the profile, you must
-first import it by clicking the following menus: `Code` -> `Settings` -> `Profiles` -> `Import Profile...`. 
-Then select the file [vscode/nplinker.code-profile](vscode/nplinker.code-profile) to import the profile.
-VS Code will take a while to install the extensions and apply the settings. Want more info? See 
-[vscode profiles guide](https://code.visualstudio.com/docs/editor/profiles).
+The VS Code Profile for this project is [vscode/nplinker.code-profile](vscode/nplinker.code-profile), which contains the settings, extensions and snippets for the project. 
 
+To use the profile, you must first import it by clicking the following menus: `Code` -> `Settings` -> `Profiles` -> `Import Profile...`. 
+Then select the file [vscode/nplinker.code-profile](vscode/nplinker.code-profile) to import the profile.
+VS Code will take a while to install the extensions and apply the settings. Want more info? See [vscode profiles guide](https://code.visualstudio.com/docs/editor/profiles).
 
 If you want to add more settings, you can update the workspace settings, see [the guide](https://code.visualstudio.com/docs/getstarted/settings) for more info.
 
@@ -21,25 +19,23 @@ If you want to add more settings, you can update the workspace settings, see [th
 We use Python 3.10 for development environment.
 
 ```shell
-# Create a virtual environment, e.g. with
-python3 -m venv venv
+# Create a virtual environment
+conda create -n npl-dev python=3.10
 
 # activate virtual environment
-source venv/bin/activate
+conda activate npl-dev
 
-# make sure to have a recent version of pip and setuptools
-python3 -m pip install --upgrade pip setuptools
+# Clone the repository
+git clone https://github.com/NPLinker/nplinker.git
+cd nplinker
 
 # install development dependencies
-pip install --no-cache-dir --editable ".[dev]"
+pip install -e ".[dev]"
 
 # install non-pypi dependencies
 install-nplinker-deps
 ```
 
-Afterwards check that the install directory is present in the `PATH` environment variable.
-
-You can also use [conda](https://docs.conda.io/projects/conda/en/stable/) to manage python environments.
 
 ## Running the tests
 
@@ -47,17 +43,16 @@ You can also use [conda](https://docs.conda.io/projects/conda/en/stable/) to man
 ```shell
 pytest
 # or
-pytest -n auto tests/unit
+pytest -n 2 tests/unit
 ```
-Parallel testing is supported with `pytest-xdist` plugin. To run tests in parallel, use the `-n`
-option, e.g. `-n auto` to run tests in parallel with the number of CPUs available.
+Parallel testing is supported with `pytest-xdist` plugin. To run tests in parallel, use the `-n` option, e.g. `-n 2` to run tests in parallel with 2 CPUs. 
+By default, `pytest` will use all available CPUs to run the tests in parallel.
 
 **Run integration tests with**
 ```shell
 pytest -n 0 tests/integration
 ```
 `-n 0` means no parallel testing.
-
 
 
 ### Test coverage
@@ -77,6 +72,7 @@ coverage report
 ```
 
 `coverage` can also generate output in HTML and other formats; see `coverage help` for more information.
+
 
 ## Linting and formatting
 
@@ -121,6 +117,7 @@ Mypy configurations are set in [pyproject.toml](pyproject.toml) file.
 For more info about static typing and mypy, see:
 - [Static typing with Python](https://typing.readthedocs.io/en/latest/index.html#)
 - [Mypy doc](https://mypy.readthedocs.io/en/stable/)
+
 
 ## Docs
 We use [MkDocs](https://www.mkdocs.org/) and its theme [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)
