@@ -1609,6 +1609,24 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.MetcalfScoring.format_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;format_data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.MetcalfScoring.sort" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;sort
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1892,6 +1910,24 @@
   <a href="#nplinker.scoring.MetcalfScoring.get_links" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get_links
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.MetcalfScoring.format_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;format_data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nplinker.scoring.MetcalfScoring.sort" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;sort
     </span>
   </a>
   
@@ -2819,6 +2855,66 @@ input objects with the Metcalf scores.</p>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MetcalfScoring: completed! Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">links</span><span class="o">.</span><span class="n">links</span><span class="p">)</span><span class="si">}</span><span class="s2"> links in total.&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a>    <span class="k">return</span> <span class="n">links</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="nplinker.scoring.MetcalfScoring.format_data" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">format_data</span>
+
+
+<a href="#nplinker.scoring.MetcalfScoring.format_data" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">format_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Format the data for display.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/nplinker/scoring/metcalf_scoring.py</code></summary>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-213">213</a></span>
+<span class="normal"><a href="#__codelineno-0-214">214</a></span>
+<span class="normal"><a href="#__codelineno-0-215">215</a></span>
+<span class="normal"><a href="#__codelineno-0-216">216</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Format the data for display.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="c1"># for metcalf the data will just be a floating point value (i.e. the score)</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="nplinker.scoring.MetcalfScoring.sort" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">sort</span>
+
+
+<a href="#nplinker.scoring.MetcalfScoring.sort" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">sort</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Sort the objects based on the score.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/nplinker/scoring/metcalf_scoring.py</code></summary>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-219">219</a></span>
+<span class="normal"><a href="#__codelineno-0-220">220</a></span>
+<span class="normal"><a href="#__codelineno-0-221">221</a></span>
+<span class="normal"><a href="#__codelineno-0-222">222</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="k">def</span><span class="w"> </span><span class="nf">sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objects</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sort the objects based on the score.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="c1"># sort based on score</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">objlink</span><span class="p">:</span> <span class="n">objlink</span><span class="p">[</span><span class="bp">self</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="n">reverse</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
