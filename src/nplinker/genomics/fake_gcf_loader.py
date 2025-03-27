@@ -37,8 +37,10 @@ class FakeGCFLoader(GCFLoaderBase):
         """
         gcf_list = self._gcf_list
         if not keep_mibig_only:
+            logger.info("Filtering GCFs that contain only MIBiG BGCs.")
             gcf_list = [gcf for gcf in gcf_list if not gcf.has_mibig_only()]
         if not keep_singleton:
+            logger.info("Filtering singleton GCFs.")
             gcf_list = [gcf for gcf in gcf_list if not gcf.is_singleton()]
         return gcf_list
 
