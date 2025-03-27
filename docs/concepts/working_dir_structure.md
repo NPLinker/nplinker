@@ -28,26 +28,27 @@ root_dir # (1)!
     │
     ├── bigscape                            [F][O] # (8)!
     │   ├── mix_clustering_c0.30.tsv        [F]    # (9)!
+    │   ├── data_sqlite.db                  [F]    # (10)!
     │   └── bigscape_running_output
     │       └── ...
     │
-    ├── downloads                           [F][A] # (10)!
-    │       ├── paired_datarecord_4b29ddc3-26d0-40d7-80c5-44fb6631dbf9.4.json # (11)!
+    ├── downloads                           [F][A] # (11)!
+    │       ├── paired_datarecord_4b29ddc3-26d0-40d7-80c5-44fb6631dbf9.4.json # (12)!
     │       ├── GCF_000016425.1.zip
     │       ├── GCF_0000514975.1.zip
     │       ├── c22f44b14a3d450eb836d607cb9521bb.zip
     │       ├── genome_status.json
     │       └── mibig_json_3.1.tar.gz
     │
-    ├── mibig                               [F][A] # (12)!
+    ├── mibig                               [F][A] # (13)!
     │   ├── BGC0000001.json
     │   ├── BGC0000002.json
     │   └── ...
     │
-    ├── output                              [F][A] # (13)!
+    ├── output                              [F][A] # (14)!
     │   └── ...
     │
-    └── ...                                        # (14)!
+    └── ...                                        # (15)!
 ```
 
 1. `root_dir` is the working directory you created, used as the root directory for NPLinker.
@@ -67,17 +68,18 @@ root_dir # (1)!
 8. `bigscape` directory is optional and contains the output of BigScape. If the directory is not
     provided, NPLinker will run BigScape automatically to generate the data using the AntiSMASH BGC
     data.
-9.  `mix_clustering_c0.30.tsv` is an example output of BigScape. The file name must follow the pattern
+9.  `mix_clustering_c0.30.tsv` is an example output of BigScape v1. The file name must follow the pattern
     `mix_clustering_c{cutoff}.tsv`, where `{cutoff}` is the cutoff value used in the BigScape run.
-10. `downloads` directory is automatically created and managed by NPLinker. It stores the downloaded data
+10. `data_sqlite.db` is the output of BigScape v2.
+11. `downloads` directory is automatically created and managed by NPLinker. It stores the downloaded data
    from the internet. Users can also use it to store their own downloaded data. <br>
     `[A]` means the directory is automatically created and/or managed by NPLinker.
-11. This is an example file, the actual file would be different. Same as the other files in
+12. This is an example file, the actual file would be different. Same as the other files in
     the `downloads` directory.
-12. `mibig` directory contains the MIBiG metadata, which is automatically created and downloaded by
+13. `mibig` directory contains the MIBiG metadata, which is automatically created and downloaded by
      NPLinker. Users should not interfere with this directory and its content.
-13. `output` directory is automatically created by NPLinker. It stores the output data of NPLinker.
-14. It's flexible to extend NPLinker by adding other types of data.
+14. `output` directory is automatically created by NPLinker. It stores the output data of NPLinker.
+15. It's flexible to extend NPLinker by adding other types of data.
 
 !!! tip
     - `[F]` means the file or directory name is fixed and must be named as shown. The names are defined in the [defaults](../api/nplinker.md#nplinker.defaults) module.
