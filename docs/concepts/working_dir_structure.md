@@ -27,8 +27,8 @@ root_dir # (1)!
     │   └── ...
     │
     ├── bigscape                            [F][O] # (9)!
-    │   ├── mix_clustering_c0.30.tsv               # (10)!
-    │   ├── data_sqlite.db                         # (11)!
+    │   ├── mix_clustering_c0.30.tsv           [O] # (10)!
+    │   ├── data_sqlite.db                     [O] # (11)!
     │   └── bigscape_running_output            [A] # (12)!
     │       └── ...
     │
