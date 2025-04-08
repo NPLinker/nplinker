@@ -75,10 +75,10 @@ parameters = "version1_parameters_or_version2_parameters"
 # For version 2:
 # --------------
 # BiG-SCAPE v2 has subcommands. NPLinker requires the `cluster` subcommand and its parameters.
-# Required parameters of `cluster` subcommand are: `--mibig_version`, `--include_singletons` and `--gcf_cutoffs`.
-# DO NOT set these parameters: `--pfam_path`, `--inputdir`, `--outputdir`. NPLinker will automatically configure them.
+# Required parameters of `cluster` subcommand are: `--mibig-version`, `--include-singletons` and `--gcf-cutoffs`.
+# DO NOT set these parameters: `--pfam-path`, `--inputdir`, `--outputdir`. NPLinker will automatically configure them.
 # BiG-SCPAPE v2 also runs a `--mix` analysis by default, so you don't need to set this parameter here.
-# An example value could be: "--mibig_version 3.1 --include_singletons --gcf_cutoffs 0.30"
+# An example value could be: "--mibig-version 3.1 --include-singletons --gcf-cutoffs 0.30"
 
 [gnps]
 # Settings for GNPS.
