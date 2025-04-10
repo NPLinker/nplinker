@@ -9,6 +9,9 @@ help:
 	@echo "build - build package"
 	@echo "update - update pip, build, twine packages"
 	@echo "update-version - update NPLinker version. Usage: make update-version CURRENT_VERSION=0.1.0 NEW_VERSION=0.2.0"
+install-dev:	
+	pip install -e ".[dev]"
+	install-nplinker-deps
 
 clean: clean-build clean-pyc clean-test clean-doc
 
