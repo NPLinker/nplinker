@@ -40,15 +40,6 @@ build: clean
 release: update
 	python -m twine upload dist/*
 
-update:
-	pip install --upgrade pip build twine
-
-venv:
-	python -m venv venv
-
-clean-venv:
-	rm -rf venv
-
 
 # Define the files to update version
 FILES := src/nplinker/__init__.py pyproject.toml CITATION.cff
