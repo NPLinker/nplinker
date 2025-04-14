@@ -34,7 +34,7 @@ flowchart TD
     ConfigError[Dynaconf config validation error]
     DataError[Data validation error]
     UseIt[Use the data]
-    Download[First remove existing data if relevent, then download or generate data]
+    Download[First remove existing data if relevant, then download or generate data]
 
     A[GNPS or antiSMASH] --> B{Pass Dynaconf config validation?}
     B -->|No | ConfigError
@@ -59,7 +59,7 @@ flowchart TD
     ConfigError[Dynaconf config validation error]
     DataError[Data validation error]
     UseIt[Use the data]
-    Download[First remove existing data if relevent, then download or generate data]
+    Download[First remove existing data if relevant, then download or generate data]
 
     A[BigSCape] --> B{Pass Dynaconf config validation?}
     B -->|No | ConfigError
