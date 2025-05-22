@@ -1,0 +1,45 @@
+name: Deploy documentation
+
+on:
+    workflow_dispatch:
+    release:
+      types:
+        - published
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout nplinker
+      uses: actions/checkout@v4
+      with:
+        ref: dev
+        fetch-tags: true
+
+    - name: Fetch gh-pages
+      run: git fetch origin gh-pages:gh-pages
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: python3 -m pip install .[dev]
+
+    - name: Sync webapp README
+      run: |
+        mkdir -p docs/webapp
+        curl -sSf https://raw.githubusercontent.com/NPLinker/nplinker-webapp/main/README.md -o docs/webapp/readme.md
+
+    - name: Configure Git
+      run: |
+        git config user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
+        git config user.name "GitHub Actions"
+        git config -l
+
+    - name: Deploy documentation using mike
+      run: |
+        version=$(git describe --tags --abbrev=0 | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+)-alpha\.([0-9]+)/\1a\2/')
+        mike deploy -p -u $version latest
