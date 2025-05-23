@@ -28,21 +28,14 @@ jobs:
     - name: Install dependencies
       run: python3 -m pip install .[dev]
 
-    - name: Sync webapp README # use the make command here
-      run: |
-        mkdir -p docs/webapp
-        curl -sSf https://raw.githubusercontent.com/NPLinker/nplinker-webapp/main/README.md -o docs/webapp/readme.md
-
     - name: Configure Git
       run: |
         git config user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
         git config user.name "GitHub Actions"
         git config -l
 
-    - name: Deploy documentation using mike # merge "Sync webapp README" with this one, retrieving the version before running this
+    - name: Sync webapp README and deploy docs
       run: |
+        make sync-readme
         version=$(git describe --tags --abbrev=0 | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+)-alpha\.([0-9]+)/\1a\2/')
-        mike deploy -p -u $version latest
-
-        # finally do the manual deployment to 2.0.0.a9
-        # and to dev (twice)
+        make deploy-docs version=$version
