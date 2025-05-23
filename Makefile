@@ -1,5 +1,5 @@
 # .PHONY is used to declare that the targets are not files
-.PHONY: install-dev clean clean-build clean-pyc clean-test clean-doc release build update-version
+.PHONY: install-dev clean clean-build clean-pyc clean-test clean-doc release build update-version sync-readme build-docs deploy-docs
 
 help:
 	@echo "Available commands to 'make':"
@@ -80,3 +80,16 @@ endif
 		fi; \
 	done
 	@echo "Version update complete."
+
+sync-readme:
+	mkdir -p docs/webapp
+	curl -sSf https://raw.githubusercontent.com/NPLinker/nplinker-webapp/main/README.md -o docs/webapp/readme.md
+
+build-docs: sync-readme
+	mkdocs serve
+
+deploy-docs: sync-readme
+ifndef version
+	$(error version is not set. Usage: make deploy-docs version=YOUR_VERSION)
+endif
+	mike deploy -p -u $(version) latest
