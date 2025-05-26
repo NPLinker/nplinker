@@ -36,6 +36,5 @@ jobs:
 
     - name: Sync webapp README and deploy docs
       run: |
-        make sync-readme
         version=$(git describe --tags --abbrev=0 | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+)-alpha\.([0-9]+)/\1a\2/')
         make deploy-docs version=$version
