@@ -11,6 +11,8 @@ help:
 	@echo "  clean-doc     : remove doc build artifacts"
 	@echo "  build         : build package"
 	@echo "  release       : upload package to pypi"
+	@echo "  build-docs    : build documentation for local development"
+	@echo "  deploy-docs   : deploy documentation to GitHub Pages"
 	@echo "  update-version: update NPLinker version (e.g. make update-version CURRENT_VERSION=0.1.0 NEW_VERSION=0.2.0)"
 
 install-dev:	
