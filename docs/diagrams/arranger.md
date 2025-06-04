@@ -5,7 +5,7 @@ The [DatasetArranger][nplinker.arranger.DatasetArranger] is implemented accordin
 ## Strain mappings file
 ``` mermaid
 flowchart TD
-    StrainMappings[`strain_mappings.json`] --> SM{Is the mode PODP?}
+    StrainMappings[strain_mappings.json] --> SM{Is the mode PODP?}
     SM --> |No |SM0[Validate the file]
     SM --> |Yes|SM1[Generate the file] --> SM0
 ```
@@ -13,7 +13,7 @@ flowchart TD
 ## Strain selection file
 ``` mermaid
 flowchart TD
-    StrainsSelected[`strains_selected.json`] --> S{Does the file exist?}
+    StrainsSelected[strains_selected.json] --> S{Does the file exist?}
     S --> |No | S0[Nothing to do]
     S --> |Yes| S1[Validate the file]
 ```
@@ -34,7 +34,7 @@ flowchart TD
     ConfigError[Dynaconf config validation error]
     DataError[Data validation error]
     UseIt[Use the data]
-    Download[First remove existing data if relevent, then download or generate data]
+    Download[First remove existing data if relevant, then download or generate data]
 
     A[GNPS or antiSMASH] --> B{Pass Dynaconf config validation?}
     B -->|No | ConfigError
@@ -59,7 +59,7 @@ flowchart TD
     ConfigError[Dynaconf config validation error]
     DataError[Data validation error]
     UseIt[Use the data]
-    Download[First remove existing data if relevent, then download or generate data]
+    Download[First remove existing data if relevant, then download or generate data]
 
     A[BigSCape] --> B{Pass Dynaconf config validation?}
     B -->|No | ConfigError

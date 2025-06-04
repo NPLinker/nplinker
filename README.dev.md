@@ -132,22 +132,45 @@ mkdocs serve -w docs -w src
 Then open your browser and go to [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
 
 ### Publishing the docs
-The docs are published on github pages. We use [mike](https://github.com/jimporter/mike)
-to deploy the docs to the `gh-pages` branch and to manage the versions of docs.
 
-For example, to deploy the version 2.0 of the docs to the `gh-pages` branch and make it the latest
-version, run:
-```shell
-mike deploy -p -u 2.0 latest
+Documentation is published to GitHub Pages using [mike](https://github.com/jimporter/mike), which also manages versioning on the `gh-pages` branch.
+
+#### Deploying a new version
+
+To deploy version `2.0` of the docs and mark it as the latest, run:
+
+```bash
+make deploy-docs version=2.0
 ```
-If you are not happy with the changes you can run `mike delete [version]`.
-All these mike operations will be recorded as git commits of branch `gh-pages`.
 
- `mike serve` is used to check all versions committed to branch `gh-pages`, which is for checking
- the production website. If you have changes but not commit them yet, you should use `mkdocs serve`
- instead of  `mike serve` to check them.
+This command does the following:
 
+* Fetches the latest README from the [`nplinker-webapp`](https://github.com/NPLinker/nplinker-webapp) repository.
+* Builds and deploys the documentation to the `gh-pages` branch.
+* Updates the `latest` alias to point to this version.
+* Creates a commit on the `gh-pages` branch to record the deployment.
 
+If you want to undo a deployment, you can run:
+
+```bash
+mike delete 2.0
+```
+
+#### Previewing the docs
+
+* To preview all committed versions from `gh-pages`, use:
+
+  ```bash
+  mike serve
+  ```
+
+* To preview your local, uncommitted changes, use:
+
+  ```bash
+  make build-docs
+  ```
+
+> `make build-docs` will also update the webapp README before serving the docs.
 
 ## Versioning
 

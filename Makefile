@@ -1,14 +1,23 @@
-.PHONY: clean clean-build clean-pyc clean-test release build update-version
+# .PHONY is used to declare that the targets are not files
+.PHONY: install-dev clean clean-build clean-pyc clean-test clean-doc release build update-version sync-webapp-readme build-docs deploy-docs
 
 help:
-	@echo "clean - remove all build, test, coverage and Python artifacts"
-	@echo "clean-build - remove build artifacts"
-	@echo "clean-pyc - remove Python file artifacts"
-	@echo "clean-test - remove test and coverage artifacts"
-	@echo "release - upload package to pypi"
-	@echo "build - build package"
-	@echo "update - update pip, build, twine packages"
-	@echo "update-version - update NPLinker version. Usage: make update-version CURRENT_VERSION=0.1.0 NEW_VERSION=0.2.0"
+	@echo "Available commands to 'make':"
+	@echo "  install-dev   : do an editable install of the NPLinker package for development" 
+	@echo "  clean         : remove all build, test, coverage and Python artifacts"
+	@echo "  clean-build   : remove build artifacts"
+	@echo "  clean-pyc     : remove Python cache file artifacts"
+	@echo "  clean-test    : remove test and coverage artifacts"
+	@echo "  clean-doc     : remove doc build artifacts"
+	@echo "  build         : build package"
+	@echo "  release       : upload package to pypi"
+	@echo "  build-docs    : build documentation for local development"
+	@echo "  deploy-docs   : deploy documentation to GitHub Pages"
+	@echo "  update-version: update NPLinker version (e.g. make update-version CURRENT_VERSION=0.1.0 NEW_VERSION=0.2.0)"
+
+install-dev:	
+	pip install -e ".[dev]"
+	install-nplinker-deps
 
 clean: clean-build clean-pyc clean-test clean-doc
 
@@ -39,15 +48,6 @@ build: clean
 
 release: update
 	python -m twine upload dist/*
-
-update:
-	pip install --upgrade pip build twine
-
-venv:
-	python -m venv venv
-
-clean-venv:
-	rm -rf venv
 
 
 # Define the files to update version
@@ -82,3 +82,16 @@ endif
 		fi; \
 	done
 	@echo "Version update complete."
+
+sync-webapp-readme:
+	mkdir -p docs/webapp
+	curl -sSf https://raw.githubusercontent.com/NPLinker/nplinker-webapp/main/README.md -o docs/webapp/readme.md
+
+build-docs: sync-webapp-readme
+	mkdocs serve
+
+deploy-docs: sync-webapp-readme
+ifndef version
+	$(error version is not set. Usage: make deploy-docs version=YOUR_VERSION)
+endif
+	mike deploy -p -u $(version) latest

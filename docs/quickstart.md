@@ -121,7 +121,7 @@ Here are some example values for the `nplinker.toml` file:
     ??? example "GNPS task id and workflow"
         Given an example of GNPS task at https://gnps.ucsd.edu/ProteoSAFe/status.jsp?task=c22f44b14a3d450eb836d607cb9521bb,
         the task id is the last part of this url, i.e. `c22f44b14a3d450eb836d607cb9521bb`. Open this link,
-        you can find the worklow info at the row "Workflow" of the table "Job Status", for this case,
+        you can find the workflow info at the row "Workflow" of the table "Job Status", for this case,
         it is `METABOLOMICS-SNETS`.
 
     ```python title="Download & Extract GNPS data"

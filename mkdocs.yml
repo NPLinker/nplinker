@@ -102,6 +102,8 @@ nav:
     - Scoring Methods: api/scoring_methods.md
     - Data Models: api/scoring.md
     - Utilities: api/scoring_utils.md
+- Webapp:
+  - Webapp Docs: webapp/readme.md
 
 markdown_extensions:
 # https://python-markdown.github.io/extensions/
