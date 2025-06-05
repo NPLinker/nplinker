@@ -5,7 +5,9 @@ import pytest
 from nplinker import utils
 
 
-BGC_GBK_URL = "https://mibig.secondarymetabolites.org/repository/BGC0000001/BGC0000001.gbk"
+PODP_PROJECT_URL = (
+    "https://pairedomicsdata.bioinformatics.nl/api/projects/4b29ddc3-26d0-40d7-80c5-44fb6631dbf9.4"
+)
 MIBIG_METADATA_URL = "https://dl.secondarymetabolites.org/mibig/mibig_json_3.1.tar.gz"
 ROOT = Path(__file__).parent
 
@@ -19,14 +21,9 @@ class TestDownloadUrl:
         yield temppath
         rmtree(temppath)
 
-    def test_default(self, temppath1):
-        utils.download_url(url=BGC_GBK_URL, root=temppath1)
-        f = Path(temppath1) / "BGC0000001.gbk"
-        assert f.is_file()
-
     def test_optional_args(self, temppath1):
-        utils.download_url(url=BGC_GBK_URL, root=temppath1, filename="example.gbk")
-        f = Path(temppath1) / "example.gbk"
+        utils.download_url(url=PODP_PROJECT_URL, root=temppath1, filename="example.json")
+        f = Path(temppath1) / "example.json"
         assert f.is_file()
 
 

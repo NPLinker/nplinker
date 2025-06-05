@@ -16,11 +16,11 @@ If you want to add more settings, you can update the workspace settings, see [th
 
 ## Setup
 
-We use Python 3.10 for development environment.
+We use Python 3.11 for development environment.
 
 ```shell
 # Create a virtual environment
-conda create -n npl-dev python=3.10
+conda create -n npl-dev python=3.11
 
 # activate virtual environment
 conda activate npl-dev
@@ -98,7 +98,7 @@ ruff format filename.py
 
 We use [inline type annotation](https://typing.readthedocs.io/en/latest/source/libraries.html#how-to-provide-type-annotations) for static typing rather than stub files (i.e. `.pyi` files).
 
-Since Python 3.10 is used as dev environment and NPLinker must support Python version ≥3.9, you may see various typing issues at runtime. Here is [a guide to solve the potential runtime issues](https://mypy.readthedocs.io/en/stable/runtime_troubles.html).
+Since Python 3.11 is used as dev environment (older NPLinker must support Python version ≥3.9), you may see various typing issues at runtime. Here is [a guide to solve the potential runtime issues](https://mypy.readthedocs.io/en/stable/runtime_troubles.html).
 
 By default, we use `from __future__ import annotations` at module level to stop evaluating annotations at function definition time (see [PEP 563](https://peps.python.org/pep-0563/)), which would solve most of compatibility issues between different Python versions. Make sure you're aware of the [caveats](https://mypy.readthedocs.io/en/stable/runtime_troubles.html#future-annotations-import-pep-563).
 

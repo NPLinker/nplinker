@@ -41,7 +41,9 @@ def test_unknown_workflow(tmpdir):
         ["2", "2014f321d72542afb5216c932e0d5079", "2014f321d72542afb5216c932e0d5079.tar"],
     ],
 )
-def test_get_download_file(gnps_version, task_id, filename, tmpdir):
+def test_get_download_file(gnps_version, task_id, filename, tmpdir, gnps_website_is_down):
+    if gnps_website_is_down:
+        pytest.skip("GNPS website is down: https://gnps.ucsd.edu")
     downloader = GNPSDownloader(task_id, tmpdir, gnps_version)
     assert downloader.get_download_file() == tmpdir / filename
 
@@ -54,7 +56,9 @@ def test_get_download_file(gnps_version, task_id, filename, tmpdir):
         "189e8bf16af145758b0a900f1c44ff4a",
     ],
 )
-def test_get_task_id(task_id, tmpdir):
+def test_get_task_id(task_id, tmpdir, gnps_website_is_down):
+    if gnps_website_is_down:
+        pytest.skip("GNPS website is down: https://gnps.ucsd.edu")
     downloader = GNPSDownloader(task_id, tmpdir)
     assert downloader.get_task_id() == task_id
 
@@ -89,7 +93,9 @@ def test_get_task_id(task_id, tmpdir):
         ],
     ],
 )
-def test_get_url(gnps_version, task_id, url, tmpdir):
+def test_get_url(gnps_version, task_id, url, tmpdir, gnps_website_is_down):
+    if gnps_website_is_down:
+        pytest.skip("GNPS website is down: https://gnps.ucsd.edu")
     downloader = GNPSDownloader(task_id, tmpdir, gnps_version)
     assert downloader.get_url() == url
 
