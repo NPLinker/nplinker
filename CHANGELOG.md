@@ -1,19 +1,23 @@
 # Changelog
 
+## [v2.0.0-beta.1](https://github.com/NPLinker/nplinker/tree/v2.0.0-beta.1) (2025-06-05)
+
+[Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.9...v2.0.0-beta.1)
+
+**Merged pull requests:**
+
+- Update python version and fix testing issues [\#329](https://github.com/NPLinker/nplinker/pull/329) ([CunliangGeng](https://github.com/CunliangGeng))
+- Update BiG-SCAPE v2 dependency [\#328](https://github.com/NPLinker/nplinker/pull/328) ([adraismawur](https://github.com/adraismawur))
+- docs: add webapp docs page [\#327](https://github.com/NPLinker/nplinker/pull/327) ([gcroci2](https://github.com/gcroci2))
+- improve make commands and fix some typos [\#325](https://github.com/NPLinker/nplinker/pull/325) ([CunliangGeng](https://github.com/CunliangGeng))
+- Update doc for work dir structure [\#322](https://github.com/NPLinker/nplinker/pull/322) ([CunliangGeng](https://github.com/CunliangGeng))
+- Update readme dev [\#320](https://github.com/NPLinker/nplinker/pull/320) ([CunliangGeng](https://github.com/CunliangGeng))
+- Update installation instructions to use conda [\#319](https://github.com/NPLinker/nplinker/pull/319) ([CunliangGeng](https://github.com/CunliangGeng))
+- Remove unused methods and files [\#318](https://github.com/NPLinker/nplinker/pull/318) ([CunliangGeng](https://github.com/CunliangGeng))
+
 ## [v2.0.0-alpha.9](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.9) (2025-03-25)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.8...v2.0.0-alpha.9)
-
-**Fixed bugs:**
-
-- Fix dependency conflict [\#278](https://github.com/NPLinker/nplinker/issues/278)
-
-**Closed issues:**
-
-- Fix logging file output [\#314](https://github.com/NPLinker/nplinker/issues/314)
-- Inconsistent BiG-SCAPE version handling causes ValueError [\#305](https://github.com/NPLinker/nplinker/issues/305)
-- GNPS2 results not supported [\#284](https://github.com/NPLinker/nplinker/issues/284)
-- Update releasing workflow [\#279](https://github.com/NPLinker/nplinker/issues/279)
 
 **Merged pull requests:**
 
@@ -27,10 +31,6 @@
 ## [v2.0.0-alpha.8](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.8) (2025-01-23)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.7...v2.0.0-alpha.8)
-
-**Closed issues:**
-
-- Replace square NPLinker logo by one used for Slack \(with NPLinker text\) [\#288](https://github.com/NPLinker/nplinker/issues/288)
 
 **Merged pull requests:**
 
@@ -54,11 +54,6 @@
 ## [v2.0.0-alpha.7](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.7) (2024-11-28)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.6...v2.0.0-alpha.7)
-
-**Closed issues:**
-
-- Incorrect precursor m/z when loading MGF file from GNPS [\#282](https://github.com/NPLinker/nplinker/issues/282)
-- Use bigscape version in loaders [\#271](https://github.com/NPLinker/nplinker/issues/271)
 
 **Merged pull requests:**
 
@@ -90,16 +85,6 @@
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.3...v2.0.0-alpha.4)
 
-**Implemented enhancements:**
-
-- Select subset of the data [\#265](https://github.com/NPLinker/nplinker/issues/265)
-
-**Closed issues:**
-
-- Fix code scanning alert - Token-Permissions [\#268](https://github.com/NPLinker/nplinker/issues/268)
-- support bigscape v2 [\#216](https://github.com/NPLinker/nplinker/issues/216)
-- Abstraction of run\_bigscape function [\#115](https://github.com/NPLinker/nplinker/issues/115)
-
 **Merged pull requests:**
 
 - update doc for bigscape [\#270](https://github.com/NPLinker/nplinker/pull/270) ([CunliangGeng](https://github.com/CunliangGeng))
@@ -112,18 +97,6 @@
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.2...v2.0.0-alpha.3)
 
-**Implemented enhancements:**
-
-- Data size warnings / checks when installing and using nplinker package [\#237](https://github.com/NPLinker/nplinker/issues/237)
-
-**Closed issues:**
-
-- Podp: not all genome IDs are in antismashDB [\#242](https://github.com/NPLinker/nplinker/issues/242)
-- refactoring scoring \(tracker issue\) [\#205](https://github.com/NPLinker/nplinker/issues/205)
-- ensure that IDs are unique [\#146](https://github.com/NPLinker/nplinker/issues/146)
-- refactor `__eq__` and `__hash__` methods [\#136](https://github.com/NPLinker/nplinker/issues/136)
-- Missing mibig BGC [\#86](https://github.com/NPLinker/nplinker/issues/86)
-
 **Merged pull requests:**
 
 - fix tabular file header detection [\#264](https://github.com/NPLinker/nplinker/pull/264) ([CunliangGeng](https://github.com/CunliangGeng))
@@ -134,11 +107,6 @@
 ## [v2.0.0-alpha.2](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.2) (2024-06-20)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.1...v2.0.0-alpha.2)
-
-**Closed issues:**
-
-- improvement on docs [\#232](https://github.com/NPLinker/nplinker/issues/232)
-- writing tutorials and docs for preparing data [\#204](https://github.com/NPLinker/nplinker/issues/204)
 
 **Merged pull requests:**
 
@@ -170,57 +138,6 @@
 ## [v2.0.0-alpha.1](https://github.com/NPLinker/nplinker/tree/v2.0.0-alpha.1) (2024-03-25)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v1.3.2...v2.0.0-alpha.1)
-
-**Fixed bugs:**
-
-- Fix failing tests [\#96](https://github.com/NPLinker/nplinker/issues/96)
-
-**Closed issues:**
-
-- Fix dev setup issues [\#222](https://github.com/NPLinker/nplinker/issues/222)
-- Running NPLinker tutorial [\#213](https://github.com/NPLinker/nplinker/issues/213)
-- Exception: Failed to find \*ANY\* strains, missing strain\_mappings.csv? [\#170](https://github.com/NPLinker/nplinker/issues/170)
-- Add schema validation [\#165](https://github.com/NPLinker/nplinker/issues/165)
-- Refactor initialisation of project root and data folders \[Track issue\] [\#163](https://github.com/NPLinker/nplinker/issues/163)
-- http 404 error from `test_nplinker_local.py` [\#156](https://github.com/NPLinker/nplinker/issues/156)
-- implement the function to generate strain mappings file [\#154](https://github.com/NPLinker/nplinker/issues/154)
-- implement the function to generate `refseq id ↔ BGC id` mapping file [\#153](https://github.com/NPLinker/nplinker/issues/153)
-- change csv to json for strain mappings file [\#152](https://github.com/NPLinker/nplinker/issues/152)
-- change csv to json for genome status file [\#151](https://github.com/NPLinker/nplinker/issues/151)
-- generate strain mappings file for PODP data [\#150](https://github.com/NPLinker/nplinker/issues/150)
-- how is `strain_mappings.csv` generated? [\#148](https://github.com/NPLinker/nplinker/issues/148)
-- Strain generation, loading and mapping [\#147](https://github.com/NPLinker/nplinker/issues/147)
-- Refactor `DatasetLoader` class  [\#145](https://github.com/NPLinker/nplinker/issues/145)
-- Use UUID for singleton molecular family? [\#144](https://github.com/NPLinker/nplinker/issues/144)
-- KeyError: 'cluster' Extract MIBIG data [\#140](https://github.com/NPLinker/nplinker/issues/140)
-- Use the refactored antismash downloader in `PODPDownloader` class [\#137](https://github.com/NPLinker/nplinker/issues/137)
-- remove `_strain_dict_index` from `StrainCollection` class [\#134](https://github.com/NPLinker/nplinker/issues/134)
-- Rename `Downloader` class to `PODPDownloader` [\#133](https://github.com/NPLinker/nplinker/issues/133)
-- Exception: Failed to find \*ANY\* strains, missing strain\_mappings.csv? [\#130](https://github.com/NPLinker/nplinker/issues/130)
-- error when loading local data [\#129](https://github.com/NPLinker/nplinker/issues/129)
-- nplinker library download [\#128](https://github.com/NPLinker/nplinker/issues/128)
-- Hardware Requirements: [\#124](https://github.com/NPLinker/nplinker/issues/124)
-- replace load\_gcfs function [\#122](https://github.com/NPLinker/nplinker/issues/122)
-- Refactor `Downloader` class to have a specific PoDP downloader [\#121](https://github.com/NPLinker/nplinker/issues/121)
-- PODP mode and local data mode [\#117](https://github.com/NPLinker/nplinker/issues/117)
-- Create StrainMappingLoader [\#116](https://github.com/NPLinker/nplinker/issues/116)
-- Refactor GCF loading process [\#114](https://github.com/NPLinker/nplinker/issues/114)
-- Change `strains` in `StrainCollection` to be a `set` instead of `list` [\#113](https://github.com/NPLinker/nplinker/issues/113)
-- Implement comparison operator for `StrainCollection` class [\#110](https://github.com/NPLinker/nplinker/issues/110)
-- Include `strains` again in objects loaded from Metabolomics [\#109](https://github.com/NPLinker/nplinker/issues/109)
-- check if this function is still needed or forward to the proper implementation [\#108](https://github.com/NPLinker/nplinker/issues/108)
-- Implement GNPS loading functionality on `DatasetLoader` layer [\#107](https://github.com/NPLinker/nplinker/issues/107)
-- Rename `MibigBGC` to `BGC` in MibigBGCLoader [\#106](https://github.com/NPLinker/nplinker/issues/106)
-- Remove strain assignment from BGC loaders? [\#104](https://github.com/NPLinker/nplinker/issues/104)
-- Use unique and fixed GCF identifier in scoring [\#103](https://github.com/NPLinker/nplinker/issues/103)
-- Move test files to subfolders [\#99](https://github.com/NPLinker/nplinker/issues/99)
-- Create `antismash_downloader` module [\#98](https://github.com/NPLinker/nplinker/issues/98)
-- Fix instructions for zsh shell [\#95](https://github.com/NPLinker/nplinker/issues/95)
-- MiBIG v3.x support [\#94](https://github.com/NPLinker/nplinker/issues/94)
-- Implement removing the strain also from self.\_lookup indices. \[Bug\] [\#90](https://github.com/NPLinker/nplinker/issues/90)
-- Improve GNPS format detection [\#89](https://github.com/NPLinker/nplinker/issues/89)
-- PoDP RefSeq accession is used as antiSMASH accession [\#76](https://github.com/NPLinker/nplinker/issues/76)
-- Documentation on readthedocs.io [\#74](https://github.com/NPLinker/nplinker/issues/74)
 
 **Merged pull requests:**
 
@@ -330,11 +247,6 @@
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v1.3.0...v1.3.1)
 
-**Closed issues:**
-
-- Important: Stop committing until restructuring is done  [\#73](https://github.com/NPLinker/nplinker/issues/73)
-- Explore tutorials/modules are relevant to develop the dashboard [\#68](https://github.com/NPLinker/nplinker/issues/68)
-
 **Merged pull requests:**
 
 - Refine install script and upgrade python syntax [\#75](https://github.com/NPLinker/nplinker/pull/75) ([CunliangGeng](https://github.com/CunliangGeng))
@@ -342,22 +254,6 @@
 ## [v1.3.0](https://github.com/NPLinker/nplinker/tree/v1.3.0) (2022-07-21)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v1.2.0...v1.3.0)
-
-**Implemented enhancements:**
-
-- Packaging [\#15](https://github.com/NPLinker/nplinker/issues/15)
-
-**Closed issues:**
-
-- Create independent repo for webapp? [\#72](https://github.com/NPLinker/nplinker/issues/72)
-- Restructure repo with python template from eScience Center  [\#71](https://github.com/NPLinker/nplinker/issues/71)
-- Update wiki page [\#64](https://github.com/NPLinker/nplinker/issues/64)
-- something goes wrong in the step for "MetcalfScoring.setup preprocessing dataset" [\#57](https://github.com/NPLinker/nplinker/issues/57)
-- Parsing strains in GNPS FBMN output needs to be more flexible [\#50](https://github.com/NPLinker/nplinker/issues/50)
-- Rosetta Score issue [\#39](https://github.com/NPLinker/nplinker/issues/39)
-- Loading FBMN-GNPS and Bigscape output data into NPLinker error. [\#35](https://github.com/NPLinker/nplinker/issues/35)
-- Remove requirements.txt file [\#6](https://github.com/NPLinker/nplinker/issues/6)
-- Matching compound names from GNPS to MiBIG [\#3](https://github.com/NPLinker/nplinker/issues/3)
 
 **Merged pull requests:**
 
@@ -367,13 +263,6 @@
 ## [v1.2.0](https://github.com/NPLinker/nplinker/tree/v1.2.0) (2022-06-07)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v1.1.3...v1.2.0)
-
-**Closed issues:**
-
-- WebApp shows no data in tables [\#63](https://github.com/NPLinker/nplinker/issues/63)
-- "Error in server loaded hook UnicodeDecodeError" [\#60](https://github.com/NPLinker/nplinker/issues/60)
-- Error in loading from PoDP: MSV000078839 [\#58](https://github.com/NPLinker/nplinker/issues/58)
-- Linking molfams [\#54](https://github.com/NPLinker/nplinker/issues/54)
 
 **Merged pull requests:**
 
@@ -391,18 +280,9 @@
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v1.1.1...v1.1.2)
 
-**Closed issues:**
-
-- Turning MIBiG on in BiG-SCAPE run of NPLinker [\#55](https://github.com/NPLinker/nplinker/issues/55)
-
 ## [v1.1.1](https://github.com/NPLinker/nplinker/tree/v1.1.1) (2021-09-13)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v1.1...v1.1.1)
-
-**Closed issues:**
-
-- Add a changelog and tag Docker images [\#52](https://github.com/NPLinker/nplinker/issues/52)
-- GCF/BGC data does appear correctly in results [\#49](https://github.com/NPLinker/nplinker/issues/49)
 
 **Merged pull requests:**
 
@@ -411,23 +291,6 @@
 ## [v1.1](https://github.com/NPLinker/nplinker/tree/v1.1) (2021-09-04)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v1.0...v1.1)
-
-**Implemented enhancements:**
-
-- Error when loading Crüsemann data [\#38](https://github.com/NPLinker/nplinker/issues/38)
-
-**Fixed bugs:**
-
-- large-scale sample run error [\#43](https://github.com/NPLinker/nplinker/issues/43)
-
-**Closed issues:**
-
-- Add Licence [\#48](https://github.com/NPLinker/nplinker/issues/48)
-- Allowing other websocket to connect to proxy server? [\#47](https://github.com/NPLinker/nplinker/issues/47)
-- KeyError in strains.py [\#46](https://github.com/NPLinker/nplinker/issues/46)
-- Internal Server Error with tutorial data [\#45](https://github.com/NPLinker/nplinker/issues/45)
-- Error loading tutorial data [\#44](https://github.com/NPLinker/nplinker/issues/44)
-- rosetta scoring: check for knownclusterblast .txt files at start of scoring process [\#34](https://github.com/NPLinker/nplinker/issues/34)
 
 **Merged pull requests:**
 
@@ -445,39 +308,13 @@
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v.0.1...last_version_with_plots)
 
-**Closed issues:**
-
-- Write log output to file [\#37](https://github.com/NPLinker/nplinker/issues/37)
-
 ## [v.0.1](https://github.com/NPLinker/nplinker/tree/v.0.1) (2020-12-11)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/scoring_jun2020...v.0.1)
 
-**Implemented enhancements:**
-
-- Input options [\#14](https://github.com/NPLinker/nplinker/issues/14)
-- More general annotations [\#12](https://github.com/NPLinker/nplinker/issues/12)
-
-**Closed issues:**
-
-- metadata [\#2](https://github.com/NPLinker/nplinker/issues/2)
-- MiBIG [\#1](https://github.com/NPLinker/nplinker/issues/1)
-
 ## [scoring_jun2020](https://github.com/NPLinker/nplinker/tree/scoring_jun2020) (2020-05-29)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/6c299348b417e494167c4bd4869fa79f62383fc9...scoring_jun2020)
-
-**Implemented enhancements:**
-
-- Generate null distributions for the different scoring functions [\#9](https://github.com/NPLinker/nplinker/issues/9)
-
-**Fixed bugs:**
-
-- NP-optimised Metcalf score crashes [\#24](https://github.com/NPLinker/nplinker/issues/24)
-
-**Closed issues:**
-
-- Restrict NPLinker strain object to data set population [\#27](https://github.com/NPLinker/nplinker/issues/27)
 
 **Merged pull requests:**
 
