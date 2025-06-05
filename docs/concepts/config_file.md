@@ -6,7 +6,7 @@
 
 ## Example Configuration
 
-For a full example of a configuration file, see [here](../quickstart.md#3-prepare-config-file).
+For a full example of a configuration file, see [here](../quickstart.md#2-prepare-config-file).
 
 ## Config loader
 

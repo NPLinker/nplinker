@@ -145,7 +145,7 @@ plugins:
       python:
         # https://mkdocstrings.github.io/python/usage/#configuration
         paths: [src]
-        import:
+        inventories:
           - https://docs.python.org/3/objects.inv
           - https://numpy.org/doc/stable/objects.inv
           - https://docs.scipy.org/doc/scipy/objects.inv
