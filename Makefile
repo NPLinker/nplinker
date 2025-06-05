@@ -46,9 +46,8 @@ build: clean
 	python -m build
 	ls -l dist
 
-release: update
+release: 
 	python -m twine upload dist/*
-
 
 # Define the files to update version
 FILES := src/nplinker/__init__.py pyproject.toml CITATION.cff

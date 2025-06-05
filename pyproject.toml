@@ -45,6 +45,7 @@ dev = [
     # packaging
     "build",
     "wheel",
+    "twine",
     # formatting and linting
     "ruff",
     # testing
