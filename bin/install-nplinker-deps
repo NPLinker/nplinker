@@ -144,7 +144,7 @@ echo "🔥 Start installing BigScape ..."
     [[ -d BiG-SCAPE-v2 ]] || git clone -b dev --filter=blob:limit=10m https://github.com/medema-group/BiG-SCAPE.git BiG-SCAPE-v2
     cd BiG-SCAPE-v2
     git config --ad advice.detatchedHead false
-    git checkout 99a4c2e4923bb50e175b2e619c2cee0a14918789 # Commits on Jun 14, 2024
+    git checkout v2.0.0-beta.5 # feb 12, 2025
     pip install click sqlalchemy pyhmmer tqdm matplotlib requests
     chmod 754 bigscape.py
     ln -sf $LIB_PATH/BiG-SCAPE-v2/bigscape.py $PY_PATH/bin/bigscape-v2.py
@@ -153,17 +153,6 @@ echo "🔥 Start installing BigScape ..."
 
 echo -e "✅ BigScape installed successfully\n"
 
-#--- Install FastTree (not support Windows, required by BigScape)
-# http://www.microbesonline.org/fasttree/
-echo "🔥 Start installing FastTree ..."
-    if [[ "$OSTYPE" == "linux"* ]]; then
-        $do_install fasttree
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        wget -q --show-progress http://www.microbesonline.org/fasttree/FastTree.c
-        $gcc -DNO_SSE -O3 -finline-functions -funroll-loops -Wall -o $PY_PATH/bin/fasttree FastTree.c -lm
-        rm FastTree.c
-    fi
-echo -e "✅ FastTree installed successfully\n"
 
 #--- Install Hmmer (required by BigScape)
 if ! command -v hmmpress &> /dev/null; then
