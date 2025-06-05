@@ -45,6 +45,10 @@ def gnps_website_is_down():
     try:
         r = httpx.get(gnps_url, follow_redirects=True)
         if r.is_success:
+            # Check for keywords indicating unavailability
+            unavailable_keywords = ["unavailable", "maintenance", "down"]
+            if any(keyword in r.text.lower() for keyword in unavailable_keywords):
+                return True
             return False
         else:
             return True
@@ -159,6 +163,10 @@ def gnps2_website_is_down():
     try:
         r = httpx.get(gnps_url, follow_redirects=True)
         if r.is_success:
+            # Check for keywords indicating unavailability
+            unavailable_keywords = ["unavailable", "maintenance", "down"]
+            if any(keyword in r.text.lower() for keyword in unavailable_keywords):
+                return True
             return False
         else:
             return True
