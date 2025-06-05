@@ -1,7 +1,7 @@
 
 !!!- Note "Requirements"
     - Linux, MacOS or [Windows with WSL](https://learn.microsoft.com/en-us/windows/wsl/)
-    - Python version ≥3.9
+    - Python version ≥3.11
 
 
 NPLinker is a python package that has both pypi packages and non-pypi packages as dependencies. It 
@@ -11,8 +11,8 @@ Install `nplinker` package as following:
 
 ```bash title="Install nplinker package"
 # Create a new virtual environment and activate it
-conda create -n npl-3.10 python=3.10  # (1)!
-conda activate npl-3.10 
+conda create -n npl-3.11 python=3.11  # (1)!
+conda activate npl-3.11 
 
 # install nplinker package (requiring ~300MB of disk space)
 pip install --pre nplinker # (2)!

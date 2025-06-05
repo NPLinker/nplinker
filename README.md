@@ -26,7 +26,7 @@ Original paper: [Ranking microbial metabolomic and genomic links in the NPLinker
 
 ### Requirement
 - Linux, MacOS or [Windows with WSL](https://learn.microsoft.com/en-us/windows/wsl/)
-- Python version ≥3.9
+- Python version ≥3.11
 
 
 ### Installation
@@ -35,8 +35,8 @@ requires <span style="color:red;">**~4.5GB**</span> of disk space to install all
 
 ```shell
 # Create a new virtual environment and activate it
-conda create -n npl-3.10 python=3.10
-conda activate npl-3.10 
+conda create -n npl-3.11 python=3.11
+conda activate npl-3.11 
 
 # install from nplinker releases (requiring ~300MB of disk space)
 pip install --pre nplinker
@@ -51,8 +51,8 @@ To run the tests, you need to clone this repo and install the development depend
 
 ```shell
 # Create a new virtual environment
-conda create -n npl-3.10 python=3.10
-conda activate npl-3.10
+conda create -n npl-3.11 python=3.11
+conda activate npl-3.11
 
 # Clone the repository and install the development dependencies
 git clone https://github.com/NPLinker/nplinker.git

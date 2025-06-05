@@ -85,8 +85,8 @@ Follow these steps to install the application directly on your system:
 
 2. **Set up a conda environment**
    ```bash
-    # Create a new conda environment with Python 3.10
-    conda create -n nplinker-webapp python=3.10
+    # Create a new conda environment with Python 3.11
+    conda create -n nplinker-webapp python=3.11
 
     # Activate the environment
     conda activate nplinker-webapp
@@ -113,7 +113,7 @@ Follow these steps to install the application directly on your system:
 
 <ul>
   <li><strong>Port already in use</strong>: If port 8050 is already in use, modify the port in <code>app/main.py</code> by changing <code>app.run_server(debug=True, port=8050)</code></li>
-  <li><strong>Package installation errors</strong>: Make sure you're using Python 3.10 and that your pip is up-to-date</li>
+  <li><strong>Package installation errors</strong>: Make sure you're using Python 3.11 and that your pip is up-to-date</li>
 </ul>
 
 <p>If you encounter other problems, please check the <a href="https://github.com/NPLinker/nplinker-webapp/issues">Issues</a> page or create a new issue.</p>
