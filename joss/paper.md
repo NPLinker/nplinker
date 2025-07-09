@@ -12,6 +12,7 @@ tags:
 authors:
   - name: Cunliang Geng
     orcid: 0000-0002-1409-8358
+    corresponding: true
     affiliation: 1
   - name: Giulia Crocioni
     orcid: 0000-0002-0823-0121
@@ -43,7 +44,7 @@ authors:
   - name: Justin J.J. van der Hooft
     orcid: 0000-0002-9340-5511
     corresponding: true
-    affiliation: 3
+    affiliation: "3, 6"
 affiliations:
  - name: Netherlands eScience Center, Netherlands
    index: 1
@@ -55,6 +56,8 @@ affiliations:
    index: 4
  - name: Newcastle University, Biosciences Institute, Newcastle upon Tyne, UK
    index: 5
+ - name: Department of Biochemistry, University of Johannesburg, 2006 Johannesburg, South Africa
+   index: 6
 date: 8 July 2025
 bibliography: paper.bib
 ---
