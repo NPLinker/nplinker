@@ -101,8 +101,10 @@ Modularity and extensibility are key features of NPLinker 2, which provides a se
 
 **"Load Data" component:** The `DatasetLoader` class manages data loaders responsible for loading and parsing genomics, metabolomics, and strain data files. Users can add new data loaders to support additional sources or formats. For example, to load BGC data from a new source, one can define a Python class `NewBGCLoader` that inherits from the `BGCLoaderBase` interface and implements the `get_files` and `get_bgcs` methods, then register it within the `DatasetLoader` class.
 
-**"Scoring" component:** This component handles the linking of data and the scoring of those links. A undirected graph is used to store the linked data, with nodes corresponding to genomics or metabolomics data items and edges representing the links between them. The `ScoringBase` interface is provided to allow the implementation of custom scoring methods.
+**"Scoring" component:** This component handles the linking of data and the scoring of those links. A undirected graph is used to store the linked data, with nodes corresponding to genomics or metabolomics data items and edges representing the links between them with scoring values, as illustrated in \autoref{fig:2}. The `ScoringBase` interface is provided to allow the implementation of custom scoring methods.
 
+
+![Graph representation of linkings. \label{fig:2}](fig2.png){ width=40%}
 
 ## New documentation website
 A dedicated documentation website is available to help users and developers understand how to use and extend NPLinker 2. It includes tutorials, conceptual overviews, pipeline diagrams, and an API reference. The documentation is available at [https://nplinker.github.io/nplinker](https://nplinker.github.io/nplinker).
