@@ -123,7 +123,7 @@ The linking is currently provided starting from both omics views: from Gene Clus
 
 # Acknowledgements
 
-This work was supported by the Netherlands eScience Center under grant number NLESC.OEC.2021.002. A. Lien, L. R. Torres Ortega, D. Ferreira, K. Duncan, M.H. Medema and J. J. J. van der Hooft acknowledge the MAGic-MOLFUN Doctoral Training Network that has received funding from the European Union's Horizon Europe programme under the Marie Skłodowska-Curie grant agreement No. 101072485.
+This work was supported by the Netherlands eScience Center under grant number NLESC.OEC.2021.002 (M.H. Medema and J.J.J. van der Hooft). A. Lien, L. R. Torres Ortega, D. Ferreira, K.R. Duncan, M.H. Medema and J. J. J. van der Hooft acknowledge the MAGic-MOLFUN Doctoral Training Network that has received funding from the European Union's Horizon Europe programme under the Marie Skłodowska-Curie grant agreement No. 101072485 (M.H. Medema and J.J.J. van der Hooft) and and UKRI EP/X03142X/2 (K.R. Duncan).
 
 # Conflict of Interest
 JJJvdH is member of the Scientific Advisory Board of NAICONS Srl., Milano, Italy and consults for Corteva Agriscience, Indianapolis, IN, USA. MHM is a member of the scientific advisory boards of Hexagon Bio and Hothouse Therapeutics Ltd. All other authors declare to have no competing interests.
