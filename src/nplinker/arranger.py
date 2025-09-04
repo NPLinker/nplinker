@@ -334,8 +334,8 @@ class DatasetArranger:
                 shutil.copy(f, self.bigscape_dir)
         elif version == "2":
             shutil.copy(
-                self.bigscape_running_output_dir / "data_sqlite.db",
-                self.bigscape_dir,
+                self.bigscape_running_output_dir / f"{self.bigscape_running_output_dir.name}.db",
+                self.bigscape_dir / f"{self.bigscape_dir.name}.db",
             )
         else:
             raise ValueError(f"Invalid BiG-SCAPE version: {version}")
@@ -525,6 +525,6 @@ def validate_bigscape(bigscape_dir: str | PathLike, cutoff: str) -> None:
         raise FileNotFoundError(f"BiG-SCAPE data directory not found at {bigscape_dir}")
 
     clustering_file = bigscape_dir / f"mix_clustering_c{cutoff}.tsv"
-    database_file = bigscape_dir / "data_sqlite.db"
+    database_file = bigscape_dir / f"{bigscape_dir.name}.db"
     if not clustering_file.exists() and not database_file.exists():
         raise FileNotFoundError(f"BiG-SCAPE data not found in {clustering_file} or {database_file}")
