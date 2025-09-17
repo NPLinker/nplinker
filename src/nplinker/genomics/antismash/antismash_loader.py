@@ -97,6 +97,12 @@ class AntismashBGCLoader(BGCLoaderBase):
             for f in files:
                 fname = os.path.splitext(f)[0]
                 fpath = os.path.join(subdir, f)
+                if fname in bgc_files.keys():
+                    raise ValueError(
+                        f"Duplicated BGC gbk file name {fname} in {fpath} and "
+                        f"{bgc_files[fname]}. All BGC gbk file names must be "
+                        f"unique across all directories."
+                    )
                 bgc_files[fname] = fpath
 
         return bgc_files
