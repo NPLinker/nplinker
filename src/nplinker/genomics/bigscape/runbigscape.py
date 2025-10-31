@@ -17,6 +17,7 @@ def run_bigscape(
     output_path: str | PathLike,
     extra_params: str,
     version: Literal["1", "2"] = "1",
+    full_results: bool = False
 ) -> bool:
     """Runs BiG-SCAPE to cluster BGCs.
 
@@ -100,9 +101,11 @@ def run_bigscape(
                 "cluster",
                 "--pfam-path",
                 os.path.join(PFAM_PATH, "Pfam-A.hmm"),
-                "--db-only-output",
             ]
         )
+
+        if not full_results:
+            args.append("--db-only-output")
 
     # add input and output paths. these are unchanged
     args.extend(["-i", str(antismash_path), "-o", str(output_path)])

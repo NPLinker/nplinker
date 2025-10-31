@@ -319,6 +319,7 @@ class DatasetArranger:
             self.bigscape_running_output_dir,
             self.config.bigscape.parameters,
             version,
+            self.config.bigscape.full_results
         )
 
         if version == "1":
