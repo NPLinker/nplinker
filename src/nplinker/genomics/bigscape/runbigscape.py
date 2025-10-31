@@ -50,6 +50,7 @@ def run_bigscape(
         output_path: Path to the output directory where BiG-SCAPE will write its results.
         extra_params: Additional parameters to pass to BiG-SCAPE.
         version: The version of BiG-SCAPE to run. Must be "1" or "2".
+        full_results: Whether to generate full results for BiG-SCAPE 2
 
     Returns:
         True if BiG-SCAPE ran successfully, False otherwise.
