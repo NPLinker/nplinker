@@ -55,7 +55,10 @@ echo -e "⏳ Installation will take about 5 minutes\n"
 
 if [[ "$OSTYPE" == "linux"* ]]; then
     # detect package manager for Linux
-    if command -v apt &> /dev/null; then
+    if command -v emerge &> /dev/null; then
+        echo -e "✅ Package manager is 'emerge'\n"
+        do_install="sudo emerge -a"
+    elif command -v apt &> /dev/null; then
         echo -e "✅ Package manager is 'apt'\n"
         if ${run_on_github}; then
             do_install="sudo apt install -y"
