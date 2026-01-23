@@ -32,6 +32,19 @@ mkdir nplinker_quickstart
     Before going to the next step, make sure you get familiar with how NPLinker organizes data in the
     working directory, see [Working Directory Structure](./concepts/working_dir_structure.md) page.
 
+??? tip "Example dataset for local mode"
+
+    To quickly try out local mode, you can download an example dataset from Zenodo:
+
+    ```bash title="Download and unzip example dataset"
+    wget "https://zenodo.org/records/10822604/files/nplinker_local_mode_example.zip"
+    unzip nplinker_local_mode_example.zip
+    ```
+
+    The extracted folder `nplinker_local_mode_example` contains all required and optional input
+    data (GNPS, antiSMASH, BiGSCAPE, and strain mappings) for running NPLinker in local mode
+    and can be used as working directory.
+
 
 ## 2. Prepare config file
 
