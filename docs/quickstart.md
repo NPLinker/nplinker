@@ -43,7 +43,7 @@ mkdir nplinker_quickstart
 
     The extracted folder `nplinker_local_mode_example` contains all required and optional input
     data (GNPS, antiSMASH, BiGSCAPE, and strain mappings) for running NPLinker in local mode
-    and can be used as working directory.
+    and can be used as the working directory.
 
 
 ## 2. Prepare config file
