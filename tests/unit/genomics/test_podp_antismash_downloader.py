@@ -23,6 +23,44 @@ def genome_status_file(download_root):
     return Path(download_root, GENOME_STATUS_FILENAME)
 
 
+def download_and_skip_on_404(genome_records, download_root, extract_root, caplog):
+    """Helper function to download antiSMASH data and skip test if 404 errors occur.
+
+    Args:
+        genome_records: List of genome records to download
+        download_root: Download directory path
+        extract_root: Extract directory path
+        caplog: pytest caplog fixture for capturing logs
+
+    Raises:
+        pytest.skip: If all downloads fail due to 404 errors (external database issue)
+        ValueError: If downloads fail for other reasons (actual code bug)
+    """
+    try:
+        podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
+    except ValueError as e:
+        # If all downloads failed, check if it's due to 404 errors (external database issue)
+        if "No antiSMASH data found for any genome" in str(e):
+            # Check logs for 404 errors indicating genomes no longer in antiSMASH database
+            if "status code 404" in caplog.text:
+                failed_genomes = []
+                for record in genome_records:
+                    genome_id = (
+                        record["genome_ID"].get("RefSeq_accession")
+                        or record["genome_ID"].get("GenBank_accession")
+                        or record["genome_ID"].get("JGI_Genome_ID")
+                    )
+                    if genome_id and genome_id in caplog.text and "404" in caplog.text:
+                        failed_genomes.append(genome_id)
+
+                pytest.skip(
+                    f"Genomes no longer available in antiSMASH database (404 error): {failed_genomes}. "
+                    "This is an external database issue, not a code bug."
+                )
+        # If it's a different error, re-raise it
+        raise
+
+
 # Test `GenomeStatus` class
 @pytest.mark.parametrize(
     "params, expected",
