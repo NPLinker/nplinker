@@ -28,7 +28,7 @@ dependencies = [
     "beautifulsoup4",
     "biopython",
     "dynaconf",
-    "httpx",
+    "httpx>=0.23,<1.0",
     "jsonschema",
     "numpy",
     "networkx",
