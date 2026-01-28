@@ -32,22 +32,6 @@ mkdir nplinker_quickstart
     Before going to the next step, make sure you get familiar with how NPLinker organizes data in the
     working directory, see [Working Directory Structure](./concepts/working_dir_structure.md) page.
 
-??? tip "Example dataset for local mode"
-
-    To quickly try out local mode, you can download an example dataset from Zenodo:
-
-    ```bash title="Download and unzip example dataset"
-    wget "https://zenodo.org/records/10822604/files/nplinker_local_mode_example.zip"
-    unzip nplinker_local_mode_example.zip
-    
-    # copy all data to your working directory
-    cp nplinker_local_mode_example/*  nplinker_quickstart
-    ```
-
-    The extracted folder `nplinker_local_mode_example` contains all required and optional input
-    data (GNPS, antiSMASH, BiGSCAPE, and strain mappings) for running NPLinker in local mode
-    and can be used as the working directory.
-
 
 ## 2. Prepare config file
 
@@ -131,6 +115,20 @@ Here are some example values for the `nplinker.toml` file:
 
     If you choose the `local` mode, meaning you have input data of NPLinker stored on your local
     machine, you need to move the input data to the working directory created in the previous step.
+
+    ??? tip "Example dataset for local mode"
+
+        To quickly try out local mode, you can download an example dataset from Zenodo:
+
+        ```bash
+        wget "https://zenodo.org/records/10822604/files/nplinker_local_mode_example.zip"
+        unzip nplinker_local_mode_example.zip
+        
+        # copy all data to your working directory
+        cp nplinker_local_mode_example/*  nplinker_quickstart
+        ```
+
+        This example dataset contains all required and optional input data (GNPS, antiSMASH, BiGSCAPE, and strain mappings) for running NPLinker in local mode.
 
     ### GNPS data
     NPLinker accepts data from the output of [GNPS1 or GNPS2 workflows](./concepts/gnps_data.md). 
