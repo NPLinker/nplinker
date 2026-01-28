@@ -39,6 +39,9 @@ mkdir nplinker_quickstart
     ```bash title="Download and unzip example dataset"
     wget "https://zenodo.org/records/10822604/files/nplinker_local_mode_example.zip"
     unzip nplinker_local_mode_example.zip
+    
+    # copy all data to your working directory
+    cp nplinker_local_mode_example/*  nplinker_quickstart
     ```
 
     The extracted folder `nplinker_local_mode_example` contains all required and optional input
