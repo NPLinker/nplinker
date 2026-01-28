@@ -121,7 +121,7 @@ Here are some example values for the `nplinker.toml` file:
         If want to quickly try out local mode without using your own input data, you can download 
         an example dataset from Zenodo:
 
-        ```bash"
+        ```bash
         wget "https://zenodo.org/records/10822604/files/nplinker_local_mode_example.zip"
         unzip nplinker_local_mode_example.zip
         
