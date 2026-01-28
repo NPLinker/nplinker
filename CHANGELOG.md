@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.0.0](https://github.com/NPLinker/nplinker/tree/v2.0.0) (2026-01-28)
+
+[Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-beta.1...v2.0.0)
+
+**Merged pull requests:**
+
+- Provide example input data for the local mode [\#344](https://github.com/NPLinker/nplinker/pull/344) ([liannette](https://github.com/liannette))
+- \[add\] more state of the art - other methods + references [\#343](https://github.com/NPLinker/nplinker/pull/343) ([rtlortega](https://github.com/rtlortega))
+- joss review - updated statement of need [\#340](https://github.com/NPLinker/nplinker/pull/340) ([justinjjvanderhooft](https://github.com/justinjjvanderhooft))
+- Fix installation depencencies for Gentoo [\#338](https://github.com/NPLinker/nplinker/pull/338) ([apraga](https://github.com/apraga))
+- add joss paper draft [\#331](https://github.com/NPLinker/nplinker/pull/331) ([CunliangGeng](https://github.com/CunliangGeng))
+
 ## [v2.0.0-beta.1](https://github.com/NPLinker/nplinker/tree/v2.0.0-beta.1) (2025-06-05)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-alpha.9...v2.0.0-beta.1)
