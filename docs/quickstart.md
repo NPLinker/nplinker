@@ -118,7 +118,7 @@ Here are some example values for the `nplinker.toml` file:
 
     ??? tip "Example dataset for local mode"
 
-        If want to quickly try out local mode without using your own input data, you can download 
+        To quickly try out local mode without using your own input data, you can download 
         an example dataset from Zenodo:
 
         ```bash
