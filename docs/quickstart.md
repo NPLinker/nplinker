@@ -52,7 +52,7 @@ mkdir nplinker_quickstart
 ## 2. Prepare config file
 
 NPLinker requires a configuration file, `nplinker.toml`, to specify the working directory, mode,
-and other settings for a run. The file does not need to be placed in the working directory created
+and other settings for a run. This file does not need to be placed in the working directory created
 in step 1 (e.g., `nplinker_quickstart`), but for clarity and ease of following the QuickStart 
 workflow, it is recommended to put it there.
 
