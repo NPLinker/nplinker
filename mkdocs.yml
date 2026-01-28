@@ -60,7 +60,6 @@ validation:
 nav:
 - Get Started:
   - Welcome to NPLinker: index.md
-  - Installation: install.md
   - Quickstart: quickstart.md
   - Logging: logging.md
   # - Configuration: config.md
