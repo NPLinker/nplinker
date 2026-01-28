@@ -118,9 +118,10 @@ Here are some example values for the `nplinker.toml` file:
 
     ??? tip "Example dataset for local mode"
 
-        To quickly try out local mode, you can download an example dataset from Zenodo:
+        If want to quickly try out local mode without using your own input data, you can download 
+        an example dataset from Zenodo:
 
-        ```bash
+        ```bash"
         wget "https://zenodo.org/records/10822604/files/nplinker_local_mode_example.zip"
         unzip nplinker_local_mode_example.zip
         
@@ -128,7 +129,11 @@ Here are some example values for the `nplinker.toml` file:
         cp nplinker_local_mode_example/*  nplinker_quickstart
         ```
 
-        This example dataset contains all required and optional input data (GNPS, antiSMASH, BiGSCAPE, and strain mappings) for running NPLinker in local mode.
+        This example dataset contains all required and optional input data (GNPS, antiSMASH, BiGSCAPE, 
+        and strain mappings) for running NPLinker in local mode. 
+        
+        If you do not use this example dataset, continue with the rest of this section to prepare 
+        your own input data.
 
     ### GNPS data
     NPLinker accepts data from the output of [GNPS1 or GNPS2 workflows](./concepts/gnps_data.md). 
