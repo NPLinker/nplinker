@@ -122,6 +122,7 @@ Here are some example values for the `nplinker.toml` file:
         an example dataset from Zenodo:
 
         ```bash
+        # Download and extract example dataset
         wget "https://zenodo.org/records/10822604/files/nplinker_local_mode_example.zip"
         unzip nplinker_local_mode_example.zip
         
