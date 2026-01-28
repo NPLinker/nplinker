@@ -15,15 +15,14 @@ conda create -n npl-3.11 python=3.11  # (1)!
 conda activate npl-3.11 
 
 # install nplinker package (requiring ~300MB of disk space)
-pip install --pre nplinker # (2)!
+pip install nplinker
 
 # install nplinker non-pypi dependencies and databases (~4GB)
-install-nplinker-deps # (3)!
+install-nplinker-deps # (2)!
 ```
 
 1. A virtual environment is ***required*** to install the non-pypi dependencies. It's recommended to use `conda` to manage python virtual environments. Check [conda documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for installation instructions.
-2. NPLinker v2 is still under development and released as [pre-release](https://pypi.org/project/nplinker/#history). To install the pre-release, you need the `--pre` option. 
-3. Use `which install-nplinker-deps` command to check if the command `install-nplinker-deps` is in the activated python virtual environment. If not, make sure you have activated the virtual environment and/or reinstall the `nplinker` package.
+2. Use `which install-nplinker-deps` command to check if the command `install-nplinker-deps` is in the activated python virtual environment. If not, make sure you have activated the virtual environment and/or reinstall the `nplinker` package.
 
 ## Install from source code
 

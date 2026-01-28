@@ -39,7 +39,7 @@ conda create -n npl-3.11 python=3.11
 conda activate npl-3.11 
 
 # install from nplinker releases (requiring ~300MB of disk space)
-pip install --pre nplinker
+pip install nplinker
 
 # install nplinker non-pypi dependencies and databases (~4GB)
 install-nplinker-deps

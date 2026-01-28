@@ -84,7 +84,7 @@ To install NPLinker 2 and its dependencies, users can run the following commands
 
 ```bash
 # Install the NPLinker package
-pip install --pre nplinker
+pip install nplinker
 
 # Install non-PyPi dependencies and required databases
 install-nplinker-deps 
