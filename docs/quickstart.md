@@ -127,7 +127,7 @@ Here are some example values for the `nplinker.toml` file:
         unzip nplinker_local_mode_example.zip
         
         # copy all data to your working directory
-        cp nplinker_local_mode_example/*  nplinker_quickstart
+        cp -r nplinker_local_mode_example/*  nplinker_quickstart
         ```
 
         This example dataset contains all required and optional input data (GNPS, antiSMASH, BiGSCAPE, 
