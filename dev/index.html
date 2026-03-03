@@ -14,7 +14,7 @@
       
       
       
-        <link rel="next" href="install/">
+        <link rel="next" href="quickstart/">
       
       
       <link rel="icon" href="images/NPLinker_icon_black.svg">
@@ -442,6 +442,19 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Welcome to NPLinker
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="." class="md-nav__link md-nav__link--active">
         
   
@@ -454,29 +467,43 @@
 
       </a>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="install/" class="md-nav__link">
         
-  
-  
-  <span class="md-ellipsis">
-    Installation
-    
-  </span>
-  
 
-      </a>
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-from-source-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Install from source code
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1654,6 +1681,32 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-from-source-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Install from source code
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1675,11 +1728,39 @@
 <p><img src="images/NPLinker_standard_black.svg" class="theme-toggle-image"></p>
 <p>NPLinker is a python framework for data mining microbial natural products by integrating genomics and metabolomics data.</p>
 <p>For a deep understanding of NPLinker, please refer to the <a href="https://doi.org/10.1371/journal.pcbi.1008920">original paper</a>.</p>
-<div class="admonition warning">
-<p class="admonition-title">Under Development</p>
-<p>NPLinker v2 is under active development (<a href="https://pypi.org/project/nplinker/#history">see its pre-releases</a>). 
-The documentation is not complete yet. If you have any questions, please contact us via <a href="https://github.com/NPLinker/nplinker/issues">GitHub Issues</a>.</p>
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
+<div class="admonition - note">
+<p class="admonition-title">Requirements</p>
+<ul>
+<li>Linux, MacOS or <a href="https://learn.microsoft.com/en-us/windows/wsl/">Windows with WSL</a></li>
+<li>Python version ≥3.11</li>
+</ul>
 </div>
+<p>NPLinker is a python package that has both pypi packages and non-pypi packages as dependencies. It 
+requires <span style="color:red;"><strong>~4.5GB</strong></span> of disk space to install all the dependencies. </p>
+<p>Install <code>nplinker</code> package as following:</p>
+<div class="language-bash highlight"><span class="filename">Install nplinker package</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Create a new virtual environment and activate it</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>npl-3.11<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.11<span class="w">  </span><span class="c1"># (1)!</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>conda<span class="w"> </span>activate<span class="w"> </span>npl-3.11<span class="w"> </span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># install nplinker package (requiring ~300MB of disk space)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>pip<span class="w"> </span>install<span class="w"> </span>nplinker
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># install nplinker non-pypi dependencies and databases (~4GB)</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>install-nplinker-deps<span class="w"> </span><span class="c1"># (2)!</span>
+</code></pre></div>
+<ol>
+<li>A virtual environment is <strong><em>required</em></strong> to install the non-pypi dependencies. It's recommended to use <code>conda</code> to manage python virtual environments. Check <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html">conda documentation</a> for installation instructions.</li>
+<li>Use <code>which install-nplinker-deps</code> command to check if the command <code>install-nplinker-deps</code> is in the activated python virtual environment. If not, make sure you have activated the virtual environment and/or reinstall the <code>nplinker</code> package.</li>
+</ol>
+<h2 id="install-from-source-code">Install from source code<a class="headerlink" href="#install-from-source-code" title="Permanent link">&para;</a></h2>
+<p>You can also install NPLinker from source code:</p>
+<div class="language-bash highlight"><span class="filename">Install from latest source code</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/nplinker/nplinker@dev<span class="w">  </span><span class="c1"># (1)!</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>install-nplinker-deps
+</code></pre></div>
+<ol>
+<li>The <code>@dev</code> is the branch name. You can replace it with the branch name, commit or tag.</li>
+</ol>
 
 
 
