@@ -200,7 +200,11 @@ class DatasetLoader:
             loader = BigscapeGCFLoader(bigscape_cluster_file)
             logger.info(f"Loading BigSCAPE cluster file {bigscape_cluster_file}")
         elif self.config.bigscape.version == "2":
-            bigscape_db_file = self.config.root_dir / defaults.BIGSCAPE_DIRNAME / "data_sqlite.db"
+            bigscape_db_file = (
+                self.config.root_dir
+                / defaults.BIGSCAPE_DIRNAME
+                / f"{defaults.BIGSCAPE_DIRNAME}.db"
+            )
             loader = BigscapeV2GCFLoader(bigscape_db_file)
             logger.info(f"Loading BigSCAPE database file {bigscape_db_file}")
         else:
