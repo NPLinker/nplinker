@@ -35,9 +35,14 @@ mkdir nplinker_quickstart
 
 ## 2. Prepare config file
 
-The configuration file `nplinker.toml` is required by NPLinker to specify the working directory, mode,
-and other settings for the run of NPLinker. You can put the `nplinker.toml` file in any place, but it 
-is recommended to put it in the working directory created in step 1.
+NPLinker requires a configuration file, `nplinker.toml`, to specify the working directory, mode,
+and other settings for a run. This file does not need to be placed in the working directory created
+in step 1 (e.g., `nplinker_quickstart`), but for clarity and ease of following the QuickStart 
+workflow, it is recommended to put it there.
+
+Inside `nplinker.toml`, the `root_dir` setting must be explicitly specified. This should point to
+your working directory (e.g., `nplinker_quickstart`) and tells NPLinker where to find all
+input data and where to store output data. 
 
 The details of all settings can be found at this page [Config File](./concepts/config_file.md).
 
@@ -110,6 +115,26 @@ Here are some example values for the `nplinker.toml` file:
 
     If you choose the `local` mode, meaning you have input data of NPLinker stored on your local
     machine, you need to move the input data to the working directory created in the previous step.
+
+    ??? tip "Example dataset for local mode"
+
+        To quickly try out local mode without using your own input data, you can download 
+        an example dataset from Zenodo:
+
+        ```bash
+        # Download and extract example dataset
+        wget "https://zenodo.org/records/10822604/files/nplinker_local_mode_example.zip"
+        unzip nplinker_local_mode_example.zip
+        
+        # copy all data to your working directory
+        cp -r nplinker_local_mode_example/*  nplinker_quickstart
+        ```
+
+        This example dataset contains all required and optional input data (GNPS, antiSMASH, BiGSCAPE, 
+        and strain mappings) for running NPLinker in local mode. 
+        
+        If you do not use this example dataset, continue with the rest of this section to prepare 
+        your own input data.
 
     ### GNPS data
     NPLinker accepts data from the output of [GNPS1 or GNPS2 workflows](./concepts/gnps_data.md). 

@@ -1,5 +1,6 @@
 import tarfile
 import zipfile
+import httpx
 import pytest
 from nplinker.metabolomics.gnps import GNPSDownloader
 from nplinker.metabolomics.gnps import GNPSFormat
@@ -11,8 +12,11 @@ def test_invalid_gnps_version(tmpdir):
 
 
 def test_unknown_workflow(tmpdir):
-    with pytest.raises(ValueError, match="Unknown workflow type for GNPS task .*"):
-        GNPSDownloader("0ad6535e34d449788f297e712f43068a", tmpdir)
+    try:
+        with pytest.raises(ValueError, match="Unknown workflow type for GNPS task .*"):
+            GNPSDownloader("0ad6535e34d449788f297e712f43068a", tmpdir)
+    except httpx.ReadTimeout:
+        pytest.skip("GNPS website is not responding (timeout)")
 
 
 @pytest.mark.parametrize(
