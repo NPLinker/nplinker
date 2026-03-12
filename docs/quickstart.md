@@ -150,10 +150,11 @@ Here are some example values for the `nplinker.toml` file:
         it is `METABOLOMICS-SNETS`.
 
     ```python title="Download & Extract GNPS data"
+    import os
     from nplinker.metabolomics.gnps import GNPSDownloader, GNPSExtractor
 
     # Go to the working directory
-    cd nplinker_quickstart
+    os.chdir("nplinker_quickstart")
 
     # Download GNPS data & get the path to the downloaded archive
     downloader = GNPSDownloader("gnps_task_id", "downloads") # (1)!
