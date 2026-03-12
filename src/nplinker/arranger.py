@@ -335,8 +335,7 @@ class DatasetArranger:
         elif version == "2":
             # BiG-SCAPE v2 names the DB as <output_dir_name>.db
             bigscape_db = (
-                self.bigscape_running_output_dir
-                / f"{self.bigscape_running_output_dir.name}.db"
+                self.bigscape_running_output_dir / f"{self.bigscape_running_output_dir.name}.db"
             )
             shutil.copy(bigscape_db, self.bigscape_dir / "data_sqlite.db")
         else:
