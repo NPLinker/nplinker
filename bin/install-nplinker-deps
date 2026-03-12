@@ -150,7 +150,7 @@ echo "🔥 Start installing BigScape ..."
     git config --add advice.detachedHead false
     git fetch --tags
     git checkout v2.0.2 # Feb 3, 2026
-    pip install -q click sqlalchemy "pyhmmer>=0.12.0" tqdm matplotlib requests sortedcontainers pyyaml importlib-metadata
+    pip install -q click sqlalchemy "pyhmmer>=0.12.0" tqdm matplotlib requests sortedcontainers pyyaml importlib-metadata importlib-resources
     pip install -q .
     cd ..
 
