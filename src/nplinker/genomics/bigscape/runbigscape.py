@@ -68,7 +68,7 @@ def run_bigscape(
     if version == "1":
         bigscape_py_path = "bigscape.py"
     elif version == "2":
-        bigscape_py_path = "bigscape-v2.py"
+        bigscape_py_path = "bigscape"
     else:
         raise ValueError("Invalid BiG-SCAPE version number. Expected: '1' or '2'.")
 
