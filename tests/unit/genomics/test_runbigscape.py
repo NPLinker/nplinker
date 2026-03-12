@@ -1,6 +1,8 @@
 import os
+import subprocess
 import pytest
 from nplinker.genomics import bigscape
+from nplinker.genomics.bigscape import runbigscape
 from .. import DATA_DIR
 
 
@@ -68,3 +70,49 @@ def test_bad_parameters(tmp_path, version):
         )
 
     assert "BiG-SCAPE" in e.value.args[0]
+
+
+def test_v2_converts_underscores_to_hyphens(tmp_path, monkeypatch):
+    """Test that underscores in option names are converted to hyphens for BiG-SCAPE v2."""
+    calls = []
+
+    def fake_run(args, **kwargs):
+        calls.append(args)
+        return subprocess.CompletedProcess(args, returncode=0)
+
+    monkeypatch.setattr(runbigscape.subprocess, "run", fake_run)
+
+    bigscape.run_bigscape(
+        antismash_path=tmp_path,
+        output_path=tmp_path,
+        extra_params="--mibig_version 3.1 --include_singletons --gcf_cutoffs 0.30",
+        version="2",
+    )
+
+    # Second call is the actual BiG-SCAPE run (first is the -h check)
+    actual_args = calls[1]
+    assert "--mibig-version" in actual_args
+    assert "--include-singletons" in actual_args
+    assert "--gcf-cutoffs" in actual_args
+    assert "--mibig_version" not in actual_args
+
+
+def test_v1_preserves_underscores(tmp_path, monkeypatch):
+    """Test that underscores in option names are preserved for BiG-SCAPE v1."""
+    calls = []
+
+    def fake_run(args, **kwargs):
+        calls.append(args)
+        return subprocess.CompletedProcess(args, returncode=0)
+
+    monkeypatch.setattr(runbigscape.subprocess, "run", fake_run)
+
+    bigscape.run_bigscape(
+        antismash_path=tmp_path,
+        output_path=tmp_path,
+        extra_params="--mibig_version 3.1",
+        version="1",
+    )
+
+    actual_args = calls[1]
+    assert "--mibig_version" in actual_args
