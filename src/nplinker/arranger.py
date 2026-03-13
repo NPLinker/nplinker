@@ -333,10 +333,11 @@ class DatasetArranger:
             ):
                 shutil.copy(f, self.bigscape_dir)
         elif version == "2":
-            shutil.copy(
-                self.bigscape_running_output_dir / "data_sqlite.db",
-                self.bigscape_dir,
+            # BiG-SCAPE v2 names the DB as <output_dir_name>.db
+            bigscape_db = (
+                self.bigscape_running_output_dir / f"{self.bigscape_running_output_dir.name}.db"
             )
+            shutil.copy(bigscape_db, self.bigscape_dir / "data_sqlite.db")
         else:
             raise ValueError(f"Invalid BiG-SCAPE version: {version}")
 

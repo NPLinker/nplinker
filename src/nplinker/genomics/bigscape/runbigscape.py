@@ -68,7 +68,7 @@ def run_bigscape(
     if version == "1":
         bigscape_py_path = "bigscape.py"
     elif version == "2":
-        bigscape_py_path = "bigscape-v2.py"
+        bigscape_py_path = "bigscape"
     else:
         raise ValueError("Invalid BiG-SCAPE version number. Expected: '1' or '2'.")
 
@@ -109,7 +109,13 @@ def run_bigscape(
 
     # append the user supplied params, if any
     if len(extra_params) > 0:
-        args.extend(extra_params.split(" "))
+        params = extra_params.split(" ")
+        # BiG-SCAPE v2 uses Click which requires hyphens in option names,
+        # while v1 used argparse which accepted both. Convert underscores
+        # to hyphens in option names for v2 compatibility.
+        if version == "2":
+            params = [p.replace("_", "-") if p.startswith("-") else p for p in params]
+        args.extend(params)
 
     logger.info(f"BiG-SCAPE command: {args}")
     result = subprocess.run(args, stdout=sys.stdout, stderr=sys.stderr)
