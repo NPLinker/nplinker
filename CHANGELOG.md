@@ -1,5 +1,15 @@
 # Changelog
 
+## [v2.0.1](https://github.com/NPLinker/nplinker/tree/v2.0.1) (2026-03-14)
+
+[Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0...v2.0.1)
+
+**Merged pull requests:**
+
+- Enhance run\_bigscape for BiG-SCAPE v2 compatibility [\#349](https://github.com/NPLinker/nplinker/pull/349) ([CunliangGeng](https://github.com/CunliangGeng))
+- Joss review - work on revisions Round 2 [\#348](https://github.com/NPLinker/nplinker/pull/348) ([justinjjvanderhooft](https://github.com/justinjjvanderhooft))
+- Change cp command to copy directories recursively [\#346](https://github.com/NPLinker/nplinker/pull/346) ([bgyori](https://github.com/bgyori))
+
 ## [v2.0.0](https://github.com/NPLinker/nplinker/tree/v2.0.0) (2026-01-28)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0-beta.1...v2.0.0)
