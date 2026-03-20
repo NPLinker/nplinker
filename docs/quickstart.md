@@ -104,7 +104,9 @@ Here are some example values for the `nplinker.toml` file:
 
     1. Replace `absolute/path/to/working/directory` with the **absolute** path to the working directory
        created in step 1.
-    2. Replace `podp_id` with the identifier of the dataset in the Paired Omics Data Platform (PODP).
+    2. Replace `podp_id` with the identifier of the dataset in the Paired Omics Data Platform (PODP). 
+       For example: `707bce6a-5000-43e0-95bf-ddb41cb2ccfa.3` corresponds to the dataset at
+       https://pairedomicsdata.bioinformatics.nl/projects/707bce6a-5000-43e0-95bf-ddb41cb2ccfa.3
 
 
 ## 3. Prepare input data (`local` mode only)
