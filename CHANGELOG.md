@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.0.2](https://github.com/NPLinker/nplinker/tree/v2.0.2) (2026-03-30)
+
+[Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.1...v2.0.2)
+
+**Merged pull requests:**
+
+- Add example `podp_id` to quickstart [\#350](https://github.com/NPLinker/nplinker/pull/350) ([liannette](https://github.com/liannette))
+
 ## [v2.0.1](https://github.com/NPLinker/nplinker/tree/v2.0.1) (2026-03-14)
 
 [Full Changelog](https://github.com/NPLinker/nplinker/compare/v2.0.0...v2.0.1)

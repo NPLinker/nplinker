@@ -58,7 +58,7 @@ authors:
     family-names: van der Hooft
     affiliation: "Bioinformatics Group, Wageningen University & Research"
     orcid: "https://orcid.org/0000-0002-9340-5511"
-version: "2.0.1"
+version: "2.0.2"
 repository-code: "https://github.com/NPLinker/nplinker"
 keywords:
   - Python
