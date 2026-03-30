@@ -1939,7 +1939,9 @@ input data and where to store output data. </p>
 <ol>
 <li>Replace <code>absolute/path/to/working/directory</code> with the <strong>absolute</strong> path to the working directory
    created in step 1.</li>
-<li>Replace <code>podp_id</code> with the identifier of the dataset in the Paired Omics Data Platform (PODP).</li>
+<li>Replace <code>podp_id</code> with the identifier of the dataset in the Paired Omics Data Platform (PODP). 
+   For example: <code>707bce6a-5000-43e0-95bf-ddb41cb2ccfa.3</code> corresponds to the dataset at
+   <a href="https://pairedomicsdata.bioinformatics.nl/projects/707bce6a-5000-43e0-95bf-ddb41cb2ccfa.3">https://pairedomicsdata.bioinformatics.nl/projects/707bce6a-5000-43e0-95bf-ddb41cb2ccfa.3</a></li>
 </ol>
 </div>
 </div>
@@ -1979,17 +1981,18 @@ the task id is the last part of this url, i.e. <code>c22f44b14a3d450eb836d607cb9
 you can find the workflow info at the row "Workflow" of the table "Job Status", for this case,
 it is <code>METABOLOMICS-SNETS</code>.</p>
 </details>
-<div class="language-python highlight"><span class="filename">Download & Extract GNPS data</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">nplinker.metabolomics.gnps</span><span class="w"> </span><span class="kn">import</span> <span class="n">GNPSDownloader</span><span class="p">,</span> <span class="n">GNPSExtractor</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="c1"># Go to the working directory</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">cd</span> <span class="n">nplinker_quickstart</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="c1"># Download GNPS data &amp; get the path to the downloaded archive</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="n">downloader</span> <span class="o">=</span> <span class="n">GNPSDownloader</span><span class="p">(</span><span class="s2">&quot;gnps_task_id&quot;</span><span class="p">,</span> <span class="s2">&quot;downloads&quot;</span><span class="p">)</span> <span class="c1"># (1)!</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">downloaded_archive</span> <span class="o">=</span> <span class="n">downloader</span><span class="o">.</span><span class="n">download</span><span class="p">()</span><span class="o">.</span><span class="n">get_download_file</span><span class="p">()</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="c1"># Extract GNPS data to `gnps` directory</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="n">extractor</span> <span class="o">=</span> <span class="n">GNPSExtractor</span><span class="p">(</span><span class="n">downloaded_archive</span><span class="p">,</span> <span class="s2">&quot;gnps&quot;</span><span class="p">)</span> <span class="c1"># (2)!</span>
+<div class="language-python highlight"><span class="filename">Download & Extract GNPS data</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">nplinker.metabolomics.gnps</span><span class="w"> </span><span class="kn">import</span> <span class="n">GNPSDownloader</span><span class="p">,</span> <span class="n">GNPSExtractor</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Go to the working directory</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;nplinker_quickstart&quot;</span><span class="p">)</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Download GNPS data &amp; get the path to the downloaded archive</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">downloader</span> <span class="o">=</span> <span class="n">GNPSDownloader</span><span class="p">(</span><span class="s2">&quot;gnps_task_id&quot;</span><span class="p">,</span> <span class="s2">&quot;downloads&quot;</span><span class="p">)</span> <span class="c1"># (1)!</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="n">downloaded_archive</span> <span class="o">=</span> <span class="n">downloader</span><span class="o">.</span><span class="n">download</span><span class="p">()</span><span class="o">.</span><span class="n">get_download_file</span><span class="p">()</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="c1"># Extract GNPS data to `gnps` directory</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="n">extractor</span> <span class="o">=</span> <span class="n">GNPSExtractor</span><span class="p">(</span><span class="n">downloaded_archive</span><span class="p">,</span> <span class="s2">&quot;gnps&quot;</span><span class="p">)</span> <span class="c1"># (2)!</span>
 </code></pre></div>
 <ol>
 <li>If you already have the downloaded archive of GNPS data, you can skip the download steps.</li>

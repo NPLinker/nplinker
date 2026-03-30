@@ -3178,8 +3178,7 @@ according to <a class="autorefs autorefs-internal" title="            STRAIN_MAP
 
             <details class="quote">
               <summary>Source code in <code>src/nplinker/arranger.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-344">344</a></span>
 <span class="normal"><a href="#__codelineno-0-345">345</a></span>
 <span class="normal"><a href="#__codelineno-0-346">346</a></span>
 <span class="normal"><a href="#__codelineno-0-347">347</a></span>
@@ -3191,20 +3190,21 @@ according to <a class="autorefs autorefs-internal" title="            STRAIN_MAP
 <span class="normal"><a href="#__codelineno-0-353">353</a></span>
 <span class="normal"><a href="#__codelineno-0-354">354</a></span>
 <span class="normal"><a href="#__codelineno-0-355">355</a></span>
-<span class="normal"><a href="#__codelineno-0-356">356</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="k">def</span><span class="w"> </span><span class="nf">arrange_strain_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Arrange the strain mappings file.</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    For `local` mode, validate the strain mappings file.</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    For `podp` mode, always generate the new strain mappings file and validate it.</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">    The validation checks if the strain mappings file exists and if it is a valid JSON file</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    according to [STRAIN_MAPPINGS_SCHEMA][nplinker.schemas.STRAIN_MAPPINGS_SCHEMA].</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;podp&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_generate_strain_mappings</span><span class="p">()</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_validate_strain_mappings</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-356">356</a></span>
+<span class="normal"><a href="#__codelineno-0-357">357</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="k">def</span><span class="w"> </span><span class="nf">arrange_strain_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Arrange the strain mappings file.</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    For `local` mode, validate the strain mappings file.</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">    For `podp` mode, always generate the new strain mappings file and validate it.</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    The validation checks if the strain mappings file exists and if it is a valid JSON file</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">    according to [STRAIN_MAPPINGS_SCHEMA][nplinker.schemas.STRAIN_MAPPINGS_SCHEMA].</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;podp&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_generate_strain_mappings</span><span class="p">()</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_validate_strain_mappings</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3230,8 +3230,7 @@ according to <a class="autorefs autorefs-internal" title="            STRAIN_MAP
 
             <details class="quote">
               <summary>Source code in <code>src/nplinker/arranger.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-401">401</a></span>
-<span class="normal"><a href="#__codelineno-0-402">402</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-402">402</a></span>
 <span class="normal"><a href="#__codelineno-0-403">403</a></span>
 <span class="normal"><a href="#__codelineno-0-404">404</a></span>
 <span class="normal"><a href="#__codelineno-0-405">405</a></span>
@@ -3239,16 +3238,17 @@ according to <a class="autorefs autorefs-internal" title="            STRAIN_MAP
 <span class="normal"><a href="#__codelineno-0-407">407</a></span>
 <span class="normal"><a href="#__codelineno-0-408">408</a></span>
 <span class="normal"><a href="#__codelineno-0-409">409</a></span>
-<span class="normal"><a href="#__codelineno-0-410">410</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="k">def</span><span class="w"> </span><span class="nf">arrange_strains_selected</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Arrange the strains selected file.</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    If the file exists, validate it according to the schema defined in `user_strains.json`.</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a>    <span class="n">strains_selected_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">defaults</span><span class="o">.</span><span class="n">STRAINS_SELECTED_FILENAME</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a>    <span class="k">if</span> <span class="n">strains_selected_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">strains_selected_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>            <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a>        <span class="n">validate</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">json_data</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">USER_STRAINS_SCHEMA</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-410">410</a></span>
+<span class="normal"><a href="#__codelineno-0-411">411</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="k">def</span><span class="w"> </span><span class="nf">arrange_strains_selected</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Arrange the strains selected file.</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">    If the file exists, validate it according to the schema defined in `user_strains.json`.</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>    <span class="n">strains_selected_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">defaults</span><span class="o">.</span><span class="n">STRAINS_SELECTED_FILENAME</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>    <span class="k">if</span> <span class="n">strains_selected_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">strains_selected_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>            <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>        <span class="n">validate</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">json_data</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">USER_STRAINS_SCHEMA</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3322,8 +3322,7 @@ is not found.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/nplinker/arranger.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-413">413</a></span>
-<span class="normal"><a href="#__codelineno-0-414">414</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-414">414</a></span>
 <span class="normal"><a href="#__codelineno-0-415">415</a></span>
 <span class="normal"><a href="#__codelineno-0-416">416</a></span>
 <span class="normal"><a href="#__codelineno-0-417">417</a></span>
@@ -3366,51 +3365,52 @@ is not found.</p>
 <span class="normal"><a href="#__codelineno-0-454">454</a></span>
 <span class="normal"><a href="#__codelineno-0-455">455</a></span>
 <span class="normal"><a href="#__codelineno-0-456">456</a></span>
-<span class="normal"><a href="#__codelineno-0-457">457</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="k">def</span><span class="w"> </span><span class="nf">validate_gnps</span><span class="p">(</span><span class="n">gnps_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the GNPS data directory and its contents.</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">    The GNPS data directory must contain the following files:</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">    - `file_mappings.tsv` or `file_mappings.csv`</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">    - `spectra.mgf`</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">    - `molecular_families.tsv`</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">    - `annotations.tsv`</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">        gnps_dir: Path to the GNPS data directory.</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        FileNotFoundError: If the GNPS data directory is not found or any of the required files</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">            is not found.</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        ValueError: If both file_mappings.tsv and file_mapping.csv are found.</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>    <span class="n">gnps_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">gnps_dir</span><span class="p">)</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">gnps_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GNPS data directory not found at </span><span class="si">{</span><span class="n">gnps_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>    <span class="n">file_mappings_tsv</span> <span class="o">=</span> <span class="n">gnps_dir</span> <span class="o">/</span> <span class="n">defaults</span><span class="o">.</span><span class="n">GNPS_FILE_MAPPINGS_TSV</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="n">file_mappings_csv</span> <span class="o">=</span> <span class="n">gnps_dir</span> <span class="o">/</span> <span class="n">defaults</span><span class="o">.</span><span class="n">GNPS_FILE_MAPPINGS_CSV</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="k">if</span> <span class="n">file_mappings_tsv</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">file_mappings_csv</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>            <span class="sa">f</span><span class="s2">&quot;Both </span><span class="si">{</span><span class="n">file_mappings_tsv</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">file_mappings_csv</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> found in GNPS directory &quot;</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">gnps_dir</span><span class="si">}</span><span class="s2">, only one is allowed.&quot;</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>        <span class="p">)</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>    <span class="k">elif</span> <span class="ow">not</span> <span class="n">file_mappings_tsv</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">file_mappings_csv</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>            <span class="sa">f</span><span class="s2">&quot;Neither </span><span class="si">{</span><span class="n">file_mappings_tsv</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> nor </span><span class="si">{</span><span class="n">file_mappings_csv</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> found in GNPS directory&quot;</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">gnps_dir</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>        <span class="p">)</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>    <span class="n">required_files</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>        <span class="n">gnps_dir</span> <span class="o">/</span> <span class="n">defaults</span><span class="o">.</span><span class="n">GNPS_SPECTRA_FILENAME</span><span class="p">,</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a>        <span class="n">gnps_dir</span> <span class="o">/</span> <span class="n">defaults</span><span class="o">.</span><span class="n">GNPS_MOLECULAR_FAMILY_FILENAME</span><span class="p">,</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a>        <span class="n">gnps_dir</span> <span class="o">/</span> <span class="n">defaults</span><span class="o">.</span><span class="n">GNPS_ANNOTATIONS_FILENAME</span><span class="p">,</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>    <span class="p">]</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a>    <span class="n">list_not_found</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">required_files</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>    <span class="k">if</span> <span class="n">list_not_found</span><span class="p">:</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>            <span class="sa">f</span><span class="s2">&quot;Files not found in GNPS directory </span><span class="si">{</span><span class="n">gnps_dir</span><span class="si">}</span><span class="s2">: &#39;, &#39;.join(</span><span class="si">{</span><span class="n">list_not_found</span><span class="si">}</span><span class="s2">)&quot;</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>        <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-457">457</a></span>
+<span class="normal"><a href="#__codelineno-0-458">458</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="k">def</span><span class="w"> </span><span class="nf">validate_gnps</span><span class="p">(</span><span class="n">gnps_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the GNPS data directory and its contents.</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">    The GNPS data directory must contain the following files:</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">    - `file_mappings.tsv` or `file_mappings.csv`</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">    - `spectra.mgf`</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">    - `molecular_families.tsv`</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">    - `annotations.tsv`</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        gnps_dir: Path to the GNPS data directory.</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        FileNotFoundError: If the GNPS data directory is not found or any of the required files</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">            is not found.</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        ValueError: If both file_mappings.tsv and file_mapping.csv are found.</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>    <span class="n">gnps_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">gnps_dir</span><span class="p">)</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">gnps_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GNPS data directory not found at </span><span class="si">{</span><span class="n">gnps_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="n">file_mappings_tsv</span> <span class="o">=</span> <span class="n">gnps_dir</span> <span class="o">/</span> <span class="n">defaults</span><span class="o">.</span><span class="n">GNPS_FILE_MAPPINGS_TSV</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="n">file_mappings_csv</span> <span class="o">=</span> <span class="n">gnps_dir</span> <span class="o">/</span> <span class="n">defaults</span><span class="o">.</span><span class="n">GNPS_FILE_MAPPINGS_CSV</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>    <span class="k">if</span> <span class="n">file_mappings_tsv</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">file_mappings_csv</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>            <span class="sa">f</span><span class="s2">&quot;Both </span><span class="si">{</span><span class="n">file_mappings_tsv</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">file_mappings_csv</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> found in GNPS directory &quot;</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">gnps_dir</span><span class="si">}</span><span class="s2">, only one is allowed.&quot;</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>        <span class="p">)</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>    <span class="k">elif</span> <span class="ow">not</span> <span class="n">file_mappings_tsv</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">file_mappings_csv</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>            <span class="sa">f</span><span class="s2">&quot;Neither </span><span class="si">{</span><span class="n">file_mappings_tsv</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> nor </span><span class="si">{</span><span class="n">file_mappings_csv</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> found in GNPS directory&quot;</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">gnps_dir</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="p">)</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>    <span class="n">required_files</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>        <span class="n">gnps_dir</span> <span class="o">/</span> <span class="n">defaults</span><span class="o">.</span><span class="n">GNPS_SPECTRA_FILENAME</span><span class="p">,</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>        <span class="n">gnps_dir</span> <span class="o">/</span> <span class="n">defaults</span><span class="o">.</span><span class="n">GNPS_MOLECULAR_FAMILY_FILENAME</span><span class="p">,</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>        <span class="n">gnps_dir</span> <span class="o">/</span> <span class="n">defaults</span><span class="o">.</span><span class="n">GNPS_ANNOTATIONS_FILENAME</span><span class="p">,</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>    <span class="p">]</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>    <span class="n">list_not_found</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">required_files</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>    <span class="k">if</span> <span class="n">list_not_found</span><span class="p">:</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>            <span class="sa">f</span><span class="s2">&quot;Files not found in GNPS directory </span><span class="si">{</span><span class="n">gnps_dir</span><span class="si">}</span><span class="s2">: &#39;, &#39;.join(</span><span class="si">{</span><span class="n">list_not_found</span><span class="si">}</span><span class="s2">)&quot;</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>        <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3478,8 +3478,7 @@ sub-directory.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/nplinker/arranger.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-460">460</a></span>
-<span class="normal"><a href="#__codelineno-0-461">461</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-461">461</a></span>
 <span class="normal"><a href="#__codelineno-0-462">462</a></span>
 <span class="normal"><a href="#__codelineno-0-463">463</a></span>
 <span class="normal"><a href="#__codelineno-0-464">464</a></span>
@@ -3520,49 +3519,50 @@ sub-directory.</p>
 <span class="normal"><a href="#__codelineno-0-499">499</a></span>
 <span class="normal"><a href="#__codelineno-0-500">500</a></span>
 <span class="normal"><a href="#__codelineno-0-501">501</a></span>
-<span class="normal"><a href="#__codelineno-0-502">502</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="k">def</span><span class="w"> </span><span class="nf">validate_antismash</span><span class="p">(</span><span class="n">antismash_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the antiSMASH data directory and its contents.</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">    The validation only checks the structure of the antiSMASH data directory and file names.</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">    It does not check</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">    - the content of the BGC files</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">    - the consistency between the antiSMASH data and the PODP project JSON file for the `podp` mode</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">    The antiSMASH data directory must exist and contain at least one sub-directory. The name of the</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">    sub-directories must not contain any space. Each sub-directory must contain at least one BGC</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">    file (with the suffix `.region???.gbk` where `???` is the region number).</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">        antismash_dir: Path to the antiSMASH data directory.</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">        FileNotFoundError: If the antiSMASH data directory is not found, or no sub-directories</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">            are found in the antiSMASH data directory, or no BGC files are found in any</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">            sub-directory.</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">        ValueError: If any sub-directory name contains a space.</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>    <span class="n">antismash_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">antismash_dir</span><span class="p">)</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">antismash_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;antiSMASH data directory not found at </span><span class="si">{</span><span class="n">antismash_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a>    <span class="n">sub_dirs</span> <span class="o">=</span> <span class="n">list_dirs</span><span class="p">(</span><span class="n">antismash_dir</span><span class="p">)</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">sub_dirs</span><span class="p">:</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>            <span class="s2">&quot;No BGC directories found in antiSMASH data directory </span><span class="si">{antismash_dir}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>        <span class="p">)</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>    <span class="k">for</span> <span class="n">sub_dir</span> <span class="ow">in</span> <span class="n">sub_dirs</span><span class="p">:</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="n">dir_name</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">sub_dir</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="k">if</span> <span class="s2">&quot; &quot;</span> <span class="ow">in</span> <span class="n">dir_name</span><span class="p">:</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a>                <span class="sa">f</span><span class="s2">&quot;antiSMASH sub-directory name </span><span class="si">{</span><span class="n">dir_name</span><span class="si">}</span><span class="s2"> contains space, which is not allowed&quot;</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>            <span class="p">)</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">gbk_files</span> <span class="o">=</span> <span class="n">list_files</span><span class="p">(</span><span class="n">sub_dir</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.gbk&quot;</span><span class="p">,</span> <span class="n">keep_parent</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="n">bgc_files</span> <span class="o">=</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">gbk_files</span><span class="p">,</span> <span class="s2">&quot;*.region???.gbk&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">bgc_files</span><span class="p">:</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a>            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No BGC files found in antiSMASH sub-directory </span><span class="si">{</span><span class="n">sub_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-502">502</a></span>
+<span class="normal"><a href="#__codelineno-0-503">503</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="k">def</span><span class="w"> </span><span class="nf">validate_antismash</span><span class="p">(</span><span class="n">antismash_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the antiSMASH data directory and its contents.</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">    The validation only checks the structure of the antiSMASH data directory and file names.</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">    It does not check</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">    - the content of the BGC files</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">    - the consistency between the antiSMASH data and the PODP project JSON file for the `podp` mode</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">    The antiSMASH data directory must exist and contain at least one sub-directory. The name of the</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">    sub-directories must not contain any space. Each sub-directory must contain at least one BGC</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">    file (with the suffix `.region???.gbk` where `???` is the region number).</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">        antismash_dir: Path to the antiSMASH data directory.</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        FileNotFoundError: If the antiSMASH data directory is not found, or no sub-directories</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">            are found in the antiSMASH data directory, or no BGC files are found in any</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">            sub-directory.</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        ValueError: If any sub-directory name contains a space.</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>    <span class="n">antismash_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">antismash_dir</span><span class="p">)</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">antismash_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;antiSMASH data directory not found at </span><span class="si">{</span><span class="n">antismash_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>    <span class="n">sub_dirs</span> <span class="o">=</span> <span class="n">list_dirs</span><span class="p">(</span><span class="n">antismash_dir</span><span class="p">)</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">sub_dirs</span><span class="p">:</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>            <span class="s2">&quot;No BGC directories found in antiSMASH data directory </span><span class="si">{antismash_dir}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="p">)</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="k">for</span> <span class="n">sub_dir</span> <span class="ow">in</span> <span class="n">sub_dirs</span><span class="p">:</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="n">dir_name</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">sub_dir</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>        <span class="k">if</span> <span class="s2">&quot; &quot;</span> <span class="ow">in</span> <span class="n">dir_name</span><span class="p">:</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a>                <span class="sa">f</span><span class="s2">&quot;antiSMASH sub-directory name </span><span class="si">{</span><span class="n">dir_name</span><span class="si">}</span><span class="s2"> contains space, which is not allowed&quot;</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>            <span class="p">)</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="n">gbk_files</span> <span class="o">=</span> <span class="n">list_files</span><span class="p">(</span><span class="n">sub_dir</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.gbk&quot;</span><span class="p">,</span> <span class="n">keep_parent</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>        <span class="n">bgc_files</span> <span class="o">=</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">gbk_files</span><span class="p">,</span> <span class="s2">&quot;*.region???.gbk&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">bgc_files</span><span class="p">:</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No BGC files found in antiSMASH sub-directory </span><span class="si">{</span><span class="n">sub_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3628,8 +3628,7 @@ contain results from a single run with the desired cutoff.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/nplinker/arranger.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-505">505</a></span>
-<span class="normal"><a href="#__codelineno-0-506">506</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-506">506</a></span>
 <span class="normal"><a href="#__codelineno-0-507">507</a></span>
 <span class="normal"><a href="#__codelineno-0-508">508</a></span>
 <span class="normal"><a href="#__codelineno-0-509">509</a></span>
@@ -3653,32 +3652,33 @@ contain results from a single run with the desired cutoff.</p>
 <span class="normal"><a href="#__codelineno-0-527">527</a></span>
 <span class="normal"><a href="#__codelineno-0-528">528</a></span>
 <span class="normal"><a href="#__codelineno-0-529">529</a></span>
-<span class="normal"><a href="#__codelineno-0-530">530</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="k">def</span><span class="w"> </span><span class="nf">validate_bigscape</span><span class="p">(</span><span class="n">bigscape_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the BiG-SCAPE data directory and its contents.</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">    The BiG-SCAPE data directory must exist and contain the clustering file</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">    `mix_clustering_c{self.config.bigscape.cutoff}.tsv` where `{self.config.bigscape.cutoff}` is the</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">    bigscape cutoff value set in the config file.</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">    Alternatively, the directory can contain the BiG-SCAPE database file generated by BiG-SCAPE v2.</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">    At the moment, all the family assignments in the database will be used, so this database should</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">    contain results from a single run with the desired cutoff.</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">        bigscape_dir: Path to the BiG-SCAPE data directory.</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">        cutoff: The BiG-SCAPE cutoff value.</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">        FileNotFoundError: If the BiG-SCAPE data directory or the clustering file is not found.</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a>    <span class="n">bigscape_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">bigscape_dir</span><span class="p">)</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">bigscape_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;BiG-SCAPE data directory not found at </span><span class="si">{</span><span class="n">bigscape_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a>    <span class="n">clustering_file</span> <span class="o">=</span> <span class="n">bigscape_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;mix_clustering_c</span><span class="si">{</span><span class="n">cutoff</span><span class="si">}</span><span class="s2">.tsv&quot;</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a>    <span class="n">database_file</span> <span class="o">=</span> <span class="n">bigscape_dir</span> <span class="o">/</span> <span class="s2">&quot;data_sqlite.db&quot;</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">clustering_file</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">database_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;BiG-SCAPE data not found in </span><span class="si">{</span><span class="n">clustering_file</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="n">database_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-530">530</a></span>
+<span class="normal"><a href="#__codelineno-0-531">531</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="k">def</span><span class="w"> </span><span class="nf">validate_bigscape</span><span class="p">(</span><span class="n">bigscape_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the BiG-SCAPE data directory and its contents.</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">    The BiG-SCAPE data directory must exist and contain the clustering file</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">    `mix_clustering_c{self.config.bigscape.cutoff}.tsv` where `{self.config.bigscape.cutoff}` is the</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">    bigscape cutoff value set in the config file.</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">    Alternatively, the directory can contain the BiG-SCAPE database file generated by BiG-SCAPE v2.</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">    At the moment, all the family assignments in the database will be used, so this database should</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">    contain results from a single run with the desired cutoff.</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">        bigscape_dir: Path to the BiG-SCAPE data directory.</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        cutoff: The BiG-SCAPE cutoff value.</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">        FileNotFoundError: If the BiG-SCAPE data directory or the clustering file is not found.</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a>    <span class="n">bigscape_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">bigscape_dir</span><span class="p">)</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">bigscape_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;BiG-SCAPE data directory not found at </span><span class="si">{</span><span class="n">bigscape_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a>    <span class="n">clustering_file</span> <span class="o">=</span> <span class="n">bigscape_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;mix_clustering_c</span><span class="si">{</span><span class="n">cutoff</span><span class="si">}</span><span class="s2">.tsv&quot;</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a>    <span class="n">database_file</span> <span class="o">=</span> <span class="n">bigscape_dir</span> <span class="o">/</span> <span class="s2">&quot;data_sqlite.db&quot;</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">clustering_file</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">database_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;BiG-SCAPE data not found in </span><span class="si">{</span><span class="n">clustering_file</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="n">database_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
