@@ -1,7 +1,7 @@
 # YAML 1.2
 ---
 cff-version: "1.1.0"
-title: "NPLinker"
+title: "NPLinker 2: a modular and customizable framework for paired omics analyses"
 authors:
   -
     given-names: Cunliang
@@ -12,45 +12,62 @@ authors:
     given-names: Giulia
     family-names: Crocioni
     affiliation: "Netherlands eScience Center"
+    orcid: "https://orcid.org/0000-0002-0823-0121"
   -
-    given-names:  Simon
-    family-names:  Rogers
+    given-names: Helge
+    family-names: Hecht
+    affiliation: "RECETOX, Faculty of Science, Masaryk University"
+    orcid: "https://orcid.org/0000-0001-6744-996X"
   -
-    given-names:  Andrew
-    family-names:  Ramsay
+    given-names: Arjan
+    family-names: Draisma
+    affiliation: "Bioinformatics Group, Wageningen University & Research"
+    orcid: "https://orcid.org/0009-0004-0503-6261"
   -
-    given-names:  Katherine
-    family-names:  Duncan
+    given-names: Annette
+    family-names: Lien
+    affiliation: "Bioinformatics Group, Wageningen University & Research"
+    orcid: "https://orcid.org/0009-0006-0578-9225"
   -
-    given-names:  Justin
-    family-names:  van
+    given-names: Laura Rosina
+    family-names: Torres Ortega
+    affiliation: "Bioinformatics Group, Wageningen University & Research"
+    orcid: "https://orcid.org/0000-0003-4439-6740"
   -
-    given-names:  Grímur
-    family-names:  Hjörleifsson
+    given-names: Dora
+    family-names: Ferreira
+    affiliation: "Naicons Srl, Milan, Italy"
+    orcid: "https://orcid.org/0000-0002-5823-4219"
   -
-    given-names:  Sylvia
-    family-names:  Soldatou
+    given-names: Pablo
+    family-names: Lopez-Tarifa
+    affiliation: "Netherlands eScience Center"
+    orcid: "https://orcid.org/0000-0002-4136-1860"
   -
-    given-names:  Florian
-    family-names:  Huber
+    given-names: Katherine R.
+    family-names: Duncan
+    affiliation: "Newcastle University, Biosciences Institute"
+    orcid: "https://orcid.org/0000-0002-3670-4849"
   -
-    given-names:  Joe
-    family-names:  Wandy
+    given-names: Marnix H.
+    family-names: Medema
+    affiliation: "Bioinformatics Group, Wageningen University & Research"
+    orcid: "https://orcid.org/0000-0002-2191-2821"
   -
-    given-names:  Ronan
-    family-names:  Daly
-  -
-    given-names:  Joris
-    family-names:  Louwen
-  -
-    given-names:  Marnix
-    family-names:  Medema
+    given-names: Justin J.J.
+    family-names: van der Hooft
+    affiliation: "Bioinformatics Group, Wageningen University & Research"
+    orcid: "https://orcid.org/0000-0002-9340-5511"
 version: "2.0.1"
 repository-code: "https://github.com/NPLinker/nplinker"
 keywords:
-  - Genome
-  - Metabolome
-  - Natural Products
-  - Data Mining
+  - Python
+  - bioinformatics
+  - natural products
+  - genomics
+  - metabolomics
+  - multi-omics
+  - biosynthetic gene clusters
+  - mass spectrometry
 message: "If you use this software, please cite it using these metadata."
 license: Apache-2.0
