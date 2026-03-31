@@ -6,17 +6,17 @@ authors:
   -
     given-names: Cunliang
     family-names: Geng
-    affiliation: "Netherlands eScience Center"
+    affiliation: "Netherlands eScience Center, Amsterdam, NL"
     orcid: "https://orcid.org/0000-0002-1409-8358"
   -
     given-names: Giulia
     family-names: Crocioni
-    affiliation: "Netherlands eScience Center"
+    affiliation: "Netherlands eScience Center, Amsterdam, NL"
     orcid: "https://orcid.org/0000-0002-0823-0121"
   -
     given-names: Helge
     family-names: Hecht
-    affiliation: "RECETOX, Faculty of Science, Masaryk University"
+    affiliation: "RECETOX, Faculty of Science, Masaryk University, Brno, CZ"
     orcid: "https://orcid.org/0000-0001-6744-996X"
   -
     given-names: Arjan
@@ -36,17 +36,17 @@ authors:
   -
     given-names: Dora
     family-names: Ferreira
-    affiliation: "Naicons Srl, Milan, Italy & nterfaculty Institute of Microbiology and Infection Medicine Tübingen (IMIT), University of Tübingen, Germany"
+    affiliation: "Naicons Srl, Milan, IT & nterfaculty Institute of Microbiology and Infection Medicine Tübingen (IMIT), University of Tübingen, GER"
     orcid: "https://orcid.org/0000-0002-5823-4219"
   -
     given-names: Pablo
     family-names: Lopez-Tarifa
-    affiliation: "Netherlands eScience Center"
+    affiliation: "Netherlands eScience Center, Amsterdam, NL"
     orcid: "https://orcid.org/0000-0002-4136-1860"
   -
     given-names: Katherine R.
     family-names: Duncan
-    affiliation: "Newcastle University, Biosciences Institute"
+    affiliation: "Newcastle University, Biosciences Institute, UK"
     orcid: "https://orcid.org/0000-0002-3670-4849"
   -
     given-names: Marnix H.
@@ -56,7 +56,7 @@ authors:
   -
     given-names: Justin J.J.
     family-names: van der Hooft
-    affiliation: "Bioinformatics Group, Wageningen University & Research, Wageningen, NL"
+    affiliation: "Bioinformatics Group, Wageningen University & Research, Wageningen, NL & Department of Biochemistry, University of Johannesburg, Johannesburg, SA"
     orcid: "https://orcid.org/0000-0002-9340-5511"
 version: "2.0.2"
 repository-code: "https://github.com/NPLinker/nplinker"
