@@ -21,22 +21,22 @@ authors:
   -
     given-names: Arjan
     family-names: Draisma
-    affiliation: "Bioinformatics Group, Wageningen University & Research"
+    affiliation: "Bioinformatics Group, Wageningen University & Research, Wageningen, NL"
     orcid: "https://orcid.org/0009-0004-0503-6261"
   -
     given-names: Annette
     family-names: Lien
-    affiliation: "Bioinformatics Group, Wageningen University & Research"
+    affiliation: "Bioinformatics Group, Wageningen University & Research, Wageningen, NL"
     orcid: "https://orcid.org/0009-0006-0578-9225"
   -
     given-names: Laura Rosina
     family-names: Torres Ortega
-    affiliation: "Bioinformatics Group, Wageningen University & Research"
+    affiliation: "Bioinformatics Group, Wageningen University & Research, Wageningen, NL"
     orcid: "https://orcid.org/0000-0003-4439-6740"
   -
     given-names: Dora
     family-names: Ferreira
-    affiliation: "Naicons Srl, Milan, Italy"
+    affiliation: "Naicons Srl, Milan, Italy & nterfaculty Institute of Microbiology and Infection Medicine Tübingen (IMIT), University of Tübingen, Germany"
     orcid: "https://orcid.org/0000-0002-5823-4219"
   -
     given-names: Pablo
@@ -51,12 +51,12 @@ authors:
   -
     given-names: Marnix H.
     family-names: Medema
-    affiliation: "Bioinformatics Group, Wageningen University & Research"
+    affiliation: "Bioinformatics Group, Wageningen University & Research, Wageningen, NL"
     orcid: "https://orcid.org/0000-0002-2191-2821"
   -
     given-names: Justin J.J.
     family-names: van der Hooft
-    affiliation: "Bioinformatics Group, Wageningen University & Research"
+    affiliation: "Bioinformatics Group, Wageningen University & Research, Wageningen, NL"
     orcid: "https://orcid.org/0000-0002-9340-5511"
 version: "2.0.2"
 repository-code: "https://github.com/NPLinker/nplinker"
