@@ -31,20 +31,20 @@ authors:
     affiliation: 3
   - name: Dora Ferreira
     orcid: 0000-0002-5823-4219
-    affiliation: 4
+    affiliation: "4, 5"
   - name: Pablo Lopez-Tarifa
     orcid: 0000-0002-4136-1860
     affiliation: 1
   - name: Katherine R. Duncan
     orcid: 0000-0002-3670-4849
-    affiliation: 5
+    affiliation: 6
   - name: Marnix H. Medema
     orcid: 0000-0002-2191-2821
     affiliation: 3
   - name: Justin J.J. van der Hooft
     orcid: 0000-0002-9340-5511
     corresponding: true
-    affiliation: "3, 6"
+    affiliation: "3, 7"
 affiliations:
  - name: Netherlands eScience Center, Netherlands
    index: 1
@@ -54,10 +54,12 @@ affiliations:
    index: 3
  - name: Naicons Srl, Milan, Italy
    index: 4
- - name: Newcastle University, Biosciences Institute, Newcastle upon Tyne, UK
+ - name: Interfaculty Institute of Microbiology and Infection Medicine Tübingen (IMIT), University of Tübingen, Germany
    index: 5
- - name: Department of Biochemistry, University of Johannesburg, 2006 Johannesburg, South Africa
+ - name: Newcastle University, Biosciences Institute, Newcastle upon Tyne, UK
    index: 6
+ - name: Department of Biochemistry, University of Johannesburg, 2006 Johannesburg, South Africa
+   index: 7
 date: 8 July 2025
 bibliography: paper.bib
 ---
