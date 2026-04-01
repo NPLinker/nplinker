@@ -187,17 +187,18 @@ This command will update the version in the following files:
 
 ## Making a release
 
-This section describes how to make a release in 2 parts:
+This section describes how to make a release in 3 parts:
 
-1. Create Github release
-2. Publish to Pypi
+1. Create Github release (which will trigger a Zenodo archive)
+2. Publish python package to Pypi
+3. Publish the docs to GitHub Pages
 
-### (1/2) Create Github release
+### (1/3) Create Github release
 
 We use the Github action [Draft or publish Github release
 ](https://github.com/NPLinker/nplinker/actions/workflows/publish_gh_release.yml) to create a Github release.
 
-Click the right corner `Run workflow` button, then fill in the current version number and new version number, and choose `publish` to publish Github release, then click the `Run workflow` button. 
+Go to the workflow page and click the right corner `Run workflow` button, then fill in the current version number and new version number, and choose `publish` to publish Github release, then click the `Run workflow` button. 
 
 The action will first update the version with the command `make update-version`. Then it will generate a release notes and update the `CHANGELOG.md` file with the notes. After that, the action will commit and push the changes. In the end, the action will create a Github release with the new version number and create a tag for the release.
 
@@ -205,13 +206,19 @@ After the action is finished successfully, you can go to the [release page](http
 
 This repository uses the GitHub-Zenodo integration, the new Github release will trigger Zenodo into making a snapshot of the repository and sticking a DOI on it. Check the [Zenodo page](https://zenodo.org/records/14723594) to see the new snapshot.
 
-### (2/2) Publish to Pypi
+### (2/3) Publish Python Package to Pypi
 
-You can publish the package to pypi with the following steps:
+You can publish the Python package to pypi with the following steps:
 
 ```shell
 # Go to your local nplinker repository
 cd path-to-nplinker-repo
+
+# Make sure you have the latest changes from the remote repository
+git pull origin dev
+
+# Install the development dependencies [Optional]
+pip install -e ".[dev]"
 
 # Clean the repository
 make clean
@@ -223,4 +230,16 @@ make build
 make release
 ```
 
+Note: you need to have an account on pypi and the permission to publish this package to pypi. Please ask the project maintainers for access.
+
 After publishing to pypi, you can check the [pypi page](https://pypi.org/project/nplinker/#history) to see the new version.
+
+### (3/3) Publish the docs
+After creating a new release, you can publish the docs for the new version with the following command:
+
+```shell
+# change 2.0.3 to the new version number
+make deploy-docs version=2.0.3 
+```
+
+this will deploy the docs for the new version and mark it as the latest version. You can check the [docs page](https://nplinker.github.io/nplinker/) to see the new version of the docs.
