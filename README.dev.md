@@ -243,3 +243,19 @@ make deploy-docs version=2.0.3
 ```
 
 this will deploy the docs for the new version and mark it as the latest version. You can check the [docs page](https://nplinker.github.io/nplinker/) to see the new version of the docs.
+
+
+## Preview the JOSS (Journal of Open Source Software) paper
+
+You can preview the JOSS PDF paper with the following command:
+
+```shell
+cd path-to-nplinker-repo
+
+# ensure docker is running before executing the command
+make joss
+```
+
+This command will convert the JOSS paper from [markdown](./joss/paper.md) to a PDF. Preview the PDF to make sure everything looks good before committing the changes of the markdown file. 
+
+After you push the changes of the markdown file to the remote repository, a Github action will automatically generate the PDF from the markdown file and commit it to the `joss` directory. 

@@ -1,5 +1,5 @@
 # .PHONY is used to declare that the targets are not files
-.PHONY: install-dev clean clean-build clean-pyc clean-test clean-doc release build update-version sync-webapp-readme build-docs deploy-docs
+.PHONY: install-dev clean clean-build clean-pyc clean-test clean-doc release build update-version sync-webapp-readme build-docs deploy-docs joss
 
 help:
 	@echo "Available commands to 'make':"
@@ -14,6 +14,7 @@ help:
 	@echo "  build-docs    : build documentation for local development"
 	@echo "  deploy-docs   : deploy documentation to GitHub Pages"
 	@echo "  update-version: update NPLinker version (e.g. make update-version CURRENT_VERSION=0.1.0 NEW_VERSION=0.2.0)"
+	@echo "  joss          : compile JOSS paper from markdown to PDF for previewing"
 
 install-dev:	
 	pip install -e ".[dev]"
@@ -94,3 +95,11 @@ ifndef version
 	$(error version is not set. Usage: make deploy-docs version=YOUR_VERSION)
 endif
 	mike deploy -p -u $(version) latest
+
+joss: 
+	@docker info > /dev/null 2>&1 || { echo >&2 "Docker is not running. Please start Docker and try again."; exit 1; }
+	docker run --rm \
+		--volume ${PWD}/joss:/data \
+		--user $(id -u):$(id -g) \
+		--env JOURNAL=joss \
+		openjournals/inara
