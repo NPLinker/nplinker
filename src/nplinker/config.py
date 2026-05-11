@@ -70,6 +70,7 @@ CONFIG_VALIDATORS = [
     Validator("bigscape.parameters", is_type_of=str),
     Validator("bigscape.cutoff", required=True, is_type_of=str),
     Validator("bigscape.version", required=True, is_type_of=str, is_in=["1", "2"]),
+    Validator("bigscape.full_results", required=True, when=Validator("bigscape.version", eq="2"), is_type_of=bool),
     # GNPS
     Validator("gnps.version", required=True, is_type_of=str, is_in=["1", "2"]),
     # Scoring
