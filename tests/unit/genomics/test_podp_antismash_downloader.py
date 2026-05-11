@@ -74,7 +74,7 @@ def download_and_skip_on_404(genome_records, download_root, extract_root, caplog
 )
 def test_genome_status_init(params, expected):
     gs = GenomeStatus(*params)
-    assert [gs.original_id, gs.resolved_refseq_id, gs.resolve_attempted, gs.bgc_path] == expected
+    assert [gs.original_id, gs.resolved_id, gs.failed_previously, gs.bgc_path] == expected
 
 
 def test_genome_status_read_json(tmp_path):
@@ -82,14 +82,14 @@ def test_genome_status_read_json(tmp_path):
         "genome_status": [
             {
                 "original_id": "genome1",
-                "resolved_refseq_id": "refseq1",
-                "resolve_attempted": True,
+                "resolved_id": "refseq1",
+                "failed_previously": True,
                 "bgc_path": "/path/to/bgc1",
             },
             {
                 "original_id": "genome2",
-                "resolved_refseq_id": "",
-                "resolve_attempted": False,
+                "resolved_id": "",
+                "failed_previously": False,
                 "bgc_path": "",
             },
         ],
@@ -102,12 +102,12 @@ def test_genome_status_read_json(tmp_path):
 
     assert len(genome_status_dict) == 2
     assert genome_status_dict["genome1"].original_id == "genome1"
-    assert genome_status_dict["genome1"].resolved_refseq_id == "refseq1"
-    assert genome_status_dict["genome1"].resolve_attempted is True
+    assert genome_status_dict["genome1"].resolved_id == "refseq1"
+    assert genome_status_dict["genome1"].failed_previously is True
     assert genome_status_dict["genome1"].bgc_path == "/path/to/bgc1"
     assert genome_status_dict["genome2"].original_id == "genome2"
-    assert genome_status_dict["genome2"].resolved_refseq_id == ""
-    assert genome_status_dict["genome2"].resolve_attempted is False
+    assert genome_status_dict["genome2"].resolved_id == ""
+    assert genome_status_dict["genome2"].failed_previously is False
     assert genome_status_dict["genome2"].bgc_path == ""
 
 
@@ -124,12 +124,12 @@ def test_genome_status_to_json(tmp_path):
     assert loaded_data["version"] == "1.0"
     assert len(loaded_data["genome_status"]) == 2
     assert loaded_data["genome_status"][0]["original_id"] == "genome1"
-    assert loaded_data["genome_status"][0]["resolved_refseq_id"] == "refseq1"
-    assert loaded_data["genome_status"][0]["resolve_attempted"] is True
+    assert loaded_data["genome_status"][0]["resolved_id"] == "refseq1"
+    assert loaded_data["genome_status"][0]["failed_previously"] is True
     assert loaded_data["genome_status"][0]["bgc_path"] == "/path/to/bgc1"
     assert loaded_data["genome_status"][1]["original_id"] == "genome2"
-    assert loaded_data["genome_status"][1]["resolved_refseq_id"] == ""
-    assert loaded_data["genome_status"][1]["resolve_attempted"] is False
+    assert loaded_data["genome_status"][1]["resolved_id"] == ""
+    assert loaded_data["genome_status"][1]["failed_previously"] is False
     assert loaded_data["genome_status"][1]["bgc_path"] == ""
 
 
@@ -143,10 +143,10 @@ def test_genome_status_to_json_nofile():
     assert isinstance(result, str)
     assert (
         result == '{"genome_status": '
-        '[{"original_id": "genome1", "resolved_refseq_id": "refseq1", '
-        '"resolve_attempted": true, "bgc_path": "/path/to/bgc1"}, '
-        '{"original_id": "genome2", "resolved_refseq_id": "", '
-        '"resolve_attempted": false, "bgc_path": ""}], "version": "1.0"}'
+        '[{"original_id": "genome1", "resolved_id": "refseq1", '
+        '"failed_previously": true, "bgc_path": "/path/to/bgc1"}, '
+        '{"original_id": "genome2", "resolved_id": "", '
+        '"failed_previously": false, "bgc_path": ""}], "version": "1.0"}'
     )
 
 
@@ -263,10 +263,10 @@ def test_caching(download_root, extract_root, genome_status_file, caplog):
     genome_status_old = GenomeStatus.read_json(genome_status_file)
     genome_obj = genome_status_old["GCF_000016425.1"]
     assert Path(genome_obj.bgc_path).exists()
-    assert genome_obj.resolve_attempted
+    assert genome_obj.failed_previously is False
     podp_download_and_extract_antismash_data(genome_records, download_root, extract_root)
     assert (
-        f"Genome ID {genome_obj.original_id} already downloaded to {genome_obj.bgc_path}"
+        f"antiSMASH BGC data for genome ID {genome_obj.original_id} already downloaded to {genome_obj.bgc_path}"
         in caplog.text
     )
     assert (
@@ -319,8 +319,8 @@ def test_refseq_id(download_root, extract_root, genome_status_file, caplog):
 
     genome_status = GenomeStatus.read_json(genome_status_file)
     genome_obj = genome_status["GCF_000016425.1"]
-    archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
-    extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
+    archive = download_root / Path(str(genome_obj.resolved_id) + ".zip")
+    extracted_folder = extract_root / "antismash" / genome_obj.resolved_id
     extracted_files = list_files(extracted_folder, keep_parent=False)
 
     assert archive.exists()
@@ -346,8 +346,8 @@ def test_genbank_id(download_root, extract_root, genome_status_file, caplog):
 
     genome_status = GenomeStatus.read_json(genome_status_file)
     genome_obj = genome_status["GCA_000016425.1"]
-    archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
-    extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
+    archive = download_root / Path(str(genome_obj.resolved_id) + ".zip")
+    extracted_folder = extract_root / "antismash" / genome_obj.resolved_id
     extracted_files = list_files(extracted_folder, keep_parent=False)
 
     assert archive.exists()
@@ -373,8 +373,8 @@ def test_jgi_id(download_root, extract_root, genome_status_file, caplog):
 
     genome_status = GenomeStatus.read_json(genome_status_file)
     genome_obj = genome_status["640427140"]
-    archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
-    extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
+    archive = download_root / Path(str(genome_obj.resolved_id) + ".zip")
+    extracted_folder = extract_root / "antismash" / genome_obj.resolved_id
     extracted_files = list_files(extracted_folder, keep_parent=False)
 
     assert archive.exists()
@@ -405,8 +405,8 @@ def test_refseq_jgi_id(download_root, extract_root, genome_status_file, caplog):
 
     genome_status = GenomeStatus.read_json(genome_status_file)
     genome_obj = genome_status["GCF_000016425.1"]
-    archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
-    extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
+    archive = download_root / Path(str(genome_obj.resolved_id) + ".zip")
+    extracted_folder = extract_root / "antismash" / genome_obj.resolved_id
     extracted_files = list_files(extracted_folder, keep_parent=False)
 
     assert archive.exists()
@@ -437,8 +437,8 @@ def test_refseq_genbank_id(download_root, extract_root, genome_status_file, capl
 
     genome_status = GenomeStatus.read_json(genome_status_file)
     genome_obj = genome_status["GCF_000016425.1"]
-    archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
-    extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
+    archive = download_root / Path(str(genome_obj.resolved_id) + ".zip")
+    extracted_folder = extract_root / "antismash" / genome_obj.resolved_id
     extracted_files = list_files(extracted_folder, keep_parent=False)
 
     assert archive.exists()
@@ -469,8 +469,8 @@ def test_genbank_jgi_id(download_root, extract_root, genome_status_file, caplog)
 
     genome_status = GenomeStatus.read_json(genome_status_file)
     genome_obj = genome_status["GCA_000016425.1"]
-    archive = download_root / Path(str(genome_obj.resolved_refseq_id) + ".zip")
-    extracted_folder = extract_root / "antismash" / genome_obj.resolved_refseq_id
+    archive = download_root / Path(str(genome_obj.resolved_id) + ".zip")
+    extracted_folder = extract_root / "antismash" / genome_obj.resolved_id
     extracted_files = list_files(extracted_folder, keep_parent=False)
 
     assert archive.exists()

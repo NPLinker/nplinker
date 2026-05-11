@@ -17,8 +17,8 @@
         "type": "object",
         "required": [
           "original_id",
-          "resolved_refseq_id",
-          "resolve_attempted",
+          "resolved_id",
+          "failed_previously",
           "bgc_path"
         ],
         "properties": {
@@ -28,15 +28,15 @@
             "description": "The original ID of the genome",
             "minLength": 1
           },
-          "resolved_refseq_id": {
+          "resolved_id": {
             "type": "string",
-            "title": "Resolved RefSeq ID",
-            "description": "The RefSeq ID that was resolved for this genome"
+            "title": "Resolved genome ID",
+            "description": "The genome ID that was resolved for this genome"
           },
-          "resolve_attempted": {
+          "failed_previously": {
             "type": "boolean",
-            "title": "Resolve Attempted",
-            "description": "Whether or not an attempt was made to resolve this genome"
+            "title": "Failed Attempt",
+            "description": "Indicates if a previous attempt to retrieve BGC data for this genome was unsuccessful"
           },
           "bgc_path": {
             "type": "string",
