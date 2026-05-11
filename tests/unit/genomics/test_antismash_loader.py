@@ -54,6 +54,9 @@ class TestAntismashBGCLoader:
         assert bgc_files["NZ_AZWB01000005.region001"] == str(
             data_dir / "GCF_000514515.1" / "NZ_AZWB01000005.region001.gbk"
         )
+        data_dir = DATA_DIR / "antismash_duplicated_bgc_ids"
+        with pytest.raises(ValueError, match="Duplicated BGC gbk file name"):
+            AntismashBGCLoader._parse_data_dir(str(data_dir))
 
     def test_get_bgcs(self, loader):
         bgcs = loader.get_bgcs()
