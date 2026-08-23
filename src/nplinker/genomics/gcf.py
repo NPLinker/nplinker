@@ -133,6 +133,25 @@ class GCF:
         """
         return all(map(lambda id: id.startswith("BGC"), self.bgc_ids))
 
+    def has_mibig_only_bgcs(self) -> bool:
+        """Check if the GCF's attached BGC objects are only MIBiG BGCs.
+
+        Unlike `has_mibig_only`, which inspects the raw `GCF.bgc_ids`, this
+        inspects the attached `GCF.bgcs` objects. A GCF can end up with only
+        MIBiG BGCs attached (e.g. its antiSMASH BGC was never loaded) while
+        `bgc_ids` still lists the missing non-MIBiG id, so the id-based check
+        does not catch it.
+
+        Warning:
+            Relies on `BGC.is_mibig`, which detects MIBiG BGCs by the `"BGC"`
+            id prefix and may give false positives.
+
+        Returns:
+            True if there is at least one attached BGC and all attached BGCs
+            are MIBiG reference BGCs.
+        """
+        return len(self.bgcs) > 0 and all(bgc.is_mibig() for bgc in self.bgcs)
+
     def is_singleton(self) -> bool:
         """Check if the GCF contains only one BGC.
 

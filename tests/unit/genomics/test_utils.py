@@ -6,6 +6,7 @@ from nplinker.genomics import BGC
 from nplinker.genomics import GCF
 from nplinker.genomics.utils import add_bgc_to_gcf
 from nplinker.genomics.utils import add_strain_to_bgc
+from nplinker.genomics.utils import drop_mibig_only_gcfs
 from nplinker.genomics.utils import extract_mappings_original_genome_id_resolved_genome_id
 from nplinker.genomics.utils import extract_mappings_resolved_genome_id_bgc_id
 from nplinker.genomics.utils import extract_mappings_strain_id_original_genome_id
@@ -138,6 +139,74 @@ def test_add_bgc_to_gcf(bgcs):
     assert gcf_with_bgc[0].bgcs == {bgcs[0], bgcs[1]}
     assert gcf_with_bgc[1].bgcs == {bgcs[2]}
     assert gcf_without_bgc[0].bgcs == set()
+
+
+def test_add_bgc_to_gcf_leaves_mibig_only_gcf_detectable():
+    """Regression for issue #351.
+
+    When a GCF's antiSMASH BGC is not loaded (missing), the GCF is left with only
+    its MIBiG BGC attached. The id-based `has_mibig_only` misses it because the
+    missing antiSMASH id remains in `bgc_ids`; the attached-object-based
+    `has_mibig_only_bgcs` catches it, so the loader can drop it.
+    """
+    mibig_bgc = BGC("BGC_01", "NPR")  # MIBiG reference BGC (the only one loaded)
+    gcf = GCF("1")
+    gcf.bgc_ids = {"BGC_01", "antismash_c"}  # also references an antiSMASH BGC
+
+    gcf_with_bgc, _, gcf_missing_bgc = add_bgc_to_gcf([mibig_bgc], [gcf])
+
+    assert gcf in gcf_with_bgc  # kept: it has >=1 attached BGC
+    assert gcf_missing_bgc == {gcf: {"antismash_c"}}
+    assert gcf.bgcs == {mibig_bgc}
+    assert gcf.has_mibig_only() is False  # old id-based check MISSES the leak
+    assert gcf.has_mibig_only_bgcs() is True  # new check CATCHES it
+
+    # control: when the antiSMASH BGC IS loaded, the GCF is not flagged
+    anti_bgc = BGC("antismash_c", "Polyketide")
+    gcf2 = GCF("2")
+    gcf2.bgc_ids = {"BGC_02", "antismash_c"}
+    add_bgc_to_gcf([BGC("BGC_02", "NPR"), anti_bgc], [gcf2])
+    assert gcf2.has_mibig_only_bgcs() is False
+
+    # detaching the dropped GCF's BGCs (as the loader does) clears the back-ref
+    for bgc in list(gcf.bgcs):
+        gcf.detach_bgc(bgc)
+    assert gcf not in mibig_bgc.parents
+    assert gcf.bgcs == set()
+
+
+def test_drop_mibig_only_gcfs():
+    """Test drop_mibig_only_gcfs: removes MIBiG-only-after-attachment GCFs and
+    detaches their BGCs, while keeping mixed GCFs and shared BGCs intact."""
+    mibig_bgc = BGC("BGC_01", "NPR")  # MIBiG reference BGC
+    anti_bgc = BGC("antismash_c", "Polyketide")  # non-MIBiG BGC
+
+    # GCF "A": only the MIBiG BGC attached -> dropped
+    gcf_a = GCF("A")
+    gcf_a.add_bgc(mibig_bgc)
+    # GCF "B": shares the MIBiG BGC and has a non-MIBiG BGC -> kept
+    gcf_b = GCF("B")
+    gcf_b.add_bgc(mibig_bgc)
+    gcf_b.add_bgc(anti_bgc)
+
+    kept = drop_mibig_only_gcfs([gcf_a, gcf_b])
+
+    # dropped GCF removed, kept GCF present; input list-derived order preserved
+    assert kept == [gcf_b]
+    # dropped GCF's BGCs detached
+    assert gcf_a.bgcs == set()
+    assert gcf_a.bgc_ids == set()
+    # the shared BGC survives in the kept GCF, back-ref points only to the survivor
+    assert mibig_bgc in gcf_b.bgcs
+    assert mibig_bgc.parents == {gcf_b}
+    assert anti_bgc in gcf_b.bgcs
+
+    # no-op: nothing is MIBiG-only -> all kept, nothing detached
+    gcf_c = GCF("C")
+    only_anti = BGC("antismash_d", "NRP")
+    gcf_c.add_bgc(only_anti)
+    assert drop_mibig_only_gcfs([gcf_c]) == [gcf_c]
+    assert only_anti in gcf_c.bgcs
 
 
 def test_get_mibig_from_gcf():

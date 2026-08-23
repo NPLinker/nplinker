@@ -105,6 +105,25 @@ def test_has_mibig_only():
     assert gcf.has_mibig_only() is False
 
 
+def test_has_mibig_only_bgcs():
+    """Test has_mibig_only_bgcs method (inspects attached BGC objects)."""
+    mibig_bgc = BGC("BGC0000001", "NPR")
+    mibig_bgc2 = BGC("BGC0000002", "NPR")
+    nonmibig_bgc = BGC("S0001", "NPR")
+
+    # no attached BGCs -> False (empty guard)
+    gcf = GCF("1")
+    assert gcf.has_mibig_only_bgcs() is False
+    # only MIBiG BGCs attached -> True
+    gcf.add_bgc(mibig_bgc)
+    assert gcf.has_mibig_only_bgcs() is True
+    gcf.add_bgc(mibig_bgc2)
+    assert gcf.has_mibig_only_bgcs() is True
+    # a non-MIBiG BGC attached -> False
+    gcf.add_bgc(nonmibig_bgc)
+    assert gcf.has_mibig_only_bgcs() is False
+
+
 def test_is_singleton():
     """Test is_singleton method."""
     bgc1 = BGC("BGC0000001", "NPR")

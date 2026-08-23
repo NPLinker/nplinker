@@ -209,6 +209,36 @@ def get_mibig_from_gcf(gcfs: Sequence[GCF]) -> tuple[list[BGC], StrainCollection
     return mibig_bgcs_in_use, mibig_strains_in_use
 
 
+def drop_mibig_only_gcfs(gcfs: Sequence[GCF]) -> list[GCF]:
+    """Drop GCFs whose attached BGC objects are all MIBiG reference BGCs.
+
+    After BGC objects are attached to GCFs (see `add_bgc_to_gcf`), a GCF can end
+    up with only MIBiG BGCs attached -- its non-MIBiG member was not loaded (e.g.
+    it had no strain) -- which the id-based load-time filter cannot detect. Such
+    GCFs generate spurious links (see issue #351), so they are removed here. The
+    dropped GCFs' BGCs are detached so no stale `BGC.parents` back-reference to a
+    dropped GCF remains.
+
+    !!! note
+        This method changes the dropped GCF objects in place (their BGCs are
+        detached). It does not modify the input list.
+
+    Args:
+        gcfs: A list of GCF objects with BGC objects already attached.
+
+    Returns:
+        The GCF objects that are not composed solely of MIBiG reference BGCs.
+    """
+    gcfs_to_keep = []
+    for gcf in gcfs:
+        if gcf.has_mibig_only_bgcs():
+            for bgc in list(gcf.bgcs):
+                gcf.detach_bgc(bgc)
+        else:
+            gcfs_to_keep.append(gcf)
+    return gcfs_to_keep
+
+
 # ------------------------------------------------------------------------------
 # Functions to extract mappings for genomics side:
 # strain_id <-> original_geonme_id <-> resolved_genome_id <-> bgc_id
