@@ -10,6 +10,7 @@ from nplinker.genomics.bigscape import BigscapeV2GCFLoader
 from nplinker.genomics.mibig import MibigLoader
 from nplinker.genomics.utils import add_bgc_to_gcf
 from nplinker.genomics.utils import add_strain_to_bgc
+from nplinker.genomics.utils import drop_mibig_only_gcfs
 from nplinker.genomics.utils import get_mibig_from_gcf
 from nplinker.metabolomics import MolecularFamily
 from nplinker.metabolomics import Spectrum
@@ -220,7 +221,14 @@ class DatasetLoader:
 
         # Step 7: set attributes with valid objects
         self.bgcs = antismash_bgcs_with_strain + mibig_bgcs_in_use
-        self.gcfs = all_gcfs_with_bgc
+        # Drop GCFs that, after BGC attachment, contain only MIBiG reference BGCs
+        # (their non-MIBiG member was not loaded); left in `self.gcfs` they
+        # generate spurious links (issue #351). Run after `get_mibig_from_gcf`
+        # above, so `self.bgcs` / `self.mibig_strains_in_use` are unaffected.
+        if self.config.mibig.to_use:
+            self.gcfs = drop_mibig_only_gcfs(all_gcfs_with_bgc)
+        else:
+            self.gcfs = all_gcfs_with_bgc
         self.mibig_strains_in_use = mibig_strains_in_use
 
         logger.info("Loading genomics data completed\n")
