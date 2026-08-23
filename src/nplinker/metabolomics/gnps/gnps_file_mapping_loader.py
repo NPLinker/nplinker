@@ -235,5 +235,6 @@ class GNPSFileMappingLoader(FileMappingLoaderBase):
                 samples = []
                 for col in row:
                     if pattern in col and float(row[col]) > 0:
-                        samples.append(col.strip(pattern))
+                        # drop the trailing " Peak area" suffix to recover the sample filename
+                        samples.append(col.rsplit(pattern, 1)[0])
                 self._mapping[spectrum_id] = samples
