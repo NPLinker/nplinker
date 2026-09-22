@@ -315,7 +315,10 @@ class MetcalfScoring(ScoringBase):
                 self.raw_score_spec_gcf[col_name].isin(objects)
                 & (self.raw_score_spec_gcf["score"] >= score_cutoff)
             ]
-            df.name = LinkType.SPEC_GCF
+            # Tag the DataFrame with its LinkType. pandas has no typed setter for
+            # an arbitrary attribute (reads work via DataFrame.__getattr__), so the
+            # assignment is intentionally ignored for mypy; it round-trips at runtime.
+            df.name = LinkType.SPEC_GCF  # type: ignore[attr-defined]
             links.append(df)
 
         # mf-gcf link
@@ -324,7 +327,7 @@ class MetcalfScoring(ScoringBase):
                 self.raw_score_mf_gcf[col_name].isin(objects)
                 & (self.raw_score_mf_gcf["score"] >= score_cutoff)
             ]
-            df.name = LinkType.MF_GCF
+            df.name = LinkType.MF_GCF  # type: ignore[attr-defined]
             links.append(df)
 
         return links
@@ -365,7 +368,7 @@ class MetcalfScoring(ScoringBase):
                 else:
                     continue
 
-            standardised_score_df.name = raw_score_df.name
+            standardised_score_df.name = raw_score_df.name  # type: ignore[attr-defined]
             standardised_scores.append(standardised_score_df)
 
         return standardised_scores
